@@ -1,0 +1,182 @@
+package {{javaPackage}}.listeners;
+
+import {{javaPackage}}.core.DriverManager;
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+import com.aventstack.extentreports.ExtentTest;
+{{/if}}
+import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.ScreenshotUtils;
+import org.junit.jupiter.api.extension.*;
+
+import java.util.Optional;
+
+/**
+ * JUnit5 TestWatcher extension for reporting and screenshot capture.
+ * Handles test lifecycle events and reporting.
+ */
+public class TestWatcher implements org.junit.jupiter.api.extension.TestWatcher,
+                                   BeforeAllCallback, AfterAllCallback,
+                                   BeforeEachCallback, AfterEachCallback {
+    
+    @Override
+    public void beforeAll(ExtensionContext context) {
+        String className = context.getRequiredTestClass().getSimpleName();
+        Log.startSection("TEST CLASS: " + className);
+        Log.info("Class started: " + className);
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Initialize ExtentReports
+        ExtentManager.createInstance();
+{{/if}}
+    }
+    
+    @Override
+    public void afterAll(ExtensionContext context) {
+        String className = context.getRequiredTestClass().getSimpleName();
+        Log.info("Class finished: " + className);
+        Log.endSection();
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Flush ExtentReports
+        ExtentManager.flush();
+{{/if}}
+        
+        // Clean up old screenshots (keep for 7 days)
+        ScreenshotUtils.cleanupOldScreenshots(7);
+    }
+    
+    @Override
+    public void beforeEach(ExtensionContext context) {
+        String testName = getTestName(context);
+        String testDescription = getTestDescription(context);
+        
+        Log.testStart(testName);
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Create ExtentTest
+        ExtentTest extentTest = ExtentManager.createTest(testName, testDescription);
+        
+        // Add test information
+        ExtentManager.setTestCategory(getTestTags(context));
+        ExtentManager.setTestAuthor("QA Team");
+        ExtentManager.setTestDevice(getCurrentBrowser());
+        
+        // Log test start
+        ExtentManager.logInfo("Test started: " + testName);
+{{/if}}
+    }
+    
+    @Override
+    public void afterEach(ExtensionContext context) {
+        // Clean up is handled by specific test result methods
+    }
+    
+    @Override
+    public void testSuccessful(ExtensionContext context) {
+        String testName = getTestName(context);
+        
+        Log.testEnd(testName, "PASSED");
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Log to ExtentReports
+        ExtentManager.logPass("✅ Test passed successfully");
+        
+        // Remove test from ThreadLocal
+        ExtentManager.removeTest();
+{{/if}}
+    }
+    
+    @Override
+    public void testFailed(ExtensionContext context, Throwable cause) {
+        String testName = getTestName(context);
+        
+        Log.testEnd(testName, "FAILED");
+        Log.error("Test failed: " + testName, cause);
+        
+        // Capture screenshot on failure
+        String screenshotPath = ScreenshotUtils.captureFailureScreenshot(testName);
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Log to ExtentReports
+        ExtentManager.logFail("❌ Test failed: " + (cause != null ? cause.getMessage() : "Unknown error"));
+        ExtentManager.logException(cause);
+        
+        // Add screenshot to report if captured
+        if (screenshotPath != null) {
+            ExtentManager.addScreenshot(screenshotPath, "Failure Screenshot");
+        }
+        
+        // Remove test from ThreadLocal
+        ExtentManager.removeTest();
+{{/if}}
+    }
+    
+    @Override
+    public void testAborted(ExtensionContext context, Throwable cause) {
+        String testName = getTestName(context);
+        
+        Log.testEnd(testName, "ABORTED");
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Log to ExtentReports
+        String abortReason = cause != null ? cause.getMessage() : "Test was aborted";
+        ExtentManager.logSkip("⏭️ Test aborted: " + abortReason);
+        
+        if (cause != null) {
+            ExtentManager.logException(cause);
+        }
+        
+        // Remove test from ThreadLocal
+        ExtentManager.removeTest();
+{{/if}}
+    }
+    
+    @Override
+    public void testDisabled(ExtensionContext context, Optional<String> reason) {
+        String testName = getTestName(context);
+        String disabledReason = reason.orElse("No reason provided");
+        
+        Log.warn("Test disabled: " + testName + " - " + disabledReason);
+    }
+    
+    /**
+     * Get formatted test name
+     * @param context Extension context
+     * @return Formatted test name
+     */
+    private String getTestName(ExtensionContext context) {
+        String className = context.getRequiredTestClass().getSimpleName();
+        String methodName = context.getRequiredTestMethod().getName();
+        
+        return className + "." + methodName;
+    }
+    
+    /**
+     * Get test description from DisplayName annotation
+     * @param context Extension context
+     * @return Test description
+     */
+    private String getTestDescription(ExtensionContext context) {
+        return context.getDisplayName();
+    }
+    
+    /**
+     * Get test tags as string array
+     * @param context Extension context
+     * @return Test tags
+     */
+    private String[] getTestTags(ExtensionContext context) {
+        return context.getTags().toArray(new String[0]);
+    }
+    
+    /**
+     * Get current browser from system property
+     * @return Browser name
+     */
+    private String getCurrentBrowser() {
+        String browser = System.getProperty("browser", "chrome");
+        boolean headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
+        return browser + (headless ? " (headless)" : "");
+    }
+}

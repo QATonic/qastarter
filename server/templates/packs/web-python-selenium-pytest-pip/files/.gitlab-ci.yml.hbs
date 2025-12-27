@@ -1,0 +1,67 @@
+stages:
+  - test
+  - report
+
+variables:
+  PYTHON_VERSION: "{{toolVersions.python}}"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+test:
+  stage: test
+  image: python:$PYTHON_VERSION
+  before_script:
+    - python --version
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+  script:
+    - pytest -v -n auto
+  artifacts:
+    when: always
+    paths:
+{{#if (eq reportingTool "allure")}}
+      - allure-results/
+{{/if}}
+{{#if (eq reportingTool "pytest-html")}}
+      - reports/report.html
+{{/if}}
+{{#if (eq reportingTool "pytest-json")}}
+      - reports/report.json
+{{/if}}
+      - screenshots/
+      - logs/
+    reports:
+      junit: reports/junit.xml
+    expire_in: 30 days
+  parallel:
+    matrix:
+      - BROWSER: [chrome, firefox]
+  variables:
+    TEST_ENV: qa
+    HEADLESS: "true"
+
+{{#if (eq reportingTool "allure")}}
+generate_allure_report:
+  stage: report
+  image: python:$PYTHON_VERSION
+  dependencies:
+    - test
+  before_script:
+    - apt-get update && apt-get install -y wget
+    - wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+    - tar -zxvf allure-2.25.0.tgz -C /opt/
+    - ln -s /opt/allure-2.25.0/bin/allure /usr/local/bin/allure
+  script:
+    - allure generate allure-results --clean -o allure-report
+  artifacts:
+    when: always
+    paths:
+      - allure-report/
+    expire_in: 30 days
+  only:
+    - main
+    - develop
+{{/if}}

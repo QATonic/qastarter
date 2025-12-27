@@ -1,0 +1,56 @@
+"""
+CSV and JSON test data reader utility
+"""
+import csv
+import json
+from pathlib import Path
+from typing import List, Dict, Any
+from config.config import Config
+
+class DataReader:
+    """Data reader utility for CSV and JSON"""
+    
+    @staticmethod
+    def read_csv(filename: str) -> List[Dict[str, str]]:
+        """
+        Read CSV file and return list of dictionaries
+        
+        Args:
+            filename: CSV filename in data directory
+            
+        Returns:
+            List of dictionaries
+        """
+        file_path = Config.DATA_DIR / filename
+        with open(file_path, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            return list(reader)
+    
+    @staticmethod
+    def read_json(filename: str) -> Dict[str, Any]:
+        """
+        Read JSON file
+        
+        Args:
+            filename: JSON filename in data directory
+            
+        Returns:
+            Dictionary from JSON
+        """
+        file_path = Config.DATA_DIR / filename
+        with open(file_path, 'r') as jsonfile:
+            return json.load(jsonfile)
+    
+    @staticmethod
+    def get_test_data(key: str) -> Any:
+        """
+        Get test data from environment-specific JSON
+        
+        Args:
+            key: Data key
+            
+        Returns:
+            Test data value
+        """
+        env_data = Config.load_env_data()
+        return env_data.get(key)

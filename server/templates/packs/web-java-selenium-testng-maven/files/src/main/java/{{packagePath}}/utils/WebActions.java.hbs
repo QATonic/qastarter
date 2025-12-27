@@ -1,0 +1,367 @@
+package {{javaPackage}}.utils;
+
+import {{javaPackage}}.core.DriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
+
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Reusable web interaction methods with built-in waits.
+ * Provides high-level actions that combine waiting and interaction.
+ */
+public class WebActions {
+    
+    /**
+     * Click element after waiting for it to be clickable
+     * @param locator Element locator
+     */
+    public static void click(By locator) {
+        Log.step("Clicking element: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator);
+        element.click();
+        Log.debug("Element clicked successfully");
+    }
+    
+    /**
+     * Click element with custom timeout
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     */
+    public static void click(By locator, int timeoutInSeconds) {
+        Log.step("Clicking element: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator, timeoutInSeconds);
+        element.click();
+        Log.debug("Element clicked successfully");
+    }
+    
+    /**
+     * Click element using JavaScript
+     * @param locator Element locator
+     */
+    public static void clickWithJS(By locator) {
+        Log.step("Clicking element with JavaScript: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("arguments[0].click();", element);
+        Log.debug("Element clicked with JavaScript successfully");
+    }
+    
+    /**
+     * Type text after clearing the field
+     * @param locator Element locator
+     * @param text Text to type
+     */
+    public static void type(By locator, String text) {
+        Log.step("Typing '" + text + "' into element: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        element.clear();
+        element.sendKeys(text);
+        Log.debug("Text typed successfully");
+    }
+    
+    /**
+     * Type text without clearing the field
+     * @param locator Element locator
+     * @param text Text to type
+     */
+    public static void appendText(By locator, String text) {
+        Log.step("Appending '" + text + "' to element: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        element.sendKeys(text);
+        Log.debug("Text appended successfully");
+    }
+    
+    /**
+     * Get text from element
+     * @param locator Element locator
+     * @return Element text
+     */
+    public static String getText(By locator) {
+        Log.step("Getting text from element: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        String text = element.getText();
+        Log.debug("Retrieved text: '" + text + "'");
+        return text;
+    }
+    
+    /**
+     * Get attribute value from element
+     * @param locator Element locator
+     * @param attributeName Attribute name
+     * @return Attribute value
+     */
+    public static String getAttribute(By locator, String attributeName) {
+        Log.step("Getting '" + attributeName + "' attribute from element: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        String attributeValue = element.getAttribute(attributeName);
+        Log.debug("Retrieved attribute value: '" + attributeValue + "'");
+        return attributeValue;
+    }
+    
+    /**
+     * Select dropdown option by visible text
+     * @param locator Dropdown locator
+     * @param optionText Option text to select
+     */
+    public static void selectByText(By locator, String optionText) {
+        Log.step("Selecting option '" + optionText + "' from dropdown: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Select select = new Select(element);
+        select.selectByVisibleText(optionText);
+        Log.debug("Option selected successfully");
+    }
+    
+    /**
+     * Select dropdown option by value
+     * @param locator Dropdown locator
+     * @param value Option value to select
+     */
+    public static void selectByValue(By locator, String value) {
+        Log.step("Selecting option with value '" + value + "' from dropdown: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Select select = new Select(element);
+        select.selectByValue(value);
+        Log.debug("Option selected successfully");
+    }
+    
+    /**
+     * Select dropdown option by index
+     * @param locator Dropdown locator
+     * @param index Option index to select
+     */
+    public static void selectByIndex(By locator, int index) {
+        Log.step("Selecting option at index " + index + " from dropdown: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Select select = new Select(element);
+        select.selectByIndex(index);
+        Log.debug("Option selected successfully");
+    }
+    
+    /**
+     * Get selected option text from dropdown
+     * @param locator Dropdown locator
+     * @return Selected option text
+     */
+    public static String getSelectedOptionText(By locator) {
+        Log.step("Getting selected option text from dropdown: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Select select = new Select(element);
+        String selectedText = select.getFirstSelectedOption().getText();
+        Log.debug("Selected option text: '" + selectedText + "'");
+        return selectedText;
+    }
+    
+    /**
+     * Hover over element
+     * @param locator Element locator
+     */
+    public static void hover(By locator) {
+        Log.step("Hovering over element: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Actions actions = new Actions(DriverManager.getDriver());
+        actions.moveToElement(element).perform();
+        Log.debug("Hover action performed successfully");
+    }
+    
+    /**
+     * Double click element
+     * @param locator Element locator
+     */
+    public static void doubleClick(By locator) {
+        Log.step("Double clicking element: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator);
+        Actions actions = new Actions(DriverManager.getDriver());
+        actions.doubleClick(element).perform();
+        Log.debug("Double click performed successfully");
+    }
+    
+    /**
+     * Right click element
+     * @param locator Element locator
+     */
+    public static void rightClick(By locator) {
+        Log.step("Right clicking element: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator);
+        Actions actions = new Actions(DriverManager.getDriver());
+        actions.contextClick(element).perform();
+        Log.debug("Right click performed successfully");
+    }
+    
+    /**
+     * Drag and drop from source to target
+     * @param sourceLocator Source element locator
+     * @param targetLocator Target element locator
+     */
+    public static void dragAndDrop(By sourceLocator, By targetLocator) {
+        Log.step("Dragging from " + sourceLocator + " to " + targetLocator);
+        WebElement source = WaitUtils.waitForVisibility(sourceLocator);
+        WebElement target = WaitUtils.waitForVisibility(targetLocator);
+        Actions actions = new Actions(DriverManager.getDriver());
+        actions.dragAndDrop(source, target).perform();
+        Log.debug("Drag and drop performed successfully");
+    }
+    
+    /**
+     * Scroll to element
+     * @param locator Element locator
+     */
+    public static void scrollToElement(By locator) {
+        Log.step("Scrolling to element: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("arguments[0].scrollIntoView(true);", element);
+        Log.debug("Scrolled to element successfully");
+    }
+    
+    /**
+     * Scroll page by pixels
+     * @param x Horizontal pixels
+     * @param y Vertical pixels
+     */
+    public static void scrollBy(int x, int y) {
+        Log.step("Scrolling page by x:" + x + ", y:" + y);
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("window.scrollBy(" + x + "," + y + ");");
+        Log.debug("Page scrolled successfully");
+    }
+    
+    /**
+     * Scroll to top of page
+     */
+    public static void scrollToTop() {
+        Log.step("Scrolling to top of page");
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("window.scrollTo(0, 0);");
+        Log.debug("Scrolled to top successfully");
+    }
+    
+    /**
+     * Scroll to bottom of page
+     */
+    public static void scrollToBottom() {
+        Log.step("Scrolling to bottom of page");
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+        Log.debug("Scrolled to bottom successfully");
+    }
+    
+    /**
+     * Check if element is displayed
+     * @param locator Element locator
+     * @return true if element is displayed
+     */
+    public static boolean isDisplayed(By locator) {
+        Log.debug("Checking if element is displayed: " + locator);
+        try {
+            return WaitUtils.waitForVisibility(locator, 5).isDisplayed();
+        } catch (Exception e) {
+            Log.debug("Element is not displayed: " + locator);
+            return false;
+        }
+    }
+    
+    /**
+     * Check if element is enabled
+     * @param locator Element locator
+     * @return true if element is enabled
+     */
+    public static boolean isEnabled(By locator) {
+        Log.debug("Checking if element is enabled: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        return element.isEnabled();
+    }
+    
+    /**
+     * Check if checkbox/radio button is selected
+     * @param locator Element locator
+     * @return true if element is selected
+     */
+    public static boolean isSelected(By locator) {
+        Log.debug("Checking if element is selected: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        return element.isSelected();
+    }
+    
+    /**
+     * Get count of elements matching locator
+     * @param locator Element locator
+     * @return Number of elements found
+     */
+    public static int getElementCount(By locator) {
+        Log.debug("Getting element count for: " + locator);
+        List<WebElement> elements = DriverManager.getDriver().findElements(locator);
+        int count = elements.size();
+        Log.debug("Found " + count + " elements");
+        return count;
+    }
+    
+    /**
+     * Switch to window by title
+     * @param windowTitle Window title
+     */
+    public static void switchToWindowByTitle(String windowTitle) {
+        Log.step("Switching to window with title: " + windowTitle);
+        WebDriver driver = DriverManager.getDriver();
+        Set<String> windowHandles = driver.getWindowHandles();
+        
+        for (String handle : windowHandles) {
+            driver.switchTo().window(handle);
+            if (driver.getTitle().equals(windowTitle)) {
+                Log.debug("Switched to window successfully");
+                return;
+            }
+        }
+        
+        Log.error("Window with title '" + windowTitle + "' not found");
+        throw new RuntimeException("Window not found: " + windowTitle);
+    }
+    
+    /**
+     * Close current window and switch to main window
+     */
+    public static void closeCurrentWindowAndSwitchToMain() {
+        Log.step("Closing current window and switching to main window");
+        WebDriver driver = DriverManager.getDriver();
+        Set<String> windowHandles = driver.getWindowHandles();
+        String mainWindow = windowHandles.iterator().next();
+        
+        driver.close();
+        driver.switchTo().window(mainWindow);
+        Log.debug("Window closed and switched to main window successfully");
+    }
+    
+    /**
+     * Accept alert
+     */
+    public static void acceptAlert() {
+        Log.step("Accepting alert");
+        WaitUtils.waitForAlert().accept();
+        Log.debug("Alert accepted successfully");
+    }
+    
+    /**
+     * Dismiss alert
+     */
+    public static void dismissAlert() {
+        Log.step("Dismissing alert");
+        WaitUtils.waitForAlert().dismiss();
+        Log.debug("Alert dismissed successfully");
+    }
+    
+    /**
+     * Get alert text
+     * @return Alert text
+     */
+    public static String getAlertText() {
+        Log.step("Getting alert text");
+        String alertText = WaitUtils.waitForAlert().getText();
+        Log.debug("Alert text: '" + alertText + "'");
+        return alertText;
+    }
+}

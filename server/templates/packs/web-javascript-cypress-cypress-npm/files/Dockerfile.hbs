@@ -1,0 +1,12 @@
+FROM cypress/included:13.6.0
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+ENV BASE_URL=https://qa.example.com
+
+CMD ["npm", "test"]

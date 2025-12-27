@@ -1,0 +1,225 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.utils.Log;
+import com.microsoft.playwright.*;
+
+/**
+ * Thread-safe Browser Manager for managing Playwright Browser, BrowserContext, and Page instances.
+ * Uses ThreadLocal to ensure thread safety in parallel test execution.
+ */
+public class BrowserManager {
+    
+    private static final ThreadLocal<Playwright> playwrightThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<Browser> browserThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<BrowserContext> contextThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<Page> pageThreadLocal = new ThreadLocal<>();
+    
+    /**
+     * Initialize Playwright, Browser, Context, and Page for current thread
+     */
+    public static void initializeBrowser() {
+        try {
+            Log.info("🚀 Initializing browser for thread: " + Thread.currentThread().getName());
+            
+            // Create Playwright instance
+            Playwright playwright = PlaywrightFactory.createPlaywright();
+            playwrightThreadLocal.set(playwright);
+            
+            // Create Browser
+            Browser browser = PlaywrightFactory.createBrowser(playwright);
+            browserThreadLocal.set(browser);
+            
+            // Create BrowserContext
+            BrowserContext context = PlaywrightFactory.createContext(browser);
+            contextThreadLocal.set(context);
+            
+            // Create Page
+            Page page = PlaywrightFactory.createPage(context);
+            pageThreadLocal.set(page);
+            
+            Log.info("✅ Browser initialized successfully for thread: " + Thread.currentThread().getName());
+            
+        } catch (Exception e) {
+            Log.error("❌ Failed to initialize browser", e);
+            throw new RuntimeException("Failed to initialize browser", e);
+        }
+    }
+    
+    /**
+     * Get Playwright instance for current thread
+     * @return Playwright instance
+     */
+    public static Playwright getPlaywright() {
+        Playwright playwright = playwrightThreadLocal.get();
+        if (playwright == null) {
+            throw new IllegalStateException("Playwright not initialized for thread: " + Thread.currentThread().getName());
+        }
+        return playwright;
+    }
+    
+    /**
+     * Get Browser instance for current thread
+     * @return Browser instance
+     */
+    public static Browser getBrowser() {
+        Browser browser = browserThreadLocal.get();
+        if (browser == null) {
+            throw new IllegalStateException("Browser not initialized for thread: " + Thread.currentThread().getName());
+        }
+        return browser;
+    }
+    
+    /**
+     * Get BrowserContext instance for current thread
+     * @return BrowserContext instance
+     */
+    public static BrowserContext getContext() {
+        BrowserContext context = contextThreadLocal.get();
+        if (context == null) {
+            throw new IllegalStateException("Browser context not initialized for thread: " + Thread.currentThread().getName());
+        }
+        return context;
+    }
+    
+    /**
+     * Get Page instance for current thread
+     * @return Page instance
+     */
+    public static Page getPage() {
+        Page page = pageThreadLocal.get();
+        if (page == null) {
+            throw new IllegalStateException("Page not initialized for thread: " + Thread.currentThread().getName());
+        }
+        return page;
+    }
+    
+    /**
+     * Create new page in current context
+     * @return New Page instance
+     */
+    public static Page createNewPage() {
+        try {
+            BrowserContext context = getContext();
+            Page newPage = PlaywrightFactory.createPage(context);
+            pageThreadLocal.set(newPage);
+            return newPage;
+        } catch (Exception e) {
+            Log.error("❌ Failed to create new page", e);
+            throw new RuntimeException("Failed to create new page", e);
+        }
+    }
+    
+    /**
+     * Switch to a specific page by index
+     * @param pageIndex Page index (0-based)
+     */
+    public static void switchToPage(int pageIndex) {
+        try {
+            BrowserContext context = getContext();
+            if (pageIndex >= 0 && pageIndex < context.pages().size()) {
+                Page page = context.pages().get(pageIndex);
+                pageThreadLocal.set(page);
+                Log.info("Switched to page at index: " + pageIndex);
+            } else {
+                throw new IllegalArgumentException("Invalid page index: " + pageIndex);
+            }
+        } catch (Exception e) {
+            Log.error("❌ Failed to switch to page", e);
+            throw new RuntimeException("Failed to switch to page", e);
+        }
+    }
+    
+    /**
+     * Close current page
+     */
+    public static void closeCurrentPage() {
+        try {
+            Page page = getPage();
+            if (page != null && !page.isClosed()) {
+                page.close();
+                Log.info("Current page closed");
+                
+                // Switch to first available page if exists
+                BrowserContext context = getContext();
+                if (!context.pages().isEmpty()) {
+                    pageThreadLocal.set(context.pages().get(0));
+                } else {
+                    pageThreadLocal.remove();
+                }
+            }
+        } catch (Exception e) {
+            Log.error("❌ Failed to close current page", e);
+        }
+    }
+    
+    /**
+     * Quit browser and cleanup resources for current thread
+     */
+    public static void quitBrowser() {
+        try {
+            Log.info("🛑 Quitting browser for thread: " + Thread.currentThread().getName());
+            
+            // Close Page
+            Page page = pageThreadLocal.get();
+            if (page != null && !page.isClosed()) {
+                page.close();
+                Log.debug("Page closed");
+            }
+            
+            // Close BrowserContext
+            BrowserContext context = contextThreadLocal.get();
+            if (context != null) {
+                context.close();
+                Log.debug("Browser context closed");
+            }
+            
+            // Close Browser
+            Browser browser = browserThreadLocal.get();
+            if (browser != null && browser.isConnected()) {
+                browser.close();
+                Log.debug("Browser closed");
+            }
+            
+            // Close Playwright
+            Playwright playwright = playwrightThreadLocal.get();
+            if (playwright != null) {
+                playwright.close();
+                Log.debug("Playwright closed");
+            }
+            
+            Log.info("✅ Browser quit successfully for thread: " + Thread.currentThread().getName());
+            
+        } catch (Exception e) {
+            Log.error("❌ Error while quitting browser", e);
+        } finally {
+            // Clean up ThreadLocal references
+            pageThreadLocal.remove();
+            contextThreadLocal.remove();
+            browserThreadLocal.remove();
+            playwrightThreadLocal.remove();
+        }
+    }
+    
+    /**
+     * Check if browser is initialized for current thread
+     * @return true if browser is initialized
+     */
+    public static boolean isBrowserInitialized() {
+        return playwrightThreadLocal.get() != null && 
+               browserThreadLocal.get() != null && 
+               contextThreadLocal.get() != null && 
+               pageThreadLocal.get() != null;
+    }
+    
+    /**
+     * Get all open pages in current context
+     * @return Number of open pages
+     */
+    public static int getPageCount() {
+        try {
+            return getContext().pages().size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+}

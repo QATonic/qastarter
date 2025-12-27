@@ -1,0 +1,66 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
+
+namespace {{projectName}}.Utils;
+
+public static class JsonUtils
+{
+    public static T LoadFile<T>(string filePath)
+    {
+        var content = File.ReadAllText(filePath);
+        return JsonConvert.DeserializeObject<T>(content)!;
+    }
+
+    public static void SaveFile<T>(T data, string filePath)
+    {
+        var directory = Path.GetDirectoryName(filePath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        var json = JsonConvert.SerializeObject(data, Formatting.Indented);
+        File.WriteAllText(filePath, json);
+    }
+
+    public static JSchema LoadSchema(string schemaName)
+    {
+        var schemaPath = Path.Combine("Schemas", $"{schemaName}.json");
+        var schemaJson = File.ReadAllText(schemaPath);
+        return JSchema.Parse(schemaJson);
+    }
+
+    public static object? GetValueByPath(string json, string path)
+    {
+        var obj = JObject.Parse(json);
+        var tokens = path.Split('.');
+        JToken? current = obj;
+
+        foreach (var token in tokens)
+        {
+            if (current == null) return null;
+
+            if (int.TryParse(token, out var index) && current is JArray array)
+            {
+                current = array[index];
+            }
+            else if (current is JObject jObject)
+            {
+                current = jObject[token];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        return current?.ToObject<object>();
+    }
+
+    public static void PrettyPrint(object obj)
+    {
+        var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+        Console.WriteLine(json);
+    }
+}

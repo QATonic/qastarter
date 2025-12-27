@@ -1,0 +1,237 @@
+# {{projectName}}
+
+Appium test automation framework with TypeScript and Jest for iOS/Android mobile testing.
+
+## Features
+
+- **Appium {{toolVersions.appium}}**: Latest mobile automation framework
+- **TypeScript**: Type-safe code with strict typing
+- **Jest**: Popular testing framework with ts-jest integration
+- **WebdriverIO**: Powerful WebDriver implementation
+- **Page Object Model**: Type-safe maintainable test structure
+- **Multi-Platform**: iOS and Android support
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else}}
+- **HTML Reports**: jest-html-reporter for test reports
+{{/if}}
+- **Cloud Integration**: BrowserStack and Sauce Labs support
+
+## Prerequisites
+
+- Node.js 18+ and npm
+- Appium 2.x
+- Android SDK (for Android testing)
+- Xcode (for iOS testing on macOS)
+
+## Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Install Appium globally
+npm install -g appium@next
+
+# Install Appium drivers
+appium driver install uiautomator2  # For Android
+appium driver install xcuitest      # For iOS
+```
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file or set environment variables:
+
+```bash
+# Platform (Android or iOS)
+PLATFORM=Android
+
+# Test environment
+TEST_ENV=dev
+
+# Appium server URL
+APPIUM_SERVER=http://localhost:4723
+
+# Device configuration
+DEVICE_NAME="Android Emulator"
+PLATFORM_VERSION=13.0
+
+# App configuration
+APP_PATH=/path/to/your/app.apk
+APP_PACKAGE=com.example.app
+APP_ACTIVITY=.MainActivity
+
+# For iOS
+BUNDLE_ID=com.example.app
+
+# Cloud services (optional)
+USE_BROWSERSTACK=false
+BROWSERSTACK_USERNAME=your_username
+BROWSERSTACK_ACCESS_KEY=your_key
+
+USE_SAUCELABS=false
+SAUCE_USERNAME=your_username
+SAUCE_ACCESS_KEY=your_key
+```
+
+### Test Data
+
+Update test data in:
+- `data/dev.json` - Development environment
+- `data/qa.json` - QA environment
+
+### Device Capabilities
+
+Update device capabilities in `config/capabilities.ts` based on your testing needs.
+
+## Running Tests
+
+```bash
+# Start Appium server
+appium
+
+# Build TypeScript
+npm run build
+
+# Run all tests
+npm test
+
+# Run tests for specific platform
+npm run test:android
+npm run test:ios
+
+# Run smoke tests only
+npm run test:smoke
+
+# Watch mode (re-run tests on file changes)
+npm run test:watch
+
+# Clean artifacts
+npm run clean
+```
+
+## Project Structure
+
+```
+.
+├── config/
+│   ├── capabilities.ts    # Device capabilities manager
+│   └── settings.ts         # Application settings
+├── data/
+│   ├── dev.json           # Development test data
+│   └── qa.json            # QA test data
+├── tests/
+│   ├── types/
+│   │   └── testData.ts    # TypeScript interfaces
+│   ├── pages/
+│   │   ├── BasePage.ts    # Base page class
+│   │   ├── LoginPage.ts   # Login page object
+│   │   └── HomePage.ts    # Home page object
+│   ├── utils/
+│   │   ├── androidGestures.ts  # Android gesture utilities
+│   │   ├── iosGestures.ts      # iOS gesture utilities
+│   │   └── helpers.ts          # Helper functions
+│   ├── login.test.ts      # Login tests
+│   ├── smoke.test.ts      # Smoke tests
+│   └── setup.ts           # Test setup and teardown
+├── tsconfig.json          # TypeScript configuration
+├── jest.config.js         # Jest configuration
+└── package.json           # npm dependencies
+```
+
+## Page Objects
+
+All page objects extend `BasePage` with type-safe methods:
+- `LoginPage` - Login page interactions
+- `HomePage` - Home page interactions
+
+### Updating Locators
+
+Update locators in page objects based on your app. Use Appium Inspector to identify elements:
+
+```typescript
+// Android
+readonly usernameInput = 'id=com.example.app:id/username';
+
+// iOS
+readonly usernameInput = '~username_field'; // accessibility id
+```
+
+## Type Safety
+
+The framework provides type-safe interfaces for:
+- Test data (`TestData`, `UserCredentials`)
+- Page objects (typed methods and locators)
+- Driver capabilities
+- Helper functions
+
+## Gestures
+
+Platform-specific gesture utilities with type safety:
+- `AndroidGestures` - Android swipe, scroll, long press
+- `IOSGestures` - iOS tap, swipe, long press
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR with platform matrix (Android, iOS) on macOS runners.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Cloud Services
+
+### BrowserStack
+
+Set environment variables:
+```bash
+USE_BROWSERSTACK=true
+BROWSERSTACK_USERNAME=your_username
+BROWSERSTACK_ACCESS_KEY=your_key
+```
+
+### Sauce Labs
+
+Set environment variables:
+```bash
+USE_SAUCELABS=true
+SAUCE_USERNAME=your_username
+SAUCE_ACCESS_KEY=your_key
+```
+
+## Reports
+
+- **HTML Report**: `reports/test-report.html`
+- **Screenshots**: `screenshots/` (captured on test failure)
+- **Logs**: `logs/` directory

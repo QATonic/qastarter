@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+    
+    tools {
+        nodejs 'NodeJS {{toolVersions.node}}'
+    }
+    
+    environment {
+        APPIUM_HOME = "${WORKSPACE}/.appium"
+        ANDROID_HOME = '/opt/android-sdk'
+        TEST_ENV = 'qa'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+        
+        stage('Install Appium') {
+            steps {
+                sh '''
+                    npm install -g appium
+                    appium driver install uiautomator2
+                '''
+            }
+        }
+        
+        stage('Start Appium Server') {
+            steps {
+                sh 'appium &'
+                sh 'sleep 10'
+            }
+        }
+        
+        stage('Run Mobile Tests') {
+            steps {
+                sh 'npm test'
+            }
+            post {
+                always {
+                    {{#if (eq reportingTool "allure")}}
+                    sh 'npm run report:generate'
+                    allure([
+                        results: [[path: 'allure-results']]
+                    ])
+                    archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'allure-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "jest-html-reporter")}}
+                    publishHTML([
+                        reportDir: 'test-results',
+                        reportFiles: 'test-report.html',
+                        reportName: 'Jest HTML Report',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'test-results/test-report.html', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "mochawesome")}}
+                    publishHTML([
+                        reportDir: 'mochawesome-report',
+                        reportFiles: 'mochawesome.html',
+                        reportName: 'Mochawesome Report',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'mochawesome-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    archiveArtifacts artifacts: 'screenshots/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'logs/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            sh 'pkill -f appium || true'
+            cleanWs()
+        }
+    }
+}

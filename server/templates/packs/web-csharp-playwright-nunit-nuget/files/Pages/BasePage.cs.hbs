@@ -1,0 +1,65 @@
+using Microsoft.Playwright;
+
+namespace {{projectName}}.Pages;
+
+public class BasePage
+{
+    protected readonly IPage Page;
+
+    public BasePage(IPage page)
+    {
+        Page = page;
+    }
+
+    public async Task NavigateAsync(string url)
+    {
+        Console.WriteLine($"Navigating to: {url}");
+        await Page.GotoAsync(url);
+    }
+
+    public async Task ClickAsync(string selector)
+    {
+        Console.WriteLine($"Clicking element: {selector}");
+        await Page.ClickAsync(selector);
+    }
+
+    public async Task TypeAsync(string selector, string text)
+    {
+        Console.WriteLine($"Typing '{text}' into element: {selector}");
+        await Page.FillAsync(selector, text);
+    }
+
+    public async Task<string?> GetTextAsync(string selector)
+    {
+        var text = await Page.TextContentAsync(selector);
+        Console.WriteLine($"Getting text from element: {selector} = '{text}'");
+        return text;
+    }
+
+    public async Task<bool> IsVisibleAsync(string selector)
+    {
+        var visible = await Page.IsVisibleAsync(selector);
+        Console.WriteLine($"Checking visibility of element: {selector} = {visible}");
+        return visible;
+    }
+
+    public async Task WaitForSelectorAsync(string selector, float timeout = 30000)
+    {
+        Console.WriteLine($"Waiting for selector: {selector}");
+        await Page.WaitForSelectorAsync(selector, new() { Timeout = timeout });
+    }
+
+    public async Task<string> GetPageTitleAsync()
+    {
+        var title = await Page.TitleAsync();
+        Console.WriteLine($"Page title: {title}");
+        return title;
+    }
+
+    public string GetCurrentUrl()
+    {
+        var url = Page.Url;
+        Console.WriteLine($"Current URL: {url}");
+        return url;
+    }
+}

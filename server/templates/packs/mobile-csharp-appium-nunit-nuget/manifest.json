@@ -1,0 +1,206 @@
+{
+  "id": "mobile-csharp-appium-nunit-nuget",
+  "supportsDynamic": true,
+  "name": "Mobile Automation Framework",
+  "description": "Appium test automation framework with C# (.NET 8) and NUnit for iOS/Android mobile testing",
+  "tags": [
+    "mobile",
+    "appium",
+    "csharp",
+    "nunit",
+    "pom"
+  ],
+  "toolVersions": {
+    "dotnet": "8.0",
+    "appium": "2.x",
+    "nunit": "3.14.0",
+    "appium-dotnet-driver": "5.0.0"
+  },
+  "files": [
+    {
+      "path": "{{projectName}}.csproj",
+      "isTemplate": true,
+      "description": "C# project file with NuGet dependencies"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD workflow",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "description": "Jenkins declarative pipeline for CI/CD",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "description": "Azure DevOps pipeline configuration",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation and setup guide"
+    },
+    {
+      "path": "Config/AppiumServerConfig.cs",
+      "isTemplate": true,
+      "description": "Appium server configuration"
+    },
+    {
+      "path": "Config/CapabilitiesManager.cs",
+      "isTemplate": true,
+      "description": "Device capabilities manager"
+    },
+    {
+      "path": "Config/Settings.cs",
+      "isTemplate": true,
+      "description": "Application settings"
+    },
+    {
+      "path": "Data/DevData.json",
+      "isTemplate": true,
+      "description": "Development environment data"
+    },
+    {
+      "path": "Data/QaData.json",
+      "isTemplate": true,
+      "description": "QA environment data"
+    },
+    {
+      "path": "Data/TestData.cs",
+      "isTemplate": true,
+      "description": "Test data model classes"
+    },
+    {
+      "path": "Tests/Pages/BasePage.cs",
+      "isTemplate": true,
+      "description": "Base page class with common functionality"
+    },
+    {
+      "path": "Tests/Pages/LoginPage.cs",
+      "isTemplate": true,
+      "description": "Login page object"
+    },
+    {
+      "path": "Tests/Pages/HomePage.cs",
+      "isTemplate": true,
+      "description": "Home page object"
+    },
+    {
+      "path": "Tests/Utils/AndroidGestures.cs",
+      "isTemplate": true,
+      "description": "Android gesture utilities"
+    },
+    {
+      "path": "Tests/Utils/IOSGestures.cs",
+      "isTemplate": true,
+      "description": "iOS gesture utilities"
+    },
+    {
+      "path": "Tests/Utils/DriverManager.cs",
+      "isTemplate": true,
+      "description": "WebDriver lifecycle management"
+    },
+    {
+      "path": "Tests/Utils/ScreenshotHelper.cs",
+      "isTemplate": true,
+      "description": "Screenshot capture utilities"
+    },
+    {
+      "path": "Tests/Utils/Logger.cs",
+      "isTemplate": true,
+      "description": "Logging utility"
+    },
+    {
+      "path": "Tests/Utils/WaitHelpers.cs",
+      "isTemplate": true,
+      "description": "Wait helper utilities"
+    },
+    {
+      "path": "Tests/Utils/RetryHelper.cs",
+      "isTemplate": true,
+      "description": "Retry mechanism for flaky tests"
+    },
+    {
+      "path": "Data/users.json",
+      "isTemplate": true,
+      "description": "User test data"
+    },
+    {
+      "path": "Tests/BaseTest.cs",
+      "isTemplate": true,
+      "description": "Base test class with setup/teardown"
+    },
+    {
+      "path": "Tests/LoginTests.cs",
+      "isTemplate": true,
+      "description": "Login test suite"
+    },
+    {
+      "path": "Tests/SmokeTests.cs",
+      "isTemplate": true,
+      "description": "Smoke test suite"
+    },
+    {
+      "path": "Features/Login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "StepDefinitions/LoginSteps.cs",
+      "isTemplate": true,
+      "description": "SpecFlow step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "mobile",
+    "framework": "appium",
+    "language": "csharp",
+    "testRunner": "nunit",
+    "buildTool": "nuget"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "nunit-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

@@ -1,0 +1,196 @@
+package {{javaPackage}}.pages;
+
+import {{javaPackage}}.utils.Log;
+
+/**
+ * Login Page Object.
+ * Contains locators and methods for login page interactions.
+ */
+public class LoginPage extends BasePage {
+    
+    // Locators
+    private final String usernameInput = "input[name='username'], input[id='username'], #username";
+    private final String passwordInput = "input[name='password'], input[type='password'], #password";
+    private final String loginButton = "button[type='submit'], button:has-text('Login'), input[type='submit']";
+    private final String rememberMeCheckbox = "input[type='checkbox'][name='remember'], input#remember-me";
+    private final String forgotPasswordLink = "a:has-text('Forgot'), a:has-text('Password')";
+    private final String errorMessage = ".error, .alert-danger, [role='alert'], .error-message";
+    private final String successMessage = ".success, .alert-success";
+    private final String loginForm = "form, .login-form, #login-form";
+    
+    /**
+     * Check if login page is loaded
+     * @return true if page is loaded
+     */
+    @Override
+    public boolean isLoaded() {
+        try {
+            waitForVisible(usernameInput);
+            waitForVisible(passwordInput);
+            waitForVisible(loginButton);
+            return true;
+        } catch (Exception e) {
+            Log.error("Login page not loaded", e);
+            return false;
+        }
+    }
+    
+    /**
+     * Enter username
+     * @param username Username to enter
+     */
+    public void enterUsername(String username) {
+        Log.info("Entering username: " + username);
+        fill(usernameInput, username);
+    }
+    
+    /**
+     * Enter password
+     * @param password Password to enter
+     */
+    public void enterPassword(String password) {
+        Log.info("Entering password: " + "****");
+        fill(passwordInput, password);
+    }
+    
+    /**
+     * Click login button
+     * @param expectedPageClass Expected page class after login
+     * @param <T> Page type
+     * @return Instance of expected page
+     */
+    public <T extends BasePage> T clickLoginButton(Class<T> expectedPageClass) {
+        Log.info("Clicking login button");
+        click(loginButton);
+        
+        try {
+            return expectedPageClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            Log.error("Failed to create instance of: " + expectedPageClass.getName(), e);
+            throw new RuntimeException("Failed to create page instance", e);
+        }
+    }
+    
+    /**
+     * Perform login with username and password
+     * @param username Username
+     * @param password Password
+     * @param expectedPageClass Expected page class after login
+     * @param <T> Page type
+     * @return Instance of expected page
+     */
+    public <T extends BasePage> T login(String username, String password, Class<T> expectedPageClass) {
+        Log.step("Logging in with username: " + username);
+        enterUsername(username);
+        enterPassword(password);
+        return clickLoginButton(expectedPageClass);
+    }
+    
+    /**
+     * Set remember me checkbox
+     * @param check true to check, false to uncheck
+     */
+    public void setRememberMe(boolean check) {
+        if (check) {
+            Log.info("Checking remember me checkbox");
+            check(rememberMeCheckbox);
+        } else {
+            Log.info("Unchecking remember me checkbox");
+            uncheck(rememberMeCheckbox);
+        }
+    }
+    
+    /**
+     * Check if remember me is checked
+     * @return true if checked
+     */
+    public boolean isRememberMeChecked() {
+        return isChecked(rememberMeCheckbox);
+    }
+    
+    /**
+     * Click forgot password link
+     */
+    public void clickForgotPassword() {
+        Log.info("Clicking forgot password link");
+        click(forgotPasswordLink);
+    }
+    
+    /**
+     * Check if error message is displayed
+     * @return true if error message is displayed
+     */
+    public boolean isErrorMessageDisplayed() {
+        return isVisible(errorMessage);
+    }
+    
+    /**
+     * Get error message text
+     * @return Error message text
+     */
+    public String getErrorMessage() {
+        if (isErrorMessageDisplayed()) {
+            return getText(errorMessage);
+        }
+        return "";
+    }
+    
+    /**
+     * Check if success message is displayed
+     * @return true if success message is displayed
+     */
+    public boolean isSuccessMessageDisplayed() {
+        return isVisible(successMessage);
+    }
+    
+    /**
+     * Get success message text
+     * @return Success message text
+     */
+    public String getSuccessMessage() {
+        if (isSuccessMessageDisplayed()) {
+            return getText(successMessage);
+        }
+        return "";
+    }
+    
+    /**
+     * Check if login button is enabled
+     * @return true if enabled
+     */
+    public boolean isLoginButtonEnabled() {
+        return isEnabled(loginButton);
+    }
+    
+    /**
+     * Clear username field
+     */
+    public void clearUsername() {
+        Log.info("Clearing username field");
+        fill(usernameInput, "");
+    }
+    
+    /**
+     * Clear password field
+     */
+    public void clearPassword() {
+        Log.info("Clearing password field");
+        fill(passwordInput, "");
+    }
+    
+    /**
+     * Get username field value
+     * @return Username value
+     */
+    public String getUsernameValue() {
+        return page.inputValue(usernameInput);
+    }
+    
+    /**
+     * Get password field value
+     * @return Password value
+     */
+    public String getPasswordValue() {
+        return page.inputValue(passwordInput);
+    }
+}

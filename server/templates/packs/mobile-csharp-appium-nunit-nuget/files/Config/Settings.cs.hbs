@@ -1,0 +1,20 @@
+namespace {{projectName}}.Config;
+
+public static class Settings
+{
+    public static string Platform => Environment.GetEnvironmentVariable("PLATFORM") ?? "Android";
+    
+    public static string TestEnvironment => Environment.GetEnvironmentVariable("TEST_ENV") ?? "dev";
+    
+    public static TimeSpan ImplicitWait => TimeSpan.FromSeconds(
+        int.Parse(Environment.GetEnvironmentVariable("IMPLICIT_WAIT") ?? "10")
+    );
+    
+    public static TimeSpan ExplicitWait => TimeSpan.FromSeconds(
+        int.Parse(Environment.GetEnvironmentVariable("EXPLICIT_WAIT") ?? "30")
+    );
+
+    public static bool IsAndroid => Platform.Equals("Android", StringComparison.OrdinalIgnoreCase);
+    
+    public static bool IsIOS => Platform.Equals("iOS", StringComparison.OrdinalIgnoreCase);
+}

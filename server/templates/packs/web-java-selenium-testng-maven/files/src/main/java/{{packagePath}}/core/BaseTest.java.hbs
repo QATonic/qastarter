@@ -1,0 +1,130 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.listeners.RetryAnalyzer;
+import {{javaPackage}}.listeners.TestListener;
+import {{javaPackage}}.utils.Log;
+import org.testng.annotations.*;
+
+/**
+ * Base test class with common setup and teardown methods.
+ * All test classes should extend this class.
+ */
+@Listeners({TestListener.class})
+public class BaseTest {
+    
+    @BeforeSuite(alwaysRun = true)
+    public void beforeSuite() {
+        Log.startSection("TEST SUITE SETUP");
+        Log.info("Environment: " + ConfigurationReader.getCurrentEnvironment());
+        Log.info("Base URL: " + ConfigurationReader.getBaseUrl());
+        Log.info("Browser: " + ConfigurationReader.getBrowser());
+        Log.info("Headless: " + ConfigurationReader.isHeadless());
+        Log.endSection();
+    }
+    
+    @AfterSuite(alwaysRun = true)
+    public void afterSuite() {
+        Log.startSection("TEST SUITE TEARDOWN");
+        Log.info("Test suite execution completed");
+        Log.endSection();
+    }
+    
+    @BeforeMethod(alwaysRun = true)
+    public void setUp() {
+        Log.info("Setting up test method");
+        DriverManager.initializeDriver();
+        
+        // Navigate to base URL if configured
+        String baseUrl = ConfigurationReader.getBaseUrl();
+        if (baseUrl != null && !baseUrl.isEmpty()) {
+            DriverManager.getDriver().get(baseUrl);
+            Log.info("Navigated to base URL: " + baseUrl);
+        }
+    }
+    
+    @AfterMethod(alwaysRun = true)
+    public void tearDown() {
+        Log.info("Tearing down test method");
+        DriverManager.quitDriver();
+    }
+    
+    /**
+     * Get retry analyzer for flaky tests
+     * Override this method in test classes that need retry functionality
+     * @return RetryAnalyzer instance
+     */
+    protected IRetryAnalyzer getRetryAnalyzer() {
+        return new RetryAnalyzer();
+    }
+    
+    /**
+     * Navigate to specific URL
+     * @param url URL to navigate to
+     */
+    protected void navigateTo(String url) {
+        Log.step("Navigating to: " + url);
+        DriverManager.getDriver().get(url);
+    }
+    
+    /**
+     * Get current page title
+     * @return Page title
+     */
+    protected String getPageTitle() {
+        String title = DriverManager.getDriver().getTitle();
+        Log.debug("Current page title: " + title);
+        return title;
+    }
+    
+    /**
+     * Get current page URL
+     * @return Current URL
+     */
+    protected String getCurrentUrl() {
+        String url = DriverManager.getDriver().getCurrentUrl();
+        Log.debug("Current URL: " + url);
+        return url;
+    }
+    
+    /**
+     * Refresh current page
+     */
+    protected void refreshPage() {
+        Log.step("Refreshing current page");
+        DriverManager.getDriver().navigate().refresh();
+    }
+    
+    /**
+     * Navigate back
+     */
+    protected void navigateBack() {
+        Log.step("Navigating back");
+        DriverManager.getDriver().navigate().back();
+    }
+    
+    /**
+     * Navigate forward
+     */
+    protected void navigateForward() {
+        Log.step("Navigating forward");
+        DriverManager.getDriver().navigate().forward();
+    }
+    
+    /**
+     * Get base URL from configuration
+     * @return Base URL
+     */
+    protected String getBaseUrl() {
+        return ConfigurationReader.getBaseUrl();
+    }
+    
+    /**
+     * Get test data file path
+     * @param fileName File name
+     * @return Full file path for test data
+     */
+    protected String getTestDataPath(String fileName) {
+        return "testdata/" + fileName;
+    }
+}

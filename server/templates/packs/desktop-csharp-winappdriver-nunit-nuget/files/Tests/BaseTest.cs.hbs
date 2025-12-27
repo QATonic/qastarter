@@ -1,0 +1,47 @@
+using NUnit.Framework;
+using OpenQA.Selenium.Appium.Windows;
+using {{projectName}}.Core;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Tests;
+
+public class BaseTest
+{
+    protected WindowsDriver<WindowsElement> Driver = null!;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        Logger.Info("=".PadRight(80, '='));
+        Logger.Info("Starting test session");
+        Logger.Info("WinAppDriver must be running at http://127.0.0.1:4723");
+        Logger.Info("=".PadRight(80, '='));
+    }
+
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        Logger.Info("=".PadRight(80, '='));
+        Logger.Info("Test session completed");
+        Logger.Info("=".PadRight(80, '='));
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        var testName = TestContext.CurrentContext.Test.Name;
+        var outcome = TestContext.CurrentContext.Result.Outcome.Status;
+        
+        if (outcome == NUnit.Framework.Interfaces.TestStatus.Failed)
+        {
+            Logger.Error($"Test FAILED: {testName}");
+            ScreenshotHelper.TakeScreenshot(Driver, testName);
+        }
+        else
+        {
+            Logger.Info($"Test PASSED: {testName}");
+        }
+        
+        DriverFactory.QuitDriver(Driver);
+    }
+}

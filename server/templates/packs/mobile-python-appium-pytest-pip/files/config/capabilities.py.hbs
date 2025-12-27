@@ -1,0 +1,126 @@
+"""
+Mobile Device Capabilities Configuration
+
+============================================
+UPDATE THESE VALUES FOR YOUR APP
+============================================
+Replace the placeholder values with your actual app details.
+Set environment variables or update the default values below.
+"""
+import os
+
+class CapabilitiesManager:
+    """Manages device capabilities for Android and iOS"""
+    
+    def get_android_capabilities(self):
+        """
+        Get Android device capabilities
+        
+        UPDATE THESE VALUES:
+        - APP_PATH: Path to your .apk file
+        - APP_PACKAGE: Your app's package name (e.g., com.yourcompany.yourapp)
+        - APP_ACTIVITY: Your app's main activity (e.g., .MainActivity)
+        """
+        caps = {
+            "platformName": "Android",
+            "appium:automationName": "UiAutomator2",
+            "appium:deviceName": os.getenv("DEVICE_NAME", "Android Emulator"),
+            "appium:platformVersion": os.getenv("PLATFORM_VERSION", "13.0"),
+            "appium:app": os.getenv("APP_PATH", "/path/to/your/app.apk"),
+            "appium:appPackage": os.getenv("APP_PACKAGE", "com.your.app.package"),
+            "appium:appActivity": os.getenv("APP_ACTIVITY", ".MainActivity"),
+            "appium:noReset": False,
+            "appium:fullReset": False,
+            "appium:newCommandTimeout": 300,
+            "appium:autoGrantPermissions": True,
+            "appium:unicodeKeyboard": True,
+            "appium:resetKeyboard": True
+        }
+        
+        # Add cloud-specific capabilities if using cloud services
+        if os.getenv("USE_BROWSERSTACK", "false").lower() == "true":
+            caps.update(self._get_browserstack_android_caps())
+        elif os.getenv("USE_SAUCELABS", "false").lower() == "true":
+            caps.update(self._get_saucelabs_android_caps())
+        
+        return caps
+    
+    def get_ios_capabilities(self):
+        """
+        Get iOS device capabilities
+        
+        UPDATE THESE VALUES:
+        - APP_PATH: Path to your .app or .ipa file
+        - BUNDLE_ID: Your app's bundle identifier (e.g., com.yourcompany.yourapp)
+        """
+        caps = {
+            "platformName": "iOS",
+            "appium:automationName": "XCUITest",
+            "appium:deviceName": os.getenv("DEVICE_NAME", "iPhone 14"),
+            "appium:platformVersion": os.getenv("PLATFORM_VERSION", "16.0"),
+            "appium:app": os.getenv("APP_PATH", "/path/to/your/app.app"),
+            "appium:bundleId": os.getenv("BUNDLE_ID", "com.your.app.bundleid"),
+            "appium:noReset": False,
+            "appium:fullReset": False,
+            "appium:newCommandTimeout": 300,
+            "appium:autoAcceptAlerts": True,
+            "appium:autoDismissAlerts": False,
+            "appium:useNewWDA": False,
+            "appium:wdaLaunchTimeout": 120000
+        }
+        
+        # Add cloud-specific capabilities if using cloud services
+        if os.getenv("USE_BROWSERSTACK", "false").lower() == "true":
+            caps.update(self._get_browserstack_ios_caps())
+        elif os.getenv("USE_SAUCELABS", "false").lower() == "true":
+            caps.update(self._get_saucelabs_ios_caps())
+        
+        return caps
+    
+    def _get_browserstack_android_caps(self):
+        """BrowserStack Android capabilities"""
+        return {
+            "bstack:options": {
+                "userName": os.getenv("BROWSERSTACK_USERNAME"),
+                "accessKey": os.getenv("BROWSERSTACK_ACCESS_KEY"),
+                "projectName": "{{projectName}}",
+                "buildName": "Android Build",
+                "debug": True,
+                "networkLogs": True
+            }
+        }
+    
+    def _get_browserstack_ios_caps(self):
+        """BrowserStack iOS capabilities"""
+        return {
+            "bstack:options": {
+                "userName": os.getenv("BROWSERSTACK_USERNAME"),
+                "accessKey": os.getenv("BROWSERSTACK_ACCESS_KEY"),
+                "projectName": "{{projectName}}",
+                "buildName": "iOS Build",
+                "debug": True,
+                "networkLogs": True
+            }
+        }
+    
+    def _get_saucelabs_android_caps(self):
+        """Sauce Labs Android capabilities"""
+        return {
+            "sauce:options": {
+                "username": os.getenv("SAUCE_USERNAME"),
+                "accessKey": os.getenv("SAUCE_ACCESS_KEY"),
+                "build": "Android Build",
+                "name": "{{projectName}}"
+            }
+        }
+    
+    def _get_saucelabs_ios_caps(self):
+        """Sauce Labs iOS capabilities"""
+        return {
+            "sauce:options": {
+                "username": os.getenv("SAUCE_USERNAME"),
+                "accessKey": os.getenv("SAUCE_ACCESS_KEY"),
+                "build": "iOS Build",
+                "name": "{{projectName}}"
+            }
+        }

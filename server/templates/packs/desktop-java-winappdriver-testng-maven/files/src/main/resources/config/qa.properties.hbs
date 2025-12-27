@@ -1,0 +1,87 @@
+# QA Environment Configuration for Desktop Testing
+# {{projectName}} - Desktop Automation Framework
+
+# Environment Settings
+environment=qa
+environment.name=Quality Assurance
+
+# WinAppDriver Configuration
+winappdriver.url=http://qa-winappdriver:4723
+session.timeout=600
+implicit.wait=15
+explicit.wait=45
+
+# Default Applications
+default.application=calculator
+app.calculator.path=Microsoft.WindowsCalculator_8wekyb3d8bbwe!App
+app.notepad.path=C:\\Windows\\System32\\notepad.exe
+app.explorer.path=C:\\Windows\\explorer.exe
+app.paint.path=C:\\Windows\\System32\\mspaint.exe
+
+# Test Configuration
+headless.mode=false
+screenshot.on.failure=true
+video.recording.enabled=true
+max.retry.count=2
+parallel.execution.enabled=true
+parallel.thread.count=3
+
+# Directory Configuration
+screenshot.directory=screenshots
+reports.directory=reports
+test.data.directory=src/test/resources/testdata
+
+# Logging Configuration
+log.level=INFO
+log.to.console=true
+log.to.file=true
+
+# ExtentReports Configuration
+extent.reports.enabled=true
+extent.reports.theme=DARK
+extent.report.name={{projectName}} Desktop Test Report - QA Environment
+extent.report.document.title=QA Desktop Automation Results
+
+# Cleanup Configuration
+cleanup.enabled=true
+cleanup.age.days=14
+
+# QA Specific Settings
+debug.mode=false
+wait.after.action=200
+take.screenshots.on.pass=true
+take.screenshots.on.fail=true
+
+# Test Data Configuration
+test.data.calculator.numbers=1,5,10,25,50,100,500,1000
+test.data.notepad.sample.text=QA environment sample text for comprehensive testing.
+test.data.notepad.large.text.lines=100
+
+# Performance Settings
+page.load.timeout=45
+element.timeout=20
+action.timeout=15
+
+# Application Settings
+app.startup.wait=5000
+app.cleanup.wait=3000
+
+# Integration Settings
+integration.tests.enabled=true
+stress.tests.enabled=true
+performance.tests.enabled=true
+
+# QA Specific Test Settings
+regression.tests.enabled=true
+smoke.tests.enabled=true
+boundary.tests.enabled=true
+
+# Reporting Configuration
+report.include.environment.info=true
+report.include.system.info=true
+report.include.test.steps=true
+
+# Error Handling
+continue.on.failure=true
+take.screenshot.on.error=true
+log.full.stack.trace=true

@@ -1,0 +1,35 @@
+using OpenQA.Selenium;
+
+namespace {{projectName}}.Utils
+{
+    public class ScreenshotHelper
+    {
+        private readonly IWebDriver _driver;
+        private readonly string _screenshotDir;
+
+        public ScreenshotHelper(IWebDriver driver)
+        {
+            _driver = driver;
+            _screenshotDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Screenshots");
+
+            if (!Directory.Exists(_screenshotDir))
+            {
+                Directory.CreateDirectory(_screenshotDir);
+            }
+        }
+
+        public string Capture(string name = "")
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                name = $"screenshot_{DateTime.Now:yyyyMMdd_HHmmss}";
+            }
+
+            var screenshot = ((ITakesScreenshot)_driver).GetScreenshot();
+            var filepath = Path.Combine(_screenshotDir, $"{name}.png");
+            screenshot.SaveAsFile(filepath);
+            Logger.Info($"Screenshot saved: {name}.png");
+            return filepath;
+        }
+    }
+}

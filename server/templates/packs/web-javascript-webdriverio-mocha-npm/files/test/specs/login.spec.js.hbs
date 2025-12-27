@@ -1,0 +1,37 @@
+/**
+ * Login Test Suite
+ * 
+ * BEFORE RUNNING:
+ * 1. Update baseUrl in config/environments.js
+ * 2. Update selectors in test/pageobjects/login.page.js
+ * 3. Run: npm test
+ */
+import { expect } from '@wdio/globals';
+import LoginPage from '../pageobjects/login.page.js';
+
+// ============================================
+// UPDATE THESE VALUES FOR YOUR APPLICATION
+// ============================================
+const TEST_USERNAME = 'your-test-user@email.com';
+const TEST_PASSWORD = 'YourTestPassword123';
+// ============================================
+
+describe('Login Functionality', () => {
+  
+  it('should login with valid credentials', async () => {
+    // Step 1: Perform login
+    await LoginPage.login(TEST_USERNAME, TEST_PASSWORD);
+    
+    // Step 2: Verify login was successful
+    // UPDATE: Change this assertion to match your app's success indicator
+    await expect(LoginPage.flashMessage).toBeDisplayed();
+    const message = await LoginPage.getFlashMessage();
+    expect(message).toContain('success'); // Update expected message
+  });
+  
+  it('should display login page elements', async () => {
+    await LoginPage.open('/login');
+    await expect(LoginPage.usernameInput).toBeDisplayed();
+    await expect(LoginPage.passwordInput).toBeDisplayed();
+  });
+});

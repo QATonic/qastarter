@@ -1,0 +1,95 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Interactions;
+
+namespace {{projectName}}.Tests.Utils;
+
+public class AndroidGestures
+{
+    private readonly AppiumDriver _driver;
+
+    public AndroidGestures(AppiumDriver driver)
+    {
+        _driver = driver;
+    }
+
+    public void Swipe(int startX, int startY, int endX, int endY, int durationMs = 1000)
+    {
+        var action = new PointerInputDevice(PointerKind.Touch);
+        var sequence = new ActionSequence(action);
+        
+        sequence.AddAction(action.CreatePointerMove(CoordinateOrigin.Viewport, startX, startY, TimeSpan.Zero));
+        sequence.AddAction(action.CreatePointerDown(MouseButton.Left));
+        sequence.AddAction(action.CreatePause(TimeSpan.FromMilliseconds(durationMs)));
+        sequence.AddAction(action.CreatePointerMove(CoordinateOrigin.Viewport, endX, endY, TimeSpan.FromMilliseconds(durationMs)));
+        sequence.AddAction(action.CreatePointerUp(MouseButton.Left));
+        
+        _driver.PerformActions(new List<ActionSequence> { sequence });
+    }
+
+    public void SwipeUp()
+    {
+        var size = _driver.Manage().Window.Size;
+        int startX = size.Width / 2;
+        int startY = (int)(size.Height * 0.8);
+        int endX = size.Width / 2;
+        int endY = (int)(size.Height * 0.2);
+        
+        Swipe(startX, startY, endX, endY);
+    }
+
+    public void SwipeDown()
+    {
+        var size = _driver.Manage().Window.Size;
+        int startX = size.Width / 2;
+        int startY = (int)(size.Height * 0.2);
+        int endX = size.Width / 2;
+        int endY = (int)(size.Height * 0.8);
+        
+        Swipe(startX, startY, endX, endY);
+    }
+
+    public void SwipeLeft()
+    {
+        var size = _driver.Manage().Window.Size;
+        int startX = (int)(size.Width * 0.8);
+        int startY = size.Height / 2;
+        int endX = (int)(size.Width * 0.2);
+        int endY = size.Height / 2;
+        
+        Swipe(startX, startY, endX, endY);
+    }
+
+    public void SwipeRight()
+    {
+        var size = _driver.Manage().Window.Size;
+        int startX = (int)(size.Width * 0.2);
+        int startY = size.Height / 2;
+        int endX = (int)(size.Width * 0.8);
+        int endY = size.Height / 2;
+        
+        Swipe(startX, startY, endX, endY);
+    }
+
+    public IWebElement ScrollToText(string text)
+    {
+        return _driver.FindElement(
+            MobileBy.AndroidUIAutomator(
+                $"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text(\"{text}\"))"
+            )
+        );
+    }
+
+    public void LongPress(IWebElement element, int durationMs = 2000)
+    {
+        var action = new PointerInputDevice(PointerKind.Touch);
+        var sequence = new ActionSequence(action);
+        
+        sequence.AddAction(action.CreatePointerMove(element, 0, 0, TimeSpan.Zero));
+        sequence.AddAction(action.CreatePointerDown(MouseButton.Left));
+        sequence.AddAction(action.CreatePause(TimeSpan.FromMilliseconds(durationMs)));
+        sequence.AddAction(action.CreatePointerUp(MouseButton.Left));
+        
+        _driver.PerformActions(new List<ActionSequence> { sequence });
+    }
+}

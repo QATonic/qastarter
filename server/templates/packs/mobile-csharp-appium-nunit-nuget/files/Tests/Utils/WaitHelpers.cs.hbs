@@ -1,0 +1,179 @@
+using System;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Support.UI;
+
+namespace {{projectName}}.Tests.Utils
+{
+    /// <summary>
+    /// Wait helper utilities for mobile test automation
+    /// </summary>
+    public static class WaitHelpers
+    {
+        private static readonly int DefaultTimeoutSeconds = 30;
+        private static readonly int DefaultPollingMs = 500;
+
+        /// <summary>
+        /// Wait for element to be visible
+        /// </summary>
+        public static IWebElement WaitForElementVisible(
+            AppiumDriver driver,
+            By locator,
+            int timeoutSeconds = 0)
+        {
+            timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : DefaultTimeoutSeconds;
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            wait.PollingInterval = TimeSpan.FromMilliseconds(DefaultPollingMs);
+            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
+
+            Logger.Debug($"Waiting for element to be visible: {locator}");
+            return wait.Until(d =>
+            {
+                var element = d.FindElement(locator);
+                return element.Displayed ? element : null;
+            });
+        }
+
+        /// <summary>
+        /// Wait for element to be clickable
+        /// </summary>
+        public static IWebElement WaitForElementClickable(
+            AppiumDriver driver,
+            By locator,
+            int timeoutSeconds = 0)
+        {
+            timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : DefaultTimeoutSeconds;
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            wait.PollingInterval = TimeSpan.FromMilliseconds(DefaultPollingMs);
+            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
+
+            Logger.Debug($"Waiting for element to be clickable: {locator}");
+            return wait.Until(d =>
+            {
+                var element = d.FindElement(locator);
+                return element.Displayed && element.Enabled ? element : null;
+            });
+        }
+
+        /// <summary>
+        /// Wait for element to disappear
+        /// </summary>
+        public static bool WaitForElementToDisappear(
+            AppiumDriver driver,
+            By locator,
+            int timeoutSeconds = 0)
+        {
+            timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : DefaultTimeoutSeconds;
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            wait.PollingInterval = TimeSpan.FromMilliseconds(DefaultPollingMs);
+
+            Logger.Debug($"Waiting for element to disappear: {locator}");
+            try
+            {
+                return wait.Until(d =>
+                {
+                    try
+                    {
+                        var element = d.FindElement(locator);
+                        return !element.Displayed;
+                    }
+                    catch (NoSuchElementException)
+                    {
+                        return true;
+                    }
+                    catch (StaleElementReferenceException)
+                    {
+                        return true;
+                    }
+                });
+            }
+            catch (WebDriverTimeoutException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Wait for element to contain specific text
+        /// </summary>
+        public static bool WaitForElementText(
+            AppiumDriver driver,
+            By locator,
+            string expectedText,
+            int timeoutSeconds = 0)
+        {
+            timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : DefaultTimeoutSeconds;
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            wait.PollingInterval = TimeSpan.FromMilliseconds(DefaultPollingMs);
+            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
+
+            Logger.Debug($"Waiting for element text '{expectedText}': {locator}");
+            try
+            {
+                return wait.Until(d =>
+                {
+                    var element = d.FindElement(locator);
+                    return element.Text.Contains(expectedText);
+                });
+            }
+            catch (WebDriverTimeoutException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Wait for a custom condition
+        /// </summary>
+        public static T WaitForCondition<T>(
+            AppiumDriver driver,
+            Func<IWebDriver, T> condition,
+            int timeoutSeconds = 0)
+        {
+            timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : DefaultTimeoutSeconds;
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            wait.PollingInterval = TimeSpan.FromMilliseconds(DefaultPollingMs);
+
+            return wait.Until(condition);
+        }
+
+        /// <summary>
+        /// Wait for app to be in ready state
+        /// </summary>
+        public static void WaitForAppReady(AppiumDriver driver, int timeoutSeconds = 0)
+        {
+            timeoutSeconds = timeoutSeconds > 0 ? timeoutSeconds : DefaultTimeoutSeconds;
+            Logger.Debug("Waiting for app to be ready...");
+            
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            wait.Until(d => d.PageSource != null && d.PageSource.Length > 0);
+            
+            Logger.Debug("App is ready");
+        }
+
+        /// <summary>
+        /// Simple sleep (use sparingly)
+        /// </summary>
+        public static void Sleep(int milliseconds)
+        {
+            Logger.Debug($"Sleeping for {milliseconds}ms");
+            System.Threading.Thread.Sleep(milliseconds);
+        }
+
+        /// <summary>
+        /// Check if element exists without waiting
+        /// </summary>
+        public static bool IsElementPresent(AppiumDriver driver, By locator)
+        {
+            try
+            {
+                driver.FindElement(locator);
+                return true;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+    }
+}

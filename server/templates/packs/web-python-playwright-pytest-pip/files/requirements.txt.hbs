@@ -1,0 +1,26 @@
+# Core Testing Dependencies
+playwright=={{toolVersions.playwright}}
+pytest=={{toolVersions.pytest}}
+pytest-playwright==0.4.4
+pytest-xdist==3.5.0
+
+# Reporting Tools (conditional)
+{{#if (eq reportingTool "pytest-html")}}
+pytest-html==4.1.1
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+allure-pytest==2.13.2
+{{/if}}
+{{#if (eq reportingTool "pytest-json-report")}}
+pytest-json-report==1.5.0
+{{/if}}
+
+# BDD Testing (conditional)
+{{#if (eq testingPattern "bdd")}}
+pytest-bdd==7.0.1
+{{/if}}
+
+# Utilities
+python-dotenv==1.0.0
+Pillow==10.1.0
+PyYAML==6.0.1

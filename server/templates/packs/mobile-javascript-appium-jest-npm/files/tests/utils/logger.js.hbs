@@ -1,0 +1,84 @@
+/**
+ * Logger utility for mobile test execution.
+ */
+class Logger {
+  static LEVELS = {
+    DEBUG: 0,
+    INFO: 1,
+    WARN: 2,
+    ERROR: 3
+  };
+
+  static currentLevel = Logger.LEVELS.INFO;
+  static separator = '========================================';
+  static stepPrefix = '  → ';
+
+  static setLevel(level) {
+    Logger.currentLevel = level;
+  }
+
+  static getTimestamp() {
+    return new Date().toISOString();
+  }
+
+  static debug(message) {
+    if (Logger.currentLevel <= Logger.LEVELS.DEBUG) {
+      console.log(`[${Logger.getTimestamp()}] 🔍 DEBUG: ${message}`);
+    }
+  }
+
+  static info(message) {
+    if (Logger.currentLevel <= Logger.LEVELS.INFO) {
+      console.log(`[${Logger.getTimestamp()}] ℹ️  INFO: ${message}`);
+    }
+  }
+
+  static warn(message) {
+    if (Logger.currentLevel <= Logger.LEVELS.WARN) {
+      console.warn(`[${Logger.getTimestamp()}] ⚠️  WARN: ${message}`);
+    }
+  }
+
+  static error(message, error = null) {
+    if (Logger.currentLevel <= Logger.LEVELS.ERROR) {
+      console.error(`[${Logger.getTimestamp()}] ❌ ERROR: ${message}`);
+      if (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  static step(message) {
+    console.log(`${Logger.stepPrefix}${message}`);
+  }
+
+  static startSection(sectionName) {
+    console.log(Logger.separator);
+    console.log(sectionName);
+    console.log(Logger.separator);
+  }
+
+  static endSection() {
+    console.log(Logger.separator);
+  }
+
+  static testStart(testName) {
+    Logger.startSection(`🧪 TEST START: ${testName}`);
+  }
+
+  static testEnd(testName, passed) {
+    const result = passed ? '✅ PASSED' : '❌ FAILED';
+    console.log(`TEST ${result}: ${testName}`);
+    Logger.endSection();
+  }
+
+  static device(platform, deviceName) {
+    console.log(`📱 DEVICE: ${platform} - ${deviceName}`);
+  }
+
+  static gesture(gestureName, details = '') {
+    console.log(`👆 GESTURE: ${gestureName} ${details}`);
+  }
+}
+
+export default Logger;

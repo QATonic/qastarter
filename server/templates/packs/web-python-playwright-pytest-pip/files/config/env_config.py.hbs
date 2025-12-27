@@ -1,0 +1,30 @@
+import os
+import json
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class EnvConfig:
+    def __init__(self):
+        self.environment = os.getenv('TEST_ENV', 'dev')
+        self.env_data = self._load_environment_data()
+
+    def _load_environment_data(self):
+        data_path = Path(__file__).parent.parent / 'data' / f'{self.environment}.json'
+        with open(data_path, 'r') as file:
+            return json.load(file)
+
+    def get_base_url(self) -> str:
+        return self.env_data['baseUrl']
+
+    def get_credentials(self, user_type: str = 'validUser') -> dict:
+        return self.env_data['credentials'].get(user_type, self.env_data['credentials']['validUser'])
+
+    def get_timeout(self) -> int:
+        return self.env_data.get('timeout', 30000)
+
+    def get_environment(self) -> str:
+        return self.environment
+
+env_config = EnvConfig()

@@ -1,0 +1,154 @@
+version: 2.1
+
+executors:
+  node-executor:
+    docker:
+      - image: cimg/node:{{toolVersions.node}}-browsers
+    working_directory: ~/project
+
+jobs:
+  test-chromium:
+    executor: node-executor
+    environment:
+      BROWSER: chromium
+      TEST_ENV: qa
+      HEADLESS: true
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - v1-deps-{{raw}}{{ checksum "package-lock.json" }}{{/raw}}
+            - v1-deps-
+      
+      - run:
+          name: Install dependencies
+          command: npm ci
+      
+      - save_cache:
+          key: v1-deps-{{raw}}{{ checksum "package-lock.json" }}{{/raw}}
+          paths:
+            - node_modules
+      
+      - run:
+          name: Install Playwright Chromium
+          command: npx playwright install --with-deps chromium
+      
+      - run:
+          name: Run tests
+          command: npm test
+      {{#if (eq reportingTool "allure")}}
+      
+      - run:
+          name: Generate Allure Report
+          command: npm run report:generate
+          when: always
+      
+      - store_artifacts:
+          path: allure-results
+          destination: allure-results
+      
+      - store_artifacts:
+          path: allure-report
+          destination: allure-report
+      {{/if}}
+      {{#if (eq reportingTool "jest-html")}}
+      
+      - store_artifacts:
+          path: test-results/test-report.html
+          destination: html-report
+      {{/if}}
+      {{#if (eq reportingTool "junit")}}
+      
+      - store_test_results:
+          path: test-results
+      
+      - store_artifacts:
+          path: test-results/junit-results.xml
+          destination: junit-reports
+      {{/if}}
+      
+      - store_artifacts:
+          path: screenshots
+          destination: screenshots
+          when: on_fail
+      
+      - store_artifacts:
+          path: logs
+          destination: logs
+
+  test-firefox:
+    executor: node-executor
+    environment:
+      BROWSER: firefox
+      TEST_ENV: qa
+      HEADLESS: true
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - v1-deps-{{raw}}{{ checksum "package-lock.json" }}{{/raw}}
+            - v1-deps-
+      
+      - run:
+          name: Install dependencies
+          command: npm ci
+      
+      - save_cache:
+          key: v1-deps-{{raw}}{{ checksum "package-lock.json" }}{{/raw}}
+          paths:
+            - node_modules
+      
+      - run:
+          name: Install Playwright Firefox
+          command: npx playwright install --with-deps firefox
+      
+      - run:
+          name: Run tests
+          command: npm test
+      {{#if (eq reportingTool "allure")}}
+      
+      - run:
+          name: Generate Allure Report
+          command: npm run report:generate
+          when: always
+      
+      - store_artifacts:
+          path: allure-results
+          destination: allure-results
+      
+      - store_artifacts:
+          path: allure-report
+          destination: allure-report
+      {{/if}}
+      {{#if (eq reportingTool "jest-html")}}
+      
+      - store_artifacts:
+          path: test-results/test-report.html
+          destination: html-report
+      {{/if}}
+      {{#if (eq reportingTool "junit")}}
+      
+      - store_test_results:
+          path: test-results
+      
+      - store_artifacts:
+          path: test-results/junit-results.xml
+          destination: junit-reports
+      {{/if}}
+      
+      - store_artifacts:
+          path: screenshots
+          destination: screenshots
+          when: on_fail
+      
+      - store_artifacts:
+          path: logs
+          destination: logs
+
+workflows:
+  test-workflow:
+    jobs:
+      - test-chromium
+      - test-firefox

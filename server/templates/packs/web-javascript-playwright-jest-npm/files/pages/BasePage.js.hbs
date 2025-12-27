@@ -1,0 +1,50 @@
+const logger = require('../utils/logger');
+
+class BasePage {
+  constructor(page) {
+    this.page = page;
+  }
+
+  async navigate(url) {
+    logger.info(`Navigating to: ${url}`);
+    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
+  }
+
+  async click(selector) {
+    await this.page.click(selector);
+    logger.info(`Clicked: ${selector}`);
+  }
+
+  async fill(selector, text) {
+    await this.page.fill(selector, text);
+    logger.info(`Filled "${text}" into: ${selector}`);
+  }
+
+  async getText(selector) {
+    return await this.page.textContent(selector);
+  }
+
+  async isVisible(selector) {
+    try {
+      return await this.page.isVisible(selector);
+    } catch {
+      return false;
+    }
+  }
+
+  async getPageTitle() {
+    return await this.page.title();
+  }
+
+  async getCurrentUrl() {
+    return this.page.url();
+  }
+
+  async takeScreenshot(name) {
+    const path = `screenshots/${name}.png`;
+    await this.page.screenshot({ path, fullPage: true });
+    logger.info(`Screenshot saved: ${name}.png`);
+  }
+}
+
+module.exports = BasePage;

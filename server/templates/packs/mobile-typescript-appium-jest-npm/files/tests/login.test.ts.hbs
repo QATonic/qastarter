@@ -1,0 +1,43 @@
+import LoginPage from './pages/LoginPage';
+import HomePage from './pages/HomePage';
+
+// ========== UPDATE THESE VALUES ==========
+// Replace with your actual test credentials
+const TEST_USERNAME = 'YOUR_USERNAME_HERE';
+const TEST_PASSWORD = 'YOUR_PASSWORD_HERE';
+// ==========================================
+
+describe('Login Tests', () => {
+  let loginPage: LoginPage;
+  let homePage: HomePage;
+
+  beforeEach(() => {
+    loginPage = new LoginPage(driver);
+    homePage = new HomePage(driver);
+  });
+
+  /**
+   * Verify login functionality works correctly.
+   * 
+   * BEFORE RUNNING:
+   * 1. Update TEST_USERNAME and TEST_PASSWORD above with valid credentials
+   * 2. Configure device capabilities in config/capabilities.ts
+   * 3. Ensure Appium server is running
+   * 4. Update selectors in pages/LoginPage.ts to match your app
+   */
+  test('should login with valid credentials', async () => {
+    try {
+      // Step 1: Perform login
+      await loginPage.login(TEST_USERNAME, TEST_PASSWORD);
+      
+      // Step 2: Verify home page is displayed
+      const isHomeDisplayed = await homePage.isHomePageDisplayed();
+      expect(isHomeDisplayed).toBe(true);
+      
+      // Test passed! Your {{framework}} framework is working correctly.
+    } catch (error) {
+      await driver.saveScreenshot('screenshots/FAILED-login-valid-credentials.png');
+      throw error;
+    }
+  });
+});

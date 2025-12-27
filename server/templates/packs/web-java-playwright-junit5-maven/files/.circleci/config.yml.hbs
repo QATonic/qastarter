@@ -1,0 +1,204 @@
+version: 2.1
+
+orbs:
+  maven: circleci/maven@1.4.1
+
+executors:
+  java-playwright-executor:
+    docker:
+      - image: cimg/openjdk:{{toolVersions.java}}-node
+    working_directory: ~/repo
+    environment:
+      MAVEN_OPTS: -Xmx3200m
+
+jobs:
+  test-chromium:
+    executor: java-playwright-executor
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{raw}}{{ checksum "pom.xml" }}{{/raw}}
+            - v1-dependencies-
+      
+      - run:
+          name: Build Project
+          command: mvn clean compile
+      
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{raw}}{{ checksum "pom.xml" }}{{/raw}}
+      
+      - run:
+          name: Install Playwright Browsers
+          command: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
+      
+      - run:
+          name: Run Tests with Chromium
+          command: mvn test -Dbrowser=chromium -Denv=qa
+      {{#if (eq reportingTool "allure")}}
+      
+      - run:
+          name: Generate Allure Report
+          when: always
+          command: mvn allure:report
+      {{/if}}
+      
+      - store_test_results:
+          path: target/surefire-reports
+      {{#if (eq reportingTool "allure")}}
+      
+      - store_artifacts:
+          path: target/allure-results
+          destination: allure-results
+      
+      - store_artifacts:
+          path: target/site/allure-maven-plugin
+          destination: allure-report
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      
+      - store_artifacts:
+          path: reports/extent-report.html
+          destination: extent-report
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      
+      - store_artifacts:
+          path: target/surefire-reports
+          destination: junit-reports
+      {{/if}}
+      
+      - store_artifacts:
+          path: reports/screenshots
+          destination: screenshots
+      
+      - store_artifacts:
+          path: logs
+          destination: logs
+
+  test-firefox:
+    executor: java-playwright-executor
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{raw}}{{ checksum "pom.xml" }}{{/raw}}
+            - v1-dependencies-
+      
+      - run:
+          name: Install Playwright Browsers
+          command: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
+      
+      - run:
+          name: Run Tests with Firefox
+          command: mvn test -Dbrowser=firefox -Denv=qa
+      {{#if (eq reportingTool "allure")}}
+      
+      - run:
+          name: Generate Allure Report
+          when: always
+          command: mvn allure:report
+      {{/if}}
+      
+      - store_test_results:
+          path: target/surefire-reports
+      {{#if (eq reportingTool "allure")}}
+      
+      - store_artifacts:
+          path: target/allure-results
+          destination: allure-results
+      
+      - store_artifacts:
+          path: target/site/allure-maven-plugin
+          destination: allure-report
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      
+      - store_artifacts:
+          path: reports/extent-report.html
+          destination: extent-report
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      
+      - store_artifacts:
+          path: target/surefire-reports
+          destination: junit-reports
+      {{/if}}
+      
+      - store_artifacts:
+          path: reports/screenshots
+          destination: screenshots
+      
+      - store_artifacts:
+          path: logs
+          destination: logs
+
+  test-webkit:
+    executor: java-playwright-executor
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{raw}}{{ checksum "pom.xml" }}{{/raw}}
+            - v1-dependencies-
+      
+      - run:
+          name: Install Playwright Browsers
+          command: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
+      
+      - run:
+          name: Run Tests with WebKit
+          command: mvn test -Dbrowser=webkit -Denv=qa
+      {{#if (eq reportingTool "allure")}}
+      
+      - run:
+          name: Generate Allure Report
+          when: always
+          command: mvn allure:report
+      {{/if}}
+      
+      - store_test_results:
+          path: target/surefire-reports
+      {{#if (eq reportingTool "allure")}}
+      
+      - store_artifacts:
+          path: target/allure-results
+          destination: allure-results
+      
+      - store_artifacts:
+          path: target/site/allure-maven-plugin
+          destination: allure-report
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      
+      - store_artifacts:
+          path: reports/extent-report.html
+          destination: extent-report
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      
+      - store_artifacts:
+          path: target/surefire-reports
+          destination: junit-reports
+      {{/if}}
+      
+      - store_artifacts:
+          path: reports/screenshots
+          destination: screenshots
+      
+      - store_artifacts:
+          path: logs
+          destination: logs
+
+workflows:
+  version: 2
+  test-all-browsers:
+    jobs:
+      - test-chromium
+      - test-firefox
+      - test-webkit

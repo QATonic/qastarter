@@ -1,0 +1,277 @@
+package {{packageName}}.utils;
+
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.TouchAction;
+import io.appium.java_client.touch.WaitOptions;
+import io.appium.java_client.touch.offset.PointOption;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.WebElement;
+import {{packageName}}.core.DriverManager;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.time.Duration;
+
+/**
+ * Mobile-specific gesture and interaction utilities
+ * Provides swipe, tap, scroll, and other mobile gestures
+ */
+public class MobileActions {
+
+    private static AppiumDriver getDriver() {
+        return DriverManager.getDriver();
+    }
+
+    /**
+     * Perform swipe gesture from one point to another
+     * 
+     * @param startX Start X coordinate
+     * @param startY Start Y coordinate
+     * @param endX End X coordinate
+     * @param endY End Y coordinate
+     * @param durationMs Swipe duration in milliseconds
+     */
+    public static void swipe(int startX, int startY, int endX, int endY, int durationMs) {
+        try {
+            TouchAction touchAction = new TouchAction(getDriver());
+            touchAction.press(PointOption.point(startX, startY))
+                       .waitAction(WaitOptions.waitOptions(Duration.ofMillis(durationMs)))
+                       .moveTo(PointOption.point(endX, endY))
+                       .release()
+                       .perform();
+            
+            {{#if utilities.logger}}
+            Log.info("Performed swipe from (" + startX + "," + startY + ") to (" + endX + "," + endY + ")");
+            {{/if}}
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to perform swipe gesture", e);
+            {{/if}}
+            throw new RuntimeException("Swipe gesture failed", e);
+        }
+    }
+
+    /**
+     * Swipe up on the screen
+     */
+    public static void swipeUp() {
+        Dimension size = getDriver().manage().window().getSize();
+        int startX = size.width / 2;
+        int startY = (int) (size.height * 0.8);
+        int endY = (int) (size.height * 0.2);
+        
+        swipe(startX, startY, startX, endY, 1000);
+        {{#if utilities.logger}}
+        Log.info("Performed swipe up gesture");
+        {{/if}}
+    }
+
+    /**
+     * Swipe down on the screen
+     */
+    public static void swipeDown() {
+        Dimension size = getDriver().manage().window().getSize();
+        int startX = size.width / 2;
+        int startY = (int) (size.height * 0.2);
+        int endY = (int) (size.height * 0.8);
+        
+        swipe(startX, startY, startX, endY, 1000);
+        {{#if utilities.logger}}
+        Log.info("Performed swipe down gesture");
+        {{/if}}
+    }
+
+    /**
+     * Swipe left on the screen
+     */
+    public static void swipeLeft() {
+        Dimension size = getDriver().manage().window().getSize();
+        int startX = (int) (size.width * 0.8);
+        int endX = (int) (size.width * 0.2);
+        int y = size.height / 2;
+        
+        swipe(startX, y, endX, y, 1000);
+        {{#if utilities.logger}}
+        Log.info("Performed swipe left gesture");
+        {{/if}}
+    }
+
+    /**
+     * Swipe right on the screen
+     */
+    public static void swipeRight() {
+        Dimension size = getDriver().manage().window().getSize();
+        int startX = (int) (size.width * 0.2);
+        int endX = (int) (size.width * 0.8);
+        int y = size.height / 2;
+        
+        swipe(startX, y, endX, y, 1000);
+        {{#if utilities.logger}}
+        Log.info("Performed swipe right gesture");
+        {{/if}}
+    }
+
+    /**
+     * Tap on specific coordinates
+     * 
+     * @param x X coordinate
+     * @param y Y coordinate
+     */
+    public static void tap(int x, int y) {
+        try {
+            TouchAction touchAction = new TouchAction(getDriver());
+            touchAction.tap(PointOption.point(x, y)).perform();
+            
+            {{#if utilities.logger}}
+            Log.info("Performed tap at coordinates (" + x + "," + y + ")");
+            {{/if}}
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to perform tap gesture", e);
+            {{/if}}
+            throw new RuntimeException("Tap gesture failed", e);
+        }
+    }
+
+    /**
+     * Tap on a WebElement
+     * 
+     * @param element WebElement to tap
+     */
+    public static void tap(WebElement element) {
+        try {
+            TouchAction touchAction = new TouchAction(getDriver());
+            touchAction.tap(PointOption.point(element.getLocation().x + element.getSize().width / 2,
+                                            element.getLocation().y + element.getSize().height / 2))
+                       .perform();
+            
+            {{#if utilities.logger}}
+            Log.info("Performed tap on element: " + element.toString());
+            {{/if}}
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to tap on element", e);
+            {{/if}}
+            throw new RuntimeException("Tap on element failed", e);
+        }
+    }
+
+    /**
+     * Perform long press on coordinates
+     * 
+     * @param x X coordinate
+     * @param y Y coordinate
+     * @param durationMs Duration in milliseconds
+     */
+    public static void longPress(int x, int y, int durationMs) {
+        try {
+            TouchAction touchAction = new TouchAction(getDriver());
+            touchAction.longPress(PointOption.point(x, y), Duration.ofMillis(durationMs))
+                       .release()
+                       .perform();
+            
+            {{#if utilities.logger}}
+            Log.info("Performed long press at (" + x + "," + y + ") for " + durationMs + "ms");
+            {{/if}}
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to perform long press", e);
+            {{/if}}
+            throw new RuntimeException("Long press failed", e);
+        }
+    }
+
+    /**
+     * Perform long press on a WebElement
+     * 
+     * @param element WebElement to long press
+     * @param durationMs Duration in milliseconds
+     */
+    public static void longPress(WebElement element, int durationMs) {
+        try {
+            TouchAction touchAction = new TouchAction(getDriver());
+            touchAction.longPress(PointOption.point(element.getLocation().x + element.getSize().width / 2,
+                                                   element.getLocation().y + element.getSize().height / 2),
+                                 Duration.ofMillis(durationMs))
+                       .release()
+                       .perform();
+            
+            {{#if utilities.logger}}
+            Log.info("Performed long press on element for " + durationMs + "ms");
+            {{/if}}
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to long press on element", e);
+            {{/if}}
+            throw new RuntimeException("Long press on element failed", e);
+        }
+    }
+
+    /**
+     * Scroll to element using mobile scroll gesture
+     * 
+     * @param scrollableElement The scrollable container element
+     * @param targetElement The target element to scroll to
+     */
+    public static void scrollToElement(WebElement scrollableElement, WebElement targetElement) {
+        try {
+            // Implementation would depend on the specific mobile automation needs
+            // This is a basic example
+            int maxScrollAttempts = 10;
+            int scrollAttempts = 0;
+            
+            while (!targetElement.isDisplayed() && scrollAttempts < maxScrollAttempts) {
+                swipeUp();
+                scrollAttempts++;
+            }
+            
+            {{#if utilities.logger}}
+            Log.info("Scrolled to target element after " + scrollAttempts + " attempts");
+            {{/if}}
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to scroll to element", e);
+            {{/if}}
+            throw new RuntimeException("Scroll to element failed", e);
+        }
+    }
+
+    /**
+     * Hide mobile keyboard
+     */
+    public static void hideKeyboard() {
+        try {
+            getDriver().hideKeyboard();
+            {{#if utilities.logger}}
+            Log.info("Mobile keyboard hidden");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.warn("Could not hide keyboard - it may not be visible", e);
+            {{/if}}
+        }
+    }
+
+    /**
+     * Check if keyboard is shown
+     * 
+     * @return true if keyboard is visible, false otherwise
+     */
+    public static boolean isKeyboardShown() {
+        try {
+            return getDriver().isKeyboardShown();
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.warn("Could not determine keyboard visibility", e);
+            {{/if}}
+            return false;
+        }
+    }
+}

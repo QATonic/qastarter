@@ -1,0 +1,14 @@
+[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts = 
+    --html=test-results/report.html 
+    --self-contained-html
+    -v
+    --tb=short
+markers =
+    smoke: Smoke tests
+    regression: Regression tests
+    critical: Critical path tests

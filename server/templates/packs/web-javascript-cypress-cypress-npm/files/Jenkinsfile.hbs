@@ -1,0 +1,124 @@
+pipeline {
+    agent any
+    
+    tools {
+        nodejs 'NodeJS {{toolVersions.node}}'
+    }
+    
+    environment {
+        TEST_ENV = 'qa'
+        CYPRESS_CACHE_FOLDER = "${WORKSPACE}/.cypress-cache"
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+        
+        stage('Install Cypress') {
+            steps {
+                sh 'npx cypress install'
+            }
+        }
+        
+        stage('Run Cypress Tests - Chrome') {
+            environment {
+                BROWSER = 'chrome'
+            }
+            steps {
+                sh 'npx cypress run --browser chrome'
+            }
+            post {
+                always {
+                    {{#if (eq reportingTool "allure")}}
+                    sh 'npm run report:generate'
+                    allure([
+                        results: [[path: 'allure-results']]
+                    ])
+                    archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'allure-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "jest-html-reporter")}}
+                    publishHTML([
+                        reportDir: 'cypress/reports',
+                        reportFiles: 'report.html',
+                        reportName: 'Cypress HTML Report - Chrome',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "mochawesome")}}
+                    publishHTML([
+                        reportDir: 'cypress/reports/mochawesome',
+                        reportFiles: 'mochawesome.html',
+                        reportName: 'Mochawesome Report - Chrome',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'cypress/reports/mochawesome/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    archiveArtifacts artifacts: 'cypress/screenshots/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'cypress/videos/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+        
+        stage('Run Cypress Tests - Firefox') {
+            environment {
+                BROWSER = 'firefox'
+            }
+            steps {
+                sh 'npx cypress run --browser firefox'
+            }
+            post {
+                always {
+                    {{#if (eq reportingTool "allure")}}
+                    sh 'npm run report:generate'
+                    allure([
+                        results: [[path: 'allure-results']]
+                    ])
+                    archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'allure-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "jest-html-reporter")}}
+                    publishHTML([
+                        reportDir: 'cypress/reports',
+                        reportFiles: 'report.html',
+                        reportName: 'Cypress HTML Report - Firefox',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "mochawesome")}}
+                    publishHTML([
+                        reportDir: 'cypress/reports/mochawesome',
+                        reportFiles: 'mochawesome.html',
+                        reportName: 'Mochawesome Report - Firefox',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'cypress/reports/mochawesome/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    archiveArtifacts artifacts: 'cypress/screenshots/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'cypress/videos/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

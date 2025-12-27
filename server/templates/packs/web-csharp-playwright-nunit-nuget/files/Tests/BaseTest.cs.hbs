@@ -1,0 +1,84 @@
+using Microsoft.Playwright;
+using NUnit.Framework;
+using {{projectName}}.Config;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Tests;
+
+public class BaseTest
+{
+    protected IPlaywright? Playwright;
+    protected IBrowser? Browser;
+    protected IBrowserContext? Context;
+    protected IPage? Page;
+
+    [OneTimeSetUp]
+    public async Task OneTimeSetup()
+    {
+        // Create directories
+        Directory.CreateDirectory("screenshots");
+        Directory.CreateDirectory("test-results");
+
+        Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
+
+        var browserType = TestSettings.Browser.ToLower() switch
+        {
+            "firefox" => Playwright.Firefox,
+            "webkit" => Playwright.Webkit,
+            _ => Playwright.Chromium
+        };
+
+        Console.WriteLine($"Launching browser: {TestSettings.Browser}");
+
+        Browser = await browserType.LaunchAsync(new()
+        {
+            Headless = TestSettings.Headless,
+            SlowMo = TestSettings.SlowMo
+        });
+    }
+
+    [SetUp]
+    public async Task Setup()
+    {
+        Context = await Browser!.NewContextAsync(new()
+        {
+            ViewportSize = new() { Width = 1920, Height = 1080 },
+            IgnoreHTTPSErrors = true
+        });
+
+        Page = await Context.NewPageAsync();
+    }
+
+    [TearDown]
+    public async Task TearDown()
+    {
+        if (TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed)
+        {
+            if (TestSettings.ScreenshotOnFailure && Page != null)
+            {
+                await ScreenshotHelper.CaptureOnFailureAsync(Page, TestContext.CurrentContext.Test.Name);
+            }
+        }
+
+        if (Page != null)
+        {
+            await Page.CloseAsync();
+        }
+
+        if (Context != null)
+        {
+            await Context.CloseAsync();
+        }
+    }
+
+    [OneTimeTearDown]
+    public async Task OneTimeTearDown()
+    {
+        if (Browser != null)
+        {
+            await Browser.CloseAsync();
+        }
+
+        Playwright?.Dispose();
+    }
+}

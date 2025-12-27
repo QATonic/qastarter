@@ -1,0 +1,190 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(
+            name: 'BROWSER',
+            choices: ['chrome', 'firefox', 'edge'],
+            description: 'Browser to run tests on'
+        )
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'qa', 'stg', 'prod'],
+            description: 'Environment to run tests against'
+        )
+        choice(
+            name: 'SUITE',
+            choices: ['testng.xml', 'smoke.xml', 'regression.xml'],
+            description: 'Test suite to execute'
+        )
+        booleanParam(
+            name: 'HEADLESS',
+            defaultValue: true,
+            description: 'Run tests in headless mode'
+        )
+    }
+    
+    environment {
+        MAVEN_OPTS = '-Xmx1024m -XX:MaxPermSize=256m'
+    }
+    
+    tools {
+        maven 'Maven {{toolVersions.maven}}'
+        jdk 'JDK {{toolVersions.java}}'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.BUILD_VERSION = sh(
+                        script: "echo '1.0.${BUILD_NUMBER}'",
+                        returnStdout: true
+                    ).trim()
+                }
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                echo "Setting up build environment..."
+                sh 'java -version'
+                sh 'mvn -version'
+            }
+        }
+        
+        stage('Compile') {
+            steps {
+                echo "Compiling the project..."
+                sh 'mvn clean compile -q'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+                script {
+                    def testCommand = "mvn clean test " +
+                        "-P${params.ENVIRONMENT} " +
+                        "-Dsuite=${params.SUITE} " +
+                        "-Dbrowser=${params.BROWSER} " +
+                        "-Dheadless=${params.HEADLESS} " +
+                        "-Dmaven.test.failure.ignore=true"
+                    
+                    sh testCommand
+                }
+            }
+            post {
+                always {
+                    // Archive test results
+                    junit(
+                        testResults: 'target/surefire-reports/*.xml',
+                        allowEmptyResults: true
+                    )
+{{#if (eq reportingTool "allure")}}
+                    
+                    // Allure Report
+                    script {
+                        sh 'mvn allure:report'
+                    }
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        results: [[path: 'target/allure-results']]
+                    ])
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+                    
+                    // Archive ExtentReports HTML
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: '*.html',
+                        reportName: 'Extent Report',
+                        reportTitles: 'Test Execution Report'
+                    ])
+{{/if}}
+{{#if (eq reportingTool "testng-reports")}}
+                    
+                    // Archive TestNG Reports
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'target/surefire-reports',
+                        reportFiles: 'index.html',
+                        reportName: 'TestNG Report',
+                        reportTitles: 'TestNG Execution Report'
+                    ])
+{{/if}}
+                    
+                    // Archive screenshots if any test failed
+                    archiveArtifacts(
+                        artifacts: 'reports/screenshots/**/*.*',
+                        allowEmptyArchive: true,
+                        fingerprint: false
+                    )
+                    
+                    // Archive logs
+                    archiveArtifacts(
+                        artifacts: 'logs/**/*.log',
+                        allowEmptyArchive: true,
+                        fingerprint: false
+                    )
+                }
+            }
+        }
+        
+        stage('Generate Report Summary') {
+            steps {
+                script {
+                    // Generate a simple test summary
+                    sh '''
+                        echo "Test Execution Summary" > test-summary.txt
+                        echo "=====================" >> test-summary.txt
+                        echo "Browser: ${BROWSER}" >> test-summary.txt
+                        echo "Environment: ${ENVIRONMENT}" >> test-summary.txt
+                        echo "Suite: ${SUITE}" >> test-summary.txt
+                        echo "Headless: ${HEADLESS}" >> test-summary.txt
+                        echo "Build: ${BUILD_VERSION}" >> test-summary.txt
+                        echo "" >> test-summary.txt
+                        
+                        if [ -f "target/surefire-reports/testng-results.xml" ]; then
+                            echo "TestNG Results:" >> test-summary.txt
+                            grep -o "passed=\"[^\"]*\"" target/surefire-reports/testng-results.xml | head -1 >> test-summary.txt
+                            grep -o "failed=\"[^\"]*\"" target/surefire-reports/testng-results.xml | head -1 >> test-summary.txt
+                            grep -o "skipped=\"[^\"]*\"" target/surefire-reports/testng-results.xml | head -1 >> test-summary.txt
+                        fi
+                    '''
+                    
+                    archiveArtifacts artifacts: 'test-summary.txt', fingerprint: false
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Clean workspace
+            cleanWs()
+        }
+        
+        success {
+            echo "✅ Tests completed successfully!"
+            // You can add Slack/Teams notifications here
+        }
+        
+        failure {
+            echo "❌ Tests failed or build encountered issues!"
+            // You can add Slack/Teams notifications here
+        }
+        
+        unstable {
+            echo "⚠️  Some tests failed but build completed!"
+            // You can add Slack/Teams notifications here
+        }
+    }
+}

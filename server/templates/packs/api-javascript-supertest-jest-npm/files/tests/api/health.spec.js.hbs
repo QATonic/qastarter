@@ -1,0 +1,67 @@
+import { apiClient } from '../../core/ApiClient.js';
+
+/**
+ * Health Check / Smoke Tests
+ * 
+ * These tests verify basic API connectivity and health.
+ * Run these first to ensure the API is accessible.
+ */
+describe('API Health Check Tests', () => {
+  
+  /**
+   * Test API is reachable
+   */
+  test('should verify API is reachable', async () => {
+    // TODO: Update to your API's health endpoint
+    const response = await apiClient.get('/health');
+    
+    expect([200, 204]).toContain(response.status);
+  });
+  
+  /**
+   * Test API returns expected content type
+   */
+  test('should return JSON content type', async () => {
+    const response = await apiClient.get('/health');
+    
+    expect(response.headers['content-type']).toMatch(/application\/json/);
+  });
+  
+  /**
+   * Test API version endpoint (if available)
+   */
+  test('should return API version', async () => {
+    // TODO: Update to your API's version endpoint
+    const response = await apiClient.get('/version');
+    
+    if (response.status === 200) {
+      expect(response.body).toHaveProperty('version');
+    } else {
+      // Skip if endpoint doesn't exist
+      expect([200, 404]).toContain(response.status);
+    }
+  });
+  
+  /**
+   * Test 404 for non-existent endpoint
+   */
+  test('should return 404 for non-existent endpoint', async () => {
+    const response = await apiClient.get('/non-existent-endpoint-12345');
+    
+    expect(response.status).toBe(404);
+  });
+  
+  /**
+   * Test response time is acceptable
+   */
+  test('should respond within acceptable time', async () => {
+    const startTime = Date.now();
+    
+    await apiClient.get('/health');
+    
+    const responseTime = Date.now() - startTime;
+    
+    // Response should be under 5 seconds
+    expect(responseTime).toBeLessThan(5000);
+  });
+});

@@ -1,0 +1,30 @@
+# ============================================
+# CONFIGURATION FILE - UPDATE THESE VALUES
+# ============================================
+# This file contains your application settings.
+# Replace the placeholder values below with your actual test environment details.
+
+# Your application's base URL (no trailing slash)
+base.url=https://your-app-url.com
+
+# Browser settings
+browser=chrome
+headless=false
+
+# Timeouts (seconds)
+implicit.wait=10
+explicit.wait=20
+page.load.timeout=30
+
+# Test credentials - UPDATE THESE
+default.username=your-test-user@email.com
+default.password=YourTestPassword123
+
+# Reporting
+{{#if (eq reportingTool "extent-reports")}}
+extent.report.path=reports/ExtentReport.html
+extent.report.title={{projectName}} Test Results
+{{/if}}
+
+# Environment
+environment=dev

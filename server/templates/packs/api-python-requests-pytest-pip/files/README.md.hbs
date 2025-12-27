@@ -1,0 +1,210 @@
+# {{projectName}}
+
+REST API automation framework with Python, Requests, and Pytest.
+
+## Features
+
+- **Python {{toolVersions.python}}**: Modern async-capable Python
+- **Requests {{toolVersions.requests}}**: Industry-standard HTTP library
+- **Pytest {{toolVersions.pytest}}**: Powerful testing framework
+- **JSON Schema Validation**: Validate API responses
+- **Data-Driven Testing**: Parameterized tests with external data
+- **Comprehensive Logging**: Detailed test execution logs
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else if (eq reportingTool "pytest-html")}}
+- **Pytest HTML Reports**: Beautiful test reports
+{{else}}
+- **HTML Reports**: Beautiful test reports
+{{/if}}
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+
+## Installation
+
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file:
+
+```bash
+# Environment
+TEST_ENV=dev
+
+# API Configuration
+BASE_URL=https://jsonplaceholder.typicode.com
+
+# Authentication
+AUTH_TOKEN=
+API_KEY=
+USERNAME=
+PASSWORD=
+
+# Timeouts
+REQUEST_TIMEOUT=30
+RETRY_COUNT=3
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=logs/test_run.log
+
+# SSL Verification
+VERIFY_SSL=true
+```
+
+### Environment Files
+
+Update configurations in `config/environments.py` for different environments (dev, qa, staging, prod).
+
+## Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/test_users.py
+
+# Run tests by marker
+pytest -m smoke
+pytest -m regression
+
+# Run with HTML report
+pytest --html=reports/report.html --self-contained-html
+
+# Run in parallel
+pytest -n auto
+
+# Run with coverage
+pytest --cov=. --cov-report=html
+```
+
+## Project Structure
+
+```
+.
+├── config/
+│   ├── settings.py          # Configuration management
+│   └── environments.py      # Environment configs
+├── core/
+│   ├── api_client.py        # Base API client
+│   ├── request_builder.py   # Request builder pattern
+│   └── response_validator.py # Response validation
+├── models/
+│   ├── user.py              # User data model
+│   └── api_response.py      # API response model
+├── utils/
+│   ├── auth_manager.py      # Authentication manager
+│   ├── json_utils.py        # JSON utilities
+│   └── logger.py            # Logging configuration
+├── tests/
+│   ├── conftest.py          # Pytest fixtures
+│   ├── test_users.py        # User API tests
+│   ├── test_authentication.py # Auth tests
+│   └── test_data_driven.py  # Data-driven tests
+├── schemas/
+│   └── user_schema.json     # JSON schemas
+├── data/
+│   ├── users.json           # Test user data
+│   └── test_cases.json      # Test case data
+├── requirements.txt         # Dependencies
+└── pytest.ini               # Pytest configuration
+```
+
+## Writing Tests
+
+### Basic Test Example
+
+```python
+from core.api_client import APIClient
+from core.response_validator import ResponseValidator
+
+def test_get_user(api_client: APIClient):
+    response = api_client.get("/users/1")
+    
+    validator = ResponseValidator(response)
+    validator.assert_status_code(200)
+    validator.assert_json_contains("id")
+    validator.assert_json_contains("name")
+```
+
+### Using Request Builder
+
+```python
+from core.request_builder import RequestBuilder
+
+builder = RequestBuilder()
+kwargs = builder \
+    .with_header("Content-Type", "application/json") \
+    .with_param("page", 1) \
+    .with_json({"name": "John"}) \
+    .build()
+
+response = api_client.post("/users", **kwargs)
+```
+
+### JSON Schema Validation
+
+```python
+from utils.json_utils import JSONUtils
+
+schema = JSONUtils.load_schema("user_schema")
+validator.assert_json_schema(schema)
+```
+
+## Test Markers
+
+- `@pytest.mark.smoke` - Smoke tests
+- `@pytest.mark.regression` - Regression tests
+- `@pytest.mark.auth` - Authentication tests
+- `@pytest.mark.users` - User API tests
+- `@pytest.mark.slow` - Slow running tests
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR with Python version matrix (3.11, 3.12).
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Reports
+
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Generate with `allure serve allure-results`
+{{else}}
+- **HTML Reports**: `reports/report.html`
+{{/if}}
+- **Logs**: `logs/test_run.log`

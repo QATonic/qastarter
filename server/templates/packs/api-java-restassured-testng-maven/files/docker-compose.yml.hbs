@@ -1,0 +1,55 @@
+# {{projectName}} - Docker Compose for API Testing
+# Provides containerized API test execution environment
+
+version: '3.8'
+
+services:
+  # API Test Runner
+  api-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TEST_ENV=qa
+      - BASE_URL={{#if baseUrl}}{{baseUrl}}{{else}}https://api.example.com{{/if}}
+      - MAVEN_OPTS=-Xmx1024m
+    volumes:
+      - ./target:/app/target
+    networks:
+      - test-network
+
+  # Optional: Mock API Server (WireMock)
+  mock-api:
+    image: wiremock/wiremock:3.3.1
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/test/resources/wiremock:/home/wiremock
+    networks:
+      - test-network
+    profiles:
+      - mock
+
+  # Allure Report Server
+  allure:
+    image: frankescobar/allure-docker-service:2.21.0
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./target/allure-results:/app/allure-results
+    environment:
+      - CHECK_RESULTS_EVERY_SECONDS=3
+    networks:
+      - test-network
+    profiles:
+      - report
+
+networks:
+  test-network:
+    driver: bridge
+
+# Usage:
+# Run tests: docker-compose up --build api-tests
+# Run with mock server: docker-compose --profile mock up
+# View Allure reports: docker-compose --profile report up allure
+# Run specific test class: docker-compose run api-tests mvn test -Dtest=UserApiTests

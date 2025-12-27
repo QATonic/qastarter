@@ -1,0 +1,53 @@
+"""
+Sample desktop automation test with single positive test case
+"""
+import pytest
+import time
+from core.gui_actions import GUIActions
+from core.keyboard_actions import KeyboardActions
+from config.settings import Settings
+
+# ========== UPDATE THESE VALUES ==========
+# Calculator is used as an example. Replace with your application
+APP_COMMAND = "YOUR_APPLICATION_COMMAND_HERE"
+# ==========================================
+
+
+@pytest.mark.smoke
+@pytest.mark.skipif(not Settings.IS_WINDOWS, reason="Calculator test is Windows-specific")
+class TestCalculator:
+    @pytest.fixture(scope="function")
+    def calculator_app(self, check_calculator_available):
+        """Launch Calculator before each test"""
+        GUIActions.launch_application(Settings.get_calculator_command())
+        time.sleep(2)  # Wait for app to fully load
+        yield
+        GUIActions.close_application()
+        time.sleep(1)
+    
+    def test_simple_addition(self, calculator_app):
+        """
+        Verify basic calculator functionality works correctly.
+        
+        BEFORE RUNNING:
+        1. Ensure your application is installed
+        2. Configure app command in config/settings.py
+        3. Update test actions for your specific application
+        """
+        # Step 1: Enter first number
+        KeyboardActions.type_text("5")
+        
+        # Step 2: Press plus key
+        KeyboardActions.press_key("add")
+        
+        # Step 3: Enter second number
+        KeyboardActions.type_text("3")
+        
+        # Step 4: Press enter to calculate
+        KeyboardActions.press_enter()
+        
+        # Allow time for result
+        time.sleep(1)
+        
+        # Test passed! Your {{framework}} framework is working correctly.
+        # Note: Actual result verification would require OCR or image recognition

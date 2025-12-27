@@ -1,0 +1,91 @@
+package {{javaPackage}}.bdd;
+
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.core.MobileDriverFactory;
+import {{javaPackage}}.utils.Log;
+{{#if (eq reportingTool "allure")}}
+import {{javaPackage}}.utils.AllureManager;
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+{{/if}}
+
+/**
+ * Cucumber Hooks for Mobile BDD Tests
+ * Handles test setup and teardown for each scenario
+ */
+public class Hooks {
+
+    @Before
+    public void setUp(Scenario scenario) {
+        Log.info("========================================");
+        Log.info("Starting Scenario: " + scenario.getName());
+        Log.info("========================================");
+        
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.createTest(scenario.getName(), "BDD Mobile Test");
+        {{/if}}
+        
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Starting scenario: " + scenario.getName());
+        {{/if}}
+        
+        // Initialize driver
+        String platform = System.getProperty("platform", "android");
+        try {
+            MobileDriverFactory.initializeDriver(platform);
+            Log.info("Mobile driver initialized for platform: " + platform);
+            
+            {{#if (eq reportingTool "allure")}}
+            AllureManager.attachDeviceInfo(DriverManager.getDriver());
+            {{/if}}
+        } catch (Exception e) {
+            Log.error("Failed to initialize mobile driver", e);
+            throw new RuntimeException("Driver initialization failed", e);
+        }
+    }
+
+    @After
+    public void tearDown(Scenario scenario) {
+        try {
+            if (scenario.isFailed()) {
+                Log.error("Scenario FAILED: " + scenario.getName());
+                
+                // Take screenshot on failure
+                if (DriverManager.getDriver() != null) {
+                    {{#if (eq reportingTool "allure")}}
+                    AllureManager.attachScreenshotOnFailure(DriverManager.getDriver());
+                    {{/if}}
+                    {{#if (eq reportingTool "extent-reports")}}
+                    String screenshotPath = {{javaPackage}}.utils.ScreenshotUtils.takeScreenshot(scenario.getName() + "_FAILED");
+                    if (screenshotPath != null) {
+                        ExtentManager.addFailureScreenshot(screenshotPath);
+                    }
+                    {{/if}}
+                }
+                
+                {{#if (eq reportingTool "extent-reports")}}
+                ExtentManager.logFail("Scenario failed", null);
+                {{/if}}
+            } else {
+                Log.info("Scenario PASSED: " + scenario.getName());
+                
+                {{#if (eq reportingTool "extent-reports")}}
+                ExtentManager.logPass("Scenario completed successfully");
+                {{/if}}
+                
+                {{#if (eq reportingTool "allure")}}
+                AllureManager.addStep("Scenario completed successfully");
+                {{/if}}
+            }
+        } finally {
+            // Quit driver
+            DriverManager.quitDriver();
+            Log.info("Mobile driver quit successfully");
+            Log.info("========================================");
+        }
+    }
+}

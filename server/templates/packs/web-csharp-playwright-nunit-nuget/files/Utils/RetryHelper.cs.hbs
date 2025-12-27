@@ -1,0 +1,112 @@
+using System;
+using System.Threading.Tasks;
+
+namespace {{projectName}}.Utils
+{
+    /// <summary>
+    /// Retry helper for handling flaky operations.
+    /// </summary>
+    public static class RetryHelper
+    {
+        public static readonly int DefaultRetries = 3;
+        public static readonly int DefaultDelayMs = 1000;
+        public static readonly int DefaultBackoffMultiplier = 2;
+
+        /// <summary>
+        /// Retry an async action with exponential backoff.
+        /// </summary>
+        public static async Task<T> RetryAsync<T>(
+            Func<Task<T>> action,
+            int retries = 3,
+            int delayMs = 1000,
+            int backoffMultiplier = 2,
+            Func<Exception, bool>? shouldRetry = null)
+        {
+            Exception? lastException = null;
+            var currentDelay = delayMs;
+
+            for (int attempt = 1; attempt <= retries + 1; attempt++)
+            {
+                try
+                {
+                    Logger.Debug($"Attempt {attempt}/{retries + 1}");
+                    var result = await action();
+
+                    if (attempt > 1)
+                    {
+                        Logger.Info($"Succeeded on attempt {attempt}");
+                    }
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+
+                    if (attempt <= retries && (shouldRetry?.Invoke(ex) ?? true))
+                    {
+                        Logger.Warn($"Attempt {attempt} failed: {ex.Message}. Retrying in {currentDelay}ms...");
+                        await Task.Delay(currentDelay);
+                        currentDelay *= backoffMultiplier;
+                    }
+                    else
+                    {
+                        Logger.Error($"All {attempt} attempts failed");
+                        break;
+                    }
+                }
+            }
+
+            throw lastException!;
+        }
+
+        /// <summary>
+        /// Retry an async action without return value.
+        /// </summary>
+        public static async Task RetryAsync(
+            Func<Task> action,
+            int retries = 3,
+            int delayMs = 1000,
+            int backoffMultiplier = 2,
+            Func<Exception, bool>? shouldRetry = null)
+        {
+            await RetryAsync(async () =>
+            {
+                await action();
+                return true;
+            }, retries, delayMs, backoffMultiplier, shouldRetry);
+        }
+
+        /// <summary>
+        /// Wait for a condition to be true.
+        /// </summary>
+        public static async Task<bool> WaitForAsync(
+            Func<Task<bool>> condition,
+            int timeoutMs = 30000,
+            int intervalMs = 1000,
+            string message = "Condition not met")
+        {
+            var startTime = DateTime.Now;
+            var endTime = startTime.AddMilliseconds(timeoutMs);
+
+            while (DateTime.Now < endTime)
+            {
+                try
+                {
+                    if (await condition())
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Debug($"Condition check failed: {ex.Message}");
+                }
+
+                await Task.Delay(intervalMs);
+            }
+
+            throw new TimeoutException($"{message} within {timeoutMs}ms");
+        }
+    }
+}

@@ -1,0 +1,21 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import logger from './logger';
+
+export class DataReader {
+  public static readJson<T>(filename: string): T {
+    const filepath: string = path.join('data', filename);
+    logger.info(`Reading data from: ${filepath}`);
+    const data: string = fs.readFileSync(filepath, 'utf-8');
+    return JSON.parse(data) as T;
+  }
+
+  public static readCsv(filename: string): string[][] {
+    const filepath: string = path.join('data', filename);
+    logger.info(`Reading CSV from: ${filepath}`);
+    const data: string = fs.readFileSync(filepath, 'utf-8');
+    return data.split('\n').map((line: string): string[] => line.split(','));
+  }
+}
+
+export default DataReader;

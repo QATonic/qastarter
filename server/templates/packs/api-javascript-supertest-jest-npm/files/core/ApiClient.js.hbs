@@ -1,0 +1,82 @@
+import request from 'supertest';
+import { config } from '../config/settings.js';
+import { logger } from '../utils/logger.js';
+
+/**
+ * Base API client using Supertest
+ * Provides reusable methods for API testing
+ */
+export class ApiClient {
+  constructor(baseUrl = config.baseUrl) {
+    this.baseUrl = baseUrl;
+    this.defaultHeaders = config.headers;
+  }
+
+  /**
+   * GET request
+   */
+  async get(endpoint, headers = {}) {
+    logger.info(`GET ${endpoint}`);
+    return request(this.baseUrl)
+      .get(endpoint)
+      .set({ ...this.defaultHeaders, ...headers })
+      .timeout(config.timeout);
+  }
+
+  /**
+   * POST request
+   */
+  async post(endpoint, body, headers = {}) {
+    logger.info(`POST ${endpoint}`, { body });
+    return request(this.baseUrl)
+      .post(endpoint)
+      .send(body)
+      .set({ ...this.defaultHeaders, ...headers })
+      .timeout(config.timeout);
+  }
+
+  /**
+   * PUT request
+   */
+  async put(endpoint, body, headers = {}) {
+    logger.info(`PUT ${endpoint}`, { body });
+    return request(this.baseUrl)
+      .put(endpoint)
+      .send(body)
+      .set({ ...this.defaultHeaders, ...headers })
+      .timeout(config.timeout);
+  }
+
+  /**
+   * PATCH request
+   */
+  async patch(endpoint, body, headers = {}) {
+    logger.info(`PATCH ${endpoint}`, { body });
+    return request(this.baseUrl)
+      .patch(endpoint)
+      .send(body)
+      .set({ ...this.defaultHeaders, ...headers })
+      .timeout(config.timeout);
+  }
+
+  /**
+   * DELETE request
+   */
+  async delete(endpoint, headers = {}) {
+    logger.info(`DELETE ${endpoint}`);
+    return request(this.baseUrl)
+      .delete(endpoint)
+      .set({ ...this.defaultHeaders, ...headers })
+      .timeout(config.timeout);
+  }
+
+  /**
+   * Add authentication token to headers
+   */
+  withAuth(token) {
+    this.defaultHeaders['Authorization'] = `Bearer ${token}`;
+    return this;
+  }
+}
+
+export const apiClient = new ApiClient();

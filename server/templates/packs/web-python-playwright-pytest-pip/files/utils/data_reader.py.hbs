@@ -1,0 +1,19 @@
+import json
+import csv
+from pathlib import Path
+from utils.logger import logger
+
+class DataReader:
+    @staticmethod
+    def read_json(filename: str) -> dict:
+        filepath = Path('data') / filename
+        logger.info(f"Reading data from: {filepath}")
+        with open(filepath, 'r') as file:
+            return json.load(file)
+
+    @staticmethod
+    def read_csv(filename: str) -> list:
+        filepath = Path('data') / filename
+        logger.info(f"Reading CSV from: {filepath}")
+        with open(filepath, 'r') as file:
+            return list(csv.reader(file))

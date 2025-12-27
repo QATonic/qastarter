@@ -1,0 +1,64 @@
+import { By, WebDriver, WebElement, until } from 'selenium-webdriver';
+import logger from '../utils/Logger';
+
+export default class BasePage {
+  protected driver: WebDriver;
+
+  constructor(driver: WebDriver) {
+    this.driver = driver;
+  }
+
+  async navigate(url: string): Promise<void> {
+    logger.info(`Navigating to: ${url}`);
+    await this.driver.get(url);
+  }
+
+  async findElement(locator: By): Promise<WebElement> {
+    return await this.driver.wait(until.elementLocated(locator), 10000);
+  }
+
+  async click(locator: By): Promise<void> {
+    const element = await this.findElement(locator);
+    await element.click();
+    logger.info(`Clicked: ${locator}`);
+  }
+
+  async type(locator: By, text: string): Promise<void> {
+    const element = await this.findElement(locator);
+    await element.clear();
+    await element.sendKeys(text);
+    logger.info(`Typed "${text}" into: ${locator}`);
+  }
+
+  async getText(locator: By): Promise<string> {
+    const element = await this.findElement(locator);
+    return await element.getText();
+  }
+
+  async isDisplayed(locator: By): Promise<boolean> {
+    try {
+      const element = await this.findElement(locator);
+      return await element.isDisplayed();
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async waitForElement(locator: By, timeout: number = 10000): Promise<void> {
+    await this.driver.wait(until.elementLocated(locator), timeout);
+  }
+
+  async getPageTitle(): Promise<string> {
+    return await this.driver.getTitle();
+  }
+
+  async getCurrentUrl(): Promise<string> {
+    return await this.driver.getCurrentUrl();
+  }
+
+  async takeScreenshot(name: string): Promise<void> {
+    const screenshot = await this.driver.takeScreenshot();
+    require('fs').writeFileSync(`screenshots/${name}.png`, screenshot, 'base64');
+    logger.info(`Screenshot saved: ${name}.png`);
+  }
+}

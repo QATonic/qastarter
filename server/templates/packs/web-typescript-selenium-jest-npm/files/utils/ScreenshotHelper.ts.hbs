@@ -1,0 +1,24 @@
+import { WebDriver } from 'selenium-webdriver';
+import * as fs from 'fs';
+import * as path from 'path';
+
+export default class ScreenshotHelper {
+  private driver: WebDriver;
+  private screenshotDir: string;
+
+  constructor(driver: WebDriver) {
+    this.driver = driver;
+    this.screenshotDir = path.join(process.cwd(), 'screenshots');
+    
+    if (!fs.existsSync(this.screenshotDir)) {
+      fs.mkdirSync(this.screenshotDir, { recursive: true });
+    }
+  }
+
+  async capture(name: string = `screenshot_${Date.now()}`): Promise<string> {
+    const screenshot = await this.driver.takeScreenshot();
+    const filepath = path.join(this.screenshotDir, `${name}.png`);
+    fs.writeFileSync(filepath, screenshot, 'base64');
+    return filepath;
+  }
+}

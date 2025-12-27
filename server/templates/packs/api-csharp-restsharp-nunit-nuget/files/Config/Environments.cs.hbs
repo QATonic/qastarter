@@ -1,0 +1,44 @@
+namespace {{projectName}}.Config;
+
+public class EnvironmentConfig
+{
+    public string BaseURL { get; set; } = string.Empty;
+    public int Timeout { get; set; }
+    public bool VerifySSL { get; set; }
+}
+
+public static class Environments
+{
+    private static readonly Dictionary<string, EnvironmentConfig> _environments = new()
+    {
+        ["dev"] = new EnvironmentConfig
+        {
+            BaseURL = "https://jsonplaceholder.typicode.com",
+            Timeout = 30000,
+            VerifySSL = true
+        },
+        ["qa"] = new EnvironmentConfig
+        {
+            BaseURL = "https://qa-api.example.com",
+            Timeout = 30000,
+            VerifySSL = true
+        },
+        ["staging"] = new EnvironmentConfig
+        {
+            BaseURL = "https://staging-api.example.com",
+            Timeout = 30000,
+            VerifySSL = true
+        },
+        ["prod"] = new EnvironmentConfig
+        {
+            BaseURL = "https://api.example.com",
+            Timeout = 60000,
+            VerifySSL = true
+        }
+    };
+
+    public static EnvironmentConfig? GetEnvironment(string name)
+    {
+        return _environments.GetValueOrDefault(name.ToLower());
+    }
+}

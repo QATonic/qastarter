@@ -1,0 +1,21 @@
+namespace {{projectName}}.Config;
+
+public static class Settings
+{
+    public static string WinAppDriverUrl => GetEnvironmentVariable("WINAPPDRIVER_URL", "http://127.0.0.1:4723");
+    public static int ImplicitWaitSeconds => int.Parse(GetEnvironmentVariable("IMPLICIT_WAIT", "10"));
+    public static int ExplicitWaitSeconds => int.Parse(GetEnvironmentVariable("EXPLICIT_WAIT", "30"));
+    public static string LogLevel => GetEnvironmentVariable("LOG_LEVEL", "Information");
+    public static string LogFile => GetEnvironmentVariable("LOG_FILE", "logs/test-run.log");
+    public static string ScreenshotPath => GetEnvironmentVariable("SCREENSHOT_PATH", "Screenshots");
+    public static bool TakeScreenshotOnFailure => bool.Parse(GetEnvironmentVariable("SCREENSHOT_ON_FAILURE", "true"));
+
+    // Common Windows App Paths
+    public static string CalculatorAppId => "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
+    public static string NotepadPath => @"C:\Windows\System32\notepad.exe";
+
+    private static string GetEnvironmentVariable(string key, string defaultValue)
+    {
+        return System.Environment.GetEnvironmentVariable(key) ?? defaultValue;
+    }
+}

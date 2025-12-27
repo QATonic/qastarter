@@ -1,0 +1,147 @@
+# {{projectName}}
+
+A production-ready Playwright test automation framework using Java, TestNG, and Gradle.
+
+## 🚀 Features
+
+- **Playwright** for modern web automation
+- **TestNG** for test execution and reporting
+- **Gradle** for build management
+- **Page Object Model** design pattern
+{{#if (eq testingPattern "bdd")}}
+- **Cucumber BDD** for behavior-driven development
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports** for beautiful test reports
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+- **ExtentReports** for detailed HTML reports
+{{/if}}
+- **Log4j2** for logging
+- **Multi-browser support** (Chromium, Firefox, WebKit)
+- **Parallel execution** support
+- **Docker** support for containerized testing
+
+## 📋 Prerequisites
+
+- Java 17 or higher
+- Gradle 8.4 or higher (or use the included wrapper)
+
+## 🛠️ Setup
+
+1. Clone the repository
+2. Install Playwright browsers:
+   ```bash
+   ./gradlew installPlaywrightBrowsers
+   ```
+
+## 🏃 Running Tests
+
+### Run all tests
+```bash
+./gradlew test
+```
+
+### Run with specific browser
+```bash
+./gradlew test -Pbrowser=chromium
+./gradlew test -Pbrowser=firefox
+./gradlew test -Pbrowser=webkit
+```
+
+### Run in headless mode
+```bash
+./gradlew test -Pheadless=true
+```
+
+### Run with specific environment
+```bash
+./gradlew test -Penv=dev
+./gradlew test -Penv=qa
+./gradlew test -Penv=prod
+```
+
+### Run smoke tests
+```bash
+./gradlew smokeTest
+```
+
+### Run regression tests with parallel execution
+```bash
+./gradlew regressionTest -Pparallel=true -PthreadCount=3
+```
+
+## 📁 Project Structure
+
+```
+{{projectName}}/
+├── build.gradle              # Gradle build configuration
+├── settings.gradle           # Gradle settings
+├── gradle.properties         # Gradle properties
+├── testng.xml               # TestNG suite configuration
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   ├── config/      # Configuration classes
+│   │   │   ├── pages/       # Page objects
+│   │   │   └── utils/       # Utility classes
+│   │   └── resources/       # Main resources
+│   └── test/
+│       ├── java/
+│       │   ├── tests/       # Test classes
+│       │   └── utils/       # Test utilities
+│       └── resources/
+│           ├── config/      # Environment configs
+│           ├── testdata/    # Test data files
+{{#if (eq testingPattern "bdd")}}
+│           └── features/    # Cucumber feature files
+{{/if}}
+│           └── log4j2.xml   # Logging configuration
+├── reports/                 # Generated reports
+├── logs/                    # Log files
+└── screenshots/             # Failure screenshots
+```
+
+## 🔧 Configuration
+
+### Environment Configuration
+Edit files in `src/test/resources/config/`:
+- `dev.properties` - Development environment
+- `qa.properties` - QA environment
+- `prod.properties` - Production environment
+
+### Browser Configuration
+Set browser via command line or `gradle.properties`:
+- `chromium` (default)
+- `firefox`
+- `webkit`
+
+## 📊 Reports
+{{#if (eq reportingTool "allure")}}
+
+### Allure Reports
+Generate and view Allure reports:
+```bash
+./gradlew allureReport
+./gradlew allureServe
+```
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+
+### ExtentReports
+Reports are generated in `reports/extent-report.html` after test execution.
+{{/if}}
+
+### TestNG Reports
+Default TestNG reports are generated in `build/reports/tests/test/index.html`.
+
+## 🐳 Docker
+
+### Build and run tests in Docker
+```bash
+docker-compose up --build
+```
+
+## 📝 License
+
+This project is licensed under the MIT License.

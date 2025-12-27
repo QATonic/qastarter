@@ -1,0 +1,96 @@
+using OpenQA.Selenium.Appium.Windows;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Core;
+
+public static class ElementActions
+{
+    public static void Click(WindowsElement element, string elementName = "Element")
+    {
+        try
+        {
+            Logger.Info($"Clicking on: {elementName}");
+            element.Click();
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, $"Failed to click on: {elementName}");
+            throw;
+        }
+    }
+
+    public static void SendKeys(WindowsElement element, string text, string elementName = "Element")
+    {
+        try
+        {
+            Logger.Info($"Sending keys '{text}' to: {elementName}");
+            element.Clear();
+            element.SendKeys(text);
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, $"Failed to send keys to: {elementName}");
+            throw;
+        }
+    }
+
+    public static string GetText(WindowsElement element, string elementName = "Element")
+    {
+        try
+        {
+            var text = element.Text;
+            Logger.Info($"Got text '{text}' from: {elementName}");
+            return text;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, $"Failed to get text from: {elementName}");
+            throw;
+        }
+    }
+
+    public static string GetAttribute(WindowsElement element, string attributeName, string elementName = "Element")
+    {
+        try
+        {
+            var value = element.GetAttribute(attributeName);
+            Logger.Info($"Got attribute '{attributeName}' = '{value}' from: {elementName}");
+            return value;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, $"Failed to get attribute '{attributeName}' from: {elementName}");
+            throw;
+        }
+    }
+
+    public static bool IsDisplayed(WindowsElement element, string elementName = "Element")
+    {
+        try
+        {
+            var displayed = element.Displayed;
+            Logger.Info($"Element '{elementName}' displayed: {displayed}");
+            return displayed;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, $"Failed to check if element is displayed: {elementName}");
+            return false;
+        }
+    }
+
+    public static bool IsEnabled(WindowsElement element, string elementName = "Element")
+    {
+        try
+        {
+            var enabled = element.Enabled;
+            Logger.Info($"Element '{elementName}' enabled: {enabled}");
+            return enabled;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, $"Failed to check if element is enabled: {elementName}");
+            return false;
+        }
+    }
+}

@@ -1,0 +1,167 @@
+# {{projectName}}
+
+Playwright test automation framework with Java, TestNG, and Maven.
+
+## 🚀 Quick Start (3 Steps)
+
+### Step 1: Install Dependencies
+```bash
+mvn clean install
+mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"
+```
+
+### Step 2: Configure for Your Application
+Update these files with your application details:
+
+| File | What to Update |
+|------|----------------|
+| `src/test/resources/config/dev.properties` | Your app URL and test credentials |
+| `src/main/java/pages/LoginPage.java` | CSS selectors matching your login form |
+| `src/test/java/tests/LoginTest.java` | Test credentials (or use config file) |
+
+### Step 3: Run Tests
+```bash
+mvn test
+```
+
+---
+
+## ⚙️ Configuration Guide
+
+### Environment Configuration (`src/test/resources/config/dev.properties`)
+
+```properties
+# UPDATE THESE VALUES for your application:
+base.url=https://your-app-url.com
+validUser.username=your-test-user@email.com
+validUser.password=YourPassword123
+adminUser.username=your-admin@email.com
+adminUser.password=AdminPassword123
+timeout=30000
+```
+
+### Page Object Locators (`src/main/java/pages/LoginPage.java`)
+
+Update CSS selectors to match your application's HTML elements:
+
+```java
+// Find these in your browser DevTools (F12 → Elements → right-click → Copy selector)
+private final String USERNAME_INPUT = "#your-username-field";
+private final String PASSWORD_INPUT = "#your-password-field";
+private final String LOGIN_BUTTON = "#your-login-button";
+private final String ERROR_MESSAGE = ".your-error-class";
+private final String SUCCESS_INDICATOR = ".your-dashboard-class";
+```
+
+**Tip:** Use browser DevTools to find the correct selectors for your application.
+
+---
+
+## Features
+
+- **Playwright**: Modern browser automation with multi-browser support
+- **Java {{toolVersions.java}}**: Latest LTS version with modern language features
+- **TestNG**: Powerful test framework with parallel execution
+- **Maven**: Dependency management and build automation
+- **Page Object Model**: Maintainable test structure
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions**: CI/CD workflow included
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins**: CI/CD pipeline included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI**: CI/CD pipeline included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps**: CI/CD pipeline included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI**: CI/CD workflow included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+- **Log4j2**: Comprehensive logging
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else if (eq reportingTool "extent-reports")}}
+- **ExtentReports**: Detailed HTML test reports
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+- **Cucumber BDD**: Gherkin feature files support
+{{/if}}
+
+## Prerequisites
+
+- Java 17+
+- Maven 3.9+
+
+## Running Tests
+
+```bash
+# Run all tests
+mvn test
+
+# Run tests with specific environment
+mvn test -Denv=qa
+
+# Run tests in headed mode (see browser)
+mvn test -Dheadless=false
+
+# Run specific test suite
+mvn test -DsuiteXmlFile=testng.xml
+```
+
+## Environment Files
+
+| Environment | File | Usage |
+|-------------|------|-------|
+| Development | `src/test/resources/config/dev.properties` | Default |
+| QA | `src/test/resources/config/qa.properties` | `-Denv=qa` |
+| Production | `src/test/resources/config/prod.properties` | `-Denv=prod` |
+
+## Project Structure
+
+```
+src/
+├── main/java/
+│   ├── config/          # Environment and test configuration
+│   └── pages/           # Page Object classes
+│       ├── BasePage.java
+│       ├── LoginPage.java
+│       └── HomePage.java
+└── test/
+    ├── java/
+    │   ├── tests/       # Test classes
+    │   │   ├── BaseTest.java
+    │   │   ├── LoginTest.java
+    │   │   └── SmokeTest.java
+    │   └── utils/       # Helper utilities
+    └── resources/
+        ├── config/      # Environment properties
+        └── testdata/    # Test data files (CSV, JSON)
+```
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+GitHub Actions workflow automatically runs tests on push/PR to main or develop branches.
+
+## Utilities
+
+- **ScreenshotHelper**: Auto-capture on failure
+- **WaitHelpers**: Custom wait utilities
+- **DataReader**: Test data file reader (CSV, JSON)
+- **Log**: Logging wrapper for consistent output
+
+## Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Browser not found | Run `mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"` |
+| Element not found | Check your CSS selectors in page objects match your app |
+| Login fails | Verify credentials in config file and selectors in LoginPage |
+| Timeout errors | Increase `timeout` value in properties file |

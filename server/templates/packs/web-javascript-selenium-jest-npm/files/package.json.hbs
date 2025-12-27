@@ -1,0 +1,55 @@
+{
+  "name": "{{projectName}}",
+  "version": "1.0.0",
+  "description": "Selenium WebDriver automation with JavaScript and Jest",
+  "scripts": {
+{{#if (eq testingPattern "bdd")}}
+    "test": "cucumber-js",
+    "test:headed": "HEADLESS=false cucumber-js",
+    "test:smoke": "cucumber-js --tags @smoke",
+    "test:parallel": "cucumber-js --parallel 4",
+{{else}}
+    "test": "jest",
+    "test:headed": "HEADLESS=false jest",
+    "test:smoke": "jest --testPathPattern=smoke",
+    "test:parallel": "jest --maxWorkers=4",
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+    "report": "allure generate allure-results --clean && allure open",
+    "report:generate": "allure generate allure-results --clean"
+{{else if (eq reportingTool "jest-html-reporter")}}
+    "report": "open test-results/test-report.html || xdg-open test-results/test-report.html || start test-results/test-report.html"
+{{else if (eq reportingTool "mochawesome")}}
+    "report": "open test-results/mochawesome.html || xdg-open test-results/mochawesome.html || start test-results/mochawesome.html"
+{{else}}
+    "report": "allure serve allure-results"
+{{/if}}
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.16.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@jest/globals": "^29.7.0",
+{{#if (eq reportingTool "allure")}}
+  {{#if (eq testingPattern "bdd")}}
+    "allure-cucumberjs": "^2.15.2",
+  {{else}}
+    "allure-jest": "^2.15.1",
+  {{/if}}
+    "allure-commandline": "^2.25.0",
+{{/if}}
+{{#if (eq reportingTool "jest-html-reporter")}}
+    "jest-html-reporter": "^3.10.2",
+{{/if}}
+{{#if (eq reportingTool "mochawesome")}}
+    "mochawesome": "^7.1.3",
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+    "@cucumber/cucumber": "^10.0.0",
+{{/if}}
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.1",
+    "csv-parse": "^5.5.3"
+  }
+}

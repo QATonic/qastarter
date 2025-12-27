@@ -1,0 +1,22 @@
+from playwright.sync_api import Page
+from pathlib import Path
+from datetime import datetime
+from utils.logger import logger
+
+class ScreenshotHelper:
+    @staticmethod
+    def capture_screenshot(page: Page, name: str) -> str:
+        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        filename = f"{name}-{timestamp}.png"
+        filepath = Path('screenshots') / filename
+        
+        page.screenshot(path=str(filepath), full_page=True)
+        logger.info(f"Screenshot saved: {filepath}")
+        return str(filepath)
+
+    @staticmethod
+    def capture_on_failure(page: Page, test_name: str) -> None:
+        try:
+            ScreenshotHelper.capture_screenshot(page, f"FAILED-{test_name}")
+        except Exception as e:
+            logger.error(f"Failed to capture screenshot: {e}")

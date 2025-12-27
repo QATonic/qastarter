@@ -1,0 +1,208 @@
+{
+  "id": "api-python-requests-pytest-pip",
+  "name": "API Testing Framework",
+  "description": "REST API automation framework with Python, Requests, and Pytest",
+  "tags": [
+    "api",
+    "rest",
+    "python",
+    "pytest",
+    "requests"
+  ],
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "requests",
+    "language": "python",
+    "testRunner": "pytest",
+    "buildTool": "pip"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "pytest-html",
+      "allure",
+      "pytest-json"
+    ],
+    "cicdTools": [
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci",
+      "jenkins"
+    ],
+    "testingPatterns": [
+      "data-driven",
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "python": "3.11+",
+    "requests": "2.31.0",
+    "pytest": "7.4.3",
+    "jsonschema": "4.20.0"
+  },
+  "files": [
+    {
+      "path": "requirements.txt",
+      "isTemplate": true,
+      "description": "Python dependencies"
+    },
+    {
+      "path": "pytest.ini",
+      "isTemplate": true,
+      "description": "Pytest configuration"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "config/__init__.py",
+      "isTemplate": true,
+      "description": "Config package init"
+    },
+    {
+      "path": "config/settings.py",
+      "isTemplate": true,
+      "description": "Configuration management"
+    },
+    {
+      "path": "config/environments.py",
+      "isTemplate": true,
+      "description": "Environment configurations"
+    },
+    {
+      "path": "core/__init__.py",
+      "isTemplate": true,
+      "description": "Core package init"
+    },
+    {
+      "path": "core/api_client.py",
+      "isTemplate": true,
+      "description": "Base API client"
+    },
+    {
+      "path": "core/request_builder.py",
+      "isTemplate": true,
+      "description": "HTTP request builder"
+    },
+    {
+      "path": "core/response_validator.py",
+      "isTemplate": true,
+      "description": "Response validation utilities"
+    },
+    {
+      "path": "models/__init__.py",
+      "isTemplate": true,
+      "description": "Models package init"
+    },
+    {
+      "path": "models/user.py",
+      "isTemplate": true,
+      "description": "User data model"
+    },
+    {
+      "path": "models/api_response.py",
+      "isTemplate": true,
+      "description": "API response model"
+    },
+    {
+      "path": "utils/__init__.py",
+      "isTemplate": true,
+      "description": "Utils package init"
+    },
+    {
+      "path": "utils/auth_manager.py",
+      "isTemplate": true,
+      "description": "Authentication manager"
+    },
+    {
+      "path": "utils/json_utils.py",
+      "isTemplate": true,
+      "description": "JSON utilities"
+    },
+    {
+      "path": "utils/logger.py",
+      "isTemplate": true,
+      "description": "Logging configuration"
+    },
+    {
+      "path": "schemas/user_schema.json",
+      "isTemplate": true,
+      "description": "JSON schema for user"
+    },
+    {
+      "path": "tests/__init__.py",
+      "isTemplate": true,
+      "description": "Tests package init"
+    },
+    {
+      "path": "tests/conftest.py",
+      "isTemplate": true,
+      "description": "Pytest fixtures and configuration"
+    },
+    {
+      "path": "tests/test_users.py",
+      "isTemplate": true,
+      "description": "User API tests"
+    },
+    {
+      "path": "tests/test_authentication.py",
+      "isTemplate": true,
+      "description": "Authentication tests"
+    },
+    {
+      "path": "tests/test_data_driven.py",
+      "isTemplate": true,
+      "description": "Data-driven tests"
+    },
+    {
+      "path": "data/users.json",
+      "isTemplate": true,
+      "description": "Test user data"
+    },
+    {
+      "path": "data/test_cases.json",
+      "isTemplate": true,
+      "description": "Test case data"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/test_login_steps.py",
+      "isTemplate": true,
+      "description": "pytest-bdd step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/__init__.py",
+      "isTemplate": false,
+      "description": "Python package initializer",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    }
+  ]
+}

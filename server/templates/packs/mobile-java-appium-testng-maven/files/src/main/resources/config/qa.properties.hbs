@@ -1,0 +1,48 @@
+# QA Environment Configuration for Mobile Testing
+
+# Appium Server Configuration
+appium.server.url=http://qa-appium.example.com:4723
+
+# Mobile Testing Timeouts
+mobile.implicit.wait=15
+mobile.explicit.wait=30
+mobile.polling.interval=1000
+
+# Android Configuration
+mobile.android.platformName=Android
+mobile.android.platformVersion=12.0
+mobile.android.deviceName=QA Android Device
+mobile.android.automationName=UiAutomator2
+mobile.android.app=/path/to/qa/android/app.apk
+mobile.android.appPackage=com.example.app.qa
+mobile.android.appActivity=com.example.app.MainActivity
+mobile.android.newCommandTimeout=600
+mobile.android.noReset=false
+
+# iOS Configuration  
+mobile.ios.platformName=iOS
+mobile.ios.platformVersion=15.5
+mobile.ios.deviceName=QA iPhone 13
+mobile.ios.automationName=XCUITest
+mobile.ios.app=/path/to/qa/ios/app.app
+mobile.ios.bundleId=com.example.app.qa
+mobile.ios.newCommandTimeout=600
+mobile.ios.noReset=false
+
+# Test Data Configuration
+test.data.base.path=src/test/resources/testdata
+test.data.users.file=users.csv
+test.data.sample.file=sample.json
+
+# Reporting Configuration
+reports.base.path=reports
+extent.report.name=Mobile_Automation_Report_QA
+extent.report.title=Mobile Test Automation Report - QA Environment
+
+# Screenshot Configuration
+screenshot.on.failure=true
+screenshot.base.path=reports/screenshots
+
+# Logging Configuration
+log.level=INFO
+log.file.path=logs/mobile-automation-qa.log

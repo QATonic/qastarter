@@ -1,0 +1,35 @@
+using NUnit.Framework;
+using {{projectName}}.Config;
+using {{projectName}}.Pages;
+
+namespace {{projectName}}.Tests;
+
+[TestFixture]
+public class SmokeTests : BaseTest
+{
+    [Test, Order(1)]
+    [Description("Verify login page loads")]
+    public async Task TestLoginPageLoads()
+    {
+        var loginPage = new LoginPage(Page!);
+
+        await loginPage.NavigateToLoginAsync();
+        var title = await loginPage.GetPageTitleAsync();
+
+        Assert.IsNotNull(title, "Page title is null");
+        Assert.IsTrue(await loginPage.IsUsernameVisibleAsync(), "Username field not visible");
+        Assert.IsTrue(await loginPage.IsPasswordVisibleAsync(), "Password field not visible");
+    }
+
+    [Test, Order(2)]
+    [Description("Verify base URL is accessible")]
+    public async Task TestBaseUrlAccessible()
+    {
+        var config = EnvConfig.Instance;
+
+        await Page!.GotoAsync(config.BaseUrl);
+        var url = Page.Url;
+
+        Assert.IsTrue(url.Contains(config.BaseUrl), "Base URL is not accessible");
+    }
+}

@@ -1,0 +1,39 @@
+using NUnit.Framework;
+using {{projectName}}.Core;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Tests;
+
+public class BaseTest
+{
+    protected ApiClient Client = null!;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        Logger.Info("=".PadRight(80, '='));
+        Logger.Info("Starting test session");
+        Logger.Info("=".PadRight(80, '='));
+    }
+
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        Logger.Info("=".PadRight(80, '='));
+        Logger.Info("Test session completed");
+        Logger.Info("=".PadRight(80, '='));
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        Client = new ApiClient();
+        Logger.Info($"Starting test: {TestContext.CurrentContext.Test.Name}");
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        Logger.Info($"Completed test: {TestContext.CurrentContext.Test.Name}");
+    }
+}

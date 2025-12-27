@@ -1,0 +1,73 @@
+# {{projectName}}
+
+Selenium WebDriver automation framework with TypeScript and Jest.
+
+## Features
+
+- **Selenium WebDriver {{toolVersions.selenium}}**: Browser automation
+- **TypeScript**: Type safety and better IDE support
+- **Jest**: Test runner with parallel execution
+- **Page Object Model**: Maintainable architecture
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else if (eq reportingTool "jest-html-reporter")}}
+- **Jest HTML Reporter**: Beautiful test reports
+{{else}}
+- **Test Reporting**: Built-in test reports
+{{/if}}
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+
+## Setup
+```bash
+npm install
+```
+
+## Run Tests
+```bash
+npm test              # Run all tests
+npm run test:smoke    # Smoke tests only
+npm run test:parallel # Parallel execution
+{{#if (eq reportingTool "allure")}}
+npm run report        # View Allure report
+{{/if}}
+```
+
+## Project Structure
+```
+{{projectName}}/
+├── pages/          # Page Objects (TypeScript)
+├── tests/          # Test cases
+├── utils/          # Utilities
+├── config/         # Configuration
+├── data/           # Test data
+└── types/          # Type definitions
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps pipeline is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI workflow is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included.
+{{/if}}

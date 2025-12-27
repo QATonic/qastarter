@@ -1,0 +1,68 @@
+import pyautogui
+from config.settings import Settings
+from utils.logger import Logger
+
+class MouseActions:
+    @staticmethod
+    def move_to(x: int, y: int, duration: float = 0.5):
+        """Move mouse to coordinates"""
+        try:
+            Logger.info(f"Moving mouse to: ({x}, {y})")
+            pyautogui.moveTo(x, y, duration=duration)
+        except Exception as e:
+            Logger.error(f"Failed to move mouse: {str(e)}")
+            raise
+    
+    @staticmethod
+    def click(x: int = None, y: int = None, clicks: int = 1, button: str = 'left'):
+        """Click at coordinates or current position"""
+        try:
+            if x is not None and y is not None:
+                Logger.info(f"Clicking at: ({x}, {y})")
+                pyautogui.click(x, y, clicks=clicks, button=button)
+            else:
+                Logger.info("Clicking at current position")
+                pyautogui.click(clicks=clicks, button=button)
+        except Exception as e:
+            Logger.error(f"Failed to click: {str(e)}")
+            raise
+    
+    @staticmethod
+    def double_click(x: int = None, y: int = None):
+        """Double-click at coordinates or current position"""
+        MouseActions.click(x, y, clicks=2)
+    
+    @staticmethod
+    def right_click(x: int = None, y: int = None):
+        """Right-click at coordinates or current position"""
+        MouseActions.click(x, y, button='right')
+    
+    @staticmethod
+    def drag_to(x: int, y: int, duration: float = 1.0):
+        """Drag mouse to coordinates"""
+        try:
+            Logger.info(f"Dragging mouse to: ({x}, {y})")
+            pyautogui.dragTo(x, y, duration=duration)
+        except Exception as e:
+            Logger.error(f"Failed to drag mouse: {str(e)}")
+            raise
+    
+    @staticmethod
+    def scroll(amount: int, direction: str = 'vertical'):
+        """Scroll mouse wheel"""
+        try:
+            Logger.info(f"Scrolling {direction}: {amount}")
+            if direction == 'vertical':
+                pyautogui.scroll(amount)
+            else:
+                pyautogui.hscroll(amount)
+        except Exception as e:
+            Logger.error(f"Failed to scroll: {str(e)}")
+            raise
+    
+    @staticmethod
+    def get_position():
+        """Get current mouse position"""
+        position = pyautogui.position()
+        Logger.info(f"Current mouse position: {position}")
+        return position

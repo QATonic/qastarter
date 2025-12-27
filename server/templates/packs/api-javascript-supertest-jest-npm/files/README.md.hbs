@@ -1,0 +1,113 @@
+# {{projectName}}
+
+API automation framework built with Supertest, Jest, and JavaScript.
+
+## Overview
+
+This is a production-ready API testing framework using Supertest for HTTP assertions and Jest as the test runner. Perfect for testing REST APIs with comprehensive validation and reporting.
+
+## Features
+
+- ✅ Supertest for API testing with built-in assertions
+- ✅ Jest test runner with HTML reporting
+- ✅ JSON Schema validation
+- ✅ Environment-based configuration
+- ✅ Comprehensive logging with Winston
+{{#if cicdTool}}
+- ✅ CI/CD ready with {{cicdTool}}
+{{/if}}
+- ✅ Data-driven testing support
+
+## Prerequisites
+
+- Node.js 18+ and npm
+
+## Installation
+
+```bash
+npm install
+```
+
+## Configuration
+
+Update `config/environments.js` with your API endpoints:
+
+```javascript
+export const environments = {
+  qa: {
+    baseUrl: 'https://api-qa.example.com',
+    timeout: 30000
+  },
+  prod: {
+    baseUrl: 'https://api.example.com',
+    timeout: 30000
+  }
+};
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run smoke tests
+npm run test:smoke
+
+# Run with coverage
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
+```
+
+## Project Structure
+
+```
+{{projectName}}/
+├── config/              # Environment and settings
+├── core/                # Base test utilities
+├── models/              # Data models and schemas
+├── tests/
+│   ├── api/            # API test specs
+│   └── data/           # Test data
+├── utils/              # Helper utilities
+└── reports/            # Test reports
+```
+
+## Writing Tests
+
+```javascript
+import request from 'supertest';
+import { config } from '../config/settings.js';
+
+describe('Users API', () => {
+  test('should get all users', async () => {
+    const response = await request(config.baseUrl)
+      .get('/api/users')
+      .expect(200);
+      
+    expect(response.body).toBeInstanceOf(Array);
+  });
+});
+```
+
+## CI/CD Integration
+
+{{#if (eq cicdTool "github-actions")}}
+This project is configured for GitHub Actions. Check `.github/workflows/tests.yml` for pipeline configuration.
+{{else if (eq cicdTool "jenkins")}}
+This project is configured for Jenkins. Check `Jenkinsfile` for pipeline configuration.
+{{else if (eq cicdTool "gitlab-ci")}}
+This project is configured for GitLab CI. Check `.gitlab-ci.yml` for pipeline configuration.
+{{else if (eq cicdTool "azure-devops")}}
+This project is configured for Azure DevOps. Check `azure-pipelines.yml` for pipeline configuration.
+{{else if (eq cicdTool "circleci")}}
+This project is configured for CircleCI. Check `.circleci/config.yml` for pipeline configuration.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## License
+
+MIT

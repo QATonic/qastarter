@@ -1,0 +1,45 @@
+from appium.webdriver.common.appiumby import AppiumBy
+from tests.pages.base_page import BasePage
+
+class LoginPage(BasePage):
+    """Login page object"""
+    
+    # Locators - Update these based on your app
+    USERNAME_INPUT = (AppiumBy.ID, "com.example.app:id/username")
+    PASSWORD_INPUT = (AppiumBy.ID, "com.example.app:id/password")
+    LOGIN_BUTTON = (AppiumBy.ID, "com.example.app:id/loginButton")
+    ERROR_MESSAGE = (AppiumBy.ID, "com.example.app:id/errorMessage")
+    
+    def __init__(self, driver):
+        super().__init__(driver)
+    
+    def enter_username(self, username):
+        """Enter username"""
+        self.send_keys(self.USERNAME_INPUT, username)
+    
+    def enter_password(self, password):
+        """Enter password"""
+        self.send_keys(self.PASSWORD_INPUT, password)
+    
+    def click_login_button(self):
+        """Click login button"""
+        self.click(self.LOGIN_BUTTON)
+        self.hide_keyboard()
+    
+    def login(self, username, password):
+        """Complete login flow"""
+        self.enter_username(username)
+        self.enter_password(password)
+        self.click_login_button()
+    
+    def get_error_message(self):
+        """Get error message text"""
+        return self.get_text(self.ERROR_MESSAGE)
+    
+    def is_error_displayed(self):
+        """Check if error message is displayed"""
+        return self.is_displayed(self.ERROR_MESSAGE, timeout=5)
+    
+    def is_login_button_enabled(self):
+        """Check if login button is enabled"""
+        return self.is_enabled(self.LOGIN_BUTTON)

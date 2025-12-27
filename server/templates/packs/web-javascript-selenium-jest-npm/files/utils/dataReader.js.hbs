@@ -1,0 +1,19 @@
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('csv-parse/sync');
+
+class DataReader {
+  static readJSON(filename) {
+    const filepath = path.join(process.cwd(), 'data', filename);
+    const data = fs.readFileSync(filepath, 'utf8');
+    return JSON.parse(data);
+  }
+
+  static readCSV(filename) {
+    const filepath = path.join(process.cwd(), 'data', filename);
+    const data = fs.readFileSync(filepath, 'utf8');
+    return parse(data, { columns: true, skip_empty_lines: true });
+  }
+}
+
+module.exports = DataReader;

@@ -1,0 +1,96 @@
+name: Espresso Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK {{toolVersions.java}}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '{{toolVersions.java}}'
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      
+      - name: Build the app
+        run: ./gradlew assembleDebug assembleDebugAndroidTest
+      
+      - name: Run instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: default
+          arch: x86_64
+          profile: Nexus 6
+          script: ./gradlew connectedDebugAndroidTest
+      {{#if (eq reportingTool "allure")}}
+      
+      - name: Generate Allure Report
+        if: always()
+        run: ./gradlew allureReport
+      
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: build/allure-results
+          retention-days: 7
+      
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: build/reports/allure-report
+          retention-days: 7
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      
+      - name: Upload JUnit Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-reports
+          path: app/build/reports/androidTests/connected
+          retention-days: 7
+      {{/if}}
+      {{#if (eq reportingTool "android-test-reports")}}
+      
+      - name: Upload Android Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-reports
+          path: app/build/reports/androidTests
+          retention-days: 7
+      {{/if}}
+      
+      - name: Upload Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: app/build/outputs/androidTest-results/connected/screenshots
+          retention-days: 7
+      
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: app/build/outputs/androidTest-results
+          retention-days: 7

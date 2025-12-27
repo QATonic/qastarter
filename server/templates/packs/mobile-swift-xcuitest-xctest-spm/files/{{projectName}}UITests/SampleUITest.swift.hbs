@@ -1,0 +1,55 @@
+import XCTest
+
+/**
+ * Sample XCUITest with single positive test case
+ * 
+ * Getting Started:
+ * 1. Update TestData.swift with your test credentials
+ * 2. Update element accessibilityIdentifiers below to match your app
+ * 3. Run with Cmd+U in Xcode
+ */
+final class SampleUITest: XCTestCase {
+    var app: XCUIApplication!
+    
+    // ========== UPDATE THESE ACCESSIBILITY IDs ==========
+    // Replace with your app's actual element identifiers
+    private let usernameFieldId = "YOUR_USERNAME_FIELD_ID_HERE"
+    private let passwordFieldId = "YOUR_PASSWORD_FIELD_ID_HERE"
+    private let loginButtonId = "YOUR_LOGIN_BUTTON_ID_HERE"
+    private let welcomeTextId = "YOUR_WELCOME_TEXT_ID_HERE"
+    // ====================================================
+    
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launch()
+    }
+    
+    override func tearDownWithError() throws {
+        app = nil
+    }
+    
+    func testSuccessfulLogin() throws {
+        // Step 1: Enter username
+        let usernameField = app.textFields[usernameFieldId]
+        XCTAssertTrue(usernameField.waitForExistence(timeout: 5), "Username field should exist")
+        usernameField.tap()
+        usernameField.typeText(TestData.Users.validUser.username)
+        
+        // Step 2: Enter password
+        let passwordField = app.secureTextFields[passwordFieldId]
+        XCTAssertTrue(passwordField.waitForExistence(timeout: 5), "Password field should exist")
+        passwordField.tap()
+        passwordField.typeText(TestData.Users.validUser.password)
+        
+        // Step 3: Tap login button
+        let loginButton = app.buttons[loginButtonId]
+        XCTAssertTrue(loginButton.waitForExistence(timeout: 5), "Login button should exist")
+        loginButton.tap()
+        
+        // Step 4: Verify welcome message
+        let welcomeText = app.staticTexts[welcomeTextId]
+        XCTAssertTrue(welcomeText.waitForExistence(timeout: 10), 
+            "Test passed! Your XCUITest framework is working correctly.")
+    }
+}

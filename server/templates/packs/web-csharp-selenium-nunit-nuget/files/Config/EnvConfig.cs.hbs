@@ -1,0 +1,31 @@
+using Newtonsoft.Json;
+using System.IO;
+
+namespace {{projectName}}.Config
+{
+    public class EnvConfig
+    {
+        private static EnvConfig? _instance;
+        private readonly dynamic _envData;
+
+        private EnvConfig()
+        {
+            var env = Environment.GetEnvironmentVariable("TEST_ENV") ?? "dev";
+            var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", $"{env}.json");
+            var json = File.ReadAllText(dataPath);
+            _envData = JsonConvert.DeserializeObject<dynamic>(json)!;
+        }
+
+        public static EnvConfig Instance => _instance ??= new EnvConfig();
+
+        public string GetBaseUrl() => _envData.baseUrl.ToString();
+
+        public (string username, string password) GetCredentials(string userType = "validUser")
+        {
+            var credentials = _envData.credentials[userType];
+            return (credentials.username.ToString(), credentials.password.ToString());
+        }
+
+        public int GetTimeout() => _envData.timeout ?? 30000;
+    }
+}

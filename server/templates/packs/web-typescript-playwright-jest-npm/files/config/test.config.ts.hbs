@@ -1,0 +1,21 @@
+interface TestConfig {
+  defaultTimeout: number;
+  browserOptions: {
+    headless: boolean;
+    slowMo: number;
+  };
+  screenshotOnFailure: boolean;
+  retryFailedTests: number;
+}
+
+const config: TestConfig = {
+  defaultTimeout: 60000,
+  browserOptions: {
+    headless: process.env.HEADLESS !== 'false',
+    slowMo: parseInt(process.env.SLOWMO || '0', 10)
+  },
+  screenshotOnFailure: true,
+  retryFailedTests: 1
+};
+
+export default config;

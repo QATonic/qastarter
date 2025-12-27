@@ -1,0 +1,34 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+
+# Log files
+*.log
+logs/
+
+# IDE files
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+*.tgz
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

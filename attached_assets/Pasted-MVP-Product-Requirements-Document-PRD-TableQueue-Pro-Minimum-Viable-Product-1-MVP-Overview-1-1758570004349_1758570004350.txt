@@ -1,0 +1,487 @@
+MVP Product Requirements Document (PRD): TableQueue Pro - Minimum Viable Product
+1. MVP Overview
+1.1 Product Name
+TableQueue Pro MVP - Digital Queue Management System
+
+1.2 MVP Focus
+Core functionality that solves the most critical pain points with minimal complexity and maximum reliability.
+
+1.3 MVP Philosophy
+"Do one thing well" - Focus exclusively on replacing the notebook-based queue management system with a digital solution that provides immediate value.
+
+2. MVP Scope & Boundaries
+2.1 IN Scope for MVP
+Digital customer registration and queue management
+
+Real-time table status tracking
+
+Basic SMS notifications to customers
+
+Simple queue display for staff
+
+Single-restaurant setup
+
+2.2 OUT of Scope for MVP
+Advanced analytics and reporting
+
+Customer mobile app
+
+Reservation system integration
+
+Multi-language support
+
+Multiple location management
+
+WhatsApp integration
+
+Loyalty programs
+
+Digital menus
+
+3. MVP User Stories & Requirements
+3.1 Core User Flow
+As a Gatekeeper, I want to:
+
+Quickly add customers to the digital queue with their name, phone number, and group size
+
+See the current queue status at a glance
+
+Update customer status when their table is ready
+
+View available tables that match customer group size
+
+As a Waiter, I want to:
+
+Mark tables as occupied/available with one tap
+
+See which tables I'm responsible for
+
+Get notified when new customers are assigned to my tables
+
+As a Customer, I want to:
+
+Receive an SMS with my queue position and estimated wait time
+
+Get notified when my table is ready
+
+Check my queue status without bothering staff
+
+As a Restaurant Manager, I want to:
+
+Set up my restaurant layout quickly
+
+View basic queue metrics at the end of the day
+
+Manage staff access to the system
+
+4. MVP Feature Specifications
+4.1 Feature 1: Quick Customer Registration
+Description:
+Replace the notebook entry with a 3-field form that takes less than 10 seconds to complete.
+
+Requirements:
+
+Name field (text input)
+
+Phone number (numeric input with validation)
+
+Group size (quick buttons: 1-2, 3-4, 5-6, 6+)
+
+Automatic queue number generation
+
+One-tap registration completion
+
+UI Specifications:
+
+text
+[ TableQueue Pro ]
+Name:    [_____________]
+Phone:   [_____________]
+Group:   [1-2] [3-4] [5-6] [6+]
+
+[ ADD TO QUEUE ]
+4.2 Feature 2: Real-time Queue Display
+Description:
+Digital view of the current queue that updates in real-time.
+
+Requirements:
+
+List view showing position, name, group size, wait time
+
+Color coding: waiting (yellow), table ready (green), seated (blue)
+
+Filter by group size
+
+One-tap actions: call customer, mark as no-show, seat customer
+
+UI Specifications:
+
+text
+Queue (12 customers)
+────────────────────
+#1 Raj Sharma (4) ⏱ 25min [CALL]
+#2 Priya Patel (2) ⏱ 15min [READY]
+#3 Amit Kumar (6) ⏱ 10min [WAITING]
+#4 Sneha Gupta (3) ⏱ 5min  [WAITING]
+4.3 Feature 3: Table Management
+Description:
+Simple visual table layout with status indicators.
+
+Requirements:
+
+Grid-based table layout
+
+One-tap status toggle: Available → Occupied → Cleaning → Available
+
+Color coding: Green (available), Red (occupied), Yellow (cleaning)
+
+Capacity display on each table
+
+Drag-and-drop customer assignment to tables
+
+UI Specifications:
+
+text
+Tables Status
+┌─┐ ┌─┐ ┌──┐
+│2│ │4│ │6 │ ← Green border
+└─┘ └─┘ └──┘
+┌──┐ ┌─┐ ┌─┐
+│4 │ │2│ │2│ ← Red border  
+└──┘ └─┘ └─┘
+4.4 Feature 4: SMS Notifications
+Description:
+Automated SMS messages to keep customers informed.
+
+Requirements:
+
+Welcome SMS with queue position and estimated wait time
+
+Table ready notification with table number
+
+Simple SMS templates with customization
+
+SMS delivery status tracking
+
+SMS Templates:
+
+text
+Welcome: "Hi {name}, you're #{position} in queue. Est. wait: {time} min. Reply STOP to unsub."
+
+Ready: "Hi {name}, your table for {group_size} is ready at Table {table_no}. Please proceed."
+5. MVP Technical Specifications
+5.1 Architecture
+text
+Frontend (React PWA) → API Gateway → Backend (Node.js) → Database (PostgreSQL)
+                              ↓
+                         SMS Service (Twilio)
+5.2 Database Schema (MVP Simplified)
+sql
+-- Restaurants
+CREATE TABLE restaurants (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(15),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Tables
+CREATE TABLE tables (
+    id SERIAL PRIMARY KEY,
+    restaurant_id INTEGER REFERENCES restaurants(id),
+    table_number VARCHAR(10) NOT NULL,
+    capacity INTEGER NOT NULL,
+    status VARCHAR(20) DEFAULT 'available' -- available, occupied, cleaning
+);
+
+-- Queue
+CREATE TABLE queue (
+    id SERIAL PRIMARY KEY,
+    restaurant_id INTEGER REFERENCES restaurants(id),
+    customer_name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(15) NOT NULL,
+    group_size INTEGER NOT NULL,
+    queue_position INTEGER NOT NULL,
+    status VARCHAR(20) DEFAULT 'waiting', -- waiting, ready, seated, cancelled
+    estimated_wait INTEGER,
+    created_at TIMESTAMP DEFAULT NOW(),
+    seated_at TIMESTAMP
+);
+
+-- Staff
+CREATE TABLE staff (
+    id SERIAL PRIMARY KEY,
+    restaurant_id INTEGER REFERENCES restaurants(id),
+    name VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL, -- admin, gatekeeper, waiter
+    pin_code VARCHAR(4) NOT NULL -- for quick login
+);
+5.3 API Endpoints (MVP Core)
+Queue Management
+
+POST /api/queue/add - Add customer to queue
+
+GET /api/queue/current - Get current queue
+
+PUT /api/queue/:id/status - Update customer status
+
+DELETE /api/queue/:id - Remove from queue
+
+Table Management
+
+GET /api/tables - Get all tables with status
+
+PUT /api/tables/:id/status - Update table status
+
+POST /api/tables/assign - Assign customer to table
+
+SMS Management
+
+POST /api/sms/send - Send SMS notification
+
+GET /api/sms/templates - Get SMS templates
+
+5.4 Technology Stack
+Frontend
+
+React.js with TypeScript
+
+Progressive Web App (PWA) for mobile devices
+
+Bootstrap for responsive design
+
+Socket.io for real-time updates
+
+Backend
+
+Node.js with Express.js
+
+PostgreSQL database
+
+Redis for caching and real-time features
+
+Twilio for SMS services
+
+Infrastructure
+
+AWS EC2 or DigitalOcean Droplet
+
+Nginx as reverse proxy
+
+PM2 for process management
+
+Let's Encrypt for SSL
+
+6. MVP User Interface Specifications
+6.1 Login Screen
+text
+TableQueue Pro
+[Phone Number: ___________]
+[PIN Code: ____]
+
+[ Login ] [ Forgot PIN? ]
+6.2 Gatekeeper Dashboard
+text
+Raj Palace Restaurant ── 📱 👤 ⚙️
+
+Quick Add
+Name: [______________] 
+Phone: [______________]
+Group: [1-2] [3-4] [5-6] [6+]
+[ ADD TO QUEUE ]
+
+Current Queue (8 waiting)
+─────────────────────────
+#1 Kumar (4) 25min [CALL]
+#2 Priya (2) 15min [READY] 
+#3 Singh (6) 10min [WAIT]
+
+Table View    Queue View    [📊 Reports]
+● ○ ○
+[Table 1] [Table 2] [Table 3]
+[2]       [4]       [6]  
+Available Occupied  Available
+6.3 Waiter View
+text
+My Tables ── Raj Palace
+Table 2 (4 seats) - Occupied - 45min
+Table 5 (2 seats) - Available
+Table 8 (6 seats) - Cleaning - 2min
+
+[ MARK AVAILABLE ] [ NEED CLEANING ]
+7. MVP Implementation Plan
+Phase 1: Week 1-2 - Core Setup
+Basic React frontend with login
+
+Node.js backend with authentication
+
+PostgreSQL database setup
+
+Basic queue management API
+
+Phase 2: Week 3-4 - Queue Management
+Customer registration flow
+
+Real-time queue display
+
+Table status management
+
+Basic UI/UX improvements
+
+Phase 3: Week 5-6 - Notifications & Polish
+SMS integration with Twilio
+
+Real-time updates with Socket.io
+
+Error handling and validation
+
+Mobile responsiveness
+
+Phase 4: Week 7-8 - Testing & Deployment
+User testing with 2-3 pilot restaurants
+
+Bug fixes and performance optimization
+
+Production deployment
+
+Documentation creation
+
+8. MVP Success Metrics
+8.1 Primary Metrics
+Registration Time: < 15 seconds per customer (vs 30+ seconds manual)
+
+Table Turnover Improvement: 15% reduction in wait time
+
+Customer Satisfaction: 4+ star rating from pilot restaurants
+
+System Uptime: 99% during peak hours
+
+8.2 User Adoption Metrics
+90% of customers receive and understand SMS notifications
+
+Staff can use system with less than 30 minutes training
+
+Zero notebook usage after 3 days of implementation
+
+9. MVP Limitations & Workarounds
+9.1 Known Limitations
+No offline mode (requires stable internet)
+
+Basic SMS only (no WhatsApp)
+
+Single device support initially
+
+No advanced reporting
+
+9.2 Workarounds
+Mobile hotspot as backup internet
+
+Manual customer calling if SMS fails
+
+Scheduled exports for basic reporting
+
+Multiple staff can use same device with different PINs
+
+10. MVP Testing Plan
+10.1 Pilot Restaurant Criteria
+High customer volume (50+ customers during peak)
+
+Willingness to provide feedback
+
+Basic comfort with technology
+
+Located in urban area with good internet
+
+10.2 Testing Scenarios
+Happy Path:
+
+Customer registration → SMS received → Table assignment → Seated
+
+Edge Cases:
+
+Customer no-show after table ready
+
+Internet outage during peak hours
+
+Large group (8+) arrival
+
+Multiple groups with same name
+
+11. MVP Deployment Checklist
+Pre-Deployment
+Domain registration (tablequeue.pro)
+
+Server provisioning and setup
+
+SSL certificate installation
+
+Database backup configuration
+
+SMS provider account setup
+
+Pilot Deployment
+2-3 restaurant onboarding
+
+Staff training materials ready
+
+Support contact established
+
+Feedback collection process defined
+
+Go-Live
+Monitoring and alerting setup
+
+Bug reporting system active
+
+Customer support channels open
+
+Analytics tracking implemented
+
+12. MVP Support & Maintenance
+12.1 Support Structure
+WhatsApp support group for pilot restaurants
+
+Phone support during peak hours (7-11 PM)
+
+Email support with 4-hour response time
+
+Remote troubleshooting capability
+
+12.2 Maintenance Plan
+Daily database backups
+
+Weekly system health checks
+
+Monthly feature updates based on feedback
+
+Quarterly security reviews
+
+13. MVP Next Steps
+Post-MVP Success Criteria
+3+ restaurants successfully using system for 30 days
+
+Positive feedback from staff and customers
+
+Clear ROI demonstrated (time savings, customer satisfaction)
+
+List of feature requests for Version 2
+
+Version 2 Planning
+Based on MVP feedback, prioritize:
+
+WhatsApp integration
+
+Advanced analytics dashboard
+
+Multi-device support
+
+Offline capability
+
+Reservation system
+
+MVP Development Timeline: 8 weeks
+Pilot Testing Period: 4 weeks
+Go-to-Market Decision: Week 12
+
+This MVP PRD focuses on delivering core value quickly while maintaining flexibility for iteration based on real-world feedback.
+

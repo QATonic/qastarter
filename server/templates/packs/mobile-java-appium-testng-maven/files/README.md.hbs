@@ -1,0 +1,281 @@
+# {{projectName}} - Mobile Automation Framework
+
+A comprehensive mobile test automation framework built with **Appium**, **Java**, **TestNG**, and **Maven**.
+
+## 🚀 Features
+
+- **Cross-platform mobile testing** (Android & iOS)
+- **Page Object Model** design pattern
+- **Data-driven testing** with CSV/JSON support
+- **Parallel test execution** with TestNG
+{{#if (eq reportingTool "extent-reports")}}
+- **ExtentReports** for detailed reporting
+{{else if (eq reportingTool "allure")}}
+- **Allure Reports** for rich test reporting
+{{else}}
+- **TestNG Reports** for built-in reporting
+{{/if}}
+{{#if cicdTool}}
+{{#if (eq cicdTool "jenkins")}}
+- **Jenkins** CI/CD pipeline integration
+{{else if (eq cicdTool "github-actions")}}
+- **GitHub Actions** CI/CD workflow
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI** pipeline integration
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps** pipeline integration
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI** workflow integration
+{{/if}}
+{{/if}}
+- **Screenshot capture** on test failures
+- **Configurable environments** (dev/qa/prod)
+{{#if (eq testingPattern "bdd")}}
+- **Cucumber BDD** for Gherkin feature files
+{{/if}}
+
+## 📱 Supported Platforms
+
+- **Android**: Using UiAutomator2 automation engine
+- **iOS**: Using XCUITest automation engine
+
+## 🛠 Prerequisites
+
+- **Java {{toolVersions.java}}+** - Programming language
+- **Maven {{toolVersions.maven}}+** - Build tool
+- **Appium Server {{toolVersions.appium}}+** - Mobile automation server
+- **Android SDK** (for Android testing)
+- **Xcode** (for iOS testing on macOS)
+
+## 📦 Dependencies
+
+- **Appium Java Client**: {{appium.version}}
+- **Selenium WebDriver**: {{selenium.version}}
+- **TestNG**: {{testng.version}}
+{{#if (includes reporting "extent-reports")}}
+- **ExtentReports**: For detailed test reporting
+{{/if}}
+{{#if utilities.logger}}
+- **Log4j2**: For comprehensive logging
+{{/if}}
+
+## 🏗 Project Structure
+
+```
+{{artifactId}}/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── {{packagePath}}/
+│   │   │       ├── config/          # Configuration management
+│   │   │       ├── core/            # Core framework components
+│   │   │       ├── pages/           # Page Object Model classes
+│   │   │       ├── utils/           # Utility classes
+│   │   │       └── listeners/       # TestNG listeners
+│   │   └── resources/
+│   │       ├── config/              # Environment properties
+│   │       ├── log4j2.xml          # Logging configuration
+│   │       └── extent-config.xml    # ExtentReports configuration
+│   └── test/
+│       ├── java/
+│       │   └── {{packagePath}}/
+│       │       └── tests/           # Test classes
+│       └── resources/
+│           ├── capabilities/        # Device capabilities
+│           ├── testdata/           # Test data files
+│           ├── testng.xml          # TestNG suite configuration
+│           ├── android.xml         # Android-specific suite
+│           └── ios.xml             # iOS-specific suite
+├── reports/                        # Test reports
+├── logs/                          # Application logs
+├── apps/                          # Mobile applications
+├── pom.xml                        # Maven configuration
+└── Jenkinsfile                    # CI/CD pipeline
+```
+
+## ⚙️ Configuration
+
+### Environment Setup
+
+1. **Configure Appium Server**:
+   ```bash
+   npm install -g appium@next
+   appium driver install uiautomator2
+   appium driver install xcuitest
+   appium server --port 4723
+   ```
+
+2. **Android Setup**:
+   - Install Android SDK
+   - Set ANDROID_HOME environment variable
+   - Enable USB Debugging on device/emulator
+
+3. **iOS Setup** (macOS only):
+   - Install Xcode and Command Line Tools
+   - Install iOS Simulator
+
+### Application Configuration
+
+Update the following files for your application:
+
+1. **Device Capabilities**: `src/test/resources/capabilities/`
+   - `android.json` - Android device capabilities
+   - `ios.json` - iOS device capabilities
+
+2. **Environment Properties**: `src/main/resources/config/`
+   - `dev.properties` - Development environment
+   - `qa.properties` - QA environment
+   - `prod.properties` - Production environment
+
+## 🧪 Running Tests
+
+### Command Line Execution
+
+```bash
+# Run all tests
+mvn clean test
+
+# Run Android tests only
+mvn clean test -Pandroid -Denvironment=qa
+
+# Run iOS tests only
+mvn clean test -Pios -Denvironment=qa
+
+# Run specific test suite
+mvn clean test -DsuiteXmlFile=src/test/resources/testng.xml
+
+# Run tests with custom properties
+mvn clean test -Dplatform=android -Denvironment=dev
+```
+
+### TestNG Suite Execution
+
+```bash
+# Run complete test suite
+mvn clean test -DsuiteXmlFile=src/test/resources/testng.xml
+
+# Run Android-specific tests
+mvn clean test -DsuiteXmlFile=src/test/resources/android.xml
+
+# Run iOS-specific tests
+mvn clean test -DsuiteXmlFile=src/test/resources/ios.xml
+```
+
+## 📊 Test Reporting
+
+{{#if (includes reporting "extent-reports")}}
+### ExtentReports
+
+- **Location**: `reports/ExtentReport.html`
+- **Features**: Screenshots, logs, test timeline
+- **Configuration**: `src/main/resources/extent-config.xml`
+{{/if}}
+
+### TestNG Reports
+
+- **Location**: `target/surefire-reports/`
+- **Features**: XML and HTML reports
+
+## 🔧 Customization
+
+### Adding New Page Objects
+
+1. Create new page class extending `BasePage`
+2. Define platform-specific locators using `@AndroidFindBy` and `@iOSXCUITFindBy`
+3. Implement page-specific methods
+
+```java
+public class NewPage extends BasePage {
+    @AndroidFindBy(id = "android.id")
+    @iOSXCUITFindBy(accessibility = "ios.accessibility.id")
+    private WebElement element;
+    
+    // Page methods here
+}
+```
+
+### Adding New Test Cases
+
+1. Create test class extending `BaseTest`
+2. Use TestNG annotations for test configuration
+3. Implement data-driven testing with `@DataProvider`
+
+```java
+public class NewTests extends BaseTest {
+    @Test(dataProvider = "testData")
+    public void testMethod(String param1, String param2) {
+        // Test implementation
+    }
+}
+```
+
+## 🚀 CI/CD Integration
+
+### Jenkins Pipeline
+
+The included `Jenkinsfile` provides:
+
+- **Multi-stage pipeline** with parallel Android/iOS execution
+- **Artifact archival** for reports and logs
+- **Test result publishing** with trend analysis
+- **Email notifications** on build status
+
+### Pipeline Stages
+
+1. **Checkout** - Source code retrieval
+2. **Build** - Maven compilation and dependency resolution
+3. **Test (Android)** - Android test execution
+4. **Test (iOS)** - iOS test execution  
+5. **Report** - Test report generation and publishing
+6. **Archive** - Artifact storage
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Appium Server Connection**:
+   - Verify Appium server is running on correct port
+   - Check `appium.server.url` in properties files
+
+2. **Device/Emulator Not Found**:
+   - Verify device is connected and recognized
+   - Check device capabilities configuration
+
+3. **App Installation Issues**:
+   - Verify app path in capabilities
+   - Check app permissions and signing
+
+4. **Element Not Found**:
+   - Verify locator strategies for platform
+   - Check element timing and waits
+
+### Debug Mode
+
+Enable debug logging by setting:
+```properties
+log.level=DEBUG
+```
+
+## 📚 Best Practices
+
+1. **Page Object Model**: Keep page objects focused and maintainable
+2. **Wait Strategies**: Use explicit waits instead of Thread.sleep()
+3. **Data Management**: Externalize test data using CSV/JSON
+4. **Error Handling**: Implement proper exception handling
+5. **Parallel Execution**: Design tests for parallel execution
+6. **Cross-platform**: Use platform-agnostic approaches where possible
+
+## 🤝 Contributing
+
+1. Follow the existing code structure and patterns
+2. Add appropriate tests for new functionality
+3. Update documentation for any changes
+4. Ensure tests pass on both Android and iOS platforms
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Generated by QAStarter** - Your Mobile Test Automation Framework Generator

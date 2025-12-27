@@ -1,0 +1,43 @@
+/**
+ * Login Test Suite
+ * 
+ * BEFORE RUNNING:
+ * 1. Update credentials in: data/dev.json
+ * 2. Update selectors in: pages/LoginPage.js
+ * 3. Run: npm test
+ */
+const DriverFactory = require('../utils/driverFactory');
+const LoginPage = require('../pages/LoginPage');
+const ScreenshotHelper = require('../utils/screenshotHelper');
+const envConfig = require('../config/env.config');
+
+describe('Login Tests', () => {
+  let driver, loginPage, screenshot;
+
+  beforeAll(async () => {
+    driver = await DriverFactory.createDriver();
+    loginPage = new LoginPage(driver);
+    screenshot = new ScreenshotHelper(driver);
+  });
+
+  afterAll(async () => {
+    if (driver) {
+      await driver.quit();
+    }
+  });
+
+  test('should login with valid credentials', async () => {
+    // Get credentials from config file (data/dev.json)
+    const credentials = envConfig.getCredentials('validUser');
+    
+    // Step 1: Navigate to login page
+    await loginPage.navigateToLogin();
+    
+    // Step 2: Enter credentials and submit
+    await loginPage.login(credentials.username, credentials.password);
+    
+    // Step 3: Verify login was successful
+    const isLoggedIn = await loginPage.isLoginSuccessful();
+    expect(isLoggedIn).toBe(true);
+  });
+});

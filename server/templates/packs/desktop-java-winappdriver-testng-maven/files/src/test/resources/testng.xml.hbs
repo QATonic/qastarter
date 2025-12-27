@@ -1,0 +1,95 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="{{projectName}} Desktop Automation Test Suite" 
+       verbose="1" 
+       parallel="false" 
+       thread-count="1"
+       preserve-order="true"
+       configfailurepolicy="continue">
+    
+    <!-- Suite Parameters -->
+    <parameter name="environment" value="dev"/>
+    
+    <!-- Listeners -->
+    <listeners>
+        <listener class-name="{{groupId}}.listeners.TestListener"/>
+    </listeners>
+    
+    <!-- Test Groups Definition -->
+    <groups>
+        <run>
+            <include name="smoke"/>
+            <include name="basic"/>
+            <include name="calculator"/>
+            <include name="notepad"/>
+        </run>
+    </groups>
+    
+    <!-- Smoke Tests -->
+    <test name="Smoke Tests" 
+          group-by-instances="true"
+          preserve-order="true">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="{{groupId}}.tests.CalculatorTests">
+                <methods>
+                    <include name="testBasicAddition"/>
+                    <include name="testBasicSubtraction"/>
+                    <include name="testClearFunctionality"/>
+                </methods>
+            </class>
+            <class name="{{groupId}}.tests.NotepadTests">
+                <methods>
+                    <include name="testBasicTextTyping"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    
+    <!-- Calculator Tests -->
+    <test name="Calculator Application Tests" 
+          group-by-instances="true"
+          preserve-order="true">
+        <groups>
+            <run>
+                <include name="calculator"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="{{groupId}}.tests.CalculatorTests"/>
+        </classes>
+    </test>
+    
+    <!-- Notepad Tests -->
+    <test name="Notepad Application Tests" 
+          group-by-instances="true"
+          preserve-order="true">
+        <groups>
+            <run>
+                <include name="notepad"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="{{groupId}}.tests.NotepadTests"/>
+        </classes>
+    </test>
+    
+    <!-- Integration Tests -->
+    <test name="Windows Integration Tests" 
+          group-by-instances="true"
+          preserve-order="true"
+          enabled="true">
+        <groups>
+            <run>
+                <include name="integration"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="{{groupId}}.tests.WindowsIntegrationTests"/>
+        </classes>
+    </test>
+    
+</suite>

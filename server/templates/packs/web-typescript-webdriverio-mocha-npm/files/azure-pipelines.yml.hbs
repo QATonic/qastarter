@@ -1,0 +1,96 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  NODE_VERSION: '{{toolVersions.node}}'
+  TEST_ENV: 'qa'
+  HEADLESS: 'true'
+
+strategy:
+  matrix:
+    chrome:
+      BROWSER: 'chrome'
+    firefox:
+      BROWSER: 'firefox'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '{{toolVersions.node}}'
+    displayName: 'Install Node.js {{toolVersions.node}}'
+
+  - script: npm ci
+    displayName: 'Install dependencies'
+
+  - script: npx wdio run wdio.conf.ts
+    displayName: 'Run WebdriverIO tests'
+    env:
+      BROWSER: $(BROWSER)
+      TEST_ENV: $(TEST_ENV)
+      HEADLESS: $(HEADLESS)
+
+{{#if (eq reportingTool "allure")}}
+  - script: npm run report:generate
+    displayName: 'Generate Allure Report'
+    condition: always()
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Allure Results'
+    condition: always()
+    inputs:
+      PathtoPublish: 'allure-results'
+      ArtifactName: 'allure-results-$(BROWSER)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Allure Report'
+    condition: always()
+    inputs:
+      PathtoPublish: 'allure-report'
+      ArtifactName: 'allure-report-$(BROWSER)'
+{{/if}}
+
+{{#if (eq reportingTool "spec")}}
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Test Results'
+    condition: always()
+    inputs:
+      PathtoPublish: 'test-results'
+      ArtifactName: 'test-results-$(BROWSER)'
+{{/if}}
+
+{{#if (eq reportingTool "junit")}}
+  - task: PublishTestResults@2
+    displayName: 'Publish JUnit Test Results'
+    condition: always()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'test-results/junit-results.xml'
+      testRunTitle: 'WebdriverIO Tests - $(BROWSER)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish JUnit Reports'
+    condition: always()
+    inputs:
+      PathtoPublish: 'test-results'
+      ArtifactName: 'junit-reports-$(BROWSER)'
+{{/if}}
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Screenshots'
+    condition: failed()
+    inputs:
+      PathtoPublish: 'screenshots'
+      ArtifactName: 'screenshots-$(BROWSER)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Logs'
+    condition: always()
+    inputs:
+      PathtoPublish: 'logs'
+      ArtifactName: 'logs-$(BROWSER)'

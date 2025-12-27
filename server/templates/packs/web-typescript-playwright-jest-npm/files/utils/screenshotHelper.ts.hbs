@@ -1,0 +1,25 @@
+import { Page } from 'playwright';
+import * as path from 'path';
+import logger from './logger';
+
+export class ScreenshotHelper {
+  public static async captureScreenshot(page: Page, name: string): Promise<string> {
+    const timestamp: string = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename: string = `${name}-${timestamp}.png`;
+    const filepath: string = path.join('screenshots', filename);
+    
+    await page.screenshot({ path: filepath, fullPage: true });
+    logger.info(`Screenshot saved: ${filepath}`);
+    return filepath;
+  }
+
+  public static async captureOnFailure(page: Page, testName: string): Promise<void> {
+    try {
+      await this.captureScreenshot(page, `FAILED-${testName}`);
+    } catch (error: unknown) {
+      logger.error(`Failed to capture screenshot: ${error}`);
+    }
+  }
+}
+
+export default ScreenshotHelper;

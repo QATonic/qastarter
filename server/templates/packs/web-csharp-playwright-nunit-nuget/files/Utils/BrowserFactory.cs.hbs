@@ -1,0 +1,66 @@
+using Microsoft.Playwright;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Utils
+{
+    /// <summary>
+    /// Factory class for creating Playwright browser instances.
+    /// </summary>
+    public static class BrowserFactory
+    {
+        public static async Task<IBrowser> CreateBrowserAsync(IPlaywright playwright, string browserType = "")
+        {
+            browserType = string.IsNullOrEmpty(browserType) ? TestSettings.Browser : browserType;
+            var headless = TestSettings.Headless;
+
+            Logger.Info($"Creating {browserType} browser (headless: {headless})");
+
+            var launchOptions = new BrowserTypeLaunchOptions
+            {
+                Headless = headless,
+                SlowMo = TestSettings.SlowMo
+            };
+
+            IBrowser browser = browserType.ToLower() switch
+            {
+                "chromium" or "chrome" => await playwright.Chromium.LaunchAsync(launchOptions),
+                "firefox" => await playwright.Firefox.LaunchAsync(launchOptions),
+                "webkit" or "safari" => await playwright.Webkit.LaunchAsync(launchOptions),
+                _ => throw new ArgumentException($"Unsupported browser: {browserType}")
+            };
+
+            return browser;
+        }
+
+        public static async Task<IBrowserContext> CreateContextAsync(IBrowser browser)
+        {
+            var contextOptions = new BrowserNewContextOptions
+            {
+                ViewportSize = new ViewportSize
+                {
+                    Width = TestSettings.ViewportWidth,
+                    Height = TestSettings.ViewportHeight
+                },
+                IgnoreHTTPSErrors = true,
+                RecordVideoDir = TestSettings.RecordVideo ? "videos/" : null
+            };
+
+            var context = await browser.NewContextAsync(contextOptions);
+
+            // Set default timeout
+            context.SetDefaultTimeout(TestSettings.DefaultTimeout);
+
+            return context;
+        }
+
+        public static async Task<IPage> CreatePageAsync(IBrowserContext context)
+        {
+            var page = await context.NewPageAsync();
+
+            // Set default navigation timeout
+            page.SetDefaultNavigationTimeout(TestSettings.NavigationTimeout);
+
+            return page;
+        }
+    }
+}

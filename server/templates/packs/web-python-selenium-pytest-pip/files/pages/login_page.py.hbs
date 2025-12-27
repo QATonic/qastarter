@@ -1,0 +1,75 @@
+"""
+Login Page Object
+
+HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+1. Open your app's login page in a browser
+2. Right-click on each element → Inspect → Copy selector
+3. Replace the placeholder locators below with your actual locators
+4. Update the login URL path in __init__() method
+"""
+from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
+from config.config import Config
+
+class LoginPage(BasePage):
+    """Login page object"""
+    
+    # ============================================
+    # UPDATE THESE LOCATORS FOR YOUR APPLICATION
+    # ============================================
+    # Tip: Use browser DevTools (F12) to find correct selectors
+    USERNAME_INPUT = (By.ID, "username")                    # Your username/email input field
+    PASSWORD_INPUT = (By.ID, "password")                    # Your password input field
+    LOGIN_BUTTON = (By.CSS_SELECTOR, "button[type='submit']") # Your login/submit button
+    ERROR_MESSAGE = (By.CSS_SELECTOR, ".error-message")     # Error message element
+    REMEMBER_ME_CHECKBOX = (By.ID, "remember-me")
+    FORGOT_PASSWORD_LINK = (By.LINK_TEXT, "Forgot Password?")
+    # ============================================
+    
+    def __init__(self, driver):
+        super().__init__(driver)
+        # UPDATE: Change '/login' to your actual login page path
+        self.url = f"{Config.get_base_url()}/login"
+    
+    def navigate(self) -> None:
+        """Navigate to login page"""
+        self.navigate_to(self.url)
+    
+    def enter_username(self, username: str) -> None:
+        """Enter username"""
+        self.type(self.USERNAME_INPUT, username)
+    
+    def enter_password(self, password: str) -> None:
+        """Enter password"""
+        self.type(self.PASSWORD_INPUT, password)
+    
+    def click_login(self) -> None:
+        """Click login button"""
+        self.click(self.LOGIN_BUTTON)
+    
+    def login(self, username: str, password: str) -> None:
+        """Perform login"""
+        self.logger.info(f"Logging in with username: {username}")
+        self.enter_username(username)
+        self.enter_password(password)
+        self.click_login()
+    
+    def is_error_displayed(self) -> bool:
+        """Check if error message is displayed"""
+        return self.is_displayed(self.ERROR_MESSAGE)
+    
+    def get_error_message(self) -> str:
+        """Get error message text"""
+        return self.get_text(self.ERROR_MESSAGE)
+    
+    def is_login_successful(self) -> bool:
+        """Verify login success"""
+        return "/dashboard" in self.get_current_url() or "Dashboard" in self.get_page_title()
+    
+    def check_remember_me(self) -> None:
+        """Check remember me checkbox"""
+        self.click(self.REMEMBER_ME_CHECKBOX)
+    
+    def click_forgot_password(self) -> None:
+        """Click forgot password link"""
+        self.click(self.FORGOT_PASSWORD_LINK)

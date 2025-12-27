@@ -1,0 +1,31 @@
+using Microsoft.Extensions.Configuration;
+
+namespace {{projectName}}.Config
+{
+    public class BrowserConfig
+    {
+        private static readonly IConfiguration Configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+
+        public static string Browser => Environment.GetEnvironmentVariable("BROWSER") ?? Configuration["Browser"] ?? "chrome";
+        public static bool Headless => bool.Parse(Environment.GetEnvironmentVariable("HEADLESS") ?? Configuration["Headless"] ?? "false");
+        public static int ImplicitWait => int.Parse(Configuration["ImplicitWait"] ?? "10");
+        public static int PageLoadTimeout => int.Parse(Configuration["PageLoadTimeout"] ?? "30");
+        public static int ScriptTimeout => int.Parse(Configuration["ScriptTimeout"] ?? "30");
+
+        public static string[] ChromeOptions => new[]
+        {
+            "--disable-gpu",
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--window-size=1920,1080"
+        };
+
+        public static string[] FirefoxOptions => new[]
+        {
+            "--width=1920",
+            "--height=1080"
+        };
+    }
+}

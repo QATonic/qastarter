@@ -1,0 +1,61 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Utils
+{
+    /// <summary>
+    /// Factory class for creating WebDriver instances with Selenium Manager (Selenium 4+).
+    /// Selenium Manager automatically handles driver downloads and management.
+    /// </summary>
+    public class DriverFactory
+    {
+        public static IWebDriver CreateDriver(string browserType = "")
+        {
+            browserType = string.IsNullOrEmpty(browserType) ? BrowserConfig.Browser : browserType;
+            Logger.Info($"Creating {browserType} driver (headless: {BrowserConfig.Headless})");
+
+            IWebDriver driver;
+
+            switch (browserType.ToLower())
+            {
+                case "chrome":
+                    var chromeOptions = new ChromeOptions();
+                    foreach (var option in BrowserConfig.ChromeOptions)
+                    {
+                        chromeOptions.AddArgument(option);
+                    }
+                    if (BrowserConfig.Headless)
+                    {
+                        chromeOptions.AddArgument("--headless=new");
+                    }
+                    driver = new ChromeDriver(chromeOptions);
+                    break;
+
+                case "firefox":
+                    var firefoxOptions = new FirefoxOptions();
+                    foreach (var option in BrowserConfig.FirefoxOptions)
+                    {
+                        firefoxOptions.AddArgument(option);
+                    }
+                    if (BrowserConfig.Headless)
+                    {
+                        firefoxOptions.AddArgument("--headless");
+                    }
+                    driver = new FirefoxDriver(firefoxOptions);
+                    break;
+
+                default:
+                    throw new ArgumentException($"Unsupported browser: {browserType}");
+            }
+
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(BrowserConfig.ImplicitWait);
+            driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(BrowserConfig.PageLoadTimeout);
+            driver.Manage().Timeouts().AsynchronousJavaScript = TimeSpan.FromSeconds(BrowserConfig.ScriptTimeout);
+            driver.Manage().Window.Maximize();
+
+            return driver;
+        }
+    }
+}

@@ -1,0 +1,124 @@
+# {{projectName}}
+
+Cypress test automation framework with JavaScript and npm.
+
+## Features
+
+- **Cypress {{toolVersions.cypress}}**: Modern end-to-end testing framework
+- **JavaScript**: Simple and powerful scripting
+- **npm**: Package management
+- **Page Object Model**: Maintainable test structure
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions**: CI/CD workflow included
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins**: CI/CD pipeline included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI**: CI/CD pipeline included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps**: CI/CD pipeline included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI**: CI/CD workflow included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+{{#if (eq reportingTool "mochawesome")}}
+- **Mochawesome Reports**: Beautiful HTML test reports
+{{else if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else}}
+- **Built-in Reports**: Cypress native reporting
+{{/if}}
+- **Multi-Browser**: Chrome, Firefox support
+{{#if (eq testingPattern "bdd")}}
+- **Cucumber BDD**: Gherkin feature files support
+{{/if}}
+
+## Prerequisites
+
+- Node.js 18+ and npm
+
+## Installation
+
+```bash
+npm install
+```
+
+## Running Tests
+
+```bash
+# Run all tests (headless)
+npm test
+
+# Run tests in headed mode
+npm run test:headed
+
+# Run tests in specific browser
+npm run test:chrome
+npm run test:firefox
+
+# Open Cypress Test Runner
+npm run open
+
+# Clean test artifacts
+npm run clean
+```
+
+## Configuration
+
+Update test data in:
+- `cypress/fixtures/config.json` - Environment URLs
+- `cypress/fixtures/users.json` - User credentials
+
+Set base URL with environment variable:
+```bash
+BASE_URL=https://qa.example.com npm test
+```
+
+## Page Objects
+
+All page objects extend `BasePage` and are located in `cypress/pages/`:
+- `LoginPage.js` - Login page interactions
+- `HomePage.js` - Home page interactions
+
+## Test Structure
+
+```
+cypress/
+  ├── e2e/
+  │   ├── login.cy.js     # Login functionality tests
+  │   └── smoke.cy.js     # Smoke tests
+  ├── pages/
+  │   ├── BasePage.js     # Base page class
+  │   ├── LoginPage.js    # Login page object
+  │   └── HomePage.js     # Home page object
+  ├── fixtures/
+  │   ├── config.json     # Environment config
+  │   └── users.json      # Test user data
+  └── support/
+      ├── e2e.js          # Global setup
+      └── commands.js     # Custom commands
+```
+
+## Custom Commands
+
+Custom Cypress commands are available:
+- `cy.login(username, password)` - Login helper
+- `cy.logout()` - Logout helper
+- `cy.waitForElement(selector)` - Wait for element
+- `cy.fullScreenshot(filename)` - Full page screenshot
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+GitHub Actions workflow automatically runs tests on push/PR with multi-browser matrix (Chrome, Firefox).
+
+## Reports
+
+Mochawesome HTML reports are generated in `cypress/results/` after test execution.

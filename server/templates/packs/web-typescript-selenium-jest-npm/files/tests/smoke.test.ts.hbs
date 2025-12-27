@@ -1,0 +1,34 @@
+import { WebDriver } from 'selenium-webdriver';
+import DriverFactory from '../utils/DriverFactory';
+import LoginPage from '../pages/LoginPage';
+import envConfig from '../config/env.config';
+
+describe('Smoke Tests', () => {
+  let driver: WebDriver;
+  let loginPage: LoginPage;
+
+  beforeAll(async () => {
+    driver = await DriverFactory.createDriver();
+    loginPage = new LoginPage(driver);
+  });
+
+  afterAll(async () => {
+    if (driver) {
+      await driver.quit();
+    }
+  });
+
+  test('login page loads successfully', async () => {
+    await loginPage.navigateToLogin();
+    const title = await loginPage.getPageTitle();
+    expect(title).toBeTruthy();
+    expect(await loginPage.isDisplayed(loginPage.usernameInput)).toBe(true);
+    expect(await loginPage.isDisplayed(loginPage.passwordInput)).toBe(true);
+  });
+
+  test('base URL is accessible', async () => {
+    await driver.get(envConfig.getBaseUrl());
+    const url = await driver.getCurrentUrl();
+    expect(url).toContain(envConfig.getBaseUrl());
+  });
+});

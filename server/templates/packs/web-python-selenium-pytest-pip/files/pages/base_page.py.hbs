@@ -1,0 +1,118 @@
+"""
+Base Page Object Model class with common page functionality
+"""
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from utils.logger import Logger
+from utils.screenshot_util import ScreenshotUtil
+from config.config import Config
+
+class BasePage:
+    """Base class for all page objects"""
+    
+    def __init__(self, driver: WebDriver):
+        self.driver = driver
+        self.wait = WebDriverWait(driver, Config.EXPLICIT_WAIT)
+        self.logger = Logger.get_logger(self.__class__.__name__)
+        self.screenshot = ScreenshotUtil(driver)
+    
+    def navigate_to(self, url: str) -> None:
+        """Navigate to a URL"""
+        self.logger.info(f"Navigating to: {url}")
+        self.driver.get(url)
+    
+    def find_element(self, locator: tuple) -> WebElement:
+        """Find an element with explicit wait"""
+        self.logger.debug(f"Finding element: {locator}")
+        return self.wait.until(EC.presence_of_element_located(locator))
+    
+    def find_elements(self, locator: tuple) -> list[WebElement]:
+        """Find multiple elements"""
+        self.logger.debug(f"Finding elements: {locator}")
+        return self.wait.until(EC.presence_of_all_elements_located(locator))
+    
+    def click(self, locator: tuple) -> None:
+        """Click an element"""
+        element = self.wait.until(EC.element_to_be_clickable(locator))
+        self.logger.info(f"Clicking element: {locator}")
+        element.click()
+    
+    def type(self, locator: tuple, text: str) -> None:
+        """Type text into an element"""
+        element = self.find_element(locator)
+        self.logger.info(f"Typing into element: {locator}")
+        element.clear()
+        element.send_keys(text)
+    
+    def get_text(self, locator: tuple) -> str:
+        """Get text from an element"""
+        element = self.find_element(locator)
+        return element.text
+    
+    def is_displayed(self, locator: tuple) -> bool:
+        """Check if element is displayed"""
+        try:
+            element = self.find_element(locator)
+            return element.is_displayed()
+        except:
+            return False
+    
+    def is_enabled(self, locator: tuple) -> bool:
+        """Check if element is enabled"""
+        try:
+            element = self.find_element(locator)
+            return element.is_enabled()
+        except:
+            return False
+    
+    def wait_for_element(self, locator: tuple, timeout: int = None) -> WebElement:
+        """Wait for element with custom timeout"""
+        wait_time = timeout or Config.EXPLICIT_WAIT
+        wait = WebDriverWait(self.driver, wait_time)
+        return wait.until(EC.presence_of_element_located(locator))
+    
+    def wait_for_element_clickable(self, locator: tuple, timeout: int = None) -> WebElement:
+        """Wait for element to be clickable"""
+        wait_time = timeout or Config.EXPLICIT_WAIT
+        wait = WebDriverWait(self.driver, wait_time)
+        return wait.until(EC.element_to_be_clickable(locator))
+    
+    def get_page_title(self) -> str:
+        """Get current page title"""
+        return self.driver.title
+    
+    def get_current_url(self) -> str:
+        """Get current URL"""
+        return self.driver.current_url
+    
+    def scroll_to_element(self, locator: tuple) -> None:
+        """Scroll to an element"""
+        element = self.find_element(locator)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+    
+    def switch_to_frame(self, frame_locator: tuple) -> None:
+        """Switch to iframe"""
+        frame = self.find_element(frame_locator)
+        self.driver.switch_to.frame(frame)
+    
+    def switch_to_default_content(self) -> None:
+        """Switch back to main content"""
+        self.driver.switch_to.default_content()
+    
+    def accept_alert(self) -> None:
+        """Accept alert"""
+        alert = self.wait.until(EC.alert_is_present())
+        alert.accept()
+    
+    def dismiss_alert(self) -> None:
+        """Dismiss alert"""
+        alert = self.wait.until(EC.alert_is_present())
+        alert.dismiss()
+    
+    def get_alert_text(self) -> str:
+        """Get alert text"""
+        alert = self.wait.until(EC.alert_is_present())
+        return alert.text

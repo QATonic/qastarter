@@ -1,0 +1,110 @@
+pipeline {
+    agent any
+    
+    tools {
+        nodejs 'NodeJS {{toolVersions.node}}'
+    }
+    
+    environment {
+        TEST_ENV = 'qa'
+        CYPRESS_CACHE_FOLDER = '${WORKSPACE}/.cypress-cache'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+        
+        stage('Install Cypress') {
+            steps {
+                sh 'npx cypress install'
+            }
+        }
+        
+        stage('Run Cypress Tests - Chrome') {
+            steps {
+                sh 'npx cypress run --browser chrome'
+            }
+            post {
+                always {
+                    {{#if (eq reportingTool "allure")}}
+                    sh 'npm run report:generate'
+                    allure([
+                        results: [[path: 'allure-results']]
+                    ])
+                    archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'allure-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "mochawesome")}}
+                    publishHTML([
+                        reportDir: 'cypress/reports/mochawesome',
+                        reportFiles: 'mochawesome.html',
+                        reportName: 'Cypress Test Report - Chrome',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "junit")}}
+                    junit 'cypress/results/junit-*.xml'
+                    archiveArtifacts artifacts: 'cypress/results/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    archiveArtifacts artifacts: 'cypress/videos/**/*', allowEmptyArchive: true
+                }
+                failure {
+                    archiveArtifacts artifacts: 'cypress/screenshots/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+        
+        stage('Run Cypress Tests - Firefox') {
+            steps {
+                sh 'npx cypress run --browser firefox'
+            }
+            post {
+                always {
+                    {{#if (eq reportingTool "allure")}}
+                    sh 'npm run report:generate'
+                    allure([
+                        results: [[path: 'allure-results']]
+                    ])
+                    archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'allure-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "mochawesome")}}
+                    publishHTML([
+                        reportDir: 'cypress/reports/mochawesome',
+                        reportFiles: 'mochawesome.html',
+                        reportName: 'Cypress Test Report - Firefox',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'cypress/reports/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "junit")}}
+                    junit 'cypress/results/junit-*.xml'
+                    archiveArtifacts artifacts: 'cypress/results/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    archiveArtifacts artifacts: 'cypress/videos/**/*', allowEmptyArchive: true
+                }
+                failure {
+                    archiveArtifacts artifacts: 'cypress/screenshots/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

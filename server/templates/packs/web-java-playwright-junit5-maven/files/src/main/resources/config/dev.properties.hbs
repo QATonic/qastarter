@@ -1,0 +1,90 @@
+# ============================================
+# CONFIGURATION FILE - UPDATE THESE VALUES
+# ============================================
+# This file contains your application settings.
+# Replace the placeholder values below with your actual test environment details.
+
+# Your application's base URL (no trailing slash)
+base.url=https://your-app-url.com
+
+# Browser Configuration
+browser=chromium
+headless=false
+
+# Playwright Configuration
+slow.motion=0
+browser.args=
+downloads.path=downloads/
+
+# Viewport Configuration
+viewport.width=1920
+viewport.height=1080
+
+# Timeout Configuration (in milliseconds)
+default.timeout=30000
+navigation.timeout=60000
+
+# Localization
+locale=en-US
+timezone=America/New_York
+
+# Retry Configuration
+retry.count=1
+
+# Screenshot Configuration
+capture.screenshots.on.failure=true
+capture.screenshots.on.pass=false
+
+# Test Data Configuration
+test.data.path=src/test/resources/testdata/
+
+# Logging Configuration
+log.level=DEBUG
+enable.console.logging=true
+enable.file.logging=true
+
+# ExtentReports Configuration
+extent.report.path=reports/ExtentReport.html
+extent.report.title={{projectName}} - Test Results
+extent.report.name=Automation Test Execution Report
+
+# Database Configuration (if needed)
+# db.url=jdbc:mysql://localhost:3306/testdb
+# db.username=testuser
+# db.password=testpass
+
+# API Configuration (if needed)
+# api.base.url=https://api.example.com
+# api.timeout=30
+# api.version=v1
+
+# Environment Specific Settings
+environment=dev
+test.environment=development
+debug.mode=true
+enable.performance.tracking=true
+
+# Application Specific Configuration
+default.username=admin
+default.password=password123
+app.version=1.0.0
+
+# Parallel Execution Configuration
+parallel.execution=false
+thread.count=1
+parallel.mode=methods
+
+# Video Recording
+record.video=false
+video.path=reports/videos/
+
+# Tracing (for debugging)
+enable.tracing=false
+trace.path=reports/traces/
+
+# Custom Properties
+custom.wait.polling=500
+custom.retry.interval=1000
+enable.soft.assertions=false
+highlight.elements=true
+take.screenshot.on.element.interaction=false

@@ -1,0 +1,139 @@
+package {{javaPackage}}.utils;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * Logger wrapper utility for consistent logging across the framework.
+ * Uses Log4j2 for logging with different log levels.
+ */
+public class Log {
+    private static final Logger logger = LogManager.getLogger(Log.class);
+    
+    /**
+     * Log info message
+     * @param message Message to log
+     */
+    public static void info(String message) {
+        logger.info(message);
+    }
+    
+    /**
+     * Log debug message
+     * @param message Message to log
+     */
+    public static void debug(String message) {
+        logger.debug(message);
+    }
+    
+    /**
+     * Log warning message
+     * @param message Message to log
+     */
+    public static void warn(String message) {
+        logger.warn(message);
+    }
+    
+    /**
+     * Log error message
+     * @param message Message to log
+     */
+    public static void error(String message) {
+        logger.error(message);
+    }
+    
+    /**
+     * Log error message with exception
+     * @param message Message to log
+     * @param throwable Exception to log
+     */
+    public static void error(String message, Throwable throwable) {
+        logger.error(message, throwable);
+    }
+    
+    /**
+     * Log fatal message
+     * @param message Message to log
+     */
+    public static void fatal(String message) {
+        logger.fatal(message);
+    }
+    
+    /**
+     * Log fatal message with exception
+     * @param message Message to log
+     * @param throwable Exception to log
+     */
+    public static void fatal(String message, Throwable throwable) {
+        logger.fatal(message, throwable);
+    }
+    
+    /**
+     * Log test step with INFO level
+     * @param stepDescription Step description
+     */
+    public static void step(String stepDescription) {
+        logger.info("🔸 STEP: " + stepDescription);
+    }
+    
+    /**
+     * Log test assertion with INFO level
+     * @param assertionDescription Assertion description
+     */
+    public static void assertion(String assertionDescription) {
+        logger.info("✅ ASSERTION: " + assertionDescription);
+    }
+    
+    /**
+     * Log test start
+     * @param testName Test name
+     */
+    public static void testStart(String testName) {
+        logger.info("🚀 TEST START: " + testName);
+    }
+    
+    /**
+     * Log test end
+     * @param testName Test name
+     * @param status Test status (PASSED/FAILED/SKIPPED)
+     */
+    public static void testEnd(String testName, String status) {
+        String emoji = getStatusEmoji(status);
+        logger.info(emoji + " TEST END: " + testName + " - " + status);
+    }
+    
+    /**
+     * Get emoji for test status
+     * @param status Test status
+     * @return Emoji representation
+     */
+    private static String getStatusEmoji(String status) {
+        switch (status.toUpperCase()) {
+            case "PASSED":
+                return "✅";
+            case "FAILED":
+                return "❌";
+            case "SKIPPED":
+                return "⏭️";
+            default:
+                return "❓";
+        }
+    }
+    
+    /**
+     * Start a new log section with separator
+     * @param sectionName Section name
+     */
+    public static void startSection(String sectionName) {
+        logger.info("═══════════════════════════════════════");
+        logger.info("📋 " + sectionName);
+        logger.info("═══════════════════════════════════════");
+    }
+    
+    /**
+     * End log section with separator
+     */
+    public static void endSection() {
+        logger.info("═══════════════════════════════════════");
+    }
+}

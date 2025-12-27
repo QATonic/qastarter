@@ -1,0 +1,34 @@
+using Microsoft.Playwright;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Pages;
+
+public class HomePage : BasePage
+{
+    private const string WelcomeMessage = ".welcome-message, h1";
+    private const string UserProfile = ".user-profile";
+    private const string LogoutButton = "button[data-action='logout'], .logout";
+
+    public HomePage(IPage page) : base(page) { }
+
+    public async Task NavigateToHomeAsync()
+    {
+        await NavigateAsync(EnvConfig.Instance.BaseUrl);
+    }
+
+    public async Task<string?> GetWelcomeMessageAsync()
+    {
+        return await GetTextAsync(WelcomeMessage);
+    }
+
+    public async Task<bool> IsUserProfileVisibleAsync()
+    {
+        return await IsVisibleAsync(UserProfile);
+    }
+
+    public async Task LogoutAsync()
+    {
+        await ClickAsync(LogoutButton);
+        await Page.WaitForURLAsync("**/login", new() { Timeout = 5000 });
+    }
+}

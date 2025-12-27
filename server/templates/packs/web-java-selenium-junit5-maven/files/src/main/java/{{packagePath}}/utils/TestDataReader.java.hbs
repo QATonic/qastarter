@@ -1,0 +1,279 @@
+package {{javaPackage}}.utils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Utility class for reading test data from CSV and JSON files.
+ * Supports data-driven testing with various data formats.
+ */
+public class TestDataReader {
+    
+    /**
+     * Read CSV file and return list of maps
+     * @param filePath Path to CSV file in resources
+     * @return List of maps representing CSV data
+     */
+    public static List<Map<String, String>> readCSV(String filePath) {
+        List<Map<String, String>> data = new ArrayList<>();
+        
+        try (InputStream inputStream = TestDataReader.class.getClassLoader().getResourceAsStream(filePath);
+             InputStreamReader reader = new InputStreamReader(inputStream)) {
+            
+            if (inputStream == null) {
+                Log.error("CSV file not found: " + filePath);
+                return data;
+            }
+            
+            Iterable<CSVRecord> records = CSVFormat.DEFAULT
+                    .withFirstRecordAsHeader()
+                    .parse(reader);
+            
+            for (CSVRecord record : records) {
+                Map<String, String> row = new HashMap<>();
+                record.getParser().getHeaderMap().keySet()
+                        .forEach(header -> row.put(header, record.get(header)));
+                data.add(row);
+            }
+            
+            Log.info("Successfully read " + data.size() + " records from CSV: " + filePath);
+            
+        } catch (IOException e) {
+            Log.error("Error reading CSV file: " + filePath, e);
+        }
+        
+        return data;
+    }
+    
+    /**
+     * Read JSON file and return JsonNode
+     * @param filePath Path to JSON file in resources
+     * @return JsonNode representing JSON data
+     */
+    public static JsonNode readJSON(String filePath) {
+        try (InputStream inputStream = TestDataReader.class.getClassLoader().getResourceAsStream(filePath)) {
+            
+            if (inputStream == null) {
+                Log.error("JSON file not found: " + filePath);
+                return null;
+            }
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(inputStream);
+            
+            Log.info("Successfully read JSON file: " + filePath);
+            return jsonNode;
+            
+        } catch (IOException e) {
+            Log.error("Error reading JSON file: " + filePath, e);
+            return null;
+        }
+    }
+    
+    /**
+     * Read JSON file and convert to specific class
+     * @param filePath Path to JSON file in resources
+     * @param valueType Target class type
+     * @param <T> Generic type parameter
+     * @return Object of specified type
+     */
+    public static <T> T readJSON(String filePath, Class<T> valueType) {
+        try (InputStream inputStream = TestDataReader.class.getClassLoader().getResourceAsStream(filePath)) {
+            
+            if (inputStream == null) {
+                Log.error("JSON file not found: " + filePath);
+                return null;
+            }
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            T object = objectMapper.readValue(inputStream, valueType);
+            
+            Log.info("Successfully read JSON file and converted to " + valueType.getSimpleName() + ": " + filePath);
+            return object;
+            
+        } catch (IOException e) {
+            Log.error("Error reading JSON file: " + filePath, e);
+            return null;
+        }
+    }
+    
+    /**
+     * Read JSON array and return as list of maps
+     * @param filePath Path to JSON file in resources
+     * @return List of maps representing JSON array data
+     */
+    public static List<Map<String, Object>> readJSONArray(String filePath) {
+        List<Map<String, Object>> data = new ArrayList<>();
+        
+        try (InputStream inputStream = TestDataReader.class.getClassLoader().getResourceAsStream(filePath)) {
+            
+            if (inputStream == null) {
+                Log.error("JSON file not found: " + filePath);
+                return data;
+            }
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(inputStream);
+            
+            if (jsonNode.isArray()) {
+                for (JsonNode item : jsonNode) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> map = objectMapper.convertValue(item, Map.class);
+                    data.add(map);
+                }
+            } else {
+                Log.error("JSON file does not contain an array: " + filePath);
+            }
+            
+            Log.info("Successfully read " + data.size() + " records from JSON array: " + filePath);
+            
+        } catch (IOException e) {
+            Log.error("Error reading JSON array file: " + filePath, e);
+        }
+        
+        return data;
+    }
+    
+    /**
+     * Convert CSV data to 2D Object array for TestNG DataProvider
+     * @param filePath Path to CSV file in resources
+     * @return 2D Object array
+     */
+    public static Object[][] getCSVDataAsArray(String filePath) {
+        List<Map<String, String>> data = readCSV(filePath);
+        
+        if (data.isEmpty()) {
+            Log.warn("No data found in CSV file: " + filePath);
+            return new Object[0][0];
+        }
+        
+        Object[][] array = new Object[data.size()][];
+        for (int i = 0; i < data.size(); i++) {
+            array[i] = new Object[]{data.get(i)};
+        }
+        
+        Log.info("Converted CSV data to 2D array: " + data.size() + " rows");
+        return array;
+    }
+    
+    /**
+     * Convert JSON array to 2D Object array for TestNG DataProvider
+     * @param filePath Path to JSON file in resources
+     * @return 2D Object array
+     */
+    public static Object[][] getJSONDataAsArray(String filePath) {
+        List<Map<String, Object>> data = readJSONArray(filePath);
+        
+        if (data.isEmpty()) {
+            Log.warn("No data found in JSON file: " + filePath);
+            return new Object[0][0];
+        }
+        
+        Object[][] array = new Object[data.size()][];
+        for (int i = 0; i < data.size(); i++) {
+            array[i] = new Object[]{data.get(i)};
+        }
+        
+        Log.info("Converted JSON data to 2D array: " + data.size() + " rows");
+        return array;
+    }
+    
+    /**
+     * Get specific test data by key from CSV
+     * @param filePath Path to CSV file in resources
+     * @param keyColumn Name of column to use as key
+     * @param keyValue Value to search for
+     * @return Map representing the matching row, or null if not found
+     */
+    public static Map<String, String> getCSVDataByKey(String filePath, String keyColumn, String keyValue) {
+        List<Map<String, String>> data = readCSV(filePath);
+        
+        for (Map<String, String> row : data) {
+            if (keyValue.equals(row.get(keyColumn))) {
+                Log.info("Found matching row for key '" + keyColumn + "' = '" + keyValue + "' in " + filePath);
+                return row;
+            }
+        }
+        
+        Log.warn("No matching row found for key '" + keyColumn + "' = '" + keyValue + "' in " + filePath);
+        return null;
+    }
+    
+    /**
+     * Get specific test data by key from JSON array
+     * @param filePath Path to JSON file in resources
+     * @param keyField Name of field to use as key
+     * @param keyValue Value to search for
+     * @return Map representing the matching object, or null if not found
+     */
+    public static Map<String, Object> getJSONDataByKey(String filePath, String keyField, String keyValue) {
+        List<Map<String, Object>> data = readJSONArray(filePath);
+        
+        for (Map<String, Object> item : data) {
+            if (keyValue.equals(String.valueOf(item.get(keyField)))) {
+                Log.info("Found matching object for key '" + keyField + "' = '" + keyValue + "' in " + filePath);
+                return item;
+            }
+        }
+        
+        Log.warn("No matching object found for key '" + keyField + "' = '" + keyValue + "' in " + filePath);
+        return null;
+    }
+    
+    /**
+     * Validate that required columns exist in CSV data
+     * @param data CSV data
+     * @param requiredColumns Required column names
+     * @return true if all required columns exist
+     */
+    public static boolean validateCSVColumns(List<Map<String, String>> data, String... requiredColumns) {
+        if (data.isEmpty()) {
+            Log.error("CSV data is empty, cannot validate columns");
+            return false;
+        }
+        
+        Map<String, String> firstRow = data.get(0);
+        for (String column : requiredColumns) {
+            if (!firstRow.containsKey(column)) {
+                Log.error("Required column '" + column + "' not found in CSV data");
+                return false;
+            }
+        }
+        
+        Log.info("All required columns validated successfully");
+        return true;
+    }
+    
+    /**
+     * Print CSV data structure for debugging
+     * @param data CSV data
+     */
+    public static void printCSVStructure(List<Map<String, String>> data) {
+        if (data.isEmpty()) {
+            Log.info("CSV data is empty");
+            return;
+        }
+        
+        Log.info("CSV Structure:");
+        Log.info("Total rows: " + data.size());
+        Log.info("Columns: " + data.get(0).keySet());
+        
+        for (int i = 0; i < Math.min(data.size(), 3); i++) {
+            Log.info("Sample row " + (i + 1) + ": " + data.get(i));
+        }
+        
+        if (data.size() > 3) {
+            Log.info("... and " + (data.size() - 3) + " more rows");
+        }
+    }
+}

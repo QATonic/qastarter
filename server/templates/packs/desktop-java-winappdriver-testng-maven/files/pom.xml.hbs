@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>{{groupId}}</groupId>
+    <artifactId>{{artifactId}}</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>{{projectName}}</name>
+    <description>Desktop Test Automation Framework using WinAppDriver, TestNG, and Maven</description>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <!-- Dependency Versions -->
+        <selenium.version>4.16.0</selenium.version>
+        <testng.version>7.8.0</testng.version>
+        <log4j.version>2.20.0</log4j.version>
+        <jackson.version>2.15.2</jackson.version>
+        <commons.lang3.version>3.13.0</commons.lang3.version>
+        <commons.io.version>2.11.0</commons.io.version>
+        
+{{#if (eq reportingTool "allure")}}
+        <!-- Allure Reporting -->
+        <allure.version>{{toolVersions.allure}}</allure.version>
+        <aspectj.version>1.9.20</aspectj.version>
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+        <!-- ExtentReports -->
+        <extentreports.version>{{toolVersions.extentreports}}</extentreports.version>
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+        <!-- Cucumber BDD -->
+        <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
+{{/if}}
+        
+        <!-- Plugin Versions -->
+        <maven.surefire.version>3.1.2</maven.surefire.version>
+        <maven.compiler.version>3.11.0</maven.compiler.version>
+        <maven.resources.version>3.3.1</maven.resources.version>
+        
+        <!-- Test Execution Properties -->
+        <environment>dev</environment>
+        <winappdriver.url>http://127.0.0.1:4723</winappdriver.url>
+        <parallel.execution.enabled>false</parallel.execution.enabled>
+        <parallel.thread.count>1</parallel.thread.count>
+    </properties>
+
+    <dependencies>
+        <!-- Appium Java Client for WinAppDriver -->
+        <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>8.6.0</version>
+        </dependency>
+        
+        <!-- Selenium WebDriver (used by Appium) -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <!-- TestNG for test execution -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+        </dependency>
+
+{{#if (eq testingPattern "bdd")}}
+        <!-- Cucumber -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-testng</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+
+        <!-- ExtentReports -->
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>${extentreports.version}</version>
+        </dependency>
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+
+        <!-- Allure -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-testng</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+{{#if (eq testingPattern "bdd")}}
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-cucumber7-jvm</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+{{/if}}
+{{/if}}
+
+        <!-- Log4j2 for logging -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <!-- Apache Commons Lang for utilities -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang3.version}</version>
+        </dependency>
+
+        <!-- Commons IO for file operations -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
+        </dependency>
+
+        <!-- Jackson for JSON processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- Windows-specific dependencies -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>5.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>5.13.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Maven Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Resources Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.version}</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Surefire Plugin for running tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.version}</version>
+                <configuration>
+{{#if (eq testingPattern "bdd")}}
+                    <includes>
+                        <include>**/runners/*TestRunner.java</include>
+                    </includes>
+{{else}}
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+{{/if}}
+                    <systemPropertyVariables>
+                        <environment>${environment}</environment>
+                        <winappdriver.url>${winappdriver.url}</winappdriver.url>
+                        <parallel.execution.enabled>${parallel.execution.enabled}</parallel.execution.enabled>
+                        <parallel.thread.count>${parallel.thread.count}</parallel.thread.count>
+{{#if (eq reportingTool "allure")}}
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+{{/if}}
+                    </systemPropertyVariables>
+                    <properties>
+                        <property>
+                            <name>parallel</name>
+                            <value>${parallel.execution.enabled}</value>
+                        </property>
+                        <property>
+                            <name>threadcount</name>
+                            <value>${parallel.thread.count}</value>
+                        </property>
+                    </properties>
+                    <argLine>
+                        -Dfile.encoding=UTF-8
+                        -Djava.awt.headless=false
+{{#if (eq reportingTool "allure")}}
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+{{/if}}
+                    </argLine>
+                    <testFailureIgnore>false</testFailureIgnore>
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                </configuration>
+{{#if (eq reportingTool "allure")}}
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
+{{/if}}
+            </plugin>
+{{#if (eq reportingTool "allure")}}
+
+            <!-- Allure Maven Plugin -->
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>2.12.0</version>
+                <configuration>
+                    <reportVersion>${allure.version}</reportVersion>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+                </configuration>
+            </plugin>
+{{/if}}
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Development Profile -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <environment>dev</environment>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <!-- QA Profile -->
+        <profile>
+            <id>qa</id>
+            <properties>
+                <environment>qa</environment>
+            </properties>
+        </profile>
+
+        <!-- Staging Profile -->
+        <profile>
+            <id>staging</id>
+            <properties>
+                <environment>staging</environment>
+            </properties>
+        </profile>
+
+        <!-- Production Profile -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <environment>prod</environment>
+            </properties>
+        </profile>
+
+        <!-- Desktop Tests Profile -->
+        <profile>
+            <id>desktop-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>src/test/resources/desktop-tests.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Regression Tests Profile -->
+        <profile>
+            <id>regression</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>src/test/resources/regression-tests.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

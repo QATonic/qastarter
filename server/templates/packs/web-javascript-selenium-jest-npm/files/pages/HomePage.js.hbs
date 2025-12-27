@@ -1,0 +1,39 @@
+const { By } = require('selenium-webdriver');
+const BasePage = require('./BasePage');
+const envConfig = require('../config/env.config');
+
+class HomePage extends BasePage {
+  constructor(driver) {
+    super(driver);
+    this.url = `${envConfig.getBaseUrl()}/dashboard`;
+    
+    // Locators
+    this.logo = By.css('.logo');
+    this.userMenu = By.css('.user-menu');
+    this.logoutButton = By.linkText('Logout');
+    this.welcomeMessage = By.css('.welcome-message');
+  }
+
+  async navigateToHome() {
+    await this.navigate(this.url);
+  }
+
+  async isLoaded() {
+    return await this.isDisplayed(this.logo);
+  }
+
+  async getWelcomeMessage() {
+    return await this.getText(this.welcomeMessage);
+  }
+
+  async logout() {
+    await this.click(this.userMenu);
+    await this.click(this.logoutButton);
+  }
+
+  async isUserLoggedIn() {
+    return await this.isDisplayed(this.userMenu);
+  }
+}
+
+module.exports = HomePage;

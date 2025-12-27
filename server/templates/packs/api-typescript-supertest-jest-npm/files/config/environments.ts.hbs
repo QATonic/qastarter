@@ -1,0 +1,31 @@
+/**
+ * Environment Configuration
+ * 
+ * ============================================
+ * UPDATE THESE VALUES FOR YOUR API
+ * ============================================
+ * Replace the placeholder URLs with your actual API endpoints.
+ */
+export interface Environment {
+  baseUrl: string;
+  timeout: number;
+}
+
+export const environments: Record<string, Environment> = {
+  dev: {
+    baseUrl: 'https://your-dev-api-url.com',
+    timeout: 30000
+  },
+  qa: {
+    baseUrl: 'https://your-qa-api-url.com',
+    timeout: 30000
+  },
+  staging: {
+    baseUrl: 'https://your-staging-api-url.com',
+    timeout: 30000
+  },
+  prod: {
+    baseUrl: 'https://your-prod-api-url.com',
+    timeout: 30000
+  }
+};

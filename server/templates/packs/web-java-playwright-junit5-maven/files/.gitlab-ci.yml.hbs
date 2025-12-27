@@ -1,0 +1,106 @@
+image: maven:3.9-eclipse-temurin-{{toolVersions.java}}
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  ENVIRONMENT: "qa"
+
+cache:
+  paths:
+    - .m2/repository
+
+stages:
+  - setup
+  - test
+  - report
+
+install:browsers:
+  stage: setup
+  script:
+    - apt-get update && apt-get install -y nodejs npm
+    - mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
+  artifacts:
+    paths:
+      - ~/.cache/ms-playwright
+    expire_in: 1 day
+
+test:chromium:
+  stage: test
+  dependencies:
+    - install:browsers
+  script:
+    - mvn clean test -Dbrowser=chromium
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - target/allure-results
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      - target/surefire-reports
+      {{/if}}
+      - reports/screenshots
+      - logs
+    expire_in: 7 days
+
+test:firefox:
+  stage: test
+  dependencies:
+    - install:browsers
+  script:
+    - mvn clean test -Dbrowser=firefox
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - target/allure-results
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      - target/surefire-reports
+      {{/if}}
+      - reports/screenshots
+      - logs
+    expire_in: 7 days
+
+test:webkit:
+  stage: test
+  dependencies:
+    - install:browsers
+  script:
+    - mvn clean test -Dbrowser=webkit
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - target/allure-results
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      - target/surefire-reports
+      {{/if}}
+      - reports/screenshots
+      - logs
+    expire_in: 7 days
+
+{{#if (eq reportingTool "allure")}}
+allure:report:
+  stage: report
+  script:
+    - mvn allure:report
+  dependencies:
+    - test:chromium
+    - test:firefox
+    - test:webkit
+  artifacts:
+    paths:
+      - target/site/allure-maven-plugin
+    expire_in: 30 days
+  when: always
+{{/if}}

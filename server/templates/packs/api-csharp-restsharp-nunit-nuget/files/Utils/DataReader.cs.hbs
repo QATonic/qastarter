@@ -1,0 +1,138 @@
+using System;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace {{projectName}}.Utils
+{
+    /// <summary>
+    /// Utility class for reading test data from various file formats
+    /// </summary>
+    public static class DataReader
+    {
+        private static readonly string DataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+
+        /// <summary>
+        /// Read JSON file and deserialize to specified type
+        /// </summary>
+        /// <typeparam name="T">Type to deserialize to</typeparam>
+        /// <param name="fileName">Name of the JSON file</param>
+        /// <returns>Deserialized object</returns>
+        public static T ReadJson<T>(string fileName)
+        {
+            var filePath = GetFilePath(fileName);
+            var jsonContent = File.ReadAllText(filePath);
+            return JsonConvert.DeserializeObject<T>(jsonContent);
+        }
+
+        /// <summary>
+        /// Read JSON file as JObject for dynamic access
+        /// </summary>
+        /// <param name="fileName">Name of the JSON file</param>
+        /// <returns>JObject for dynamic access</returns>
+        public static JObject ReadJsonDynamic(string fileName)
+        {
+            var filePath = GetFilePath(fileName);
+            var jsonContent = File.ReadAllText(filePath);
+            return JObject.Parse(jsonContent);
+        }
+
+        /// <summary>
+        /// Read JSON array from file
+        /// </summary>
+        /// <param name="fileName">Name of the JSON file</param>
+        /// <returns>JArray for iteration</returns>
+        public static JArray ReadJsonArray(string fileName)
+        {
+            var filePath = GetFilePath(fileName);
+            var jsonContent = File.ReadAllText(filePath);
+            return JArray.Parse(jsonContent);
+        }
+
+        /// <summary>
+        /// Get specific value from JSON file by path
+        /// </summary>
+        /// <param name="fileName">Name of the JSON file</param>
+        /// <param name="jsonPath">JSON path to the value (e.g., "users[0].email")</param>
+        /// <returns>Value as string</returns>
+        public static string GetValue(string fileName, string jsonPath)
+        {
+            var json = ReadJsonDynamic(fileName);
+            var token = json.SelectToken(jsonPath);
+            return token?.ToString();
+        }
+
+        /// <summary>
+        /// Get environment-specific data file
+        /// </summary>
+        /// <param name="environment">Environment name (dev, qa, prod)</param>
+        /// <returns>JObject with environment data</returns>
+        public static JObject GetEnvironmentData(string environment = null)
+        {
+            environment ??= Environment.GetEnvironmentVariable("TEST_ENV") ?? "dev";
+            var fileName = $"{environment}.json";
+            return ReadJsonDynamic(fileName);
+        }
+
+        /// <summary>
+        /// Read test cases from JSON file for data-driven testing
+        /// </summary>
+        /// <typeparam name="T">Type of test case data</typeparam>
+        /// <param name="fileName">Name of the test cases file</param>
+        /// <returns>Array of test case data</returns>
+        public static T[] ReadTestCases<T>(string fileName = "test-cases.json")
+        {
+            return ReadJson<T[]>(fileName);
+        }
+
+        /// <summary>
+        /// Read users data
+        /// </summary>
+        /// <returns>JArray of users</returns>
+        public static JArray GetUsers()
+        {
+            var data = ReadJsonDynamic("users.json");
+            return data["users"] as JArray ?? new JArray();
+        }
+
+        /// <summary>
+        /// Get user by type (admin, standard, etc.)
+        /// </summary>
+        /// <param name="userType">Type of user</param>
+        /// <returns>User data as JObject</returns>
+        public static JObject GetUserByType(string userType)
+        {
+            var users = GetUsers();
+            foreach (var user in users)
+            {
+                if (user["type"]?.ToString() == userType)
+                {
+                    return user as JObject;
+                }
+            }
+            throw new Exception($"User with type '{userType}' not found");
+        }
+
+        private static string GetFilePath(string fileName)
+        {
+            // Try multiple locations
+            var paths = new[]
+            {
+                Path.Combine(DataDirectory, fileName),
+                Path.Combine(Directory.GetCurrentDirectory(), "Data", fileName),
+                Path.Combine(AppContext.BaseDirectory, "Data", fileName),
+                fileName
+            };
+
+            foreach (var path in paths)
+            {
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
+
+            throw new FileNotFoundException($"Data file not found: {fileName}");
+        }
+    }
+}

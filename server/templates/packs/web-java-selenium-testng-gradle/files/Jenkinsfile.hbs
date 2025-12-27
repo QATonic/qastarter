@@ -1,0 +1,164 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(
+            name: 'BROWSER',
+            choices: ['chrome', 'firefox', 'edge'],
+            description: 'Browser to run tests on'
+        )
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'qa', 'stg', 'prod'],
+            description: 'Environment to run tests against'
+        )
+        choice(
+            name: 'SUITE',
+            choices: ['testng.xml', 'smoke.xml', 'regression.xml'],
+            description: 'Test suite to execute'
+        )
+        booleanParam(
+            name: 'HEADLESS',
+            defaultValue: true,
+            description: 'Run tests in headless mode'
+        )
+    }
+    
+    environment {
+        GRADLE_OPTS = '-Xmx1024m'
+        JAVA_HOME = '/usr/lib/jvm/java-11-openjdk'
+    }
+    
+    tools {
+        jdk 'JDK-11'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.BUILD_VERSION = sh(
+                        script: "echo '1.0.${BUILD_NUMBER}'",
+                        returnStdout: true
+                    ).trim()
+                }
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                echo "Setting up build environment..."
+                sh 'java -version'
+                sh 'chmod +x gradlew'
+                sh './gradlew --version'
+            }
+        }
+        
+        stage('Compile') {
+            steps {
+                echo "Compiling the project..."
+                sh './gradlew compileJava'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo "Running tests..."
+                script {
+                    def testCommand = "./gradlew test " +
+                        "-Penv=${params.ENVIRONMENT} " +
+                        "-Psuite=${params.SUITE} " +
+                        "-Pbrowser=${params.BROWSER} " +
+                        "-Pheadless=${params.HEADLESS} " +
+                        "--continue"
+                    
+                    sh testCommand
+                }
+            }
+            post {
+                always {
+                    // Archive test results
+                    junit(
+                        testResults: 'build/test-results/test/*.xml',
+                        allowEmptyResults: true
+                    )
+                    
+                    // Archive ExtentReports HTML
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'ExtentReport_*.html',
+                        reportName: 'Extent Reports',
+                        reportTitles: 'Test Execution Report'
+                    ])
+                    
+                    // Archive screenshots if any test failed
+                    archiveArtifacts(
+                        artifacts: 'reports/screenshots/**/*.*',
+                        allowEmptyArchive: true,
+                        fingerprint: false
+                    )
+                    
+                    // Archive logs
+                    archiveArtifacts(
+                        artifacts: 'logs/**/*.log',
+                        allowEmptyArchive: true,
+                        fingerprint: false
+                    )
+                }
+            }
+        }
+        
+        stage('Generate Report Summary') {
+            steps {
+                script {
+                    // Generate a simple test summary
+                    sh '''
+                        echo "Test Execution Summary" > test-summary.txt
+                        echo "=====================" >> test-summary.txt
+                        echo "Browser: ${BROWSER}" >> test-summary.txt
+                        echo "Environment: ${ENVIRONMENT}" >> test-summary.txt
+                        echo "Suite: ${SUITE}" >> test-summary.txt
+                        echo "Headless: ${HEADLESS}" >> test-summary.txt
+                        echo "Build: ${BUILD_VERSION}" >> test-summary.txt
+                        echo "" >> test-summary.txt
+                        
+                        if [ -f "build/reports/tests/test/index.html" ]; then
+                            echo "Test Results Available" >> test-summary.txt
+                            echo "Gradle HTML Report: build/reports/tests/test/index.html" >> test-summary.txt
+                        else
+                            echo "No test results found" >> test-summary.txt
+                        fi
+                    '''
+                    
+                    archiveArtifacts artifacts: 'test-summary.txt', fingerprint: false
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Clean workspace
+            cleanWs()
+        }
+        
+        success {
+            echo "✅ Tests completed successfully!"
+            // You can add Slack/Teams notifications here
+        }
+        
+        failure {
+            echo "❌ Tests failed or build encountered issues!"
+            // You can add Slack/Teams notifications here
+        }
+        
+        unstable {
+            echo "⚠️  Some tests failed but build completed!"
+            // You can add Slack/Teams notifications here
+        }
+    }
+}

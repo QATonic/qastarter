@@ -1,0 +1,155 @@
+{
+  "id": "mobile-swift-xcuitest-xctest-spm",
+  "supportsDynamic": true,
+  "name": "XCUITest iOS Testing Framework",
+  "description": "Native iOS UI testing framework with XCUITest, XCTest, and Swift",
+  "tags": [
+    "mobile",
+    "ios",
+    "xcuitest",
+    "swift",
+    "xctest",
+    "spm"
+  ],
+  "toolVersions": {
+    "swift": "5.9+",
+    "xcode": "15+",
+    "ios": "15+"
+  },
+  "files": [
+    {
+      "path": "Package.swift",
+      "isTemplate": true,
+      "description": "Swift Package Manager configuration"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "description": "Jenkins CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "description": "Azure DevOps CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "description": "GitLab CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "description": "CircleCI pipeline configuration",
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "{{projectName}}UITests/BaseScreen.swift",
+      "isTemplate": true,
+      "description": "Base Screen Object class"
+    },
+    {
+      "path": "{{projectName}}UITests/Screens/LoginScreen.swift",
+      "isTemplate": true,
+      "description": "Login screen page object"
+    },
+    {
+      "path": "{{projectName}}UITests/Screens/HomeScreen.swift",
+      "isTemplate": true,
+      "description": "Home screen page object"
+    },
+    {
+      "path": "{{projectName}}UITests/Utils/Logger.swift",
+      "isTemplate": true,
+      "description": "Logging utility"
+    },
+    {
+      "path": "{{projectName}}UITests/Utils/WaitHelpers.swift",
+      "isTemplate": true,
+      "description": "Wait helper utilities"
+    },
+    {
+      "path": "{{projectName}}UITests/Utils/ScreenshotHelper.swift",
+      "isTemplate": true,
+      "description": "Screenshot capture utility"
+    },
+    {
+      "path": "{{projectName}}UITests/TestData.swift",
+      "isTemplate": true,
+      "description": "Test data structures"
+    },
+    {
+      "path": "{{projectName}}UITests/Tests/LoginTests.swift",
+      "isTemplate": true,
+      "description": "Login functionality tests"
+    },
+    {
+      "path": "{{projectName}}UITests/Tests/SmokeTests.swift",
+      "isTemplate": true,
+      "description": "Smoke tests for critical functionality"
+    },
+    {
+      "path": "{{projectName}}UITests/SampleUITest.swift",
+      "isTemplate": true,
+      "description": "Sample XCUITest"
+    },
+    {
+      "path": "Tests/Features/LoginTests.swift",
+      "isTemplate": true,
+      "description": "BDD-style login tests using Given-When-Then",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "mobile",
+    "framework": "xcuitest",
+    "language": "swift",
+    "testRunner": "xctest",
+    "buildTool": "spm"
+  },
+  "dynamicSupport": {
+    "reportingTools": [],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

@@ -1,0 +1,56 @@
+"""
+Login Page Object
+
+HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+1. Open your app's login page in a browser
+2. Right-click on each element → Inspect → Copy selector
+3. Replace the placeholder selectors below with your actual selectors
+4. Update the login URL path in navigate_to_login() method
+"""
+from playwright.sync_api import Page
+from pages.base_page import BasePage
+from config.env_config import env_config
+
+class LoginPage(BasePage):
+    def __init__(self, page: Page):
+        super().__init__(page)
+        # ============================================
+        # UPDATE THESE SELECTORS FOR YOUR APPLICATION
+        # ============================================
+        # Tip: Use browser DevTools (F12) to find correct selectors
+        self.selectors = {
+            'username_input': '#username',           # Your username/email input field
+            'password_input': '#password',           # Your password input field
+            'login_button': 'button[type="submit"]', # Your login/submit button
+            'error_message': '.error-message',       # Error message element
+            'success_indicator': '.dashboard, .home' # Element visible after successful login
+        }
+        # ============================================
+
+    def navigate_to_login(self) -> None:
+        """Navigate to login page. UPDATE: Change '/login' to your actual login page path"""
+        self.navigate(f"{env_config.get_base_url()}/login")
+
+    def login(self, username: str, password: str) -> None:
+        self.type(self.selectors['username_input'], username)
+        self.type(self.selectors['password_input'], password)
+        self.click(self.selectors['login_button'])
+
+    def is_login_successful(self) -> bool:
+        try:
+            self.wait_for_selector(self.selectors['success_indicator'], timeout=10000)
+            return True
+        except:
+            return False
+
+    def is_error_displayed(self) -> bool:
+        return self.is_visible(self.selectors['error_message'])
+
+    def get_error_message(self) -> str:
+        return self.get_text(self.selectors['error_message'])
+
+    def is_username_visible(self) -> bool:
+        return self.is_visible(self.selectors['username_input'])
+
+    def is_password_visible(self) -> bool:
+        return self.is_visible(self.selectors['password_input'])

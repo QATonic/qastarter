@@ -1,0 +1,44 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+class Settings:
+    """Application configuration settings."""
+    
+    # Environment
+    ENVIRONMENT = os.getenv("TEST_ENV", "dev")
+    
+    # API Base URLs
+    BASE_URL = os.getenv("BASE_URL", "https://jsonplaceholder.typicode.com")
+    
+    # Authentication
+    AUTH_TOKEN = os.getenv("AUTH_TOKEN", "")
+    API_KEY = os.getenv("API_KEY", "")
+    USERNAME = os.getenv("USERNAME", "")
+    PASSWORD = os.getenv("PASSWORD", "")
+    
+    # Timeouts (in seconds)
+    REQUEST_TIMEOUT = int(os.getenv("REQUEST_TIMEOUT", "30"))
+    RETRY_COUNT = int(os.getenv("RETRY_COUNT", "3"))
+    
+    # Logging
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+    LOG_FILE = os.getenv("LOG_FILE", "logs/test_run.log")
+    
+    # Reporting
+    REPORT_DIR = os.getenv("REPORT_DIR", "reports")
+    ALLURE_RESULTS_DIR = os.getenv("ALLURE_RESULTS_DIR", "allure-results")
+    
+    # SSL Verification
+    VERIFY_SSL = os.getenv("VERIFY_SSL", "true").lower() == "true"
+    
+    @classmethod
+    def get_base_url(cls) -> str:
+        """Get base URL based on environment."""
+        from config.environments import ENVIRONMENTS
+        return ENVIRONMENTS.get(cls.ENVIRONMENT, {}).get("base_url", cls.BASE_URL)
+
+
+settings = Settings()

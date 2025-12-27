@@ -1,0 +1,39 @@
+"""
+Login Test Suite
+
+BEFORE RUNNING:
+1. Update credentials in: data/dev.json
+2. Update selectors in: pages/login_page.py
+3. Run: pytest
+"""
+import pytest
+from playwright.sync_api import Page
+from pages.login_page import LoginPage
+from config.env_config import env_config
+
+
+class TestLogin:
+    def test_login_with_valid_credentials(self, page: Page):
+        """Verify successful login with valid credentials"""
+        # Get credentials from config file (data/dev.json)
+        credentials = env_config.get_credentials('validUser')
+        
+        login_page = LoginPage(page)
+        
+        # Step 1: Navigate to login page
+        login_page.navigate_to_login()
+        
+        # Step 2: Enter credentials and submit
+        login_page.login(credentials['username'], credentials['password'])
+        
+        # Step 3: Verify login was successful
+        assert login_page.is_login_successful(), \
+            "Login failed. Check credentials in data/dev.json and selectors in pages/login_page.py"
+
+    def test_login_page_elements_visible(self, page: Page):
+        """Verify login page elements are visible"""
+        login_page = LoginPage(page)
+        login_page.navigate_to_login()
+        
+        assert login_page.is_username_visible(), "Username field should be visible"
+        assert login_page.is_password_visible(), "Password field should be visible"

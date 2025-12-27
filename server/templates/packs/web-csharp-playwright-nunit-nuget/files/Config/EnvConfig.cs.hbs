@@ -1,0 +1,30 @@
+using Newtonsoft.Json.Linq;
+
+namespace {{projectName}}.Config;
+
+public class EnvConfig
+{
+    private static EnvConfig? _instance;
+    private readonly JObject _config;
+    private readonly string _environment;
+
+    private EnvConfig()
+    {
+        _environment = Environment.GetEnvironmentVariable("TEST_ENV") ?? "dev";
+        var configPath = Path.Combine("Data", $"{_environment}.json");
+        var jsonContent = File.ReadAllText(configPath);
+        _config = JObject.Parse(jsonContent);
+    }
+
+    public static EnvConfig Instance => _instance ??= new EnvConfig();
+
+    public string BaseUrl => _config["baseUrl"]?.ToString() ?? string.Empty;
+
+    public string GetUsername(string userType) => 
+        _config["users"]?[userType]?["username"]?.ToString() ?? string.Empty;
+
+    public string GetPassword(string userType) => 
+        _config["users"]?[userType]?["password"]?.ToString() ?? string.Empty;
+
+    public string Environment => _environment;
+}

@@ -1,0 +1,315 @@
+{
+  "name": "Desktop Testing Framework",
+  "description": "Professional Windows desktop application automation framework using WinAppDriver, Java, TestNG, and Maven with comprehensive utilities and reporting",
+  "version": "1.0.0",
+  "supportsDynamic": true,
+  "author": "QAStarter Generated Framework",
+  "toolVersions": {
+    "java": "11+",
+    "maven": "3.8+",
+    "winappdriver": "1.2.1",
+    "testng": "7.8.0",
+    "selenium": "4.16.0",
+    "allure": "2.25.0",
+    "extentreports": "5.1.1",
+    "cucumber": "7.15.0"
+  },
+  "dependencies": {
+    "selenium-java": "4.16.0",
+    "testng": "7.8.0",
+    "extent-reports": "5.1.1",
+    "log4j-core": "2.22.0",
+    "commons-lang3": "3.14.0",
+    "jackson-databind": "2.16.0",
+    "commons-io": "2.15.1"
+  },
+  "files": [
+    {
+      "path": "pom.xml",
+      "template": "pom.xml.hbs",
+      "isTemplate": true,
+      "description": "Maven build configuration with WinAppDriver and desktop testing dependencies"
+    },
+    {
+      "path": "README.md",
+      "template": "README.md.hbs",
+      "isTemplate": true,
+      "description": "Complete setup and usage documentation for desktop testing"
+    },
+    {
+      "path": ".gitignore",
+      "template": ".gitignore",
+      "isTemplate": false,
+      "description": "Git ignore rules for Java/Maven desktop projects"
+    },
+    {
+      "path": "Jenkinsfile",
+      "template": "Jenkinsfile.hbs",
+      "isTemplate": true,
+      "description": "Jenkins declarative pipeline for desktop CI/CD",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions workflow for desktop testing CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "template": "azure-pipelines.yml.hbs",
+      "isTemplate": true,
+      "description": "Azure DevOps CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
+      "template": "src/main/java/{{packagePath}}/config/ConfigurationReader.java.hbs",
+      "isTemplate": true,
+      "description": "Type-safe configuration reader for desktop environment properties"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/Environment.java",
+      "template": "src/main/java/{{packagePath}}/config/Environment.java.hbs",
+      "isTemplate": true,
+      "description": "Environment enumeration for desktop testing environments"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/DriverManager.java",
+      "template": "src/main/java/{{packagePath}}/core/DriverManager.java.hbs",
+      "isTemplate": true,
+      "description": "Thread-safe WinAppDriver lifecycle management"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/DesktopDriverFactory.java",
+      "template": "src/main/java/{{packagePath}}/core/DesktopDriverFactory.java.hbs",
+      "isTemplate": true,
+      "description": "Desktop driver instantiation for Windows applications"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
+      "template": "src/main/java/{{packagePath}}/core/BaseTest.java.hbs",
+      "isTemplate": true,
+      "description": "Base test class with desktop setup/teardown and common functionality"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/CapabilitiesManager.java",
+      "template": "src/main/java/{{packagePath}}/core/CapabilitiesManager.java.hbs",
+      "isTemplate": true,
+      "description": "Desktop capabilities configuration for Windows applications"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/BasePage.java",
+      "template": "src/main/java/{{packagePath}}/pages/BasePage.java.hbs",
+      "isTemplate": true,
+      "description": "Base page class with desktop-specific functionality"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/CalculatorPage.java",
+      "template": "src/main/java/{{packagePath}}/pages/CalculatorPage.java.hbs",
+      "isTemplate": true,
+      "description": "Sample Windows Calculator page with POM implementation"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/NotepadPage.java",
+      "template": "src/main/java/{{packagePath}}/pages/NotepadPage.java.hbs",
+      "isTemplate": true,
+      "description": "Sample Windows Notepad page with POM implementation"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/WindowsUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/WindowsUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Windows-specific utilities for process and window management"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ElementWaitUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/ElementWaitUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Desktop-specific wait utilities for reliable element interactions"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/DesktopActions.java",
+      "template": "src/main/java/{{packagePath}}/utils/DesktopActions.java.hbs",
+      "isTemplate": true,
+      "description": "Desktop interaction utilities (keyboard shortcuts, window management)"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Screenshot capture utilities for desktop applications"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/Log.java",
+      "template": "src/main/java/{{packagePath}}/utils/Log.java.hbs",
+      "isTemplate": true,
+      "description": "Logger wrapper for consistent logging across desktop automation"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
+      "template": "src/main/java/{{packagePath}}/utils/ExtentManager.java.hbs",
+      "isTemplate": true,
+      "description": "ExtentReports configuration for desktop test reporting",
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
+      "template": "src/main/java/{{packagePath}}/listeners/TestListener.java.hbs",
+      "isTemplate": true,
+      "description": "TestNG listener for desktop test lifecycle and reporting"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java",
+      "template": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java.hbs",
+      "isTemplate": true,
+      "description": "TestNG retry analyzer for handling flaky desktop tests"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/CalculatorTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/CalculatorTests.java.hbs",
+      "isTemplate": true,
+      "description": "Sample tests for Windows Calculator application"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/NotepadTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/NotepadTests.java.hbs",
+      "isTemplate": true,
+      "description": "Sample tests for Windows Notepad application"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/WindowsIntegrationTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/WindowsIntegrationTests.java.hbs",
+      "isTemplate": true,
+      "description": "Integration tests for Windows desktop functionality"
+    },
+    {
+      "path": "src/main/resources/config/dev.properties",
+      "template": "src/main/resources/config/dev.properties.hbs",
+      "isTemplate": true,
+      "description": "Development environment configuration"
+    },
+    {
+      "path": "src/main/resources/config/qa.properties",
+      "template": "src/main/resources/config/qa.properties.hbs",
+      "isTemplate": true,
+      "description": "QA environment configuration"
+    },
+    {
+      "path": "src/main/resources/config/prod.properties",
+      "template": "src/main/resources/config/prod.properties.hbs",
+      "isTemplate": true,
+      "description": "Production environment configuration"
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "template": "src/main/resources/log4j2.xml.hbs",
+      "isTemplate": true,
+      "description": "Log4j2 logging configuration"
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "template": "src/main/resources/extent-config.xml.hbs",
+      "isTemplate": true,
+      "description": "ExtentReports configuration",
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
+    },
+    {
+      "path": "src/main/resources/allure.properties",
+      "isTemplate": true,
+      "description": "Allure Reports configuration",
+      "conditional": {
+        "reportingTool": "allure"
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/AllureManager.java",
+      "isTemplate": true,
+      "description": "Allure Reports configuration and management",
+      "conditional": {
+        "reportingTool": "allure"
+      }
+    },
+    {
+      "path": "src/test/resources/testng.xml",
+      "template": "src/test/resources/testng.xml.hbs",
+      "isTemplate": true,
+      "description": "TestNG suite configuration for desktop tests"
+    },
+    {
+      "path": "src/test/resources/desktop-tests.xml",
+      "template": "src/test/resources/desktop-tests.xml.hbs",
+      "isTemplate": true,
+      "description": "Desktop-specific test suite configuration"
+    },
+    {
+      "path": "src/test/resources/regression-tests.xml",
+      "template": "src/test/resources/regression-tests.xml.hbs",
+      "isTemplate": true,
+      "description": "Regression test suite configuration"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
+      "isTemplate": true,
+      "description": "Cucumber TestNG runner",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java",
+      "isTemplate": true,
+      "description": "Step definitions for login scenarios",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/features/Login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature with Gherkin scenarios",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "template": "Dockerfile.hbs",
+      "isTemplate": true,
+      "description": "Docker configuration for Windows containers"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "desktop",
+    "framework": "winappdriver",
+    "language": "java",
+    "testRunner": "testng",
+    "buildTool": "maven"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "extent-reports",
+      "allure"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions"
+    ],
+    "testingPatterns": [
+      "pom",
+      "hybrid",
+      "data-driven",
+      "bdd"
+    ]
+  }
+}

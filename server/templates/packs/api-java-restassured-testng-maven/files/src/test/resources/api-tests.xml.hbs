@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="{{projectName}}_API_Only_Suite" parallel="classes" thread-count="2">
+    
+    <parameter name="environment" value="qa"/>
+    
+    <!-- API-focused test execution -->
+    <test name="Core_API_Tests" preserve-order="true">
+        <parameter name="environment" value="qa"/>
+        
+        <classes>
+            <class name="{{packageName}}.tests.UserAPITests"/>
+        </classes>
+        
+        <groups>
+            <run>
+                <include name="api"/>
+            </run>
+        </groups>
+    </test>
+    
+    <test name="Authentication_API_Tests" preserve-order="true">
+        <parameter name="environment" value="qa"/>
+        
+        <classes>
+            <class name="{{packageName}}.tests.AuthenticationTests"/>
+        </classes>
+        
+        <groups>
+            <run>
+                <include name="auth"/>
+            </run>
+        </groups>
+    </test>
+    
+    <listeners>
+        <listener class-name="{{packageName}}.listeners.TestListener"/>
+        <listener class-name="{{packageName}}.listeners.RetryAnalyzer"/>
+    </listeners>
+    
+</suite>

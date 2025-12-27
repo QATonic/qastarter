@@ -1,0 +1,75 @@
+/**
+ * Test data generator utility.
+ */
+class DataGenerator {
+  static randomString(length = 10): string {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  static randomNumber(min = 0, max = 1000): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  static randomEmail(domain = 'test.example.com'): string {
+    const username = DataGenerator.randomString(8).toLowerCase();
+    const timestamp = Date.now();
+    return `${username}.${timestamp}@${domain}`;
+  }
+
+  static randomPhone(): string {
+    const areaCode = DataGenerator.randomNumber(200, 999);
+    const prefix = DataGenerator.randomNumber(200, 999);
+    const line = DataGenerator.randomNumber(1000, 9999);
+    return `${areaCode}-${prefix}-${line}`;
+  }
+
+  static uuid(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  static randomDate(start = new Date(2020, 0, 1), end = new Date()): Date {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  }
+
+  static randomISODate(): string {
+    return DataGenerator.randomDate().toISOString();
+  }
+
+  static randomBoolean(): boolean {
+    return Math.random() >= 0.5;
+  }
+
+  static randomItem<T>(array: T[]): T {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+
+  static randomUser(): Record<string, unknown> {
+    const firstName = DataGenerator.randomItem(['John', 'Jane', 'Bob', 'Alice', 'Charlie', 'Diana']);
+    const lastName = DataGenerator.randomItem(['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Davis']);
+
+    return {
+      id: DataGenerator.uuid(),
+      firstName,
+      lastName,
+      email: DataGenerator.randomEmail(),
+      phone: DataGenerator.randomPhone(),
+      username: `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${DataGenerator.randomNumber(1, 999)}`,
+      createdAt: DataGenerator.randomISODate()
+    };
+  }
+
+  static randomUsers(count = 5): Record<string, unknown>[] {
+    return Array.from({ length: count }, () => DataGenerator.randomUser());
+  }
+}
+
+export default DataGenerator;

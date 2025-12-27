@@ -1,0 +1,53 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
+
+namespace {{projectName}}.Tests.Pages;
+
+public class LoginPage : BasePage
+{
+    // Locators - Update these based on your app
+    private readonly By _usernameInput = By.Id("com.example.app:id/username");
+    private readonly By _passwordInput = By.Id("com.example.app:id/password");
+    private readonly By _loginButton = By.Id("com.example.app:id/loginButton");
+    private readonly By _errorMessage = By.Id("com.example.app:id/errorMessage");
+
+    public LoginPage(AppiumDriver driver) : base(driver) { }
+
+    public void EnterUsername(string username)
+    {
+        SendKeys(_usernameInput, username);
+    }
+
+    public void EnterPassword(string password)
+    {
+        SendKeys(_passwordInput, password);
+    }
+
+    public void ClickLoginButton()
+    {
+        Click(_loginButton);
+        HideKeyboard();
+    }
+
+    public void Login(string username, string password)
+    {
+        EnterUsername(username);
+        EnterPassword(password);
+        ClickLoginButton();
+    }
+
+    public string GetErrorMessage()
+    {
+        return GetText(_errorMessage);
+    }
+
+    public bool IsErrorDisplayed()
+    {
+        return IsDisplayed(_errorMessage, 5);
+    }
+
+    public bool IsLoginButtonEnabled()
+    {
+        return IsEnabled(_loginButton);
+    }
+}

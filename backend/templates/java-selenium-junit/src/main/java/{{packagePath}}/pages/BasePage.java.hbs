@@ -1,0 +1,496 @@
+package {{config.packageName}}.pages;
+
+import {{config.packageName}}.core.DriverManager;
+{{#if dependencies.includes "Logging"}}
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+{{/if}}
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+
+import java.time.Duration;
+import java.util.List;
+
+/**
+ * BasePage - Base class for all page objects
+ * 
+ * This class provides common functionality for all page objects including:
+ * - WebDriver and WebDriverWait initialization
+ * - Common web element operations
+ * - Wait methods for different conditions
+ * - Screenshot capabilities
+ * - JavaScript execution methods
+ * 
+ * @author QAStarter
+ * @version 1.0
+ */
+public abstract class BasePage {
+    
+    {{#if dependencies.includes "Logging"}}
+    protected static final Logger logger = LogManager.getLogger(BasePage.class);
+    {{/if}}
+    
+    protected WebDriver driver;
+    protected WebDriverWait wait;
+    protected Actions actions;
+    protected JavascriptExecutor jsExecutor;
+    
+    // Default timeout values
+    protected static final int DEFAULT_TIMEOUT = 30;
+    protected static final int SHORT_TIMEOUT = 10;
+    protected static final int LONG_TIMEOUT = 60;
+    
+    /**
+     * Constructor - Initialize page with WebDriver
+     * 
+     * @param driver WebDriver instance
+     */
+    public BasePage(WebDriver driver) {
+        this.driver = driver;
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(DEFAULT_TIMEOUT));
+        this.actions = new Actions(driver);
+        this.jsExecutor = (JavascriptExecutor) driver;
+        PageFactory.initElements(driver, this);
+        
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Initialized page: {}", this.getClass().getSimpleName());
+        {{/if}}
+    }
+    
+    /**
+     * Default constructor using DriverManager
+     */
+    public BasePage() {
+        this(DriverManager.getDriver());
+    }
+    
+    // ============== NAVIGATION METHODS ==============
+    
+    /**
+     * Navigate to URL
+     * 
+     * @param url URL to navigate to
+     */
+    public void navigateTo(String url) {
+        {{#if dependencies.includes "Logging"}}
+        logger.info("Navigating to URL: {}", url);
+        {{/if}}
+        driver.get(url);
+    }
+    
+    /**
+     * Get current page URL
+     * 
+     * @return Current URL
+     */
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl();
+    }
+    
+    /**
+     * Get page title
+     * 
+     * @return Page title
+     */
+    public String getPageTitle() {
+        return driver.getTitle();
+    }
+    
+    /**
+     * Refresh the current page
+     */
+    public void refreshPage() {
+        {{#if dependencies.includes "Logging"}}
+        logger.info("Refreshing page");
+        {{/if}}
+        driver.navigate().refresh();
+    }
+    
+    /**
+     * Navigate back
+     */
+    public void navigateBack() {
+        {{#if dependencies.includes "Logging"}}
+        logger.info("Navigating back");
+        {{/if}}
+        driver.navigate().back();
+    }
+    
+    /**
+     * Navigate forward
+     */
+    public void navigateForward() {
+        {{#if dependencies.includes "Logging"}}
+        logger.info("Navigating forward");
+        {{/if}}
+        driver.navigate().forward();
+    }
+    
+    // ============== ELEMENT INTERACTION METHODS ==============
+    
+    /**
+     * Click on element
+     * 
+     * @param element WebElement to click
+     */
+    public void click(WebElement element) {
+        waitForElementToBeClickable(element);
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Clicking on element: {}", element.toString());
+        {{/if}}
+        element.click();
+    }
+    
+    /**
+     * Click on element using locator
+     * 
+     * @param locator By locator
+     */
+    public void click(By locator) {
+        WebElement element = waitForElementToBeVisible(locator);
+        click(element);
+    }
+    
+    /**
+     * Type text into element
+     * 
+     * @param element WebElement to type into
+     * @param text Text to type
+     */
+    public void type(WebElement element, String text) {
+        waitForElementToBeVisible(element);
+        element.clear();
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Typing text '{}' into element: {}", text, element.toString());
+        {{/if}}
+        element.sendKeys(text);
+    }
+    
+    /**
+     * Type text into element using locator
+     * 
+     * @param locator By locator
+     * @param text Text to type
+     */
+    public void type(By locator, String text) {
+        WebElement element = waitForElementToBeVisible(locator);
+        type(element, text);
+    }
+    
+    /**
+     * Get text from element
+     * 
+     * @param element WebElement to get text from
+     * @return Element text
+     */
+    public String getText(WebElement element) {
+        waitForElementToBeVisible(element);
+        String text = element.getText();
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Retrieved text '{}' from element: {}", text, element.toString());
+        {{/if}}
+        return text;
+    }
+    
+    /**
+     * Get text from element using locator
+     * 
+     * @param locator By locator
+     * @return Element text
+     */
+    public String getText(By locator) {
+        WebElement element = waitForElementToBeVisible(locator);
+        return getText(element);
+    }
+    
+    /**
+     * Get attribute value from element
+     * 
+     * @param element WebElement
+     * @param attributeName Attribute name
+     * @return Attribute value
+     */
+    public String getAttribute(WebElement element, String attributeName) {
+        waitForElementToBeVisible(element);
+        return element.getAttribute(attributeName);
+    }
+    
+    /**
+     * Check if element is displayed
+     * 
+     * @param element WebElement to check
+     * @return true if displayed, false otherwise
+     */
+    public boolean isDisplayed(WebElement element) {
+        try {
+            return element.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Check if element is enabled
+     * 
+     * @param element WebElement to check
+     * @return true if enabled, false otherwise
+     */
+    public boolean isEnabled(WebElement element) {
+        try {
+            return element.isEnabled();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    // ============== DROPDOWN METHODS ==============
+    
+    /**
+     * Select dropdown option by visible text
+     * 
+     * @param element Dropdown element
+     * @param text Visible text to select
+     */
+    public void selectByText(WebElement element, String text) {
+        waitForElementToBeVisible(element);
+        Select select = new Select(element);
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Selecting dropdown option by text: {}", text);
+        {{/if}}
+        select.selectByVisibleText(text);
+    }
+    
+    /**
+     * Select dropdown option by value
+     * 
+     * @param element Dropdown element
+     * @param value Value to select
+     */
+    public void selectByValue(WebElement element, String value) {
+        waitForElementToBeVisible(element);
+        Select select = new Select(element);
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Selecting dropdown option by value: {}", value);
+        {{/if}}
+        select.selectByValue(value);
+    }
+    
+    // ============== WAIT METHODS ==============
+    
+    /**
+     * Wait for element to be visible
+     * 
+     * @param locator By locator
+     * @return WebElement
+     */
+    public WebElement waitForElementToBeVisible(By locator) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+    
+    /**
+     * Wait for element to be visible
+     * 
+     * @param element WebElement
+     * @return WebElement
+     */
+    public WebElement waitForElementToBeVisible(WebElement element) {
+        return wait.until(ExpectedConditions.visibilityOf(element));
+    }
+    
+    /**
+     * Wait for element to be clickable
+     * 
+     * @param element WebElement
+     * @return WebElement
+     */
+    public WebElement waitForElementToBeClickable(WebElement element) {
+        return wait.until(ExpectedConditions.elementToBeClickable(element));
+    }
+    
+    /**
+     * Wait for element to be clickable
+     * 
+     * @param locator By locator
+     * @return WebElement
+     */
+    public WebElement waitForElementToBeClickable(By locator) {
+        return wait.until(ExpectedConditions.elementToBeClickable(locator));
+    }
+    
+    /**
+     * Wait for text to be present in element
+     * 
+     * @param locator By locator
+     * @param text Text to wait for
+     * @return true if text is present
+     */
+    public boolean waitForTextToBePresentInElement(By locator, String text) {
+        return wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+    }
+    
+    /**
+     * Wait for URL to contain text
+     * 
+     * @param text Text to wait for in URL
+     * @return true if URL contains text
+     */
+    public boolean waitForUrlToContain(String text) {
+        return wait.until(ExpectedConditions.urlContains(text));
+    }
+    
+    /**
+     * Wait for custom condition with timeout
+     * 
+     * @param timeout Timeout in seconds
+     * @param condition Expected condition
+     * @return Result of condition
+     */
+    public <T> T waitWithCustomTimeout(int timeout, org.openqa.selenium.support.ui.ExpectedCondition<T> condition) {
+        WebDriverWait customWait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
+        return customWait.until(condition);
+    }
+    
+    // ============== JAVASCRIPT METHODS ==============
+    
+    /**
+     * Execute JavaScript
+     * 
+     * @param script JavaScript to execute
+     * @return Result of execution
+     */
+    public Object executeJavaScript(String script) {
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Executing JavaScript: {}", script);
+        {{/if}}
+        return jsExecutor.executeScript(script);
+    }
+    
+    /**
+     * Scroll to element
+     * 
+     * @param element WebElement to scroll to
+     */
+    public void scrollToElement(WebElement element) {
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Scrolling to element: {}", element.toString());
+        {{/if}}
+        executeJavaScript("arguments[0].scrollIntoView(true);", element);
+    }
+    
+    /**
+     * Click element using JavaScript
+     * 
+     * @param element WebElement to click
+     */
+    public void clickWithJavaScript(WebElement element) {
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Clicking element using JavaScript: {}", element.toString());
+        {{/if}}
+        executeJavaScript("arguments[0].click();", element);
+    }
+    
+    // ============== SCREENSHOT METHODS ==============
+    
+    {{#if dependencies.includes "Screenshot"}}
+    /**
+     * Take screenshot
+     * 
+     * @return Screenshot as byte array
+     */
+    public byte[] takeScreenshot() {
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Taking screenshot");
+        {{/if}}
+        return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+    }
+    {{/if}}
+    
+    // ============== UTILITY METHODS ==============
+    
+    /**
+     * Get all elements by locator
+     * 
+     * @param locator By locator
+     * @return List of WebElements
+     */
+    public List<WebElement> getElements(By locator) {
+        return driver.findElements(locator);
+    }
+    
+    /**
+     * Check if element exists
+     * 
+     * @param locator By locator
+     * @return true if element exists, false otherwise
+     */
+    public boolean isElementPresent(By locator) {
+        try {
+            driver.findElement(locator);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Switch to window by title
+     * 
+     * @param windowTitle Window title
+     */
+    public void switchToWindowByTitle(String windowTitle) {
+        for (String handle : driver.getWindowHandles()) {
+            driver.switchTo().window(handle);
+            if (driver.getTitle().equals(windowTitle)) {
+                {{#if dependencies.includes "Logging"}}
+                logger.debug("Switched to window with title: {}", windowTitle);
+                {{/if}}
+                return;
+            }
+        }
+        {{#if dependencies.includes "Logging"}}
+        logger.warn("Window with title '{}' not found", windowTitle);
+        {{/if}}
+    }
+    
+    /**
+     * Accept alert
+     */
+    public void acceptAlert() {
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Accepting alert");
+        {{/if}}
+        driver.switchTo().alert().accept();
+    }
+    
+    /**
+     * Dismiss alert
+     */
+    public void dismissAlert() {
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Dismissing alert");
+        {{/if}}
+        driver.switchTo().alert().dismiss();
+    }
+    
+    /**
+     * Get alert text
+     * 
+     * @return Alert text
+     */
+    public String getAlertText() {
+        String alertText = driver.switchTo().alert().getText();
+        {{#if dependencies.includes "Logging"}}
+        logger.debug("Alert text: {}", alertText);
+        {{/if}}
+        return alertText;
+    }
+} 

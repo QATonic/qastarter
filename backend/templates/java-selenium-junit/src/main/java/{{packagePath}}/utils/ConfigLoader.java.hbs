@@ -1,0 +1,267 @@
+package {{config.packageName}}.utils;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+{{#if (includes dependencies "Logging")}}
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+{{/if}}
+
+/**
+ * Configuration Loader - Manages application properties and configuration
+ */
+public class ConfigLoader {
+
+    private static ConfigLoader instance;
+    private Properties properties;
+    {{#if (includes dependencies "Logging")}}
+    private static final Logger logger = LogManager.getLogger(ConfigLoader.class);
+    {{/if}}
+
+    // Default configuration values
+    private static final String DEFAULT_BASE_URL = "http://localhost:8080";
+    private static final String DEFAULT_BROWSER = "chrome";
+    private static final int DEFAULT_TIMEOUT = 10;
+    private static final boolean DEFAULT_HEADLESS = false;
+
+    /**
+     * Private constructor for singleton pattern
+     */
+    private ConfigLoader() {
+        loadProperties();
+    }
+
+    /**
+     * Get singleton instance
+     */
+    public static ConfigLoader getInstance() {
+        if (instance == null) {
+            synchronized (ConfigLoader.class) {
+                if (instance == null) {
+                    instance = new ConfigLoader();
+                }
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * Load properties from configuration file
+     */
+    private void loadProperties() {
+        properties = new Properties();
+        
+        // Try to load from different locations
+        String[] configFiles = {
+            "src/test/resources/config.properties",
+            "config.properties",
+            "test.properties"
+        };
+
+        boolean loaded = false;
+        for (String configFile : configFiles) {
+            try (FileInputStream fis = new FileInputStream(configFile)) {
+                properties.load(fis);
+                {{#if (includes dependencies "Logging")}}
+                logger.info("Configuration loaded from: " + configFile);
+                {{/if}}
+                loaded = true;
+                break;
+            } catch (IOException e) {
+                {{#if (includes dependencies "Logging")}}
+                logger.debug("Could not load config from: " + configFile);
+                {{/if}}
+            }
+        }
+
+        if (!loaded) {
+            {{#if (includes dependencies "Logging")}}
+            logger.warn("No configuration file found, using default values");
+            {{/if}}
+            loadDefaultProperties();
+        }
+
+        // Override with system properties if available
+        overrideWithSystemProperties();
+    }
+
+    /**
+     * Load default properties
+     */
+    private void loadDefaultProperties() {
+        properties.setProperty("base.url", DEFAULT_BASE_URL);
+        properties.setProperty("browser", DEFAULT_BROWSER);
+        properties.setProperty("timeout", String.valueOf(DEFAULT_TIMEOUT));
+        properties.setProperty("headless", String.valueOf(DEFAULT_HEADLESS));
+        properties.setProperty("screenshot.on.failure", "true");
+        properties.setProperty("retry.count", "1");
+        properties.setProperty("wait.timeout", "10");
+        properties.setProperty("page.load.timeout", "30");
+    }
+
+    /**
+     * Override properties with system properties
+     */
+    private void overrideWithSystemProperties() {
+        String[] systemProps = {
+            "base.url", "browser", "timeout", "headless", 
+            "screenshot.on.failure", "retry.count", "wait.timeout", "page.load.timeout"
+        };
+
+        for (String prop : systemProps) {
+            String systemValue = System.getProperty(prop);
+            if (systemValue != null) {
+                properties.setProperty(prop, systemValue);
+                {{#if (includes dependencies "Logging")}}
+                logger.info("Overriding property " + prop + " with system value: " + systemValue);
+                {{/if}}
+            }
+        }
+    }
+
+    /**
+     * Get base URL for the application under test
+     */
+    public String getBaseUrl() {
+        return getProperty("base.url", DEFAULT_BASE_URL);
+    }
+
+    /**
+     * Get browser name
+     */
+    public String getBrowser() {
+        return getProperty("browser", DEFAULT_BROWSER);
+    }
+
+    /**
+     * Get implicit wait timeout in seconds
+     */
+    public int getTimeout() {
+        return getIntProperty("timeout", DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Check if tests should run in headless mode
+     */
+    public boolean isHeadless() {
+        return getBooleanProperty("headless", DEFAULT_HEADLESS);
+    }
+
+    /**
+     * Check if screenshots should be taken on test failure
+     */
+    public boolean isScreenshotOnFailure() {
+        return getBooleanProperty("screenshot.on.failure", true);
+    }
+
+    /**
+     * Get retry count for failed tests
+     */
+    public int getRetryCount() {
+        return getIntProperty("retry.count", 1);
+    }
+
+    /**
+     * Get wait timeout for explicit waits
+     */
+    public int getWaitTimeout() {
+        return getIntProperty("wait.timeout", 10);
+    }
+
+    /**
+     * Get page load timeout
+     */
+    public int getPageLoadTimeout() {
+        return getIntProperty("page.load.timeout", 30);
+    }
+
+    /**
+     * Get test data file path
+     */
+    public String getTestDataPath() {
+        return getProperty("test.data.path", "src/test/resources/testdata.json");
+    }
+
+    /**
+     * Get reports output directory
+     */
+    public String getReportsPath() {
+        return getProperty("reports.path", "target/reports");
+    }
+
+    /**
+     * Get screenshots output directory
+     */
+    public String getScreenshotsPath() {
+        return getProperty("screenshots.path", "target/screenshots");
+    }
+
+    /**
+     * Get string property with default value
+     */
+    public String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    /**
+     * Get string property
+     */
+    public String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    /**
+     * Get integer property with default value
+     */
+    public int getIntProperty(String key, int defaultValue) {
+        try {
+            String value = properties.getProperty(key);
+            return value != null ? Integer.parseInt(value) : defaultValue;
+        } catch (NumberFormatException e) {
+            {{#if (includes dependencies "Logging")}}
+            logger.warn("Invalid integer value for property " + key + ", using default: " + defaultValue);
+            {{/if}}
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get boolean property with default value
+     */
+    public boolean getBooleanProperty(String key, boolean defaultValue) {
+        String value = properties.getProperty(key);
+        return value != null ? Boolean.parseBoolean(value) : defaultValue;
+    }
+
+    /**
+     * Set property value
+     */
+    public void setProperty(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
+    /**
+     * Check if property exists
+     */
+    public boolean hasProperty(String key) {
+        return properties.containsKey(key);
+    }
+
+    /**
+     * Get all properties
+     */
+    public Properties getAllProperties() {
+        return new Properties(properties);
+    }
+
+    /**
+     * Reload configuration
+     */
+    public void reload() {
+        {{#if (includes dependencies "Logging")}}
+        logger.info("Reloading configuration");
+        {{/if}}
+        loadProperties();
+    }
+} 

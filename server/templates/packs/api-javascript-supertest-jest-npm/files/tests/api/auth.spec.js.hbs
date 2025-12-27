@@ -1,0 +1,132 @@
+import { apiClient } from '../../core/ApiClient.js';
+import AuthHelper from '../../utils/authHelper.js';
+import { testUsers } from '../data/users.js';
+
+/**
+ * Authentication API Tests
+ * 
+ * ========== IMPORTANT: UPDATE THESE VALUES ==========
+ * 1. Update API endpoints to match your API
+ * 2. Update test data in tests/data/users.js
+ * 3. Update expected response structure
+ * =====================================================
+ */
+describe('Authentication API Tests', () => {
+  
+  beforeAll(() => {
+    // Clear any cached tokens before tests
+    AuthHelper.clearAllTokens();
+  });
+  
+  afterAll(() => {
+    AuthHelper.clearAllTokens();
+  });
+  
+  describe('POST /auth/login', () => {
+    
+    /**
+     * Test successful login with valid credentials
+     */
+    test('should login successfully with valid credentials', async () => {
+      const credentials = testUsers.validUser;
+      
+      // TODO: Update endpoint to match your API
+      const response = await apiClient.post('/auth/login', {
+        username: credentials.username,
+        password: credentials.password
+      });
+      
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('token');
+      // Or expect(response.body).toHaveProperty('accessToken');
+    });
+    
+    /**
+     * Test login with invalid credentials
+     */
+    test('should return 401 for invalid credentials', async () => {
+      const response = await apiClient.post('/auth/login', {
+        username: 'invalid@example.com',
+        password: 'wrongpassword'
+      });
+      
+      expect(response.status).toBe(401);
+    });
+    
+    /**
+     * Test login with missing credentials
+     */
+    test('should return 400 for missing credentials', async () => {
+      const response = await apiClient.post('/auth/login', {});
+      
+      expect([400, 422]).toContain(response.status);
+    });
+    
+    /**
+     * Test login with empty password
+     */
+    test('should return error for empty password', async () => {
+      const response = await apiClient.post('/auth/login', {
+        username: testUsers.validUser.username,
+        password: ''
+      });
+      
+      expect([400, 401, 422]).toContain(response.status);
+    });
+  });
+  
+  describe('Token Validation', () => {
+    
+    /**
+     * Test accessing protected endpoint with valid token
+     */
+    test('should access protected endpoint with valid token', async () => {
+      const token = await AuthHelper.getToken(testUsers.validUser);
+      
+      // TODO: Update to a protected endpoint in your API
+      const response = await apiClient.get('/users/me', {
+        'Authorization': `Bearer ${token}`
+      });
+      
+      expect(response.status).toBe(200);
+    });
+    
+    /**
+     * Test accessing protected endpoint without token
+     */
+    test('should return 401 without token', async () => {
+      // TODO: Update to a protected endpoint in your API
+      const response = await apiClient.get('/users/me');
+      
+      expect(response.status).toBe(401);
+    });
+    
+    /**
+     * Test accessing protected endpoint with invalid token
+     */
+    test('should return 401 with invalid token', async () => {
+      const response = await apiClient.get('/users/me', {
+        'Authorization': 'Bearer invalid-token-here'
+      });
+      
+      expect(response.status).toBe(401);
+    });
+  });
+  
+  describe('POST /auth/logout', () => {
+    
+    /**
+     * Test logout
+     */
+    test('should logout successfully', async () => {
+      const token = await AuthHelper.getToken(testUsers.validUser);
+      
+      // TODO: Update endpoint to match your API
+      const response = await apiClient.post('/auth/logout', {}, {
+        'Authorization': `Bearer ${token}`
+      });
+      
+      expect([200, 204]).toContain(response.status);
+    });
+  });
+});

@@ -1,0 +1,29 @@
+import BasePage from './BasePage';
+
+class HomePage extends BasePage {
+  constructor() {
+    super();
+    this.welcomeMessage = '.welcome-message, h1';
+    this.userProfile = '.user-profile';
+    this.logoutButton = 'button[data-action="logout"], .logout';
+  }
+
+  visitHomePage(baseUrl) {
+    this.visit(baseUrl);
+  }
+
+  getWelcomeMessage() {
+    return this.getText(this.welcomeMessage);
+  }
+
+  verifyUserProfileVisible() {
+    cy.get(this.userProfile).should('be.visible');
+  }
+
+  logout() {
+    this.click(this.logoutButton);
+    cy.url().should('include', '/login');
+  }
+}
+
+export default HomePage;

@@ -1,0 +1,112 @@
+"""
+Login Step Definitions for BDD Tests
+"""
+import pytest
+from pytest_bdd import scenarios, given, when, then, parsers
+from pages.login_page import LoginPage
+from pages.home_page import HomePage
+from utils.logger import Logger
+
+# Load all scenarios from the feature file
+scenarios('../features/login.feature')
+
+logger = Logger(__name__).get_logger()
+
+
+# Fixtures
+@pytest.fixture
+def login_page(driver):
+    """Initialize LoginPage"""
+    return LoginPage(driver)
+
+
+@pytest.fixture
+def home_page(driver):
+    """Initialize HomePage"""
+    return HomePage(driver)
+
+
+# Given Steps
+@given('I navigate to the login page')
+def navigate_to_login_page(driver, config, login_page):
+    """Navigate to the login page"""
+    logger.info("Navigating to login page")
+    driver.get(config.base_url)
+    login_page.wait_for_page_load()
+
+
+# When Steps
+@when(parsers.parse('I enter username "{username}"'))
+def enter_username(login_page, username):
+    """Enter username in the login form"""
+    logger.info(f"Entering username: {username}")
+    login_page.enter_username(username)
+
+
+@when(parsers.parse('I enter password "{password}"'))
+def enter_password(login_page, password):
+    """Enter password in the login form"""
+    logger.info("Entering password")
+    login_page.enter_password(password)
+
+
+@when('I click the login button')
+def click_login_button(login_page):
+    """Click the login button"""
+    logger.info("Clicking login button")
+    login_page.click_login()
+
+
+# Then Steps
+@then('I should be redirected to the home page')
+def verify_home_page_redirect(driver, config, home_page):
+    """Verify user is redirected to home page"""
+    logger.info("Verifying redirect to home page")
+    home_page.wait_for_page_load()
+    assert config.base_url in driver.current_url, "Not redirected to home page"
+
+
+@then(parsers.parse('I should see welcome message "{message}"'))
+def verify_welcome_message(home_page, message):
+    """Verify welcome message is displayed"""
+    logger.info(f"Verifying welcome message: {message}")
+    assert home_page.is_welcome_message_displayed(), "Welcome message not displayed"
+    # Note: In a real implementation, you would verify the actual message text
+
+
+@then(parsers.parse('I should see error message "{error_message}"'))
+def verify_error_message(login_page, error_message):
+    """Verify error message is displayed"""
+    logger.info(f"Verifying error message: {error_message}")
+    assert login_page.is_error_displayed(), "Error message not displayed"
+    # Note: In a real implementation, you would verify the actual error text
+
+
+@then('I should remain on the login page')
+def verify_on_login_page(driver, config, login_page):
+    """Verify user remains on login page"""
+    logger.info("Verifying still on login page")
+    login_page.wait_for_page_load()
+    assert "login" in driver.current_url.lower(), "Not on login page"
+
+
+{{#if (eq reportingTool "allure")}}
+# Allure reporting hooks
+import allure
+from pytest_bdd import when as bdd_when, then as bdd_then, given as bdd_given
+
+
+def pytest_bdd_step_error(request, feature, scenario, step, step_func, step_func_args, exception):
+    """Attach screenshot on step failure"""
+    if hasattr(request, 'driver'):
+        allure.attach(
+            request.driver.get_screenshot_as_png(),
+            name=f"failure_{step.name}",
+            attachment_type=allure.attachment_type.PNG
+        )
+
+
+def pytest_bdd_after_step(request, feature, scenario, step, step_func, step_func_args):
+    """Attach step information to Allure report"""
+    allure.dynamic.description(f"{step.keyword} {step.name}")
+{{/if}}

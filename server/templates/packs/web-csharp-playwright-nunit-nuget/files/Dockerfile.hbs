@@ -1,0 +1,16 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+WORKDIR /app
+
+COPY *.csproj ./
+RUN dotnet restore
+
+COPY . ./
+
+RUN dotnet build
+RUN pwsh -Command "cd bin/Debug/net8.0; ./playwright.ps1 install --with-deps"
+
+ENV TEST_ENV=qa
+ENV HEADLESS=true
+
+CMD ["dotnet", "test", "--no-build", "--verbosity", "normal"]

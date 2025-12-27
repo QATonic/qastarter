@@ -1,0 +1,37 @@
+"""
+Desktop Application Settings
+
+============================================
+UPDATE THESE VALUES FOR YOUR APPLICATION
+============================================
+Replace the placeholder values with your actual app details.
+"""
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Settings:
+    # WinAppDriver Configuration
+    WINAPPDRIVER_URL = os.getenv("WINAPPDRIVER_URL", "http://127.0.0.1:4723")
+    
+    # Timeouts (in seconds)
+    IMPLICIT_WAIT = int(os.getenv("IMPLICIT_WAIT", "10"))
+    EXPLICIT_WAIT = int(os.getenv("EXPLICIT_WAIT", "30"))
+    
+    # Logging
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+    LOG_FILE = os.getenv("LOG_FILE", "logs/test-run.log")
+    
+    # Screenshots
+    SCREENSHOT_PATH = os.getenv("SCREENSHOT_PATH", "screenshots")
+    SCREENSHOT_ON_FAILURE = os.getenv("SCREENSHOT_ON_FAILURE", "true").lower() == "true"
+    
+    # ============================================
+    # APPLICATION PATHS - UPDATE THESE
+    # ============================================
+    # For UWP apps: Use the App ID
+    # For Win32 apps: Use the full path
+    YOUR_APP_PATH = r"C:\Path\To\Your\Application.exe"
+    CALCULATOR_APP_ID = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App"
+    NOTEPAD_PATH = r"C:\Windows\System32\notepad.exe"

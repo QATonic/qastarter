@@ -1,0 +1,68 @@
+@api @users
+Feature: User API Testing
+  As an API consumer
+  I want to interact with the User API
+  So that I can manage user resources
+
+  Background:
+    Given the API base URL is configured
+    And I have valid authentication credentials
+
+  @smoke @create
+  Scenario: Create a new user successfully
+    Given I have user data with name "John Doe" and email "john.doe@example.com"
+    When I send a POST request to "/api/users" endpoint
+    Then the response status code should be 201
+    And the response should contain user id
+    And the response should contain name "John Doe"
+    And the response should contain email "john.doe@example.com"
+
+  @smoke @retrieve
+  Scenario: Retrieve a user by ID
+    Given a user exists with id "1"
+    When I send a GET request to "/api/users/1" endpoint
+    Then the response status code should be 200
+    And the response should contain user id "1"
+    And the response time should be less than 2000 milliseconds
+
+  @regression @retrieve
+  Scenario: Retrieve all users
+    Given multiple users exist in the system
+    When I send a GET request to "/api/users" endpoint
+    Then the response status code should be 200
+    And the response should be a list of users
+    And the response should contain at least 1 user
+
+  @regression @update
+  Scenario: Update an existing user
+    Given a user exists with id "1"
+    And I have updated user data with name "Jane Smith"
+    When I send a PUT request to "/api/users/1" endpoint
+    Then the response status code should be 200
+    And the response should contain name "Jane Smith"
+
+  @regression @delete
+  Scenario: Delete a user
+    Given a user exists with id "999"
+    When I send a DELETE request to "/api/users/999" endpoint
+    Then the response status code should be 204
+
+  @negative @retrieve
+  Scenario: Retrieve non-existent user
+    When I send a GET request to "/api/users/99999" endpoint
+    Then the response status code should be 404
+    And the response should contain error message
+
+  @negative @create
+  Scenario: Create user with invalid data
+    Given I have user data with invalid email format
+    When I send a POST request to "/api/users" endpoint
+    Then the response status code should be 400
+    And the response should contain validation error
+
+  @schema
+  Scenario: Validate user response schema
+    Given a user exists with id "1"
+    When I send a GET request to "/api/users/1" endpoint
+    Then the response status code should be 200
+    And the response should match the user schema

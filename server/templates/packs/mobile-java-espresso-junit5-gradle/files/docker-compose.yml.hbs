@@ -1,0 +1,48 @@
+# {{projectName}} - Docker Compose for Espresso Testing
+# Provides Android emulator environment for CI testing
+
+version: '3.8'
+
+services:
+  # Android Emulator
+  android-emulator:
+    image: budtmo/docker-android:emulator_13.0
+    privileged: true
+    ports:
+      - "6080:6080"
+      - "5554:5554"
+      - "5555:5555"
+    environment:
+      - EMULATOR_DEVICE=Samsung Galaxy S10
+      - WEB_VNC=true
+      - DATAPARTITION=4g
+    volumes:
+      - ./app:/app/app
+    networks:
+      - android-network
+
+  # Test Runner
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - android-emulator
+    environment:
+      - ANDROID_SERIAL=emulator-5554
+      - TEST_ENV=qa
+    volumes:
+      - ./build:/app/build
+    networks:
+      - android-network
+    profiles:
+      - test
+
+networks:
+  android-network:
+    driver: bridge
+
+# Usage:
+# Start emulator: docker-compose up -d android-emulator
+# Wait for emulator to boot, then run tests: docker-compose --profile test up tests
+# View emulator VNC: http://localhost:6080

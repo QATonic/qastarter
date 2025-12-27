@@ -1,0 +1,33 @@
+using System.Net;
+using RestSharp;
+
+namespace {{projectName}}.Models;
+
+public class ApiResponse<T>
+{
+    public HttpStatusCode StatusCode { get; set; }
+    public Dictionary<string, string?> Headers { get; set; } = new();
+    public T? Body { get; set; }
+    public string? Error { get; set; }
+
+    public bool IsSuccess => (int)StatusCode >= 200 && (int)StatusCode < 300;
+    public bool IsClientError => (int)StatusCode >= 400 && (int)StatusCode < 500;
+    public bool IsServerError => (int)StatusCode >= 500 && (int)StatusCode < 600;
+
+    public static ApiResponse<T> FromRestResponse(RestResponse<T> response)
+    {
+        var headers = new Dictionary<string, string?>();
+        foreach (var header in response.Headers ?? Enumerable.Empty<HeaderParameter>())
+        {
+            headers[header.Name ?? ""] = header.Value?.ToString();
+        }
+
+        return new ApiResponse<T>
+        {
+            StatusCode = response.StatusCode,
+            Headers = headers,
+            Body = response.Data,
+            Error = response.IsSuccessful ? null : response.ErrorMessage
+        };
+    }
+}

@@ -1,0 +1,19 @@
+export interface UserCredentials {
+  username: string;
+  password: string;
+}
+
+export interface Users {
+  valid: UserCredentials;
+  admin: UserCredentials;
+}
+
+export interface AppInfo {
+  name: string;
+  version: string;
+}
+
+export interface TestData {
+  users: Users;
+  app: AppInfo;
+}

@@ -1,0 +1,35 @@
+# {{projectName}} - Desktop Automation with PyAutoGUI
+# NOTE: PyAutoGUI requires display access - use with X11 forwarding or VNC
+
+FROM python:3.11-slim
+
+# Install system dependencies for PyAutoGUI
+RUN apt-get update && apt-get install -y \
+    python3-tk \
+    python3-dev \
+    scrot \
+    xvfb \
+    x11-utils \
+    xdotool \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy test code
+COPY . .
+
+# Set environment variables
+ENV DISPLAY=:99
+ENV TEST_ENV=qa
+
+# Create directories for test results
+RUN mkdir -p /app/reports /app/screenshots
+
+# Start Xvfb and run tests
+ENTRYPOINT ["sh", "-c", "Xvfb :99 -screen 0 1920x1080x24 & sleep 2 && python -m pytest"]
+CMD ["tests/", "-v", "--html=reports/report.html"]

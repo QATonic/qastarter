@@ -1,0 +1,217 @@
+# {{projectName}}
+
+REST API automation framework with C#, RestSharp, and NUnit.
+
+## Features
+
+- **.NET {{toolVersions.dotnet}}**: Modern C# with async/await support
+- **RestSharp {{toolVersions.restsharp}}**: Powerful HTTP client library
+- **NUnit {{toolVersions.nunit}}**: Industry-standard testing framework
+- **FluentAssertions**: Fluent assertion syntax
+- **JSON Schema Validation**: Validate API responses with Newtonsoft.Json.Schema
+- **Data-Driven Testing**: TestCase attributes with external data
+- **Serilog Logging**: Structured logging with file and console output
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+
+## Installation
+
+```bash
+# Restore dependencies
+dotnet restore
+
+# Build project
+dotnet build
+```
+
+## Configuration
+
+### Environment Variables
+
+Set environment variables for configuration:
+
+```bash
+# Environment
+TEST_ENV=dev
+
+# API Configuration
+BASE_URL=https://jsonplaceholder.typicode.com
+
+# Authentication
+AUTH_TOKEN=
+API_KEY=
+USERNAME=
+PASSWORD=
+
+# Timeouts (in milliseconds)
+REQUEST_TIMEOUT=30000
+RETRY_COUNT=3
+
+# Logging
+LOG_LEVEL=Information
+LOG_FILE=logs/test-run.log
+
+# SSL Verification
+VERIFY_SSL=true
+```
+
+### Environment Files
+
+Update configurations in `Config/Environments.cs` for different environments (dev, qa, staging, prod).
+
+## Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run with verbose output
+dotnet test --verbosity normal
+
+# Run specific category
+dotnet test --filter Category=Smoke
+dotnet test --filter Category=Regression
+
+# Run with test results
+dotnet test --logger "trx;LogFileName=test-results.trx"
+
+# Run with coverage (requires coverlet.collector)
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+## Project Structure
+
+```
+.
+├── Config/
+│   ├── Settings.cs          # Configuration management
+│   └── Environments.cs      # Environment configs
+├── Core/
+│   ├── ApiClient.cs         # Base API client
+│   ├── RequestBuilder.cs    # Request builder pattern
+│   └── ResponseValidator.cs # Response validation
+├── Models/
+│   ├── User.cs              # User data model
+│   └── ApiResponse.cs       # API response model
+├── Utils/
+│   ├── AuthManager.cs       # Authentication manager
+│   ├── JsonUtils.cs         # JSON utilities
+│   └── Logger.cs            # Logging configuration
+├── Tests/
+│   ├── BaseTest.cs          # Base test class
+│   ├── UserTests.cs         # User API tests
+│   ├── AuthenticationTests.cs # Auth tests
+│   └── DataDrivenTests.cs   # Data-driven tests
+├── Schemas/
+│   └── user-schema.json     # JSON schemas
+├── Data/
+│   ├── users.json           # Test user data
+│   └── test-cases.json      # Test case data
+└── {{projectName}}.csproj   # Project file
+```
+
+## Writing Tests
+
+### Basic Test Example
+
+```csharp
+using NUnit.Framework;
+using {{projectName}}.Core;
+using {{projectName}}.Models;
+
+[TestFixture]
+public class UserTests : BaseTest
+{
+    [Test]
+    public async Task GetUserById_ShouldReturnUser()
+    {
+        var response = await Client.GetAsync<User>("/users/1");
+        
+        var validator = new ResponseValidator<User>(response);
+        validator.AssertStatusCode(HttpStatusCode.OK)
+                 .AssertSuccess();
+        
+        response.Data.Should().NotBeNull();
+    }
+}
+```
+
+### Using Request Builder
+
+```csharp
+var builder = new RequestBuilder("/users")
+    .WithHeader("Content-Type", "application/json")
+    .WithQueryParameter("page", "1")
+    .WithBody(newUser);
+
+var request = builder.Build();
+var response = await Client.PostAsync<User>("/users", newUser, request);
+```
+
+### JSON Schema Validation
+
+```csharp
+var schema = JsonUtils.LoadSchema("user-schema");
+validator.AssertJsonSchema(schema);
+```
+
+### Data-Driven Tests
+
+```csharp
+[Test]
+[TestCase(1)]
+[TestCase(2)]
+[TestCase(3)]
+public async Task GetUserById_WithMultipleIds_ShouldReturnUser(int userId)
+{
+    var response = await Client.GetAsync<User>($"/users/{userId}");
+    validator.AssertStatusCode(HttpStatusCode.OK);
+}
+```
+
+## Test Categories
+
+- `[Category("Smoke")]` - Critical path tests
+- `[Category("Regression")]` - Full regression suite
+- `[Category("Authentication")]` - Authentication tests
+
+Run specific categories:
+```bash
+dotnet test --filter Category=Smoke
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR with:
+- .NET {{toolVersions.dotnet}}
+- Matrix: Ubuntu + Windows
+- TRX test results
+- Artifact upload
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Reports
+
+- **Test Results**: `TestResults/*.trx`
+- **Logs**: `logs/test-run.log`

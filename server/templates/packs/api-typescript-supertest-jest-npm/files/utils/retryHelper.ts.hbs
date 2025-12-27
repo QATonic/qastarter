@@ -1,0 +1,99 @@
+import logger from './logger';
+
+interface RetryOptions {
+  retries?: number;
+  delay?: number;
+  backoff?: number;
+  shouldRetry?: (error: Error) => boolean;
+  onRetry?: (error: Error, attempt: number) => void;
+}
+
+interface WaitOptions {
+  timeout?: number;
+  interval?: number;
+  message?: string;
+}
+
+/**
+ * Retry helper for handling flaky API calls.
+ */
+class RetryHelper {
+  static readonly DEFAULT_RETRIES = 3;
+  static readonly DEFAULT_DELAY = 1000;
+  static readonly DEFAULT_BACKOFF = 2;
+
+  static async retry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
+    const {
+      retries = RetryHelper.DEFAULT_RETRIES,
+      delay = RetryHelper.DEFAULT_DELAY,
+      backoff = RetryHelper.DEFAULT_BACKOFF,
+      shouldRetry = () => true,
+      onRetry = () => {}
+    } = options;
+
+    let lastError: Error;
+    let currentDelay = delay;
+
+    for (let attempt = 1; attempt <= retries + 1; attempt++) {
+      try {
+        logger.debug(`Attempt ${attempt}/${retries + 1}`);
+        const result = await fn();
+
+        if (attempt > 1) {
+          logger.info(`Succeeded on attempt ${attempt}`);
+        }
+
+        return result;
+      } catch (error) {
+        lastError = error as Error;
+
+        if (attempt <= retries && shouldRetry(lastError)) {
+          logger.warn(`Attempt ${attempt} failed: ${lastError.message}. Retrying in ${currentDelay}ms...`);
+          onRetry(lastError, attempt);
+
+          await RetryHelper.sleep(currentDelay);
+          currentDelay *= backoff;
+        } else {
+          logger.error(`All ${attempt} attempts failed`);
+          break;
+        }
+      }
+    }
+
+    throw lastError!;
+  }
+
+  static async waitFor(
+    condition: () => Promise<boolean> | boolean,
+    options: WaitOptions = {}
+  ): Promise<boolean> {
+    const {
+      timeout = 30000,
+      interval = 1000,
+      message = 'Condition not met'
+    } = options;
+
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      try {
+        const result = await condition();
+        if (result) {
+          return true;
+        }
+      } catch (error) {
+        logger.debug(`Condition check failed: ${(error as Error).message}`);
+      }
+
+      await RetryHelper.sleep(interval);
+    }
+
+    throw new Error(`${message} within ${timeout}ms`);
+  }
+
+  static sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+}
+
+export default RetryHelper;

@@ -1,0 +1,109 @@
+import XCTest
+@testable import {{projectName}}
+
+/**
+ * Login Feature Test Suite
+ * BDD-style tests using Given-When-Then pattern
+ * 
+ * Feature: User Login
+ * As a user
+ * I want to log in to the application
+ * So that I can access my account
+ * 
+ * ========== UPDATE THESE VALUES ==========
+ * Replace with your actual test credentials and element IDs
+ * =========================================
+ */
+class LoginFeatureTests: XCTestCase {
+    
+    var app: XCUIApplication!
+    
+    // ========== UPDATE THESE ACCESSIBILITY IDs ==========
+    private let loginScreenId = "YOUR_LOGIN_SCREEN_ID_HERE"
+    private let usernameFieldId = "YOUR_USERNAME_FIELD_ID_HERE"
+    private let passwordFieldId = "YOUR_PASSWORD_FIELD_ID_HERE"
+    private let loginButtonId = "YOUR_LOGIN_BUTTON_ID_HERE"
+    private let homeScreenId = "YOUR_HOME_SCREEN_ID_HERE"
+    private let welcomeLabelId = "YOUR_WELCOME_LABEL_ID_HERE"
+    
+    // Test credentials
+    private let testUsername = "YOUR_USERNAME_HERE"
+    private let testPassword = "YOUR_PASSWORD_HERE"
+    // ====================================================
+    
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launch()
+    }
+    
+    override func tearDownWithError() throws {
+        app = nil
+    }
+    
+    /**
+     * Scenario: Successful login with valid credentials
+     * Given I am on the login page
+     * When I enter valid username and password
+     * And I tap the login button
+     * Then I should be redirected to the home screen
+     * And I should see a welcome message
+     */
+    func testSuccessfulLoginWithValidCredentials() throws {
+        // Given I am on the login page
+        givenIAmOnTheLoginPage()
+        
+        // When I enter valid credentials
+        whenIEnterUsername(testUsername)
+        whenIEnterPassword(testPassword)
+        whenITapTheLoginButton()
+        
+        // Then I should see home screen
+        thenIShouldBeRedirectedToHomeScreen()
+        thenIShouldSeeWelcomeMessage()
+        
+        // Test passed! Your XCUITest BDD framework is working correctly.
+    }
+    
+    // MARK: - Given Steps
+    
+    private func givenIAmOnTheLoginPage() {
+        let loginScreen = app.otherElements[loginScreenId]
+        XCTAssertTrue(loginScreen.waitForExistence(timeout: 5), "Login screen should be displayed")
+    }
+    
+    // MARK: - When Steps
+    
+    private func whenIEnterUsername(_ username: String) {
+        let usernameField = app.textFields[usernameFieldId]
+        XCTAssertTrue(usernameField.exists, "Username field should exist")
+        usernameField.tap()
+        usernameField.typeText(username)
+    }
+    
+    private func whenIEnterPassword(_ password: String) {
+        let passwordField = app.secureTextFields[passwordFieldId]
+        XCTAssertTrue(passwordField.exists, "Password field should exist")
+        passwordField.tap()
+        passwordField.typeText(password)
+    }
+    
+    private func whenITapTheLoginButton() {
+        let loginButton = app.buttons[loginButtonId]
+        XCTAssertTrue(loginButton.exists, "Login button should exist")
+        loginButton.tap()
+    }
+    
+    // MARK: - Then Steps
+    
+    private func thenIShouldBeRedirectedToHomeScreen() {
+        let homeScreen = app.otherElements[homeScreenId]
+        XCTAssertTrue(homeScreen.waitForExistence(timeout: 5), "Home screen should be displayed")
+    }
+    
+    private func thenIShouldSeeWelcomeMessage(containing text: String = "Welcome") {
+        let welcomeLabel = app.staticTexts[welcomeLabelId]
+        XCTAssertTrue(welcomeLabel.exists, "Welcome message should exist")
+        XCTAssertTrue(welcomeLabel.label.contains(text), "Welcome message should contain '\(text)'")
+    }
+}

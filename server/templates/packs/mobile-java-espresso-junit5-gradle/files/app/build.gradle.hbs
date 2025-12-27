@@ -1,0 +1,71 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace '{{packageName}}'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "{{packageName}}"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    testOptions {
+        animationsDisabled = true
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // Testing dependencies
+    testImplementation 'junit:junit:4.13.2'
+    
+    // Espresso dependencies
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
+    androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.5.1'
+    
+    // UI Automator for cross-app testing
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    
+    // Hamcrest matchers
+    androidTestImplementation 'org.hamcrest:hamcrest:2.2'
+{{#if (eq reportingTool "allure")}}
+    
+    // Allure reporting
+    androidTestImplementation 'io.qameta.allure:allure-android:2.4.0'
+{{/if}}
+}

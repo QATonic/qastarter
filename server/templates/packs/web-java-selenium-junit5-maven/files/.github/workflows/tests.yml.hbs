@@ -1,0 +1,99 @@
+name: Selenium Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chrome, firefox]
+      fail-fast: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up JDK {{toolVersions.java}}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '{{toolVersions.java}}'
+          distribution: 'temurin'
+          cache: maven
+      
+      - name: Install Chrome
+        if: matrix.browser == 'chrome'
+        uses: browser-actions/setup-chrome@latest
+      
+      - name: Install Firefox
+        if: matrix.browser == 'firefox'
+        uses: browser-actions/setup-firefox@latest
+      
+      - name: Run tests
+        run: mvn clean test -Dbrowser={{raw}}${{ matrix.browser }}{{/raw}}
+        env:
+          ENVIRONMENT: qa
+      {{#if (eq reportingTool "allure")}}
+      
+      - name: Generate Allure Report
+        if: always()
+        run: mvn allure:report
+      
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: target/allure-results
+          retention-days: 7
+      
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: target/site/allure-maven-plugin
+          retention-days: 7
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      
+      - name: Upload ExtentReports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-reports-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: reports/extent-report.html
+          retention-days: 7
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      
+      - name: Upload JUnit Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-reports-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: target/surefire-reports
+          retention-days: 7
+      {{/if}}
+      
+      - name: Upload Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: reports/screenshots
+          retention-days: 7
+      
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: logs
+          retention-days: 7

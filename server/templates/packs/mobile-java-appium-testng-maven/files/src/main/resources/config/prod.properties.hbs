@@ -1,0 +1,48 @@
+# Production Environment Configuration for Mobile Testing
+
+# Appium Server Configuration
+appium.server.url=http://prod-appium.example.com:4723
+
+# Mobile Testing Timeouts
+mobile.implicit.wait=20
+mobile.explicit.wait=45
+mobile.polling.interval=2000
+
+# Android Configuration
+mobile.android.platformName=Android
+mobile.android.platformVersion=13.0
+mobile.android.deviceName=Production Android Device
+mobile.android.automationName=UiAutomator2
+mobile.android.app=/path/to/prod/android/app.apk
+mobile.android.appPackage=com.example.app
+mobile.android.appActivity=com.example.app.MainActivity
+mobile.android.newCommandTimeout=900
+mobile.android.noReset=true
+
+# iOS Configuration  
+mobile.ios.platformName=iOS
+mobile.ios.platformVersion=16.0
+mobile.ios.deviceName=Production iPhone 14
+mobile.ios.automationName=XCUITest
+mobile.ios.app=/path/to/prod/ios/app.app
+mobile.ios.bundleId=com.example.app
+mobile.ios.newCommandTimeout=900
+mobile.ios.noReset=true
+
+# Test Data Configuration
+test.data.base.path=src/test/resources/testdata
+test.data.users.file=prod_users.csv
+test.data.sample.file=prod_sample.json
+
+# Reporting Configuration
+reports.base.path=reports
+extent.report.name=Mobile_Automation_Report_Production
+extent.report.title=Mobile Test Automation Report - Production
+
+# Screenshot Configuration
+screenshot.on.failure=true
+screenshot.base.path=reports/screenshots
+
+# Logging Configuration
+log.level=WARN
+log.file.path=logs/mobile-automation-prod.log

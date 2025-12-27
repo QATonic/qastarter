@@ -1,0 +1,41 @@
+"""
+Sample API test with single positive test case
+"""
+import pytest
+from core.api_client import APIClient
+from core.response_validator import ResponseValidator
+
+# ========== UPDATE THESE VALUES ==========
+# Replace with your actual API endpoint
+API_BASE_URL = "YOUR_API_BASE_URL_HERE"
+USER_ID = 1  # Replace with a valid user ID from your API
+# ==========================================
+
+
+@pytest.mark.users
+@pytest.mark.smoke
+class TestUserAPI:
+    """User API test suite."""
+    
+    def test_get_user_by_id(self, api_client: APIClient):
+        """
+        Verify API connection and basic GET request works correctly.
+        
+        BEFORE RUNNING:
+        1. Update API_BASE_URL in config/settings.py
+        2. Update USER_ID above with a valid user ID from your API
+        3. Update response validation to match your API response structure
+        """
+        # Step 1: Make GET request to users endpoint
+        response = api_client.get(f"/users/{USER_ID}")
+        
+        # Step 2: Validate response
+        validator = ResponseValidator(response)
+        validator.assert_status_code(200)
+        validator.assert_json_contains("id")
+        
+        # Step 3: Verify user ID matches
+        user_data = response.json()
+        assert user_data["id"] == USER_ID
+        
+        # Test passed! Your {{framework}} framework is working correctly.

@@ -1,0 +1,31 @@
+"""
+Environment Configuration
+
+============================================
+UPDATE THESE VALUES FOR YOUR API
+============================================
+Replace the placeholder URLs with your actual API endpoints.
+"""
+
+ENVIRONMENTS = {
+    "dev": {
+        "base_url": "https://your-dev-api-url.com",
+        "timeout": 30,
+        "verify_ssl": True
+    },
+    "qa": {
+        "base_url": "https://your-qa-api-url.com",
+        "timeout": 30,
+        "verify_ssl": True
+    },
+    "staging": {
+        "base_url": "https://your-staging-api-url.com",
+        "timeout": 30,
+        "verify_ssl": True
+    },
+    "prod": {
+        "base_url": "https://your-prod-api-url.com",
+        "timeout": 60,
+        "verify_ssl": True
+    }
+}

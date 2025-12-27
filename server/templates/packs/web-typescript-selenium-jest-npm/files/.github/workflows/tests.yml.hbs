@@ -1,0 +1,44 @@
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chrome, firefox]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Run tests
+        env:
+          BROWSER: {{raw}}${{ matrix.browser }}{{/raw}}
+          TEST_ENV: qa
+          HEADLESS: true
+        run: npm test
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: |
+            test-results/
+            screenshots/
+            logs/
+            allure-results/

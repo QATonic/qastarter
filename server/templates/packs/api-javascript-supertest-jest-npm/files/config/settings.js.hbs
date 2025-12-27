@@ -1,0 +1,25 @@
+import dotenv from 'dotenv';
+import { environments } from './environments.js';
+
+dotenv.config();
+
+const ENV = process.env.TEST_ENV || 'qa';
+
+export const config = {
+  env: ENV,
+  baseUrl: environments[ENV].baseUrl,
+  timeout: environments[ENV].timeout || 30000,
+  
+  // API Configuration
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  
+  // Test Configuration
+  retryAttempts: process.env.RETRY_ATTEMPTS || 2,
+  screenshotOnFailure: process.env.SCREENSHOT_ON_FAILURE === 'true',
+  
+  // Logging
+  logLevel: process.env.LOG_LEVEL || 'info'
+};

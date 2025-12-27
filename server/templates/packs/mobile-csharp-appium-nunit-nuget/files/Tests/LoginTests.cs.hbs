@@ -1,0 +1,49 @@
+using NUnit.Framework;
+using {{projectName}}.Tests.Pages;
+
+namespace {{projectName}}.Tests;
+
+// ========== UPDATE THESE VALUES ==========
+// Replace with your actual test credentials
+// ==========================================
+
+[TestFixture]
+public class LoginTests : BaseTest
+{
+    // ========== UPDATE THESE VALUES ==========
+    private const string TestUsername = "YOUR_USERNAME_HERE";
+    private const string TestPassword = "YOUR_PASSWORD_HERE";
+    // ==========================================
+    
+    private LoginPage _loginPage = null!;
+    private HomePage _homePage = null!;
+
+    [SetUp]
+    public void SetUpPages()
+    {
+        _loginPage = new LoginPage(Driver);
+        _homePage = new HomePage(Driver);
+    }
+
+    /// <summary>
+    /// Verify login functionality works correctly.
+    /// 
+    /// BEFORE RUNNING:
+    /// 1. Update TestUsername and TestPassword above with valid credentials
+    /// 2. Configure device capabilities in Config/CapabilitiesConfig.cs
+    /// 3. Ensure Appium server is running
+    /// 4. Update selectors in Tests/Pages/LoginPage.cs to match your app
+    /// </summary>
+    [Test]
+    public void ShouldLoginWithValidCredentials()
+    {
+        // Step 1: Perform login
+        _loginPage.Login(TestUsername, TestPassword);
+        
+        // Step 2: Verify home page is displayed
+        var isHomeDisplayed = _homePage.IsHomePageDisplayed();
+        Assert.That(isHomeDisplayed, Is.True, "Home page should be displayed after login");
+        
+        // Test passed! Your {{framework}} framework is working correctly.
+    }
+}

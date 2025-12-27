@@ -1,0 +1,45 @@
+[pytest]
+# Test discovery patterns
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+
+# Markers
+markers =
+    smoke: Smoke test suite
+    regression: Regression test suite
+    login: Login related tests
+    slow: Tests that take a long time to run
+
+# Output options
+addopts = 
+    -v
+    --tb=short
+    --strict-markers
+{{#if (eq reportingTool "pytest-html")}}
+    --html=reports/report.html
+    --self-contained-html
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+    --alluredir=allure-results
+{{/if}}
+{{#if (eq reportingTool "pytest-json")}}
+    --json-report
+    --json-report-file=reports/report.json
+{{/if}}
+
+# Test paths
+{{#if (eq testingPattern "bdd")}}
+testpaths = features
+{{else}}
+testpaths = tests
+{{/if}}
+
+# Logging
+log_cli = true
+log_cli_level = INFO
+log_file = logs/test.log
+log_file_level = DEBUG
+
+# Parallel execution
+# Run with: pytest -n auto

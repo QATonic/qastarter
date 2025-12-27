@@ -1,0 +1,86 @@
+const settings = require('../../config/settings');
+
+class BasePage {
+  constructor(driver) {
+    this.driver = driver;
+    this.settings = settings;
+  }
+
+  async findElement(locator) {
+    return await this.driver.$(locator);
+  }
+
+  async findElements(locator) {
+    return await this.driver.$$(locator);
+  }
+
+  async click(locator) {
+    const element = await this.findElement(locator);
+    await element.waitForDisplayed({ timeout: this.settings.explicitWait });
+    await element.click();
+  }
+
+  async sendKeys(locator, text) {
+    const element = await this.findElement(locator);
+    await element.clearValue();
+    await element.setValue(text);
+  }
+
+  async getText(locator) {
+    const element = await this.findElement(locator);
+    return await element.getText();
+  }
+
+  async isDisplayed(locator, timeout = null) {
+    try {
+      const element = await this.findElement(locator);
+      await element.waitForDisplayed({ 
+        timeout: timeout || this.settings.explicitWait 
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async isEnabled(locator) {
+    const element = await this.findElement(locator);
+    return await element.isEnabled();
+  }
+
+  async waitForElement(locator, timeout = null) {
+    const element = await this.findElement(locator);
+    await element.waitForDisplayed({ 
+      timeout: timeout || this.settings.explicitWait 
+    });
+    return element;
+  }
+
+  async waitForElementToDisappear(locator, timeout = null) {
+    const element = await this.findElement(locator);
+    await element.waitForDisplayed({ 
+      timeout: timeout || this.settings.explicitWait,
+      reverse: true
+    });
+  }
+
+  async scrollToElement(locator) {
+    const element = await this.findElement(locator);
+    await element.scrollIntoView();
+  }
+
+  async getAttribute(locator, attribute) {
+    const element = await this.findElement(locator);
+    return await element.getAttribute(attribute);
+  }
+
+  async hideKeyboard() {
+    try {
+      await this.driver.hideKeyboard();
+    } catch (error) {
+      // Keyboard not shown or already hidden
+    }
+  }
+}
+
+module.exports = BasePage;

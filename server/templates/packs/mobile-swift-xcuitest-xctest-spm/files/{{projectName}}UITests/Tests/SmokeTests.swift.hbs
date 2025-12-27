@@ -1,0 +1,96 @@
+import XCTest
+
+/**
+ * Smoke tests for critical application functionality.
+ * These tests should be run first to verify basic app health.
+ */
+final class SmokeTests: XCTestCase {
+    
+    var app: XCUIApplication!
+    var loginScreen: LoginScreen!
+    var homeScreen: HomeScreen!
+    
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        
+        app = XCUIApplication()
+        app.launch()
+        
+        loginScreen = LoginScreen(app: app)
+        homeScreen = HomeScreen(app: app)
+        
+        Logger.info("Smoke tests setup complete")
+    }
+    
+    override func tearDownWithError() throws {
+        if let failureCount = testRun?.failureCount, failureCount > 0 {
+            takeScreenshotOnFailure()
+        }
+        
+        app.terminate()
+        app = nil
+    }
+    
+    // MARK: - Smoke Tests
+    
+    /// Verify app launches successfully
+    func testAppLaunches() throws {
+        Logger.testStart("testAppLaunches")
+        
+        // App should launch and display initial screen
+        XCTAssertTrue(loginScreen.isLoaded(), "App should launch and display login screen")
+        
+        Logger.testEnd("testAppLaunches", passed: true)
+    }
+    
+    /// Verify basic login flow works
+    func testBasicLoginFlow() throws {
+        Logger.testStart("testBasicLoginFlow")
+        
+        // Given: Valid credentials
+        let credentials = TestData.Users.validUser
+        
+        // When: User logs in
+        let home = loginScreen.login(username: credentials.username, password: credentials.password)
+        
+        // Then: Home screen is displayed
+        XCTAssertTrue(home.isLoaded(), "Should navigate to home screen after login")
+        
+        Logger.testEnd("testBasicLoginFlow", passed: true)
+    }
+    
+    /// Verify logout flow works
+    func testBasicLogoutFlow() throws {
+        Logger.testStart("testBasicLogoutFlow")
+        
+        // Given: User is logged in
+        let credentials = TestData.Users.validUser
+        let home = loginScreen.login(username: credentials.username, password: credentials.password)
+        
+        // When: User logs out
+        let login = home.logout()
+        
+        // Then: Login screen is displayed
+        XCTAssertTrue(login.isLoaded(), "Should return to login screen after logout")
+        
+        Logger.testEnd("testBasicLogoutFlow", passed: true)
+    }
+    
+    /// Verify app handles background/foreground transitions
+    func testAppBackgroundForeground() throws {
+        Logger.testStart("testAppBackgroundForeground")
+        
+        // Given: App is in foreground
+        XCTAssertEqual(app.state, .runningForeground)
+        
+        // When: App goes to background and returns
+        XCUIDevice.shared.press(.home)
+        Thread.sleep(forTimeInterval: 1)
+        app.activate()
+        
+        // Then: App should be in foreground
+        XCTAssertTrue(WaitHelpers.waitForAppForeground(app), "App should return to foreground")
+        
+        Logger.testEnd("testAppBackgroundForeground", passed: true)
+    }
+}

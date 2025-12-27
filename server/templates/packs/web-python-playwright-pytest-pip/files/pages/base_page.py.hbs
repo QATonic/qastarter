@@ -1,0 +1,42 @@
+from playwright.sync_api import Page
+from utils.logger import logger
+
+class BasePage:
+    def __init__(self, page: Page):
+        self.page = page
+
+    def navigate(self, url: str) -> None:
+        logger.info(f"Navigating to: {url}")
+        self.page.goto(url, wait_until='domcontentloaded')
+
+    def click(self, selector: str) -> None:
+        logger.info(f"Clicking element: {selector}")
+        self.page.click(selector)
+
+    def type(self, selector: str, text: str) -> None:
+        logger.info(f"Typing '{text}' into element: {selector}")
+        self.page.fill(selector, text)
+
+    def get_text(self, selector: str) -> str:
+        text = self.page.text_content(selector) or ''
+        logger.info(f"Getting text from element: {selector} = '{text}'")
+        return text
+
+    def is_visible(self, selector: str) -> bool:
+        visible = self.page.is_visible(selector)
+        logger.info(f"Checking visibility of element: {selector} = {visible}")
+        return visible
+
+    def wait_for_selector(self, selector: str, timeout: int = 30000) -> None:
+        logger.info(f"Waiting for selector: {selector}")
+        self.page.wait_for_selector(selector, timeout=timeout)
+
+    def get_page_title(self) -> str:
+        title = self.page.title()
+        logger.info(f"Page title: {title}")
+        return title
+
+    def get_current_url(self) -> str:
+        url = self.page.url
+        logger.info(f"Current URL: {url}")
+        return url

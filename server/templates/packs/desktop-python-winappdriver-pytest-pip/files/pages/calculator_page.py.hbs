@@ -1,0 +1,108 @@
+from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
+
+class CalculatorPage(BasePage):
+    # Locators
+    NUMBER_ONE = (By.NAME, "One")
+    NUMBER_TWO = (By.NAME, "Two")
+    NUMBER_THREE = (By.NAME, "Three")
+    NUMBER_FOUR = (By.NAME, "Four")
+    NUMBER_FIVE = (By.NAME, "Five")
+    NUMBER_SIX = (By.NAME, "Six")
+    NUMBER_SEVEN = (By.NAME, "Seven")
+    NUMBER_EIGHT = (By.NAME, "Eight")
+    NUMBER_NINE = (By.NAME, "Nine")
+    NUMBER_ZERO = (By.NAME, "Zero")
+    
+    PLUS_BUTTON = (By.NAME, "Plus")
+    MINUS_BUTTON = (By.NAME, "Minus")
+    MULTIPLY_BUTTON = (By.NAME, "Multiply by")
+    DIVIDE_BUTTON = (By.NAME, "Divide by")
+    EQUALS_BUTTON = (By.NAME, "Equals")
+    CLEAR_BUTTON = (By.NAME, "Clear")
+    
+    RESULTS_DISPLAY = (By.XPATH, "//Text[@AutomationId='CalculatorResults']")
+    
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.number_buttons = {
+            0: self.NUMBER_ZERO,
+            1: self.NUMBER_ONE,
+            2: self.NUMBER_TWO,
+            3: self.NUMBER_THREE,
+            4: self.NUMBER_FOUR,
+            5: self.NUMBER_FIVE,
+            6: self.NUMBER_SIX,
+            7: self.NUMBER_SEVEN,
+            8: self.NUMBER_EIGHT,
+            9: self.NUMBER_NINE
+        }
+    
+    def click_number(self, number: int):
+        if number not in self.number_buttons:
+            raise ValueError(f"Invalid number: {number}")
+        button = self.find_element(self.number_buttons[number])
+        self.click(button, f"Number {number}")
+        return self
+    
+    def click_plus(self):
+        self.click(self.find_element(self.PLUS_BUTTON), "Plus")
+        return self
+    
+    def click_minus(self):
+        self.click(self.find_element(self.MINUS_BUTTON), "Minus")
+        return self
+    
+    def click_multiply(self):
+        self.click(self.find_element(self.MULTIPLY_BUTTON), "Multiply")
+        return self
+    
+    def click_divide(self):
+        self.click(self.find_element(self.DIVIDE_BUTTON), "Divide")
+        return self
+    
+    def click_equals(self):
+        self.click(self.find_element(self.EQUALS_BUTTON), "Equals")
+        return self
+    
+    def click_clear(self):
+        self.click(self.find_element(self.CLEAR_BUTTON), "Clear")
+        return self
+    
+    def get_result(self) -> str:
+        result_element = self.find_element(self.RESULTS_DISPLAY)
+        result_text = self.get_attribute(result_element, "Name", "Results Display")
+        # Extract number from "Display is <number>"
+        return result_text.replace("Display is", "").strip()
+    
+    def enter_number(self, number: int):
+        for digit in str(number):
+            self.click_number(int(digit))
+    
+    def add(self, num1: int, num2: int):
+        self.enter_number(num1)
+        self.click_plus()
+        self.enter_number(num2)
+        self.click_equals()
+        return self
+    
+    def subtract(self, num1: int, num2: int):
+        self.enter_number(num1)
+        self.click_minus()
+        self.enter_number(num2)
+        self.click_equals()
+        return self
+    
+    def multiply(self, num1: int, num2: int):
+        self.enter_number(num1)
+        self.click_multiply()
+        self.enter_number(num2)
+        self.click_equals()
+        return self
+    
+    def divide(self, num1: int, num2: int):
+        self.enter_number(num1)
+        self.click_divide()
+        self.enter_number(num2)
+        self.click_equals()
+        return self

@@ -1,0 +1,117 @@
+# {{projectName}}
+
+Playwright test automation framework with C#, NUnit, and NuGet.
+
+## Features
+
+- **Playwright {{toolVersions.playwright}}**: Modern browser automation with multi-browser support
+- **.NET {{toolVersions.dotnet}}**: Latest LTS version with modern C# features
+- **NUnit {{toolVersions.nunit}}**: Popular testing framework with extensive features
+- **NuGet**: Package management and dependency resolution
+- **Page Object Model**: Maintainable test structure
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+- **Async/Await**: Modern asynchronous programming patterns
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{/if}}
+
+## Prerequisites
+
+- .NET 8.0 SDK or later
+
+## Installation
+
+```bash
+# Restore dependencies
+dotnet restore
+
+# Build project
+dotnet build
+
+# Install Playwright browsers
+pwsh bin/Debug/net8.0/playwright.ps1 install
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run tests with specific environment
+TEST_ENV=qa dotnet test
+
+# Run tests in headed mode
+HEADLESS=false dotnet test
+
+# Run tests with specific browser
+BROWSER=firefox dotnet test
+
+# Run tests with filter
+dotnet test --filter "TestCategory=Smoke"
+```
+
+## Environment Configuration
+
+Update test data in:
+- `Data/dev.json` - Development environment
+- `Data/qa.json` - QA environment
+
+Set environment with `TEST_ENV=qa`
+
+## Page Objects
+
+All page objects extend `BasePage` and are located in `Pages/`:
+- `LoginPage.cs` - Login page interactions
+- `HomePage.cs` - Home page interactions
+
+## Test Structure
+
+```
+Tests/
+  ├── BaseTest.cs      # Base test class with setup/teardown
+  ├── LoginTests.cs    # Login functionality tests
+  └── SmokeTests.cs    # Smoke tests
+```
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR to main or develop branches with matrix strategy for multiple browsers.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Utilities
+
+- **ScreenshotHelper**: Auto-capture on failure (`Utils/ScreenshotHelper.cs`)
+- **WaitHelpers**: Custom wait utilities (`Utils/WaitHelpers.cs`)
+- **DataReader**: Test data utilities (`Utils/DataReader.cs`)

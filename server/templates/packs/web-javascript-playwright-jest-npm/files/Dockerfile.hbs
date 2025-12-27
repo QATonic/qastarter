@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/playwright:v1.38.0-focal
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+RUN mkdir -p test-results logs screenshots playwright-report trace
+
+ENV HEADLESS=true
+ENV TEST_ENV=qa
+
+CMD ["npm", "test"]

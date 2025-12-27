@@ -1,0 +1,142 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium.Windows;
+
+namespace {{projectName}}.Pages;
+
+public class CalculatorPage : BasePage
+{
+    public CalculatorPage(WindowsDriver<WindowsElement> driver) : base(driver) { }
+
+    // Locators
+    private By NumberOneButton => By.Name("One");
+    private By NumberTwoButton => By.Name("Two");
+    private By NumberThreeButton => By.Name("Three");
+    private By NumberFourButton => By.Name("Four");
+    private By NumberFiveButton => By.Name("Five");
+    private By NumberSixButton => By.Name("Six");
+    private By NumberSevenButton => By.Name("Seven");
+    private By NumberEightButton => By.Name("Eight");
+    private By NumberNineButton => By.Name("Nine");
+    private By NumberZeroButton => By.Name("Zero");
+    
+    private By PlusButton => By.Name("Plus");
+    private By MinusButton => By.Name("Minus");
+    private By MultiplyButton => By.Name("Multiply by");
+    private By DivideButton => By.Name("Divide by");
+    private By EqualsButton => By.Name("Equals");
+    private By ClearButton => By.Name("Clear");
+    
+    private By ResultsDisplay => By.XPath("//Text[@AutomationId='CalculatorResults']");
+
+    // Actions
+    public CalculatorPage ClickNumber(int number)
+    {
+        var buttonLocator = number switch
+        {
+            0 => NumberZeroButton,
+            1 => NumberOneButton,
+            2 => NumberTwoButton,
+            3 => NumberThreeButton,
+            4 => NumberFourButton,
+            5 => NumberFiveButton,
+            6 => NumberSixButton,
+            7 => NumberSevenButton,
+            8 => NumberEightButton,
+            9 => NumberNineButton,
+            _ => throw new ArgumentException($"Invalid number: {number}")
+        };
+
+        Click(FindElement(buttonLocator), $"Number {number}");
+        return this;
+    }
+
+    public CalculatorPage ClickPlus()
+    {
+        Click(FindElement(PlusButton), "Plus");
+        return this;
+    }
+
+    public CalculatorPage ClickMinus()
+    {
+        Click(FindElement(MinusButton), "Minus");
+        return this;
+    }
+
+    public CalculatorPage ClickMultiply()
+    {
+        Click(FindElement(MultiplyButton), "Multiply");
+        return this;
+    }
+
+    public CalculatorPage ClickDivide()
+    {
+        Click(FindElement(DivideButton), "Divide");
+        return this;
+    }
+
+    public CalculatorPage ClickEquals()
+    {
+        Click(FindElement(EqualsButton), "Equals");
+        return this;
+    }
+
+    public CalculatorPage ClickClear()
+    {
+        Click(FindElement(ClearButton), "Clear");
+        return this;
+    }
+
+    public string GetResult()
+    {
+        var resultElement = FindElement(ResultsDisplay);
+        var resultText = GetAttribute(resultElement, "Name", "Results Display");
+        
+        // Extract number from "Display is <number>"
+        return resultText.Replace("Display is", "").Trim();
+    }
+
+    // Complex operations
+    public CalculatorPage Add(int num1, int num2)
+    {
+        EnterNumber(num1);
+        ClickPlus();
+        EnterNumber(num2);
+        ClickEquals();
+        return this;
+    }
+
+    public CalculatorPage Subtract(int num1, int num2)
+    {
+        EnterNumber(num1);
+        ClickMinus();
+        EnterNumber(num2);
+        ClickEquals();
+        return this;
+    }
+
+    public CalculatorPage Multiply(int num1, int num2)
+    {
+        EnterNumber(num1);
+        ClickMultiply();
+        EnterNumber(num2);
+        ClickEquals();
+        return this;
+    }
+
+    public CalculatorPage Divide(int num1, int num2)
+    {
+        EnterNumber(num1);
+        ClickDivide();
+        EnterNumber(num2);
+        ClickEquals();
+        return this;
+    }
+
+    private void EnterNumber(int number)
+    {
+        foreach (var digit in number.ToString())
+        {
+            ClickNumber(int.Parse(digit.ToString()));
+        }
+    }
+}

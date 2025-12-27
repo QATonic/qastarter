@@ -1,0 +1,113 @@
+package {{packageName}}.screens;
+
+import {{packageName}}.utils.Log;
+
+/**
+ * Login Screen Page Object.
+ * 
+ * ========== IMPORTANT: UPDATE THESE VALUES ==========
+ * Replace the R.id references below with your actual view IDs.
+ * These are placeholder values that need to match your app's layout.
+ * =====================================================
+ */
+public class LoginScreen extends BaseScreen {
+
+    // ========== UPDATE THESE VIEW IDs ==========
+    // Replace with your actual resource IDs from R.id
+    // Example: private static final int USERNAME_FIELD = R.id.editTextUsername;
+    
+    // Placeholder IDs - REPLACE WITH YOUR ACTUAL IDs
+    private static final int USERNAME_FIELD = 0; // R.id.your_username_field
+    private static final int PASSWORD_FIELD = 0; // R.id.your_password_field
+    private static final int LOGIN_BUTTON = 0;   // R.id.your_login_button
+    private static final int ERROR_MESSAGE = 0;  // R.id.your_error_message
+    private static final int FORGOT_PASSWORD_LINK = 0; // R.id.your_forgot_password
+    // ============================================
+
+    /**
+     * Enter username
+     */
+    public LoginScreen enterUsername(String username) {
+        Log.step("Entering username: " + username);
+        typeTextById(USERNAME_FIELD, username);
+        return this;
+    }
+
+    /**
+     * Enter password
+     */
+    public LoginScreen enterPassword(String password) {
+        Log.step("Entering password: ****");
+        typeTextById(PASSWORD_FIELD, password);
+        return this;
+    }
+
+    /**
+     * Click login button
+     */
+    public void clickLogin() {
+        Log.step("Clicking login button");
+        clickById(LOGIN_BUTTON);
+    }
+
+    /**
+     * Perform complete login
+     */
+    public void login(String username, String password) {
+        Log.startSection("Performing login");
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
+        Log.endSection();
+    }
+
+    /**
+     * Click forgot password link
+     */
+    public void clickForgotPassword() {
+        Log.step("Clicking forgot password link");
+        clickById(FORGOT_PASSWORD_LINK);
+    }
+
+    /**
+     * Get error message text
+     */
+    public String getErrorMessage() {
+        return getTextById(ERROR_MESSAGE);
+    }
+
+    /**
+     * Verify error message is displayed
+     */
+    public LoginScreen verifyErrorDisplayed() {
+        verifyDisplayedById(ERROR_MESSAGE);
+        return this;
+    }
+
+    /**
+     * Verify error message text
+     */
+    public LoginScreen verifyErrorMessage(String expectedMessage) {
+        verifyTextById(ERROR_MESSAGE, expectedMessage);
+        return this;
+    }
+
+    /**
+     * Clear login form
+     */
+    public LoginScreen clearForm() {
+        clearTextById(USERNAME_FIELD);
+        clearTextById(PASSWORD_FIELD);
+        return this;
+    }
+
+    /**
+     * Check if login screen is loaded
+     */
+    @Override
+    public boolean isLoaded() {
+        return isDisplayedById(USERNAME_FIELD) && 
+               isDisplayedById(PASSWORD_FIELD) && 
+               isDisplayedById(LOGIN_BUTTON);
+    }
+}

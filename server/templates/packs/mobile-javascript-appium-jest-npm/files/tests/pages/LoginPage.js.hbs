@@ -1,0 +1,46 @@
+const BasePage = require('./BasePage');
+
+class LoginPage extends BasePage {
+  constructor(driver) {
+    super(driver);
+    
+    // Locators - Update these based on your app
+    this.usernameInput = 'id=com.example.app:id/username';
+    this.passwordInput = 'id=com.example.app:id/password';
+    this.loginButton = 'id=com.example.app:id/loginButton';
+    this.errorMessage = 'id=com.example.app:id/errorMessage';
+  }
+
+  async enterUsername(username) {
+    await this.sendKeys(this.usernameInput, username);
+  }
+
+  async enterPassword(password) {
+    await this.sendKeys(this.passwordInput, password);
+  }
+
+  async clickLoginButton() {
+    await this.click(this.loginButton);
+    await this.hideKeyboard();
+  }
+
+  async login(username, password) {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLoginButton();
+  }
+
+  async getErrorMessage() {
+    return await this.getText(this.errorMessage);
+  }
+
+  async isErrorDisplayed() {
+    return await this.isDisplayed(this.errorMessage, 5000);
+  }
+
+  async isLoginButtonEnabled() {
+    return await this.isEnabled(this.loginButton);
+  }
+}
+
+module.exports = LoginPage;

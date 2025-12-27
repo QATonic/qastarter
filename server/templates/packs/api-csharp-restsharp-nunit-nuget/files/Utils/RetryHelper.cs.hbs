@@ -1,0 +1,156 @@
+using System;
+using RestSharp;
+
+namespace {{projectName}}.Utils
+{
+    /// <summary>
+    /// Helper class for implementing retry logic on API requests
+    /// </summary>
+    public static class RetryHelper
+    {
+        private static readonly Logger _logger = new Logger();
+
+        /// <summary>
+        /// Execute an API request with retry logic
+        /// </summary>
+        /// <param name="action">The action to execute</param>
+        /// <param name="maxRetries">Maximum number of retry attempts</param>
+        /// <param name="delayMs">Delay between retries in milliseconds</param>
+        /// <returns>RestResponse from the successful request</returns>
+        public static RestResponse ExecuteWithRetry(
+            Func<RestResponse> action,
+            int maxRetries = 3,
+            int delayMs = 1000)
+        {
+            Exception lastException = null;
+            RestResponse lastResponse = null;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    lastResponse = action();
+
+                    // Check if response is successful (2xx status codes)
+                    if (lastResponse.IsSuccessful)
+                    {
+                        if (attempt > 1)
+                        {
+                            _logger.Info($"Request succeeded on attempt {attempt}");
+                        }
+                        return lastResponse;
+                    }
+
+                    // Retry on server errors (5xx) or rate limiting (429)
+                    if ((int)lastResponse.StatusCode >= 500 || (int)lastResponse.StatusCode == 429)
+                    {
+                        _logger.Warning($"Attempt {attempt}/{maxRetries} failed with status {lastResponse.StatusCode}. Retrying...");
+                        
+                        if (attempt < maxRetries)
+                        {
+                            System.Threading.Thread.Sleep(delayMs * attempt); // Exponential backoff
+                        }
+                        continue;
+                    }
+
+                    // Don't retry client errors (4xx except 429)
+                    return lastResponse;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    _logger.Error($"Attempt {attempt}/{maxRetries} threw exception: {ex.Message}");
+
+                    if (attempt < maxRetries)
+                    {
+                        System.Threading.Thread.Sleep(delayMs * attempt);
+                    }
+                }
+            }
+
+            if (lastException != null)
+            {
+                throw new Exception($"Request failed after {maxRetries} attempts", lastException);
+            }
+
+            return lastResponse;
+        }
+
+        /// <summary>
+        /// Execute an async API request with retry logic
+        /// </summary>
+        public static async Task<RestResponse> ExecuteWithRetryAsync(
+            Func<Task<RestResponse>> action,
+            int maxRetries = 3,
+            int delayMs = 1000)
+        {
+            Exception lastException = null;
+            RestResponse lastResponse = null;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    lastResponse = await action();
+
+                    if (lastResponse.IsSuccessful)
+                    {
+                        return lastResponse;
+                    }
+
+                    if ((int)lastResponse.StatusCode >= 500 || (int)lastResponse.StatusCode == 429)
+                    {
+                        _logger.Warning($"Attempt {attempt}/{maxRetries} failed. Retrying...");
+                        
+                        if (attempt < maxRetries)
+                        {
+                            await Task.Delay(delayMs * attempt);
+                        }
+                        continue;
+                    }
+
+                    return lastResponse;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    _logger.Error($"Attempt {attempt}/{maxRetries} threw exception: {ex.Message}");
+
+                    if (attempt < maxRetries)
+                    {
+                        await Task.Delay(delayMs * attempt);
+                    }
+                }
+            }
+
+            if (lastException != null)
+            {
+                throw new Exception($"Request failed after {maxRetries} attempts", lastException);
+            }
+
+            return lastResponse;
+        }
+
+        /// <summary>
+        /// Wait for a condition to be true with retry
+        /// </summary>
+        public static bool WaitForCondition(
+            Func<bool> condition,
+            int timeoutSeconds = 30,
+            int pollIntervalMs = 500)
+        {
+            var endTime = DateTime.Now.AddSeconds(timeoutSeconds);
+
+            while (DateTime.Now < endTime)
+            {
+                if (condition())
+                {
+                    return true;
+                }
+                System.Threading.Thread.Sleep(pollIntervalMs);
+            }
+
+            return false;
+        }
+    }
+}

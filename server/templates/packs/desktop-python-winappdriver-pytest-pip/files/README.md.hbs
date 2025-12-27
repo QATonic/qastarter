@@ -1,0 +1,285 @@
+# {{projectName}}
+
+Windows desktop application automation framework with Python, WinAppDriver, and Pytest.
+
+## Features
+
+- **Python {{toolVersions.python}}**: Modern Python with type hints
+- **WinAppDriver**: Microsoft's UI automation framework for Windows apps
+- **Pytest {{toolVersions.pytest}}**: Powerful testing framework
+- **Page Object Model**: Clean separation of test logic and UI
+- **Automatic Screenshots**: Capture on test failure
+- **Logging**: Comprehensive logging with file and console output
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Workflow for Windows runners
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+
+## Prerequisites
+
+### 1. WinAppDriver Installation
+
+Download and install WinAppDriver:
+- Download from: https://github.com/microsoft/WinAppDriver/releases
+- Install the MSI package
+- WinAppDriver.exe will be installed to: `C:\Program Files (x86)\Windows Application Driver\`
+
+### 2. Enable Developer Mode (Windows 10/11)
+
+1. Open Settings → Update & Security → For Developers
+2. Enable "Developer Mode"
+
+## Installation
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+## Running Tests
+
+### Start WinAppDriver
+
+Before running tests, start WinAppDriver:
+
+```bash
+# Start WinAppDriver on default port (4723)
+"C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe"
+```
+
+### Run Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/test_calculator.py
+
+# Run specific test
+pytest tests/test_calculator.py::TestCalculator::test_addition
+
+# Run smoke tests only
+pytest -m smoke
+
+# Run tests in parallel
+pytest -n 2
+```
+
+## Project Structure
+
+```
+.
+├── config/
+│   ├── settings.py              # Configuration management
+│   └── winappdriver_config.py   # WinAppDriver options
+├── core/
+│   ├── driver_factory.py        # Driver session management
+│   ├── element_actions.py       # Common element actions
+│   └── wait_helpers.py          # Wait utilities
+├── pages/
+│   ├── base_page.py             # Base page object class
+│   ├── calculator_page.py       # Calculator app page object
+│   └── notepad_page.py          # Notepad app page object
+├── tests/
+│   ├── conftest.py              # Pytest fixtures
+│   ├── test_calculator.py       # Calculator automation tests
+│   └── test_notepad.py          # Notepad automation tests
+├── utils/
+│   ├── logger.py                # Logging configuration
+│   └── screenshot_helper.py     # Screenshot utilities
+├── pytest.ini                   # Pytest configuration
+└── requirements.txt             # Dependencies
+```
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file:
+
+```bash
+# WinAppDriver URL
+WINAPPDRIVER_URL=http://127.0.0.1:4723
+
+# Timeouts (in seconds)
+IMPLICIT_WAIT=10
+EXPLICIT_WAIT=30
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=logs/test-run.log
+
+# Screenshots
+SCREENSHOT_PATH=screenshots
+SCREENSHOT_ON_FAILURE=true
+```
+
+## Writing Tests
+
+### Basic Test Example
+
+```python
+import pytest
+from pages.calculator_page import CalculatorPage
+
+@pytest.mark.smoke
+class TestCalculator:
+    def test_addition(self, calculator_driver):
+        calculator = CalculatorPage(calculator_driver)
+        calculator.add(5, 3)
+        
+        result = calculator.get_result()
+        assert "8" in result
+```
+
+### Page Object Pattern
+
+```python
+from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
+
+class CalculatorPage(BasePage):
+    NUMBER_ONE = (By.NAME, "One")
+    PLUS_BUTTON = (By.NAME, "Plus")
+    
+    def click_number(self, number: int):
+        button = self.find_element(self.NUMBER_ONE)
+        self.click(button, "Number 1")
+        return self
+```
+
+### Parametrized Tests
+
+```python
+@pytest.mark.parametrize("num1,num2,expected", [
+    (1, 1, "2"),
+    (5, 5, "10"),
+    (10, 20, "30")
+])
+def test_addition(self, calculator_driver, num1, num2, expected):
+    calculator = CalculatorPage(calculator_driver)
+    calculator.add(num1, num2)
+    assert expected in calculator.get_result()
+```
+
+## Automating Custom Applications
+
+To automate your own Windows application:
+
+1. **Get Application ID or Path**:
+   ```python
+   # For Microsoft Store apps
+   app_id = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App"
+   
+   # For traditional desktop apps
+   app_path = r"C:\Path\To\Your\Application.exe"
+   ```
+
+2. **Create Options**:
+   ```python
+   from appium.options.windows import WindowsOptions
+   
+   options = WindowsOptions()
+   options.app = app_path
+   options.platform_name = "Windows"
+   options.device_name = "WindowsPC"
+   ```
+
+3. **Inspect UI Elements**:
+   Use tools like:
+   - Inspect.exe (Windows SDK)
+   - Accessibility Insights
+   - WinAppDriver UI Recorder
+
+## Finding Element Locators
+
+Common locator strategies:
+```python
+from selenium.webdriver.common.by import By
+
+# By Name
+(By.NAME, "Button Name")
+
+# By Automation ID
+(By.XPATH, "//Button[@AutomationId='btnSubmit']")
+
+# By Class Name
+(By.CLASS_NAME, "Button")
+
+# By XPath
+(By.XPATH, "//Edit[@Name='Search']")
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+The GitHub Actions workflow:
+- Runs on Windows runners
+- Installs WinAppDriver automatically
+- Starts WinAppDriver service
+- Runs tests
+- Uploads screenshots and logs
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Troubleshooting
+
+### WinAppDriver Connection Issues
+- Ensure WinAppDriver is running on port 4723
+- Check Windows Firewall settings
+- Verify Developer Mode is enabled
+
+### Element Not Found
+- Use Inspect.exe to verify element properties
+- Check if app is fully loaded before interacting
+- Increase wait timeouts if needed
+
+### Session Creation Failed
+- Verify application path or ID is correct
+- Ensure application can be launched manually
+- Check WinAppDriver logs for errors
+
+## Test Markers
+
+- `@pytest.mark.smoke` - Critical path tests
+- `@pytest.mark.regression` - Full regression suite
+
+Run specific markers:
+```bash
+pytest -m smoke
+```
+
+## Reports
+
+- **HTML Report**: `reports/test-report.html`
+- **Screenshots**: `screenshots/`
+- **Logs**: `logs/pytest.log`

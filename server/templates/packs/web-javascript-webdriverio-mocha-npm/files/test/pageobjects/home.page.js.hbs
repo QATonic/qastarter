@@ -1,0 +1,94 @@
+import BasePage from './base.page.js';
+
+/**
+ * Home Page Object
+ * 
+ * ========== IMPORTANT: UPDATE THESE VALUES ==========
+ * Replace the selectors below with your actual selectors.
+ * These are placeholder values that need to match your application.
+ * =====================================================
+ */
+class HomePage extends BasePage {
+  
+  // ========== UPDATE THESE SELECTORS ==========
+  get welcomeMessage() { return $('[data-testid="welcome-message"]'); }
+  get userProfile() { return $('[data-testid="user-profile"]'); }
+  get menuButton() { return $('[data-testid="menu-button"]'); }
+  get logoutButton() { return $('[data-testid="logout-button"]'); }
+  get settingsButton() { return $('[data-testid="settings-button"]'); }
+  get navigationBar() { return $('[data-testid="navigation-bar"]'); }
+  // =============================================
+  
+  /**
+   * Open home page
+   */
+  async open() {
+    return super.open('/home');
+  }
+  
+  /**
+   * Get welcome message text
+   */
+  async getWelcomeText() {
+    await this.waitForDisplayed(this.welcomeMessage);
+    return await this.getText(this.welcomeMessage);
+  }
+  
+  /**
+   * Click user profile
+   */
+  async clickUserProfile() {
+    await this.clickElement(this.userProfile);
+  }
+  
+  /**
+   * Click menu button
+   */
+  async clickMenu() {
+    await this.clickElement(this.menuButton);
+  }
+  
+  /**
+   * Click logout button
+   */
+  async clickLogout() {
+    await this.clickElement(this.logoutButton);
+  }
+  
+  /**
+   * Click settings button
+   */
+  async clickSettings() {
+    await this.clickElement(this.settingsButton);
+  }
+  
+  /**
+   * Perform logout
+   */
+  async logout() {
+    await this.clickMenu();
+    await this.clickLogout();
+  }
+  
+  /**
+   * Verify home page is loaded
+   */
+  async isLoaded() {
+    try {
+      await this.welcomeMessage.waitForDisplayed({ timeout: 10000 });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+  
+  /**
+   * Verify welcome message
+   */
+  async verifyWelcomeMessage(expectedMessage) {
+    const actualMessage = await this.getWelcomeText();
+    expect(actualMessage).toContain(expectedMessage);
+  }
+}
+
+export default new HomePage();

@@ -1,0 +1,92 @@
+plugins {
+    id 'com.android.application' version '8.1.2'
+{{#if (eq reportingTool "allure")}}
+    id 'io.qameta.allure' version '2.11.2'
+{{/if}}
+}
+
+android {
+    namespace 'com.example.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.example.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        animationsDisabled true
+        unitTests.returnDefaultValues = true
+    }
+}
+
+dependencies {
+    // AndroidX
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    // Espresso for UI testing
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
+    androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.5.1'
+
+    // AndroidX Test
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+
+    // JUnit 5
+    androidTestImplementation 'de.mannodermaus.junit5:android-test-core:1.4.0'
+    androidTestRuntimeOnly 'de.mannodermaus.junit5:android-test-runner:1.4.0'
+
+    // Hamcrest matchers
+    androidTestImplementation 'org.hamcrest:hamcrest:2.2'
+{{#if (eq reportingTool "allure")}}
+
+    // Allure
+    androidTestImplementation 'io.qameta.allure:allure-java-commons:2.24.0'
+{{#if (eq testingPattern "bdd")}}
+    androidTestImplementation 'io.qameta.allure:allure-cucumber7-jvm:2.24.0'
+{{/if}}
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+
+    // ExtentReports
+    androidTestImplementation 'com.aventstack:extentreports:5.0.9'
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+
+    // Cucumber BDD
+    androidTestImplementation 'io.cucumber:cucumber-java:7.14.0'
+    androidTestImplementation 'io.cucumber:cucumber-android:7.14.0'
+{{/if}}
+}
+{{#if (eq reportingTool "allure")}}
+
+// Allure configuration
+allure {
+    version = '2.24.0'
+    autoconfigure = true
+}
+{{/if}}

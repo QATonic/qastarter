@@ -1,0 +1,53 @@
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from config.settings import Settings
+from utils.logger import Logger
+import time
+
+class WaitHelpers:
+    @staticmethod
+    def wait_for_element(driver, locator, timeout=None):
+        if timeout is None:
+            timeout = Settings.EXPLICIT_WAIT
+        
+        try:
+            Logger.info(f"Waiting for element: {locator}")
+            element = WebDriverWait(driver, timeout).until(
+                EC.presence_of_element_located(locator)
+            )
+            Logger.info(f"Element found: {locator}")
+            return element
+        except TimeoutException as e:
+            Logger.error(f"Timeout waiting for element: {locator}")
+            raise
+    
+    @staticmethod
+    def wait_for_element_clickable(driver, element, timeout=None):
+        if timeout is None:
+            timeout = Settings.EXPLICIT_WAIT
+        
+        try:
+            WebDriverWait(driver, timeout).until(
+                lambda d: element.is_enabled() and element.is_displayed()
+            )
+            return True
+        except TimeoutException:
+            return False
+    
+    @staticmethod
+    def wait_for_element_to_disappear(driver, locator, timeout=None):
+        if timeout is None:
+            timeout = Settings.EXPLICIT_WAIT
+        
+        try:
+            WebDriverWait(driver, timeout).until_not(
+                EC.presence_of_element_located(locator)
+            )
+            return True
+        except TimeoutException:
+            return False
+    
+    @staticmethod
+    def sleep(seconds):
+        time.sleep(seconds)

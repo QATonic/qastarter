@@ -1,0 +1,43 @@
+package com.example.app.pages;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+
+import androidx.test.espresso.ViewInteraction;
+
+/**
+ * Base Page Object class
+ * Provides common methods for all page objects
+ */
+public abstract class BasePage {
+
+    protected ViewInteraction findElement(int resourceId) {
+        return onView(withId(resourceId));
+    }
+
+    protected void clickElement(int resourceId) {
+        onView(withId(resourceId)).perform(click());
+    }
+
+    protected void enterText(int resourceId, String text) {
+        onView(withId(resourceId))
+            .perform(typeText(text), closeSoftKeyboard());
+    }
+
+    protected void verifyElementDisplayed(int resourceId) {
+        onView(withId(resourceId)).check(matches(isDisplayed()));
+    }
+
+    protected void waitFor(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}

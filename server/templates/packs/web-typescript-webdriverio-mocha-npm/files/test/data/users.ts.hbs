@@ -1,0 +1,18 @@
+/**
+ * Test data for user authentication
+ */
+
+export interface User {
+  username: string;
+  password: string;
+}
+
+export const validUser: User = {
+  username: 'tomsmith',
+  password: 'SuperSecretPassword!'
+};
+
+export const invalidUser: User = {
+  username: 'invaliduser',
+  password: 'wrongpassword'
+};

@@ -1,0 +1,118 @@
+package {{packageName}}.utils;
+
+import android.graphics.Bitmap;
+import android.os.Environment;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.runner.screenshot.Screenshot;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+/**
+ * Screenshot utility for capturing test evidence.
+ */
+public class ScreenshotUtils {
+
+    private static final String SCREENSHOT_DIR = "test-screenshots";
+    private static final SimpleDateFormat DATE_FORMAT = 
+            new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US);
+
+    /**
+     * Capture screenshot with auto-generated name
+     */
+    public static void captureScreenshot() {
+        String timestamp = DATE_FORMAT.format(new Date());
+        captureScreenshot("screenshot_" + timestamp);
+    }
+
+    /**
+     * Capture screenshot with custom name
+     */
+    public static void captureScreenshot(String name) {
+        try {
+            Log.info("Capturing screenshot: " + name);
+            
+            // Use AndroidX Screenshot API
+            Bitmap bitmap = Screenshot.capture().getBitmap();
+            
+            // Get screenshot directory
+            File screenshotDir = getScreenshotDirectory();
+            
+            // Create file with timestamp
+            String timestamp = DATE_FORMAT.format(new Date());
+            String fileName = name + "_" + timestamp + ".png";
+            File screenshotFile = new File(screenshotDir, fileName);
+            
+            // Save bitmap to file
+            saveBitmap(bitmap, screenshotFile);
+            
+            Log.info("Screenshot saved: " + screenshotFile.getAbsolutePath());
+            
+        } catch (Exception e) {
+            Log.error("Failed to capture screenshot: " + name, e);
+        }
+    }
+
+    /**
+     * Get screenshot directory
+     */
+    private static File getScreenshotDirectory() {
+        File dir;
+        
+        // Try external storage first
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            dir = new File(Environment.getExternalStorageDirectory(), SCREENSHOT_DIR);
+        } else {
+            // Fall back to app's internal storage
+            dir = new File(InstrumentationRegistry.getInstrumentation()
+                    .getTargetContext().getFilesDir(), SCREENSHOT_DIR);
+        }
+        
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        
+        return dir;
+    }
+
+    /**
+     * Save bitmap to file
+     */
+    private static void saveBitmap(Bitmap bitmap, File file) throws IOException {
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
+        }
+    }
+
+    /**
+     * Clear all screenshots
+     */
+    public static void clearScreenshots() {
+        File dir = getScreenshotDirectory();
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+            Log.info("Cleared all screenshots");
+        }
+    }
+}

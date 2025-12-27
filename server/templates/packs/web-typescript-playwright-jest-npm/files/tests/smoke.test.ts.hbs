@@ -1,0 +1,24 @@
+import LoginPage from '../pages/LoginPage';
+import envConfig from '../config/env.config';
+
+describe('Smoke Tests', () => {
+  let loginPage: LoginPage;
+
+  beforeEach(async () => {
+    loginPage = new LoginPage(page);
+  });
+
+  test('login page loads successfully', async () => {
+    await loginPage.navigateToLogin();
+    const title = await loginPage.getPageTitle();
+    expect(title).toBeTruthy();
+    expect(await loginPage.isUsernameVisible()).toBe(true);
+    expect(await loginPage.isPasswordVisible()).toBe(true);
+  });
+
+  test('base URL is accessible', async () => {
+    await page.goto(envConfig.getBaseUrl());
+    const url = page.url();
+    expect(url).toContain(envConfig.getBaseUrl());
+  });
+});

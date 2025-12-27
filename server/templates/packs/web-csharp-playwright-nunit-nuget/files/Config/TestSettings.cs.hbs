@@ -1,0 +1,24 @@
+namespace {{projectName}}.Config;
+
+public static class TestSettings
+{
+    public static bool Headless
+    {
+        get
+        {
+            var headlessEnv = Environment.GetEnvironmentVariable("HEADLESS");
+            if (headlessEnv == null) return true; // Default to headless
+            return headlessEnv.ToLower() == "true";
+        }
+    }
+    
+    public static string Browser => 
+        Environment.GetEnvironmentVariable("BROWSER")?.ToLower() ?? "chromium";
+    
+    public static int DefaultTimeout => 30000;
+    
+    public static bool ScreenshotOnFailure => true;
+    
+    public static int SlowMo => 
+        int.TryParse(Environment.GetEnvironmentVariable("SLOW_MO"), out var slowMo) ? slowMo : 0;
+}

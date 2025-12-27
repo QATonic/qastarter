@@ -1,0 +1,18 @@
+[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+markers =
+    smoke: Smoke tests for critical functionality
+    regression: Full regression test suite
+addopts =
+    -v
+    --tb=short
+    --strict-markers
+    --html=reports/test-report.html
+    --self-contained-html
+log_cli = true
+log_cli_level = INFO
+log_file = logs/pytest.log
+log_file_level = DEBUG

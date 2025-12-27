@@ -1,0 +1,32 @@
+const { until } = require('selenium-webdriver');
+
+class WaitHelpers {
+  constructor(driver, timeout = 10000) {
+    this.driver = driver;
+    this.timeout = timeout;
+  }
+
+  async waitForElementLocated(locator) {
+    return await this.driver.wait(until.elementLocated(locator), this.timeout);
+  }
+
+  async waitForElementVisible(locator) {
+    const element = await this.waitForElementLocated(locator);
+    return await this.driver.wait(until.elementIsVisible(element), this.timeout);
+  }
+
+  async waitForElementClickable(locator) {
+    const element = await this.waitForElementLocated(locator);
+    return await this.driver.wait(until.elementIsEnabled(element), this.timeout);
+  }
+
+  async waitForUrlContains(urlFragment) {
+    return await this.driver.wait(until.urlContains(urlFragment), this.timeout);
+  }
+
+  async waitForTitleContains(title) {
+    return await this.driver.wait(until.titleContains(title), this.timeout);
+  }
+}
+
+module.exports = WaitHelpers;

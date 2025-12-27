@@ -1,0 +1,227 @@
+using NUnit.Framework;
+using TechTalk.SpecFlow;
+using {{csharpNamespace}}.Pages;
+using {{csharpNamespace}}.Core;
+{{#if (eq reportingTool "allure")}}
+using Allure.Net.Commons;
+using {{csharpNamespace}}.Utils;
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+using {{csharpNamespace}}.Utils;
+{{/if}}
+
+namespace {{csharpNamespace}}.StepDefinitions
+{
+    [Binding]
+    public class LoginSteps
+    {
+        private readonly ScenarioContext _scenarioContext;
+        private LoginPage _loginPage;
+        private HomePage _homePage;
+
+        public LoginSteps(ScenarioContext scenarioContext)
+        {
+            _scenarioContext = scenarioContext;
+        }
+
+        private LoginPage LoginPage
+        {
+            get
+            {
+                if (_loginPage == null)
+                {
+                    _loginPage = new LoginPage(DriverManager.Driver);
+                }
+                return _loginPage;
+            }
+        }
+
+        private HomePage HomePage
+        {
+            get
+            {
+                if (_homePage == null)
+                {
+                    _homePage = new HomePage(DriverManager.Driver);
+                }
+                return _homePage;
+            }
+        }
+
+        [Given(@"I navigate to the login page")]
+        public void GivenINavigateToTheLoginPage()
+        {
+            Log.Info("Step: Navigate to login page");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                LoginPage.NavigateToLoginPage();
+                Assert.That(LoginPage.IsLoginPageDisplayed(), Is.True, "Login page should be displayed");
+            }, "Navigate to login page");
+{{else}}
+            LoginPage.NavigateToLoginPage();
+            Assert.That(LoginPage.IsLoginPageDisplayed(), Is.True, "Login page should be displayed");
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogStep("Navigate to login page");
+{{/if}}
+            Log.Info("Successfully navigated to login page");
+        }
+
+        [When(@"I enter username ""(.*)""")]
+        public void WhenIEnterUsername(string username)
+        {
+            Log.Info($"Step: Enter username: {username}");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                LoginPage.EnterUsername(username);
+            }, $"Enter username: {username}");
+{{else}}
+            LoginPage.EnterUsername(username);
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogStep($"Enter username: {username}");
+{{/if}}
+            Log.Info("Username entered successfully");
+        }
+
+        [When(@"I enter password ""(.*)""")]
+        public void WhenIEnterPassword(string password)
+        {
+            Log.Info("Step: Enter password");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                LoginPage.EnterPassword(password);
+            }, "Enter password");
+{{else}}
+            LoginPage.EnterPassword(password);
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogStep("Enter password");
+{{/if}}
+            Log.Info("Password entered successfully");
+        }
+
+        [When(@"I click the login button")]
+        public void WhenIClickTheLoginButton()
+        {
+            Log.Info("Step: Click login button");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                LoginPage.ClickLoginButton();
+            }, "Click login button");
+{{else}}
+            LoginPage.ClickLoginButton();
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogStep("Click login button");
+{{/if}}
+            Log.Info("Login button clicked");
+        }
+
+        [Then(@"I should be redirected to the home page")]
+        public void ThenIShouldBeRedirectedToTheHomePage()
+        {
+            Log.Info("Step: Verify redirect to home page");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                var isHomePageDisplayed = HomePage.IsHomePageDisplayed();
+                Assert.That(isHomePageDisplayed, Is.True, "User should be redirected to home page after successful login");
+            }, "Verify redirect to home page");
+{{else}}
+            var isHomePageDisplayed = HomePage.IsHomePageDisplayed();
+            Assert.That(isHomePageDisplayed, Is.True, "User should be redirected to home page after successful login");
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogAssertion("User redirected to home page");
+{{/if}}
+            Log.Info("Successfully redirected to home page");
+        }
+
+        [Then(@"I should see a welcome message")]
+        public void ThenIShouldSeeAWelcomeMessage()
+        {
+            Log.Info("Step: Verify welcome message");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                var welcomeMessage = HomePage.GetWelcomeMessage();
+                Assert.That(welcomeMessage, Is.Not.Null, "Welcome message should be displayed");
+                Assert.That(welcomeMessage, Does.Contain("Welcome"), "Welcome message should contain 'Welcome' text");
+            }, "Verify welcome message");
+{{else}}
+            var welcomeMessage = HomePage.GetWelcomeMessage();
+            Assert.That(welcomeMessage, Is.Not.Null, "Welcome message should be displayed");
+            Assert.That(welcomeMessage, Does.Contain("Welcome"), "Welcome message should contain 'Welcome' text");
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogAssertion($"Welcome message displayed: {HomePage.GetWelcomeMessage()}");
+{{/if}}
+            Log.Info($"Welcome message verified: {HomePage.GetWelcomeMessage()}");
+        }
+
+        [Then(@"I should see welcome message ""(.*)""")]
+        public void ThenIShouldSeeWelcomeMessage(string expectedMessage)
+        {
+            Log.Info($"Step: Verify welcome message: {expectedMessage}");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                var welcomeMessage = HomePage.GetWelcomeMessage();
+                Assert.That(welcomeMessage, Does.Contain(expectedMessage), $"Welcome message should contain: {expectedMessage}");
+            }, $"Verify welcome message: {expectedMessage}");
+{{else}}
+            var welcomeMessage = HomePage.GetWelcomeMessage();
+            Assert.That(welcomeMessage, Does.Contain(expectedMessage), $"Welcome message should contain: {expectedMessage}");
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogAssertion($"Welcome message verified: {expectedMessage}");
+{{/if}}
+            Log.Info($"Welcome message verified: {expectedMessage}");
+        }
+
+        [Then(@"I should see error message ""(.*)""")]
+        public void ThenIShouldSeeErrorMessage(string expectedError)
+        {
+            Log.Info($"Step: Verify error message: {expectedError}");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                var actualError = LoginPage.GetErrorMessage();
+                Assert.That(actualError, Is.Not.Null, "Error message should be displayed");
+                Assert.That(actualError, Does.Contain(expectedError), $"Error message should contain: {expectedError}");
+            }, $"Verify error message: {expectedError}");
+{{else}}
+            var actualError = LoginPage.GetErrorMessage();
+            Assert.That(actualError, Is.Not.Null, "Error message should be displayed");
+            Assert.That(actualError, Does.Contain(expectedError), $"Error message should contain: {expectedError}");
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogAssertion($"Error message displayed: {LoginPage.GetErrorMessage()}");
+{{/if}}
+            Log.Info($"Error message verified: {LoginPage.GetErrorMessage()}");
+        }
+
+        [Then(@"I should remain on the login page")]
+        public void ThenIShouldRemainOnTheLoginPage()
+        {
+            Log.Info("Step: Verify still on login page");
+{{#if (eq reportingTool "allure")}}
+            AllureLifecycle.Instance.WrapInStep(() =>
+            {
+                Assert.That(LoginPage.IsLoginPageDisplayed(), Is.True, "Should remain on login page");
+            }, "Verify still on login page");
+{{else}}
+            Assert.That(LoginPage.IsLoginPageDisplayed(), Is.True, "Should remain on login page");
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentReportManager.LogAssertion("User remained on login page");
+{{/if}}
+            Log.Info("User remained on login page");
+        }
+    }
+}

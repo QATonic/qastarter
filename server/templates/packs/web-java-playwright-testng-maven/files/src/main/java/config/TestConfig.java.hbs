@@ -1,0 +1,8 @@
+package config;
+
+public class TestConfig {
+    public static final int DEFAULT_TIMEOUT = 60000;
+    public static final boolean HEADLESS = Boolean.parseBoolean(System.getProperty("headless", "true"));
+    public static final boolean SCREENSHOT_ON_FAILURE = true;
+    public static final int SLOW_MO = Integer.parseInt(System.getProperty("slowMo", "0"));
+}

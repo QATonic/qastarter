@@ -1,0 +1,29 @@
+from appium.webdriver.common.appiumby import AppiumBy
+from tests.pages.base_page import BasePage
+
+class HomePage(BasePage):
+    """Home page object"""
+    
+    # Locators - Update these based on your app
+    WELCOME_MESSAGE = (AppiumBy.ID, "com.example.app:id/welcomeMessage")
+    USER_PROFILE = (AppiumBy.ID, "com.example.app:id/userProfile")
+    LOGOUT_BUTTON = (AppiumBy.ID, "com.example.app:id/logoutButton")
+    
+    def __init__(self, driver):
+        super().__init__(driver)
+    
+    def get_welcome_message(self):
+        """Get welcome message text"""
+        return self.get_text(self.WELCOME_MESSAGE)
+    
+    def is_home_page_displayed(self):
+        """Verify home page is displayed"""
+        return self.is_displayed(self.WELCOME_MESSAGE)
+    
+    def is_user_profile_displayed(self):
+        """Check if user profile is displayed"""
+        return self.is_displayed(self.USER_PROFILE)
+    
+    def click_logout(self):
+        """Click logout button"""
+        self.click(self.LOGOUT_BUTTON)

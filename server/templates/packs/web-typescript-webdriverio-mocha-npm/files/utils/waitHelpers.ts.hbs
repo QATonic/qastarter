@@ -1,0 +1,70 @@
+import Logger from './logger';
+
+/**
+ * Wait helper utilities for WebdriverIO.
+ */
+class WaitHelpers {
+  static readonly DEFAULT_TIMEOUT = 10000;
+  static readonly SHORT_TIMEOUT = 5000;
+  static readonly LONG_TIMEOUT = 30000;
+  
+  static async waitForDisplayed(element: WebdriverIO.Element, timeout = WaitHelpers.DEFAULT_TIMEOUT): Promise<void> {
+    Logger.debug('Waiting for element to be displayed');
+    await element.waitForDisplayed({ timeout });
+  }
+  
+  static async waitForExist(element: WebdriverIO.Element, timeout = WaitHelpers.DEFAULT_TIMEOUT): Promise<void> {
+    Logger.debug('Waiting for element to exist');
+    await element.waitForExist({ timeout });
+  }
+  
+  static async waitForClickable(element: WebdriverIO.Element, timeout = WaitHelpers.DEFAULT_TIMEOUT): Promise<void> {
+    Logger.debug('Waiting for element to be clickable');
+    await element.waitForClickable({ timeout });
+  }
+  
+  static async waitForNotDisplayed(element: WebdriverIO.Element, timeout = WaitHelpers.DEFAULT_TIMEOUT): Promise<void> {
+    Logger.debug('Waiting for element to disappear');
+    await element.waitForDisplayed({ timeout, reverse: true });
+  }
+  
+  static async waitForUrlContains(text: string, timeout = WaitHelpers.DEFAULT_TIMEOUT): Promise<void> {
+    Logger.debug(`Waiting for URL to contain: ${text}`);
+    await browser.waitUntil(
+      async () => (await browser.getUrl()).includes(text),
+      { timeout, timeoutMsg: `URL did not contain "${text}" within ${timeout}ms` }
+    );
+  }
+  
+  static async waitForTitleContains(text: string, timeout = WaitHelpers.DEFAULT_TIMEOUT): Promise<void> {
+    Logger.debug(`Waiting for title to contain: ${text}`);
+    await browser.waitUntil(
+      async () => (await browser.getTitle()).includes(text),
+      { timeout, timeoutMsg: `Title did not contain "${text}" within ${timeout}ms` }
+    );
+  }
+  
+  static async waitForCondition(
+    condition: () => Promise<boolean>,
+    timeout = WaitHelpers.DEFAULT_TIMEOUT,
+    message = 'Condition not met'
+  ): Promise<void> {
+    Logger.debug('Waiting for custom condition');
+    await browser.waitUntil(condition, { timeout, timeoutMsg: `${message} within ${timeout}ms` });
+  }
+  
+  static async waitForPageLoad(timeout = WaitHelpers.LONG_TIMEOUT): Promise<void> {
+    Logger.debug('Waiting for page to load');
+    await browser.waitUntil(
+      async () => (await browser.execute(() => document.readyState)) === 'complete',
+      { timeout, timeoutMsg: `Page did not load within ${timeout}ms` }
+    );
+  }
+  
+  static async hardWait(milliseconds: number): Promise<void> {
+    Logger.debug(`Hard wait for ${milliseconds}ms`);
+    await browser.pause(milliseconds);
+  }
+}
+
+export default WaitHelpers;

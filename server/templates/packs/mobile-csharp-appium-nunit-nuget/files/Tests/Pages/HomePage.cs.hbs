@@ -1,0 +1,34 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
+
+namespace {{projectName}}.Tests.Pages;
+
+public class HomePage : BasePage
+{
+    // Locators - Update these based on your app
+    private readonly By _welcomeMessage = By.Id("com.example.app:id/welcomeMessage");
+    private readonly By _userProfile = By.Id("com.example.app:id/userProfile");
+    private readonly By _logoutButton = By.Id("com.example.app:id/logoutButton");
+
+    public HomePage(AppiumDriver driver) : base(driver) { }
+
+    public string GetWelcomeMessage()
+    {
+        return GetText(_welcomeMessage);
+    }
+
+    public bool IsHomePageDisplayed()
+    {
+        return IsDisplayed(_welcomeMessage);
+    }
+
+    public bool IsUserProfileDisplayed()
+    {
+        return IsDisplayed(_userProfile);
+    }
+
+    public void ClickLogout()
+    {
+        Click(_logoutButton);
+    }
+}

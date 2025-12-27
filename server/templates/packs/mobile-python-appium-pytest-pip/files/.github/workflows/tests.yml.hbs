@@ -1,0 +1,82 @@
+name: Mobile Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: {{raw}}${{ matrix.os }}{{/raw}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest]
+        platform: [android, ios]
+        python-version: ['3.11']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python {{raw}}${{ matrix.python-version }}{{/raw}}
+        uses: actions/setup-python@v4
+        with:
+          python-version: {{raw}}${{ matrix.python-version }}{{/raw}}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Set up Android SDK (Android only)
+        if: matrix.platform == 'android'
+        uses: android-actions/setup-android@v3
+      
+      - name: Install Appium
+        run: |
+          npm install -g appium@next
+          appium driver install uiautomator2
+          appium driver install xcuitest
+      
+      - name: Start Appium Server
+        run: |
+          appium &
+          sleep 5
+      
+      - name: Run tests
+        env:
+          PLATFORM: {{raw}}${{ matrix.platform }}{{/raw}}
+          TEST_ENV: qa
+          APPIUM_SERVER: http://localhost:4723
+        run: |
+          pytest -v -n auto --html=reports/report.html --alluredir=allure-results -m smoke
+      
+      - name: Generate Allure Report
+        if: always()
+        uses: simple-elf/allure-report-action@master
+        with:
+          allure_results: allure-results
+          allure_history: allure-history
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-{{raw}}${{ matrix.platform }}{{/raw}}
+          path: |
+            reports/
+            screenshots/
+            logs/
+            allure-results/
+      
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-report-{{raw}}${{ matrix.platform }}{{/raw}}
+          path: allure-history/

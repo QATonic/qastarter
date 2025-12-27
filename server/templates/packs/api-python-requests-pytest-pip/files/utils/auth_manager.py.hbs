@@ -1,0 +1,68 @@
+from typing import Optional
+from core.api_client import APIClient
+from utils.logger import logger
+
+
+class AuthManager:
+    """Authentication manager for API requests."""
+    
+    def __init__(self, client: APIClient):
+        self.client = client
+        self._token: Optional[str] = None
+    
+    def login(self, username: str, password: str, endpoint: str = "/auth/login") -> str:
+        """Login and get authentication token."""
+        response = self.client.post(
+            endpoint,
+            json={"username": username, "password": password}
+        )
+        
+        if response.status_code == 200:
+            data = response.json()
+            self._token = data.get("token") or data.get("access_token")
+            
+            if self._token:
+                self.client.set_auth_token(self._token)
+                logger.info(f"Successfully authenticated as {username}")
+                return self._token
+        
+        raise Exception(f"Authentication failed: {response.status_code}")
+    
+    def logout(self, endpoint: str = "/auth/logout"):
+        """Logout and clear authentication."""
+        if self._token:
+            try:
+                self.client.post(endpoint)
+            except:
+                pass
+            finally:
+                self.clear_auth()
+                logger.info("Logged out successfully")
+    
+    def set_token(self, token: str):
+        """Set authentication token directly."""
+        self._token = token
+        self.client.set_auth_token(token)
+    
+    def set_api_key(self, api_key: str, header_name: str = "X-API-Key"):
+        """Set API key authentication."""
+        self.client.set_api_key(api_key, header_name)
+    
+    def set_basic_auth(self, username: str, password: str):
+        """Set basic authentication."""
+        self.client.set_basic_auth(username, password)
+    
+    def clear_auth(self):
+        """Clear all authentication."""
+        self._token = None
+        self.client.clear_auth()
+    
+    @property
+    def token(self) -> Optional[str]:
+        """Get current token."""
+        return self._token
+    
+    @property
+    def is_authenticated(self) -> bool:
+        """Check if authenticated."""
+        return self._token is not None

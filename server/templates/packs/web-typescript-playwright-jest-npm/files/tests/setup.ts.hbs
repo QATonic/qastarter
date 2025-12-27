@@ -1,0 +1,25 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import testConfig from '../config/test.config';
+import ScreenshotHelper from '../utils/screenshotHelper';
+
+// Create necessary directories
+const dirs = ['logs', 'screenshots', 'test-results'];
+dirs.forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
+
+// Set default timeout
+jest.setTimeout(testConfig.defaultTimeout);
+
+// Screenshot on test failure
+if (testConfig.screenshotOnFailure) {
+  afterEach(async () => {
+    const testName = expect.getState().currentTestName || 'unknown';
+    if (expect.getState().isExpectingAssertions) {
+      await ScreenshotHelper.captureOnFailure(page, testName);
+    }
+  });
+}

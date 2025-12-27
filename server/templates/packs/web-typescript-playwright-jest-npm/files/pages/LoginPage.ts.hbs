@@ -1,0 +1,71 @@
+/**
+ * Login Page Object
+ * 
+ * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+ * 1. Open your app's login page in a browser
+ * 2. Right-click on each element → Inspect → Copy selector
+ * 3. Replace the placeholder selectors below with your actual selectors
+ * 4. Update the login URL path in navigateToLogin() method
+ */
+import { Page } from 'playwright';
+import BasePage from './BasePage';
+import envConfig from '../config/env.config';
+
+export default class LoginPage extends BasePage {
+  // ============================================
+  // UPDATE THESE SELECTORS FOR YOUR APPLICATION
+  // ============================================
+  // Tip: Use browser DevTools (F12) to find correct selectors
+  private selectors = {
+    usernameInput: '#username',           // Your username/email input field
+    passwordInput: '#password',           // Your password input field
+    loginButton: 'button[type="submit"]', // Your login/submit button
+    errorMessage: '.error-message',       // Error message element
+    successIndicator: '.dashboard, .home' // Element visible after successful login
+  };
+  // ============================================
+
+  constructor(page: Page) {
+    super(page);
+  }
+
+  async navigateToLogin(): Promise<void> {
+    // UPDATE: Change '/login' to your actual login page path
+    await this.navigate(`${envConfig.getBaseUrl()}/login`);
+  }
+
+  async login(username: string, password: string): Promise<void> {
+    await this.type(this.selectors.usernameInput, username);
+    await this.type(this.selectors.passwordInput, password);
+    await this.click(this.selectors.loginButton);
+  }
+
+  async isLoginSuccessful(): Promise<boolean> {
+    try {
+      await this.waitForSelector(this.selectors.successIndicator, 10000);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async isErrorDisplayed(): Promise<boolean> {
+    return await this.isVisible(this.selectors.errorMessage);
+  }
+
+  async getErrorMessage(): Promise<string> {
+    return await this.getText(this.selectors.errorMessage);
+  }
+
+  async getPageTitle(): Promise<string> {
+    return await super.getPageTitle();
+  }
+
+  async isUsernameVisible(): Promise<boolean> {
+    return await this.isVisible(this.selectors.usernameInput);
+  }
+
+  async isPasswordVisible(): Promise<boolean> {
+    return await this.isVisible(this.selectors.passwordInput);
+  }
+}

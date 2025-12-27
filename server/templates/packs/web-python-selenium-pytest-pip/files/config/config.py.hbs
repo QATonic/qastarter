@@ -1,0 +1,54 @@
+"""
+Configuration management for different environments
+"""
+import os
+from pathlib import Path
+import json
+from typing import Dict, Any
+
+class Config:
+    """Configuration manager for test environments"""
+    
+    BASE_DIR = Path(__file__).parent.parent
+    DATA_DIR = BASE_DIR / 'data'
+    
+    # Environment configuration
+    ENV = os.getenv('TEST_ENV', 'dev').lower()
+    
+    # Browser configuration
+    BROWSER = os.getenv('BROWSER', 'chrome').lower()
+    HEADLESS = os.getenv('HEADLESS', 'false').lower() == 'true'
+    IMPLICIT_WAIT = int(os.getenv('IMPLICIT_WAIT', '10'))
+    EXPLICIT_WAIT = int(os.getenv('EXPLICIT_WAIT', '20'))
+    
+    # Screenshot configuration
+    SCREENSHOT_ON_FAILURE = True
+    SCREENSHOT_DIR = BASE_DIR / 'screenshots'
+    
+    # Logging configuration
+    LOG_DIR = BASE_DIR / 'logs'
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+    
+    # Report configuration
+    REPORT_DIR = BASE_DIR / 'reports'
+    
+    @classmethod
+    def load_env_data(cls) -> Dict[str, Any]:
+        """Load environment-specific test data"""
+        data_file = cls.DATA_DIR / f'{cls.ENV}.json'
+        if data_file.exists():
+            with open(data_file, 'r') as f:
+                return json.load(f)
+        return {}
+    
+    @classmethod
+    def get_base_url(cls) -> str:
+        """Get base URL for current environment"""
+        env_data = cls.load_env_data()
+        return env_data.get('base_url', 'https://example.com')
+    
+    @classmethod
+    def get_credentials(cls, user_type: str = 'valid_user') -> Dict[str, str]:
+        """Get user credentials for testing"""
+        env_data = cls.load_env_data()
+        return env_data.get('credentials', {}).get(user_type, {})

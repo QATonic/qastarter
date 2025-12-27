@@ -1,0 +1,45 @@
+package {{javaPackage}}.tests;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.core.BaseTest;
+import {{javaPackage}}.pages.HomePage;
+import {{javaPackage}}.pages.LoginPage;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+/**
+ * Login Test Suite
+ * 
+ * BEFORE RUNNING:
+ * 1. Update credentials in: src/main/resources/config/dev.properties
+ * 2. Update selectors in: src/main/java/.../pages/LoginPage.java
+ * 3. Run: mvn clean test
+ */
+public class LoginTests extends BaseTest {
+    
+    @Test(groups = {"smoke", "login"}, 
+          description = "Verify successful login with valid credentials")
+    public void testValidLogin() {
+        // Get credentials from config file (dev.properties)
+        String username = ConfigurationReader.getProperty("default.username");
+        String password = ConfigurationReader.getProperty("default.password");
+        
+        // Step 1: Navigate to login page
+        LoginPage loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isLoaded(), "Login page should be loaded");
+        
+        // Step 2: Enter credentials and login
+        HomePage homePage = loginPage.login(username, password, HomePage.class);
+        
+        // Step 3: Verify successful login
+        Assert.assertTrue(homePage.isLoaded(), 
+            "Login failed. Check credentials in dev.properties and selectors in LoginPage.java");
+    }
+    
+    @Test(groups = {"smoke", "login"},
+          description = "Verify login page elements are visible")
+    public void testLoginPageElements() {
+        LoginPage loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.validatePageElements(), "All login page elements should be present");
+    }
+}

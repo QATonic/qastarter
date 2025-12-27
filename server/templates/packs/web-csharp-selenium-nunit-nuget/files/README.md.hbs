@@ -1,0 +1,69 @@
+# {{projectName}}
+
+Selenium WebDriver automation framework with C# and NUnit.
+
+## Features
+
+- **Selenium WebDriver {{toolVersions.selenium}}**: Browser automation
+- **NUnit {{toolVersions.nunit}}**: Test framework with parallel execution
+- **Page Object Model**: Maintainable architecture
+{{#if (eq reportingTool "extent-reports")}}
+- **ExtentReports**: Rich HTML test reports
+{{else if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else}}
+- **NUnit Reports**: Built-in test reporting
+{{/if}}
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+
+## Setup
+```bash
+dotnet restore
+dotnet build
+```
+
+## Run Tests
+```bash
+dotnet test                          # Run all tests
+dotnet test --filter Category=Smoke  # Smoke tests only
+dotnet test --logger "console;verbosity=detailed"  # Verbose output
+```
+
+## Project Structure
+```
+{{projectName}}/
+├── Pages/          # Page Objects
+├── Tests/          # Test cases
+├── Utils/          # Utilities
+├── Config/         # Configuration
+└── Data/           # Test data
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps pipeline is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI workflow is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included.
+{{/if}}

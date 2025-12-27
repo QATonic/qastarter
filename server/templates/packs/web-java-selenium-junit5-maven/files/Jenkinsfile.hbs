@@ -1,0 +1,187 @@
+pipeline {
+    agent any
+    
+    tools {
+        maven 'Maven 3.9'
+        jdk 'JDK {{toolVersions.java}}'
+    }
+    
+    parameters {
+        choice(name: 'BROWSER', choices: ['chrome', 'firefox', 'edge'], description: 'Browser to run tests')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'stg', 'prod'], description: 'Environment to test against')
+    }
+    
+    environment {
+        MAVEN_OPTS = '-Xmx3072m'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+        
+        stage('Test - Chrome') {
+            when {
+                expression { params.BROWSER == 'chrome' || params.BROWSER == null }
+            }
+            steps {
+                sh """
+                    mvn test -Dbrowser=chrome -Denv=${params.ENVIRONMENT}
+                """
+            }
+            post {
+                always {
+                    junit testResults: '**/target/surefire-reports/TEST-*.xml', allowEmptyResults: true
+{{#if (eq reportingTool "allure")}}
+                    script {
+                        allure([
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: 'target/allure-results']]
+                        ])
+                    }
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'extent-report.html',
+                        reportName: 'ExtentReports - Chrome',
+                        reportTitles: ''
+                    ])
+{{/if}}
+{{#if (eq reportingTool "junit-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'target/surefire-reports',
+                        reportFiles: '*.html',
+                        reportName: 'JUnit Reports - Chrome',
+                        reportTitles: ''
+                    ])
+{{/if}}
+                    archiveArtifacts artifacts: 'reports/screenshots/**, logs/**', allowEmptyArchive: true
+                }
+            }
+        }
+        
+        stage('Test - Firefox') {
+            when {
+                expression { params.BROWSER == 'firefox' }
+            }
+            steps {
+                sh """
+                    mvn test -Dbrowser=firefox -Denv=${params.ENVIRONMENT}
+                """
+            }
+            post {
+                always {
+                    junit testResults: '**/target/surefire-reports/TEST-*.xml', allowEmptyResults: true
+{{#if (eq reportingTool "allure")}}
+                    script {
+                        allure([
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: 'target/allure-results']]
+                        ])
+                    }
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'extent-report.html',
+                        reportName: 'ExtentReports - Firefox',
+                        reportTitles: ''
+                    ])
+{{/if}}
+{{#if (eq reportingTool "junit-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'target/surefire-reports',
+                        reportFiles: '*.html',
+                        reportName: 'JUnit Reports - Firefox',
+                        reportTitles: ''
+                    ])
+{{/if}}
+                    archiveArtifacts artifacts: 'reports/screenshots/**, logs/**', allowEmptyArchive: true
+                }
+            }
+        }
+        
+        stage('Test - Edge') {
+            when {
+                expression { params.BROWSER == 'edge' }
+            }
+            steps {
+                sh """
+                    mvn test -Dbrowser=edge -Denv=${params.ENVIRONMENT}
+                """
+            }
+            post {
+                always {
+                    junit testResults: '**/target/surefire-reports/TEST-*.xml', allowEmptyResults: true
+{{#if (eq reportingTool "allure")}}
+                    script {
+                        allure([
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: 'target/allure-results']]
+                        ])
+                    }
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'reports',
+                        reportFiles: 'extent-report.html',
+                        reportName: 'ExtentReports - Edge',
+                        reportTitles: ''
+                    ])
+{{/if}}
+{{#if (eq reportingTool "junit-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'target/surefire-reports',
+                        reportFiles: '*.html',
+                        reportName: 'JUnit Reports - Edge',
+                        reportTitles: ''
+                    ])
+{{/if}}
+                    archiveArtifacts artifacts: 'reports/screenshots/**, logs/**', allowEmptyArchive: true
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

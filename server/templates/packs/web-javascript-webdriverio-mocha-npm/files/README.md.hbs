@@ -1,0 +1,119 @@
+# {{projectName}}
+
+Web automation framework built with WebdriverIO, Mocha, and JavaScript.
+
+## Overview
+
+Modern web automation framework using WebdriverIO with Page Object Model pattern, providing a robust foundation for end-to-end testing.
+
+## Features
+
+- ✅ WebdriverIO {{toolVersions.webdriverio}} with modern async/await syntax
+- ✅ Mocha test framework
+- ✅ Page Object Model pattern
+{{#if (eq reportingTool "allure")}}
+- ✅ Allure reporting with screenshots
+{{else}}
+- ✅ Allure reporting with screenshots
+{{/if}}
+- ✅ Chrome and Firefox support
+- ✅ Headless mode for CI/CD
+{{#if cicdTool}}
+- ✅ {{cicdTool}} integration
+{{/if}}
+- ✅ Cross-browser testing ready
+
+## Prerequisites
+
+- Node.js 18+ and npm
+- Chrome or Firefox browser
+
+## Installation
+
+```bash
+npm install
+```
+
+## Configuration
+
+Update `config/wdio.config.js` to configure your test environment:
+
+```javascript
+export const config = {
+  baseUrl: 'https://your-app.com',
+  // ... other settings
+};
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run in Chrome
+npm run test:chrome
+
+# Run in Firefox
+npm run test:firefox
+
+# Run in headless mode (CI/CD)
+npm run test:headless
+```
+
+## Generate Reports
+
+```bash
+# Generate Allure report
+npm run allure:generate
+
+# Open Allure report
+npm run allure:open
+```
+
+## Project Structure
+
+```
+{{projectName}}/
+├── config/              # WebdriverIO configuration
+├── test/
+│   ├── pageobjects/    # Page Object classes
+│   ├── specs/          # Test specifications
+│   └── data/           # Test data
+└── allure-results/     # Test results
+```
+
+## Writing Tests
+
+```javascript
+import { expect } from '@wdio/globals';
+import LoginPage from '../pageobjects/login.page.js';
+
+describe('My Feature', () => {
+  it('should do something', async () => {
+    await LoginPage.open('/login');
+    await LoginPage.login('user', 'pass');
+    await expect(LoginPage.flashMessage).toBeDisplayed();
+  });
+});
+```
+
+## CI/CD Integration
+
+{{#if (eq cicdTool "github-actions")}}
+This project is configured for GitHub Actions. Check `.github/workflows/tests.yml` for pipeline configuration.
+{{else if (eq cicdTool "jenkins")}}
+This project is configured for Jenkins. Check `Jenkinsfile` for pipeline configuration.
+{{else if (eq cicdTool "gitlab-ci")}}
+This project is configured for GitLab CI. Check `.gitlab-ci.yml` for pipeline configuration.
+{{else if (eq cicdTool "azure-devops")}}
+This project is configured for Azure DevOps. Check `azure-pipelines.yml` for pipeline configuration.
+{{else if (eq cicdTool "circleci")}}
+This project is configured for CircleCI. Check `.circleci/config.yml` for pipeline configuration.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## License
+
+MIT

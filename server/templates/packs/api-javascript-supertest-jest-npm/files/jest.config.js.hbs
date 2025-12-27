@@ -1,0 +1,23 @@
+export default {
+  testEnvironment: 'node',
+  coverageDirectory: 'coverage',
+  collectCoverageFrom: [
+    'tests/**/*.js',
+    '!tests/**/*.spec.js',
+    '!**/node_modules/**'
+  ],
+  testMatch: [
+    '**/tests/**/*.spec.js'
+  ],
+  reporters: [
+    'default',
+    ['jest-html-reporter', {
+      pageTitle: '{{projectName}} - API Test Report',
+      outputPath: 'reports/test-report.html',
+      includeFailureMsg: true,
+      includeConsoleLog: true
+    }]
+  ],
+  testTimeout: 30000,
+  verbose: true
+};

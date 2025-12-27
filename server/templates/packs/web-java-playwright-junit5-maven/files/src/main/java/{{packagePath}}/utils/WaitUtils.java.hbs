@@ -1,0 +1,216 @@
+package {{javaPackage}}.utils;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.WaitForSelectorState;
+
+/**
+ * Utility class for Playwright wait operations.
+ * Provides reusable wait methods using Playwright's built-in waiting mechanisms.
+ */
+public class WaitUtils {
+    
+    private final Page page;
+    private final int defaultTimeout;
+    
+    public WaitUtils(Page page) {
+        this.page = page;
+        this.defaultTimeout = ConfigurationReader.getIntProperty("default.timeout", 30000);
+    }
+    
+    /**
+     * Wait for element to be visible
+     * @param selector Element selector
+     */
+    public void waitForVisible(String selector) {
+        waitForVisible(selector, defaultTimeout);
+    }
+    
+    /**
+     * Wait for element to be visible with custom timeout
+     * @param selector Element selector
+     * @param timeout Timeout in milliseconds
+     */
+    public void waitForVisible(String selector, int timeout) {
+        Log.debug("Waiting for element to be visible: " + selector);
+        page.waitForSelector(selector, new Page.WaitForSelectorOptions()
+            .setState(WaitForSelectorState.VISIBLE)
+            .setTimeout(timeout));
+    }
+    
+    /**
+     * Wait for element to be hidden
+     * @param selector Element selector
+     */
+    public void waitForHidden(String selector) {
+        waitForHidden(selector, defaultTimeout);
+    }
+    
+    /**
+     * Wait for element to be hidden with custom timeout
+     * @param selector Element selector
+     * @param timeout Timeout in milliseconds
+     */
+    public void waitForHidden(String selector, int timeout) {
+        Log.debug("Waiting for element to be hidden: " + selector);
+        page.waitForSelector(selector, new Page.WaitForSelectorOptions()
+            .setState(WaitForSelectorState.HIDDEN)
+            .setTimeout(timeout));
+    }
+    
+    /**
+     * Wait for element to be attached to DOM
+     * @param selector Element selector
+     */
+    public void waitForAttached(String selector) {
+        waitForAttached(selector, defaultTimeout);
+    }
+    
+    /**
+     * Wait for element to be attached with custom timeout
+     * @param selector Element selector
+     * @param timeout Timeout in milliseconds
+     */
+    public void waitForAttached(String selector, int timeout) {
+        Log.debug("Waiting for element to be attached: " + selector);
+        page.waitForSelector(selector, new Page.WaitForSelectorOptions()
+            .setState(WaitForSelectorState.ATTACHED)
+            .setTimeout(timeout));
+    }
+    
+    /**
+     * Wait for element to be detached from DOM
+     * @param selector Element selector
+     */
+    public void waitForDetached(String selector) {
+        waitForDetached(selector, defaultTimeout);
+    }
+    
+    /**
+     * Wait for element to be detached with custom timeout
+     * @param selector Element selector
+     * @param timeout Timeout in milliseconds
+     */
+    public void waitForDetached(String selector, int timeout) {
+        Log.debug("Waiting for element to be detached: " + selector);
+        page.waitForSelector(selector, new Page.WaitForSelectorOptions()
+            .setState(WaitForSelectorState.DETACHED)
+            .setTimeout(timeout));
+    }
+    
+    /**
+     * Wait for page load (load event)
+     */
+    public void waitForPageLoad() {
+        Log.debug("Waiting for page load");
+        page.waitForLoadState();
+    }
+    
+    /**
+     * Wait for network to be idle
+     */
+    public void waitForNetworkIdle() {
+        Log.debug("Waiting for network idle");
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+    }
+    
+    /**
+     * Wait for DOM content to be loaded
+     */
+    public void waitForDOMContentLoaded() {
+        Log.debug("Waiting for DOM content loaded");
+        page.waitForLoadState(com.microsoft.playwright.options.LoadState.DOMCONTENTLOADED);
+    }
+    
+    /**
+     * Wait for URL to match pattern
+     * @param urlPattern URL pattern (regex)
+     */
+    public void waitForURL(String urlPattern) {
+        waitForURL(urlPattern, defaultTimeout);
+    }
+    
+    /**
+     * Wait for URL to match pattern with timeout
+     * @param urlPattern URL pattern (regex)
+     * @param timeout Timeout in milliseconds
+     */
+    public void waitForURL(String urlPattern, int timeout) {
+        Log.debug("Waiting for URL to match: " + urlPattern);
+        page.waitForURL(urlPattern, new Page.WaitForURLOptions().setTimeout(timeout));
+    }
+    
+    /**
+     * Wait for specific condition using JavaScript
+     * @param condition JavaScript condition to evaluate
+     */
+    public void waitForCondition(String condition) {
+        waitForCondition(condition, defaultTimeout);
+    }
+    
+    /**
+     * Wait for specific condition with timeout
+     * @param condition JavaScript condition to evaluate
+     * @param timeout Timeout in milliseconds
+     */
+    public void waitForCondition(String condition, int timeout) {
+        Log.debug("Waiting for condition: " + condition);
+        page.waitForFunction(condition, null, new Page.WaitForFunctionOptions().setTimeout(timeout));
+    }
+    
+    /**
+     * Wait for element count to match expected count
+     * @param selector Element selector
+     * @param expectedCount Expected element count
+     */
+    public void waitForElementCount(String selector, int expectedCount) {
+        waitForElementCount(selector, expectedCount, defaultTimeout);
+    }
+    
+    /**
+     * Wait for element count with timeout
+     * @param selector Element selector
+     * @param expectedCount Expected element count
+     * @param timeout Timeout in milliseconds
+     */
+    public void waitForElementCount(String selector, int expectedCount, int timeout) {
+        Log.debug("Waiting for element count: " + expectedCount + " for selector: " + selector);
+        String condition = String.format("document.querySelectorAll('%s').length === %d", selector, expectedCount);
+        waitForCondition(condition, timeout);
+    }
+    
+    /**
+     * Wait for text to be present in element
+     * @param selector Element selector
+     * @param text Expected text
+     */
+    public void waitForText(String selector, String text) {
+        waitForText(selector, text, defaultTimeout);
+    }
+    
+    /**
+     * Wait for text with timeout
+     * @param selector Element selector
+     * @param text Expected text
+     * @param timeout Timeout in milliseconds
+     */
+    public void waitForText(String selector, String text, int timeout) {
+        Log.debug("Waiting for text: '" + text + "' in element: " + selector);
+        page.locator(selector).filter(new com.microsoft.playwright.Locator.FilterOptions().setHasText(text))
+            .waitFor(new com.microsoft.playwright.Locator.WaitForOptions().setTimeout(timeout));
+    }
+    
+    /**
+     * Wait for specified milliseconds
+     * @param milliseconds Time to wait
+     */
+    public void sleep(int milliseconds) {
+        try {
+            Log.debug("Sleeping for " + milliseconds + "ms");
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Log.warn("Sleep interrupted");
+        }
+    }
+}

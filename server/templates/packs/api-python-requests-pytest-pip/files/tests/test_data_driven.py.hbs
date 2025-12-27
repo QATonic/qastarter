@@ -1,0 +1,58 @@
+import pytest
+from core.api_client import APIClient
+from core.response_validator import ResponseValidator
+from utils.json_utils import JSONUtils
+from pathlib import Path
+
+
+@pytest.mark.regression
+class TestDataDriven:
+    """Data-driven test suite."""
+    
+    @pytest.fixture(scope="class")
+    def test_data(self):
+        """Load test data from JSON file."""
+        data_file = Path("data/test_cases.json")
+        if data_file.exists():
+            return JSONUtils.load_file(str(data_file))
+        return {"user_ids": [1, 2, 3], "invalid_ids": [0, -1, 99999]}
+    
+    @pytest.mark.parametrize("status_code", [200, 201, 204, 400, 401, 403, 404, 500])
+    def test_status_codes(self, api_client: APIClient, status_code: int):
+        """Test handling different status codes."""
+        # Using httpstat.us as example for status code testing
+        # Replace with your actual API endpoints
+        if status_code in [200, 201, 204]:
+            response = api_client.get("/users")
+            assert response.status_code in [200, 201, 204]
+    
+    def test_users_from_data_file(self, api_client: APIClient, test_data: dict):
+        """Test users using data from file."""
+        user_ids = test_data.get("user_ids", [1, 2, 3])
+        
+        for user_id in user_ids:
+            response = api_client.get(f"/users/{user_id}")
+            validator = ResponseValidator(response)
+            validator.assert_success()
+    
+    def test_invalid_users_from_data(self, api_client: APIClient, test_data: dict):
+        """Test invalid user IDs from data file."""
+        invalid_ids = test_data.get("invalid_ids", [99999])
+        
+        for user_id in invalid_ids:
+            response = api_client.get(f"/users/{user_id}")
+            validator = ResponseValidator(response)
+            validator.assert_status_code(404)
+    
+    @pytest.mark.parametrize("content_type,accept", [
+        ("application/json", "application/json"),
+        ("application/json", "*/*"),
+    ])
+    def test_content_type_combinations(self, clean_client: APIClient, content_type: str, accept: str):
+        """Test different content type combinations."""
+        clean_client.set_header("Content-Type", content_type)
+        clean_client.set_header("Accept", accept)
+        
+        response = clean_client.get("/users")
+        validator = ResponseValidator(response)
+        validator.assert_success()

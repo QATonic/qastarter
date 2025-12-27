@@ -1,0 +1,43 @@
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
+import requests
+
+
+@dataclass
+class APIResponse:
+    """Standardized API response wrapper."""
+    
+    status_code: int
+    headers: Dict[str, str]
+    body: Optional[Any] = None
+    error: Optional[str] = None
+    
+    @classmethod
+    def from_response(cls, response: requests.Response) -> "APIResponse":
+        """Create APIResponse from requests.Response."""
+        try:
+            body = response.json()
+        except:
+            body = response.text
+        
+        return cls(
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            body=body,
+            error=None if response.ok else response.text
+        )
+    
+    @property
+    def is_success(self) -> bool:
+        """Check if response is successful (2xx)."""
+        return 200 <= self.status_code < 300
+    
+    @property
+    def is_client_error(self) -> bool:
+        """Check if response is client error (4xx)."""
+        return 400 <= self.status_code < 500
+    
+    @property
+    def is_server_error(self) -> bool:
+        """Check if response is server error (5xx)."""
+        return 500 <= self.status_code < 600

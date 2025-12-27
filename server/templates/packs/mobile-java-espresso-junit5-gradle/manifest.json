@@ -1,0 +1,202 @@
+{
+  "id": "mobile-java-espresso-junit5-gradle",
+  "supportsDynamic": true,
+  "name": "Espresso Android Testing Framework",
+  "description": "Native Android UI testing framework with Espresso, JUnit 5, and Java",
+  "tags": [
+    "mobile",
+    "android",
+    "espresso",
+    "java",
+    "junit5",
+    "gradle"
+  ],
+  "toolVersions": {
+    "java": "17+",
+    "gradle": "8.0+",
+    "espresso": "3.5.1",
+    "androidSdk": "34"
+  },
+  "files": [
+    {
+      "path": "build.gradle",
+      "isTemplate": true,
+      "description": "Root Gradle build configuration"
+    },
+    {
+      "path": "settings.gradle",
+      "isTemplate": true,
+      "description": "Gradle settings"
+    },
+    {
+      "path": "app/build.gradle",
+      "isTemplate": true,
+      "description": "App module Gradle build configuration"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "description": "Jenkins CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "description": "Azure DevOps CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "description": "GitLab CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "description": "CircleCI pipeline configuration",
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/base/BaseTest.java",
+      "isTemplate": true,
+      "description": "Base test class with setup/teardown"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/screens/BaseScreen.java",
+      "isTemplate": true,
+      "description": "Base screen class for Page Object Model"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/screens/LoginScreen.java",
+      "isTemplate": true,
+      "description": "Login screen page object"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/screens/HomeScreen.java",
+      "isTemplate": true,
+      "description": "Home screen page object"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/utils/WaitUtils.java",
+      "isTemplate": true,
+      "description": "Wait utilities for Espresso"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/utils/Log.java",
+      "isTemplate": true,
+      "description": "Logging utility"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/utils/ScreenshotUtils.java",
+      "isTemplate": true,
+      "description": "Screenshot capture utility"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/utils/TestDataReader.java",
+      "isTemplate": true,
+      "description": "Test data reader utility"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/tests/LoginTests.java",
+      "isTemplate": true,
+      "description": "Login functionality tests"
+    },
+    {
+      "path": "app/src/androidTest/java/{{packagePath}}/tests/SmokeTests.java",
+      "isTemplate": true,
+      "description": "Smoke tests for critical functionality"
+    },
+    {
+      "path": "app/src/androidTest/assets/testdata/users.json",
+      "isTemplate": true,
+      "description": "Test user data"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
+      "isTemplate": true,
+      "description": "Cucumber TestNG runner",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java",
+      "isTemplate": true,
+      "description": "Step definitions for login scenarios",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/features/Login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature with Gherkin scenarios",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for Android SDK"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Android emulator testing"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "mobile",
+    "framework": "espresso",
+    "language": "java",
+    "testRunner": "junit5",
+    "buildTool": "gradle"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "testng-reports",
+      "junit-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

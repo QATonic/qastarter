@@ -1,0 +1,102 @@
+import fs from 'fs';
+import path from 'path';
+import Logger from './logger.js';
+
+/**
+ * Screenshot helper for capturing test evidence.
+ */
+class ScreenshotHelper {
+  
+  static SCREENSHOT_DIR = './screenshots';
+  
+  /**
+   * Ensure screenshot directory exists
+   */
+  static ensureDirectoryExists() {
+    if (!fs.existsSync(ScreenshotHelper.SCREENSHOT_DIR)) {
+      fs.mkdirSync(ScreenshotHelper.SCREENSHOT_DIR, { recursive: true });
+    }
+  }
+  
+  /**
+   * Generate timestamp for filename
+   */
+  static getTimestamp() {
+    return new Date().toISOString().replace(/[:.]/g, '-');
+  }
+  
+  /**
+   * Capture screenshot with auto-generated name
+   */
+  static async capture(name = 'screenshot') {
+    ScreenshotHelper.ensureDirectoryExists();
+    
+    const timestamp = ScreenshotHelper.getTimestamp();
+    const filename = `${name}_${timestamp}.png`;
+    const filepath = path.join(ScreenshotHelper.SCREENSHOT_DIR, filename);
+    
+    try {
+      await browser.saveScreenshot(filepath);
+      Logger.info(`Screenshot saved: ${filepath}`);
+      return filepath;
+    } catch (error) {
+      Logger.error(`Failed to capture screenshot: ${name}`, error);
+      return null;
+    }
+  }
+  
+  /**
+   * Capture screenshot on test failure
+   */
+  static async captureOnFailure(testName) {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9]/g, '_');
+    return await ScreenshotHelper.capture(`failed_${sanitizedName}`);
+  }
+  
+  /**
+   * Capture element screenshot
+   */
+  static async captureElement(element, name = 'element') {
+    ScreenshotHelper.ensureDirectoryExists();
+    
+    const timestamp = ScreenshotHelper.getTimestamp();
+    const filename = `${name}_${timestamp}.png`;
+    const filepath = path.join(ScreenshotHelper.SCREENSHOT_DIR, filename);
+    
+    try {
+      await element.saveScreenshot(filepath);
+      Logger.info(`Element screenshot saved: ${filepath}`);
+      return filepath;
+    } catch (error) {
+      Logger.error(`Failed to capture element screenshot: ${name}`, error);
+      return null;
+    }
+  }
+  
+  /**
+   * Clear all screenshots
+   */
+  static clearScreenshots() {
+    if (fs.existsSync(ScreenshotHelper.SCREENSHOT_DIR)) {
+      const files = fs.readdirSync(ScreenshotHelper.SCREENSHOT_DIR);
+      files.forEach(file => {
+        fs.unlinkSync(path.join(ScreenshotHelper.SCREENSHOT_DIR, file));
+      });
+      Logger.info('Cleared all screenshots');
+    }
+  }
+  
+  /**
+   * Get all screenshot files
+   */
+  static getScreenshots() {
+    if (!fs.existsSync(ScreenshotHelper.SCREENSHOT_DIR)) {
+      return [];
+    }
+    return fs.readdirSync(ScreenshotHelper.SCREENSHOT_DIR)
+      .filter(file => file.endsWith('.png'))
+      .map(file => path.join(ScreenshotHelper.SCREENSHOT_DIR, file));
+  }
+}
+
+export default ScreenshotHelper;

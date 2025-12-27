@@ -1,0 +1,36 @@
+Feature: Mobile Login Functionality
+  As a mobile app user
+  I want to be able to login to the application
+  So that I can access my account
+
+  Background:
+    Given the user is on the login screen
+
+  @smoke @login
+  Scenario: Successful login with valid credentials
+    When the user enters username "testuser" and password "TestPass123!"
+    And the user clicks the login button
+    Then the user should be redirected to the home screen
+
+  @negative @login
+  Scenario: Failed login with invalid credentials
+    When the user enters username "invaliduser" and password "wrongpass"
+    And the user clicks the login button
+    Then an error message "Invalid credentials" should be displayed
+
+  @negative @login
+  Scenario: Failed login with empty credentials
+    When the user enters username "" and password ""
+    Then the login button should be disabled
+
+  @regression @login
+  Scenario Outline: Login with different credential combinations
+    When the user enters username "<username>" and password "<password>"
+    And the user clicks the login button
+    Then an error message "<error>" should be displayed
+
+    Examples:
+      | username    | password     | error                |
+      | testuser    | wrongpass    | Invalid credentials  |
+      | invaliduser | TestPass123! | Invalid credentials  |
+      | admin       | admin        | Invalid credentials  |

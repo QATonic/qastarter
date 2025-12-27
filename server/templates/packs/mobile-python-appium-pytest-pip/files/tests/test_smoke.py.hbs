@@ -1,0 +1,54 @@
+import pytest
+from tests.pages.login_page import LoginPage
+from tests.utils.helpers import is_android, is_ios
+
+@pytest.mark.smoke
+class TestSmoke:
+    """Smoke tests to verify basic app functionality"""
+    
+    def test_app_launches(self, driver):
+        """Test that app launches successfully"""
+        # Verify driver is initialized
+        assert driver is not None, "Driver not initialized"
+        
+        # Verify we can get current activity/view
+        if is_android():
+            current_activity = driver.current_activity
+            assert current_activity is not None, "Current activity is None"
+        else:  # iOS
+            # For iOS, verify we can get page source
+            page_source = driver.page_source
+            assert page_source is not None, "Page source is None"
+    
+    def test_login_page_elements_displayed(self, driver):
+        """Test that login page elements are displayed"""
+        login_page = LoginPage(driver)
+        
+        # Verify username input is displayed
+        assert login_page.is_displayed(login_page.USERNAME_INPUT), "Username input not displayed"
+        
+        # Verify password input is displayed
+        assert login_page.is_displayed(login_page.PASSWORD_INPUT), "Password input not displayed"
+        
+        # Verify login button is displayed
+        assert login_page.is_displayed(login_page.LOGIN_BUTTON), "Login button not displayed"
+    
+    @pytest.mark.android
+    def test_android_specific_feature(self, driver):
+        """Test Android-specific features"""
+        if not is_android():
+            pytest.skip("Test only for Android platform")
+        
+        # Add Android-specific tests here
+        current_package = driver.current_package
+        assert current_package is not None, "Current package is None"
+    
+    @pytest.mark.ios
+    def test_ios_specific_feature(self, driver):
+        """Test iOS-specific features"""
+        if not is_ios():
+            pytest.skip("Test only for iOS platform")
+        
+        # Add iOS-specific tests here
+        bundle_id = driver.capabilities.get('bundleId')
+        assert bundle_id is not None, "Bundle ID is None"

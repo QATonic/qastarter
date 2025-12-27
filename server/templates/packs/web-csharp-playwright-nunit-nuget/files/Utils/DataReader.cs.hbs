@@ -1,0 +1,15 @@
+using Newtonsoft.Json.Linq;
+
+namespace {{projectName}}.Utils;
+
+public static class DataReader
+{
+    public static JObject ReadJson(string filename)
+    {
+        var filepath = Path.Combine("Data", filename);
+        Console.WriteLine($"Reading data from: {filepath}");
+        
+        var jsonContent = File.ReadAllText(filepath);
+        return JObject.Parse(jsonContent);
+    }
+}

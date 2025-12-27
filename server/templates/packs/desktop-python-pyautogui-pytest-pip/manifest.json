@@ -1,0 +1,179 @@
+{
+  "id": "desktop-python-pyautogui-pytest-pip",
+  "supportsDynamic": true,
+  "name": "Desktop GUI Automation Framework",
+  "description": "Cross-platform desktop GUI automation with Python, PyAutoGUI, and Pytest",
+  "tags": [
+    "desktop",
+    "gui",
+    "python",
+    "pytest",
+    "pyautogui"
+  ],
+  "toolVersions": {
+    "python": "3.11+",
+    "pyautogui": "0.9.54",
+    "pytest": "7.4.0",
+    "pillow": "10.1.0",
+    "opencv-python": "4.8.0"
+  },
+  "files": [
+    {
+      "path": "requirements.txt",
+      "isTemplate": true,
+      "description": "Python dependencies"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "pytest.ini",
+      "isTemplate": true,
+      "description": "Pytest configuration"
+    },
+    {
+      "path": "config/settings.py",
+      "isTemplate": true,
+      "description": "Configuration management"
+    },
+    {
+      "path": "config/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "core/gui_actions.py",
+      "isTemplate": true,
+      "description": "GUI automation actions"
+    },
+    {
+      "path": "core/keyboard_actions.py",
+      "isTemplate": true,
+      "description": "Keyboard automation"
+    },
+    {
+      "path": "core/mouse_actions.py",
+      "isTemplate": true,
+      "description": "Mouse automation"
+    },
+    {
+      "path": "core/image_recognition.py",
+      "isTemplate": true,
+      "description": "Image recognition utilities"
+    },
+    {
+      "path": "core/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "tests/conftest.py",
+      "isTemplate": true,
+      "description": "Pytest fixtures and configuration"
+    },
+    {
+      "path": "tests/test_calculator.py",
+      "isTemplate": true,
+      "description": "Calculator automation tests"
+    },
+    {
+      "path": "tests/test_notepad.py",
+      "isTemplate": true,
+      "description": "Notepad automation tests"
+    },
+    {
+      "path": "tests/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "utils/logger.py",
+      "isTemplate": true,
+      "description": "Logging configuration"
+    },
+    {
+      "path": "utils/screenshot_helper.py",
+      "isTemplate": true,
+      "description": "Screenshot capture utilities"
+    },
+    {
+      "path": "utils/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "images/.gitkeep",
+      "isTemplate": true,
+      "description": "Images directory placeholder"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/test_login_steps.py",
+      "isTemplate": true,
+      "description": "pytest-bdd step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/__init__.py",
+      "isTemplate": false,
+      "description": "Python package initializer",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration with Xvfb for headless GUI testing"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "desktop",
+    "framework": "pyautogui",
+    "language": "python",
+    "testRunner": "pytest",
+    "buildTool": "pip"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "pytest-html",
+      "pytest-json-report"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "functional-patterns",
+      "bdd"
+    ]
+  }
+}

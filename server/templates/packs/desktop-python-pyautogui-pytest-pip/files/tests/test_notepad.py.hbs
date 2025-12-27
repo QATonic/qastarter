@@ -1,0 +1,67 @@
+import pytest
+import time
+from core.gui_actions import GUIActions
+from core.keyboard_actions import KeyboardActions
+from config.settings import Settings
+
+@pytest.mark.smoke
+@pytest.mark.skipif(not Settings.IS_WINDOWS, reason="Notepad test is Windows-specific")
+class TestNotepad:
+    @pytest.fixture(scope="function")
+    def notepad_app(self, check_notepad_available):
+        """Launch Notepad before each test"""
+        GUIActions.launch_application(Settings.get_notepad_command())
+        time.sleep(2)  # Wait for app to fully load
+        yield
+        GUIActions.close_application()
+        time.sleep(0.5)
+        # Handle "Do you want to save?" dialog
+        KeyboardActions.press_tab()  # Move to "Don't Save" button
+        KeyboardActions.press_enter()
+        time.sleep(0.5)
+    
+    def test_type_text(self, notepad_app):
+        """Test typing text into Notepad"""
+        test_text = "Hello, PyAutoGUI!"
+        KeyboardActions.type_text(test_text)
+        time.sleep(0.5)
+    
+    def test_select_all(self, notepad_app):
+        """Test select all functionality"""
+        KeyboardActions.type_text("Sample text for testing")
+        time.sleep(0.5)
+        KeyboardActions.select_all()
+        time.sleep(0.5)
+    
+    def test_copy_paste(self, notepad_app):
+        """Test copy and paste"""
+        original_text = "Text to copy"
+        KeyboardActions.type_text(original_text)
+        time.sleep(0.5)
+        
+        KeyboardActions.select_all()
+        KeyboardActions.copy()
+        time.sleep(0.5)
+        
+        KeyboardActions.press_enter()
+        KeyboardActions.paste()
+        time.sleep(0.5)
+    
+    def test_multiline_text(self, notepad_app):
+        """Test typing multiple lines"""
+        KeyboardActions.type_text("Line 1")
+        KeyboardActions.press_enter()
+        KeyboardActions.type_text("Line 2")
+        KeyboardActions.press_enter()
+        KeyboardActions.type_text("Line 3")
+        time.sleep(0.5)
+    
+    @pytest.mark.parametrize("text", [
+        "Hello World",
+        "Test 123",
+        "Special chars: @#$%"
+    ])
+    def test_type_different_text(self, notepad_app, text):
+        """Test typing different text"""
+        KeyboardActions.type_text(text)
+        time.sleep(0.5)

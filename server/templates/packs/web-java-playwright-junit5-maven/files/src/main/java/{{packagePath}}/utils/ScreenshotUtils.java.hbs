@@ -1,0 +1,171 @@
+package {{javaPackage}}.utils;
+
+import {{javaPackage}}.core.BrowserManager;
+import com.microsoft.playwright.Page;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Utility class for capturing screenshots using Playwright.
+ * Provides methods for full page and element-specific screenshots.
+ */
+public class ScreenshotUtils {
+    
+    private static final String SCREENSHOT_DIR = "reports/screenshots/";
+    
+    /**
+     * Take full page screenshot with timestamp
+     * @param screenshotName Screenshot name
+     * @return Path to saved screenshot
+     */
+    public static String takeScreenshot(String screenshotName) {
+        try {
+            Page page = BrowserManager.getPage();
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String fileName = screenshotName + "_" + timestamp + ".png";
+            Path filePath = Paths.get(SCREENSHOT_DIR + fileName);
+            
+            // Create directory if it doesn't exist
+            filePath.getParent().toFile().mkdirs();
+            
+            page.screenshot(new Page.ScreenshotOptions()
+                .setPath(filePath)
+                .setFullPage(true));
+            
+            Log.info("Screenshot saved: " + filePath);
+            return filePath.toString();
+            
+        } catch (Exception e) {
+            Log.error("Failed to take screenshot", e);
+            return null;
+        }
+    }
+    
+    /**
+     * Take screenshot with test name
+     * @param testName Test name
+     * @return Path to saved screenshot
+     */
+    public static String takeScreenshotForTest(String testName) {
+        String sanitizedTestName = testName.replaceAll("[^a-zA-Z0-9]", "_");
+        return takeScreenshot(sanitizedTestName);
+    }
+    
+    /**
+     * Take screenshot on test failure
+     * @param testName Test name
+     * @return Path to saved screenshot
+     */
+    public static String takeScreenshotOnFailure(String testName) {
+        String sanitizedTestName = testName.replaceAll("[^a-zA-Z0-9]", "_");
+        return takeScreenshot("FAILED_" + sanitizedTestName);
+    }
+    
+    /**
+     * Take full page screenshot
+     * @param filePath Full file path including name
+     * @return Path to saved screenshot
+     */
+    public static String takeFullPageScreenshot(String filePath) {
+        try {
+            Page page = BrowserManager.getPage();
+            Path path = Paths.get(filePath);
+            
+            // Create directory if it doesn't exist
+            path.getParent().toFile().mkdirs();
+            
+            page.screenshot(new Page.ScreenshotOptions()
+                .setPath(path)
+                .setFullPage(true));
+            
+            Log.info("Full page screenshot saved: " + filePath);
+            return filePath;
+            
+        } catch (Exception e) {
+            Log.error("Failed to take full page screenshot", e);
+            return null;
+        }
+    }
+    
+    /**
+     * Take viewport screenshot (visible area only)
+     * @param screenshotName Screenshot name
+     * @return Path to saved screenshot
+     */
+    public static String takeViewportScreenshot(String screenshotName) {
+        try {
+            Page page = BrowserManager.getPage();
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String fileName = screenshotName + "_" + timestamp + ".png";
+            Path filePath = Paths.get(SCREENSHOT_DIR + fileName);
+            
+            // Create directory if it doesn't exist
+            filePath.getParent().toFile().mkdirs();
+            
+            page.screenshot(new Page.ScreenshotOptions()
+                .setPath(filePath)
+                .setFullPage(false));
+            
+            Log.info("Viewport screenshot saved: " + filePath);
+            return filePath.toString();
+            
+        } catch (Exception e) {
+            Log.error("Failed to take viewport screenshot", e);
+            return null;
+        }
+    }
+    
+    /**
+     * Take element screenshot
+     * @param selector Element selector
+     * @param screenshotName Screenshot name
+     * @return Path to saved screenshot
+     */
+    public static String takeElementScreenshot(String selector, String screenshotName) {
+        try {
+            Page page = BrowserManager.getPage();
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String fileName = screenshotName + "_" + timestamp + ".png";
+            Path filePath = Paths.get(SCREENSHOT_DIR + fileName);
+            
+            // Create directory if it doesn't exist
+            filePath.getParent().toFile().mkdirs();
+            
+            page.locator(selector).screenshot(new com.microsoft.playwright.Locator.ScreenshotOptions()
+                .setPath(filePath));
+            
+            Log.info("Element screenshot saved: " + filePath);
+            return filePath.toString();
+            
+        } catch (Exception e) {
+            Log.error("Failed to take element screenshot", e);
+            return null;
+        }
+    }
+    
+    /**
+     * Take screenshot as base64
+     * @return Base64 encoded screenshot
+     */
+    public static String takeScreenshotAsBase64() {
+        try {
+            Page page = BrowserManager.getPage();
+            byte[] screenshot = page.screenshot(new Page.ScreenshotOptions().setFullPage(true));
+            return java.util.Base64.getEncoder().encodeToString(screenshot);
+        } catch (Exception e) {
+            Log.error("Failed to take screenshot as base64", e);
+            return null;
+        }
+    }
+    
+    /**
+     * Get screenshot directory path
+     * @return Screenshot directory
+     */
+    public static String getScreenshotDirectory() {
+        return SCREENSHOT_DIR;
+    }
+}

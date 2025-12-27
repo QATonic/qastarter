@@ -1,0 +1,54 @@
+{
+  "name": "{{projectName}}",
+  "version": "1.0.0",
+  "description": "API automation framework with JavaScript, Supertest, and Jest",
+  "type": "module",
+  "scripts": {
+{{#if (eq testingPattern "bdd")}}
+    "test": "cucumber-js",
+    "test:watch": "cucumber-js --watch",
+    "test:smoke": "cucumber-js --tags @smoke",
+    "test:regression": "cucumber-js --tags @regression",
+{{else}}
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test:smoke": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern='smoke'",
+    "test:regression": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern='regression'",
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+    "report": "allure generate allure-results --clean && allure open",
+    "report:generate": "allure generate allure-results --clean"
+{{else if (eq reportingTool "jest-html")}}
+    "report": "open test-results/test-report.html || xdg-open test-results/test-report.html || start test-results/test-report.html"
+{{else}}
+    "report": "echo 'Test results available in test-results/'"
+{{/if}}
+  },
+  "keywords": ["api", "testing", "automation", "supertest", "jest", "rest"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "supertest": "^6.3.3",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+{{#if (eq reportingTool "jest-html")}}
+    "jest-html-reporter": "^3.10.2",
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+  {{#if (eq testingPattern "bdd")}}
+    "allure-cucumberjs": "^2.15.2",
+  {{else}}
+    "allure-jest": "^3.0.0",
+  {{/if}}
+    "allure-commandline": "^2.25.0",
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+    "@cucumber/cucumber": "^10.0.0",
+{{/if}}
+    "ajv": "^8.12.0",
+    "winston": "^3.11.0"
+  }
+}

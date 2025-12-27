@@ -1,0 +1,143 @@
+package {{javaPackage}}.stepdefinitions;
+
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.ScreenshotUtils;
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+{{/if}}
+import io.cucumber.java.*;
+
+/**
+ * Cucumber hooks for BDD test setup and teardown.
+ * Runs before and after scenarios.
+ */
+public class Hooks {
+    
+    @BeforeAll
+    public static void beforeAll() {
+        Log.startSection("BDD TEST SUITE SETUP");
+        Log.info("Environment: " + ConfigurationReader.getCurrentEnvironment());
+        Log.info("Base URL: " + ConfigurationReader.getBaseUrl());
+        Log.info("Browser: " + ConfigurationReader.getBrowser());
+        Log.info("Headless: " + ConfigurationReader.isHeadless());
+        Log.endSection();
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Initialize ExtentReports
+        ExtentManager.createInstance();
+{{/if}}
+    }
+    
+    @AfterAll
+    public static void afterAll() {
+        Log.startSection("BDD TEST SUITE TEARDOWN");
+        Log.info("Test suite execution completed");
+        Log.endSection();
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Flush ExtentReports
+        ExtentManager.flush();
+{{/if}}
+        
+        // Clean up old screenshots
+        ScreenshotUtils.cleanupOldScreenshots(7);
+    }
+    
+    @Before
+    public void setUp(Scenario scenario) {
+        String scenarioName = scenario.getName();
+        Log.testStart(scenarioName);
+{{#if (eq reportingTool "extent-reports")}}
+        
+        // Create ExtentTest for scenario
+        ExtentManager.createTest(scenarioName, "BDD Scenario");
+        
+        // Add scenario tags
+        scenario.getSourceTagNames().forEach(tag -> 
+            ExtentManager.setTestCategory(new String[]{tag.replace("@", "")}));
+        
+        ExtentManager.logInfo("Scenario started: " + scenarioName);
+{{/if}}
+        
+        // Initialize WebDriver - LAZY initialization
+        // Driver will be created when first accessed via DriverManager.getDriver()
+        Log.info("WebDriver will be initialized on first use");
+    }
+    
+    @After
+    public void tearDown(Scenario scenario) {
+        String scenarioName = scenario.getName();
+        
+        try {
+            // Handle scenario result
+            if (scenario.isFailed()) {
+                Log.testEnd(scenarioName, "FAILED");
+                
+                // Capture screenshot only if driver was initialized
+                if (DriverManager.isDriverInitialized()) {
+                    String screenshotPath = ScreenshotUtils.captureFailureScreenshot(scenarioName);
+                    
+                    // Attach screenshot to Cucumber report
+                    if (screenshotPath != null) {
+                        byte[] screenshot = ScreenshotUtils.getScreenshotAsBytes();
+                        if (screenshot != null) {
+                            scenario.attach(screenshot, "image/png", "Failure Screenshot");
+                        }
+{{#if (eq reportingTool "extent-reports")}}
+                        
+                        // Add screenshot to ExtentReports
+                        ExtentManager.addScreenshot(screenshotPath, "Failure Screenshot");
+{{/if}}
+                    }
+                }
+{{#if (eq reportingTool "extent-reports")}}
+                
+                // Log failure to ExtentReports
+                ExtentManager.logFail("❌ Scenario failed");
+{{/if}}
+            } else if (scenario.getStatus() == Status.PASSED) {
+                Log.testEnd(scenarioName, "PASSED");
+{{#if (eq reportingTool "extent-reports")}}
+                
+                // Log success to ExtentReports
+                ExtentManager.logPass("✅ Scenario passed");
+{{/if}}
+            } else if (scenario.getStatus() == Status.SKIPPED) {
+                Log.testEnd(scenarioName, "SKIPPED");
+{{#if (eq reportingTool "extent-reports")}}
+                
+                // Log skip to ExtentReports
+                ExtentManager.logSkip("⏭️ Scenario skipped");
+{{/if}}
+            }
+        } finally {
+            // Quit WebDriver only if it was initialized
+            if (DriverManager.isDriverInitialized()) {
+                Log.info("Quitting WebDriver");
+                DriverManager.quitDriver();
+            }
+{{#if (eq reportingTool "extent-reports")}}
+            
+            // Remove test from ThreadLocal
+            ExtentManager.removeTest();
+{{/if}}
+        }
+    }
+    
+    @BeforeStep
+    public void beforeStep(Scenario scenario) {
+        // Can add step-level logging here if needed
+    }
+    
+    @AfterStep
+    public void afterStep(Scenario scenario) {
+        // Can add step-level screenshots or logging here if needed
+{{#if (eq reportingTool "extent-reports")}}
+        if (scenario.isFailed()) {
+            // Step failed - already handled in @After
+        }
+{{/if}}
+    }
+}

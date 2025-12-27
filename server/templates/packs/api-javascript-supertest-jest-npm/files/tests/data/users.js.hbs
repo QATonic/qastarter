@@ -1,0 +1,30 @@
+/**
+ * Test data for Users API
+ */
+
+export const validUser = {
+  name: 'John Doe',
+  email: 'john.doe@example.com',
+  username: 'johndoe',
+  phone: '1-234-567-8900',
+  website: 'johndoe.com',
+  address: {
+    street: '123 Main St',
+    city: 'New York',
+    zipcode: '10001'
+  },
+  company: {
+    name: 'Tech Corp',
+    catchPhrase: 'Innovation at its best'
+  }
+};
+
+export const invalidUser = {
+  name: '',
+  email: 'invalid-email'
+};
+
+export const updateUser = {
+  name: 'John Updated',
+  email: 'john.updated@example.com'
+};

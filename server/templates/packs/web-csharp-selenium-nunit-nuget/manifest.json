@@ -1,0 +1,195 @@
+{
+  "name": "C# Selenium WebDriver NUnit Framework",
+  "description": "Production-ready Selenium automation framework with C#, NUnit, and Page Object Model",
+  "version": "1.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "selenium",
+    "language": "csharp",
+    "testRunner": "nunit",
+    "buildTool": "nuget"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "nunit-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "dotnet": "8.0",
+    "selenium-webdriver": "4.16.0",
+    "nunit": "3.14.0",
+    "extent-reports": "5.0.2"
+  },
+  "files": [
+    {
+      "path": "{{projectName}}.csproj",
+      "isTemplate": true,
+      "description": "C# project configuration"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Setup and usage documentation"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false,
+      "description": "Git ignore rules"
+    },
+    {
+      "path": "appsettings.json",
+      "isTemplate": true,
+      "description": "Application settings"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "description": "Jenkins declarative pipeline for CI/CD",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "description": "Azure DevOps pipeline configuration",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "Config/EnvConfig.cs",
+      "isTemplate": true,
+      "description": "Environment configuration"
+    },
+    {
+      "path": "Config/BrowserConfig.cs",
+      "isTemplate": true,
+      "description": "Browser configuration"
+    },
+    {
+      "path": "Pages/BasePage.cs",
+      "isTemplate": true,
+      "description": "Base page with common methods"
+    },
+    {
+      "path": "Pages/LoginPage.cs",
+      "isTemplate": true,
+      "description": "Login page object"
+    },
+    {
+      "path": "Pages/HomePage.cs",
+      "isTemplate": true,
+      "description": "Home page object"
+    },
+    {
+      "path": "Utils/DriverFactory.cs",
+      "isTemplate": true,
+      "description": "WebDriver factory"
+    },
+    {
+      "path": "Utils/Logger.cs",
+      "isTemplate": true,
+      "description": "Logging utility"
+    },
+    {
+      "path": "Utils/ScreenshotHelper.cs",
+      "isTemplate": true,
+      "description": "Screenshot utility"
+    },
+    {
+      "path": "Utils/WaitHelpers.cs",
+      "isTemplate": true,
+      "description": "Wait utilities"
+    },
+    {
+      "path": "Utils/DataReader.cs",
+      "isTemplate": true,
+      "description": "Test data reader"
+    },
+    {
+      "path": "Tests/LoginTests.cs",
+      "isTemplate": true,
+      "description": "Login tests"
+    },
+    {
+      "path": "Tests/SmokeTests.cs",
+      "isTemplate": true,
+      "description": "Smoke tests"
+    },
+    {
+      "path": "Tests/BaseTest.cs",
+      "isTemplate": true,
+      "description": "Base test setup/teardown"
+    },
+    {
+      "path": "Data/dev.json",
+      "isTemplate": true,
+      "description": "Dev environment data"
+    },
+    {
+      "path": "Data/qa.json",
+      "isTemplate": true,
+      "description": "QA environment data"
+    },
+    {
+      "path": "Data/users.json",
+      "isTemplate": true,
+      "description": "User test data"
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration"
+    },
+    {
+      "path": ".dockerignore",
+      "isTemplate": false,
+      "description": "Docker ignore"
+    },
+    {
+      "path": "Features/Login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "StepDefinitions/LoginSteps.cs",
+      "isTemplate": true,
+      "description": "SpecFlow step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    }
+  ],
+  "directories": [
+    "TestResults",
+    "Logs",
+    "Screenshots",
+    "Reports"
+  ]
+}

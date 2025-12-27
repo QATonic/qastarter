@@ -1,0 +1,199 @@
+{
+  "id": "web-python-playwright-pytest-pip",
+  "supportsDynamic": true,
+  "name": "Web Automation Framework",
+  "description": "Playwright test automation framework with Python and Pytest for web testing",
+  "tags": [
+    "web",
+    "playwright",
+    "python",
+    "pytest",
+    "pip",
+    "pom"
+  ],
+  "toolVersions": {
+    "python": "3.11",
+    "playwright": "1.41.0",
+    "pytest": "8.0.0",
+    "pytest-playwright": "0.4.4"
+  },
+  "files": [
+    {
+      "path": "requirements.txt",
+      "isTemplate": true,
+      "description": "Python dependencies including Playwright and Pytest"
+    },
+    {
+      "path": "pytest.ini",
+      "isTemplate": true,
+      "description": "Pytest configuration"
+    },
+    {
+      "path": "conftest.py",
+      "isTemplate": true,
+      "description": "Pytest fixtures and configuration"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD workflow",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation and setup guide"
+    },
+    {
+      "path": "config/__init__.py",
+      "isTemplate": true,
+      "description": "Config package initializer"
+    },
+    {
+      "path": "config/env_config.py",
+      "isTemplate": true,
+      "description": "Environment configuration manager"
+    },
+    {
+      "path": "config/test_config.py",
+      "isTemplate": true,
+      "description": "Test configuration and settings"
+    },
+    {
+      "path": "pages/__init__.py",
+      "isTemplate": true,
+      "description": "Pages package initializer"
+    },
+    {
+      "path": "pages/base_page.py",
+      "isTemplate": true,
+      "description": "Base page class with common functionality"
+    },
+    {
+      "path": "pages/login_page.py",
+      "isTemplate": true,
+      "description": "Login page object"
+    },
+    {
+      "path": "pages/home_page.py",
+      "isTemplate": true,
+      "description": "Home page object"
+    },
+    {
+      "path": "utils/__init__.py",
+      "isTemplate": true,
+      "description": "Utils package initializer"
+    },
+    {
+      "path": "utils/logger.py",
+      "isTemplate": true,
+      "description": "Python logging utility"
+    },
+    {
+      "path": "utils/screenshot_helper.py",
+      "isTemplate": true,
+      "description": "Screenshot capture utility"
+    },
+    {
+      "path": "utils/wait_helpers.py",
+      "isTemplate": true,
+      "description": "Custom wait utilities"
+    },
+    {
+      "path": "utils/data_reader.py",
+      "isTemplate": true,
+      "description": "Test data file reader"
+    },
+    {
+      "path": "tests/__init__.py",
+      "isTemplate": true,
+      "description": "Tests package initializer"
+    },
+    {
+      "path": "tests/test_login.py",
+      "isTemplate": true,
+      "description": "Login test suite"
+    },
+    {
+      "path": "tests/test_smoke.py",
+      "isTemplate": true,
+      "description": "Smoke test suite"
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true,
+      "description": "Development environment test data"
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true,
+      "description": "QA environment test data"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/test_login_steps.py",
+      "isTemplate": true,
+      "description": "pytest-bdd step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/__init__.py",
+      "isTemplate": false,
+      "description": "Python package initializer",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Playwright testing"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "playwright",
+    "language": "python",
+    "testRunner": "pytest",
+    "buildTool": "pip"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "pytest-html",
+      "pytest-json-report"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

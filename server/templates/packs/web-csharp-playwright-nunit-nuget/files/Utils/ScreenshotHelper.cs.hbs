@@ -1,0 +1,36 @@
+using Microsoft.Playwright;
+
+namespace {{projectName}}.Utils;
+
+public static class ScreenshotHelper
+{
+    public static async Task<string> CaptureScreenshotAsync(IPage page, string name)
+    {
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+        var filename = $"{name}-{timestamp}.png";
+        var screenshotsDir = "screenshots";
+        
+        if (!Directory.Exists(screenshotsDir))
+        {
+            Directory.CreateDirectory(screenshotsDir);
+        }
+
+        var filepath = Path.Combine(screenshotsDir, filename);
+        await page.ScreenshotAsync(new() { Path = filepath, FullPage = true });
+        
+        Console.WriteLine($"Screenshot saved: {filepath}");
+        return filepath;
+    }
+
+    public static async Task CaptureOnFailureAsync(IPage page, string testName)
+    {
+        try
+        {
+            await CaptureScreenshotAsync(page, $"FAILED-{testName}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to capture screenshot: {ex.Message}");
+        }
+    }
+}

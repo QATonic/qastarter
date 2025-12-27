@@ -1,0 +1,24 @@
+package utils;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.FileReader;
+import java.io.IOException;
+
+public class DataReader {
+    private static final Logger logger = LogManager.getLogger(DataReader.class);
+
+    public static JsonObject readJson(String filename) {
+        String filepath = "src/test/resources/data/" + filename;
+        logger.info("Reading data from: " + filepath);
+        
+        try (FileReader reader = new FileReader(filepath)) {
+            return new Gson().fromJson(reader, JsonObject.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read JSON file: " + filepath, e);
+        }
+    }
+}

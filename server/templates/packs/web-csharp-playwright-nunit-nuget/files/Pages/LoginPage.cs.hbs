@@ -1,0 +1,74 @@
+/// <summary>
+/// Login Page Object
+/// 
+/// HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+/// 1. Open your app's login page in a browser
+/// 2. Right-click on each element → Inspect → Copy selector
+/// 3. Replace the placeholder selectors below with your actual selectors
+/// </summary>
+using Microsoft.Playwright;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Pages;
+
+public class LoginPage : BasePage
+{
+    // ============================================
+    // UPDATE THESE SELECTORS FOR YOUR APPLICATION
+    // ============================================
+    // Tip: Use browser DevTools (F12) to find correct selectors
+    private const string UsernameInput = "#username";           // Your username/email input field
+    private const string PasswordInput = "#password";           // Your password input field
+    private const string LoginButton = "button[type='submit']"; // Your login/submit button
+    private const string ErrorMessage = ".error-message";       // Error message element
+    private const string SuccessIndicator = ".dashboard, .home"; // Element visible after successful login
+    // ============================================
+
+    public LoginPage(IPage page) : base(page) { }
+
+    public async Task NavigateToLoginAsync()
+    {
+        // UPDATE: Change "/login" to your actual login page path
+        await NavigateAsync($"{EnvConfig.Instance.BaseUrl}/login");
+    }
+
+    public async Task LoginAsync(string username, string password)
+    {
+        await TypeAsync(UsernameInput, username);
+        await TypeAsync(PasswordInput, password);
+        await ClickAsync(LoginButton);
+    }
+
+    public async Task<bool> IsLoginSuccessfulAsync()
+    {
+        try
+        {
+            await WaitForSelectorAsync(SuccessIndicator, 10000);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> IsErrorDisplayedAsync()
+    {
+        return await IsVisibleAsync(ErrorMessage);
+    }
+
+    public async Task<string?> GetErrorMessageAsync()
+    {
+        return await GetTextAsync(ErrorMessage);
+    }
+
+    public async Task<bool> IsUsernameVisibleAsync()
+    {
+        return await IsVisibleAsync(UsernameInput);
+    }
+
+    public async Task<bool> IsPasswordVisibleAsync()
+    {
+        return await IsVisibleAsync(PasswordInput);
+    }
+}

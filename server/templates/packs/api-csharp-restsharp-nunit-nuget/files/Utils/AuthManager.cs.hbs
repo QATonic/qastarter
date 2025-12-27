@@ -1,0 +1,80 @@
+using {{projectName}}.Core;
+
+namespace {{projectName}}.Utils;
+
+public class AuthManager
+{
+    private readonly ApiClient _client;
+    private string? _token;
+
+    public AuthManager(ApiClient client)
+    {
+        _client = client;
+    }
+
+    public async Task<string> LoginAsync(string username, string password, string endpoint = "/auth/login")
+    {
+        var body = new { username, password };
+        var response = await _client.PostAsync<Dictionary<string, object>>(endpoint, body);
+
+        if (response.IsSuccessful && response.Data != null)
+        {
+            _token = response.Data.GetValueOrDefault("token")?.ToString() 
+                    ?? response.Data.GetValueOrDefault("access_token")?.ToString();
+
+            if (_token != null)
+            {
+                _client.SetAuthToken(_token);
+                Logger.Info($"Successfully authenticated as {username}");
+                return _token;
+            }
+        }
+
+        throw new Exception($"Authentication failed: {response.StatusCode}");
+    }
+
+    public async Task LogoutAsync(string endpoint = "/auth/logout")
+    {
+        if (_token != null)
+        {
+            try
+            {
+                await _client.PostAsync<object>(endpoint);
+            }
+            catch
+            {
+                // Ignore logout errors
+            }
+            finally
+            {
+                ClearAuth();
+                Logger.Info("Logged out successfully");
+            }
+        }
+    }
+
+    public void SetToken(string token)
+    {
+        _token = token;
+        _client.SetAuthToken(token);
+    }
+
+    public void SetApiKey(string apiKey, string headerName = "X-API-Key")
+    {
+        _client.SetApiKey(apiKey, headerName);
+    }
+
+    public void SetBasicAuth(string username, string password)
+    {
+        _client.SetBasicAuth(username, password);
+    }
+
+    public void ClearAuth()
+    {
+        _token = null;
+        _client.ClearAuth();
+    }
+
+    public string? Token => _token;
+    public bool IsAuthenticated => _token != null;
+}

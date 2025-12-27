@@ -1,0 +1,84 @@
+import pytest
+import json
+import os
+from appium import webdriver
+from appium.options.android import UiAutomator2Options
+from appium.options.ios import XCUITestOptions
+from config.capabilities import CapabilitiesManager
+from config.settings import Settings
+
+@pytest.fixture(scope="session")
+def settings():
+    """Load application settings"""
+    return Settings()
+
+@pytest.fixture(scope="session")
+def test_data(settings):
+    """Load test data based on environment"""
+    env = settings.test_env
+    data_file = f"data/{env}.json"
+    
+    with open(data_file, 'r') as f:
+        return json.load(f)
+
+@pytest.fixture(scope="function")
+def driver(settings):
+    """Initialize and return Appium driver"""
+    capabilities_manager = CapabilitiesManager()
+    
+    # Get capabilities based on platform
+    if settings.platform.lower() == 'android':
+        caps = capabilities_manager.get_android_capabilities()
+        options = UiAutomator2Options().load_capabilities(caps)
+    else:  # iOS
+        caps = capabilities_manager.get_ios_capabilities()
+        options = XCUITestOptions().load_capabilities(caps)
+    
+    # Create driver
+    driver = webdriver.Remote(
+        command_executor=settings.appium_server,
+        options=options
+    )
+    
+    driver.implicitly_wait(settings.implicit_wait)
+    
+    yield driver
+    
+    # Cleanup
+    driver.quit()
+
+@pytest.fixture(autouse=True)
+def test_logger(request):
+    """Log test execution"""
+    test_name = request.node.name
+    print(f"\n{'='*80}")
+    print(f"Starting test: {test_name}")
+    print(f"{'='*80}")
+    
+    yield
+    
+    print(f"\n{'='*80}")
+    print(f"Finished test: {test_name}")
+    print(f"{'='*80}\n")
+
+def pytest_configure(config):
+    """Create necessary directories"""
+    os.makedirs("logs", exist_ok=True)
+    os.makedirs("screenshots", exist_ok=True)
+    os.makedirs("allure-results", exist_ok=True)
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Capture screenshot on test failure"""
+    outcome = yield
+    report = outcome.get_result()
+    
+    if report.when == "call" and report.failed:
+        driver = item.funcargs.get('driver')
+        if driver:
+            try:
+                screenshot_name = f"screenshots/{item.name}_{call.when}.png"
+                driver.save_screenshot(screenshot_name)
+                print(f"Screenshot saved: {screenshot_name}")
+            except Exception as e:
+                print(f"Failed to capture screenshot: {str(e)}")

@@ -1,0 +1,29 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+# Install Node.js for Appium
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
+
+# Install Appium
+RUN npm install -g appium@2 && \
+    appium driver install uiautomator2
+
+WORKDIR /app
+
+# Copy project files
+COPY *.csproj ./
+RUN dotnet restore
+
+# Copy application
+COPY . .
+
+# Build application
+RUN dotnet build -c Release
+
+# Environment variables
+ENV PLATFORM=Android
+ENV TEST_ENV=qa
+ENV APPIUM_SERVER=http://localhost:4723
+
+# Start Appium in background and run tests
+CMD appium & sleep 5 && dotnet test -c Release

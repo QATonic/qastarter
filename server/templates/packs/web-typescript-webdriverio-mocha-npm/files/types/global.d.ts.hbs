@@ -1,0 +1,50 @@
+/**
+ * Global type definitions for WebdriverIO tests.
+ */
+
+declare namespace NodeJS {
+  interface ProcessEnv {
+    TEST_ENV?: string;
+    DEV_BASE_URL?: string;
+    DEV_API_URL?: string;
+    QA_BASE_URL?: string;
+    QA_API_URL?: string;
+    STAGING_BASE_URL?: string;
+    STAGING_API_URL?: string;
+    PROD_BASE_URL?: string;
+    PROD_API_URL?: string;
+    BROWSER?: string;
+    HEADLESS?: string;
+  }
+}
+
+/**
+ * Test user interface
+ */
+interface TestUser {
+  username: string;
+  password: string;
+  displayName?: string;
+  email?: string;
+  role?: string;
+}
+
+/**
+ * Test users collection
+ */
+interface TestUsers {
+  validUser: TestUser;
+  invalidUser: TestUser;
+  adminUser?: TestUser;
+  [key: string]: TestUser | undefined;
+}
+
+/**
+ * Environment configuration
+ */
+interface EnvironmentConfig {
+  baseUrl: string;
+  apiUrl: string;
+  timeout: number;
+  retries: number;
+}

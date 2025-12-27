@@ -1,0 +1,241 @@
+pipeline {
+    agent any
+    
+    tools {
+        maven 'Maven-3.8.1'
+        jdk 'JDK-11'
+    }
+    
+    environment {
+        // Test configuration
+        MAVEN_OPTS = '-Xmx1024m'
+        BROWSER = 'chrome'
+        HEADLESS = 'true'
+        BASE_URL = 'http://localhost:8080'
+        
+        // CI specific settings
+        CI = 'true'
+        SCREENSHOT_ON_FAILURE = 'true'
+        REPORTS_PATH = 'target/reports'
+        SCREENSHOTS_PATH = 'target/screenshots'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Checking out source code...'
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn clean compile'
+                    } else {
+                        bat 'mvn clean compile'
+                    }
+                }
+            }
+        }
+        
+        stage('Unit Tests') {
+            steps {
+                echo 'Running unit tests...'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn test -Dtest=*UnitTest'
+                    } else {
+                        bat 'mvn test -Dtest=*UnitTest'
+                    }
+                }
+            }
+            post {
+                always {
+                    // Publish unit test results
+                    publishTestResults testResultsPattern: 'target/surefire-reports/TEST-*.xml'
+                }
+            }
+        }
+        
+        stage('Integration Tests') {
+            parallel {
+                stage('Chrome Tests') {
+                    steps {
+                        echo 'Running integration tests on Chrome...'
+                        script {
+                            if (isUnix()) {
+                                sh '''
+                                    mvn test -Dtest=*Test \
+                                    -Dbrowser=chrome \
+                                    -Dheadless=true \
+                                    -Dbase.url=${BASE_URL} \
+                                    -Dscreenshot.on.failure=true
+                                '''
+                            } else {
+                                bat '''
+                                    mvn test -Dtest=*Test ^
+                                    -Dbrowser=chrome ^
+                                    -Dheadless=true ^
+                                    -Dbase.url=%BASE_URL% ^
+                                    -Dscreenshot.on.failure=true
+                                '''
+                            }
+                        }
+                    }
+                }
+                
+                stage('Firefox Tests') {
+                    steps {
+                        echo 'Running integration tests on Firefox...'
+                        script {
+                            if (isUnix()) {
+                                sh '''
+                                    mvn test -Dtest=*Test \
+                                    -Dbrowser=firefox \
+                                    -Dheadless=true \
+                                    -Dbase.url=${BASE_URL} \
+                                    -Dscreenshot.on.failure=true
+                                '''
+                            } else {
+                                bat '''
+                                    mvn test -Dtest=*Test ^
+                                    -Dbrowser=firefox ^
+                                    -Dheadless=true ^
+                                    -Dbase.url=%BASE_URL% ^
+                                    -Dscreenshot.on.failure=true
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    // Publish test results
+                    publishTestResults testResultsPattern: 'target/surefire-reports/TEST-*.xml'
+                    
+                    // Archive screenshots if any
+                    archiveArtifacts artifacts: 'target/screenshots/**', allowEmptyArchive: true
+                    
+                    {{#if (includes integrations.reporting "Extent Reports")}}
+                    // Publish Extent Reports
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'target/reports',
+                        reportFiles: '*.html',
+                        reportName: 'Test Report'
+                    ])
+                    {{/if}}
+                }
+            }
+        }
+        
+        stage('Performance Tests') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                }
+            }
+            steps {
+                echo 'Running performance tests...'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn test -Dtest=*PerformanceTest'
+                    } else {
+                        bat 'mvn test -Dtest=*PerformanceTest'
+                    }
+                }
+            }
+        }
+        
+        stage('Security Tests') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo 'Running security tests...'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn test -Dtest=*SecurityTest'
+                    } else {
+                        bat 'mvn test -Dtest=*SecurityTest'
+                    }
+                }
+            }
+        }
+        
+        stage('Generate Reports') {
+            steps {
+                echo 'Generating test reports...'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn surefire-report:report'
+                    } else {
+                        bat 'mvn surefire-report:report'
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'Cleaning up workspace...'
+            
+            // Archive build artifacts
+            archiveArtifacts artifacts: 'target/reports/**', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'target/logs/**', allowEmptyArchive: true
+            
+            // Publish test results
+            publishTestResults testResultsPattern: 'target/surefire-reports/TEST-*.xml'
+            
+            // Clean workspace
+            cleanWs()
+        }
+        
+        success {
+            echo 'Pipeline completed successfully!'
+            {{#if (includes integrations.others "Docker")}}
+            // Build and push Docker image on success
+            script {
+                def imageName = "{{config.projectName}}:${env.BUILD_NUMBER}"
+                if (isUnix()) {
+                    sh "docker build -t ${imageName} ."
+                    sh "docker tag ${imageName} {{config.projectName}}:latest"
+                } else {
+                    bat "docker build -t ${imageName} ."
+                    bat "docker tag ${imageName} {{config.projectName}}:latest"
+                }
+            }
+            {{/if}}
+        }
+        
+        failure {
+            echo 'Pipeline failed!'
+            
+            // Send notification on failure
+            emailext(
+                subject: "Test Pipeline Failed: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+                body: "The test pipeline has failed. Please check the build logs for details.\n\nBuild URL: ${env.BUILD_URL}",
+                to: "${env.CHANGE_AUTHOR_EMAIL}"
+            )
+        }
+        
+        unstable {
+            echo 'Pipeline completed with test failures!'
+            
+            // Send notification on unstable build
+            emailext(
+                subject: "Test Pipeline Unstable: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
+                body: "The test pipeline completed but some tests failed. Please review the test results.\n\nBuild URL: ${env.BUILD_URL}",
+                to: "${env.CHANGE_AUTHOR_EMAIL}"
+            )
+        }
+    }
+} 

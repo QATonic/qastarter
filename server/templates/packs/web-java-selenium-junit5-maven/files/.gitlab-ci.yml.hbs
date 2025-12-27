@@ -1,0 +1,73 @@
+image: maven:3.9-eclipse-temurin-{{toolVersions.java}}
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  ENVIRONMENT: "qa"
+
+cache:
+  paths:
+    - .m2/repository
+
+stages:
+  - test
+  - report
+
+test:chrome:
+  stage: test
+  script:
+    - apt-get update && apt-get install -y wget gnupg2
+    - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+    - apt-get update && apt-get install -y google-chrome-stable
+    - mvn clean test -Dbrowser=chrome
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - target/allure-results
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      - target/surefire-reports
+      {{/if}}
+      - reports/screenshots
+      - logs
+    expire_in: 7 days
+
+test:firefox:
+  stage: test
+  script:
+    - apt-get update && apt-get install -y firefox-esr
+    - mvn clean test -Dbrowser=firefox
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - target/allure-results
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      - target/surefire-reports
+      {{/if}}
+      - reports/screenshots
+      - logs
+    expire_in: 7 days
+
+{{#if (eq reportingTool "allure")}}
+allure:report:
+  stage: report
+  script:
+    - mvn allure:report
+  dependencies:
+    - test:chrome
+    - test:firefox
+  artifacts:
+    paths:
+      - target/site/allure-maven-plugin
+    expire_in: 30 days
+  when: always
+{{/if}}

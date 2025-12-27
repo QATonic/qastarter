@@ -1,0 +1,49 @@
+class BasePage {
+  visit(url: string): void {
+    cy.log(`Navigating to: ${url}`);
+    cy.visit(url);
+  }
+
+  click(selector: string): void {
+    cy.log(`Clicking element: ${selector}`);
+    cy.get(selector).click();
+  }
+
+  type(selector: string, text: string): void {
+    cy.log(`Typing '${text}' into element: ${selector}`);
+    cy.get(selector).clear().type(text);
+  }
+
+  getText(selector: string): Cypress.Chainable<string> {
+    cy.log(`Getting text from element: ${selector}`);
+    return cy.get(selector).invoke('text');
+  }
+
+  isVisible(selector: string): void {
+    cy.log(`Checking visibility of element: ${selector}`);
+    cy.get(selector).should('be.visible');
+  }
+
+  waitForElement(selector: string, timeout: number = 10000): void {
+    cy.log(`Waiting for selector: ${selector}`);
+    cy.get(selector, { timeout }).should('be.visible');
+  }
+
+  getTitle(): Cypress.Chainable<string> {
+    return cy.title();
+  }
+
+  getCurrentUrl(): Cypress.Chainable<string> {
+    return cy.url();
+  }
+
+  assertUrlContains(text: string): void {
+    cy.url().should('include', text);
+  }
+
+  assertTitleContains(text: string): void {
+    cy.title().should('include', text);
+  }
+}
+
+export default BasePage;

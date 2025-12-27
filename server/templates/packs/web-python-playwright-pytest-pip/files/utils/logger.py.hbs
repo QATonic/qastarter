@@ -1,0 +1,26 @@
+import logging
+from pathlib import Path
+
+# Create logs directory
+Path('logs').mkdir(exist_ok=True)
+
+# Configure logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# File handler
+file_handler = logging.FileHandler('logs/test.log')
+file_handler.setLevel(logging.INFO)
+
+# Console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+
+# Formatter
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# Add handlers
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)

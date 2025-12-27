@@ -1,0 +1,87 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium.Windows;
+using OpenQA.Selenium.Support.UI;
+using {{projectName}}.Config;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Core;
+
+public static class WaitHelpers
+{
+    public static WindowsElement WaitForElement(
+        WindowsDriver<WindowsElement> driver,
+        By locator,
+        int timeoutSeconds = -1)
+    {
+        if (timeoutSeconds == -1)
+            timeoutSeconds = Settings.ExplicitWaitSeconds;
+
+        try
+        {
+            Logger.Info($"Waiting for element: {locator}");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            var element = wait.Until(drv => drv.FindElement(locator) as WindowsElement);
+            Logger.Info($"Element found: {locator}");
+            return element!;
+        }
+        catch (WebDriverTimeoutException ex)
+        {
+            Logger.Error(ex, $"Timeout waiting for element: {locator}");
+            throw;
+        }
+    }
+
+    public static bool WaitForElementToBeClickable(
+        WindowsDriver<WindowsElement> driver,
+        WindowsElement element,
+        int timeoutSeconds = -1)
+    {
+        if (timeoutSeconds == -1)
+            timeoutSeconds = Settings.ExplicitWaitSeconds;
+
+        try
+        {
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            return wait.Until(drv => element.Enabled && element.Displayed);
+        }
+        catch (WebDriverTimeoutException)
+        {
+            return false;
+        }
+    }
+
+    public static bool WaitForElementToDisappear(
+        WindowsDriver<WindowsElement> driver,
+        By locator,
+        int timeoutSeconds = -1)
+    {
+        if (timeoutSeconds == -1)
+            timeoutSeconds = Settings.ExplicitWaitSeconds;
+
+        try
+        {
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            return wait.Until(drv =>
+            {
+                try
+                {
+                    drv.FindElement(locator);
+                    return false;
+                }
+                catch (NoSuchElementException)
+                {
+                    return true;
+                }
+            });
+        }
+        catch (WebDriverTimeoutException)
+        {
+            return false;
+        }
+    }
+
+    public static void Sleep(int milliseconds)
+    {
+        Thread.Sleep(milliseconds);
+    }
+}

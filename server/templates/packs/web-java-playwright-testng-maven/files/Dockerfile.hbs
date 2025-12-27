@@ -1,0 +1,10 @@
+FROM mcr.microsoft.com/playwright/java:v1.40.0-focal
+
+WORKDIR /app
+
+COPY pom.xml .
+RUN mvn dependency:go-offline
+
+COPY . .
+
+CMD ["mvn", "test"]

@@ -1,0 +1,58 @@
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Android;
+using OpenQA.Selenium.Appium.iOS;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Tests.Utils;
+
+public class DriverManager
+{
+    private static AppiumDriver? _driver;
+
+    public static AppiumDriver GetDriver()
+    {
+        if (_driver != null)
+            return _driver;
+
+        var serverUri = AppiumServerConfig.GetServerUri();
+        
+        if (Settings.IsAndroid)
+        {
+            var options = CapabilitiesManager.GetAndroidCapabilities();
+            _driver = new AndroidDriver(serverUri, options);
+        }
+        else if (Settings.IsIOS)
+        {
+            var options = CapabilitiesManager.GetIOSCapabilities();
+            _driver = new IOSDriver(serverUri, options);
+        }
+        else
+        {
+            throw new InvalidOperationException($"Unsupported platform: {Settings.Platform}");
+        }
+
+        _driver.Manage().Timeouts().ImplicitWait = Settings.ImplicitWait;
+        
+        return _driver;
+    }
+
+    public static void QuitDriver()
+    {
+        if (_driver != null)
+        {
+            try
+            {
+                _driver.Quit();
+                _driver.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error quitting driver: {ex.Message}");
+            }
+            finally
+            {
+                _driver = null;
+            }
+        }
+    }
+}

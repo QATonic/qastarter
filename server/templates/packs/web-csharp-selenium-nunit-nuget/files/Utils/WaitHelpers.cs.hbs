@@ -1,0 +1,43 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
+
+namespace {{projectName}}.Utils
+{
+    public class WaitHelpers
+    {
+        private readonly IWebDriver _driver;
+        private readonly WebDriverWait _wait;
+
+        public WaitHelpers(IWebDriver driver, int timeout = 10)
+        {
+            _driver = driver;
+            _wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
+        }
+
+        public IWebElement WaitForElementLocated(By locator)
+        {
+            return _wait.Until(ExpectedConditions.ElementExists(locator));
+        }
+
+        public IWebElement WaitForElementVisible(By locator)
+        {
+            return _wait.Until(ExpectedConditions.ElementIsVisible(locator));
+        }
+
+        public IWebElement WaitForElementClickable(By locator)
+        {
+            return _wait.Until(ExpectedConditions.ElementToBeClickable(locator));
+        }
+
+        public bool WaitForUrlContains(string urlFragment)
+        {
+            return _wait.Until(ExpectedConditions.UrlContains(urlFragment));
+        }
+
+        public bool WaitForTitleContains(string title)
+        {
+            return _wait.Until(ExpectedConditions.TitleContains(title));
+        }
+    }
+}

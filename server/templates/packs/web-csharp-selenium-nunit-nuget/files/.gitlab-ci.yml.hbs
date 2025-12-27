@@ -1,0 +1,87 @@
+image: mcr.microsoft.com/dotnet/sdk:{{toolVersions.dotnet}}
+
+variables:
+  NUGET_PACKAGES_DIRECTORY: '.nuget'
+  ENVIRONMENT: 'qa'
+  HEADLESS: 'true'
+
+cache:
+  paths:
+    - .nuget/
+
+stages:
+  - test
+  - report
+
+test:chrome:
+  stage: test
+  before_script:
+    - apt-get update && apt-get install -y wget gnupg2
+    - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+    - apt-get update && apt-get install -y google-chrome-stable
+    - dotnet restore
+  script:
+    - dotnet test --configuration Release --logger "trx;LogFileName=test-results.trx" -p:Browser=chrome
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - allure-results/
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - TestResults/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "nunit")}}
+      - TestResults/test-results.trx
+      {{/if}}
+      - screenshots/
+      - logs/
+    reports:
+      junit: TestResults/test-results.trx
+    expire_in: 7 days
+
+test:firefox:
+  stage: test
+  before_script:
+    - apt-get update && apt-get install -y firefox-esr
+    - dotnet restore
+  script:
+    - dotnet test --configuration Release --logger "trx;LogFileName=test-results.trx" -p:Browser=firefox
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - allure-results/
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - TestResults/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "nunit")}}
+      - TestResults/test-results.trx
+      {{/if}}
+      - screenshots/
+      - logs/
+    reports:
+      junit: TestResults/test-results.trx
+    expire_in: 7 days
+
+{{#if (eq reportingTool "allure")}}
+allure:report:
+  stage: report
+  before_script:
+    - apt-get update && apt-get install -y wget default-jre
+    - wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+    - tar -zxvf allure-2.25.0.tgz -C /opt/
+    - ln -s /opt/allure-2.25.0/bin/allure /usr/local/bin/allure
+  script:
+    - allure generate allure-results --clean -o allure-report
+  dependencies:
+    - test:chrome
+    - test:firefox
+  artifacts:
+    paths:
+      - allure-report/
+    expire_in: 30 days
+  when: always
+{{/if}}

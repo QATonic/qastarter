@@ -1,0 +1,53 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+export const config = {
+  runner: 'local',
+  specs: ['./test/specs/**/*.js'],
+  exclude: [],
+  
+  maxInstances: 5,
+  
+  capabilities: [{
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      args: process.argv.includes('--headless') 
+        ? ['--headless', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage']
+        : []
+    }
+  }],
+  
+  logLevel: 'info',
+  bail: 0,
+  baseUrl: process.env.BASE_URL || 'https://the-internet.herokuapp.com',
+  waitforTimeout: 10000,
+  connectionRetryTimeout: 120000,
+  connectionRetryCount: 3,
+  
+  services: ['chromedriver'],
+  
+  framework: 'mocha',
+  reporters: [
+    'spec',
+    ['allure', {
+      outputDir: 'allure-results',
+      disableWebdriverStepsReporting: false,
+      disableWebdriverScreenshotsReporting: false
+    }]
+  ],
+  
+  mochaOpts: {
+    ui: 'bdd',
+    timeout: 60000
+  },
+  
+  before: function (capabilities, specs) {
+    browser.maximizeWindow();
+  },
+  
+  afterTest: async function(test, context, { error, result, duration, passed, retries }) {
+    if (!passed) {
+      await browser.takeScreenshot();
+    }
+  }
+};

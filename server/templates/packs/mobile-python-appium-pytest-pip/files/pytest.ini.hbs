@@ -1,0 +1,19 @@
+[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts = 
+    -v
+    --tb=short
+    --strict-markers
+    --alluredir=allure-results
+markers =
+    smoke: Smoke tests
+    regression: Regression tests
+    ios: iOS specific tests
+    android: Android specific tests
+log_cli = true
+log_cli_level = INFO
+log_file = logs/test.log
+log_file_level = DEBUG

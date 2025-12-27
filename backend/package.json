@@ -1,0 +1,70 @@
+{
+  "name": "qastarter-backend",
+  "version": "1.0.0",
+  "description": "QAStarter Backend API - Generate QA test automation project boilerplates",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "qa",
+    "testing",
+    "automation",
+    "selenium",
+    "project-generator",
+    "boilerplate"
+  ],
+  "author": "QAStarter Team",
+  "license": "MIT",
+  "dependencies": {
+    "@types/morgan": "^1.9.10",
+    "archiver": "^6.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "fs-extra": "^11.2.0",
+    "handlebars": "^4.7.8",
+    "helmet": "^7.1.0",
+    "joi": "^17.11.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jest": "^29.5.8",
+    "@types/joi": "^17.2.3",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.10.5",
+    "@types/supertest": "^2.0.16",
+    "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.1",
+    "tsc-alias": "^1.8.8",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

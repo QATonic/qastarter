@@ -1,0 +1,385 @@
+{
+  "name": "mobile-java-appium-testng-maven",
+  "displayName": "Java + Appium + TestNG + Maven",
+  "description": "Professional mobile automation framework with Java, Appium, TestNG, and Maven for iOS and Android testing",
+  "version": "2.0.0",
+  "category": "mobile-testing",
+  "tags": [
+    "mobile",
+    "java",
+    "appium",
+    "testng",
+    "maven",
+    "automation",
+    "android",
+    "ios"
+  ],
+  "supportsDynamic": true,
+  "toolVersions": {
+    "java": "11",
+    "maven": "3.8+",
+    "appium": "9.0.0",
+    "testng": "7.8.0",
+    "allure": "2.25.0",
+    "extentreports": "5.1.1",
+    "cucumber": "7.14.0",
+    "log4j": "2.22.0"
+  },
+  "files": [
+    {
+      "path": "pom.xml",
+      "template": "pom.xml.hbs",
+      "isTemplate": true,
+      "description": "Maven build configuration with Appium and mobile testing dependencies"
+    },
+    {
+      "path": "README.md",
+      "template": "README.md.hbs",
+      "isTemplate": true,
+      "description": "Complete setup and usage documentation for mobile testing"
+    },
+    {
+      "path": ".gitignore",
+      "template": ".gitignore",
+      "isTemplate": false,
+      "description": "Git ignore rules for Java/Maven mobile projects"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "template": ".github/workflows/tests.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      },
+      "description": "GitHub Actions workflow for mobile automated testing"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "template": ".gitlab-ci.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline for mobile automated testing"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "template": "azure-pipelines.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline for mobile automated testing"
+    },
+    {
+      "path": ".circleci/config.yml",
+      "template": ".circleci/config.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      },
+      "description": "CircleCI configuration for mobile automated testing"
+    },
+    {
+      "path": "Jenkinsfile",
+      "template": "Jenkinsfile.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
+      "description": "Jenkins declarative pipeline for mobile CI/CD"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
+      "template": "src/main/java/{{packagePath}}/config/ConfigurationReader.java.hbs",
+      "isTemplate": true,
+      "description": "Type-safe configuration reader for mobile environment properties"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/Environment.java",
+      "template": "src/main/java/{{packagePath}}/config/Environment.java.hbs",
+      "isTemplate": true,
+      "description": "Environment enumeration for dev/qa/prod mobile testing"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/DriverManager.java",
+      "template": "src/main/java/{{packagePath}}/core/DriverManager.java.hbs",
+      "isTemplate": true,
+      "description": "Thread-safe Appium driver lifecycle management"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/MobileDriverFactory.java",
+      "template": "src/main/java/{{packagePath}}/core/MobileDriverFactory.java.hbs",
+      "isTemplate": true,
+      "description": "Mobile driver instantiation for Android and iOS"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
+      "template": "src/main/java/{{packagePath}}/core/BaseTest.java.hbs",
+      "isTemplate": true,
+      "description": "Base test class with mobile setup/teardown and common functionality"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/CapabilitiesManager.java",
+      "template": "src/main/java/{{packagePath}}/core/CapabilitiesManager.java.hbs",
+      "isTemplate": true,
+      "description": "Mobile capabilities configuration for Android and iOS"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/BasePage.java",
+      "template": "src/main/java/{{packagePath}}/pages/BasePage.java.hbs",
+      "isTemplate": true,
+      "description": "Base page class with mobile-specific functionality"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/LoginPage.java",
+      "template": "src/main/java/{{packagePath}}/pages/LoginPage.java.hbs",
+      "isTemplate": true,
+      "description": "Sample mobile login page with POM implementation"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/HomePage.java",
+      "template": "src/main/java/{{packagePath}}/pages/HomePage.java.hbs",
+      "isTemplate": true,
+      "description": "Sample mobile home page with POM implementation"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/MobileWaitUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/MobileWaitUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Mobile-specific wait utilities for reliable element interactions"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/MobileActions.java",
+      "template": "src/main/java/{{packagePath}}/utils/MobileActions.java.hbs",
+      "isTemplate": true,
+      "description": "Mobile gesture and interaction utilities (swipe, tap, scroll)"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Mobile screenshot capture utility for test reporting"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
+      "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
+      "isTemplate": true,
+      "description": "CSV and JSON test data reader utility"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/AllureManager.java",
+      "template": "src/main/java/{{packagePath}}/utils/AllureManager.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure reporting configuration and utilities for mobile testing"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
+      "template": "src/main/java/{{packagePath}}/utils/ExtentManager.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      },
+      "description": "ExtentReports configuration and management for mobile testing"
+    },
+    {
+      "path": "src/main/resources/allure.properties",
+      "template": "src/main/resources/allure.properties.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure reporting configuration file for mobile testing"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/Log.java",
+      "template": "src/main/java/{{packagePath}}/utils/Log.java.hbs",
+      "isTemplate": true,
+      "description": "Logger wrapper for consistent logging across mobile framework"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
+      "template": "src/main/java/{{packagePath}}/listeners/TestListener.java.hbs",
+      "isTemplate": true,
+      "description": "TestNG listener for mobile reporting and screenshot on failure"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java",
+      "template": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java.hbs",
+      "isTemplate": true,
+      "description": "TestNG retry analyzer for handling flaky mobile tests"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/LoginTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/LoginTests.java.hbs",
+      "isTemplate": true,
+      "description": "Sample mobile login tests with data-driven approach"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/SmokeSuite.java",
+      "template": "src/test/java/{{packagePath}}/tests/SmokeSuite.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "page-object-model"
+      },
+      "description": "Sample mobile smoke test suite using TestNG (POM pattern)"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/bdd/TestRunner.java",
+      "template": "src/test/java/{{packagePath}}/bdd/TestRunner.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Cucumber TestNG runner for mobile BDD tests"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/bdd/Hooks.java",
+      "template": "src/test/java/{{packagePath}}/bdd/Hooks.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Cucumber hooks for mobile test setup and teardown"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/bdd/steps/LoginSteps.java",
+      "template": "src/test/java/{{packagePath}}/bdd/steps/LoginSteps.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Sample Cucumber step definitions for mobile login scenarios"
+    },
+    {
+      "path": "src/test/resources/features/Login.feature",
+      "template": "src/test/resources/features/Login.feature.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Sample Cucumber feature file for mobile login scenarios"
+    },
+    {
+      "path": "src/main/resources/config/dev.properties",
+      "template": "src/main/resources/config/dev.properties.hbs",
+      "isTemplate": true,
+      "description": "Development environment configuration for mobile testing"
+    },
+    {
+      "path": "src/main/resources/config/qa.properties",
+      "template": "src/main/resources/config/qa.properties.hbs",
+      "isTemplate": true,
+      "description": "QA environment configuration for mobile testing"
+    },
+    {
+      "path": "src/main/resources/config/prod.properties",
+      "template": "src/main/resources/config/prod.properties.hbs",
+      "isTemplate": true,
+      "description": "Production environment configuration for mobile testing"
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "template": "src/main/resources/log4j2.xml.hbs",
+      "isTemplate": true,
+      "description": "Log4j2 configuration with rolling file appender"
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "template": "src/main/resources/extent-config.xml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      },
+      "description": "ExtentReports configuration for mobile testing"
+    },
+    {
+      "path": "src/test/resources/testng.xml",
+      "template": "src/test/resources/testng.xml.hbs",
+      "isTemplate": true,
+      "description": "TestNG suite configuration for mobile tests"
+    },
+    {
+      "path": "src/test/resources/android.xml",
+      "template": "src/test/resources/android.xml.hbs",
+      "isTemplate": true,
+      "description": "TestNG Android-specific test suite configuration"
+    },
+    {
+      "path": "src/test/resources/ios.xml",
+      "template": "src/test/resources/ios.xml.hbs",
+      "isTemplate": true,
+      "description": "TestNG iOS-specific test suite configuration"
+    },
+    {
+      "path": "src/test/resources/testdata/users.csv",
+      "template": "src/test/resources/testdata/users.csv.hbs",
+      "isTemplate": true,
+      "description": "Sample CSV test data file for mobile tests"
+    },
+    {
+      "path": "src/test/resources/testdata/sample.json",
+      "template": "src/test/resources/testdata/sample.json.hbs",
+      "isTemplate": true,
+      "description": "Sample JSON test data file for mobile tests"
+    },
+    {
+      "path": "src/test/resources/capabilities/android.json",
+      "template": "src/test/resources/capabilities/android.json.hbs",
+      "isTemplate": true,
+      "description": "Android device capabilities configuration"
+    },
+    {
+      "path": "src/test/resources/capabilities/ios.json",
+      "template": "src/test/resources/capabilities/ios.json.hbs",
+      "isTemplate": true,
+      "description": "iOS device capabilities configuration"
+    },
+    {
+      "path": "Dockerfile",
+      "template": "Dockerfile.hbs",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": "docker-compose.yml",
+      "template": "docker-compose.yml.hbs",
+      "isTemplate": true,
+      "description": "Docker Compose for Appium testing"
+    }
+  ],
+  "directories": [
+    "reports",
+    "logs",
+    "apps"
+  ],
+  "supportedCombination": {
+    "testingType": "mobile",
+    "framework": "appium",
+    "language": "java",
+    "testRunner": "testng",
+    "buildTool": "maven"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "testng-reports",
+      "junit-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

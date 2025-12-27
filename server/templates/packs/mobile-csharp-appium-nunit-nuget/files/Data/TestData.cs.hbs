@@ -1,0 +1,55 @@
+using Newtonsoft.Json;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Data;
+
+public class UserCredentials
+{
+    [JsonProperty("username")]
+    public string Username { get; set; } = string.Empty;
+
+    [JsonProperty("password")]
+    public string Password { get; set; } = string.Empty;
+}
+
+public class Users
+{
+    [JsonProperty("valid")]
+    public UserCredentials Valid { get; set; } = new();
+
+    [JsonProperty("admin")]
+    public UserCredentials Admin { get; set; } = new();
+}
+
+public class AppInfo
+{
+    [JsonProperty("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonProperty("version")]
+    public string Version { get; set; } = string.Empty;
+}
+
+public class TestDataModel
+{
+    [JsonProperty("users")]
+    public Users Users { get; set; } = new();
+
+    [JsonProperty("app")]
+    public AppInfo App { get; set; } = new();
+
+    public static TestDataModel Load()
+    {
+        var environment = Settings.TestEnvironment;
+        var filePath = Path.Combine("Data", $"{char.ToUpper(environment[0])}{environment.Substring(1)}Data.json");
+        
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException($"Test data file not found: {filePath}");
+        }
+
+        var json = File.ReadAllText(filePath);
+        return JsonConvert.DeserializeObject<TestDataModel>(json) 
+            ?? throw new InvalidOperationException("Failed to deserialize test data");
+    }
+}

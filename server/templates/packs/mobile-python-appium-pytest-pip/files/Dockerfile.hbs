@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    nodejs \
+    npm \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Appium
+RUN npm install -g appium@next && \
+    appium driver install uiautomator2
+
+WORKDIR /app
+
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY . .
+
+# Environment variables
+ENV PLATFORM=Android
+ENV TEST_ENV=qa
+ENV APPIUM_SERVER=http://localhost:4723
+
+# Start Appium in background and run tests
+CMD appium & sleep 5 && pytest -v -n auto

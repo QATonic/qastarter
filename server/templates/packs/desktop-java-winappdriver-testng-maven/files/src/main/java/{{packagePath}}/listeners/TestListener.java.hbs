@@ -1,0 +1,322 @@
+package {{groupId}}.listeners;
+
+import {{groupId}}.core.DriverManager;
+import {{groupId}}.utils.Log;
+import {{groupId}}.utils.ScreenshotUtils;
+import {{groupId}}.utils.ExtentManager;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import org.testng.*;
+
+/**
+ * TestNG listener for desktop test lifecycle and reporting
+ * Handles test events, logging, and screenshot capture
+ */
+public class TestListener implements ITestListener, ISuiteListener, IInvokedMethodListener {
+
+    /**
+     * Suite started event
+     * @param suite Test suite
+     */
+    @Override
+    public void onStart(ISuite suite) {
+        String suiteName = suite.getName();
+        Log.startSuite(suiteName);
+        
+        // Initialize extent reports if not already done
+        try {
+            ExtentManager.initializeReport();
+            ExtentManager.addSystemInfo("Suite Name", suiteName);
+        } catch (Exception e) {
+            Log.error("Failed to initialize reporting for suite: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Suite finished event
+     * @param suite Test suite
+     */
+    @Override
+    public void onFinish(ISuite suite) {
+        String suiteName = suite.getName();
+        Log.endSuite(suiteName);
+        
+        // Get suite results
+        ISuiteResult result = suite.getResults().values().iterator().next();
+        if (result != null) {
+            ITestContext context = result.getTestContext();
+            int totalTests = context.getAllTestMethods().length;
+            int passedTests = context.getPassedTests().size();
+            int failedTests = context.getFailedTests().size();
+            int skippedTests = context.getSkippedTests().size();
+            
+            Log.info("Suite Summary - Total: " + totalTests + 
+                    ", Passed: " + passedTests + 
+                    ", Failed: " + failedTests + 
+                    ", Skipped: " + skippedTests);
+        }
+        
+        // Flush extent reports
+        try {
+            ExtentManager.flushReport();
+        } catch (Exception e) {
+            Log.error("Failed to flush reports: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test started event
+     * @param result Test result
+     */
+    @Override
+    public void onTestStart(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        String className = result.getTestClass().getName();
+        
+        Log.startTest(testName);
+        
+        // Create extent test
+        try {
+            ExtentTest extentTest = ExtentManager.createTest(className + " - " + testName);
+            
+            // Add test information
+            ExtentManager.addCategory(extentTest, "Desktop Tests");
+            ExtentManager.addAuthor(extentTest, "Desktop Automation Framework");
+            
+            // Store test instance for later use
+            result.setAttribute("extentTest", extentTest);
+            
+        } catch (Exception e) {
+            Log.error("Failed to create extent test: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test success event
+     * @param result Test result
+     */
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        long duration = result.getEndMillis() - result.getStartMillis();
+        
+        Log.endTest(testName, "PASSED");
+        Log.performance("Test execution", duration);
+        
+        // Update extent test
+        ExtentTest extentTest = (ExtentTest) result.getAttribute("extentTest");
+        if (extentTest != null) {
+            extentTest.log(Status.PASS, "Test passed successfully");
+            extentTest.log(Status.INFO, "Execution time: " + duration + "ms");
+        }
+    }
+
+    /**
+     * Test failure event
+     * @param result Test result
+     */
+    @Override
+    public void onTestFailure(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Throwable throwable = result.getThrowable();
+        String errorMessage = throwable != null ? throwable.getMessage() : "Unknown error";
+        
+        Log.endTest(testName, "FAILED");
+        Log.error("Test failed: " + testName + " - " + errorMessage);
+        
+        // Capture screenshot on failure
+        String screenshotPath = null;
+        try {
+            if (DriverManager.isDriverInitialized()) {
+                screenshotPath = ScreenshotUtils.captureFailureScreenshot(testName);
+                if (screenshotPath != null) {
+                    Log.screenshot(screenshotPath);
+                }
+            }
+        } catch (Exception e) {
+            Log.error("Failed to capture failure screenshot: " + e.getMessage());
+        }
+        
+        // Update extent test
+        ExtentTest extentTest = (ExtentTest) result.getAttribute("extentTest");
+        if (extentTest != null) {
+            extentTest.log(Status.FAIL, "Test failed: " + errorMessage);
+            
+            if (throwable != null) {
+                extentTest.log(Status.FAIL, throwable);
+            }
+            
+            // Attach screenshot if captured
+            if (screenshotPath != null) {
+                try {
+                    extentTest.addScreenCaptureFromPath(screenshotPath);
+                } catch (Exception e) {
+                    Log.error("Failed to attach screenshot to extent report: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Test skip event
+     * @param result Test result
+     */
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Throwable throwable = result.getThrowable();
+        String skipReason = throwable != null ? throwable.getMessage() : "No reason provided";
+        
+        Log.endTest(testName, "SKIPPED");
+        Log.warn("Test skipped: " + testName + " - " + skipReason);
+        
+        // Update extent test
+        ExtentTest extentTest = (ExtentTest) result.getAttribute("extentTest");
+        if (extentTest != null) {
+            extentTest.log(Status.SKIP, "Test skipped: " + skipReason);
+            
+            if (throwable != null) {
+                extentTest.log(Status.SKIP, throwable);
+            }
+        }
+    }
+
+    /**
+     * Test failed but within success percentage event
+     * @param result Test result
+     */
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Log.warn("Test failed but within success percentage: " + testName);
+        
+        ExtentTest extentTest = (ExtentTest) result.getAttribute("extentTest");
+        if (extentTest != null) {
+            extentTest.log(Status.WARNING, "Test failed but within success percentage");
+        }
+    }
+
+    /**
+     * Test context start event
+     * @param context Test context
+     */
+    @Override
+    public void onStart(ITestContext context) {
+        String testName = context.getName();
+        Log.info("Test context started: " + testName);
+        
+        // Set extent test information
+        try {
+            ExtentManager.addSystemInfo("Test Context", testName);
+            ExtentManager.addSystemInfo("Included Groups", String.join(", ", context.getIncludedGroups()));
+            ExtentManager.addSystemInfo("Excluded Groups", String.join(", ", context.getExcludedGroups()));
+        } catch (Exception e) {
+            Log.error("Failed to set test context information: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Test context finish event
+     * @param context Test context
+     */
+    @Override
+    public void onFinish(ITestContext context) {
+        String testName = context.getName();
+        Log.info("Test context finished: " + testName);
+        
+        // Log test context results
+        int passedTests = context.getPassedTests().size();
+        int failedTests = context.getFailedTests().size();
+        int skippedTests = context.getSkippedTests().size();
+        
+        Log.info("Test Context Results - Passed: " + passedTests + 
+                ", Failed: " + failedTests + 
+                ", Skipped: " + skippedTests);
+    }
+
+    /**
+     * Before method invocation event
+     * @param method Invoked method
+     * @param result Test result
+     */
+    @Override
+    public void beforeInvocation(IInvokedMethod method, ITestResult result) {
+        String methodName = method.getTestMethod().getMethodName();
+        String methodType = method.isTestMethod() ? "TEST" : "CONFIGURATION";
+        
+        Log.debug("Before " + methodType + " method: " + methodName);
+    }
+
+    /**
+     * After method invocation event
+     * @param method Invoked method
+     * @param result Test result
+     */
+    @Override
+    public void afterInvocation(IInvokedMethod method, ITestResult result) {
+        String methodName = method.getTestMethod().getMethodName();
+        String methodType = method.isTestMethod() ? "TEST" : "CONFIGURATION";
+        long duration = result.getEndMillis() - result.getStartMillis();
+        
+        Log.debug("After " + methodType + " method: " + methodName + " (Duration: " + duration + "ms)");
+        
+        // Handle configuration method failures
+        if (!method.isTestMethod() && result.getStatus() == ITestResult.FAILURE) {
+            String errorMessage = result.getThrowable() != null ? result.getThrowable().getMessage() : "Unknown error";
+            Log.error("Configuration method failed: " + methodName + " - " + errorMessage);
+            
+            // Capture screenshot for configuration failures too
+            try {
+                if (DriverManager.isDriverInitialized()) {
+                    String screenshotPath = ScreenshotUtils.captureFailureScreenshot("CONFIG_" + methodName);
+                    if (screenshotPath != null) {
+                        Log.screenshot(screenshotPath);
+                    }
+                }
+            } catch (Exception e) {
+                Log.error("Failed to capture screenshot for configuration failure: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Get test status as string
+     * @param status Test result status
+     * @return Status as string
+     */
+    private String getStatusString(int status) {
+        switch (status) {
+            case ITestResult.SUCCESS:
+                return "PASSED";
+            case ITestResult.FAILURE:
+                return "FAILED";
+            case ITestResult.SKIP:
+                return "SKIPPED";
+            case ITestResult.SUCCESS_PERCENTAGE_FAILURE:
+                return "SUCCESS_PERCENTAGE_FAILURE";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
+    /**
+     * Log test method details
+     * @param result Test result
+     */
+    private void logTestDetails(ITestResult result) {
+        String className = result.getTestClass().getName();
+        String methodName = result.getMethod().getMethodName();
+        String description = result.getMethod().getDescription();
+        String[] groups = result.getMethod().getGroups();
+        
+        Log.info("Test Details:");
+        Log.info("  Class: " + className);
+        Log.info("  Method: " + methodName);
+        if (description != null && !description.isEmpty()) {
+            Log.info("  Description: " + description);
+        }
+        if (groups.length > 0) {
+            Log.info("  Groups: " + String.join(", ", groups));
+        }
+    }
+}

@@ -1,0 +1,45 @@
+using OpenQA.Selenium;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Pages
+{
+    public class HomePage : BasePage
+    {
+        private readonly string _url;
+        private readonly By _logo = By.CssSelector(".logo");
+        private readonly By _userMenu = By.CssSelector(".user-menu");
+        private readonly By _logoutButton = By.LinkText("Logout");
+        private readonly By _welcomeMessage = By.CssSelector(".welcome-message");
+
+        public HomePage(IWebDriver driver) : base(driver)
+        {
+            _url = $"{EnvConfig.Instance.GetBaseUrl()}/dashboard";
+        }
+
+        public void NavigateToHome()
+        {
+            Navigate(_url);
+        }
+
+        public bool IsLoaded()
+        {
+            return IsDisplayed(_logo);
+        }
+
+        public string GetWelcomeMessage()
+        {
+            return GetText(_welcomeMessage);
+        }
+
+        public void Logout()
+        {
+            Click(_userMenu);
+            Click(_logoutButton);
+        }
+
+        public bool IsUserLoggedIn()
+        {
+            return IsDisplayed(_userMenu);
+        }
+    }
+}

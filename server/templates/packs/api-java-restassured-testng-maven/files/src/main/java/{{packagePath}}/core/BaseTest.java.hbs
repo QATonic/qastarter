@@ -1,0 +1,190 @@
+package {{packageName}}.core;
+
+import io.restassured.RestAssured;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.Parameters;
+import {{packageName}}.config.ConfigurationReader;
+{{#if (includes reporting "extent-reports")}}
+import {{packageName}}.utils.ExtentManager;
+{{/if}}
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.lang.reflect.Method;
+
+/**
+ * Base test class for REST API automation
+ * Provides common setup and configuration for all API tests
+ */
+public class BaseTest {
+
+    protected APIClient apiClient;
+
+    @BeforeClass(alwaysRun = true)
+    public void setupClass() {
+        {{#if utilities.logger}}
+        Log.info("Setting up API test environment");
+        {{/if}}
+        
+        // Initialize REST Assured configuration
+        setupRestAssured();
+        
+        // Initialize API client
+        apiClient = new APIClient();
+        
+        {{#if (includes reporting "extent-reports")}}
+        // Initialize ExtentReports
+        ExtentManager.initializeExtentReports();
+        {{/if}}
+        
+        {{#if utilities.logger}}
+        Log.info("API test environment setup completed");
+        {{/if}}
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    @Parameters({"environment"})
+    public void setupTest(Method method, String environment) {
+        String testName = method.getName();
+        String className = this.getClass().getSimpleName();
+        
+        {{#if utilities.logger}}
+        Log.startTest(testName + " [" + className + "]");
+        Log.info("Running test in environment: " + environment);
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.createTest(testName, method.getAnnotation(org.testng.annotations.Test.class).description());
+        ExtentManager.logInfo("Starting test: " + testName + " in " + environment + " environment");
+        {{/if}}
+    }
+
+    /**
+     * Setup REST Assured global configuration
+     */
+    private void setupRestAssured() {
+        // Base URI configuration
+        String baseUrl = ConfigurationReader.getProperty("api.base.url");
+        RestAssured.baseURI = baseUrl;
+        
+        {{#if utilities.logger}}
+        Log.info("REST Assured base URI set to: " + baseUrl);
+        {{/if}}
+        
+        // Global request/response logging
+        if (Boolean.parseBoolean(ConfigurationReader.getProperty("api.logging.enabled", "false"))) {
+            RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        }
+        
+        // Connection timeout configuration
+        int connectionTimeout = Integer.parseInt(ConfigurationReader.getProperty("api.connection.timeout", "10000"));
+        int socketTimeout = Integer.parseInt(ConfigurationReader.getProperty("api.socket.timeout", "10000"));
+        
+        RestAssured.config = RestAssuredConfig.config()
+                .httpClient(HttpClientConfig.httpClientConfig()
+                        .setParam("http.connection.timeout", connectionTimeout)
+                        .setParam("http.socket.timeout", socketTimeout));
+        
+        // Content type configuration
+        RestAssured.requestSpecification = RestAssured.given()
+                .contentType("application/json")
+                .accept("application/json");
+        
+        {{#if utilities.logger}}
+        Log.info("REST Assured configuration completed");
+        {{/if}}
+    }
+
+    @AfterClass(alwaysRun = true)
+    public void tearDownClass() {
+        {{#if utilities.logger}}
+        Log.info("Cleaning up API test environment");
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        // Generate ExtentReports
+        ExtentManager.flushReports();
+        {{/if}}
+        
+        {{#if utilities.logger}}
+        Log.info("API test environment cleanup completed");
+        {{/if}}
+    }
+
+    /**
+     * Get current environment
+     * 
+     * @return Current environment name
+     */
+    protected String getEnvironment() {
+        return ConfigurationReader.getEnvironment();
+    }
+
+    /**
+     * Get API base URL
+     * 
+     * @return API base URL
+     */
+    protected String getBaseUrl() {
+        return ConfigurationReader.getProperty("api.base.url");
+    }
+
+    /**
+     * Get API client instance
+     * 
+     * @return APIClient instance
+     */
+    protected APIClient getApiClient() {
+        return apiClient;
+    }
+
+    /**
+     * Log test step
+     * 
+     * @param stepDescription Description of the step
+     */
+    protected void logStep(String stepDescription) {
+        {{#if utilities.logger}}
+        Log.step(stepDescription);
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.logInfo("STEP: " + stepDescription);
+        {{/if}}
+    }
+
+    /**
+     * Log test action
+     * 
+     * @param action Description of the action
+     */
+    protected void logAction(String action) {
+        {{#if utilities.logger}}
+        Log.action(action);
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.logInfo("ACTION: " + action);
+        {{/if}}
+    }
+
+    /**
+     * Log test verification
+     * 
+     * @param verification Description of the verification
+     */
+    protected void logVerification(String verification) {
+        {{#if utilities.logger}}
+        Log.verification(verification);
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.logPass("VERIFICATION: " + verification);
+        {{/if}}
+    }
+}

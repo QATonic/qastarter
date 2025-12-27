@@ -1,0 +1,32 @@
+"""
+Global settings and constants
+"""
+
+# Browser configurations
+SUPPORTED_BROWSERS = ['chrome', 'firefox', 'edge', 'safari']
+
+# Timeout values (in seconds)
+SHORT_TIMEOUT = 5
+MEDIUM_TIMEOUT = 15
+LONG_TIMEOUT = 30
+
+# WebDriver capabilities
+CHROME_OPTIONS = [
+    '--disable-gpu',
+    '--no-sandbox',
+    '--disable-dev-shm-usage',
+    '--window-size=1920,1080'
+]
+
+FIREFOX_OPTIONS = [
+    '--width=1920',
+    '--height=1080'
+]
+
+# Test data
+DEFAULT_PAGE_LOAD_TIMEOUT = 30
+DEFAULT_SCRIPT_TIMEOUT = 30
+
+# Retry configuration
+MAX_RETRY_COUNT = 2
+RETRY_DELAY = 1  # seconds

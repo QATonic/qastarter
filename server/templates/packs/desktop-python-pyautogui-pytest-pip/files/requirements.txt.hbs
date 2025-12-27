@@ -1,0 +1,30 @@
+# GUI Automation
+pyautogui==0.9.54
+pyperclip==1.8.2
+
+# Image Recognition
+opencv-python==4.8.0.76
+Pillow==10.1.0
+
+# Testing Framework
+pytest==7.4.0
+pytest-timeout==2.2.0
+
+# Reporting Tools (conditional)
+{{#if (eq reportingTool "pytest-html")}}
+pytest-html==4.1.1
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+allure-pytest==2.13.2
+{{/if}}
+{{#if (eq reportingTool "pytest-json")}}
+pytest-json-report==1.5.0
+{{/if}}
+
+# BDD Testing (conditional)
+{{#if (eq testingPattern "bdd")}}
+pytest-bdd==7.0.1
+{{/if}}
+
+# Configuration
+python-dotenv==1.0.0

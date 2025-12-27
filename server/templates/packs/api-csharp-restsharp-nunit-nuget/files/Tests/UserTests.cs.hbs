@@ -1,0 +1,45 @@
+using System.Net;
+using FluentAssertions;
+using NUnit.Framework;
+using {{projectName}}.Core;
+using {{projectName}}.Models;
+
+namespace {{projectName}}.Tests;
+
+// ========== UPDATE THESE VALUES ==========
+// Replace with your actual API endpoint
+// ==========================================
+
+[TestFixture]
+[Category("Smoke")]
+public class UserTests : BaseTest
+{
+    // ========== UPDATE THESE VALUES ==========
+    // Replace with your actual API base URL and a valid user ID
+    private const string ApiBaseUrl = "YOUR_API_BASE_URL_HERE";
+    private const string UserId = "YOUR_USER_ID_HERE";
+    // ==========================================
+
+    /// <summary>
+    /// Verify API connection and basic GET request works correctly.
+    /// 
+    /// BEFORE RUNNING:
+    /// 1. Update ApiBaseUrl in Config/Settings.cs
+    /// 2. Update UserId above with a valid user ID from your API
+    /// 3. Update Models/User.cs to match your API response structure
+    /// </summary>
+    [Test]
+    public async Task GetUserById_ShouldReturnUser()
+    {
+        // Step 1: Make GET request to users endpoint
+        var response = await Client.GetAsync<User>($"/users/{UserId}");
+
+        // Step 2: Validate response
+        var validator = new ResponseValidator<User>(response);
+        validator.AssertStatusCode(HttpStatusCode.OK)
+                 .AssertSuccess();
+
+        // Step 3: Verify user data exists
+        response.Data.Should().NotBeNull("Test passed! Your {{framework}} framework is working correctly.");
+    }
+}

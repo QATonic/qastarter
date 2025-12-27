@@ -1,0 +1,102 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Tests.Pages;
+
+public abstract class BasePage
+{
+    protected readonly AppiumDriver Driver;
+    protected readonly WebDriverWait Wait;
+
+    protected BasePage(AppiumDriver driver)
+    {
+        Driver = driver;
+        Wait = new WebDriverWait(driver, Settings.ExplicitWait);
+    }
+
+    protected IWebElement FindElement(By locator)
+    {
+        return Driver.FindElement(locator);
+    }
+
+    protected IReadOnlyCollection<IWebElement> FindElements(By locator)
+    {
+        return Driver.FindElements(locator);
+    }
+
+    protected void Click(By locator)
+    {
+        var element = Wait.Until(ExpectedConditions.ElementToBeClickable(locator));
+        element.Click();
+    }
+
+    protected void SendKeys(By locator, string text)
+    {
+        var element = Wait.Until(ExpectedConditions.ElementIsVisible(locator));
+        element.Clear();
+        element.SendKeys(text);
+    }
+
+    protected string GetText(By locator)
+    {
+        var element = Wait.Until(ExpectedConditions.ElementIsVisible(locator));
+        return element.Text;
+    }
+
+    protected bool IsDisplayed(By locator, int timeoutSeconds = 30)
+    {
+        try
+        {
+            var customWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(timeoutSeconds));
+            customWait.Until(ExpectedConditions.ElementIsVisible(locator));
+            return true;
+        }
+        catch (WebDriverTimeoutException)
+        {
+            return false;
+        }
+    }
+
+    protected bool IsEnabled(By locator)
+    {
+        return FindElement(locator).Enabled;
+    }
+
+    protected void WaitForElement(By locator, int timeoutSeconds = 30)
+    {
+        var customWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(timeoutSeconds));
+        customWait.Until(ExpectedConditions.ElementIsVisible(locator));
+    }
+
+    protected void WaitForElementToDisappear(By locator, int timeoutSeconds = 30)
+    {
+        var customWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(timeoutSeconds));
+        customWait.Until(ExpectedConditions.InvisibilityOfElementLocated(locator));
+    }
+
+    protected void ScrollToElement(IWebElement element)
+    {
+        var js = (IJavaScriptExecutor)Driver;
+        js.ExecuteScript("arguments[0].scrollIntoView(true);", element);
+    }
+
+    protected string? GetAttribute(By locator, string attribute)
+    {
+        return FindElement(locator).GetAttribute(attribute);
+    }
+
+    protected void HideKeyboard()
+    {
+        try
+        {
+            Driver.HideKeyboard();
+        }
+        catch
+        {
+            // Keyboard not shown or already hidden
+        }
+    }
+}

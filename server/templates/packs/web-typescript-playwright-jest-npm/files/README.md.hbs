@@ -1,0 +1,113 @@
+# {{projectName}}
+
+Playwright test automation framework with TypeScript and Jest.
+
+## Features
+
+- **Playwright {{toolVersions.playwright}}**: Modern browser automation with multi-browser support
+- **TypeScript**: Type-safe test automation
+- **Jest**: Powerful test runner with rich assertion library
+- **Page Object Model**: Maintainable test structure
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else}}
+- **HTML Reporting**: Beautiful test reports
+{{/if}}
+
+## Prerequisites
+
+- Node.js 20+
+- npm
+
+## Installation
+
+```bash
+npm install
+npx playwright install
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in headed mode
+npm run test:headed
+
+# Run smoke tests
+npm run test:smoke
+
+# Run tests in parallel
+npm run test:parallel
+
+# View HTML report
+npm run report
+```
+
+## Environment Configuration
+
+Update test data in:
+- `data/dev.json` - Development environment
+- `data/qa.json` - QA environment
+
+Set environment with `TEST_ENV=qa npm test`
+
+## Page Objects
+
+All page objects extend `BasePage` and are located in the `pages/` directory:
+- `LoginPage.ts` - Login page interactions
+- `HomePage.ts` - Home page interactions
+
+## Test Structure
+
+```
+tests/
+  ├── login.test.ts    # Login functionality tests
+  ├── smoke.test.ts    # Smoke tests
+  └── setup.ts         # Test configuration
+```
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR to main or develop branches.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Utilities
+
+- **Logger**: Winston-based logging (`utils/logger.ts`)
+- **Screenshots**: Auto-capture on failure (`utils/screenshotHelper.ts`)
+- **Wait Helpers**: Custom wait utilities (`utils/waitHelpers.ts`)
+- **Data Reader**: Test data utilities (`utils/dataReader.ts`)

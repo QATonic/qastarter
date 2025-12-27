@@ -1,0 +1,54 @@
+/**
+ * Login Page Object
+ * 
+ * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+ * 1. Open your app's login page in a browser
+ * 2. Right-click on each element → Inspect → Copy selector
+ * 3. Replace the placeholder locators below with your actual locators
+ */
+const { By } = require('selenium-webdriver');
+const BasePage = require('./BasePage');
+const envConfig = require('../config/env.config');
+
+class LoginPage extends BasePage {
+  constructor(driver) {
+    super(driver);
+    // UPDATE: Change '/login' to your actual login page path
+    this.url = `${envConfig.getBaseUrl()}/login`;
+    
+    // ============================================
+    // UPDATE THESE LOCATORS FOR YOUR APPLICATION
+    // ============================================
+    // Tip: Use browser DevTools (F12) to find correct selectors
+    this.usernameInput = By.id('username');           // Your username/email input field
+    this.passwordInput = By.id('password');           // Your password input field
+    this.loginButton = By.css('button[type="submit"]'); // Your login/submit button
+    this.errorMessage = By.css('.error-message');     // Error message element
+    // ============================================
+  }
+
+  async navigateToLogin() {
+    await this.navigate(this.url);
+  }
+
+  async login(username, password) {
+    await this.type(this.usernameInput, username);
+    await this.type(this.passwordInput, password);
+    await this.click(this.loginButton);
+  }
+
+  async getErrorMessage() {
+    return await this.getText(this.errorMessage);
+  }
+
+  async isErrorDisplayed() {
+    return await this.isDisplayed(this.errorMessage);
+  }
+
+  async isLoginSuccessful() {
+    const url = await this.getCurrentUrl();
+    return url.includes('/dashboard');
+  }
+}
+
+module.exports = LoginPage;

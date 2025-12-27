@@ -1,0 +1,36 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium.Windows;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Utils;
+
+public static class ScreenshotHelper
+{
+    public static void TakeScreenshot(WindowsDriver<WindowsElement>? driver, string testName)
+    {
+        if (driver == null || !Settings.TakeScreenshotOnFailure)
+            return;
+
+        try
+        {
+            var screenshotDir = Settings.ScreenshotPath;
+            if (!Directory.Exists(screenshotDir))
+            {
+                Directory.CreateDirectory(screenshotDir);
+            }
+
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            var fileName = $"{testName}_{timestamp}.png";
+            var filePath = Path.Combine(screenshotDir, fileName);
+
+            var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+            screenshot.SaveAsFile(filePath);
+
+            Logger.Info($"Screenshot saved: {filePath}");
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "Failed to take screenshot");
+        }
+    }
+}

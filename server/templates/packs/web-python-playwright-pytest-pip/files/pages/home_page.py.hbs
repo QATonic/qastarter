@@ -1,0 +1,25 @@
+from playwright.sync_api import Page
+from pages.base_page import BasePage
+from config.env_config import env_config
+
+class HomePage(BasePage):
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.selectors = {
+            'welcome_message': '.welcome-message, h1',
+            'user_profile': '.user-profile',
+            'logout_button': 'button[data-action="logout"], .logout'
+        }
+
+    def navigate_to_home(self) -> None:
+        self.navigate(env_config.get_base_url())
+
+    def get_welcome_message(self) -> str:
+        return self.get_text(self.selectors['welcome_message'])
+
+    def is_user_profile_visible(self) -> bool:
+        return self.is_visible(self.selectors['user_profile'])
+
+    def logout(self) -> None:
+        self.click(self.selectors['logout_button'])
+        self.page.wait_for_url('**/login', timeout=5000)

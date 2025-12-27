@@ -1,0 +1,169 @@
+using System;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
+
+namespace {{projectName}}.Tests.Utils
+{
+    /// <summary>
+    /// Retry attribute for flaky mobile tests
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    public class RetryOnFailureAttribute : PropertyAttribute, IWrapSetUpTearDown
+    {
+        private readonly int _maxRetries;
+
+        public RetryOnFailureAttribute(int maxRetries = 3) : base(maxRetries)
+        {
+            _maxRetries = maxRetries;
+        }
+
+        public TestCommand Wrap(TestCommand command)
+        {
+            return new RetryCommand(command, _maxRetries);
+        }
+
+        private class RetryCommand : DelegatingTestCommand
+        {
+            private readonly int _maxRetries;
+
+            public RetryCommand(TestCommand innerCommand, int maxRetries) : base(innerCommand)
+            {
+                _maxRetries = maxRetries;
+            }
+
+            public override TestResult Execute(TestExecutionContext context)
+            {
+                int count = _maxRetries;
+                
+                while (count-- > 0)
+                {
+                    try
+                    {
+                        context.CurrentResult = innerCommand.Execute(context);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (count > 0)
+                        {
+                            Logger.Warning($"Test failed, retrying... ({_maxRetries - count}/{_maxRetries})");
+                            Logger.Debug($"Exception: {ex.Message}");
+                            continue;
+                        }
+                        throw;
+                    }
+
+                    if (context.CurrentResult.ResultState != ResultState.Failure &&
+                        context.CurrentResult.ResultState != ResultState.Error)
+                    {
+                        break;
+                    }
+
+                    if (count > 0)
+                    {
+                        Logger.Warning($"Test failed, retrying... ({_maxRetries - count}/{_maxRetries})");
+                    }
+                }
+
+                return context.CurrentResult;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Helper class for retry logic in test code
+    /// </summary>
+    public static class RetryHelper
+    {
+        /// <summary>
+        /// Execute an action with retry logic
+        /// </summary>
+        public static void ExecuteWithRetry(
+            Action action,
+            int maxRetries = 3,
+            int delayMs = 1000)
+        {
+            Exception lastException = null;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    action();
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    Logger.Warning($"Attempt {attempt}/{maxRetries} failed: {ex.Message}");
+
+                    if (attempt < maxRetries)
+                    {
+                        System.Threading.Thread.Sleep(delayMs * attempt);
+                    }
+                }
+            }
+
+            throw new Exception($"Action failed after {maxRetries} attempts", lastException);
+        }
+
+        /// <summary>
+        /// Execute a function with retry logic
+        /// </summary>
+        public static T ExecuteWithRetry<T>(
+            Func<T> func,
+            int maxRetries = 3,
+            int delayMs = 1000)
+        {
+            Exception lastException = null;
+
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    return func();
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    Logger.Warning($"Attempt {attempt}/{maxRetries} failed: {ex.Message}");
+
+                    if (attempt < maxRetries)
+                    {
+                        System.Threading.Thread.Sleep(delayMs * attempt);
+                    }
+                }
+            }
+
+            throw new Exception($"Function failed after {maxRetries} attempts", lastException);
+        }
+
+        /// <summary>
+        /// Wait for a condition to be true with retry
+        /// </summary>
+        public static bool WaitForCondition(
+            Func<bool> condition,
+            int timeoutSeconds = 30,
+            int pollIntervalMs = 500)
+        {
+            var endTime = DateTime.Now.AddSeconds(timeoutSeconds);
+
+            while (DateTime.Now < endTime)
+            {
+                try
+                {
+                    if (condition())
+                    {
+                        return true;
+                    }
+                }
+                catch
+                {
+                    // Ignore exceptions during polling
+                }
+                System.Threading.Thread.Sleep(pollIntervalMs);
+            }
+
+            return false;
+        }
+    }
+}

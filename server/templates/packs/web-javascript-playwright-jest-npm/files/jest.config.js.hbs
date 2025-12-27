@@ -1,0 +1,19 @@
+module.exports = {
+  preset: 'jest-playwright-preset',
+  testMatch: ['**/tests/**/*.test.js'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  testTimeout: 60000,
+  verbose: true,
+  collectCoverage: false,
+  reporters: [
+    'default',
+    [
+      'jest-html-reporter',
+      {
+        pageTitle: 'Test Report',
+        outputPath: 'test-results/test-report.html',
+        includeFailureMsg: true
+      }
+    ]
+  ]
+};

@@ -1,0 +1,195 @@
+# {{projectName}}
+
+Production-ready Selenium WebDriver automation framework built with Python and Pytest.
+
+## 🚀 Features
+
+- **Page Object Model (POM)** - Maintainable test architecture
+- **Pytest Framework** - Powerful test execution and reporting
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports** - Beautiful and comprehensive test reports
+{{else if (eq reportingTool "pytest-html")}}
+- **Pytest HTML Reports** - Clean HTML test reports
+{{else}}
+- **Built-in Reports** - Pytest native reporting
+{{/if}}
+- **Selenium Manager** - Automatic browser driver management (Selenium 4+)
+- **Parallel Execution** - Run tests in parallel for faster feedback
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions** - CI/CD workflow included
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins** - CI/CD pipeline included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI** - CI/CD pipeline included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps** - CI/CD pipeline included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI** - CI/CD workflow included
+{{/if}}
+{{/if}}
+- **Multiple Environments** - Dev, QA, and Prod configurations
+- **Screenshot on Failure** - Automatic screenshots for debugging
+- **Logging** - Detailed logging with file and console output
+- **Data-Driven Testing** - CSV and JSON data reader utilities
+{{#if (eq testingPattern "bdd")}}
+- **BDD Support** - pytest-bdd for Gherkin feature files
+{{/if}}
+
+## 📋 Prerequisites
+
+- Python 3.11 or higher
+- pip package manager
+- Chrome or Firefox browser
+
+## 🛠️ Setup
+
+1. **Clone the repository**
+   ```bash
+   cd {{projectName}}
+   ```
+
+2. **Create virtual environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
+
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+## 🧪 Running Tests
+
+### Run all tests
+```bash
+pytest
+```
+
+### Run specific test suite
+```bash
+pytest -m smoke           # Smoke tests
+pytest -m regression      # Regression tests
+pytest tests/test_login.py  # Specific test file
+```
+
+### Run tests in parallel
+```bash
+pytest -n auto  # Auto-detect CPU cores
+pytest -n 4     # Run on 4 cores
+```
+
+### Generate Allure report
+```bash
+pytest --alluredir=allure-results
+allure serve allure-results
+```
+
+## 📂 Project Structure
+
+```
+{{projectName}}/
+├── config/              # Configuration files
+│   ├── config.py       # Configuration manager
+│   └── settings.py     # Global settings
+├── pages/              # Page Object Model
+│   ├── base_page.py    # Base page class
+│   ├── login_page.py   # Login page
+│   └── home_page.py    # Home page
+├── utils/              # Utility modules
+│   ├── driver_factory.py    # WebDriver factory
+│   ├── wait_helpers.py      # Wait utilities
+│   ├── web_actions.py       # Web action helpers
+│   ├── logger.py           # Logging utility
+│   ├── screenshot_util.py  # Screenshot utility
+│   └── data_reader.py      # Data reader
+├── tests/              # Test cases
+│   ├── conftest.py     # Pytest fixtures
+│   ├── test_login.py   # Login tests
+│   └── test_smoke.py   # Smoke tests
+├── data/               # Test data
+│   ├── dev.json        # Dev environment data
+│   ├── qa.json         # QA environment data
+│   └── users.csv       # User test data
+├── .github/workflows/  # CI/CD
+│   └── tests.yml       # GitHub Actions
+├── requirements.txt    # Dependencies
+└── pytest.ini         # Pytest configuration
+```
+
+## 🔧 Configuration
+
+Environment-specific settings are managed in `config/config.py`:
+
+- `DEV` - Development environment
+- `QA` - QA/Testing environment  
+- `PROD` - Production environment
+
+Set environment via:
+```bash
+export TEST_ENV=qa  # Linux/Mac
+set TEST_ENV=qa     # Windows
+```
+
+## 📊 Reporting
+
+### HTML Report
+Generated automatically at `reports/report.html`
+
+### Allure Report
+```bash
+# Generate results
+pytest --alluredir=allure-results
+
+# Serve report
+allure serve allure-results
+```
+
+### CI/CD Reports
+Test reports are automatically generated and uploaded as artifacts in GitHub Actions
+
+## 🔄 CI/CD
+
+GitHub Actions workflow (`.github/workflows/tests.yml`) automatically:
+- Runs tests on push/PR
+- Generates test reports
+- Uploads artifacts
+- Supports parallel execution
+
+## 🐛 Debugging
+
+- **Screenshots**: Captured on test failure in `screenshots/`
+- **Logs**: Detailed logs in `logs/test.log`
+- **Verbose mode**: Run with `-v` or `-vv` for more details
+
+## 📝 Writing Tests
+
+```python
+import pytest
+from pages.login_page import LoginPage
+
+@pytest.mark.smoke
+def test_valid_login(driver):
+    login_page = LoginPage(driver)
+    login_page.navigate()
+    login_page.login("user@example.com", "password123")
+    assert login_page.is_login_successful()
+```
+
+## 🤝 Contributing
+
+1. Follow PEP 8 style guide
+2. Add tests for new features
+3. Update documentation
+4. Ensure all tests pass
+
+## 📄 License
+
+This project is licensed under the MIT License.

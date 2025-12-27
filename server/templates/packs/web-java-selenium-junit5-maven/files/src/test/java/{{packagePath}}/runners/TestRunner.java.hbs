@@ -1,0 +1,25 @@
+package {{javaPackage}}.runners;
+
+import org.junit.platform.suite.api.*;
+
+/**
+ * JUnit5 Cucumber Test Runner.
+ * Executes all feature files with configured options.
+ */
+@Suite
+@IncludeEngines("cucumber")
+@SelectClasspathResource("features")
+@ConfigurationParameter(key = "cucumber.plugin", 
+    value = "pretty, " +
+            "html:target/cucumber-reports/cucumber.html, " +
+            "json:target/cucumber-reports/cucumber.json, " +
+            "junit:target/cucumber-reports/cucumber.xml{{#if (eq reportingTool "allure")}}, " +
+            "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm{{/if}}")
+@ConfigurationParameter(key = "cucumber.glue", value = "{{javaPackage}}.stepdefinitions")
+@ConfigurationParameter(key = "cucumber.filter.tags", value = "not @skip and not @wip")
+@ConfigurationParameter(key = "cucumber.execution.parallel.enabled", value = "false")
+@ConfigurationParameter(key = "cucumber.execution.parallel.config.strategy", value = "dynamic")
+@ConfigurationParameter(key = "cucumber.publish.quiet", value = "true")
+public class TestRunner {
+    // This class will be empty - JUnit5 Platform uses annotations to configure
+}

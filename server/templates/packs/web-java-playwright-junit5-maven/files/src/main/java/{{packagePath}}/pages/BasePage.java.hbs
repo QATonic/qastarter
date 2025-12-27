@@ -1,0 +1,269 @@
+package {{javaPackage}}.pages;
+
+import {{javaPackage}}.core.BrowserManager;
+import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.PlaywrightActions;
+import {{javaPackage}}.utils.WaitUtils;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Locator;
+
+/**
+ * Base Page class containing common page operations.
+ * All page objects should extend this class.
+ */
+public abstract class BasePage {
+    
+    protected Page page;
+    protected PlaywrightActions actions;
+    protected WaitUtils waitUtils;
+    
+    public BasePage() {
+        this.page = BrowserManager.getPage();
+        this.actions = new PlaywrightActions(page);
+        this.waitUtils = new WaitUtils(page);
+    }
+    
+    /**
+     * Click on an element
+     * @param selector Element selector
+     */
+    protected void click(String selector) {
+        Log.info("Clicking element: " + selector);
+        page.click(selector);
+    }
+    
+    /**
+     * Fill input field
+     * @param selector Element selector
+     * @param text Text to fill
+     */
+    protected void fill(String selector, String text) {
+        Log.info("Filling element: " + selector + " with text: " + text);
+        page.fill(selector, text);
+    }
+    
+    /**
+     * Type text into input field with delay
+     * @param selector Element selector
+     * @param text Text to type
+     */
+    protected void type(String selector, String text) {
+        Log.info("Typing into element: " + selector);
+        page.type(selector, text);
+    }
+    
+    /**
+     * Get text content of an element
+     * @param selector Element selector
+     * @return Text content
+     */
+    protected String getText(String selector) {
+        return page.textContent(selector);
+    }
+    
+    /**
+     * Get inner text of an element
+     * @param selector Element selector
+     * @return Inner text
+     */
+    protected String getInnerText(String selector) {
+        return page.innerText(selector);
+    }
+    
+    /**
+     * Get attribute value of an element
+     * @param selector Element selector
+     * @param attributeName Attribute name
+     * @return Attribute value
+     */
+    protected String getAttribute(String selector, String attributeName) {
+        return page.getAttribute(selector, attributeName);
+    }
+    
+    /**
+     * Check if element is visible
+     * @param selector Element selector
+     * @return true if visible
+     */
+    protected boolean isVisible(String selector) {
+        try {
+            return page.isVisible(selector);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Check if element is enabled
+     * @param selector Element selector
+     * @return true if enabled
+     */
+    protected boolean isEnabled(String selector) {
+        try {
+            return page.isEnabled(selector);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Check if element is checked (for checkboxes/radio buttons)
+     * @param selector Element selector
+     * @return true if checked
+     */
+    protected boolean isChecked(String selector) {
+        try {
+            return page.isChecked(selector);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Wait for element to be visible
+     * @param selector Element selector
+     */
+    protected void waitForVisible(String selector) {
+        waitUtils.waitForVisible(selector);
+    }
+    
+    /**
+     * Wait for element to be hidden
+     * @param selector Element selector
+     */
+    protected void waitForHidden(String selector) {
+        waitUtils.waitForHidden(selector);
+    }
+    
+    /**
+     * Select option from dropdown by value
+     * @param selector Dropdown selector
+     * @param value Option value
+     */
+    protected void selectByValue(String selector, String value) {
+        Log.info("Selecting option by value: " + value + " from: " + selector);
+        page.selectOption(selector, value);
+    }
+    
+    /**
+     * Select option from dropdown by label
+     * @param selector Dropdown selector
+     * @param label Option label
+     */
+    protected void selectByLabel(String selector, String label) {
+        Log.info("Selecting option by label: " + label + " from: " + selector);
+        page.selectOption(selector, new Page.SelectOption().setLabel(label));
+    }
+    
+    /**
+     * Hover over an element
+     * @param selector Element selector
+     */
+    protected void hover(String selector) {
+        Log.info("Hovering over element: " + selector);
+        page.hover(selector);
+    }
+    
+    /**
+     * Double click on an element
+     * @param selector Element selector
+     */
+    protected void doubleClick(String selector) {
+        Log.info("Double clicking element: " + selector);
+        page.dblclick(selector);
+    }
+    
+    /**
+     * Right click on an element
+     * @param selector Element selector
+     */
+    protected void rightClick(String selector) {
+        Log.info("Right clicking element: " + selector);
+        page.click(selector, new Page.ClickOptions().setButton(com.microsoft.playwright.options.MouseButton.RIGHT));
+    }
+    
+    /**
+     * Check a checkbox
+     * @param selector Checkbox selector
+     */
+    protected void check(String selector) {
+        Log.info("Checking checkbox: " + selector);
+        page.check(selector);
+    }
+    
+    /**
+     * Uncheck a checkbox
+     * @param selector Checkbox selector
+     */
+    protected void uncheck(String selector) {
+        Log.info("Unchecking checkbox: " + selector);
+        page.uncheck(selector);
+    }
+    
+    /**
+     * Get locator for an element
+     * @param selector Element selector
+     * @return Locator
+     */
+    protected Locator locator(String selector) {
+        return page.locator(selector);
+    }
+    
+    /**
+     * Get current page URL
+     * @return Current URL
+     */
+    protected String getCurrentUrl() {
+        return page.url();
+    }
+    
+    /**
+     * Get page title
+     * @return Page title
+     */
+    protected String getPageTitle() {
+        return page.title();
+    }
+    
+    /**
+     * Navigate to URL
+     * @param url URL to navigate to
+     */
+    protected void navigateTo(String url) {
+        Log.info("Navigating to: " + url);
+        page.navigate(url);
+    }
+    
+    /**
+     * Execute JavaScript
+     * @param script JavaScript code
+     * @return Script result
+     */
+    protected Object executeScript(String script) {
+        return page.evaluate(script);
+    }
+    
+    /**
+     * Scroll to element
+     * @param selector Element selector
+     */
+    protected void scrollToElement(String selector) {
+        page.locator(selector).scrollIntoViewIfNeeded();
+    }
+    
+    /**
+     * Get count of elements matching selector
+     * @param selector Element selector
+     * @return Count of elements
+     */
+    protected int getElementCount(String selector) {
+        return page.locator(selector).count();
+    }
+    
+    /**
+     * Abstract method to verify page is loaded.
+     * Each page should implement this method.
+     * @return true if page is loaded
+     */
+    public abstract boolean isLoaded();
+}

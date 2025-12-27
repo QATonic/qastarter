@@ -1,0 +1,30 @@
+from appium import webdriver
+from appium.options.windows import WindowsOptions
+from config.settings import Settings
+from utils.logger import Logger
+
+class DriverFactory:
+    @staticmethod
+    def create_driver(options: WindowsOptions):
+        try:
+            driver = webdriver.Remote(
+                command_executor=Settings.WINAPPDRIVER_URL,
+                options=options
+            )
+            driver.implicitly_wait(Settings.IMPLICIT_WAIT)
+            
+            app_name = options.app or "Unknown"
+            Logger.info(f"WinAppDriver session created for: {app_name}")
+            return driver
+        except Exception as e:
+            Logger.error(f"Failed to create WinAppDriver session: {str(e)}")
+            raise
+    
+    @staticmethod
+    def quit_driver(driver):
+        if driver:
+            try:
+                driver.quit()
+                Logger.info("WinAppDriver session closed")
+            except Exception as e:
+                Logger.error(f"Error closing WinAppDriver session: {str(e)}")

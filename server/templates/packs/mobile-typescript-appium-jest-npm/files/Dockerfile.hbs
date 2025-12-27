@@ -1,0 +1,26 @@
+FROM node:18
+
+# Install Appium
+RUN npm install -g appium@next && \
+    appium driver install uiautomator2
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY tsconfig.json ./
+RUN npm ci
+
+# Copy application
+COPY . .
+
+# Build TypeScript
+RUN npm run build
+
+# Environment variables
+ENV PLATFORM=Android
+ENV TEST_ENV=qa
+ENV APPIUM_SERVER=http://localhost:4723
+
+# Start Appium in background and run tests
+CMD appium & sleep 5 && npm test

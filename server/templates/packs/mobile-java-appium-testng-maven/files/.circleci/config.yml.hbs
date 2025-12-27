@@ -1,0 +1,132 @@
+version: 2.1
+
+executors:
+  macos-executor:
+    macos:
+      xcode: "14.3.0"
+    resource_class: macos.x86.medium.gen2
+
+jobs:
+  test-android:
+    executor: macos-executor
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}- checksum "pom.xml" 
+            - maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}-
+
+      - run:
+          name: Install Java
+          command: |
+            brew install openjdk@{{toolVersions.java}}
+            echo 'export PATH="/usr/local/opt/openjdk@{{toolVersions.java}}/bin:$PATH"' >> $BASH_ENV
+
+      - run:
+          name: Install Appium
+          command: |
+            npm install -g appium@{{toolVersions.appium}}
+            appium driver install uiautomator2
+
+      {{#if (eq reportingTool "allure")}}
+      - run:
+          name: Install Allure CLI
+          command: |
+            curl -o allure-{{toolVersions.allure}}.tgz -L https://github.com/allure-framework/allure2/releases/download/{{toolVersions.allure}}/allure-{{toolVersions.allure}}.tgz
+            tar -zxvf allure-{{toolVersions.allure}}.tgz -C $HOME
+            echo 'export PATH="$HOME/allure-{{toolVersions.allure}}/bin:$PATH"' >> $BASH_ENV
+
+      {{/if}}
+      - run:
+          name: Run Android tests
+          command: mvn clean test -Pandroid
+          no_output_timeout: 30m
+
+      {{#if (eq reportingTool "allure")}}
+      - run:
+          name: Generate Allure report
+          command: allure generate target/allure-results --clean -o target/allure-report
+          when: always
+
+      {{/if}}
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}- checksum "pom.xml" 
+
+      - store_artifacts:
+          path: {{#if (eq reportingTool "allure")}}target/allure-report{{else}}{{#if (eq reportingTool "extent-reports")}}reports{{else}}{{#if (eq reportingTool "testng-reports")}}test-output{{else}}target/site{{/if}}{{/if}}{{/if}}
+          destination: test-reports
+
+      - store_artifacts:
+          path: logs
+          destination: test-logs
+
+      - store_test_results:
+          path: target/surefire-reports
+
+  test-ios:
+    executor: macos-executor
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}- checksum "pom.xml" 
+            - maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}-
+
+      - run:
+          name: Install Java
+          command: |
+            brew install openjdk@{{toolVersions.java}}
+            echo 'export PATH="/usr/local/opt/openjdk@{{toolVersions.java}}/bin:$PATH"' >> $BASH_ENV
+
+      - run:
+          name: Install Appium
+          command: |
+            npm install -g appium@{{toolVersions.appium}}
+            appium driver install xcuitest
+
+      {{#if (eq reportingTool "allure")}}
+      - run:
+          name: Install Allure CLI
+          command: |
+            curl -o allure-{{toolVersions.allure}}.tgz -L https://github.com/allure-framework/allure2/releases/download/{{toolVersions.allure}}/allure-{{toolVersions.allure}}.tgz
+            tar -zxvf allure-{{toolVersions.allure}}.tgz -C $HOME
+            echo 'export PATH="$HOME/allure-{{toolVersions.allure}}/bin:$PATH"' >> $BASH_ENV
+
+      {{/if}}
+      - run:
+          name: Run iOS tests
+          command: mvn clean test -Pios
+          no_output_timeout: 30m
+
+      {{#if (eq reportingTool "allure")}}
+      - run:
+          name: Generate Allure report
+          command: allure generate target/allure-results --clean -o target/allure-report
+          when: always
+
+      {{/if}}
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}- checksum "pom.xml" 
+
+      - store_artifacts:
+          path: {{#if (eq reportingTool "allure")}}target/allure-report{{else}}{{#if (eq reportingTool "extent-reports")}}reports{{else}}{{#if (eq reportingTool "testng-reports")}}test-output{{else}}target/site{{/if}}{{/if}}{{/if}}
+          destination: test-reports
+
+      - store_artifacts:
+          path: logs
+          destination: test-logs
+
+      - store_test_results:
+          path: target/surefire-reports
+
+workflows:
+  mobile-testing:
+    jobs:
+      - test-android
+      - test-ios

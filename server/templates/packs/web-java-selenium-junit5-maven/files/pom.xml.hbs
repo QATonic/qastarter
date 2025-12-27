@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>{{groupId}}</groupId>
+    <artifactId>{{artifactId}}</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>{{projectName}}</name>
+    <description>UI Automation Framework using Selenium WebDriver, JUnit5, and Maven</description>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        
+        <!-- Dependency Versions -->
+        <selenium.version>{{toolVersions.selenium}}</selenium.version>
+        <junit.version>{{toolVersions.junit5}}</junit.version>
+        <log4j.version>{{toolVersions.log4j}}</log4j.version>
+        {{#if (eq reportingTool "extent-reports")}}
+        <extentreports.version>{{toolVersions.extentreports}}</extentreports.version>
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
+        <allure.version>{{toolVersions.allure}}</allure.version>
+        <aspectj.version>1.9.20</aspectj.version>
+        {{/if}}
+        {{#if (eq testingPattern "bdd")}}
+        <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
+        {{/if}}
+        <jackson.version>2.15.2</jackson.version>
+        <commons-csv.version>1.10.0</commons-csv.version>
+        
+        <!-- Plugin Versions -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
+        
+        <!-- Test Configuration -->
+        <browser>chrome</browser>
+        <headless>false</headless>
+        <env>dev</env>
+    </properties>
+
+    <dependencies>
+        <!-- Selenium WebDriver -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <!-- JUnit5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+{{#if (eq testingPattern "bdd")}}
+
+        <!-- Cucumber -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+
+        <!-- ExtentReports -->
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>${extentreports.version}</version>
+        </dependency>
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+
+        <!-- Allure -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit5</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+{{#if (eq testingPattern "bdd")}}
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-cucumber7-jvm</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+{{/if}}
+{{/if}}
+
+        <!-- Log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- CSV Processing -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${commons-csv.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire Plugin for Test Execution -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <browser>${browser}</browser>
+                        <headless>${headless}</headless>
+                        <env>${env}</env>
+                        <junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
+                    </systemPropertyVariables>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                    <argLine>-Dfile.encoding=UTF-8{{#if (eq reportingTool "allure")}} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}</argLine>
+                </configuration>
+{{#if (eq reportingTool "allure")}}
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
+{{/if}}
+            </plugin>
+{{#if (eq reportingTool "allure")}}
+
+            <!-- Allure Maven Plugin -->
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>2.12.0</version>
+                <configuration>
+                    <reportVersion>${allure.version}</reportVersion>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+                </configuration>
+            </plugin>
+{{/if}}
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Development Environment -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <env>dev</env>
+            </properties>
+        </profile>
+
+        <!-- QA Environment -->
+        <profile>
+            <id>qa</id>
+            <properties>
+                <env>qa</env>
+            </properties>
+        </profile>
+
+        <!-- Staging Environment -->
+        <profile>
+            <id>stg</id>
+            <properties>
+                <env>stg</env>
+            </properties>
+        </profile>
+
+        <!-- Production Environment -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <env>prod</env>
+            </properties>
+        </profile>
+
+        <!-- Headless Execution -->
+        <profile>
+            <id>headless</id>
+            <properties>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+        <!-- Different Browser Profiles -->
+        <profile>
+            <id>chrome</id>
+            <properties>
+                <browser>chrome</browser>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>firefox</id>
+            <properties>
+                <browser>firefox</browser>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>edge</id>
+            <properties>
+                <browser>edge</browser>
+            </properties>
+        </profile>
+    </profiles>
+</project>

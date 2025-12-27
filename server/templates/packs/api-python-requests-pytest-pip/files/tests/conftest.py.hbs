@@ -1,0 +1,58 @@
+import pytest
+from core.api_client import APIClient
+from utils.auth_manager import AuthManager
+from utils.logger import logger
+
+
+@pytest.fixture(scope="session")
+def api_client():
+    """Create API client for testing."""
+    client = APIClient()
+    yield client
+
+
+@pytest.fixture(scope="session")
+def auth_manager(api_client):
+    """Create authentication manager."""
+    manager = AuthManager(api_client)
+    yield manager
+    manager.clear_auth()
+
+
+@pytest.fixture(scope="function")
+def clean_client():
+    """Create a fresh API client for each test."""
+    client = APIClient()
+    yield client
+
+
+@pytest.fixture(autouse=True)
+def log_test_name(request):
+    """Log test name before and after execution."""
+    test_name = request.node.name
+    logger.info(f"Starting test: {test_name}")
+    yield
+    logger.info(f"Completed test: {test_name}")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_teardown():
+    """Session-level setup and teardown."""
+    logger.info("=" * 80)
+    logger.info("Starting test session")
+    logger.info("=" * 80)
+    
+    yield
+    
+    logger.info("=" * 80)
+    logger.info("Test session completed")
+    logger.info("=" * 80)
+
+
+def pytest_configure(config):
+    """Configure pytest markers."""
+    config.addinivalue_line("markers", "smoke: Smoke tests")
+    config.addinivalue_line("markers", "regression: Regression tests")
+    config.addinivalue_line("markers", "auth: Authentication tests")
+    config.addinivalue_line("markers", "users: User API tests")
+    config.addinivalue_line("markers", "slow: Slow running tests")

@@ -1,0 +1,55 @@
+using System;
+using System.IO;
+using System.Text.Json;
+
+namespace {{projectName}}.Utils
+{
+    /// <summary>
+    /// Test data reader utility.
+    /// </summary>
+    public static class DataReader
+    {
+        private static readonly string DataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+
+        public static T ReadJson<T>(string filename)
+        {
+            var filepath = Path.Combine(DataDirectory, filename);
+
+            if (!File.Exists(filepath))
+            {
+                throw new FileNotFoundException($"Data file not found: {filepath}");
+            }
+
+            var json = File.ReadAllText(filepath);
+            return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
+        }
+
+        public static dynamic ReadJson(string filename)
+        {
+            return ReadJson<dynamic>(filename);
+        }
+
+        public static TestUser GetUser(string userType)
+        {
+            var users = ReadJson<Dictionary<string, TestUser>>("users.json");
+
+            if (!users.ContainsKey(userType))
+            {
+                throw new KeyNotFoundException($"User type not found: {userType}");
+            }
+
+            Logger.Info($"Loaded test user: {userType}");
+            return users[userType];
+        }
+    }
+
+    public class TestUser
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+    }
+}

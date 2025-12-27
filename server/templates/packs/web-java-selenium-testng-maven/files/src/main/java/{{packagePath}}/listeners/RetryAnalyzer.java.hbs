@@ -1,0 +1,59 @@
+package {{javaPackage}}.listeners;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.utils.Log;
+import org.testng.IRetryAnalyzer;
+import org.testng.ITestResult;
+
+/**
+ * TestNG retry analyzer for handling flaky tests.
+ * Retries failed tests based on configuration.
+ */
+public class RetryAnalyzer implements IRetryAnalyzer {
+    private int retryCount = 0;
+    private final int maxRetryCount;
+    
+    public RetryAnalyzer() {
+        this.maxRetryCount = ConfigurationReader.getRetryCount();
+    }
+    
+    @Override
+    public boolean retry(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        
+        if (retryCount < maxRetryCount) {
+            retryCount++;
+            Log.warn("🔄 RETRY " + retryCount + "/" + maxRetryCount + " for test: " + testName);
+            Log.warn("Retry reason: " + (result.getThrowable() != null ? 
+                     result.getThrowable().getMessage() : "Unknown failure"));
+            
+            return true;
+        }
+        
+        Log.error("❌ MAX RETRIES REACHED (" + maxRetryCount + ") for test: " + testName);
+        return false;
+    }
+    
+    /**
+     * Reset retry count (called automatically by TestNG)
+     */
+    public void reset() {
+        retryCount = 0;
+    }
+    
+    /**
+     * Get current retry count
+     * @return Current retry count
+     */
+    public int getRetryCount() {
+        return retryCount;
+    }
+    
+    /**
+     * Get maximum retry count
+     * @return Maximum retry count
+     */
+    public int getMaxRetryCount() {
+        return maxRetryCount;
+    }
+}

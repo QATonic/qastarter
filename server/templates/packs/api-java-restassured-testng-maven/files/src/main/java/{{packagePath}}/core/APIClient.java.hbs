@@ -1,0 +1,307 @@
+package {{packageName}}.core;
+
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import {{packageName}}.utils.AuthenticationManager;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+
+/**
+ * API client for making HTTP requests
+ * Provides methods for common HTTP operations with authentication support
+ */
+public class APIClient {
+
+    private final RequestBuilder requestBuilder;
+    private final ResponseValidator responseValidator;
+    {{#if utilities.authManager}}
+    private final AuthenticationManager authManager;
+    {{/if}}
+
+    public APIClient() {
+        this.requestBuilder = new RequestBuilder();
+        this.responseValidator = new ResponseValidator();
+        {{#if utilities.authManager}}
+        this.authManager = new AuthenticationManager();
+        {{/if}}
+    }
+
+    /**
+     * Perform GET request
+     * 
+     * @param endpoint API endpoint
+     * @return Response object
+     */
+    public Response get(String endpoint) {
+        {{#if utilities.logger}}
+        Log.info("Performing GET request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildBaseRequest();
+        Response response = request.get(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("GET response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform GET request with headers
+     * 
+     * @param endpoint API endpoint
+     * @param headers Request headers
+     * @return Response object
+     */
+    public Response get(String endpoint, Map<String, String> headers) {
+        {{#if utilities.logger}}
+        Log.info("Performing GET request to: " + endpoint + " with headers: " + headers);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildRequestWithHeaders(headers);
+        Response response = request.get(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("GET response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform POST request
+     * 
+     * @param endpoint API endpoint
+     * @param requestBody Request body as object
+     * @return Response object
+     */
+    public Response post(String endpoint, Object requestBody) {
+        {{#if utilities.logger}}
+        Log.info("Performing POST request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildRequestWithBody(requestBody);
+        Response response = request.post(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("POST response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform POST request with headers
+     * 
+     * @param endpoint API endpoint
+     * @param requestBody Request body as object
+     * @param headers Request headers
+     * @return Response object
+     */
+    public Response post(String endpoint, Object requestBody, Map<String, String> headers) {
+        {{#if utilities.logger}}
+        Log.info("Performing POST request to: " + endpoint + " with headers: " + headers);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildRequestWithBodyAndHeaders(requestBody, headers);
+        Response response = request.post(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("POST response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform PUT request
+     * 
+     * @param endpoint API endpoint
+     * @param requestBody Request body as object
+     * @return Response object
+     */
+    public Response put(String endpoint, Object requestBody) {
+        {{#if utilities.logger}}
+        Log.info("Performing PUT request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildRequestWithBody(requestBody);
+        Response response = request.put(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("PUT response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform PATCH request
+     * 
+     * @param endpoint API endpoint
+     * @param requestBody Request body as object
+     * @return Response object
+     */
+    public Response patch(String endpoint, Object requestBody) {
+        {{#if utilities.logger}}
+        Log.info("Performing PATCH request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildRequestWithBody(requestBody);
+        Response response = request.patch(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("PATCH response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform DELETE request
+     * 
+     * @param endpoint API endpoint
+     * @return Response object
+     */
+    public Response delete(String endpoint) {
+        {{#if utilities.logger}}
+        Log.info("Performing DELETE request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildBaseRequest();
+        Response response = request.delete(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("DELETE response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    {{#if utilities.authManager}}
+    /**
+     * Perform authenticated GET request
+     * 
+     * @param endpoint API endpoint
+     * @param token Authentication token
+     * @return Response object
+     */
+    public Response authenticatedGet(String endpoint, String token) {
+        {{#if utilities.logger}}
+        Log.info("Performing authenticated GET request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildAuthenticatedRequest(token);
+        Response response = request.get(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("Authenticated GET response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform authenticated POST request
+     * 
+     * @param endpoint API endpoint
+     * @param requestBody Request body as object
+     * @param token Authentication token
+     * @return Response object
+     */
+    public Response authenticatedPost(String endpoint, Object requestBody, String token) {
+        {{#if utilities.logger}}
+        Log.info("Performing authenticated POST request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildAuthenticatedRequestWithBody(requestBody, token);
+        Response response = request.post(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("Authenticated POST response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform authenticated PUT request
+     * 
+     * @param endpoint API endpoint
+     * @param requestBody Request body as object
+     * @param token Authentication token
+     * @return Response object
+     */
+    public Response authenticatedPut(String endpoint, Object requestBody, String token) {
+        {{#if utilities.logger}}
+        Log.info("Performing authenticated PUT request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildAuthenticatedRequestWithBody(requestBody, token);
+        Response response = request.put(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("Authenticated PUT response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+
+    /**
+     * Perform authenticated DELETE request
+     * 
+     * @param endpoint API endpoint
+     * @param token Authentication token
+     * @return Response object
+     */
+    public Response authenticatedDelete(String endpoint, String token) {
+        {{#if utilities.logger}}
+        Log.info("Performing authenticated DELETE request to: " + endpoint);
+        {{/if}}
+        
+        RequestSpecification request = requestBuilder.buildAuthenticatedRequest(token);
+        Response response = request.delete(endpoint);
+        
+        {{#if utilities.logger}}
+        Log.info("Authenticated DELETE response status: " + response.getStatusCode());
+        {{/if}}
+        
+        return response;
+    }
+    {{/if}}
+
+    /**
+     * Get request builder instance
+     * 
+     * @return RequestBuilder instance
+     */
+    public RequestBuilder getRequestBuilder() {
+        return requestBuilder;
+    }
+
+    /**
+     * Get response validator instance
+     * 
+     * @return ResponseValidator instance
+     */
+    public ResponseValidator getResponseValidator() {
+        return responseValidator;
+    }
+
+    {{#if utilities.authManager}}
+    /**
+     * Get authentication manager instance
+     * 
+     * @return AuthenticationManager instance
+     */
+    public AuthenticationManager getAuthManager() {
+        return authManager;
+    }
+    {{/if}}
+}

@@ -1,0 +1,101 @@
+import requests
+from typing import Optional, Dict, Any
+from requests.auth import HTTPBasicAuth
+from config.settings import settings
+from utils.logger import logger
+
+
+class APIClient:
+    """Base API client for making HTTP requests."""
+    
+    def __init__(self, base_url: Optional[str] = None):
+        self.base_url = base_url or settings.get_base_url()
+        self.session = requests.Session()
+        self.session.verify = settings.VERIFY_SSL
+        self.timeout = settings.REQUEST_TIMEOUT
+        
+    def _build_url(self, endpoint: str) -> str:
+        """Build full URL from endpoint."""
+        return f"{self.base_url.rstrip('/')}/{endpoint.lstrip('/')}"
+    
+    def _log_request(self, method: str, url: str, **kwargs):
+        """Log HTTP request details."""
+        logger.info(f"{method.upper()} {url}")
+        if kwargs.get("params"):
+            logger.debug(f"Params: {kwargs['params']}")
+        if kwargs.get("json"):
+            logger.debug(f"Body: {kwargs['json']}")
+    
+    def _log_response(self, response: requests.Response):
+        """Log HTTP response details."""
+        logger.info(f"Response: {response.status_code}")
+        try:
+            logger.debug(f"Body: {response.json()}")
+        except:
+            logger.debug(f"Body: {response.text}")
+    
+    def get(self, endpoint: str, **kwargs) -> requests.Response:
+        """Send GET request."""
+        url = self._build_url(endpoint)
+        self._log_request("GET", url, **kwargs)
+        
+        response = self.session.get(url, timeout=self.timeout, **kwargs)
+        self._log_response(response)
+        return response
+    
+    def post(self, endpoint: str, **kwargs) -> requests.Response:
+        """Send POST request."""
+        url = self._build_url(endpoint)
+        self._log_request("POST", url, **kwargs)
+        
+        response = self.session.post(url, timeout=self.timeout, **kwargs)
+        self._log_response(response)
+        return response
+    
+    def put(self, endpoint: str, **kwargs) -> requests.Response:
+        """Send PUT request."""
+        url = self._build_url(endpoint)
+        self._log_request("PUT", url, **kwargs)
+        
+        response = self.session.put(url, timeout=self.timeout, **kwargs)
+        self._log_response(response)
+        return response
+    
+    def patch(self, endpoint: str, **kwargs) -> requests.Response:
+        """Send PATCH request."""
+        url = self._build_url(endpoint)
+        self._log_request("PATCH", url, **kwargs)
+        
+        response = self.session.patch(url, timeout=self.timeout, **kwargs)
+        self._log_response(response)
+        return response
+    
+    def delete(self, endpoint: str, **kwargs) -> requests.Response:
+        """Send DELETE request."""
+        url = self._build_url(endpoint)
+        self._log_request("DELETE", url, **kwargs)
+        
+        response = self.session.delete(url, timeout=self.timeout, **kwargs)
+        self._log_response(response)
+        return response
+    
+    def set_auth_token(self, token: str):
+        """Set Bearer token authentication."""
+        self.session.headers.update({"Authorization": f"Bearer {token}"})
+    
+    def set_api_key(self, api_key: str, header_name: str = "X-API-Key"):
+        """Set API key authentication."""
+        self.session.headers.update({header_name: api_key})
+    
+    def set_basic_auth(self, username: str, password: str):
+        """Set basic authentication."""
+        self.session.auth = HTTPBasicAuth(username, password)
+    
+    def set_header(self, key: str, value: str):
+        """Set custom header."""
+        self.session.headers.update({key: value})
+    
+    def clear_auth(self):
+        """Clear all authentication."""
+        self.session.auth = None
+        self.session.headers.pop("Authorization", None)

@@ -1,0 +1,98 @@
+import requests
+import jsonschema
+from typing import Any, Dict, Optional
+from utils.json_utils import JSONUtils
+
+
+class ResponseValidator:
+    """Utilities for validating API responses."""
+    
+    def __init__(self, response: requests.Response):
+        self.response = response
+        self.status_code = response.status_code
+        self.headers = response.headers
+        try:
+            self.json_data = response.json()
+        except:
+            self.json_data = None
+        self.text = response.text
+    
+    def assert_status_code(self, expected_code: int) -> "ResponseValidator":
+        """Assert response status code."""
+        assert self.status_code == expected_code, \
+            f"Expected status {expected_code}, got {self.status_code}"
+        return self
+    
+    def assert_status_in(self, *expected_codes: int) -> "ResponseValidator":
+        """Assert status code is in list."""
+        assert self.status_code in expected_codes, \
+            f"Expected status in {expected_codes}, got {self.status_code}"
+        return self
+    
+    def assert_success(self) -> "ResponseValidator":
+        """Assert successful response (2xx)."""
+        assert 200 <= self.status_code < 300, \
+            f"Expected 2xx status, got {self.status_code}"
+        return self
+    
+    def assert_header_exists(self, header_name: str) -> "ResponseValidator":
+        """Assert header exists."""
+        assert header_name in self.headers, \
+            f"Header '{header_name}' not found in response"
+        return self
+    
+    def assert_header_value(self, header_name: str, expected_value: str) -> "ResponseValidator":
+        """Assert header has expected value."""
+        actual = self.headers.get(header_name)
+        assert actual == expected_value, \
+            f"Header '{header_name}': expected '{expected_value}', got '{actual}'"
+        return self
+    
+    def assert_json_schema(self, schema: Dict[str, Any]) -> "ResponseValidator":
+        """Validate JSON response against schema."""
+        assert self.json_data is not None, "Response is not JSON"
+        jsonschema.validate(instance=self.json_data, schema=schema)
+        return self
+    
+    def assert_json_path(self, json_path: str, expected_value: Any) -> "ResponseValidator":
+        """Assert JSON path has expected value."""
+        assert self.json_data is not None, "Response is not JSON"
+        actual = JSONUtils.get_value_by_path(self.json_data, json_path)
+        assert actual == expected_value, \
+            f"JSON path '{json_path}': expected '{expected_value}', got '{actual}'"
+        return self
+    
+    def assert_json_contains(self, key: str) -> "ResponseValidator":
+        """Assert JSON contains key."""
+        assert self.json_data is not None, "Response is not JSON"
+        assert key in self.json_data, \
+            f"Key '{key}' not found in JSON response"
+        return self
+    
+    def assert_json_not_empty(self) -> "ResponseValidator":
+        """Assert JSON response is not empty."""
+        assert self.json_data, "JSON response is empty"
+        return self
+    
+    def assert_text_contains(self, text: str) -> "ResponseValidator":
+        """Assert response text contains string."""
+        assert text in self.text, \
+            f"Text '{text}' not found in response"
+        return self
+    
+    def assert_content_type(self, content_type: str) -> "ResponseValidator":
+        """Assert Content-Type header."""
+        actual = self.headers.get("Content-Type", "")
+        assert content_type in actual, \
+            f"Expected Content-Type '{content_type}', got '{actual}'"
+        return self
+    
+    def get_json(self) -> Optional[Dict[str, Any]]:
+        """Get JSON data."""
+        return self.json_data
+    
+    def get_value(self, json_path: str) -> Any:
+        """Get value by JSON path."""
+        if self.json_data is None:
+            return None
+        return JSONUtils.get_value_by_path(self.json_data, json_path)

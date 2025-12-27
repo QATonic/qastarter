@@ -1,0 +1,52 @@
+import { remote, Browser } from 'webdriverio';
+import * as fs from 'fs';
+import * as path from 'path';
+import capabilities from '../config/capabilities';
+import settings from '../config/settings';
+import { loadJsonFile } from './utils/helpers';
+import { TestData } from './types/testData';
+
+let driver: Browser<'async'>;
+let testData: TestData;
+
+// Create necessary directories
+beforeAll(() => {
+  ['logs', 'screenshots', 'reports'].forEach(dir => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  });
+
+  // Load test data
+  const dataFile = path.join('data', `${settings.testEnv}.json`);
+  testData = loadJsonFile<TestData>(dataFile);
+});
+
+beforeEach(async () => {
+  // Get capabilities based on platform
+  const caps = settings.platform.toLowerCase() === 'android'
+    ? capabilities.getAndroidCapabilities()
+    : capabilities.getIOSCapabilities();
+
+  // Create driver
+  driver = await remote({
+    protocol: 'http',
+    hostname: new URL(settings.appiumServer).hostname,
+    port: parseInt(new URL(settings.appiumServer).port) || 4723,
+    path: '/',
+    capabilities: caps,
+    logLevel: 'error'
+  });
+
+  await driver.setImplicitTimeout(settings.implicitWait);
+
+  // Make driver and testData available globally
+  global.driver = driver;
+  global.testData = testData;
+});
+
+afterEach(async () => {
+  if (driver) {
+    await driver.deleteSession();
+  }
+});

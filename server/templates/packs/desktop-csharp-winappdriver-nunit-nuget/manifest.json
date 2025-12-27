@@ -1,0 +1,186 @@
+{
+  "id": "desktop-csharp-winappdriver-nunit-nuget",
+  "supportsDynamic": true,
+  "name": "Desktop Automation Framework",
+  "description": "Windows desktop application automation with C#, WinAppDriver, and NUnit",
+  "tags": [
+    "desktop",
+    "windows",
+    "csharp",
+    "nunit",
+    "winappdriver"
+  ],
+  "toolVersions": {
+    "dotnet": "8.0",
+    "appium.webdriver": "5.0.0",
+    "nunit": "3.14.0",
+    "selenium.webdriver": "4.16.0"
+  },
+  "files": [
+    {
+      "path": "{{projectName}}.csproj",
+      "isTemplate": true,
+      "description": ".NET project file"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "description": "Jenkins declarative pipeline for CI/CD",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "description": "Azure DevOps pipeline configuration",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "Config/Settings.cs",
+      "isTemplate": true,
+      "description": "Configuration management"
+    },
+    {
+      "path": "Config/WinAppDriverConfig.cs",
+      "isTemplate": true,
+      "description": "WinAppDriver configuration"
+    },
+    {
+      "path": "Core/DriverFactory.cs",
+      "isTemplate": true,
+      "description": "Driver factory for session management"
+    },
+    {
+      "path": "Core/ElementActions.cs",
+      "isTemplate": true,
+      "description": "Common element actions"
+    },
+    {
+      "path": "Core/WaitHelpers.cs",
+      "isTemplate": true,
+      "description": "Wait and synchronization helpers"
+    },
+    {
+      "path": "Pages/BasePage.cs",
+      "isTemplate": true,
+      "description": "Base page object class"
+    },
+    {
+      "path": "Pages/CalculatorPage.cs",
+      "isTemplate": true,
+      "description": "Example Calculator page object"
+    },
+    {
+      "path": "Pages/NotepadPage.cs",
+      "isTemplate": true,
+      "description": "Example Notepad page object"
+    },
+    {
+      "path": "Tests/BaseTest.cs",
+      "isTemplate": true,
+      "description": "Base test class"
+    },
+    {
+      "path": "Tests/CalculatorTests.cs",
+      "isTemplate": true,
+      "description": "Calculator automation tests"
+    },
+    {
+      "path": "Tests/NotepadTests.cs",
+      "isTemplate": true,
+      "description": "Notepad automation tests"
+    },
+    {
+      "path": "Utils/Logger.cs",
+      "isTemplate": true,
+      "description": "Logging configuration"
+    },
+    {
+      "path": "Utils/ScreenshotHelper.cs",
+      "isTemplate": true,
+      "description": "Screenshot capture utilities"
+    },
+    {
+      "path": "Utils/RetryHelper.cs",
+      "isTemplate": true,
+      "description": "Retry mechanism for flaky tests"
+    },
+    {
+      "path": "Utils/DataReader.cs",
+      "isTemplate": true,
+      "description": "Test data file reader"
+    },
+    {
+      "path": "Data/users.json",
+      "isTemplate": true,
+      "description": "User test data"
+    },
+    {
+      "path": "Features/Login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "StepDefinitions/LoginSteps.cs",
+      "isTemplate": true,
+      "description": "SpecFlow step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for Windows containers"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "desktop",
+    "framework": "winappdriver",
+    "language": "csharp",
+    "testRunner": "nunit",
+    "buildTool": "nuget"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "nunit-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

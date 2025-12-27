@@ -1,0 +1,493 @@
+package {{groupId}}.utils;
+
+import {{groupId}}.core.DriverManager;
+import io.appium.java_client.windows.WindowsDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
+/**
+ * Desktop interaction utilities for keyboard shortcuts, window management, and complex actions
+ * Provides both WebDriver Actions and Robot class functionality
+ */
+public class DesktopActions {
+
+    private static Robot robot;
+    
+    static {
+        try {
+            robot = new Robot();
+            robot.setAutoDelay(50); // Set delay between actions
+        } catch (AWTException e) {
+            Log.error("Failed to initialize Robot for desktop actions: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Perform keyboard shortcut (e.g., Ctrl+C, Ctrl+V)
+     * @param keys Keys to press simultaneously
+     */
+    public static void keyboardShortcut(Keys... keys) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            Actions actions = new Actions(driver);
+            
+            // Build the key combination
+            String[] keyArray = new String[keys.length];
+            for (int i = 0; i < keys.length; i++) {
+                keyArray[i] = keys[i].toString();
+            }
+            
+            actions.sendKeys(Keys.chord(keyArray)).perform();
+            Log.info("Keyboard shortcut performed: " + String.join(" + ", keyArray));
+            
+        } catch (Exception e) {
+            Log.error("Error performing keyboard shortcut: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Send text to active element
+     * @param text Text to send
+     */
+    public static void sendText(String text) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            Actions actions = new Actions(driver);
+            
+            actions.sendKeys(text).perform();
+            Log.info("Text sent: " + text);
+            
+        } catch (Exception e) {
+            Log.error("Error sending text: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Clear text field and send new text
+     * @param locator Element locator
+     * @param text Text to send
+     */
+    public static void clearAndSendText(By locator, String text) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebElement element = ElementWaitUtils.waitForElementVisible(locator);
+            
+            if (element != null) {
+                element.clear();
+                element.sendKeys(text);
+                Log.info("Cleared and sent text to element: " + text);
+            } else {
+                Log.error("Element not found for clear and send text: " + locator.toString());
+            }
+            
+        } catch (Exception e) {
+            Log.error("Error clearing and sending text: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Click and hold element
+     * @param locator Element locator
+     */
+    public static void clickAndHold(By locator) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebElement element = ElementWaitUtils.waitForElementClickable(locator);
+            
+            if (element != null) {
+                Actions actions = new Actions(driver);
+                actions.clickAndHold(element).perform();
+                Log.info("Click and hold performed on element");
+            } else {
+                Log.error("Element not found for click and hold: " + locator.toString());
+            }
+            
+        } catch (Exception e) {
+            Log.error("Error performing click and hold: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Drag and drop between two elements
+     * @param sourceLocator Source element locator
+     * @param targetLocator Target element locator
+     */
+    public static void dragAndDrop(By sourceLocator, By targetLocator) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebElement sourceElement = ElementWaitUtils.waitForElementVisible(sourceLocator);
+            WebElement targetElement = ElementWaitUtils.waitForElementVisible(targetLocator);
+            
+            if (sourceElement != null && targetElement != null) {
+                Actions actions = new Actions(driver);
+                actions.dragAndDrop(sourceElement, targetElement).perform();
+                Log.info("Drag and drop performed from source to target");
+            } else {
+                Log.error("Source or target element not found for drag and drop");
+            }
+            
+        } catch (Exception e) {
+            Log.error("Error performing drag and drop: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Double-click element
+     * @param locator Element locator
+     */
+    public static void doubleClick(By locator) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebElement element = ElementWaitUtils.waitForElementClickable(locator);
+            
+            if (element != null) {
+                Actions actions = new Actions(driver);
+                actions.doubleClick(element).perform();
+                Log.info("Double click performed on element");
+            } else {
+                Log.error("Element not found for double click: " + locator.toString());
+            }
+            
+        } catch (Exception e) {
+            Log.error("Error performing double click: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Right-click element
+     * @param locator Element locator
+     */
+    public static void rightClick(By locator) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebElement element = ElementWaitUtils.waitForElementClickable(locator);
+            
+            if (element != null) {
+                Actions actions = new Actions(driver);
+                actions.contextClick(element).perform();
+                Log.info("Right click performed on element");
+            } else {
+                Log.error("Element not found for right click: " + locator.toString());
+            }
+            
+        } catch (Exception e) {
+            Log.error("Error performing right click: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Move mouse to element
+     * @param locator Element locator
+     */
+    public static void moveToElement(By locator) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebElement element = ElementWaitUtils.waitForElementVisible(locator);
+            
+            if (element != null) {
+                Actions actions = new Actions(driver);
+                actions.moveToElement(element).perform();
+                Log.info("Mouse moved to element");
+            } else {
+                Log.error("Element not found for move to element: " + locator.toString());
+            }
+            
+        } catch (Exception e) {
+            Log.error("Error moving to element: " + e.getMessage());
+        }
+    }
+
+    // Robot class methods for system-level interactions
+
+    /**
+     * Send keyboard shortcut using Robot class
+     * @param keys Key codes to press (use KeyEvent constants)
+     */
+    public static void robotKeyboardShortcut(int... keys) {
+        if (robot == null) {
+            Log.error("Robot not initialized for keyboard shortcuts");
+            return;
+        }
+        
+        try {
+            // Press all keys
+            for (int key : keys) {
+                robot.keyPress(key);
+            }
+            
+            // Release all keys in reverse order
+            for (int i = keys.length - 1; i >= 0; i--) {
+                robot.keyRelease(keys[i]);
+            }
+            
+            Log.info("Robot keyboard shortcut performed");
+            
+        } catch (Exception e) {
+            Log.error("Error performing robot keyboard shortcut: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Type text using Robot class
+     * @param text Text to type
+     */
+    public static void robotTypeText(String text) {
+        if (robot == null) {
+            Log.error("Robot not initialized for typing text");
+            return;
+        }
+        
+        try {
+            for (char c : text.toCharArray()) {
+                robotTypeCharacter(c);
+            }
+            
+            Log.info("Robot typed text: " + text);
+            
+        } catch (Exception e) {
+            Log.error("Error typing text with robot: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Type single character using Robot class
+     * @param character Character to type
+     */
+    private static void robotTypeCharacter(char character) {
+        boolean upperCase = Character.isUpperCase(character);
+        int keyCode = KeyEvent.getExtendedKeyCodeForChar(character);
+        
+        if (KeyEvent.CHAR_UNDEFINED == keyCode) {
+            Log.warn("Cannot type character: " + character);
+            return;
+        }
+        
+        if (upperCase) {
+            robot.keyPress(KeyEvent.VK_SHIFT);
+        }
+        
+        robot.keyPress(keyCode);
+        robot.keyRelease(keyCode);
+        
+        if (upperCase) {
+            robot.keyRelease(KeyEvent.VK_SHIFT);
+        }
+    }
+
+    /**
+     * Click at specific screen coordinates using Robot
+     * @param x X coordinate
+     * @param y Y coordinate
+     */
+    public static void robotClickAt(int x, int y) {
+        if (robot == null) {
+            Log.error("Robot not initialized for clicking");
+            return;
+        }
+        
+        try {
+            robot.mouseMove(x, y);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            
+            Log.info("Robot clicked at coordinates: " + x + ", " + y);
+            
+        } catch (Exception e) {
+            Log.error("Error clicking with robot: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Double-click at specific screen coordinates using Robot
+     * @param x X coordinate
+     * @param y Y coordinate
+     */
+    public static void robotDoubleClickAt(int x, int y) {
+        if (robot == null) {
+            Log.error("Robot not initialized for double clicking");
+            return;
+        }
+        
+        try {
+            robot.mouseMove(x, y);
+            
+            // First click
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            
+            // Small delay between clicks
+            robot.delay(100);
+            
+            // Second click
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            
+            Log.info("Robot double-clicked at coordinates: " + x + ", " + y);
+            
+        } catch (Exception e) {
+            Log.error("Error double-clicking with robot: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Right-click at specific screen coordinates using Robot
+     * @param x X coordinate
+     * @param y Y coordinate
+     */
+    public static void robotRightClickAt(int x, int y) {
+        if (robot == null) {
+            Log.error("Robot not initialized for right clicking");
+            return;
+        }
+        
+        try {
+            robot.mouseMove(x, y);
+            robot.mousePress(InputEvent.BUTTON3_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+            
+            Log.info("Robot right-clicked at coordinates: " + x + ", " + y);
+            
+        } catch (Exception e) {
+            Log.error("Error right-clicking with robot: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Scroll using mouse wheel
+     * @param scrollAmount Positive for up, negative for down
+     */
+    public static void robotScroll(int scrollAmount) {
+        if (robot == null) {
+            Log.error("Robot not initialized for scrolling");
+            return;
+        }
+        
+        try {
+            robot.mouseWheel(scrollAmount);
+            Log.info("Robot scrolled: " + scrollAmount);
+            
+        } catch (Exception e) {
+            Log.error("Error scrolling with robot: " + e.getMessage());
+        }
+    }
+
+    // Common Windows shortcuts
+
+    /**
+     * Copy to clipboard (Ctrl+C)
+     */
+    public static void copy() {
+        keyboardShortcut(Keys.CONTROL, Keys.chord("c"));
+    }
+
+    /**
+     * Paste from clipboard (Ctrl+V)
+     */
+    public static void paste() {
+        keyboardShortcut(Keys.CONTROL, Keys.chord("v"));
+    }
+
+    /**
+     * Cut to clipboard (Ctrl+X)
+     */
+    public static void cut() {
+        keyboardShortcut(Keys.CONTROL, Keys.chord("x"));
+    }
+
+    /**
+     * Select all (Ctrl+A)
+     */
+    public static void selectAll() {
+        keyboardShortcut(Keys.CONTROL, Keys.chord("a"));
+    }
+
+    /**
+     * Undo (Ctrl+Z)
+     */
+    public static void undo() {
+        keyboardShortcut(Keys.CONTROL, Keys.chord("z"));
+    }
+
+    /**
+     * Redo (Ctrl+Y)
+     */
+    public static void redo() {
+        keyboardShortcut(Keys.CONTROL, Keys.chord("y"));
+    }
+
+    /**
+     * Save (Ctrl+S)
+     */
+    public static void save() {
+        keyboardShortcut(Keys.CONTROL, Keys.chord("s"));
+    }
+
+    /**
+     * Find (Ctrl+F)
+     */
+    public static void find() {
+        keyboardShortcut(Keys.CONTROL, Keys.chord("f"));
+    }
+
+    /**
+     * Alt+Tab to switch windows
+     */
+    public static void altTab() {
+        robotKeyboardShortcut(KeyEvent.VK_ALT, KeyEvent.VK_TAB);
+    }
+
+    /**
+     * Windows key + specific key combination
+     * @param key Key to combine with Windows key
+     */
+    public static void windowsKey(int key) {
+        robotKeyboardShortcut(KeyEvent.VK_WINDOWS, key);
+    }
+
+    /**
+     * Press Enter key
+     */
+    public static void pressEnter() {
+        keyboardShortcut(Keys.ENTER);
+    }
+
+    /**
+     * Press Escape key
+     */
+    public static void pressEscape() {
+        keyboardShortcut(Keys.ESCAPE);
+    }
+
+    /**
+     * Press Tab key
+     */
+    public static void pressTab() {
+        keyboardShortcut(Keys.TAB);
+    }
+
+    /**
+     * Press Space key
+     */
+    public static void pressSpace() {
+        keyboardShortcut(Keys.SPACE);
+    }
+
+    /**
+     * Wait/delay between actions
+     * @param milliseconds Milliseconds to wait
+     */
+    public static void wait(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+            Log.info("Waited for " + milliseconds + " milliseconds");
+        } catch (InterruptedException e) {
+            Log.warn("Wait interrupted: " + e.getMessage());
+        }
+    }
+}

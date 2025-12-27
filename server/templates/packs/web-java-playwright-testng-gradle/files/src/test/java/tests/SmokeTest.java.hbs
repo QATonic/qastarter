@@ -1,0 +1,31 @@
+package tests;
+
+import config.EnvConfig;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import pages.LoginPage;
+
+public class SmokeTest extends BaseTest {
+
+    @Test(priority = 1, description = "Verify login page loads")
+    public void testLoginPageLoads() {
+        LoginPage loginPage = new LoginPage(page);
+        
+        loginPage.navigateToLogin();
+        String title = loginPage.getPageTitle();
+        
+        Assert.assertNotNull(title, "Page title is null");
+        Assert.assertTrue(loginPage.isUsernameVisible(), "Username field not visible");
+        Assert.assertTrue(loginPage.isPasswordVisible(), "Password field not visible");
+    }
+
+    @Test(priority = 2, description = "Verify base URL is accessible")
+    public void testBaseUrlAccessible() {
+        EnvConfig config = EnvConfig.getInstance();
+        
+        page.navigate(config.getBaseUrl());
+        String url = page.url();
+        
+        Assert.assertTrue(url.contains(config.getBaseUrl()), "Base URL is not accessible");
+    }
+}

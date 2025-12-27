@@ -1,0 +1,235 @@
+# {{projectName}}
+
+Appium test automation framework with Python and Pytest for iOS/Android mobile testing.
+
+## Features
+
+- **Appium {{toolVersions.appium}}**: Latest mobile automation framework
+- **Python {{toolVersions.python}}**: Modern Python with type hints
+- **Pytest {{toolVersions.pytest}}**: Powerful testing framework
+- **Page Object Model**: Maintainable test structure
+- **Multi-Platform**: iOS and Android support
+- **Parallel Execution**: pytest-xdist for faster test runs
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else}}
+- **HTML Reports**: Beautiful test reports
+{{/if}}
+- **Cloud Integration**: BrowserStack and Sauce Labs support
+
+## Prerequisites
+
+- Python 3.11+
+- Node.js and npm (for Appium)
+- Appium 2.x
+- Android SDK (for Android testing)
+- Xcode (for iOS testing on macOS)
+
+## Installation
+
+```bash
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Install Appium globally
+npm install -g appium@next
+
+# Install Appium drivers
+appium driver install uiautomator2  # For Android
+appium driver install xcuitest      # For iOS
+```
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file or set environment variables:
+
+```bash
+# Platform (Android or iOS)
+PLATFORM=Android
+
+# Test environment
+TEST_ENV=dev
+
+# Appium server URL
+APPIUM_SERVER=http://localhost:4723
+
+# Device configuration
+DEVICE_NAME="Android Emulator"
+PLATFORM_VERSION=13.0
+
+# App configuration
+APP_PATH=/path/to/your/app.apk
+APP_PACKAGE=com.example.app
+APP_ACTIVITY=.MainActivity
+
+# For iOS
+BUNDLE_ID=com.example.app
+
+# Cloud services (optional)
+USE_BROWSERSTACK=false
+BROWSERSTACK_USERNAME=your_username
+BROWSERSTACK_ACCESS_KEY=your_key
+
+USE_SAUCELABS=false
+SAUCE_USERNAME=your_username
+SAUCE_ACCESS_KEY=your_key
+```
+
+### Test Data
+
+Update test data in:
+- `data/dev.json` - Development environment
+- `data/qa.json` - QA environment
+
+### Device Capabilities
+
+Update device capabilities in `config/capabilities.py` based on your testing needs.
+
+## Running Tests
+
+```bash
+# Start Appium server
+appium
+
+# Run all tests
+pytest -v
+
+# Run with parallel execution
+pytest -v -n auto
+
+# Run specific test markers
+pytest -v -m smoke
+pytest -v -m regression
+pytest -v -m android
+pytest -v -m ios
+
+# Run tests for specific platform
+PLATFORM=Android pytest -v
+PLATFORM=iOS pytest -v
+
+# Run with HTML report
+pytest -v --html=reports/report.html
+
+# Run with Allure report
+pytest -v --alluredir=allure-results
+allure serve allure-results
+```
+
+## Project Structure
+
+```
+.
+├── config/
+│   ├── capabilities.py    # Device capabilities manager
+│   └── settings.py         # Application settings
+├── data/
+│   ├── dev.json           # Development test data
+│   └── qa.json            # QA test data
+├── tests/
+│   ├── pages/
+│   │   ├── base_page.py   # Base page class
+│   │   ├── login_page.py  # Login page object
+│   │   └── home_page.py   # Home page object
+│   ├── utils/
+│   │   ├── android_gestures.py  # Android gesture utilities
+│   │   ├── ios_gestures.py      # iOS gesture utilities
+│   │   └── helpers.py           # Helper functions
+│   ├── test_login.py      # Login tests
+│   └── test_smoke.py      # Smoke tests
+├── conftest.py            # Pytest fixtures
+├── pytest.ini             # Pytest configuration
+└── requirements.txt       # Python dependencies
+```
+
+## Page Objects
+
+All page objects extend `BasePage` located in `tests/pages/base_page.py`:
+- `LoginPage` - Login page interactions
+- `HomePage` - Home page interactions
+
+### Updating Locators
+
+Update locators in page objects based on your app. Use Appium Inspector to identify elements:
+
+```python
+# Android
+USERNAME_INPUT = (AppiumBy.ID, "com.example.app:id/username")
+
+# iOS
+USERNAME_INPUT = (AppiumBy.ACCESSIBILITY_ID, "username_field")
+```
+
+## Gestures
+
+Platform-specific gesture utilities are available:
+- `AndroidGestures` - Android swipe, scroll, long press
+- `IOSGestures` - iOS tap, swipe, long press
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR with platform matrix (Android, iOS) on macOS runners.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Cloud Services
+
+### BrowserStack
+
+Set environment variables:
+```bash
+USE_BROWSERSTACK=true
+BROWSERSTACK_USERNAME=your_username
+BROWSERSTACK_ACCESS_KEY=your_key
+```
+
+### Sauce Labs
+
+Set environment variables:
+```bash
+USE_SAUCELABS=true
+SAUCE_USERNAME=your_username
+SAUCE_ACCESS_KEY=your_key
+```
+
+## Reports
+
+{{#if (eq reportingTool "allure")}}
+- **Allure**: Run `allure serve allure-results`
+{{else}}
+- **HTML**: `reports/report.html`
+{{/if}}
+- **Screenshots**: `screenshots/` (captured on test failure)
+- **Logs**: `logs/test.log`

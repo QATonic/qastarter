@@ -1,0 +1,27 @@
+namespace {{projectName}}.Config;
+
+public static class Settings
+{
+    public static string Environment => GetEnvironmentVariable("TEST_ENV", "dev");
+    public static string BaseURL => GetEnvironmentVariable("BASE_URL", "https://jsonplaceholder.typicode.com");
+    public static string AuthToken => GetEnvironmentVariable("AUTH_TOKEN", "");
+    public static string ApiKey => GetEnvironmentVariable("API_KEY", "");
+    public static string Username => GetEnvironmentVariable("USERNAME", "");
+    public static string Password => GetEnvironmentVariable("PASSWORD", "");
+    public static int RequestTimeout => int.Parse(GetEnvironmentVariable("REQUEST_TIMEOUT", "30000"));
+    public static int RetryCount => int.Parse(GetEnvironmentVariable("RETRY_COUNT", "3"));
+    public static string LogLevel => GetEnvironmentVariable("LOG_LEVEL", "Information");
+    public static string LogFile => GetEnvironmentVariable("LOG_FILE", "logs/test-run.log");
+    public static bool VerifySSL => bool.Parse(GetEnvironmentVariable("VERIFY_SSL", "true"));
+
+    public static string GetBaseURL()
+    {
+        var env = Environments.GetEnvironment(Environment);
+        return env?.BaseURL ?? BaseURL;
+    }
+
+    private static string GetEnvironmentVariable(string key, string defaultValue)
+    {
+        return System.Environment.GetEnvironmentVariable(key) ?? defaultValue;
+    }
+}

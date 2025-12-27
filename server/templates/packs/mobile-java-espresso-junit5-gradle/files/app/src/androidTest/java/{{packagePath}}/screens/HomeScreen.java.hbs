@@ -1,0 +1,93 @@
+package {{packageName}}.screens;
+
+import {{packageName}}.utils.Log;
+
+/**
+ * Home Screen Page Object.
+ * 
+ * ========== IMPORTANT: UPDATE THESE VALUES ==========
+ * Replace the R.id references below with your actual view IDs.
+ * These are placeholder values that need to match your app's layout.
+ * =====================================================
+ */
+public class HomeScreen extends BaseScreen {
+
+    // ========== UPDATE THESE VIEW IDs ==========
+    // Replace with your actual resource IDs from R.id
+    
+    // Placeholder IDs - REPLACE WITH YOUR ACTUAL IDs
+    private static final int WELCOME_TEXT = 0;    // R.id.your_welcome_text
+    private static final int USER_PROFILE = 0;    // R.id.your_user_profile
+    private static final int MENU_BUTTON = 0;     // R.id.your_menu_button
+    private static final int LOGOUT_BUTTON = 0;   // R.id.your_logout_button
+    private static final int SETTINGS_BUTTON = 0; // R.id.your_settings_button
+    // ============================================
+
+    /**
+     * Verify welcome message is displayed
+     */
+    public HomeScreen verifyWelcomeDisplayed() {
+        Log.step("Verifying welcome message is displayed");
+        verifyDisplayedById(WELCOME_TEXT);
+        return this;
+    }
+
+    /**
+     * Verify welcome message text
+     */
+    public HomeScreen verifyWelcomeMessage(String expectedMessage) {
+        Log.step("Verifying welcome message: " + expectedMessage);
+        verifyTextById(WELCOME_TEXT, expectedMessage);
+        return this;
+    }
+
+    /**
+     * Click user profile
+     */
+    public void clickUserProfile() {
+        Log.step("Clicking user profile");
+        clickById(USER_PROFILE);
+    }
+
+    /**
+     * Click menu button
+     */
+    public void clickMenu() {
+        Log.step("Clicking menu button");
+        clickById(MENU_BUTTON);
+    }
+
+    /**
+     * Click logout button
+     */
+    public void clickLogout() {
+        Log.step("Clicking logout button");
+        clickById(LOGOUT_BUTTON);
+    }
+
+    /**
+     * Click settings button
+     */
+    public void clickSettings() {
+        Log.step("Clicking settings button");
+        clickById(SETTINGS_BUTTON);
+    }
+
+    /**
+     * Perform logout
+     */
+    public void logout() {
+        Log.startSection("Performing logout");
+        clickMenu();
+        clickLogout();
+        Log.endSection();
+    }
+
+    /**
+     * Check if home screen is loaded
+     */
+    @Override
+    public boolean isLoaded() {
+        return isDisplayedById(WELCOME_TEXT);
+    }
+}

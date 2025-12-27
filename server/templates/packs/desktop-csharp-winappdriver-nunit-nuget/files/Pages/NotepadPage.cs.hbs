@@ -1,0 +1,75 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium.Windows;
+
+namespace {{projectName}}.Pages;
+
+public class NotepadPage : BasePage
+{
+    public NotepadPage(WindowsDriver<WindowsElement> driver) : base(driver) { }
+
+    // Locators
+    private By TextEditor => By.ClassName("Edit");
+    private By FileMenu => By.Name("File");
+    private By EditMenu => By.Name("Edit");
+    private By FormatMenu => By.Name("Format");
+    private By SaveMenuItem => By.Name("Save");
+    private By SaveAsMenuItem => By.Name("Save As...");
+    private By ExitMenuItem => By.Name("Exit");
+
+    // Actions
+    public NotepadPage TypeText(string text)
+    {
+        var editor = FindElement(TextEditor);
+        SendKeys(editor, text, "Text Editor");
+        return this;
+    }
+
+    public NotepadPage ClearText()
+    {
+        var editor = FindElement(TextEditor);
+        editor.Clear();
+        return this;
+    }
+
+    public string GetText()
+    {
+        var editor = FindElement(TextEditor);
+        return GetText(editor, "Text Editor");
+    }
+
+    public NotepadPage OpenFileMenu()
+    {
+        Click(FindElement(FileMenu), "File Menu");
+        return this;
+    }
+
+    public NotepadPage OpenEditMenu()
+    {
+        Click(FindElement(EditMenu), "Edit Menu");
+        return this;
+    }
+
+    public NotepadPage OpenFormatMenu()
+    {
+        Click(FindElement(FormatMenu), "Format Menu");
+        return this;
+    }
+
+    public void CloseWithoutSaving()
+    {
+        // Send Alt+F4 to close
+        var editor = FindElement(TextEditor);
+        editor.SendKeys(Keys.Alt + Keys.F4);
+        
+        // Handle "Do you want to save?" dialog if it appears
+        try
+        {
+            var dontSaveButton = Driver.FindElementByName("Don't Save");
+            dontSaveButton?.Click();
+        }
+        catch
+        {
+            // Dialog didn't appear, continue
+        }
+    }
+}

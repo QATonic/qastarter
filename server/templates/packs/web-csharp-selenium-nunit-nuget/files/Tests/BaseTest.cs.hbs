@@ -1,0 +1,29 @@
+using NUnit.Framework;
+using OpenQA.Selenium;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Tests
+{
+    public class BaseTest
+    {
+        protected IWebDriver Driver = null!;
+
+        [SetUp]
+        public void SetUp()
+        {
+            Driver = DriverFactory.CreateDriver();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed)
+            {
+                var testName = TestContext.CurrentContext.Test.Name;
+                new ScreenshotHelper(Driver).Capture($"failed_{testName}");
+            }
+
+            Driver?.Quit();
+        }
+    }
+}

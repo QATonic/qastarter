@@ -1,0 +1,211 @@
+{
+  "id": "mobile-typescript-appium-jest-npm",
+  "supportsDynamic": true,
+  "name": "Mobile Automation Framework",
+  "description": "Appium test automation framework with TypeScript and Jest for iOS/Android mobile testing",
+  "tags": [
+    "mobile",
+    "appium",
+    "typescript",
+    "jest",
+    "pom"
+  ],
+  "toolVersions": {
+    "node": "18.x",
+    "appium": "2.x",
+    "jest": "29.7.0",
+    "typescript": "5.3.3"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "isTemplate": true,
+      "description": "npm configuration with Appium and Jest dependencies"
+    },
+    {
+      "path": "tsconfig.json",
+      "isTemplate": true,
+      "description": "TypeScript configuration"
+    },
+    {
+      "path": "jest.config.js",
+      "isTemplate": true,
+      "description": "Jest configuration"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD workflow",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "description": "Jenkins CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "description": "Azure DevOps CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation and setup guide"
+    },
+    {
+      "path": "config/capabilities.ts",
+      "isTemplate": true,
+      "description": "Device capabilities manager"
+    },
+    {
+      "path": "config/settings.ts",
+      "isTemplate": true,
+      "description": "Application settings and configuration"
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true,
+      "description": "Development environment data"
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true,
+      "description": "QA environment data"
+    },
+    {
+      "path": "tests/types/testData.ts",
+      "isTemplate": true,
+      "description": "TypeScript interfaces for test data"
+    },
+    {
+      "path": "tests/types/global.d.ts",
+      "isTemplate": true,
+      "description": "Global type declarations"
+    },
+    {
+      "path": "tests/pages/BasePage.ts",
+      "isTemplate": true,
+      "description": "Base page class with common functionality"
+    },
+    {
+      "path": "tests/pages/LoginPage.ts",
+      "isTemplate": true,
+      "description": "Login page object"
+    },
+    {
+      "path": "tests/pages/HomePage.ts",
+      "isTemplate": true,
+      "description": "Home page object"
+    },
+    {
+      "path": "tests/utils/androidGestures.ts",
+      "isTemplate": true,
+      "description": "Android gesture utilities"
+    },
+    {
+      "path": "tests/utils/iosGestures.ts",
+      "isTemplate": true,
+      "description": "iOS gesture utilities"
+    },
+    {
+      "path": "tests/utils/helpers.ts",
+      "isTemplate": true,
+      "description": "Common helper functions"
+    },
+    {
+      "path": "tests/utils/logger.ts",
+      "isTemplate": true,
+      "description": "Logging utility"
+    },
+    {
+      "path": "tests/utils/waitHelpers.ts",
+      "isTemplate": true,
+      "description": "Wait helper utilities"
+    },
+    {
+      "path": "tests/utils/screenshotHelper.ts",
+      "isTemplate": true,
+      "description": "Screenshot capture utility"
+    },
+    {
+      "path": "data/users.json",
+      "isTemplate": true,
+      "description": "User test data"
+    },
+    {
+      "path": "tests/login.test.ts",
+      "isTemplate": true,
+      "description": "Login test suite"
+    },
+    {
+      "path": "tests/smoke.test.ts",
+      "isTemplate": true,
+      "description": "Smoke test suite"
+    },
+    {
+      "path": "tests/setup.ts",
+      "isTemplate": true,
+      "description": "Test setup and teardown"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step-definitions/loginSteps.ts",
+      "isTemplate": true,
+      "description": "Cucumber-js step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "mobile",
+    "framework": "appium",
+    "language": "typescript",
+    "testRunner": "jest",
+    "buildTool": "npm"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "jest-html-reporter",
+      "mochawesome"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

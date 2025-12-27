@@ -1,0 +1,128 @@
+using System;
+using System.IO;
+
+namespace {{projectName}}.Tests.Utils
+{
+    /// <summary>
+    /// Logging utility for mobile test automation
+    /// </summary>
+    public class Logger
+    {
+        private static readonly object _lock = new object();
+        private static readonly string LogDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
+        private static readonly string LogFile = Path.Combine(LogDirectory, $"test-{DateTime.Now:yyyy-MM-dd}.log");
+
+        public enum LogLevel
+        {
+            Debug,
+            Info,
+            Warning,
+            Error
+        }
+
+        static Logger()
+        {
+            if (!Directory.Exists(LogDirectory))
+            {
+                Directory.CreateDirectory(LogDirectory);
+            }
+        }
+
+        public static void Debug(string message) => Log(LogLevel.Debug, message);
+        public static void Info(string message) => Log(LogLevel.Info, message);
+        public static void Warning(string message) => Log(LogLevel.Warning, message);
+        public static void Error(string message) => Log(LogLevel.Error, message);
+        public static void Error(string message, Exception ex) => Log(LogLevel.Error, $"{message}\n{ex}");
+
+        public static void Step(string stepDescription)
+        {
+            Info($"[STEP] {stepDescription}");
+        }
+
+        public static void TestStart(string testName)
+        {
+            Info($"========== TEST START: {testName} ==========");
+        }
+
+        public static void TestEnd(string testName, bool passed)
+        {
+            var status = passed ? "PASSED" : "FAILED";
+            Info($"========== TEST {status}: {testName} ==========");
+        }
+
+        public static void Action(string action, string element)
+        {
+            Debug($"[ACTION] {action} on element: {element}");
+        }
+
+        public static void Verification(string description, bool result)
+        {
+            var status = result ? "✓" : "✗";
+            Info($"[VERIFY] {status} {description}");
+        }
+
+        private static void Log(LogLevel level, string message)
+        {
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            var logEntry = $"[{timestamp}] [{level.ToString().ToUpper()}] {message}";
+
+            // Console output with colors
+            lock (_lock)
+            {
+                var originalColor = Console.ForegroundColor;
+                Console.ForegroundColor = GetLogColor(level);
+                Console.WriteLine(logEntry);
+                Console.ForegroundColor = originalColor;
+
+                // File output
+                try
+                {
+                    File.AppendAllText(LogFile, logEntry + Environment.NewLine);
+                }
+                catch
+                {
+                    // Ignore file write errors
+                }
+            }
+        }
+
+        private static ConsoleColor GetLogColor(LogLevel level)
+        {
+            return level switch
+            {
+                LogLevel.Debug => ConsoleColor.Gray,
+                LogLevel.Info => ConsoleColor.White,
+                LogLevel.Warning => ConsoleColor.Yellow,
+                LogLevel.Error => ConsoleColor.Red,
+                _ => ConsoleColor.White
+            };
+        }
+
+        /// <summary>
+        /// Get the current log file path
+        /// </summary>
+        public static string GetLogFilePath() => LogFile;
+
+        /// <summary>
+        /// Clear old log files (older than specified days)
+        /// </summary>
+        public static void CleanupOldLogs(int daysToKeep = 7)
+        {
+            try
+            {
+                var cutoffDate = DateTime.Now.AddDays(-daysToKeep);
+                foreach (var file in Directory.GetFiles(LogDirectory, "test-*.log"))
+                {
+                    if (File.GetCreationTime(file) < cutoffDate)
+                    {
+                        File.Delete(file);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Warning($"Failed to cleanup old logs: {ex.Message}");
+            }
+        }
+    }
+}

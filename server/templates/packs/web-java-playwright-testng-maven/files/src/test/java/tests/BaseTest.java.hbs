@@ -1,0 +1,127 @@
+package tests;
+
+import com.microsoft.playwright.*;
+import config.TestConfig;
+import {{javaPackage}}.listeners.TestListener;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.testng.ITestResult;
+import org.testng.annotations.*;
+import utils.ScreenshotHelper;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+/**
+ * Base test class providing Playwright browser lifecycle management.
+ * All test classes should extend this class.
+ */
+@Listeners({TestListener.class})
+public class BaseTest {
+    protected static final Logger logger = LogManager.getLogger(BaseTest.class);
+    protected Playwright playwright;
+    protected Browser browser;
+    protected BrowserContext context;
+    protected Page page;
+    
+    // ThreadLocal for parallel execution support
+    private static ThreadLocal<Page> threadLocalPage = new ThreadLocal<>();
+    private static ThreadLocal<BrowserContext> threadLocalContext = new ThreadLocal<>();
+
+    @BeforeClass
+    public void setupClass() {
+        // Create directories
+        try {
+            Files.createDirectories(Paths.get("screenshots"));
+            Files.createDirectories(Paths.get("test-results"));
+            Files.createDirectories(Paths.get("reports"));
+            Files.createDirectories(Paths.get("logs"));
+        } catch (Exception e) {
+            logger.error("Failed to create directories: " + e.getMessage());
+        }
+
+        playwright = Playwright.create();
+        
+        BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions()
+                .setHeadless(TestConfig.HEADLESS)
+                .setSlowMo(TestConfig.SLOW_MO);
+        
+        String browserName = System.getProperty("browser", System.getenv("BROWSER"));
+        if (browserName == null) {
+            browserName = "chromium";
+        }
+        
+        logger.info("Launching browser: " + browserName);
+        
+        switch (browserName.toLowerCase()) {
+            case "firefox":
+                browser = playwright.firefox().launch(launchOptions);
+                break;
+            case "webkit":
+                browser = playwright.webkit().launch(launchOptions);
+                break;
+            case "chromium":
+            default:
+                browser = playwright.chromium().launch(launchOptions);
+                break;
+        }
+    }
+
+    @BeforeMethod
+    public void setupMethod() {
+        Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
+                .setViewportSize(1920, 1080)
+                .setIgnoreHTTPSErrors(true);
+        
+        context = browser.newContext(contextOptions);
+        page = context.newPage();
+        
+        // Store in ThreadLocal for parallel execution
+        threadLocalContext.set(context);
+        threadLocalPage.set(page);
+    }
+    
+    /**
+     * Get the current page instance (thread-safe)
+     * @return Current Page instance
+     */
+    public static Page getPage() {
+        return threadLocalPage.get();
+    }
+    
+    /**
+     * Get the current browser context (thread-safe)
+     * @return Current BrowserContext instance
+     */
+    public static BrowserContext getContext() {
+        return threadLocalContext.get();
+    }
+
+    @AfterMethod
+    public void teardownMethod(ITestResult result) {
+        if (!result.isSuccess() && TestConfig.SCREENSHOT_ON_FAILURE) {
+            ScreenshotHelper.captureOnFailure(page, result.getName());
+        }
+        
+        if (page != null) {
+            page.close();
+        }
+        if (context != null) {
+            context.close();
+        }
+        
+        // Clear ThreadLocal
+        threadLocalPage.remove();
+        threadLocalContext.remove();
+    }
+
+    @AfterClass
+    public void teardownClass() {
+        if (browser != null) {
+            browser.close();
+        }
+        if (playwright != null) {
+            playwright.close();
+        }
+    }
+}

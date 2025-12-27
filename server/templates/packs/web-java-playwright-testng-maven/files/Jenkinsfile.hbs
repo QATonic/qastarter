@@ -1,0 +1,84 @@
+{{{{raw}}}}
+pipeline {
+    agent any
+    
+    tools {
+        maven 'Maven 3.9'
+        jdk 'JDK 17'
+    }
+    
+    environment {
+        PLAYWRIGHT_BROWSERS_PATH = '0'
+    }
+    
+    parameters {
+        choice(name: 'BROWSER', choices: ['chromium', 'firefox', 'webkit'], description: 'Browser to run tests')
+        booleanParam(name: 'HEADLESS', defaultValue: true, description: 'Run in headless mode')
+        string(name: 'ENVIRONMENT', defaultValue: 'qa', description: 'Test environment')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh 'mvn clean install -DskipTests'
+                sh 'mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"'
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                sh """
+                    mvn test \
+                        -Dbrowser=${params.BROWSER} \
+                        -Dheadless=${params.HEADLESS} \
+                        -Denvironment=${params.ENVIRONMENT}
+                """
+            }
+        }
+        
+        stage('Generate Reports') {
+            steps {
+                script {
+                    // TestNG Reports
+                    testNG testResultsPattern: 'target/surefire-reports/testng-results.xml'
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Archive test results
+            archiveArtifacts artifacts: 'target/surefire-reports/**/*', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'screenshots/**/*', allowEmptyArchive: true
+            
+            // Publish TestNG results
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/surefire-reports',
+                reportFiles: 'index.html',
+                reportName: 'TestNG Report'
+            ])
+            
+            // Clean workspace
+            cleanWs()
+        }
+        
+        failure {
+            echo 'Tests failed! Check the reports for details.'
+        }
+        
+        success {
+            echo 'All tests passed successfully!'
+        }
+    }
+}
+{{{{/raw}}}}

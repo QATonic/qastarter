@@ -1,0 +1,185 @@
+{
+  "id": "api-javascript-supertest-jest-npm",
+  "name": "API Testing Framework",
+  "description": "REST API automation framework with JavaScript, Supertest, and Jest",
+  "tags": [
+    "api",
+    "rest",
+    "javascript",
+    "jest",
+    "supertest"
+  ],
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "supertest",
+    "language": "javascript",
+    "testRunner": "jest",
+    "buildTool": "npm"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "jest-html",
+      "allure"
+    ],
+    "cicdTools": [
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci",
+      "jenkins"
+    ],
+    "testingPatterns": [
+      "data-driven",
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "node": "18+",
+    "supertest": "6.3.3",
+    "jest": "29.7.0",
+    "ajv": "8.12.0"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "isTemplate": true,
+      "description": "NPM package configuration"
+    },
+    {
+      "path": "jest.config.js",
+      "isTemplate": true,
+      "description": "Jest configuration"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "description": "Jenkins CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "description": "Azure DevOps CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "config/settings.js",
+      "isTemplate": true,
+      "description": "Configuration management"
+    },
+    {
+      "path": "config/environments.js",
+      "isTemplate": true,
+      "description": "Environment configurations"
+    },
+    {
+      "path": "core/ApiClient.js",
+      "isTemplate": true,
+      "description": "Supertest API client wrapper"
+    },
+    {
+      "path": "core/SchemaValidator.js",
+      "isTemplate": true,
+      "description": "JSON schema validation utilities"
+    },
+    {
+      "path": "models/User.js",
+      "isTemplate": true,
+      "description": "User model and schema"
+    },
+    {
+      "path": "utils/logger.js",
+      "isTemplate": true,
+      "description": "Winston logger utility"
+    },
+    {
+      "path": "tests/data/users.js",
+      "isTemplate": true,
+      "description": "Test data for users"
+    },
+    {
+      "path": "tests/api/users.spec.js",
+      "isTemplate": true,
+      "description": "User API test cases"
+    },
+    {
+      "path": "tests/api/auth.spec.js",
+      "isTemplate": true,
+      "description": "Authentication API test cases"
+    },
+    {
+      "path": "tests/api/health.spec.js",
+      "isTemplate": true,
+      "description": "Health check API test cases"
+    },
+    {
+      "path": "utils/retryHelper.js",
+      "isTemplate": true,
+      "description": "Retry mechanism for flaky requests"
+    },
+    {
+      "path": "utils/authHelper.js",
+      "isTemplate": true,
+      "description": "Authentication helper utilities"
+    },
+    {
+      "path": "utils/dataGenerator.js",
+      "isTemplate": true,
+      "description": "Test data generator"
+    },
+    {
+      "path": "schemas/user.schema.json",
+      "isTemplate": true,
+      "description": "JSON schema for user validation"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step-definitions/loginSteps.js",
+      "isTemplate": true,
+      "description": "Cucumber-js step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for API testing"
+    }
+  ]
+}

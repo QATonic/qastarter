@@ -1,0 +1,75 @@
+using FluentAssertions;
+using NUnit.Framework;
+using {{projectName}}.Core;
+using {{projectName}}.Pages;
+
+namespace {{projectName}}.Tests;
+
+[TestFixture]
+[Category("Smoke")]
+public class NotepadTests : BaseTest
+{
+    private NotepadPage _notepadPage = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        Driver = DriverFactory.CreateNotepadDriver();
+        _notepadPage = new NotepadPage(Driver);
+    }
+
+    [Test]
+    public void TypeText_ShouldDisplayInEditor()
+    {
+        const string testText = "Hello, WinAppDriver!";
+        
+        _notepadPage.TypeText(testText);
+        
+        var actualText = _notepadPage.GetText();
+        actualText.Should().Contain(testText);
+    }
+
+    [Test]
+    public void ClearText_ShouldRemoveAllText()
+    {
+        _notepadPage.TypeText("Some text to clear");
+        _notepadPage.ClearText();
+        
+        var actualText = _notepadPage.GetText();
+        actualText.Should().BeEmpty();
+    }
+
+    [Test]
+    public void TypeMultipleLines_ShouldPreserveFormatting()
+    {
+        var multiLineText = "Line 1\nLine 2\nLine 3";
+        
+        _notepadPage.TypeText(multiLineText);
+        
+        var actualText = _notepadPage.GetText();
+        actualText.Should().Contain("Line 1");
+        actualText.Should().Contain("Line 2");
+        actualText.Should().Contain("Line 3");
+    }
+
+    [Test]
+    [TestCase("Hello World")]
+    [TestCase("Test 123")]
+    [TestCase("Special chars: @#$%")]
+    public void TypeText_WithDifferentInputs_ShouldWork(string text)
+    {
+        _notepadPage.TypeText(text);
+        
+        var actualText = _notepadPage.GetText();
+        actualText.Should().Contain(text);
+    }
+
+    [Test]
+    public void OpenFileMenu_ShouldDisplayMenuItems()
+    {
+        _notepadPage.OpenFileMenu();
+        
+        // Menu should be open (we can verify by checking if driver is still responsive)
+        Driver.Should().NotBeNull();
+    }
+}

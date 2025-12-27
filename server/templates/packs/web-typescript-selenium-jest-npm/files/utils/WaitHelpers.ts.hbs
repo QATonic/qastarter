@@ -1,0 +1,33 @@
+import { By, WebDriver, WebElement, until } from 'selenium-webdriver';
+
+export default class WaitHelpers {
+  private driver: WebDriver;
+  private timeout: number;
+
+  constructor(driver: WebDriver, timeout: number = 10000) {
+    this.driver = driver;
+    this.timeout = timeout;
+  }
+
+  async waitForElementLocated(locator: By): Promise<WebElement> {
+    return await this.driver.wait(until.elementLocated(locator), this.timeout);
+  }
+
+  async waitForElementVisible(locator: By): Promise<WebElement> {
+    const element = await this.waitForElementLocated(locator);
+    return await this.driver.wait(until.elementIsVisible(element), this.timeout);
+  }
+
+  async waitForElementClickable(locator: By): Promise<WebElement> {
+    const element = await this.waitForElementLocated(locator);
+    return await this.driver.wait(until.elementIsEnabled(element), this.timeout);
+  }
+
+  async waitForUrlContains(urlFragment: string): Promise<boolean> {
+    return await this.driver.wait(until.urlContains(urlFragment), this.timeout);
+  }
+
+  async waitForTitleContains(title: string): Promise<boolean> {
+    return await this.driver.wait(until.titleContains(title), this.timeout);
+  }
+}

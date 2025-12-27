@@ -1,0 +1,42 @@
+# {{projectName}} - Docker Compose for API Testing
+# Provides containerized API test execution environment
+
+version: '3.8'
+
+services:
+  # API Test Runner
+  api-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TEST_ENV=qa
+      - BASE_URL={{#if baseUrl}}{{baseUrl}}{{else}}https://api.example.com{{/if}}
+      - NODE_ENV=test
+    volumes:
+      - ./reports:/app/reports
+      - ./coverage:/app/coverage
+    networks:
+      - test-network
+
+  # Optional: Mock API Server (json-server)
+  mock-api:
+    image: vimagick/json-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./tests/data:/data
+    command: json-server --watch /data/db.json --host 0.0.0.0
+    networks:
+      - test-network
+    profiles:
+      - mock
+
+networks:
+  test-network:
+    driver: bridge
+
+# Usage:
+# Run tests: docker-compose up --build api-tests
+# Run with mock server: docker-compose --profile mock up
+# Run specific test: docker-compose run api-tests npm test -- --testPathPattern=users

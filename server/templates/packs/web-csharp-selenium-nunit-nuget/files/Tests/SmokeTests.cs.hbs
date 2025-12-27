@@ -1,0 +1,38 @@
+using NUnit.Framework;
+using {{projectName}}.Pages;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Tests
+{
+    [TestFixture]
+    [Category("Smoke")]
+    public class SmokeTests : BaseTest
+    {
+        private LoginPage _loginPage = null!;
+
+        [SetUp]
+        public new void SetUp()
+        {
+            base.SetUp();
+            _loginPage = new LoginPage(Driver);
+        }
+
+        [Test]
+        public void LoginPageLoadsSuccessfully()
+        {
+            _loginPage.NavigateToLogin();
+            var title = _loginPage.GetPageTitle();
+            Assert.That(title, Is.Not.Null.And.Not.Empty);
+            Assert.That(_loginPage.IsDisplayed(_loginPage.UsernameInput), Is.True);
+            Assert.That(_loginPage.IsDisplayed(_loginPage.PasswordInput), Is.True);
+        }
+
+        [Test]
+        public void BaseUrlIsAccessible()
+        {
+            Driver.Navigate().GoToUrl(EnvConfig.Instance.GetBaseUrl());
+            var url = Driver.Url;
+            Assert.That(url, Does.Contain(EnvConfig.Instance.GetBaseUrl()));
+        }
+    }
+}

@@ -1,0 +1,147 @@
+{
+  "id": "java-selenium-junit",
+  "name": "Java Selenium JUnit",
+  "description": "Complete Java Selenium WebDriver automation framework with JUnit, Maven, and best practices",
+  "framework": "Selenium WebDriver",
+  "language": "Java",
+  "buildTool": "Maven",
+  "testRunner": "JUnit",
+  "version": "1.0.0",
+  "tags": [
+    "selenium",
+    "java",
+    "junit",
+    "maven",
+    "webdriver",
+    "page-object-model",
+    "testng",
+    "extent-reports"
+  ],
+  "dependencies": [
+    {
+      "name": "selenium-java",
+      "version": "4.16.1",
+      "scope": "compile"
+    },
+    {
+      "name": "junit-jupiter-engine",
+      "version": "5.10.1",
+      "scope": "test"
+    },
+    {
+      "name": "junit-jupiter-api",
+      "version": "5.10.1", 
+      "scope": "test"
+    },
+    {
+      "name": "webdrivermanager",
+      "version": "5.6.2",
+      "scope": "compile"
+    },
+    {
+      "name": "extentreports",
+      "version": "5.1.1",
+      "scope": "compile"
+    },
+    {
+      "name": "log4j-core",
+      "version": "2.21.1",
+      "scope": "compile"
+    },
+    {
+      "name": "log4j-api",
+      "version": "2.21.1",
+      "scope": "compile"
+    },
+    {
+      "name": "commons-io",
+      "version": "2.15.0",
+      "scope": "compile"
+    },
+    {
+      "name": "jackson-databind",
+      "version": "2.16.0",
+      "scope": "compile"
+    }
+  ],
+  "configurations": [
+    {
+      "key": "projectName",
+      "type": "string",
+      "required": true,
+      "default": "selenium-automation"
+    },
+    {
+      "key": "groupId", 
+      "type": "string",
+      "required": true,
+      "default": "com.qastarter"
+    },
+    {
+      "key": "artifactId",
+      "type": "string", 
+      "required": true,
+      "default": "selenium-automation"
+    },
+    {
+      "key": "packageName",
+      "type": "string",
+      "required": true,
+      "default": "com.qastarter.selenium"
+    },
+    {
+      "key": "includeExtentReports",
+      "type": "boolean",
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "includePageObjectModel",
+      "type": "boolean",
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "includeConfigLoader",
+      "type": "boolean",
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "includeScreenshots",
+      "type": "boolean",
+      "required": false,
+      "default": true
+    },
+    {
+      "key": "includeLogging",
+      "type": "boolean",
+      "required": false,
+      "default": true
+    }
+  ],
+  "supportedScenarios": [
+    "Login",
+    "Logout", 
+    "SignUp",
+    "Form Validation",
+    "Navigation",
+    "Data Driven Testing"
+  ],
+  "supportedIntegrations": {
+    "cicd": [
+      "Jenkins",
+      "GitHub Actions",
+      "Azure Pipeline"
+    ],
+    "reporting": [
+      "Extent Reports",
+      "Allure Reports"
+    ],
+    "containerization": [
+      "Docker"
+    ]
+  },
+  "createdAt": "2025-01-27T00:00:00.000Z",
+  "updatedAt": "2025-01-27T00:00:00.000Z"
+} 

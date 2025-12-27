@@ -1,0 +1,62 @@
+using RestSharp;
+
+namespace {{projectName}}.Core;
+
+public class RequestBuilder
+{
+    private readonly RestRequest _request;
+
+    public RequestBuilder(string resource = "")
+    {
+        _request = new RestRequest(resource);
+    }
+
+    public RequestBuilder WithHeader(string name, string value)
+    {
+        _request.AddHeader(name, value);
+        return this;
+    }
+
+    public RequestBuilder WithQueryParameter(string name, string value)
+    {
+        _request.AddQueryParameter(name, value);
+        return this;
+    }
+
+    public RequestBuilder WithBody(object body)
+    {
+        _request.AddJsonBody(body);
+        return this;
+    }
+
+    public RequestBuilder WithContentType(string contentType)
+    {
+        return WithHeader("Content-Type", contentType);
+    }
+
+    public RequestBuilder WithAccept(string accept)
+    {
+        return WithHeader("Accept", accept);
+    }
+
+    public RequestBuilder WithBearerToken(string token)
+    {
+        return WithHeader("Authorization", $"Bearer {token}");
+    }
+
+    public RequestBuilder WithApiKey(string apiKey, string headerName = "X-API-Key")
+    {
+        return WithHeader(headerName, apiKey);
+    }
+
+    public RequestBuilder WithTimeout(int milliseconds)
+    {
+        _request.Timeout = milliseconds;
+        return this;
+    }
+
+    public RestRequest Build()
+    {
+        return _request;
+    }
+}

@@ -1,0 +1,72 @@
+package pages;
+
+import com.microsoft.playwright.Page;
+import config.EnvConfig;
+
+/**
+ * Login Page Object
+ * 
+ * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+ * 1. Open your app's login page in a browser
+ * 2. Right-click on each element → Inspect → Copy selector
+ * 3. Replace the placeholder selectors below with your actual selectors
+ * 4. Update the login URL path in navigateToLogin() method
+ */
+public class LoginPage extends BasePage {
+    
+    // ============================================
+    // UPDATE THESE SELECTORS FOR YOUR APPLICATION
+    // ============================================
+    // Tip: Use browser DevTools (F12) to find correct selectors
+    
+    private final String USERNAME_INPUT = "#username";           // Your username/email input field
+    private final String PASSWORD_INPUT = "#password";           // Your password input field
+    private final String LOGIN_BUTTON = "button[type='submit']"; // Your login/submit button
+    private final String ERROR_MESSAGE = ".error-message";       // Error message element (for failed login)
+    private final String SUCCESS_INDICATOR = ".dashboard, .home"; // Element visible after successful login
+    
+    // ============================================
+
+    public LoginPage(Page page) {
+        super(page);
+    }
+
+    /**
+     * Navigate to login page
+     * UPDATE: Change "/login" to your actual login page path
+     */
+    public void navigateToLogin() {
+        navigate(EnvConfig.getInstance().getBaseUrl() + "/login");
+    }
+
+    public void login(String username, String password) {
+        type(USERNAME_INPUT, username);
+        type(PASSWORD_INPUT, password);
+        click(LOGIN_BUTTON);
+    }
+
+    public boolean isLoginSuccessful() {
+        try {
+            waitForSelector(SUCCESS_INDICATOR, 10000);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isErrorDisplayed() {
+        return isVisible(ERROR_MESSAGE);
+    }
+
+    public String getErrorMessage() {
+        return getText(ERROR_MESSAGE);
+    }
+
+    public boolean isUsernameVisible() {
+        return isVisible(USERNAME_INPUT);
+    }
+
+    public boolean isPasswordVisible() {
+        return isVisible(PASSWORD_INPUT);
+    }
+}

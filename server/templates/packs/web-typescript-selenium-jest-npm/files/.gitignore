@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build
+dist/
+
+# Test Results
+test-results/
+logs/
+screenshots/
+allure-results/
+allure-report/
+coverage/
+
+# Environment
+.env
+*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

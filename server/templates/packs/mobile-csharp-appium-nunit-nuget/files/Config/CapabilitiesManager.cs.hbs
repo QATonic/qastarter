@@ -1,0 +1,116 @@
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Android;
+using OpenQA.Selenium.Appium.iOS;
+
+namespace {{projectName}}.Config;
+
+public class CapabilitiesManager
+{
+    public static AppiumOptions GetAndroidCapabilities()
+    {
+        var options = new AppiumOptions();
+        
+        options.PlatformName = "Android";
+        options.AutomationName = "UiAutomator2";
+        options.AddAdditionalAppiumOption("deviceName", Environment.GetEnvironmentVariable("DEVICE_NAME") ?? "Android Emulator");
+        options.AddAdditionalAppiumOption("platformVersion", Environment.GetEnvironmentVariable("PLATFORM_VERSION") ?? "13.0");
+        options.AddAdditionalAppiumOption("app", Environment.GetEnvironmentVariable("APP_PATH") ?? "");
+        options.AddAdditionalAppiumOption("appPackage", Environment.GetEnvironmentVariable("APP_PACKAGE") ?? "com.example.app");
+        options.AddAdditionalAppiumOption("appActivity", Environment.GetEnvironmentVariable("APP_ACTIVITY") ?? ".MainActivity");
+        options.AddAdditionalAppiumOption("noReset", false);
+        options.AddAdditionalAppiumOption("fullReset", false);
+        options.AddAdditionalAppiumOption("newCommandTimeout", 300);
+        options.AddAdditionalAppiumOption("autoGrantPermissions", true);
+        options.AddAdditionalAppiumOption("unicodeKeyboard", true);
+        options.AddAdditionalAppiumOption("resetKeyboard", true);
+
+        if (Environment.GetEnvironmentVariable("USE_BROWSERSTACK") == "true")
+        {
+            AddBrowserStackAndroidOptions(options);
+        }
+        else if (Environment.GetEnvironmentVariable("USE_SAUCELABS") == "true")
+        {
+            AddSauceLabsAndroidOptions(options);
+        }
+
+        return options;
+    }
+
+    public static AppiumOptions GetIOSCapabilities()
+    {
+        var options = new AppiumOptions();
+        
+        options.PlatformName = "iOS";
+        options.AutomationName = "XCUITest";
+        options.AddAdditionalAppiumOption("deviceName", Environment.GetEnvironmentVariable("DEVICE_NAME") ?? "iPhone 14");
+        options.AddAdditionalAppiumOption("platformVersion", Environment.GetEnvironmentVariable("PLATFORM_VERSION") ?? "16.0");
+        options.AddAdditionalAppiumOption("app", Environment.GetEnvironmentVariable("APP_PATH") ?? "");
+        options.AddAdditionalAppiumOption("bundleId", Environment.GetEnvironmentVariable("BUNDLE_ID") ?? "com.example.app");
+        options.AddAdditionalAppiumOption("noReset", false);
+        options.AddAdditionalAppiumOption("fullReset", false);
+        options.AddAdditionalAppiumOption("newCommandTimeout", 300);
+        options.AddAdditionalAppiumOption("autoAcceptAlerts", true);
+        options.AddAdditionalAppiumOption("autoDismissAlerts", false);
+        options.AddAdditionalAppiumOption("useNewWDA", false);
+        options.AddAdditionalAppiumOption("wdaLaunchTimeout", 120000);
+
+        if (Environment.GetEnvironmentVariable("USE_BROWSERSTACK") == "true")
+        {
+            AddBrowserStackIOSOptions(options);
+        }
+        else if (Environment.GetEnvironmentVariable("USE_SAUCELABS") == "true")
+        {
+            AddSauceLabsIOSOptions(options);
+        }
+
+        return options;
+    }
+
+    private static void AddBrowserStackAndroidOptions(AppiumOptions options)
+    {
+        options.AddAdditionalAppiumOption("bstack:options", new Dictionary<string, object>
+        {
+            { "userName", Environment.GetEnvironmentVariable("BROWSERSTACK_USERNAME") ?? "" },
+            { "accessKey", Environment.GetEnvironmentVariable("BROWSERSTACK_ACCESS_KEY") ?? "" },
+            { "projectName", "{{projectName}}" },
+            { "buildName", "Android Build" },
+            { "debug", true },
+            { "networkLogs", true }
+        });
+    }
+
+    private static void AddBrowserStackIOSOptions(AppiumOptions options)
+    {
+        options.AddAdditionalAppiumOption("bstack:options", new Dictionary<string, object>
+        {
+            { "userName", Environment.GetEnvironmentVariable("BROWSERSTACK_USERNAME") ?? "" },
+            { "accessKey", Environment.GetEnvironmentVariable("BROWSERSTACK_ACCESS_KEY") ?? "" },
+            { "projectName", "{{projectName}}" },
+            { "buildName", "iOS Build" },
+            { "debug", true },
+            { "networkLogs", true }
+        });
+    }
+
+    private static void AddSauceLabsAndroidOptions(AppiumOptions options)
+    {
+        options.AddAdditionalAppiumOption("sauce:options", new Dictionary<string, object>
+        {
+            { "username", Environment.GetEnvironmentVariable("SAUCE_USERNAME") ?? "" },
+            { "accessKey", Environment.GetEnvironmentVariable("SAUCE_ACCESS_KEY") ?? "" },
+            { "build", "Android Build" },
+            { "name", "{{projectName}}" }
+        });
+    }
+
+    private static void AddSauceLabsIOSOptions(AppiumOptions options)
+    {
+        options.AddAdditionalAppiumOption("sauce:options", new Dictionary<string, object>
+        {
+            { "username", Environment.GetEnvironmentVariable("SAUCE_USERNAME") ?? "" },
+            { "accessKey", Environment.GetEnvironmentVariable("SAUCE_ACCESS_KEY") ?? "" },
+            { "build", "iOS Build" },
+            { "name", "{{projectName}}" }
+        });
+    }
+}

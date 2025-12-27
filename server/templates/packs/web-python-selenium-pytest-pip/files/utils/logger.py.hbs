@@ -1,0 +1,58 @@
+"""
+Logging utility with file and console handlers
+"""
+import logging
+import sys
+from pathlib import Path
+from datetime import datetime
+from config.config import Config
+
+class Logger:
+    """Logger utility class"""
+    
+    _loggers = {}
+    
+    @classmethod
+    def get_logger(cls, name: str) -> logging.Logger:
+        """
+        Get or create logger instance
+        
+        Args:
+            name: Logger name
+            
+        Returns:
+            Logger instance
+        """
+        if name in cls._loggers:
+            return cls._loggers[name]
+        
+        logger = logging.getLogger(name)
+        logger.setLevel(getattr(logging, Config.LOG_LEVEL))
+        
+        # Create logs directory if it doesn't exist
+        Config.LOG_DIR.mkdir(exist_ok=True)
+        
+        # File handler
+        log_file = Config.LOG_DIR / f'test_{datetime.now().strftime("%Y%m%d")}.log'
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setLevel(logging.DEBUG)
+        file_formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+        file_handler.setFormatter(file_formatter)
+        
+        # Console handler
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.INFO)
+        console_formatter = logging.Formatter(
+            '%(levelname)s - %(name)s - %(message)s'
+        )
+        console_handler.setFormatter(console_formatter)
+        
+        # Add handlers
+        logger.addHandler(file_handler)
+        logger.addHandler(console_handler)
+        
+        cls._loggers[name] = logger
+        return logger

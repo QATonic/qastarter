@@ -1,0 +1,285 @@
+package {{packageName}}.utils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+import {{packageName}}.config.ConfigurationReader;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * Test data reader utility for CSV and JSON files
+ * Provides data-driven testing support for mobile automation
+ */
+public class TestDataReader {
+
+    private static final String TEST_DATA_BASE_PATH = ConfigurationReader.getProperty("test.data.base.path", "src/test/resources/testdata");
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Read CSV file and return data as Object array for TestNG DataProvider
+     * 
+     * @param fileName CSV file name
+     * @return Object array for TestNG DataProvider
+     */
+    public static Object[][] readCSVData(String fileName) {
+        List<String[]> data = new ArrayList<>();
+        String filePath = TEST_DATA_BASE_PATH + "/" + fileName;
+        
+        try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
+            // Skip header row
+            String[] header = reader.readNext();
+            {{#if utilities.logger}}
+            Log.debug("CSV Header: " + String.join(", ", header));
+            {{/if}}
+            
+            // Read data rows
+            data = reader.readAll();
+            
+            {{#if utilities.logger}}
+            Log.info("Read " + data.size() + " rows from CSV file: " + fileName);
+            {{/if}}
+            
+        } catch (IOException | CsvException e) {
+            {{#if utilities.logger}}
+            Log.error("Error reading CSV file: " + fileName, e);
+            {{/if}}
+            throw new RuntimeException("Failed to read CSV file: " + fileName, e);
+        }
+        
+        // Convert List<String[]> to Object[][]
+        Object[][] result = new Object[data.size()][];
+        for (int i = 0; i < data.size(); i++) {
+            result[i] = data.get(i);
+        }
+        
+        return result;
+    }
+
+    /**
+     * Read CSV file from resources and return data as Object array
+     * 
+     * @param fileName CSV file name in resources
+     * @return Object array for TestNG DataProvider
+     */
+    public static Object[][] readCSVDataFromResources(String fileName) {
+        List<String[]> data = new ArrayList<>();
+        
+        try {
+            InputStream inputStream = TestDataReader.class.getResourceAsStream("/testdata/" + fileName);
+            if (inputStream == null) {
+                throw new RuntimeException("CSV file not found in resources: " + fileName);
+            }
+            
+            CSVReader reader = new CSVReader(new java.io.InputStreamReader(inputStream));
+            
+            // Skip header row
+            String[] header = reader.readNext();
+            {{#if utilities.logger}}
+            Log.debug("CSV Header: " + String.join(", ", header));
+            {{/if}}
+            
+            // Read data rows
+            data = reader.readAll();
+            reader.close();
+            
+            {{#if utilities.logger}}
+            Log.info("Read " + data.size() + " rows from CSV resource: " + fileName);
+            {{/if}}
+            
+        } catch (IOException | CsvException e) {
+            {{#if utilities.logger}}
+            Log.error("Error reading CSV resource: " + fileName, e);
+            {{/if}}
+            throw new RuntimeException("Failed to read CSV resource: " + fileName, e);
+        }
+        
+        // Convert List<String[]> to Object[][]
+        Object[][] result = new Object[data.size()][];
+        for (int i = 0; i < data.size(); i++) {
+            result[i] = data.get(i);
+        }
+        
+        return result;
+    }
+
+    /**
+     * Read JSON file and return specific node data
+     * 
+     * @param fileName JSON file name
+     * @param nodeName Node name to extract data from
+     * @return Object array for TestNG DataProvider
+     */
+    public static Object[][] readJSONData(String fileName, String nodeName) {
+        List<Object[]> data = new ArrayList<>();
+        String filePath = TEST_DATA_BASE_PATH + "/" + fileName;
+        
+        try {
+            JsonNode rootNode = objectMapper.readTree(new java.io.File(filePath));
+            JsonNode dataNode = rootNode.get(nodeName);
+            
+            if (dataNode == null) {
+                throw new RuntimeException("Node '" + nodeName + "' not found in JSON file: " + fileName);
+            }
+            
+            if (dataNode.isArray()) {
+                Iterator<JsonNode> elements = dataNode.elements();
+                while (elements.hasNext()) {
+                    JsonNode element = elements.next();
+                    Object[] row = convertJsonNodeToArray(element);
+                    data.add(row);
+                }
+            }
+            
+            {{#if utilities.logger}}
+            Log.info("Read " + data.size() + " rows from JSON file: " + fileName + ", node: " + nodeName);
+            {{/if}}
+            
+        } catch (IOException e) {
+            {{#if utilities.logger}}
+            Log.error("Error reading JSON file: " + fileName, e);
+            {{/if}}
+            throw new RuntimeException("Failed to read JSON file: " + fileName, e);
+        }
+        
+        return data.toArray(new Object[0][]);
+    }
+
+    /**
+     * Read JSON file from resources
+     * 
+     * @param fileName JSON file name in resources
+     * @param nodeName Node name to extract data from
+     * @return Object array for TestNG DataProvider
+     */
+    public static Object[][] readJSONDataFromResources(String fileName, String nodeName) {
+        List<Object[]> data = new ArrayList<>();
+        
+        try {
+            InputStream inputStream = TestDataReader.class.getResourceAsStream("/testdata/" + fileName);
+            if (inputStream == null) {
+                throw new RuntimeException("JSON file not found in resources: " + fileName);
+            }
+            
+            JsonNode rootNode = objectMapper.readTree(inputStream);
+            JsonNode dataNode = rootNode.get(nodeName);
+            
+            if (dataNode == null) {
+                throw new RuntimeException("Node '" + nodeName + "' not found in JSON resource: " + fileName);
+            }
+            
+            if (dataNode.isArray()) {
+                Iterator<JsonNode> elements = dataNode.elements();
+                while (elements.hasNext()) {
+                    JsonNode element = elements.next();
+                    Object[] row = convertJsonNodeToArray(element);
+                    data.add(row);
+                }
+            }
+            
+            {{#if utilities.logger}}
+            Log.info("Read " + data.size() + " rows from JSON resource: " + fileName + ", node: " + nodeName);
+            {{/if}}
+            
+        } catch (IOException e) {
+            {{#if utilities.logger}}
+            Log.error("Error reading JSON resource: " + fileName, e);
+            {{/if}}
+            throw new RuntimeException("Failed to read JSON resource: " + fileName, e);
+        }
+        
+        return data.toArray(new Object[0][]);
+    }
+
+    /**
+     * Convert JsonNode to Object array
+     * 
+     * @param jsonNode JsonNode to convert
+     * @return Object array
+     */
+    private static Object[] convertJsonNodeToArray(JsonNode jsonNode) {
+        List<Object> values = new ArrayList<>();
+        
+        Iterator<JsonNode> elements = jsonNode.elements();
+        while (elements.hasNext()) {
+            JsonNode element = elements.next();
+            if (element.isTextual()) {
+                values.add(element.asText());
+            } else if (element.isNumber()) {
+                values.add(element.asText());
+            } else if (element.isBoolean()) {
+                values.add(element.asBoolean());
+            } else {
+                values.add(element.toString());
+            }
+        }
+        
+        return values.toArray();
+    }
+
+    // TestNG DataProvider methods
+
+    /**
+     * DataProvider for valid login credentials
+     * 
+     * @return Valid login test data
+     */
+    @org.testng.annotations.DataProvider(name = "validLoginData")
+    public static Object[][] getValidLoginData() {
+        try {
+            return readCSVDataFromResources("users.csv");
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.warn("Could not read users.csv, using default valid login data");
+            {{/if}}
+            return new Object[][]{
+                {"testuser@example.com", "password123", "Welcome"},
+                {"admin@example.com", "admin123", "Dashboard"}
+            };
+        }
+    }
+
+    /**
+     * DataProvider for invalid login credentials
+     * 
+     * @return Invalid login test data
+     */
+    @org.testng.annotations.DataProvider(name = "invalidLoginData")
+    public static Object[][] getInvalidLoginData() {
+        return new Object[][]{
+            {"invalid@example.com", "wrongpassword", "Invalid credentials"},
+            {"", "", "Username is required"},
+            {"testuser@example.com", "", "Password is required"},
+            {"", "password123", "Username is required"}
+        };
+    }
+
+    /**
+     * DataProvider for sample JSON data
+     * 
+     * @return Sample test data from JSON
+     */
+    @org.testng.annotations.DataProvider(name = "sampleJsonData")
+    public static Object[][] getSampleJsonData() {
+        try {
+            return readJSONDataFromResources("sample.json", "testdata");
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.warn("Could not read sample.json, using default sample data");
+            {{/if}}
+            return new Object[][]{
+                {"Sample Data 1", "Value 1"},
+                {"Sample Data 2", "Value 2"}
+            };
+        }
+    }
+}

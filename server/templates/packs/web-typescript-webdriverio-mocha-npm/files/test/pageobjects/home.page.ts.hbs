@@ -1,0 +1,52 @@
+import BasePage from './base.page';
+
+/**
+ * Home Page Object
+ */
+class HomePage extends BasePage {
+  
+  // ========== UPDATE THESE SELECTORS ==========
+  get welcomeMessage() { return $('[data-testid="welcome-message"]'); }
+  get userProfile() { return $('[data-testid="user-profile"]'); }
+  get menuButton() { return $('[data-testid="menu-button"]'); }
+  get logoutButton() { return $('[data-testid="logout-button"]'); }
+  get settingsButton() { return $('[data-testid="settings-button"]'); }
+  // =============================================
+  
+  async open(): Promise<void> {
+    await super.open('/home');
+  }
+  
+  async getWelcomeText(): Promise<string> {
+    await this.waitForDisplayed(await this.welcomeMessage);
+    return await this.getText(await this.welcomeMessage);
+  }
+  
+  async clickUserProfile(): Promise<void> {
+    await this.clickElement(await this.userProfile);
+  }
+  
+  async clickMenu(): Promise<void> {
+    await this.clickElement(await this.menuButton);
+  }
+  
+  async clickLogout(): Promise<void> {
+    await this.clickElement(await this.logoutButton);
+  }
+  
+  async logout(): Promise<void> {
+    await this.clickMenu();
+    await this.clickLogout();
+  }
+  
+  async isLoaded(): Promise<boolean> {
+    try {
+      await (await this.welcomeMessage).waitForDisplayed({ timeout: 10000 });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+export default new HomePage();

@@ -1,0 +1,35 @@
+// Import commands.js using ES2015 syntax:
+import './commands';
+
+// Alternatively you can use CommonJS syntax:
+// require('./commands')
+
+// Global before hook
+before(() => {
+  cy.log('Starting test suite');
+});
+
+// Global after hook
+after(() => {
+  cy.log('Test suite completed');
+});
+
+// Global beforeEach hook
+beforeEach(() => {
+  // Load fixtures or perform setup before each test
+  cy.fixture('config').as('config');
+});
+
+// Global afterEach hook for screenshots on failure
+afterEach(function() {
+  if (this.currentTest.state === 'failed') {
+    cy.screenshot(`FAILED-${this.currentTest.title}`);
+  }
+});
+
+// Uncaught exception handler
+Cypress.on('uncaught:exception', (err, runnable) => {
+  // returning false here prevents Cypress from failing the test
+  console.log('Uncaught exception:', err.message);
+  return false;
+});

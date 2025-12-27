@@ -1,0 +1,43 @@
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Windows;
+
+namespace {{projectName}}.Config;
+
+public static class WinAppDriverConfig
+{
+    public static AppiumOptions GetCalculatorOptions()
+    {
+        var options = new AppiumOptions();
+        options.AddAdditionalAppiumOption("app", Settings.CalculatorAppId);
+        options.AddAdditionalAppiumOption("platformName", "Windows");
+        options.AddAdditionalAppiumOption("deviceName", "WindowsPC");
+        return options;
+    }
+
+    public static AppiumOptions GetNotepadOptions()
+    {
+        var options = new AppiumOptions();
+        options.AddAdditionalAppiumOption("app", Settings.NotepadPath);
+        options.AddAdditionalAppiumOption("platformName", "Windows");
+        options.AddAdditionalAppiumOption("deviceName", "WindowsPC");
+        return options;
+    }
+
+    public static AppiumOptions GetDesktopOptions()
+    {
+        var options = new AppiumOptions();
+        options.AddAdditionalAppiumOption("app", "Root");
+        options.AddAdditionalAppiumOption("platformName", "Windows");
+        options.AddAdditionalAppiumOption("deviceName", "WindowsPC");
+        return options;
+    }
+
+    public static AppiumOptions GetCustomAppOptions(string appPath)
+    {
+        var options = new AppiumOptions();
+        options.AddAdditionalAppiumOption("app", appPath);
+        options.AddAdditionalAppiumOption("platformName", "Windows");
+        options.AddAdditionalAppiumOption("deviceName", "WindowsPC");
+        return options;
+    }
+}

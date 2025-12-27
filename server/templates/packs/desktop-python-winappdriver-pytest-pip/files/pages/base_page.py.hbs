@@ -1,0 +1,28 @@
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
+from core.element_actions import ElementActions
+from core.wait_helpers import WaitHelpers
+
+class BasePage:
+    def __init__(self, driver: WebDriver):
+        self.driver = driver
+        self.actions = ElementActions()
+        self.wait = WaitHelpers()
+    
+    def find_element(self, locator) -> WebElement:
+        return self.driver.find_element(*locator)
+    
+    def wait_for_element(self, locator, timeout=None) -> WebElement:
+        return self.wait.wait_for_element(self.driver, locator, timeout)
+    
+    def click(self, element: WebElement, element_name: str = "Element"):
+        self.actions.click(element, element_name)
+    
+    def send_keys(self, element: WebElement, text: str, element_name: str = "Element"):
+        self.actions.send_keys(element, text, element_name)
+    
+    def get_text(self, element: WebElement, element_name: str = "Element") -> str:
+        return self.actions.get_text(element, element_name)
+    
+    def get_attribute(self, element: WebElement, attribute_name: str, element_name: str = "Element") -> str:
+        return self.actions.get_attribute(element, attribute_name, element_name)

@@ -1,0 +1,90 @@
+version: 2.1
+
+executors:
+  python-executor:
+    docker:
+      - image: cimg/python:{{toolVersions.python}}
+    working_directory: ~/project
+
+jobs:
+  test:
+    executor: python-executor
+    parallelism: 2
+    parameters:
+      browser:
+        type: string
+    environment:
+      BROWSER: <<parameters.browser>>
+      TEST_ENV: qa
+      HEADLESS: "true"
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{raw}}{{ checksum "requirements.txt" }}{{/raw}}
+            - v1-dependencies-
+      
+      - run:
+          name: Install dependencies
+          command: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+      
+      - save_cache:
+          paths:
+            - ~/.cache/pip
+          key: v1-dependencies-{{raw}}{{ checksum "requirements.txt" }}{{/raw}}
+      
+      - run:
+          name: Run tests
+          command: pytest -v -n auto
+      
+{{#if (eq reportingTool "allure")}}
+      - run:
+          name: Install Allure CLI
+          command: |
+            wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+            tar -zxvf allure-2.25.0.tgz -C /opt/
+            sudo ln -s /opt/allure-2.25.0/bin/allure /usr/local/bin/allure
+          when: always
+      
+      - run:
+          name: Generate Allure report
+          command: |
+            allure generate allure-results --clean -o allure-report
+          when: always
+      
+      - store_artifacts:
+          path: allure-results
+          destination: allure-results-<<parameters.browser>>
+      
+      - store_artifacts:
+          path: allure-report
+          destination: allure-report-<<parameters.browser>>
+{{/if}}
+      
+{{#if (eq reportingTool "pytest-html")}}
+      - store_artifacts:
+          path: reports/report.html
+          destination: pytest-html-report-<<parameters.browser>>
+{{/if}}
+      
+{{#if (eq reportingTool "pytest-json")}}
+      - store_artifacts:
+          path: reports/report.json
+          destination: pytest-json-report-<<parameters.browser>>
+{{/if}}
+      
+      - store_artifacts:
+          path: screenshots
+          destination: screenshots-<<parameters.browser>>
+
+workflows:
+  version: 2
+  test_workflow:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              browser: ["chrome", "firefox"]

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="LOG_PATTERN_WITH_THREAD">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level [%c{1}] - %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+
+        <!-- File Appender - All Logs -->
+        <RollingFile name="FileAppender" fileName="logs/automation.log"
+                     filePattern="logs/automation-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${LOG_PATTERN_WITH_THREAD}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <!-- File Appender - Error Logs Only -->
+        <RollingFile name="ErrorFileAppender" fileName="logs/errors.log"
+                     filePattern="logs/errors-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${LOG_PATTERN_WITH_THREAD}"/>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="5MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <!-- File Appender - Test Execution Logs -->
+        <RollingFile name="TestExecutionAppender" fileName="logs/test-execution.log"
+                     filePattern="logs/test-execution-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="15"/>
+        </RollingFile>
+
+        <!-- File Appender - Debug Logs (Only in Development) -->
+        <RollingFile name="DebugFileAppender" fileName="logs/debug.log"
+                     filePattern="logs/debug-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="${LOG_PATTERN_WITH_THREAD}"/>
+            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Playwright Logging -->
+        <Logger name="com.microsoft.playwright" level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+
+        <!-- ExtentReports Logging -->
+        <Logger name="com.aventstack.extentreports" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Apache HTTP Client (for API calls) -->
+        <Logger name="org.apache.http" level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Project Specific Loggers -->
+        <Logger name="{{javaPackage}}.core" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <Logger name="{{javaPackage}}.pages" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="DebugFileAppender"/>
+        </Logger>
+
+        <Logger name="{{javaPackage}}.tests" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <Logger name="{{javaPackage}}.utils" level="DEBUG" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="DebugFileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <Logger name="{{javaPackage}}.listeners" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <!-- Root Logger -->
+        <Root level="INFO">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>

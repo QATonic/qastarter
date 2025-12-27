@@ -1,0 +1,175 @@
+package {{packageName}}.pages;
+
+import io.appium.java_client.pagefactory.AndroidFindBy;
+import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import org.openqa.selenium.WebElement;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+/**
+ * Home page implementation using Page Object Model
+ * Represents the main application home screen after successful login
+ */
+public class HomePage extends BasePage {
+
+    // Cross-platform element definitions
+    
+    @AndroidFindBy(id = "com.example.app:id/welcomeMessage")
+    @iOSXCUITFindBy(accessibility = "welcomeMessage")
+    private WebElement welcomeMessage;
+
+    @AndroidFindBy(id = "com.example.app:id/homeTitle")
+    @iOSXCUITFindBy(accessibility = "homeTitle")
+    private WebElement homeTitle;
+
+    @AndroidFindBy(id = "com.example.app:id/navigationMenu")
+    @iOSXCUITFindBy(accessibility = "navigationMenu")
+    private WebElement navigationMenu;
+
+    @AndroidFindBy(id = "com.example.app:id/profileButton")
+    @iOSXCUITFindBy(accessibility = "profileButton")
+    private WebElement profileButton;
+
+    @AndroidFindBy(id = "com.example.app:id/settingsButton")
+    @iOSXCUITFindBy(accessibility = "settingsButton")
+    private WebElement settingsButton;
+
+    @AndroidFindBy(id = "com.example.app:id/logoutButton")
+    @iOSXCUITFindBy(accessibility = "logoutButton")
+    private WebElement logoutButton;
+
+    /**
+     * Get welcome message text
+     * 
+     * @return Welcome message text
+     */
+    public String getWelcomeMessage() {
+        try {
+            String message = getElementText(welcomeMessage);
+            {{#if utilities.logger}}
+            Log.info("Retrieved welcome message: " + message);
+            {{/if}}
+            return message;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to get welcome message", e);
+            {{/if}}
+            throw new RuntimeException("Failed to get welcome message", e);
+        }
+    }
+
+    /**
+     * Click navigation menu
+     */
+    public void clickNavigationMenu() {
+        try {
+            clickElement(navigationMenu);
+            {{#if utilities.logger}}
+            Log.info("Clicked navigation menu");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to click navigation menu", e);
+            {{/if}}
+            throw new RuntimeException("Failed to click navigation menu", e);
+        }
+    }
+
+    /**
+     * Click profile button
+     */
+    public void clickProfileButton() {
+        try {
+            clickElement(profileButton);
+            {{#if utilities.logger}}
+            Log.info("Clicked profile button");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to click profile button", e);
+            {{/if}}
+            throw new RuntimeException("Failed to click profile button", e);
+        }
+    }
+
+    /**
+     * Click settings button
+     */
+    public void clickSettingsButton() {
+        try {
+            clickElement(settingsButton);
+            {{#if utilities.logger}}
+            Log.info("Clicked settings button");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to click settings button", e);
+            {{/if}}
+            throw new RuntimeException("Failed to click settings button", e);
+        }
+    }
+
+    /**
+     * Perform logout action
+     */
+    public void performLogout() {
+        try {
+            clickElement(logoutButton);
+            {{#if utilities.logger}}
+            Log.info("Performed logout action");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to perform logout", e);
+            {{/if}}
+            throw new RuntimeException("Failed to perform logout", e);
+        }
+    }
+
+    /**
+     * Check if welcome message is displayed
+     * 
+     * @return true if welcome message is displayed, false otherwise
+     */
+    public boolean isWelcomeMessageDisplayed() {
+        try {
+            boolean isDisplayed = welcomeMessage.isDisplayed();
+            {{#if utilities.logger}}
+            Log.info("Welcome message display status: " + isDisplayed);
+            {{/if}}
+            return isDisplayed;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.debug("Welcome message not displayed or not found");
+            {{/if}}
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isPageLoaded() {
+        try {
+            return homeTitle.isDisplayed() && 
+                   welcomeMessage.isDisplayed() && 
+                   navigationMenu.isDisplayed();
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.debug("Home page not fully loaded");
+            {{/if}}
+            return false;
+        }
+    }
+
+    @Override
+    public String getPageTitle() {
+        try {
+            return getElementText(homeTitle);
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to get home page title", e);
+            {{/if}}
+            return "Home Page";
+        }
+    }
+}

@@ -1,0 +1,61 @@
+/// <summary>
+/// Login Page Object
+/// 
+/// HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+/// 1. Open your app's login page in a browser
+/// 2. Right-click on each element → Inspect → Copy selector
+/// 3. Replace the placeholder locators below with your actual locators
+/// </summary>
+using OpenQA.Selenium;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Pages
+{
+    public class LoginPage : BasePage
+    {
+        private readonly string _url;
+        
+        // ============================================
+        // UPDATE THESE LOCATORS FOR YOUR APPLICATION
+        // ============================================
+        // Tip: Use browser DevTools (F12) to find correct selectors
+        public readonly By UsernameInput = By.Id("username");           // Your username/email input field
+        public readonly By PasswordInput = By.Id("password");           // Your password input field
+        private readonly By _loginButton = By.CssSelector("button[type='submit']"); // Your login/submit button
+        private readonly By _errorMessage = By.CssSelector(".error-message");       // Error message element
+        // ============================================
+
+        public LoginPage(IWebDriver driver) : base(driver)
+        {
+            // UPDATE: Change "/login" to your actual login page path
+            _url = $"{EnvConfig.Instance.GetBaseUrl()}/login";
+        }
+
+        public void NavigateToLogin()
+        {
+            Navigate(_url);
+        }
+
+        public void Login(string username, string password)
+        {
+            Type(UsernameInput, username);
+            Type(PasswordInput, password);
+            Click(_loginButton);
+        }
+
+        public string GetErrorMessage()
+        {
+            return GetText(_errorMessage);
+        }
+
+        public bool IsErrorDisplayed()
+        {
+            return IsDisplayed(_errorMessage);
+        }
+
+        public bool IsLoginSuccessful()
+        {
+            return GetCurrentUrl().Contains("/dashboard");
+        }
+    }
+}

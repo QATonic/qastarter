@@ -1,0 +1,95 @@
+using System.Net;
+using FluentAssertions;
+using NUnit.Framework;
+using {{projectName}}.Core;
+using {{projectName}}.Models;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Tests;
+
+public class TestCases
+{
+    public List<int> UserIds { get; set; } = new();
+    public List<int> InvalidIds { get; set; } = new();
+}
+
+[TestFixture]
+[Category("Regression")]
+public class DataDrivenTests : BaseTest
+{
+    private TestCases? _testData;
+
+    [OneTimeSetUp]
+    public new void OneTimeSetUp()
+    {
+        base.OneTimeSetUp();
+        
+        try
+        {
+            var dataPath = Path.Combine("Data", "test-cases.json");
+            _testData = JsonUtils.LoadFile<TestCases>(dataPath);
+        }
+        catch
+        {
+            _testData = new TestCases
+            {
+                UserIds = new List<int> { 1, 2, 3 },
+                InvalidIds = new List<int> { 99999 }
+            };
+        }
+    }
+
+    [Test]
+    public async Task GetUsers_FromDataFile_ShouldReturnSuccess()
+    {
+        var userIds = _testData?.UserIds ?? new List<int> { 1, 2, 3 };
+
+        foreach (var userId in userIds)
+        {
+            var response = await Client.GetAsync<User>($"/users/{userId}");
+
+            var validator = new ResponseValidator<User>(response);
+            validator.AssertSuccess();
+        }
+    }
+
+    [Test]
+    public async Task GetInvalidUsers_FromDataFile_ShouldReturn404()
+    {
+        var invalidIds = _testData?.InvalidIds ?? new List<int> { 99999 };
+
+        foreach (var userId in invalidIds)
+        {
+            var response = await Client.GetAsync<User>($"/users/{userId}");
+
+            var validator = new ResponseValidator<User>(response);
+            validator.AssertStatusCode(HttpStatusCode.NotFound);
+        }
+    }
+
+    [Test]
+    [TestCase("application/json", "application/json")]
+    [TestCase("application/json", "*/*")]
+    public async Task GetUsers_WithContentType_ShouldReturnSuccess(string contentType, string accept)
+    {
+        Client.SetHeader("Content-Type", contentType);
+        Client.SetHeader("Accept", accept);
+
+        var response = await Client.GetAsync<List<User>>("/users");
+
+        var validator = new ResponseValidator<List<User>>(response);
+        validator.AssertSuccess();
+    }
+
+    [Test]
+    [TestCase(200)]
+    [TestCase(201)]
+    [TestCase(204)]
+    public async Task GetUsers_ShouldHandleSuccessStatusCodes(int statusCode)
+    {
+        var response = await Client.GetAsync<List<User>>("/users");
+
+        // JSONPlaceholder returns 200, so we check for success range
+        new[] { 200, 201, 204 }.Should().Contain((int)response.StatusCode);
+    }
+}

@@ -1,0 +1,51 @@
+/**
+ * Login Page Object
+ * 
+ * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+ * 1. Open your app's login page in a browser
+ * 2. Right-click on each element → Inspect → Copy selector
+ * 3. Replace the placeholder selectors below with your actual selectors
+ */
+import BasePage from './base.page';
+
+class LoginPage extends BasePage {
+  
+  // ============================================
+  // UPDATE THESE SELECTORS FOR YOUR APPLICATION
+  // ============================================
+  // Tip: Use browser DevTools (F12) to find correct selectors
+  public get usernameInput(): WebdriverIO.Element {
+    return $('#username');           // Your username/email input field
+  }
+  
+  public get passwordInput(): WebdriverIO.Element {
+    return $('#password');           // Your password input field
+  }
+  
+  public get loginButton(): WebdriverIO.Element {
+    return $('button[type="submit"]'); // Your login/submit button
+  }
+  
+  public get flashMessage(): WebdriverIO.Element {
+    return $('#flash');              // Success/error message element
+  }
+  // ============================================
+  
+  public async login(username: string, password: string): Promise<void> {
+    // UPDATE: Change '/login' to your actual login page path
+    await this.open('/login');
+    await this.setValue(this.usernameInput, username);
+    await this.setValue(this.passwordInput, password);
+    await this.clickElement(this.loginButton);
+  }
+  
+  public async getFlashMessage(): Promise<string> {
+    return await this.getText(this.flashMessage);
+  }
+  
+  public async isFlashMessageDisplayed(): Promise<boolean> {
+    return await this.isDisplayed(this.flashMessage);
+  }
+}
+
+export default new LoginPage();

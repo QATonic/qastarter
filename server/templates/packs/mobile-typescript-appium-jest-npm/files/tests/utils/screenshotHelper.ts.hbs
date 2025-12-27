@@ -1,0 +1,140 @@
+import { Browser } from 'webdriverio';
+import * as fs from 'fs';
+import * as path from 'path';
+import logger from './logger';
+
+/**
+ * Screenshot helper for mobile test automation
+ */
+export class ScreenshotHelper {
+  private driver: Browser;
+  private screenshotDir: string;
+
+  constructor(driver: Browser, screenshotDir?: string) {
+    this.driver = driver;
+    this.screenshotDir = screenshotDir || path.join(process.cwd(), 'screenshots');
+    this.ensureDirectoryExists();
+  }
+
+  /**
+   * Ensure screenshot directory exists
+   */
+  private ensureDirectoryExists(): void {
+    if (!fs.existsSync(this.screenshotDir)) {
+      fs.mkdirSync(this.screenshotDir, { recursive: true });
+    }
+  }
+
+  /**
+   * Take a screenshot with auto-generated name
+   */
+  async takeScreenshot(name?: string): Promise<string> {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const fileName = name ? `${name}-${timestamp}.png` : `screenshot-${timestamp}.png`;
+    const filePath = path.join(this.screenshotDir, fileName);
+
+    try {
+      await this.driver.saveScreenshot(filePath);
+      logger.screenshot(filePath);
+      return filePath;
+    } catch (error) {
+      logger.error(`Failed to take screenshot: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Take screenshot on test failure
+   */
+  async takeScreenshotOnFailure(testName: string): Promise<string> {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9]/g, '_');
+    return this.takeScreenshot(`FAILED-${sanitizedName}`);
+  }
+
+  /**
+   * Take screenshot of specific element
+   */
+  async takeElementScreenshot(selector: string, name?: string): Promise<string> {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const fileName = name ? `${name}-${timestamp}.png` : `element-${timestamp}.png`;
+    const filePath = path.join(this.screenshotDir, fileName);
+
+    try {
+      const element = await this.driver.$(selector);
+      await element.saveScreenshot(filePath);
+      logger.screenshot(filePath);
+      return filePath;
+    } catch (error) {
+      logger.error(`Failed to take element screenshot: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Take screenshot and return as base64
+   */
+  async takeScreenshotAsBase64(): Promise<string> {
+    try {
+      const screenshot = await this.driver.takeScreenshot();
+      return screenshot;
+    } catch (error) {
+      logger.error(`Failed to take screenshot as base64: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Save base64 screenshot to file
+   */
+  saveBase64Screenshot(base64Data: string, fileName: string): string {
+    const filePath = path.join(this.screenshotDir, fileName);
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(filePath, buffer);
+    logger.screenshot(filePath);
+    return filePath;
+  }
+
+  /**
+   * Clean up old screenshots
+   */
+  cleanupOldScreenshots(daysToKeep: number = 7): void {
+    try {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
+
+      const files = fs.readdirSync(this.screenshotDir);
+      files.forEach(file => {
+        const filePath = path.join(this.screenshotDir, file);
+        const stats = fs.statSync(filePath);
+        if (stats.mtime < cutoffDate) {
+          fs.unlinkSync(filePath);
+          logger.debug(`Deleted old screenshot: ${file}`);
+        }
+      });
+    } catch (error) {
+      logger.warn(`Failed to cleanup old screenshots: ${error}`);
+    }
+  }
+
+  /**
+   * Get screenshot directory path
+   */
+  getScreenshotDirectory(): string {
+    return this.screenshotDir;
+  }
+
+  /**
+   * List all screenshots
+   */
+  listScreenshots(): string[] {
+    try {
+      return fs.readdirSync(this.screenshotDir)
+        .filter(file => file.endsWith('.png'))
+        .map(file => path.join(this.screenshotDir, file));
+    } catch {
+      return [];
+    }
+  }
+}
+
+export default ScreenshotHelper;

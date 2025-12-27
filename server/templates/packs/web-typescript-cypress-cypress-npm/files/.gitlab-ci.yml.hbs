@@ -1,0 +1,79 @@
+image: node:{{toolVersions.node}}
+
+variables:
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
+  TEST_ENV: "qa"
+  HEADLESS: "true"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .npm/
+
+stages:
+  - test
+  - report
+
+test:chromium:
+  stage: test
+  before_script:
+    - npm ci
+    - npx playwright install --with-deps chromium
+  script:
+    - BROWSER=chromium npm test
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - allure-results
+      {{/if}}
+      {{#if (eq reportingTool "jest-html")}}
+      - test-results/test-report.html
+      {{/if}}
+      {{#if (eq reportingTool "junit")}}
+      - test-results/junit-results.xml
+      {{/if}}
+      - screenshots
+      - logs
+    expire_in: 7 days
+
+test:firefox:
+  stage: test
+  before_script:
+    - npm ci
+    - npx playwright install --with-deps firefox
+  script:
+    - BROWSER=firefox npm test
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - allure-results
+      {{/if}}
+      {{#if (eq reportingTool "jest-html")}}
+      - test-results/test-report.html
+      {{/if}}
+      {{#if (eq reportingTool "junit")}}
+      - test-results/junit-results.xml
+      {{/if}}
+      - screenshots
+      - logs
+    expire_in: 7 days
+
+{{#if (eq reportingTool "allure")}}
+allure:report:
+  stage: report
+  before_script:
+    - npm ci
+  script:
+    - npm run report:generate
+  dependencies:
+    - test:chromium
+    - test:firefox
+  artifacts:
+    paths:
+      - allure-report
+    expire_in: 30 days
+  when: always
+{{/if}}

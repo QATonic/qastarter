@@ -1,0 +1,53 @@
+import logging
+import os
+from config.settings import Settings
+
+class Logger:
+    _logger = None
+    
+    @classmethod
+    def _setup_logger(cls):
+        if cls._logger is None:
+            log_file = Settings.LOG_FILE
+            log_dir = os.path.dirname(log_file)
+            
+            if log_dir and not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+            
+            cls._logger = logging.getLogger("PyAutoGUI")
+            cls._logger.setLevel(getattr(logging, Settings.LOG_LEVEL))
+            
+            # Console handler
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.INFO)
+            console_format = logging.Formatter('%(levelname)s - %(message)s')
+            console_handler.setFormatter(console_format)
+            
+            # File handler
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setLevel(logging.DEBUG)
+            file_format = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            file_handler.setFormatter(file_format)
+            
+            cls._logger.addHandler(console_handler)
+            cls._logger.addHandler(file_handler)
+    
+    @classmethod
+    def debug(cls, message: str):
+        cls._setup_logger()
+        cls._logger.debug(message)
+    
+    @classmethod
+    def info(cls, message: str):
+        cls._setup_logger()
+        cls._logger.info(message)
+    
+    @classmethod
+    def warning(cls, message: str):
+        cls._setup_logger()
+        cls._logger.warning(message)
+    
+    @classmethod
+    def error(cls, message: str):
+        cls._setup_logger()
+        cls._logger.error(message)

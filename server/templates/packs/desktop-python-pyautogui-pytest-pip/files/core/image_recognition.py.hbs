@@ -1,0 +1,84 @@
+import pyautogui
+import os
+from config.settings import Settings
+from utils.logger import Logger
+
+class ImageRecognition:
+    @staticmethod
+    def locate_on_screen(image_name: str, confidence: float = None):
+        """Locate an image on screen"""
+        if confidence is None:
+            confidence = Settings.CONFIDENCE_THRESHOLD
+        
+        image_path = os.path.join(Settings.IMAGES_PATH, image_name)
+        
+        if not os.path.exists(image_path):
+            Logger.error(f"Image not found: {image_path}")
+            raise FileNotFoundError(f"Image not found: {image_path}")
+        
+        try:
+            Logger.info(f"Locating image: {image_name}")
+            location = pyautogui.locateOnScreen(image_path, confidence=confidence)
+            if location:
+                Logger.info(f"Image found at: {location}")
+                return location
+            else:
+                Logger.warning(f"Image not found on screen: {image_name}")
+                return None
+        except Exception as e:
+            Logger.error(f"Error locating image: {str(e)}")
+            raise
+    
+    @staticmethod
+    def locate_center_on_screen(image_name: str, confidence: float = None):
+        """Locate center point of an image on screen"""
+        if confidence is None:
+            confidence = Settings.CONFIDENCE_THRESHOLD
+        
+        image_path = os.path.join(Settings.IMAGES_PATH, image_name)
+        
+        try:
+            Logger.info(f"Locating center of image: {image_name}")
+            center = pyautogui.locateCenterOnScreen(image_path, confidence=confidence)
+            if center:
+                Logger.info(f"Image center found at: {center}")
+                return center
+            else:
+                Logger.warning(f"Image not found on screen: {image_name}")
+                return None
+        except Exception as e:
+            Logger.error(f"Error locating image center: {str(e)}")
+            raise
+    
+    @staticmethod
+    def wait_for_image(image_name: str, timeout: int = None, confidence: float = None):
+        """Wait for image to appear on screen"""
+        if timeout is None:
+            timeout = Settings.DEFAULT_TIMEOUT
+        
+        if confidence is None:
+            confidence = Settings.CONFIDENCE_THRESHOLD
+        
+        import time
+        start_time = time.time()
+        
+        Logger.info(f"Waiting for image: {image_name} (timeout: {timeout}s)")
+        
+        while time.time() - start_time < timeout:
+            location = ImageRecognition.locate_on_screen(image_name, confidence)
+            if location:
+                return location
+            time.sleep(0.5)
+        
+        Logger.error(f"Timeout waiting for image: {image_name}")
+        raise TimeoutError(f"Image not found within {timeout} seconds: {image_name}")
+    
+    @staticmethod
+    def click_image(image_name: str, confidence: float = None):
+        """Find and click on an image"""
+        center = ImageRecognition.locate_center_on_screen(image_name, confidence)
+        if center:
+            Logger.info(f"Clicking on image: {image_name}")
+            pyautogui.click(center)
+            return True
+        return False

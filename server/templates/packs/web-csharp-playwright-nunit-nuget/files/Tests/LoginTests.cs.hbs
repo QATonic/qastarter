@@ -1,0 +1,43 @@
+using NUnit.Framework;
+using {{projectName}}.Pages;
+
+namespace {{projectName}}.Tests;
+
+// ========== UPDATE THESE VALUES ==========
+// Replace with your actual test credentials
+// ==========================================
+
+[TestFixture]
+public class LoginTests : BaseTest
+{
+    // ========== UPDATE THESE VALUES ==========
+    private const string TestUsername = "YOUR_USERNAME_HERE";
+    private const string TestPassword = "YOUR_PASSWORD_HERE";
+    // ==========================================
+
+    /// <summary>
+    /// Verify login functionality works correctly.
+    /// 
+    /// BEFORE RUNNING:
+    /// 1. Update TestUsername and TestPassword above with valid credentials
+    /// 2. Ensure your application URL is set in Config/EnvConfig.cs
+    /// 3. Update selectors in Pages/LoginPage.cs to match your app
+    /// </summary>
+    [Test, Order(1)]
+    [Description("Login with valid credentials")]
+    public async Task TestLoginWithValidCredentials()
+    {
+        var loginPage = new LoginPage(Page!);
+
+        // Step 1: Navigate to login page
+        await loginPage.NavigateToLoginAsync();
+        
+        // Step 2: Enter credentials and submit
+        await loginPage.LoginAsync(TestUsername, TestPassword);
+
+        // Step 3: Verify login was successful
+        Assert.IsTrue(await loginPage.IsLoginSuccessfulAsync(), "Login was not successful");
+        
+        // Test passed! Your {{framework}} framework is working correctly.
+    }
+}

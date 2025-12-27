@@ -1,0 +1,107 @@
+interface Capabilities {
+  [key: string]: string | number | boolean | object;
+}
+
+class CapabilitiesManager {
+  getAndroidCapabilities(): Capabilities {
+    const caps: Capabilities = {
+      platformName: 'Android',
+      'appium:automationName': 'UiAutomator2',
+      'appium:deviceName': process.env.DEVICE_NAME || 'Android Emulator',
+      'appium:platformVersion': process.env.PLATFORM_VERSION || '13.0',
+      'appium:app': process.env.APP_PATH || '',
+      'appium:appPackage': process.env.APP_PACKAGE || 'com.example.app',
+      'appium:appActivity': process.env.APP_ACTIVITY || '.MainActivity',
+      'appium:noReset': false,
+      'appium:fullReset': false,
+      'appium:newCommandTimeout': 300,
+      'appium:autoGrantPermissions': true,
+      'appium:unicodeKeyboard': true,
+      'appium:resetKeyboard': true
+    };
+
+    if (process.env.USE_BROWSERSTACK === 'true') {
+      Object.assign(caps, this._getBrowserStackAndroidCaps());
+    } else if (process.env.USE_SAUCELABS === 'true') {
+      Object.assign(caps, this._getSauceLabsAndroidCaps());
+    }
+
+    return caps;
+  }
+
+  getIOSCapabilities(): Capabilities {
+    const caps: Capabilities = {
+      platformName: 'iOS',
+      'appium:automationName': 'XCUITest',
+      'appium:deviceName': process.env.DEVICE_NAME || 'iPhone 14',
+      'appium:platformVersion': process.env.PLATFORM_VERSION || '16.0',
+      'appium:app': process.env.APP_PATH || '',
+      'appium:bundleId': process.env.BUNDLE_ID || 'com.example.app',
+      'appium:noReset': false,
+      'appium:fullReset': false,
+      'appium:newCommandTimeout': 300,
+      'appium:autoAcceptAlerts': true,
+      'appium:autoDismissAlerts': false,
+      'appium:useNewWDA': false,
+      'appium:wdaLaunchTimeout': 120000
+    };
+
+    if (process.env.USE_BROWSERSTACK === 'true') {
+      Object.assign(caps, this._getBrowserStackIOSCaps());
+    } else if (process.env.USE_SAUCELABS === 'true') {
+      Object.assign(caps, this._getSauceLabsIOSCaps());
+    }
+
+    return caps;
+  }
+
+  private _getBrowserStackAndroidCaps(): Capabilities {
+    return {
+      'bstack:options': {
+        userName: process.env.BROWSERSTACK_USERNAME,
+        accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
+        projectName: '{{projectName}}',
+        buildName: 'Android Build',
+        debug: true,
+        networkLogs: true
+      }
+    };
+  }
+
+  private _getBrowserStackIOSCaps(): Capabilities {
+    return {
+      'bstack:options': {
+        userName: process.env.BROWSERSTACK_USERNAME,
+        accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
+        projectName: '{{projectName}}',
+        buildName: 'iOS Build',
+        debug: true,
+        networkLogs: true
+      }
+    };
+  }
+
+  private _getSauceLabsAndroidCaps(): Capabilities {
+    return {
+      'sauce:options': {
+        username: process.env.SAUCE_USERNAME,
+        accessKey: process.env.SAUCE_ACCESS_KEY,
+        build: 'Android Build',
+        name: '{{projectName}}'
+      }
+    };
+  }
+
+  private _getSauceLabsIOSCaps(): Capabilities {
+    return {
+      'sauce:options': {
+        username: process.env.SAUCE_USERNAME,
+        accessKey: process.env.SAUCE_ACCESS_KEY,
+        build: 'iOS Build',
+        name: '{{projectName}}'
+      }
+    };
+  }
+}
+
+export default new CapabilitiesManager();

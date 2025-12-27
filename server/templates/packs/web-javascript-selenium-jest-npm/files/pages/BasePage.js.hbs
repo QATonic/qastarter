@@ -1,0 +1,64 @@
+const { By, until } = require('selenium-webdriver');
+const logger = require('../utils/logger');
+
+class BasePage {
+  constructor(driver) {
+    this.driver = driver;
+  }
+
+  async navigate(url) {
+    logger.info(`Navigating to: ${url}`);
+    await this.driver.get(url);
+  }
+
+  async findElement(locator) {
+    return await this.driver.wait(until.elementLocated(locator), 10000);
+  }
+
+  async click(locator) {
+    const element = await this.findElement(locator);
+    await element.click();
+    logger.info(`Clicked: ${locator}`);
+  }
+
+  async type(locator, text) {
+    const element = await this.findElement(locator);
+    await element.clear();
+    await element.sendKeys(text);
+    logger.info(`Typed "${text}" into: ${locator}`);
+  }
+
+  async getText(locator) {
+    const element = await this.findElement(locator);
+    return await element.getText();
+  }
+
+  async isDisplayed(locator) {
+    try {
+      const element = await this.findElement(locator);
+      return await element.isDisplayed();
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async waitForElement(locator, timeout = 10000) {
+    await this.driver.wait(until.elementLocated(locator), timeout);
+  }
+
+  async getPageTitle() {
+    return await this.driver.getTitle();
+  }
+
+  async getCurrentUrl() {
+    return await this.driver.getCurrentUrl();
+  }
+
+  async takeScreenshot(name) {
+    const screenshot = await this.driver.takeScreenshot();
+    require('fs').writeFileSync(`screenshots/${name}.png`, screenshot, 'base64');
+    logger.info(`Screenshot saved: ${name}.png`);
+  }
+}
+
+module.exports = BasePage;

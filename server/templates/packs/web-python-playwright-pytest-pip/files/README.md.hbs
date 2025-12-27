@@ -1,0 +1,120 @@
+# {{projectName}}
+
+Playwright test automation framework with Python and Pytest.
+
+## Features
+
+- **Playwright {{toolVersions.playwright}}**: Modern browser automation with multi-browser support
+- **Python {{toolVersions.python}}**: Clean, readable test automation
+- **Pytest {{toolVersions.pytest}}**: Powerful test framework with rich plugins
+- **Page Object Model**: Maintainable test structure
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else if (eq reportingTool "pytest-html")}}
+- **Pytest HTML Reports**: Beautiful test reports
+{{else}}
+- **HTML Reporting**: Beautiful test reports
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+- **BDD/Behave**: Behavior-driven development support
+{{/if}}
+
+## Prerequisites
+
+- Python 3.11+
+- pip
+
+## Installation
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Install Playwright browsers
+playwright install
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run tests in headed mode
+HEADLESS=false pytest
+
+# Run smoke tests
+pytest -m smoke
+
+# Run tests in parallel
+pytest -n auto
+
+# View HTML report
+open test-results/report.html
+```
+
+## Environment Configuration
+
+Update test data in:
+- `data/dev.json` - Development environment
+- `data/qa.json` - QA environment
+
+Set environment with `TEST_ENV=qa pytest`
+
+## Page Objects
+
+All page objects extend `BasePage` and are located in the `pages/` directory:
+- `login_page.py` - Login page interactions
+- `home_page.py` - Home page interactions
+
+## Test Structure
+
+```
+tests/
+  ├── test_login.py    # Login functionality tests
+  └── test_smoke.py    # Smoke tests
+```
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR to main or develop branches.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Utilities
+
+- **Logger**: Python logging (`utils/logger.py`)
+- **Screenshots**: Auto-capture on failure (`utils/screenshot_helper.py`)
+- **Wait Helpers**: Custom wait utilities (`utils/wait_helpers.py`)
+- **Data Reader**: Test data utilities (`utils/data_reader.py`)

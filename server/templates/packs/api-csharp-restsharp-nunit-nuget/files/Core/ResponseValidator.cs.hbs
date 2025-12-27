@@ -1,0 +1,94 @@
+using System.Net;
+using FluentAssertions;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
+using RestSharp;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Core;
+
+public class ResponseValidator<T>
+{
+    private readonly RestResponse<T> _response;
+
+    public ResponseValidator(RestResponse<T> response)
+    {
+        _response = response;
+    }
+
+    public ResponseValidator<T> AssertStatusCode(HttpStatusCode expectedCode)
+    {
+        _response.StatusCode.Should().Be(expectedCode);
+        return this;
+    }
+
+    public ResponseValidator<T> AssertStatusCode(int expectedCode)
+    {
+        ((int)_response.StatusCode).Should().Be(expectedCode);
+        return this;
+    }
+
+    public ResponseValidator<T> AssertStatusIn(params HttpStatusCode[] expectedCodes)
+    {
+        expectedCodes.Should().Contain(_response.StatusCode);
+        return this;
+    }
+
+    public ResponseValidator<T> AssertSuccess()
+    {
+        _response.IsSuccessful.Should().BeTrue();
+        return this;
+    }
+
+    public ResponseValidator<T> AssertHeaderExists(string headerName)
+    {
+        _response.Headers.Should().Contain(h => h.Name == headerName);
+        return this;
+    }
+
+    public ResponseValidator<T> AssertHeaderValue(string headerName, string expectedValue)
+    {
+        var header = _response.Headers?.FirstOrDefault(h => h.Name == headerName);
+        header.Should().NotBeNull();
+        header!.Value.Should().Be(expectedValue);
+        return this;
+    }
+
+    public ResponseValidator<T> AssertJsonSchema(JSchema schema)
+    {
+        var json = JObject.Parse(_response.Content ?? "{}");
+        json.IsValid(schema).Should().BeTrue();
+        return this;
+    }
+
+    public ResponseValidator<T> AssertJsonPath(string path, object expectedValue)
+    {
+        var value = JsonUtils.GetValueByPath(_response.Content ?? "{}", path);
+        value.Should().Be(expectedValue);
+        return this;
+    }
+
+    public ResponseValidator<T> AssertContentContains(string text)
+    {
+        _response.Content.Should().Contain(text);
+        return this;
+    }
+
+    public ResponseValidator<T> AssertContentType(string contentType)
+    {
+        var header = _response.Headers?.FirstOrDefault(h => h.Name == "Content-Type");
+        header.Should().NotBeNull();
+        header!.Value.Should().Contain(contentType);
+        return this;
+    }
+
+    public T GetData()
+    {
+        return _response.Data!;
+    }
+
+    public string GetContent()
+    {
+        return _response.Content ?? string.Empty;
+    }
+}

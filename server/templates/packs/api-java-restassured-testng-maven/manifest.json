@@ -1,0 +1,320 @@
+{
+  "name": "API Testing Framework",
+  "supportsDynamic": true,
+  "description": "Professional REST API automation framework using REST Assured, Java, TestNG, and Maven with comprehensive utilities and reporting",
+  "version": "1.0.0",
+  "author": "QAStarter Generated Framework",
+  "toolVersions": {
+    "java": "11",
+    "maven": "3.9.0",
+    "rest-assured": "5.4.0",
+    "testng": "7.8.0",
+    "jackson": "2.16.0",
+    "gson": "2.10.1",
+    "extentreports": "5.1.1",
+    "allure": "2.25.0",
+    "log4j": "2.22.0",
+    "cucumber": "7.15.0"
+  },
+  "dependencies": {
+    "rest-assured": "5.4.0",
+    "testng": "7.8.0",
+    "jackson": "2.16.0",
+    "gson": "2.10.1",
+    "extent-reports": "5.1.1",
+    "log4j": "2.22.0",
+    "commons-lang3": "3.14.0",
+    "json-path": "2.9.0",
+    "hamcrest": "2.2"
+  },
+  "files": [
+    {
+      "path": "pom.xml",
+      "template": "pom.xml.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "template": "README.md.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "template": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "template": ".github/workflows/tests.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "template": ".gitlab-ci.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "template": "azure-pipelines.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "template": ".circleci/config.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "template": "Jenkinsfile.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
+      "template": "src/main/java/{{packagePath}}/config/ConfigurationReader.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/Environment.java",
+      "template": "src/main/java/{{packagePath}}/config/Environment.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
+      "template": "src/main/java/{{packagePath}}/core/BaseTest.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/APIClient.java",
+      "template": "src/main/java/{{packagePath}}/core/APIClient.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/RequestBuilder.java",
+      "template": "src/main/java/{{packagePath}}/core/RequestBuilder.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/ResponseValidator.java",
+      "template": "src/main/java/{{packagePath}}/core/ResponseValidator.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/JSONUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/JSONUtils.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/AuthenticationManager.java",
+      "template": "src/main/java/{{packagePath}}/utils/AuthenticationManager.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
+      "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/Log.java",
+      "template": "src/main/java/{{packagePath}}/utils/Log.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
+      "template": "src/main/java/{{packagePath}}/utils/ExtentManager.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
+      "template": "src/main/java/{{packagePath}}/listeners/TestListener.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java",
+      "template": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/models/User.java",
+      "template": "src/main/java/{{packagePath}}/models/User.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/models/APIResponse.java",
+      "template": "src/main/java/{{packagePath}}/models/APIResponse.java.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/UserAPITests.java",
+      "template": "src/test/java/{{packagePath}}/tests/UserAPITests.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "fluent"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/AuthenticationTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/AuthenticationTests.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "fluent"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/DataDrivenTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/DataDrivenTests.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "fluent"
+      }
+    },
+    {
+      "path": "src/test/resources/features/users.feature",
+      "template": "src/test/resources/features/users.feature.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/features/authentication.feature",
+      "template": "src/test/resources/features/authentication.feature.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/steps/UserAPISteps.java",
+      "template": "src/test/java/{{packagePath}}/steps/UserAPISteps.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/steps/AuthenticationSteps.java",
+      "template": "src/test/java/{{packagePath}}/steps/AuthenticationSteps.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
+      "template": "src/test/java/{{packagePath}}/runners/TestRunner.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/main/resources/config/dev.properties",
+      "template": "src/main/resources/config/dev.properties.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/qa.properties",
+      "template": "src/main/resources/config/qa.properties.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/prod.properties",
+      "template": "src/main/resources/config/prod.properties.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "template": "src/main/resources/log4j2.xml.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "template": "src/main/resources/extent-config.xml.hbs",
+      "isTemplate": true,
+      "conditional": {"reportingTool": "extent-reports"}
+    },
+    {
+      "path": "src/test/resources/testng.xml",
+      "template": "src/test/resources/testng.xml.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/api-tests.xml",
+      "template": "src/test/resources/api-tests.xml.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/regression-tests.xml",
+      "template": "src/test/resources/regression-tests.xml.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/testdata/users.json",
+      "template": "src/test/resources/testdata/users.json.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/testdata/test-requests.json",
+      "template": "src/test/resources/testdata/test-requests.json.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/schemas/user-schema.json",
+      "template": "src/test/resources/schemas/user-schema.json.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "Dockerfile",
+      "template": "Dockerfile.hbs",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": "docker-compose.yml",
+      "template": "docker-compose.yml.hbs",
+      "isTemplate": true,
+      "description": "Docker Compose for API testing"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "restassured",
+    "language": "java",
+    "testRunner": "testng",
+    "buildTool": "maven"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "testng-reports",
+      "junit-html"
+    ],
+    "cicdTools": [
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci",
+      "jenkins"
+    ],
+    "testingPatterns": [
+      "fluent",
+      "bdd"
+    ]
+  }
+}

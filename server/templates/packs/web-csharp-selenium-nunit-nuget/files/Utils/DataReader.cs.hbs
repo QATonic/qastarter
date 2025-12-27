@@ -1,0 +1,14 @@
+using Newtonsoft.Json;
+
+namespace {{projectName}}.Utils
+{
+    public static class DataReader
+    {
+        public static T ReadJson<T>(string filename)
+        {
+            var filepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", filename);
+            var json = File.ReadAllText(filepath);
+            return JsonConvert.DeserializeObject<T>(json)!;
+        }
+    }
+}

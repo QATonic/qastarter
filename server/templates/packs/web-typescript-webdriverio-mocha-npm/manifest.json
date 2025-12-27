@@ -1,0 +1,192 @@
+{
+  "id": "web-typescript-webdriverio-mocha-npm",
+  "supportsDynamic": true,
+  "name": "WebdriverIO TypeScript Framework",
+  "description": "Modern web automation framework with WebdriverIO, Mocha, and TypeScript",
+  "tags": [
+    "web",
+    "webdriverio",
+    "mocha",
+    "typescript",
+    "e2e",
+    "pom"
+  ],
+  "toolVersions": {
+    "node": "18+",
+    "webdriverio": "8.27.0",
+    "typescript": "5.0+"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "isTemplate": true,
+      "description": "NPM package configuration"
+    },
+    {
+      "path": "tsconfig.json",
+      "isTemplate": true,
+      "description": "TypeScript configuration"
+    },
+    {
+      "path": "wdio.conf.ts",
+      "isTemplate": true,
+      "description": "WebdriverIO configuration entry"
+    },
+    {
+      "path": "config/wdio.config.ts",
+      "isTemplate": true,
+      "description": "WebdriverIO main configuration"
+    },
+    {
+      "path": "config/environments.ts",
+      "isTemplate": true,
+      "description": "Environment configuration"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "description": "Jenkins CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "description": "Azure DevOps CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "description": "GitLab CI/CD pipeline",
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "description": "CircleCI pipeline configuration",
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "test/pageobjects/base.page.ts",
+      "isTemplate": true,
+      "description": "Base Page Object class"
+    },
+    {
+      "path": "test/pageobjects/login.page.ts",
+      "isTemplate": true,
+      "description": "Login Page Object"
+    },
+    {
+      "path": "test/pageobjects/home.page.ts",
+      "isTemplate": true,
+      "description": "Home Page Object"
+    },
+    {
+      "path": "test/specs/login.spec.ts",
+      "isTemplate": true,
+      "description": "Login test specifications"
+    },
+    {
+      "path": "test/data/users.ts",
+      "isTemplate": true,
+      "description": "Test data for users"
+    },
+    {
+      "path": "utils/logger.ts",
+      "isTemplate": true,
+      "description": "Logging utility"
+    },
+    {
+      "path": "utils/waitHelpers.ts",
+      "isTemplate": true,
+      "description": "Wait helper utilities"
+    },
+    {
+      "path": "utils/screenshotHelper.ts",
+      "isTemplate": true,
+      "description": "Screenshot capture utility"
+    },
+    {
+      "path": "types/global.d.ts",
+      "isTemplate": true,
+      "description": "Global TypeScript type definitions"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step-definitions/loginSteps.ts",
+      "isTemplate": true,
+      "description": "Cucumber-js step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Selenium Grid"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "webdriverio",
+    "language": "typescript",
+    "testRunner": "mocha",
+    "buildTool": "npm"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "jest-html-reporter",
+      "mochawesome"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

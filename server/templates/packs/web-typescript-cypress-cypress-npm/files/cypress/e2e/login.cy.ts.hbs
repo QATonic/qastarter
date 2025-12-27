@@ -1,0 +1,45 @@
+/**
+ * Login Test Suite
+ * 
+ * BEFORE RUNNING:
+ * 1. Update baseUrl in cypress.config.ts
+ * 2. Update credentials in cypress/fixtures/users.json
+ * 3. Update selectors in cypress/pages/LoginPage.ts
+ * 4. Run: npx cypress open
+ */
+import LoginPage from '../pages/LoginPage';
+
+interface UserCredentials {
+  username: string;
+  password: string;
+}
+
+interface UsersFixture {
+  validUser: UserCredentials;
+  adminUser: UserCredentials;
+  invalidUser: UserCredentials;
+}
+
+describe('Login Tests', () => {
+  const loginPage = new LoginPage();
+
+  beforeEach(() => {
+    loginPage.visitLoginPage(Cypress.config('baseUrl') as string);
+  });
+
+  it('should login with valid credentials', () => {
+    // Load credentials from fixtures (cypress/fixtures/users.json)
+    cy.fixture('users').then((users: UsersFixture) => {
+      // Step 1: Enter credentials and submit
+      loginPage.login(users.validUser.username, users.validUser.password);
+      
+      // Step 2: Verify login was successful
+      loginPage.verifyLoginSuccess();
+    });
+  });
+
+  it('should display login page elements', () => {
+    loginPage.verifyUsernameVisible();
+    loginPage.verifyPasswordVisible();
+  });
+});

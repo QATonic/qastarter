@@ -1,0 +1,232 @@
+# {{projectName}}
+
+Appium test automation framework with C# and NUnit for iOS/Android mobile testing.
+
+## Features
+
+- **Appium {{toolVersions.appium}}**: Latest mobile automation framework
+- **C# with .NET {{toolVersions.dotnet}}**: Modern synchronous patterns with WebDriverWait
+- **NUnit {{toolVersions.nunit}}**: Industry-standard testing framework
+- **Appium.WebDriver**: Official .NET bindings for Appium
+- **Page Object Model**: Maintainable test structure with explicit waits
+- **Multi-Platform**: iOS and Android support
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+- **Cloud Integration**: BrowserStack and Sauce Labs support
+
+## Prerequisites
+
+- .NET SDK 8.0 or later
+- Appium 2.x
+- Android SDK (for Android testing)
+- Xcode (for iOS testing on macOS)
+
+## Installation
+
+```bash
+# Restore NuGet packages
+dotnet restore
+
+# Install Appium globally
+npm install -g appium@2
+
+# Install Appium drivers
+appium driver install uiautomator2  # For Android
+appium driver install xcuitest      # For iOS
+```
+
+## Configuration
+
+### Environment Variables
+
+Set environment variables or create a launch profile:
+
+```bash
+# Platform (Android or iOS)
+PLATFORM=Android
+
+# Test environment
+TEST_ENV=dev
+
+# Appium server URL
+APPIUM_SERVER=http://localhost:4723
+
+# Device configuration
+DEVICE_NAME="Android Emulator"
+PLATFORM_VERSION=13.0
+
+# App configuration
+APP_PATH=/path/to/your/app.apk
+APP_PACKAGE=com.example.app
+APP_ACTIVITY=.MainActivity
+
+# For iOS
+BUNDLE_ID=com.example.app
+
+# Cloud services (optional)
+USE_BROWSERSTACK=false
+BROWSERSTACK_USERNAME=your_username
+BROWSERSTACK_ACCESS_KEY=your_key
+
+USE_SAUCELABS=false
+SAUCE_USERNAME=your_username
+SAUCE_ACCESS_KEY=your_key
+
+# Timeouts (in seconds)
+IMPLICIT_WAIT=10
+EXPLICIT_WAIT=30
+```
+
+### Test Data
+
+Update test data in:
+- `Data/DevData.json` - Development environment
+- `Data/QaData.json` - QA environment
+
+### Device Capabilities
+
+Update device capabilities in `Config/CapabilitiesManager.cs` based on your testing needs.
+
+## Running Tests
+
+```bash
+# Start Appium server
+appium
+
+# Run all tests
+dotnet test
+
+# Run tests for specific platform
+PLATFORM=Android dotnet test
+PLATFORM=iOS dotnet test
+
+# Run smoke tests only
+dotnet test --filter "FullyQualifiedName~SmokeTests"
+
+# Run with detailed output
+dotnet test --logger "console;verbosity=detailed"
+
+# Build in Release mode
+dotnet build -c Release
+
+# Clean build artifacts
+dotnet clean
+```
+
+## Project Structure
+
+```
+.
+├── Config/
+│   ├── AppiumServerConfig.cs   # Appium server configuration
+│   ├── CapabilitiesManager.cs  # Device capabilities manager
+│   └── Settings.cs             # Application settings
+├── Data/
+│   ├── DevData.json            # Development test data
+│   ├── QaData.json             # QA test data
+│   └── TestData.cs             # Test data models
+├── Tests/
+│   ├── Pages/
+│   │   ├── BasePage.cs         # Base page class
+│   │   ├── LoginPage.cs        # Login page object
+│   │   └── HomePage.cs         # Home page object
+│   ├── Utils/
+│   │   ├── AndroidGestures.cs  # Android gesture utilities
+│   │   ├── IOSGestures.cs      # iOS gesture utilities
+│   │   ├── DriverManager.cs    # WebDriver lifecycle
+│   │   └── ScreenshotHelper.cs # Screenshot capture
+│   ├── BaseTest.cs             # Base test class
+│   ├── LoginTests.cs           # Login tests
+│   └── SmokeTests.cs           # Smoke tests
+└── {{projectName}}.csproj      # Project file
+```
+
+## Page Objects
+
+All page objects extend `BasePage`:
+- `LoginPage` - Login page interactions
+- `HomePage` - Home page interactions
+
+### Updating Locators
+
+Update locators in page objects based on your app. Use Appium Inspector to identify elements:
+
+```csharp
+// Android
+private readonly By _usernameInput = By.Id("com.example.app:id/username");
+
+// iOS
+private readonly By _usernameInput = MobileBy.AccessibilityId("username_field");
+```
+
+## Gestures
+
+Platform-specific gesture utilities:
+- `AndroidGestures` - Android swipe, scroll, long press
+- `IOSGestures` - iOS tap, swipe, long press
+
+```csharp
+var gestures = new AndroidGestures(Driver);
+gestures.SwipeUp();
+```
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR with platform matrix (Android, iOS) on macOS runners.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Cloud Services
+
+### BrowserStack
+
+Set environment variables:
+```bash
+USE_BROWSERSTACK=true
+BROWSERSTACK_USERNAME=your_username
+BROWSERSTACK_ACCESS_KEY=your_key
+```
+
+### Sauce Labs
+
+Set environment variables:
+```bash
+USE_SAUCELABS=true
+SAUCE_USERNAME=your_username
+SAUCE_ACCESS_KEY=your_key
+```
+
+## Reports
+
+- **Screenshots**: `Screenshots/` (captured on test failure)
+- **Logs**: `Logs/` directory
+- **Reports**: `Reports/` directory

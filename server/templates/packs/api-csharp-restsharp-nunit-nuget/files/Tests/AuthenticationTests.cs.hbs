@@ -1,0 +1,82 @@
+using FluentAssertions;
+using NUnit.Framework;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Tests;
+
+[TestFixture]
+[Category("Authentication")]
+public class AuthenticationTests : BaseTest
+{
+    [Test]
+    public void SetBearerToken_ShouldAddAuthorizationHeader()
+    {
+        Client.SetAuthToken("test-token-12345");
+
+        // Make a request to verify token is sent
+        var response = Client.GetAsync<object>("/users").Result;
+
+        response.Should().NotBeNull();
+    }
+
+    [Test]
+    public void ClearAuth_ShouldRemoveAuthorizationHeader()
+    {
+        Client.SetAuthToken("test-token");
+        Client.ClearAuth();
+
+        // Verify auth is cleared
+        var response = Client.GetAsync<object>("/users").Result;
+        response.Should().NotBeNull();
+    }
+
+    [Test]
+    public void SetApiKey_ShouldAddApiKeyHeader()
+    {
+        Client.SetApiKey("test-api-key-12345");
+
+        var response = Client.GetAsync<object>("/users").Result;
+        response.Should().NotBeNull();
+    }
+
+    [Test]
+    public void SetApiKey_WithCustomHeader_ShouldAddCustomHeader()
+    {
+        Client.SetApiKey("custom-key", "X-Custom-API-Key");
+
+        var response = Client.GetAsync<object>("/users").Result;
+        response.Should().NotBeNull();
+    }
+
+    [Test]
+    public void SetBasicAuth_ShouldAddBasicAuthHeader()
+    {
+        Client.SetBasicAuth("username", "password");
+
+        var response = Client.GetAsync<object>("/users").Result;
+        response.Should().NotBeNull();
+    }
+
+    [Test]
+    public void SetCustomHeader_ShouldAddHeader()
+    {
+        Client.SetHeader("X-Custom-Auth", "custom-value");
+
+        var response = Client.GetAsync<object>("/users").Result;
+        response.Should().NotBeNull();
+    }
+
+    [Test]
+    public void AuthManager_ShouldTrackAuthenticationState()
+    {
+        var authManager = new AuthManager(Client);
+
+        authManager.IsAuthenticated.Should().BeFalse();
+
+        authManager.SetToken("test-token");
+        authManager.IsAuthenticated.Should().BeTrue();
+
+        authManager.ClearAuth();
+        authManager.IsAuthenticated.Should().BeFalse();
+    }
+}

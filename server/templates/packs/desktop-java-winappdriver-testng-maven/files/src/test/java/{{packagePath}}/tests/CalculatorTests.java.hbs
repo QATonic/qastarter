@@ -1,0 +1,49 @@
+package {{groupId}}.tests;
+
+import {{groupId}}.core.BaseTest;
+import {{groupId}}.pages.CalculatorPage;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+/**
+ * Sample Desktop Application Test
+ * 
+ * HOW TO USE THIS TEMPLATE:
+ * 1. Install WinAppDriver on your Windows machine
+ * 2. Update the app path in config/dev.properties
+ * 3. Update CalculatorPage locators to match your application
+ * 4. Run: mvn clean test
+ * 
+ * This sample tests Windows Calculator. Replace with your application tests.
+ * Add more test cases as needed for your project.
+ */
+public class CalculatorTests extends BaseTest {
+
+    private CalculatorPage calculatorPage;
+
+    @BeforeMethod
+    public void setupCalculatorTest() {
+        calculatorPage = new CalculatorPage();
+        Assert.assertTrue(calculatorPage.waitForPageToLoad(), 
+                         "Application should be loaded");
+    }
+
+    @Test(groups = {"smoke", "calculator"},
+          description = "Verify basic addition calculation")
+    public void testBasicAddition() {
+        // Step 1: Verify app is ready
+        logInfo("Testing basic addition: 5 + 3 = 8");
+        
+        // Step 2: Perform calculation
+        String result = calculatorPage.performCalculation(5, "+", 3);
+        
+        // Step 3: Verify result
+        Assert.assertNotNull(result, "Result should not be null");
+        Assert.assertTrue(calculatorPage.verifyResult("8"), 
+                         "Addition result should be 8");
+        
+        // Test passed! Your framework is working correctly.
+        logPass("Basic addition test completed successfully");
+    }
+}

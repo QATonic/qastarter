@@ -1,0 +1,35 @@
+using Serilog;
+using Serilog.Events;
+using {{projectName}}.Config;
+
+namespace {{projectName}}.Utils;
+
+public static class Logger
+{
+    private static readonly ILogger _logger;
+
+    static Logger()
+    {
+        var logFile = Settings.LogFile;
+        var logDir = Path.GetDirectoryName(logFile);
+        
+        if (!string.IsNullOrEmpty(logDir) && !Directory.Exists(logDir))
+        {
+            Directory.CreateDirectory(logDir);
+        }
+
+        var logLevel = Enum.Parse<LogEventLevel>(Settings.LogLevel);
+
+        _logger = new LoggerConfiguration()
+            .MinimumLevel.Is(logLevel)
+            .WriteTo.Console()
+            .WriteTo.File(logFile, rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+    }
+
+    public static void Debug(string message) => _logger.Debug(message);
+    public static void Info(string message) => _logger.Information(message);
+    public static void Warning(string message) => _logger.Warning(message);
+    public static void Error(string message) => _logger.Error(message);
+    public static void Error(Exception ex, string message) => _logger.Error(ex, message);
+}

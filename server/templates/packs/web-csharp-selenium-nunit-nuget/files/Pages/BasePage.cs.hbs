@@ -1,0 +1,70 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Pages
+{
+    public class BasePage
+    {
+        protected readonly IWebDriver Driver;
+        protected readonly WebDriverWait Wait;
+
+        public BasePage(IWebDriver driver)
+        {
+            Driver = driver;
+            Wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        }
+
+        public void Navigate(string url)
+        {
+            Logger.Info($"Navigating to: {url}");
+            Driver.Navigate().GoToUrl(url);
+        }
+
+        public IWebElement FindElement(By locator)
+        {
+            Wait.Until(d => d.FindElement(locator));
+            return Driver.FindElement(locator);
+        }
+
+        public void Click(By locator)
+        {
+            FindElement(locator).Click();
+            Logger.Info($"Clicked: {locator}");
+        }
+
+        public void Type(By locator, string text)
+        {
+            var element = FindElement(locator);
+            element.Clear();
+            element.SendKeys(text);
+            Logger.Info($"Typed '{text}' into: {locator}");
+        }
+
+        public string GetText(By locator)
+        {
+            return FindElement(locator).Text;
+        }
+
+        public bool IsDisplayed(By locator)
+        {
+            try
+            {
+                return FindElement(locator).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+
+        public string GetPageTitle() => Driver.Title;
+
+        public string GetCurrentUrl() => Driver.Url;
+
+        public void TakeScreenshot(string name)
+        {
+            new ScreenshotHelper(Driver).Capture(name);
+        }
+    }
+}

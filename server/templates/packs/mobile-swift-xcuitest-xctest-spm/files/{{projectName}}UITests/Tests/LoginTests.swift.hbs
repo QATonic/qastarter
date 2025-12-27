@@ -1,0 +1,123 @@
+import XCTest
+
+/**
+ * Login functionality tests.
+ * 
+ * ========== IMPORTANT: BEFORE RUNNING ==========
+ * 1. Update accessibility identifiers in LoginScreen.swift
+ * 2. Update test data in TestData.swift
+ * 3. Update app bundle identifier in setUp()
+ * ================================================
+ */
+final class LoginTests: XCTestCase {
+    
+    var app: XCUIApplication!
+    var loginScreen: LoginScreen!
+    var homeScreen: HomeScreen!
+    
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        
+        app = XCUIApplication()
+        // TODO: Set your app's bundle identifier if needed
+        // app = XCUIApplication(bundleIdentifier: "com.yourcompany.yourapp")
+        
+        app.launch()
+        
+        loginScreen = LoginScreen(app: app)
+        homeScreen = HomeScreen(app: app)
+        
+        Logger.info("Login tests setup complete")
+    }
+    
+    override func tearDownWithError() throws {
+        // Capture screenshot on failure
+        if let failureCount = testRun?.failureCount, failureCount > 0 {
+            takeScreenshotOnFailure()
+        }
+        
+        app.terminate()
+        app = nil
+    }
+    
+    // MARK: - Test Cases
+    
+    /// Test successful login with valid credentials
+    func testSuccessfulLogin() throws {
+        Logger.testStart("testSuccessfulLogin")
+        
+        // Given: Valid user credentials
+        let credentials = TestData.Users.validUser
+        
+        // When: User logs in
+        loginScreen
+            .enterUsername(credentials.username)
+            .enterPassword(credentials.password)
+            .tapLoginButton()
+        
+        // Then: Home screen is displayed
+        XCTAssertTrue(homeScreen.isLoaded(), "Home screen should be displayed after successful login")
+        
+        Logger.testEnd("testSuccessfulLogin", passed: true)
+    }
+    
+    /// Test login with invalid credentials
+    func testInvalidLogin() throws {
+        Logger.testStart("testInvalidLogin")
+        
+        // Given: Invalid user credentials
+        let credentials = TestData.Users.invalidUser
+        
+        // When: User attempts to login
+        loginScreen
+            .enterUsername(credentials.username)
+            .enterPassword(credentials.password)
+        
+        // Tap login but stay on login screen
+        loginScreen.tapElement(loginScreen.app.buttons["loginButton"])
+        
+        // Then: Error message is displayed
+        loginScreen.verifyErrorDisplayed()
+        
+        Logger.testEnd("testInvalidLogin", passed: true)
+    }
+    
+    /// Test login with empty credentials
+    func testEmptyCredentials() throws {
+        Logger.testStart("testEmptyCredentials")
+        
+        // Given: Empty form
+        loginScreen.clearForm()
+        
+        // When: User taps login
+        loginScreen.tapElement(loginScreen.app.buttons["loginButton"])
+        
+        // Then: Error is displayed
+        loginScreen.verifyErrorDisplayed()
+        
+        Logger.testEnd("testEmptyCredentials", passed: true)
+    }
+    
+    /// Test login screen elements are displayed
+    func testLoginScreenElements() throws {
+        Logger.testStart("testLoginScreenElements")
+        
+        // Verify all login screen elements are present
+        loginScreen.verifyScreenDisplayed()
+        
+        Logger.testEnd("testLoginScreenElements", passed: true)
+    }
+    
+    /// Test forgot password navigation
+    func testForgotPasswordNavigation() throws {
+        Logger.testStart("testForgotPasswordNavigation")
+        
+        // When: User taps forgot password
+        loginScreen.tapForgotPassword()
+        
+        // Then: Forgot password screen should appear
+        // TODO: Add verification for forgot password screen
+        
+        Logger.testEnd("testForgotPasswordNavigation", passed: true)
+    }
+}

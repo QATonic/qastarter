@@ -1,0 +1,136 @@
+using RestSharp;
+using {{projectName}}.Config;
+using {{projectName}}.Utils;
+
+namespace {{projectName}}.Core;
+
+public class ApiClient
+{
+    private readonly RestClient _client;
+    private readonly string _baseUrl;
+
+    public ApiClient(string? baseUrl = null)
+    {
+        _baseUrl = baseUrl ?? Settings.GetBaseURL();
+        
+        var options = new RestClientOptions(_baseUrl)
+        {
+            MaxTimeout = Settings.RequestTimeout
+        };
+
+        _client = new RestClient(options);
+    }
+
+    public async Task<RestResponse<T>> GetAsync<T>(string endpoint, RestRequest? request = null)
+    {
+        request ??= new RestRequest(endpoint);
+        request.Method = Method.Get;
+        
+        Logger.Info($"GET {endpoint}");
+        var response = await _client.ExecuteAsync<T>(request);
+        LogResponse(response);
+        
+        return response;
+    }
+
+    public async Task<RestResponse<T>> PostAsync<T>(string endpoint, object? body = null, RestRequest? request = null)
+    {
+        request ??= new RestRequest(endpoint);
+        request.Method = Method.Post;
+        
+        if (body != null)
+        {
+            request.AddJsonBody(body);
+            Logger.Debug($"Body: {Newtonsoft.Json.JsonConvert.SerializeObject(body)}");
+        }
+
+        Logger.Info($"POST {endpoint}");
+        var response = await _client.ExecuteAsync<T>(request);
+        LogResponse(response);
+        
+        return response;
+    }
+
+    public async Task<RestResponse<T>> PutAsync<T>(string endpoint, object? body = null, RestRequest? request = null)
+    {
+        request ??= new RestRequest(endpoint);
+        request.Method = Method.Put;
+        
+        if (body != null)
+        {
+            request.AddJsonBody(body);
+            Logger.Debug($"Body: {Newtonsoft.Json.JsonConvert.SerializeObject(body)}");
+        }
+
+        Logger.Info($"PUT {endpoint}");
+        var response = await _client.ExecuteAsync<T>(request);
+        LogResponse(response);
+        
+        return response;
+    }
+
+    public async Task<RestResponse<T>> PatchAsync<T>(string endpoint, object? body = null, RestRequest? request = null)
+    {
+        request ??= new RestRequest(endpoint);
+        request.Method = Method.Patch;
+        
+        if (body != null)
+        {
+            request.AddJsonBody(body);
+            Logger.Debug($"Body: {Newtonsoft.Json.JsonConvert.SerializeObject(body)}");
+        }
+
+        Logger.Info($"PATCH {endpoint}");
+        var response = await _client.ExecuteAsync<T>(request);
+        LogResponse(response);
+        
+        return response;
+    }
+
+    public async Task<RestResponse<T>> DeleteAsync<T>(string endpoint, RestRequest? request = null)
+    {
+        request ??= new RestRequest(endpoint);
+        request.Method = Method.Delete;
+        
+        Logger.Info($"DELETE {endpoint}");
+        var response = await _client.ExecuteAsync<T>(request);
+        LogResponse(response);
+        
+        return response;
+    }
+
+    public void SetAuthToken(string token)
+    {
+        _client.AddDefaultHeader("Authorization", $"Bearer {token}");
+    }
+
+    public void SetApiKey(string apiKey, string headerName = "X-API-Key")
+    {
+        _client.AddDefaultHeader(headerName, apiKey);
+    }
+
+    public void SetBasicAuth(string username, string password)
+    {
+        var credentials = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{username}:{password}"));
+        _client.AddDefaultHeader("Authorization", $"Basic {credentials}");
+    }
+
+    public void SetHeader(string name, string value)
+    {
+        _client.AddDefaultHeader(name, value);
+    }
+
+    public void ClearAuth()
+    {
+        _client.DefaultParameters.RemoveParameter("Authorization", ParameterType.HttpHeader);
+    }
+
+    private void LogResponse<T>(RestResponse<T> response)
+    {
+        Logger.Info($"Response: {(int)response.StatusCode} {response.StatusCode}");
+        if (!string.IsNullOrEmpty(response.Content))
+        {
+            Logger.Debug($"Body: {response.Content}");
+        }
+    }
+}

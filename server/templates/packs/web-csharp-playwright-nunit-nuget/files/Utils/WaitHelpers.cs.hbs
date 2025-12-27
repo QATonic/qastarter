@@ -1,0 +1,25 @@
+using Microsoft.Playwright;
+
+namespace {{projectName}}.Utils;
+
+public static class WaitHelpers
+{
+    public static async Task WaitForElementAsync(IPage page, string selector, float timeout = 30000)
+    {
+        await page.WaitForSelectorAsync(selector, new()
+        {
+            Timeout = timeout,
+            State = WaitForSelectorState.Visible
+        });
+    }
+
+    public static async Task WaitForUrlAsync(IPage page, string urlPattern, float timeout = 30000)
+    {
+        await page.WaitForURLAsync(urlPattern, new() { Timeout = timeout });
+    }
+
+    public static async Task SleepAsync(int milliseconds)
+    {
+        await Task.Delay(milliseconds);
+    }
+}

@@ -1,0 +1,56 @@
+# ============================================
+# MOBILE CONFIGURATION FILE - UPDATE THESE VALUES
+# ============================================
+# This file contains your mobile app settings.
+# Replace the placeholder values below with your actual app details.
+
+# Appium Server Configuration
+appium.server.url=http://localhost:4723
+
+# Mobile Testing Timeouts
+mobile.implicit.wait=10
+mobile.explicit.wait=20
+mobile.polling.interval=500
+
+# ============================================
+# ANDROID CONFIGURATION - UPDATE THESE
+# ============================================
+mobile.android.platformName=Android
+mobile.android.platformVersion=13.0
+mobile.android.deviceName=Android Emulator
+mobile.android.automationName=UiAutomator2
+mobile.android.app=/path/to/your/android/app.apk
+mobile.android.appPackage=com.your.app.package
+mobile.android.appActivity=com.your.app.MainActivity
+mobile.android.newCommandTimeout=300
+mobile.android.noReset=true
+
+# ============================================
+# iOS CONFIGURATION - UPDATE THESE
+# ============================================
+mobile.ios.platformName=iOS
+mobile.ios.platformVersion=16.0
+mobile.ios.deviceName=iPhone 14
+mobile.ios.automationName=XCUITest
+mobile.ios.app=/path/to/your/ios/app.app
+mobile.ios.bundleId=com.your.app.bundleid
+mobile.ios.newCommandTimeout=300
+mobile.ios.noReset=true
+
+# Test Data Configuration
+test.data.base.path=src/test/resources/testdata
+test.data.users.file=users.csv
+test.data.sample.file=sample.json
+
+# Reporting Configuration
+reports.base.path=reports
+extent.report.name=Mobile_Automation_Report_Dev
+extent.report.title=Mobile Test Automation Report - Development
+
+# Screenshot Configuration
+screenshot.on.failure=true
+screenshot.base.path=reports/screenshots
+
+# Logging Configuration
+log.level=DEBUG
+log.file.path=logs/mobile-automation-dev.log

@@ -1,0 +1,18 @@
+module.exports = {
+  headless: process.env.HEADLESS !== 'false',
+  slowMo: parseInt(process.env.SLOW_MO || '0'),
+  timeout: parseInt(process.env.TIMEOUT || '30000'),
+  
+  viewport: {
+    width: 1920,
+    height: 1080
+  },
+  
+  launchOptions: {
+    args: [
+      '--disable-gpu',
+      '--no-sandbox',
+      '--disable-dev-shm-usage'
+    ]
+  }
+};

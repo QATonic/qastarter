@@ -1,0 +1,193 @@
+{
+  "id": "desktop-python-winappdriver-pytest-pip",
+  "supportsDynamic": true,
+  "name": "Desktop Automation Framework",
+  "description": "Windows desktop application automation with Python, WinAppDriver, and Pytest",
+  "tags": [
+    "desktop",
+    "windows",
+    "python",
+    "pytest",
+    "winappdriver"
+  ],
+  "toolVersions": {
+    "python": "3.11+",
+    "appium-python-client": "3.1.0",
+    "pytest": "7.4.0",
+    "selenium": "4.16.0"
+  },
+  "files": [
+    {
+      "path": "requirements.txt",
+      "isTemplate": true,
+      "description": "Python dependencies"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "pytest.ini",
+      "isTemplate": true,
+      "description": "Pytest configuration"
+    },
+    {
+      "path": "config/settings.py",
+      "isTemplate": true,
+      "description": "Configuration management"
+    },
+    {
+      "path": "config/winappdriver_config.py",
+      "isTemplate": true,
+      "description": "WinAppDriver configuration"
+    },
+    {
+      "path": "config/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "core/driver_factory.py",
+      "isTemplate": true,
+      "description": "Driver factory for session management"
+    },
+    {
+      "path": "core/element_actions.py",
+      "isTemplate": true,
+      "description": "Common element actions"
+    },
+    {
+      "path": "core/wait_helpers.py",
+      "isTemplate": true,
+      "description": "Wait and synchronization helpers"
+    },
+    {
+      "path": "core/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "pages/base_page.py",
+      "isTemplate": true,
+      "description": "Base page object class"
+    },
+    {
+      "path": "pages/calculator_page.py",
+      "isTemplate": true,
+      "description": "Example Calculator page object"
+    },
+    {
+      "path": "pages/notepad_page.py",
+      "isTemplate": true,
+      "description": "Example Notepad page object"
+    },
+    {
+      "path": "pages/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "tests/conftest.py",
+      "isTemplate": true,
+      "description": "Pytest fixtures and configuration"
+    },
+    {
+      "path": "tests/test_calculator.py",
+      "isTemplate": true,
+      "description": "Calculator automation tests"
+    },
+    {
+      "path": "tests/test_notepad.py",
+      "isTemplate": true,
+      "description": "Notepad automation tests"
+    },
+    {
+      "path": "tests/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "utils/logger.py",
+      "isTemplate": true,
+      "description": "Logging configuration"
+    },
+    {
+      "path": "utils/screenshot_helper.py",
+      "isTemplate": true,
+      "description": "Screenshot capture utilities"
+    },
+    {
+      "path": "utils/__init__.py",
+      "isTemplate": true,
+      "description": "Package marker"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/test_login_steps.py",
+      "isTemplate": true,
+      "description": "pytest-bdd step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/__init__.py",
+      "isTemplate": false,
+      "description": "Python package initializer",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for Windows containers"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "desktop",
+    "framework": "winappdriver",
+    "language": "python",
+    "testRunner": "pytest",
+    "buildTool": "pip"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "pytest-html",
+      "pytest-json-report"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

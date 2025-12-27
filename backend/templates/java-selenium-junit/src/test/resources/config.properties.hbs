@@ -1,0 +1,43 @@
+# {{config.projectName}} Test Configuration
+
+# Application URL
+base.url=http://localhost:8080
+
+# Browser Configuration
+browser={{#if (eq tool "Selenium")}}chrome{{else}}firefox{{/if}}
+headless=false
+
+# Timeout Configuration (in seconds)
+timeout=10
+wait.timeout=10
+page.load.timeout=30
+
+# Screenshot Configuration
+screenshot.on.failure=true
+screenshots.path=target/screenshots
+
+# Test Retry Configuration
+retry.count=1
+
+# Reporting Configuration
+reports.path=target/reports
+{{#if (includes integrations.reporting "Extent Reports")}}
+extent.report.path=target/reports/extent-report.html
+{{/if}}
+
+# Test Data Configuration
+test.data.path=src/test/resources/testdata.json
+
+# Environment Configuration
+environment=local
+{{#if (includes integrations.cicd "Jenkins")}}
+# CI/CD specific settings
+ci.headless=true
+ci.timeout=30
+{{/if}}
+
+# Login Test Data
+test.username=admin
+test.password=password123
+test.invalid.username=invalid
+test.invalid.password=wrongpassword 

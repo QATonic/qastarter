@@ -1,0 +1,104 @@
+pipeline {
+    agent any
+    
+    tools {
+        nodejs 'NodeJS {{toolVersions.node}}'
+    }
+    
+    environment {
+        TEST_ENV = 'qa'
+        HEADLESS = 'true'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+        
+        stage('Test - Chromium') {
+            environment {
+                BROWSER = 'chromium'
+            }
+            steps {
+                sh 'npx playwright install --with-deps chromium'
+                sh 'npm test'
+            }
+            post {
+                always {
+                    {{#if (eq reportingTool "allure")}}
+                    sh 'npm run report:generate'
+                    allure([
+                        results: [[path: 'allure-results']]
+                    ])
+                    archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'allure-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "jest-html")}}
+                    publishHTML([
+                        reportDir: 'test-results',
+                        reportFiles: 'test-report.html',
+                        reportName: 'HTML Report - Chromium',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'test-results/test-report.html', allowEmptyArchive: true
+                    {{/if}}
+                    archiveArtifacts artifacts: 'logs/**/*', allowEmptyArchive: true
+                }
+                failure {
+                    archiveArtifacts artifacts: 'screenshots/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+        
+        stage('Test - Firefox') {
+            environment {
+                BROWSER = 'firefox'
+            }
+            steps {
+                sh 'npx playwright install --with-deps firefox'
+                sh 'npm test'
+            }
+            post {
+                always {
+                    {{#if (eq reportingTool "allure")}}
+                    sh 'npm run report:generate'
+                    allure([
+                        results: [[path: 'allure-results']]
+                    ])
+                    archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'allure-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "jest-html")}}
+                    publishHTML([
+                        reportDir: 'test-results',
+                        reportFiles: 'test-report.html',
+                        reportName: 'HTML Report - Firefox',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    archiveArtifacts artifacts: 'test-results/test-report.html', allowEmptyArchive: true
+                    {{/if}}
+                    archiveArtifacts artifacts: 'logs/**/*', allowEmptyArchive: true
+                }
+                failure {
+                    archiveArtifacts artifacts: 'screenshots/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}

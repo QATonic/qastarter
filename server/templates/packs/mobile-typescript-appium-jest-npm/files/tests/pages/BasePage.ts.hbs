@@ -1,0 +1,88 @@
+import { Browser } from 'webdriverio';
+import settings from '../../config/settings';
+
+export default class BasePage {
+  protected driver: Browser<'async'>;
+  protected settings: typeof settings;
+
+  constructor(driver: Browser<'async'>) {
+    this.driver = driver;
+    this.settings = settings;
+  }
+
+  async findElement(locator: string) {
+    return await this.driver.$(locator);
+  }
+
+  async findElements(locator: string) {
+    return await this.driver.$$(locator);
+  }
+
+  async click(locator: string): Promise<void> {
+    const element = await this.findElement(locator);
+    await element.waitForDisplayed({ timeout: this.settings.explicitWait });
+    await element.click();
+  }
+
+  async sendKeys(locator: string, text: string): Promise<void> {
+    const element = await this.findElement(locator);
+    await element.clearValue();
+    await element.setValue(text);
+  }
+
+  async getText(locator: string): Promise<string> {
+    const element = await this.findElement(locator);
+    return await element.getText();
+  }
+
+  async isDisplayed(locator: string, timeout?: number): Promise<boolean> {
+    try {
+      const element = await this.findElement(locator);
+      await element.waitForDisplayed({ 
+        timeout: timeout || this.settings.explicitWait 
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async isEnabled(locator: string): Promise<boolean> {
+    const element = await this.findElement(locator);
+    return await element.isEnabled();
+  }
+
+  async waitForElement(locator: string, timeout?: number) {
+    const element = await this.findElement(locator);
+    await element.waitForDisplayed({ 
+      timeout: timeout || this.settings.explicitWait 
+    });
+    return element;
+  }
+
+  async waitForElementToDisappear(locator: string, timeout?: number): Promise<void> {
+    const element = await this.findElement(locator);
+    await element.waitForDisplayed({ 
+      timeout: timeout || this.settings.explicitWait,
+      reverse: true
+    });
+  }
+
+  async scrollToElement(locator: string): Promise<void> {
+    const element = await this.findElement(locator);
+    await element.scrollIntoView();
+  }
+
+  async getAttribute(locator: string, attribute: string): Promise<string | null> {
+    const element = await this.findElement(locator);
+    return await element.getAttribute(attribute);
+  }
+
+  async hideKeyboard(): Promise<void> {
+    try {
+      await this.driver.hideKeyboard();
+    } catch (error) {
+      // Keyboard not shown or already hidden
+    }
+  }
+}

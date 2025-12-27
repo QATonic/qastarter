@@ -1,0 +1,155 @@
+version: 2.1
+
+executors:
+  dotnet-executor:
+    docker:
+      - image: mcr.microsoft.com/dotnet/sdk:{{toolVersions.dotnet}}
+    working_directory: ~/repo
+    environment:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "true"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+
+jobs:
+  test-chrome:
+    executor: dotnet-executor
+    steps:
+      - checkout
+      
+      - run:
+          name: Install Chrome
+          command: |
+            sudo apt-get update && sudo apt-get install -y wget gnupg2
+            wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+            echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+            sudo apt-get update && sudo apt-get install -y google-chrome-stable
+      
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{raw}}{{ checksum "*.csproj" }}{{/raw}}
+            - v1-dependencies-
+      
+      - run:
+          name: Restore dependencies
+          command: dotnet restore
+      
+      - save_cache:
+          paths:
+            - ~/.nuget/packages
+          key: v1-dependencies-{{raw}}{{ checksum "*.csproj" }}{{/raw}}
+      
+      - run:
+          name: Run tests with Chrome
+          command: dotnet test --configuration Release --logger "trx;LogFileName=test-results.trx" -p:Browser=chrome
+      {{#if (eq reportingTool "allure")}}
+      
+      - run:
+          name: Generate Allure Report
+          when: always
+          command: |
+            apt-get update && apt-get install -y wget default-jre
+            wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+            tar -zxvf allure-2.25.0.tgz
+            ./allure-2.25.0/bin/allure generate allure-results --clean -o allure-report
+      
+      - store_artifacts:
+          path: allure-results
+          destination: allure-results
+      
+      - store_artifacts:
+          path: allure-report
+          destination: allure-report
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      
+      - store_artifacts:
+          path: TestResults/extent-report.html
+          destination: extent-report
+      {{/if}}
+      {{#if (eq reportingTool "nunit")}}
+      
+      - store_test_results:
+          path: TestResults
+      
+      - store_artifacts:
+          path: TestResults
+          destination: nunit-results
+      {{/if}}
+      
+      - store_artifacts:
+          path: screenshots
+          destination: screenshots
+      
+      - store_artifacts:
+          path: logs
+          destination: logs
+
+  test-firefox:
+    executor: dotnet-executor
+    steps:
+      - checkout
+      
+      - run:
+          name: Install Firefox
+          command: sudo apt-get update && sudo apt-get install -y firefox-esr
+      
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{raw}}{{ checksum "*.csproj" }}{{/raw}}
+            - v1-dependencies-
+      
+      - run:
+          name: Restore dependencies
+          command: dotnet restore
+      
+      - run:
+          name: Run tests with Firefox
+          command: dotnet test --configuration Release --logger "trx;LogFileName=test-results.trx" -p:Browser=firefox
+      {{#if (eq reportingTool "allure")}}
+      
+      - run:
+          name: Generate Allure Report
+          when: always
+          command: |
+            apt-get update && apt-get install -y wget default-jre
+            wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+            tar -zxvf allure-2.25.0.tgz
+            ./allure-2.25.0/bin/allure generate allure-results --clean -o allure-report
+      
+      - store_artifacts:
+          path: allure-results
+          destination: allure-results
+      
+      - store_artifacts:
+          path: allure-report
+          destination: allure-report
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      
+      - store_artifacts:
+          path: TestResults/extent-report.html
+          destination: extent-report
+      {{/if}}
+      {{#if (eq reportingTool "nunit")}}
+      
+      - store_test_results:
+          path: TestResults
+      
+      - store_artifacts:
+          path: TestResults
+          destination: nunit-results
+      {{/if}}
+      
+      - store_artifacts:
+          path: screenshots
+          destination: screenshots
+      
+      - store_artifacts:
+          path: logs
+          destination: logs
+
+workflows:
+  version: 2
+  test-all-browsers:
+    jobs:
+      - test-chrome
+      - test-firefox

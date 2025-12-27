@@ -1,0 +1,35 @@
+/// <reference types="cypress" />
+
+declare namespace Cypress {
+  interface Chainable {
+    /**
+     * Custom command to login with username and password
+     * @example cy.login('user@example.com', 'password123')
+     */
+    login(username: string, password: string): Chainable<void>;
+
+    /**
+     * Custom command to logout
+     * @example cy.logout()
+     */
+    logout(): Chainable<void>;
+
+    /**
+     * Custom command to check if element exists
+     * @example cy.elementExists('.my-selector')
+     */
+    elementExists(selector: string): Chainable<boolean>;
+
+    /**
+     * Custom command for waiting with custom timeout
+     * @example cy.waitForElement('.my-selector', 5000)
+     */
+    waitForElement(selector: string, timeout?: number): Chainable<void>;
+
+    /**
+     * Custom command for taking full page screenshot
+     * @example cy.fullScreenshot('my-screenshot')
+     */
+    fullScreenshot(filename: string): Chainable<void>;
+  }
+}

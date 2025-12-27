@@ -1,0 +1,41 @@
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+      
+      - name: Install Playwright
+        run: mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"
+      
+      - name: Run tests
+        run: mvn test -Denv=qa -Dheadless=true -Dbrowser={{raw}}${{ matrix.browser }}{{/raw}}
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: |
+            test-results/
+            screenshots/
+            target/surefire-reports/

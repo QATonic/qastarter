@@ -1,0 +1,147 @@
+/**
+ * Test data generator utility.
+ * Generates random test data for API testing.
+ */
+class DataGenerator {
+  
+  /**
+   * Generate random string
+   * @param {number} length - Length of string
+   * @returns {string} - Random string
+   */
+  static randomString(length = 10) {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+  
+  /**
+   * Generate random number
+   * @param {number} min - Minimum value
+   * @param {number} max - Maximum value
+   * @returns {number} - Random number
+   */
+  static randomNumber(min = 0, max = 1000) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  
+  /**
+   * Generate random email
+   * @param {string} domain - Email domain
+   * @returns {string} - Random email
+   */
+  static randomEmail(domain = 'test.example.com') {
+    const username = DataGenerator.randomString(8).toLowerCase();
+    const timestamp = Date.now();
+    return `${username}.${timestamp}@${domain}`;
+  }
+  
+  /**
+   * Generate random phone number
+   * @returns {string} - Random phone number
+   */
+  static randomPhone() {
+    const areaCode = DataGenerator.randomNumber(200, 999);
+    const prefix = DataGenerator.randomNumber(200, 999);
+    const line = DataGenerator.randomNumber(1000, 9999);
+    return `${areaCode}-${prefix}-${line}`;
+  }
+  
+  /**
+   * Generate UUID v4
+   * @returns {string} - UUID string
+   */
+  static uuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+  
+  /**
+   * Generate random date
+   * @param {Date} start - Start date
+   * @param {Date} end - End date
+   * @returns {Date} - Random date
+   */
+  static randomDate(start = new Date(2020, 0, 1), end = new Date()) {
+    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  }
+  
+  /**
+   * Generate random ISO date string
+   * @returns {string} - ISO date string
+   */
+  static randomISODate() {
+    return DataGenerator.randomDate().toISOString();
+  }
+  
+  /**
+   * Generate random boolean
+   * @returns {boolean} - Random boolean
+   */
+  static randomBoolean() {
+    return Math.random() >= 0.5;
+  }
+  
+  /**
+   * Pick random item from array
+   * @param {Array} array - Array to pick from
+   * @returns {*} - Random item
+   */
+  static randomItem(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+  
+  /**
+   * Generate random user object
+   * @returns {Object} - User object
+   */
+  static randomUser() {
+    const firstName = DataGenerator.randomItem(['John', 'Jane', 'Bob', 'Alice', 'Charlie', 'Diana']);
+    const lastName = DataGenerator.randomItem(['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Davis']);
+    
+    return {
+      id: DataGenerator.uuid(),
+      firstName,
+      lastName,
+      email: DataGenerator.randomEmail(),
+      phone: DataGenerator.randomPhone(),
+      username: `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${DataGenerator.randomNumber(1, 999)}`,
+      createdAt: DataGenerator.randomISODate()
+    };
+  }
+  
+  /**
+   * Generate array of random users
+   * @param {number} count - Number of users
+   * @returns {Array} - Array of user objects
+   */
+  static randomUsers(count = 5) {
+    return Array.from({ length: count }, () => DataGenerator.randomUser());
+  }
+  
+  /**
+   * Generate random address
+   * @returns {Object} - Address object
+   */
+  static randomAddress() {
+    const streets = ['Main St', 'Oak Ave', 'Maple Dr', 'Cedar Ln', 'Pine Rd'];
+    const cities = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix'];
+    const states = ['NY', 'CA', 'IL', 'TX', 'AZ'];
+    
+    return {
+      street: `${DataGenerator.randomNumber(100, 9999)} ${DataGenerator.randomItem(streets)}`,
+      city: DataGenerator.randomItem(cities),
+      state: DataGenerator.randomItem(states),
+      zipCode: DataGenerator.randomNumber(10000, 99999).toString(),
+      country: 'USA'
+    };
+  }
+}
+
+export default DataGenerator;

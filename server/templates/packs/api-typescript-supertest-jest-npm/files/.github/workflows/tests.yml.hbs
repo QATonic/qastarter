@@ -1,0 +1,52 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: ['18.x', '20.x']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js {{raw}}${{ matrix.node-version }}{{/raw}}
+        uses: actions/setup-node@v4
+        with:
+          node-version: {{raw}}${{ matrix.node-version }}{{/raw}}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run smoke tests
+        env:
+          TEST_ENV: qa
+        run: npm run test:smoke
+      
+      - name: Run regression tests
+        env:
+          TEST_ENV: qa
+        run: npm test
+      
+      - name: Generate coverage report
+        run: npm run test:coverage
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-{{raw}}${{ matrix.node-version }}{{/raw}}
+          path: |
+            reports/
+            coverage/

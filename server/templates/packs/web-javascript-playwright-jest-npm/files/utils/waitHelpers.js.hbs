@@ -1,0 +1,27 @@
+class WaitHelpers {
+  constructor(page) {
+    this.page = page;
+  }
+
+  async waitForSelector(selector, options = {}) {
+    return await this.page.waitForSelector(selector, { timeout: 10000, ...options });
+  }
+
+  async waitForNavigation(options = {}) {
+    return await this.page.waitForNavigation({ timeout: 30000, ...options });
+  }
+
+  async waitForLoadState(state = 'load') {
+    return await this.page.waitForLoadState(state);
+  }
+
+  async waitForTimeout(ms) {
+    return await this.page.waitForTimeout(ms);
+  }
+
+  async waitForFunction(fn, options = {}) {
+    return await this.page.waitForFunction(fn, { timeout: 10000, ...options });
+  }
+}
+
+module.exports = WaitHelpers;

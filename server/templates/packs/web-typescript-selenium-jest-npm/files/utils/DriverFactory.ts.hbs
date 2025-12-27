@@ -1,0 +1,46 @@
+import { Builder, WebDriver } from 'selenium-webdriver';
+import * as chrome from 'selenium-webdriver/chrome';
+import * as firefox from 'selenium-webdriver/firefox';
+import browserConfig from '../config/browser.config';
+import logger from './Logger';
+
+export default class DriverFactory {
+  static async createDriver(browserType: string = browserConfig.browser): Promise<WebDriver> {
+    logger.info(`Creating ${browserType} driver (headless: ${browserConfig.headless})`);
+    
+    let driver: WebDriver;
+    
+    if (browserType === 'chrome') {
+      const options = new chrome.Options();
+      browserConfig.chromeOptions.forEach(opt => options.addArguments(opt));
+      if (browserConfig.headless) {
+        options.addArguments('--headless=new');
+      }
+      driver = await new Builder()
+        .forBrowser('chrome')
+        .setChromeOptions(options)
+        .build();
+    } else if (browserType === 'firefox') {
+      const options = new firefox.Options();
+      browserConfig.firefoxOptions.forEach(opt => options.addArguments(opt));
+      if (browserConfig.headless) {
+        options.addArguments('--headless');
+      }
+      driver = await new Builder()
+        .forBrowser('firefox')
+        .setFirefoxOptions(options)
+        .build();
+    } else {
+      throw new Error(`Unsupported browser: ${browserType}`);
+    }
+    
+    await driver.manage().setTimeouts({
+      implicit: browserConfig.implicitWait,
+      pageLoad: browserConfig.pageLoadTimeout,
+      script: browserConfig.scriptTimeout
+    });
+    
+    await driver.manage().window().maximize();
+    return driver;
+  }
+}

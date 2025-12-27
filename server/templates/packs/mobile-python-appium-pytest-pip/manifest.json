@@ -1,0 +1,192 @@
+{
+  "id": "mobile-python-appium-pytest-pip",
+  "supportsDynamic": true,
+  "name": "Mobile Automation Framework",
+  "description": "Appium test automation framework with Python and Pytest for iOS/Android mobile testing",
+  "tags": [
+    "mobile",
+    "appium",
+    "python",
+    "pytest",
+    "pom"
+  ],
+  "toolVersions": {
+    "python": "3.11",
+    "appium": "4.0.0",
+    "pytest": "8.0.0"
+  },
+  "files": [
+    {
+      "path": "requirements.txt",
+      "isTemplate": true,
+      "description": "Python dependencies"
+    },
+    {
+      "path": "pytest.ini",
+      "isTemplate": true,
+      "description": "Pytest configuration"
+    },
+    {
+      "path": "conftest.py",
+      "isTemplate": true,
+      "description": "Pytest fixtures and hooks"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "description": "GitHub Actions CI/CD workflow",
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation and setup guide"
+    },
+    {
+      "path": "config/__init__.py",
+      "isTemplate": false,
+      "description": "Config package init"
+    },
+    {
+      "path": "config/capabilities.py",
+      "isTemplate": true,
+      "description": "Device capabilities manager"
+    },
+    {
+      "path": "config/settings.py",
+      "isTemplate": true,
+      "description": "Application settings and configuration"
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true,
+      "description": "Development environment data"
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true,
+      "description": "QA environment data"
+    },
+    {
+      "path": "tests/__init__.py",
+      "isTemplate": false,
+      "description": "Tests package init"
+    },
+    {
+      "path": "tests/pages/__init__.py",
+      "isTemplate": false,
+      "description": "Pages package init"
+    },
+    {
+      "path": "tests/pages/base_page.py",
+      "isTemplate": true,
+      "description": "Base page class with common functionality"
+    },
+    {
+      "path": "tests/pages/login_page.py",
+      "isTemplate": true,
+      "description": "Login page object"
+    },
+    {
+      "path": "tests/pages/home_page.py",
+      "isTemplate": true,
+      "description": "Home page object"
+    },
+    {
+      "path": "tests/utils/__init__.py",
+      "isTemplate": false,
+      "description": "Utils package init"
+    },
+    {
+      "path": "tests/utils/android_gestures.py",
+      "isTemplate": true,
+      "description": "Android gesture utilities"
+    },
+    {
+      "path": "tests/utils/ios_gestures.py",
+      "isTemplate": true,
+      "description": "iOS gesture utilities"
+    },
+    {
+      "path": "tests/utils/helpers.py",
+      "isTemplate": true,
+      "description": "Common helper functions"
+    },
+    {
+      "path": "tests/test_login.py",
+      "isTemplate": true,
+      "description": "Login test suite"
+    },
+    {
+      "path": "tests/test_smoke.py",
+      "isTemplate": true,
+      "description": "Smoke test suite"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "description": "Sample login feature",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/test_login_steps.py",
+      "isTemplate": true,
+      "description": "pytest-bdd step definitions",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/__init__.py",
+      "isTemplate": false,
+      "description": "Python package initializer",
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Appium testing"
+    }
+  ],
+  "supportedCombination": {
+    "testingType": "mobile",
+    "framework": "appium",
+    "language": "python",
+    "testRunner": "pytest",
+    "buildTool": "pip"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "pytest-html",
+      "pytest-json-report"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+# {{projectName}} - Docker Compose for Playwright Testing
+# Provides containerized browser testing environment
+
+version: '3.8'
+
+services:
+  # Playwright Test Runner
+  playwright:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - BROWSER=chromium
+      - HEADLESS=true
+      - TEST_ENV=qa
+      - BASE_URL={{#if baseUrl}}{{baseUrl}}{{else}}https://example.com{{/if}}
+    volumes:
+      - ./reports:/app/reports
+      - ./screenshots:/app/screenshots
+      - ./videos:/app/videos
+    networks:
+      - test-network
+
+  # Run tests with all browsers
+  playwright-all-browsers:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - HEADLESS=true
+      - TEST_ENV=qa
+    command: pytest tests/ --browser chromium --browser firefox --browser webkit
+    volumes:
+      - ./reports:/app/reports
+      - ./screenshots:/app/screenshots
+    networks:
+      - test-network
+    profiles:
+      - all-browsers
+
+networks:
+  test-network:
+    driver: bridge
+
+# Usage:
+# Build and run tests: docker-compose up --build playwright
+# Run with specific browser: docker-compose run -e BROWSER=firefox playwright
+# Run all browsers: docker-compose --profile all-browsers up playwright-all-browsers

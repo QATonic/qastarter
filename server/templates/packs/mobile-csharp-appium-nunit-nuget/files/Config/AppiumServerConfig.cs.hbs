@@ -1,0 +1,8 @@
+namespace {{projectName}}.Config;
+
+public static class AppiumServerConfig
+{
+    public static string ServerUrl => Environment.GetEnvironmentVariable("APPIUM_SERVER") ?? "http://localhost:4723";
+    
+    public static Uri GetServerUri() => new Uri(ServerUrl);
+}

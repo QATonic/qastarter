@@ -1,0 +1,48 @@
+{
+  "name": "{{projectName}}",
+  "version": "1.0.0",
+  "description": "Playwright automation framework with JavaScript and Jest",
+  "scripts": {
+{{#if (eq testingPattern "bdd")}}
+    "test": "cucumber-js",
+    "test:headed": "HEADLESS=false cucumber-js",
+    "test:smoke": "cucumber-js --tags @smoke",
+    "test:parallel": "cucumber-js --parallel 4",
+{{else}}
+    "test": "jest",
+    "test:headed": "HEADLESS=false jest",
+    "test:smoke": "jest --testPathPattern=smoke",
+    "test:parallel": "jest --maxWorkers=4",
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+    "report": "allure generate allure-results --clean && allure open",
+    "report:generate": "allure generate allure-results --clean"
+{{else}}
+    "report": "open test-results/test-report.html || xdg-open test-results/test-report.html || start test-results/test-report.html"
+{{/if}}
+  },
+  "devDependencies": {
+    "playwright": "^1.41.0",
+    "jest": "^29.7.0",
+    "jest-playwright-preset": "^3.0.1",
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.1",
+{{#if (eq reportingTool "jest-html")}}
+    "jest-html-reporter": "^3.10.2",
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+  {{#if (eq testingPattern "bdd")}}
+    "allure-cucumberjs": "^2.15.2",
+    "allure-commandline": "^2.25.0",
+  {{else}}
+    "@jest/reporters": "^29.7.0",
+    "allure-jest": "^3.0.0",
+    "allure-commandline": "^2.25.0",
+  {{/if}}
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+    "@cucumber/cucumber": "^10.0.0",
+{{/if}}
+    "@playwright/test": "^1.41.0"
+  }
+}

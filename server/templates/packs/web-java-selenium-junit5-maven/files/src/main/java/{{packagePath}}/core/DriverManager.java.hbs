@@ -1,0 +1,125 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.utils.Log;
+import org.openqa.selenium.WebDriver;
+
+/**
+ * Thread-safe WebDriver manager using ThreadLocal.
+ * Ensures each thread gets its own WebDriver instance for parallel execution.
+ */
+public class DriverManager {
+    private static final ThreadLocal<WebDriver> driverThreadLocal = new ThreadLocal<>();
+    
+    private DriverManager() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Set WebDriver for current thread
+     * @param driver WebDriver instance
+     */
+    public static void setDriver(WebDriver driver) {
+        if (driver != null) {
+            driverThreadLocal.set(driver);
+            Log.info("WebDriver set for thread: " + Thread.currentThread().getName());
+        } else {
+            Log.error("Attempted to set null WebDriver for thread: " + Thread.currentThread().getName());
+        }
+    }
+    
+    /**
+     * Get WebDriver for current thread
+     * @return WebDriver instance or null if not set
+     */
+    public static WebDriver getDriver() {
+        WebDriver driver = driverThreadLocal.get();
+        if (driver == null) {
+            Log.warn("WebDriver not found for thread: " + Thread.currentThread().getName() + 
+                    ". Creating new driver instance.");
+            initializeDriver();
+            driver = driverThreadLocal.get();
+        }
+        return driver;
+    }
+    
+    /**
+     * Initialize WebDriver for current thread using configuration
+     */
+    public static void initializeDriver() {
+        try {
+            String browser = System.getProperty("browser", ConfigurationReader.getBrowser());
+            boolean headless = Boolean.parseBoolean(
+                System.getProperty("headless", String.valueOf(ConfigurationReader.isHeadless()))
+            );
+            
+            Log.info("Initializing WebDriver - Browser: " + browser + ", Headless: " + headless);
+            
+            WebDriver driver = BrowserFactory.createDriver(browser, headless);
+            setDriver(driver);
+            
+            // Configure timeouts
+            driver.manage().timeouts().implicitlyWait(
+                java.time.Duration.ofSeconds(ConfigurationReader.getImplicitWait())
+            );
+            driver.manage().timeouts().pageLoadTimeout(
+                java.time.Duration.ofSeconds(ConfigurationReader.getPageLoadTimeout())
+            );
+            
+            // Maximize window if not headless
+            if (!headless) {
+                driver.manage().window().maximize();
+                Log.info("Browser window maximized");
+            }
+            
+        } catch (Exception e) {
+            Log.error("Failed to initialize WebDriver", e);
+            throw new RuntimeException("WebDriver initialization failed", e);
+        }
+    }
+    
+    /**
+     * Quit and remove WebDriver for current thread
+     */
+    public static void quitDriver() {
+        WebDriver driver = driverThreadLocal.get();
+        if (driver != null) {
+            try {
+                Log.info("Quitting WebDriver for thread: " + Thread.currentThread().getName());
+                driver.quit();
+            } catch (Exception e) {
+                Log.error("Error while quitting WebDriver", e);
+            } finally {
+                driverThreadLocal.remove();
+                Log.info("WebDriver removed from ThreadLocal for thread: " + Thread.currentThread().getName());
+            }
+        } else {
+            Log.warn("No WebDriver found to quit for thread: " + Thread.currentThread().getName());
+        }
+    }
+    
+    /**
+     * Check if WebDriver is initialized for current thread
+     * @return true if WebDriver exists for current thread
+     */
+    public static boolean isDriverInitialized() {
+        return driverThreadLocal.get() != null;
+    }
+    
+    /**
+     * Get current thread name for logging purposes
+     * @return Current thread name
+     */
+    public static String getCurrentThreadName() {
+        return Thread.currentThread().getName();
+    }
+    
+    /**
+     * Restart WebDriver for current thread
+     */
+    public static void restartDriver() {
+        Log.info("Restarting WebDriver for thread: " + getCurrentThreadName());
+        quitDriver();
+        initializeDriver();
+    }
+}

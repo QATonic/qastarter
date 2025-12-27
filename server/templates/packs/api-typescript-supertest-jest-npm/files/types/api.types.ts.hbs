@@ -1,0 +1,72 @@
+/**
+ * API type definitions for TypeScript tests.
+ */
+
+export interface User {
+  id: string | number;
+  email: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  role?: 'admin' | 'user' | 'guest';
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  expiresIn?: number;
+  user?: User;
+}
+
+export interface ApiError {
+  message: string;
+  code?: string;
+  status?: number;
+  details?: Record<string, unknown>;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface ApiResponse<T = unknown> {
+  status: number;
+  body: T;
+  headers: Record<string, string>;
+}
+
+export interface TestUser {
+  username: string;
+  password: string;
+  displayName?: string;
+  email?: string;
+  role?: string;
+}
+
+export interface TestUsers {
+  validUser: TestUser;
+  invalidUser: TestUser;
+  adminUser?: TestUser;
+  [key: string]: TestUser | undefined;
+}
+
+export interface EnvironmentConfig {
+  baseUrl: string;
+  apiUrl: string;
+  timeout: number;
+  retries: number;
+}

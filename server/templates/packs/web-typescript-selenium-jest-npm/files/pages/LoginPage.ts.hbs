@@ -1,0 +1,54 @@
+/**
+ * Login Page Object
+ * 
+ * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+ * 1. Open your app's login page in a browser
+ * 2. Right-click on each element → Inspect → Copy selector
+ * 3. Replace the placeholder locators below with your actual locators
+ */
+import { By, WebDriver } from 'selenium-webdriver';
+import BasePage from './BasePage';
+import envConfig from '../config/env.config';
+
+export default class LoginPage extends BasePage {
+  private url: string;
+  
+  // ============================================
+  // UPDATE THESE LOCATORS FOR YOUR APPLICATION
+  // ============================================
+  // Tip: Use browser DevTools (F12) to find correct selectors
+  public readonly usernameInput = By.id('username');           // Your username/email input field
+  public readonly passwordInput = By.id('password');           // Your password input field
+  private loginButton = By.css('button[type="submit"]');       // Your login/submit button
+  private errorMessage = By.css('.error-message');             // Error message element
+  // ============================================
+
+  constructor(driver: WebDriver) {
+    super(driver);
+    // UPDATE: Change '/login' to your actual login page path
+    this.url = `${envConfig.getBaseUrl()}/login`;
+  }
+
+  async navigateToLogin(): Promise<void> {
+    await this.navigate(this.url);
+  }
+
+  async login(username: string, password: string): Promise<void> {
+    await this.type(this.usernameInput, username);
+    await this.type(this.passwordInput, password);
+    await this.click(this.loginButton);
+  }
+
+  async getErrorMessage(): Promise<string> {
+    return await this.getText(this.errorMessage);
+  }
+
+  async isErrorDisplayed(): Promise<boolean> {
+    return await this.isDisplayed(this.errorMessage);
+  }
+
+  async isLoginSuccessful(): Promise<boolean> {
+    const url = await this.getCurrentUrl();
+    return url.includes('/dashboard');
+  }
+}

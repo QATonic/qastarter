@@ -1,0 +1,128 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.utils.Log;
+import com.microsoft.playwright.Page;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+
+/**
+ * Base Test class for all test classes.
+ * Handles browser initialization and cleanup using JUnit5 lifecycle methods.
+ * All test classes should extend this class.
+ */
+public class BaseTest {
+    
+    protected Page page;
+    
+    @BeforeEach
+    public void setUp(TestInfo testInfo) {
+        String testName = testInfo.getDisplayName();
+        Log.testStart(testName);
+        Log.startSection("Test Setup");
+        
+        try {
+            // Initialize browser
+            BrowserManager.initializeBrowser();
+            page = BrowserManager.getPage();
+            
+            // Navigate to base URL if configured
+            String baseUrl = ConfigurationReader.getBaseUrl();
+            if (baseUrl != null && !baseUrl.trim().isEmpty()) {
+                Log.info("Navigating to base URL: " + baseUrl);
+                page.navigate(baseUrl);
+            }
+            
+            Log.info("✅ Test setup completed successfully");
+            
+        } catch (Exception e) {
+            Log.error("❌ Test setup failed", e);
+            throw new RuntimeException("Test setup failed", e);
+        } finally {
+            Log.endSection();
+        }
+    }
+    
+    @AfterEach
+    public void tearDown(TestInfo testInfo) {
+        String testName = testInfo.getDisplayName();
+        Log.startSection("Test Teardown");
+        
+        try {
+            // Quit browser and cleanup
+            BrowserManager.quitBrowser();
+            Log.info("✅ Test teardown completed successfully");
+            
+        } catch (Exception e) {
+            Log.error("❌ Test teardown failed", e);
+        } finally {
+            Log.endSection();
+            
+            // Log test end (status will be determined by TestWatcher)
+            Log.info("═══════════════════════════════════════");
+        }
+    }
+    
+    /**
+     * Navigate to a URL
+     * @param url URL to navigate to
+     */
+    protected void navigateTo(String url) {
+        Log.info("Navigating to: " + url);
+        page.navigate(url);
+    }
+    
+    /**
+     * Get current page URL
+     * @return Current URL
+     */
+    protected String getCurrentUrl() {
+        return page.url();
+    }
+    
+    /**
+     * Get current page title
+     * @return Page title
+     */
+    protected String getPageTitle() {
+        return page.title();
+    }
+    
+    /**
+     * Reload current page
+     */
+    protected void reloadPage() {
+        Log.info("Reloading page");
+        page.reload();
+    }
+    
+    /**
+     * Go back in browser history
+     */
+    protected void goBack() {
+        Log.info("Navigating back");
+        page.goBack();
+    }
+    
+    /**
+     * Go forward in browser history
+     */
+    protected void goForward() {
+        Log.info("Navigating forward");
+        page.goForward();
+    }
+    
+    /**
+     * Wait for specified milliseconds
+     * @param milliseconds Time to wait
+     */
+    protected void waitFor(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Log.warn("Wait interrupted: " + e.getMessage());
+        }
+    }
+}

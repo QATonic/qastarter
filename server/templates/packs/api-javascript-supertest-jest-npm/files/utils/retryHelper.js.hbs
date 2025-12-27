@@ -1,0 +1,132 @@
+import logger from './logger.js';
+
+/**
+ * Retry helper for handling flaky API calls.
+ * Provides retry logic with exponential backoff.
+ */
+class RetryHelper {
+  
+  static DEFAULT_RETRIES = 3;
+  static DEFAULT_DELAY = 1000;
+  static DEFAULT_BACKOFF = 2;
+  
+  /**
+   * Retry an async function with exponential backoff
+   * @param {Function} fn - Async function to retry
+   * @param {Object} options - Retry options
+   * @returns {Promise} - Result of the function
+   */
+  static async retry(fn, options = {}) {
+    const {
+      retries = RetryHelper.DEFAULT_RETRIES,
+      delay = RetryHelper.DEFAULT_DELAY,
+      backoff = RetryHelper.DEFAULT_BACKOFF,
+      shouldRetry = () => true,
+      onRetry = () => {}
+    } = options;
+    
+    let lastError;
+    let currentDelay = delay;
+    
+    for (let attempt = 1; attempt <= retries + 1; attempt++) {
+      try {
+        logger.debug(`Attempt ${attempt}/${retries + 1}`);
+        const result = await fn();
+        
+        if (attempt > 1) {
+          logger.info(`Succeeded on attempt ${attempt}`);
+        }
+        
+        return result;
+      } catch (error) {
+        lastError = error;
+        
+        if (attempt <= retries && shouldRetry(error)) {
+          logger.warn(`Attempt ${attempt} failed: ${error.message}. Retrying in ${currentDelay}ms...`);
+          onRetry(error, attempt);
+          
+          await RetryHelper.sleep(currentDelay);
+          currentDelay *= backoff;
+        } else {
+          logger.error(`All ${attempt} attempts failed`);
+          break;
+        }
+      }
+    }
+    
+    throw lastError;
+  }
+  
+  /**
+   * Retry API request with status code validation
+   * @param {Function} requestFn - Function that returns a supertest request
+   * @param {Array} expectedStatuses - Array of acceptable status codes
+   * @param {Object} options - Retry options
+   */
+  static async retryRequest(requestFn, expectedStatuses = [200], options = {}) {
+    return RetryHelper.retry(
+      async () => {
+        const response = await requestFn();
+        
+        if (!expectedStatuses.includes(response.status)) {
+          throw new Error(`Unexpected status ${response.status}. Expected: ${expectedStatuses.join(', ')}`);
+        }
+        
+        return response;
+      },
+      {
+        ...options,
+        shouldRetry: (error) => {
+          // Retry on network errors or 5xx errors
+          if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+            return true;
+          }
+          if (error.message && error.message.includes('status 5')) {
+            return true;
+          }
+          return options.shouldRetry ? options.shouldRetry(error) : false;
+        }
+      }
+    );
+  }
+  
+  /**
+   * Wait for a condition to be true
+   * @param {Function} condition - Function that returns boolean or Promise<boolean>
+   * @param {Object} options - Wait options
+   */
+  static async waitFor(condition, options = {}) {
+    const {
+      timeout = 30000,
+      interval = 1000,
+      message = 'Condition not met'
+    } = options;
+    
+    const startTime = Date.now();
+    
+    while (Date.now() - startTime < timeout) {
+      try {
+        const result = await condition();
+        if (result) {
+          return true;
+        }
+      } catch (error) {
+        logger.debug(`Condition check failed: ${error.message}`);
+      }
+      
+      await RetryHelper.sleep(interval);
+    }
+    
+    throw new Error(`${message} within ${timeout}ms`);
+  }
+  
+  /**
+   * Sleep for specified milliseconds
+   * @param {number} ms - Milliseconds to sleep
+   */
+  static sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+}
+
+export default RetryHelper;

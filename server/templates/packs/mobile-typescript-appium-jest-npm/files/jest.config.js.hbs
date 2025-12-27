@@ -1,0 +1,26 @@
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testMatch: ['**/tests/**/*.test.ts'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  testTimeout: 120000,
+  reporters: [
+    'default',
+    [
+      'jest-html-reporter',
+      {
+        pageTitle: '{{projectName}} Test Report',
+        outputPath: 'reports/test-report.html',
+        includeFailureMsg: true,
+        includeConsoleLog: true,
+        dateFormat: 'yyyy-mm-dd HH:MM:ss'
+      }
+    ]
+  ],
+  collectCoverageFrom: [
+    'tests/**/*.ts',
+    '!tests/**/*.test.ts',
+    '!tests/setup.ts',
+    '!tests/types/**'
+  ]
+};

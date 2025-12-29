@@ -1,248 +1,149 @@
-# QAStarter
+<p align="center">
+  <img src="client/public/logo.svg" alt="QAStarter Logo" width="80" height="80">
+</p>
+
+<h1 align="center">QAStarter</h1>
 
 <p align="center">
-  <img src="logo-wizard.png" alt="QAStarter Logo" width="120" />
+  <strong>Free QA Automation Framework Generator</strong>
 </p>
 
 <p align="center">
-  <strong>Generate Production-Ready Test Automation Frameworks in Minutes</strong>
+  Create production-ready test automation frameworks instantly.<br>
+  Selenium, Playwright, Cypress, Appium, RestAssured & more.
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> •
-  <a href="#supported-technologies">Technologies</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#api">API</a> •
-  <a href="#contributing">Contributing</a>
+  <a href="https://github.com/QATonic/QAStarter/stargazers">
+    <img src="https://img.shields.io/github/stars/QATonic/QAStarter?style=social" alt="GitHub stars">
+  </a>
+  <a href="https://github.com/QATonic/QAStarter/network/members">
+    <img src="https://img.shields.io/github/forks/QATonic/QAStarter?style=social" alt="GitHub forks">
+  </a>
+  <a href="https://github.com/QATonic/QAStarter/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/QATonic/QAStarter" alt="License">
+  </a>
+  <a href="https://github.com/QATonic/QAStarter/issues">
+    <img src="https://img.shields.io/github/issues/QATonic/QAStarter" alt="Issues">
+  </a>
+</p>
+
+<p align="center">
+  <a href="#-features">Features</a> •
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-supported-technologies">Technologies</a> •
+  <a href="#-contributing">Contributing</a> •
+  <a href="#-license">License</a>
 </p>
 
 ---
 
-## What is QAStarter?
+## ✨ Features
 
-QAStarter is a web-based project generator that enables QA engineers to instantly create production-ready test automation framework boilerplates. Inspired by Spring Initializr, QAStarter eliminates the time-consuming setup process and allows QA professionals to focus on writing tests rather than configuring frameworks.
+- 🚀 **Instant Generation** - Create complete test automation projects in seconds
+- 🎯 **39+ Templates** - Covering web, mobile, API, and desktop testing
+- 🔧 **Production Ready** - Page Object Model, utilities, config, and more included
+- 📊 **CI/CD Integration** - GitHub Actions, GitLab CI, Azure DevOps, Jenkins, CircleCI
+- 📈 **Reporting Tools** - Allure, ExtentReports, HTML reports
+- 🐳 **Docker Support** - Optional Dockerfile and Docker Compose for containerized testing
+- 🌐 **No Signup Required** - 100% free, instant download
 
-**Problem:** QA engineers spend 40-60% of their initial project time setting up test automation frameworks, configuring build tools, managing dependencies, and establishing project structure.
+## 🛠️ Supported Technologies
 
-**Solution:** QAStarter provides a guided wizard interface that generates customized, production-ready test automation projects with pre-configured structure, boilerplate code, CI/CD pipelines, and documentation.
+### Testing Frameworks
+| Web | Mobile | API | Desktop |
+|-----|--------|-----|---------|
+| Selenium | Appium | RestAssured | WinAppDriver |
+| Playwright | Espresso | Requests | PyAutoGUI |
+| Cypress | XCUITest | SuperTest | |
+| WebdriverIO | | RestSharp | |
 
-## Features
+### Languages
+- Java (TestNG, JUnit5)
+- Python (pytest)
+- JavaScript/TypeScript (Mocha, Jest)
+- C# (NUnit, MSTest)
 
-- **Multi-Framework Support** - Selenium, Playwright, Cypress, Appium, RestAssured, and more
-- **Multi-Language Support** - Java, Python, JavaScript, TypeScript, C#, Swift
-- **Testing Patterns** - Page Object Model (POM), BDD with Cucumber, Data-Driven, Fluent patterns
-- **CI/CD Integration** - GitHub Actions, Jenkins, GitLab CI, Azure DevOps, CircleCI
-- **Reporting Tools** - Allure, ExtentReports, TestNG Reports, Jest HTML, Mochawesome
-- **Build Tools** - Maven, Gradle, npm, pip, NuGet
-- **Utilities** - Config readers, Screenshot capture, Logging, Data providers
-- **Download as ZIP** - Works with any Git provider (GitHub, GitLab, Azure DevOps, Bitbucket)
+### Build Tools
+- Maven, Gradle (Java)
+- npm (JavaScript/TypeScript)
+- pip (Python)
+- NuGet (C#)
 
-## Supported Technologies
+## 🚀 Quick Start
 
-### Testing Types
-| Type | Frameworks |
-|------|------------|
-| **Web** | Selenium, Playwright, Cypress, WebdriverIO |
-| **API** | RestAssured, Python Requests, Supertest, RestSharp |
-| **Mobile** | Appium, Espresso, XCUITest |
-| **Desktop** | WinAppDriver, PyAutoGUI |
+### Using the Web App
 
-### Languages & Build Tools
-| Language | Build Tools | Test Runners |
-|----------|-------------|--------------|
-| Java | Maven, Gradle | TestNG, JUnit 5 |
-| Python | pip | PyTest |
-| JavaScript | npm | Jest, Mocha, Cypress |
-| TypeScript | npm | Jest, Mocha, Cypress |
-| C# | NuGet | NUnit |
-| Swift | SPM | XCTest |
+1. Visit [QAStarter](https://qastarter.com) (or run locally)
+2. Select your testing type, framework, and language
+3. Configure CI/CD, reporting, and utilities
+4. Click "Generate & Download"
+5. Extract and start testing!
 
-### CI/CD Platforms
-- GitHub Actions
-- Jenkins (Jenkinsfile)
-- GitLab CI (.gitlab-ci.yml)
-- Azure DevOps (azure-pipelines.yml)
-- CircleCI (.circleci/config.yml)
-
-## Quick Start
-
-### Prerequisites
-- Node.js 18+
-- npm 9+
-
-### Installation
+### Running Locally
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/qastarter.git
-cd qastarter
+git clone https://github.com/QATonic/QAStarter.git
+cd QAStarter
 
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
-```
 
-The application will be available at `http://localhost:5000`
-
-### Production Build
-
-```bash
 # Build for production
 npm run build
-
-# Start production server
-npm start
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
-qastarter/
-├── client/                   # React frontend (Vite + TypeScript)
+QAStarter/
+├── client/                 # React frontend (Vite + TypeScript)
 │   ├── src/
-│   │   ├── components/       # UI components (Wizard, ProjectPreview, etc.)
-│   │   ├── pages/            # Page components (Home, ApiDocs)
-│   │   ├── hooks/            # Custom React hooks
-│   │   ├── lib/              # Utilities and helpers
-│   │   └── styles/           # Global styles
-├── server/                   # Express backend
-│   ├── templates/            # Project template packs
-│   │   └── packs/            # 34 framework templates
-│   ├── routes.ts             # API routes
-│   └── storage.ts            # Analytics storage
-├── shared/                   # Shared types and validation
-│   ├── schema.ts             # Zod schemas
-│   └── validationMatrix.ts   # Framework compatibility rules
-└── package.json
+│   │   ├── components/     # UI components
+│   │   └── pages/          # Page components
+│   └── public/             # Static assets
+├── server/                 # Express backend
+│   ├── templates/          # Template packs
+│   │   └── packs/          # 39+ template configurations
+│   └── services/           # Business logic
+├── shared/                 # Shared code (validation, schemas)
+└── dist/                   # Production build
 ```
 
-## API
+## 🤝 Contributing
 
-### Generate Project (POST)
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-```bash
-curl -X POST http://localhost:5000/api/generate-project \
-  -H "Content-Type: application/json" \
-  -d '{
-    "projectName": "my-qa-project",
-    "testingType": "web",
-    "framework": "playwright",
-    "language": "java",
-    "testRunner": "testng",
-    "buildTool": "maven",
-    "testingPattern": "page-object-model",
-    "cicdTool": "github-actions",
-    "reportingTool": "allure"
-  }' \
-  --output my-qa-project.zip
-```
+### Ways to Contribute
+- 🐛 Report bugs and issues
+- 💡 Suggest new features or templates
+- 📝 Improve documentation
+- 🔧 Submit pull requests
 
-### Get Metadata (GET)
+## 📜 License
 
-```bash
-curl http://localhost:5000/api/v1/metadata
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Generate via Query Parameters (GET)
+## 🙏 Support
 
-```bash
-curl "http://localhost:5000/api/v1/generate?projectName=my-project&testingType=web&framework=selenium&language=java" \
-  --output my-project.zip
-```
+If you find QAStarter helpful, please consider:
 
-## Configuration Options
-
-| Parameter | Required | Description | Example |
-|-----------|----------|-------------|---------|
-| `projectName` | Yes | Project folder name | `my-qa-project` |
-| `testingType` | Yes | Type of testing | `web`, `api`, `mobile`, `desktop` |
-| `framework` | Yes | Testing framework | `selenium`, `playwright`, `cypress` |
-| `language` | Yes | Programming language | `java`, `python`, `typescript` |
-| `testRunner` | Yes | Test runner | `testng`, `junit5`, `pytest`, `jest` |
-| `buildTool` | Yes | Build tool | `maven`, `gradle`, `npm`, `pip` |
-| `testingPattern` | Yes | Design pattern | `page-object-model`, `bdd`, `data-driven` |
-| `cicdTool` | No | CI/CD platform | `github-actions`, `jenkins`, `gitlab-ci` |
-| `reportingTool` | No | Reporting tool | `allure`, `extent-reports`, `pytest-html` |
-| `groupId` | Java only | Maven group ID | `com.company.qa` |
-| `artifactId` | Java only | Maven artifact ID | `qa-automation` |
-
-## Generated Project Structure
-
-Example for Java + Playwright + TestNG + Maven:
-
-```
-my-qa-project/
-├── pom.xml                           # Maven configuration
-├── README.md                         # Setup instructions
-├── .gitignore                        # Git ignore rules
-├── .github/workflows/tests.yml       # GitHub Actions CI/CD
-├── src/
-│   ├── main/java/com/company/qa/
-│   │   ├── config/                   # Configuration management
-│   │   ├── core/                     # Base classes (DriverManager, BaseTest)
-│   │   ├── pages/                    # Page Object classes
-│   │   ├── utils/                    # Utilities (Wait, Screenshot, Log)
-│   │   └── listeners/                # TestNG listeners
-│   └── test/java/com/company/qa/
-│       └── tests/                    # Test classes
-├── src/main/resources/
-│   ├── config/                       # Environment configs (dev, qa, prod)
-│   └── log4j2.xml                    # Logging configuration
-└── src/test/resources/
-    ├── testng.xml                    # TestNG suite configuration
-    └── testdata/                     # Test data files
-```
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `NODE_ENV` | Environment mode | `development` |
-| `PORT` | Server port | `5000` |
-
-## Tech Stack
-
-**Frontend:**
-- React 18 + TypeScript
-- Vite (build tool)
-- Tailwind CSS + shadcn/ui
-- TanStack Query (data fetching)
-- Wouter (routing)
-
-**Backend:**
-- Node.js + Express
-- TypeScript
-- Handlebars (templating)
-- Archiver (ZIP generation)
-- Zod (validation)
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Adding New Templates
-
-Templates are located in `server/templates/packs/`. Each template pack contains:
-- `manifest.json` - Template metadata and file definitions
-- `files/` - Handlebars template files (.hbs)
-
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Support
-
-- **Issues:** [GitHub Issues](https://github.com/your-org/qastarter/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/your-org/qastarter/discussions)
+- ⭐ **Starring** the repository
+- 🍴 **Forking** to contribute
+- ☕ **Supporting** on [Ko-fi](https://ko-fi.com/SantoshKarad)
 
 ---
 
 <p align="center">
-  Made with ❤️ for the QA Community
+  Made with ❤️ by <a href="https://github.com/QATonic">QATonic Innovations</a>
+</p>
+
+<p align="center">
+  <a href="https://linkedin.com/in/SantoshKarad">LinkedIn</a> •
+  <a href="https://twitter.com/SantoshKarad">Twitter</a> •
+  <a href="https://youtube.com/@SantoshKarad">YouTube</a>
 </p>

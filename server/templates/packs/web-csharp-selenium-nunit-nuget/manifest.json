@@ -160,9 +160,7 @@
       "description": "User test data"
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration","conditional": {"utilities.includeDocker": true}
     },
     {
       "path": ".dockerignore",
@@ -193,3 +191,4 @@
     "Reports"
   ]
 }
+

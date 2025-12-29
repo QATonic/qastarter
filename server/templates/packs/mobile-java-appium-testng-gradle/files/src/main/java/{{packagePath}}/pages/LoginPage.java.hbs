@@ -1,0 +1,226 @@
+package {{packageName}}.pages;
+
+import io.appium.java_client.pagefactory.AndroidFindBy;
+import io.appium.java_client.pagefactory.iOSXCUITFindBy;
+import org.openqa.selenium.WebElement;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+/**
+ * Login page implementation using Page Object Model
+ * Demonstrates cross-platform element location strategies
+ */
+public class LoginPage extends BasePage {
+
+    // Cross-platform element definitions using platform-specific locators
+    
+    @AndroidFindBy(id = "com.example.app:id/username")
+    @iOSXCUITFindBy(accessibility = "usernameField")
+    private WebElement usernameField;
+
+    @AndroidFindBy(id = "com.example.app:id/password")
+    @iOSXCUITFindBy(accessibility = "passwordField")
+    private WebElement passwordField;
+
+    @AndroidFindBy(id = "com.example.app:id/loginButton")
+    @iOSXCUITFindBy(accessibility = "loginButton")
+    private WebElement loginButton;
+
+    @AndroidFindBy(id = "com.example.app:id/forgotPassword")
+    @iOSXCUITFindBy(accessibility = "forgotPasswordLink")
+    private WebElement forgotPasswordLink;
+
+    @AndroidFindBy(id = "com.example.app:id/errorMessage")
+    @iOSXCUITFindBy(accessibility = "errorMessage")
+    private WebElement errorMessage;
+
+    @AndroidFindBy(id = "com.example.app:id/loginTitle")
+    @iOSXCUITFindBy(accessibility = "loginTitle")
+    private WebElement loginTitle;
+
+    /**
+     * Enter username in the username field
+     * 
+     * @param username Username to enter
+     */
+    public void enterUsername(String username) {
+        try {
+            sendTextToElement(usernameField, username);
+            {{#if utilities.logger}}
+            Log.info("Entered username: " + username);
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to enter username", e);
+            {{/if}}
+            throw new RuntimeException("Failed to enter username", e);
+        }
+    }
+
+    /**
+     * Enter password in the password field
+     * 
+     * @param password Password to enter
+     */
+    public void enterPassword(String password) {
+        try {
+            sendTextToElement(passwordField, password);
+            {{#if utilities.logger}}
+            Log.info("Entered password");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to enter password", e);
+            {{/if}}
+            throw new RuntimeException("Failed to enter password", e);
+        }
+    }
+
+    /**
+     * Click the login button
+     */
+    public void clickLoginButton() {
+        try {
+            clickElement(loginButton);
+            {{#if utilities.logger}}
+            Log.info("Clicked login button");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to click login button", e);
+            {{/if}}
+            throw new RuntimeException("Failed to click login button", e);
+        }
+    }
+
+    /**
+     * Click the forgot password link
+     */
+    public void clickForgotPasswordLink() {
+        try {
+            clickElement(forgotPasswordLink);
+            {{#if utilities.logger}}
+            Log.info("Clicked forgot password link");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to click forgot password link", e);
+            {{/if}}
+            throw new RuntimeException("Failed to click forgot password link", e);
+        }
+    }
+
+    /**
+     * Get error message text
+     * 
+     * @return Error message text
+     */
+    public String getErrorMessage() {
+        try {
+            String error = getElementText(errorMessage);
+            {{#if utilities.logger}}
+            Log.info("Retrieved error message: " + error);
+            {{/if}}
+            return error;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to get error message", e);
+            {{/if}}
+            return "";
+        }
+    }
+
+    /**
+     * Check if error message is displayed
+     * 
+     * @return true if error message is displayed, false otherwise
+     */
+    public boolean isErrorMessageDisplayed() {
+        try {
+            boolean isDisplayed = errorMessage.isDisplayed();
+            {{#if utilities.logger}}
+            Log.info("Error message display status: " + isDisplayed);
+            {{/if}}
+            return isDisplayed;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.debug("Error message not displayed or not found");
+            {{/if}}
+            return false;
+        }
+    }
+
+    /**
+     * Perform complete login action
+     * 
+     * @param username Username
+     * @param password Password
+     */
+    public void performLogin(String username, String password) {
+        try {
+            {{#if utilities.logger}}
+            Log.info("Performing login for user: " + username);
+            {{/if}}
+            
+            enterUsername(username);
+            enterPassword(password);
+            clickLoginButton();
+            
+            {{#if utilities.logger}}
+            Log.info("Login action completed");
+            {{/if}}
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Login failed for user: " + username, e);
+            {{/if}}
+            throw new RuntimeException("Login failed", e);
+        }
+    }
+
+    /**
+     * Clear username and password fields
+     */
+    public void clearFields() {
+        try {
+            usernameField.clear();
+            passwordField.clear();
+            {{#if utilities.logger}}
+            Log.info("Cleared login fields");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to clear login fields", e);
+            {{/if}}
+            throw new RuntimeException("Failed to clear fields", e);
+        }
+    }
+
+    @Override
+    public boolean isPageLoaded() {
+        try {
+            return loginTitle.isDisplayed() && 
+                   usernameField.isDisplayed() && 
+                   passwordField.isDisplayed() && 
+                   loginButton.isDisplayed();
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.debug("Login page not fully loaded");
+            {{/if}}
+            return false;
+        }
+    }
+
+    @Override
+    public String getPageTitle() {
+        try {
+            return getElementText(loginTitle);
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to get login page title", e);
+            {{/if}}
+            return "Login Page";
+        }
+    }
+}

@@ -1,0 +1,84 @@
+{{{{raw}}}}
+pipeline {
+    agent any
+    
+    tools {
+        gradle 'Gradle 8.4'
+        jdk 'JDK 17'
+    }
+    
+    environment {
+        PLAYWRIGHT_BROWSERS_PATH = '0'
+    }
+    
+    parameters {
+        choice(name: 'BROWSER', choices: ['chromium', 'firefox', 'webkit'], description: 'Browser to run tests')
+        booleanParam(name: 'HEADLESS', defaultValue: true, description: 'Run in headless mode')
+        string(name: 'ENVIRONMENT', defaultValue: 'qa', description: 'Test environment')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Install Playwright Browsers') {
+            steps {
+                sh './gradlew installPlaywrightBrowsers --no-daemon'
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                sh """
+                    ./gradlew test \
+                        -Pbrowser=${params.BROWSER} \
+                        -Pheadless=${params.HEADLESS} \
+                        -Penv=${params.ENVIRONMENT} \
+                        --no-daemon
+                """
+            }
+        }
+        
+        stage('Generate Reports') {
+            steps {
+                script {
+                    // TestNG Reports
+                    testNG testResultsPattern: 'build/test-results/test/*.xml'
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Archive test results
+            archiveArtifacts artifacts: 'build/reports/**/*', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'screenshots/**/*', allowEmptyArchive: true
+            
+            // Publish TestNG results
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'build/reports/tests/test',
+                reportFiles: 'index.html',
+                reportName: 'TestNG Report'
+            ])
+            
+            // Clean workspace
+            cleanWs()
+        }
+        
+        failure {
+            echo 'Tests failed! Check the reports for details.'
+        }
+        
+        success {
+            echo 'All tests passed successfully!'
+        }
+    }
+}
+{{{{/raw}}}}

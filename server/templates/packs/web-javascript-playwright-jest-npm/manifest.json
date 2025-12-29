@@ -159,9 +159,7 @@
       "description": "User test data"
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration","conditional": {"utilities.includeDocker": true}
     },
     {
       "path": ".dockerignore",
@@ -185,9 +183,7 @@
       }
     },
     {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose for Playwright testing"
+      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Playwright testing","conditional": {"utilities.includeDockerCompose": true}
     }
   ],
   "directories": [
@@ -198,3 +194,4 @@
     "trace"
   ]
 }
+

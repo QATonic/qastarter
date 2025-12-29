@@ -1,0 +1,267 @@
+{
+  "name": "api-java-restassured-testng-gradle",
+  "displayName": "Java + RestAssured + TestNG + Gradle",
+  "description": "Professional API automation framework with Java, RestAssured, TestNG, and Gradle for REST API testing",
+  "version": "1.0.0",
+  "category": "api-testing",
+  "tags": [
+    "api",
+    "java",
+    "restassured",
+    "testng",
+    "gradle",
+    "automation",
+    "rest"
+  ],
+  "supportsDynamic": true,
+  "toolVersions": {
+    "java": "11+",
+    "gradle": "8.5",
+    "restassured": "5.4.0",
+    "testng": "7.8.0"
+  },
+  "files": [
+    {
+      "path": "build.gradle",
+      "template": "build.gradle.hbs",
+      "isTemplate": true,
+      "description": "Gradle build configuration"
+    },
+    {
+      "path": "settings.gradle",
+      "template": "settings.gradle.hbs",
+      "isTemplate": true,
+      "description": "Gradle settings"
+    },
+    {
+      "path": "gradle.properties",
+      "template": "gradle.properties.hbs",
+      "isTemplate": true,
+      "description": "Gradle properties"
+    },
+    {
+      "path": "gradlew",
+      "template": "gradlew",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Unix)"
+    },
+    {
+      "path": "gradlew.bat",
+      "template": "gradlew.bat",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Windows)"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "template": "gradle/wrapper/gradle-wrapper.properties.hbs",
+      "isTemplate": true,
+      "description": "Gradle wrapper properties"
+    },
+    {
+      "path": "README.md",
+      "template": "README.md.hbs",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".gitignore",
+      "template": ".gitignore",
+      "isTemplate": false,
+      "description": "Git ignore rules"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "template": ".github/workflows/tests.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      },
+      "description": "GitHub Actions workflow"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "template": ".gitlab-ci.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "template": "azure-pipelines.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline"
+    },
+    {
+      "path": ".circleci/config.yml",
+      "template": ".circleci/config.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      },
+      "description": "CircleCI configuration"
+    },
+    {
+      "path": "Jenkinsfile",
+      "template": "Jenkinsfile.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
+      "description": "Jenkins pipeline"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
+      "template": "src/main/java/{{packagePath}}/config/ConfigurationReader.java.hbs",
+      "isTemplate": true,
+      "description": "Configuration reader"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/Environment.java",
+      "template": "src/main/java/{{packagePath}}/config/Environment.java.hbs",
+      "isTemplate": true,
+      "description": "Environment enum"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BaseApiTest.java",
+      "template": "src/main/java/{{packagePath}}/core/BaseApiTest.java.hbs",
+      "isTemplate": true,
+      "description": "Base API test class"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/RequestBuilder.java",
+      "template": "src/main/java/{{packagePath}}/core/RequestBuilder.java.hbs",
+      "isTemplate": true,
+      "description": "Request specification builder"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/endpoints/Endpoints.java",
+      "template": "src/main/java/{{packagePath}}/endpoints/Endpoints.java.hbs",
+      "isTemplate": true,
+      "description": "API endpoints"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/models/User.java",
+      "template": "src/main/java/{{packagePath}}/models/User.java.hbs",
+      "isTemplate": true,
+      "description": "Sample User model"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/JsonUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/JsonUtils.java.hbs",
+      "isTemplate": true,
+      "description": "JSON utilities"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
+      "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
+      "isTemplate": true,
+      "description": "Test data reader"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/Log.java",
+      "template": "src/main/java/{{packagePath}}/utils/Log.java.hbs",
+      "isTemplate": true,
+      "description": "Logger wrapper"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
+      "template": "src/main/java/{{packagePath}}/listeners/TestListener.java.hbs",
+      "isTemplate": true,
+      "description": "TestNG listener"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/UserApiTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/UserApiTests.java.hbs",
+      "isTemplate": true,
+      "description": "Sample API tests"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/SmokeTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/SmokeTests.java.hbs",
+      "isTemplate": true,
+      "description": "API smoke tests"
+    },
+    {
+      "path": "src/main/resources/config/dev.properties",
+      "template": "src/main/resources/config/dev.properties.hbs",
+      "isTemplate": true,
+      "description": "Dev configuration"
+    },
+    {
+      "path": "src/main/resources/config/qa.properties",
+      "template": "src/main/resources/config/qa.properties.hbs",
+      "isTemplate": true,
+      "description": "QA configuration"
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "template": "src/main/resources/log4j2.xml.hbs",
+      "isTemplate": true,
+      "description": "Log4j2 configuration"
+    },
+    {
+      "path": "src/test/resources/testng.xml",
+      "template": "src/test/resources/testng.xml.hbs",
+      "isTemplate": true,
+      "description": "TestNG suite"
+    },
+    {
+      "path": "src/test/resources/testdata/users.json",
+      "template": "src/test/resources/testdata/users.json.hbs",
+      "isTemplate": true,
+      "description": "Test data"
+    },
+    {
+      "path": "src/main/resources/allure.properties",
+      "template": "src/main/resources/allure.properties.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure config"
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "template": "src/main/resources/extent-config.xml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      },
+      "description": "ExtentReports config"
+    }
+  ],
+  "directories": [
+    "reports",
+    "logs"
+  ],
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "restassured",
+    "language": "java",
+    "testRunner": "testng",
+    "buildTool": "gradle"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "testng-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "fluent",
+      "bdd"
+    ]
+  }
+}

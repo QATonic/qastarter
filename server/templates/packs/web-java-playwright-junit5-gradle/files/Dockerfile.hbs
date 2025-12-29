@@ -1,0 +1,26 @@
+FROM mcr.microsoft.com/playwright/java:v{{toolVersions.playwright}}-jammy
+
+WORKDIR /app
+
+# Copy Gradle wrapper and build files
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY gradle.properties .
+
+# Make gradlew executable
+RUN chmod +x gradlew
+
+# Copy source code
+COPY src src
+COPY testng.xml .
+
+# Download dependencies
+RUN ./gradlew dependencies --no-daemon
+
+# Install Playwright browsers
+RUN ./gradlew installPlaywrightBrowsers --no-daemon
+
+# Default command to run tests
+CMD ["./gradlew", "test", "-Pheadless=true", "--no-daemon"]

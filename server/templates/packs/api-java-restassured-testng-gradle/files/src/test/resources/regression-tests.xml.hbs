@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="{{projectName}}_Regression_Suite" parallel="methods" thread-count="4">
+    
+    <parameter name="environment" value="qa"/>
+    
+    <!-- Comprehensive regression testing -->
+    <test name="Full_Regression_Tests" preserve-order="false">
+        <parameter name="environment" value="qa"/>
+        
+        <classes>
+            <class name="{{packageName}}.tests.UserAPITests"/>
+            <class name="{{packageName}}.tests.AuthenticationTests"/>
+            <class name="{{packageName}}.tests.DataDrivenTests"/>
+        </classes>
+        
+        <groups>
+            <run>
+                <include name="regression"/>
+                <include name="api"/>
+                <include name="auth"/>
+                <include name="data-driven"/>
+            </run>
+        </groups>
+    </test>
+    
+    <test name="Performance_Tests" preserve-order="false">
+        <parameter name="environment" value="qa"/>
+        
+        <classes>
+            <class name="{{packageName}}.tests.UserAPITests">
+                <methods>
+                    <include name="testUserAPIPerformance"/>
+                </methods>
+            </class>
+            <class name="{{packageName}}.tests.AuthenticationTests">
+                <methods>
+                    <include name="testAuthenticationPerformance"/>
+                </methods>
+            </class>
+        </classes>
+        
+        <groups>
+            <run>
+                <include name="performance"/>
+            </run>
+        </groups>
+    </test>
+    
+    <listeners>
+        <listener class-name="{{packageName}}.listeners.TestListener"/>
+        <listener class-name="{{packageName}}.listeners.RetryAnalyzer"/>
+    </listeners>
+    
+</suite>

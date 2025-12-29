@@ -1,0 +1,260 @@
+{
+  "name": "desktop-java-winappdriver-testng-gradle",
+  "displayName": "Java + WinAppDriver + TestNG + Gradle",
+  "description": "Professional desktop automation framework with Java, WinAppDriver, TestNG, and Gradle for Windows application testing",
+  "version": "1.0.0",
+  "category": "desktop-testing",
+  "tags": [
+    "desktop",
+    "java",
+    "winappdriver",
+    "testng",
+    "gradle",
+    "automation",
+    "windows"
+  ],
+  "supportsDynamic": true,
+  "toolVersions": {
+    "java": "11+",
+    "gradle": "8.5",
+    "winappdriver": "1.2.1",
+    "testng": "7.8.0"
+  },
+  "files": [
+    {
+      "path": "build.gradle",
+      "template": "build.gradle.hbs",
+      "isTemplate": true,
+      "description": "Gradle build configuration"
+    },
+    {
+      "path": "settings.gradle",
+      "template": "settings.gradle.hbs",
+      "isTemplate": true,
+      "description": "Gradle settings"
+    },
+    {
+      "path": "gradle.properties",
+      "template": "gradle.properties.hbs",
+      "isTemplate": true,
+      "description": "Gradle properties"
+    },
+    {
+      "path": "gradlew",
+      "template": "gradlew",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Unix)"
+    },
+    {
+      "path": "gradlew.bat",
+      "template": "gradlew.bat",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Windows)"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "template": "gradle/wrapper/gradle-wrapper.properties.hbs",
+      "isTemplate": true,
+      "description": "Gradle wrapper properties"
+    },
+    {
+      "path": "README.md",
+      "template": "README.md.hbs",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".gitignore",
+      "template": ".gitignore",
+      "isTemplate": false,
+      "description": "Git ignore rules"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "template": ".github/workflows/tests.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      },
+      "description": "GitHub Actions workflow"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "template": ".gitlab-ci.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "template": "azure-pipelines.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline"
+    },
+    {
+      "path": ".circleci/config.yml",
+      "template": ".circleci/config.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      },
+      "description": "CircleCI configuration"
+    },
+    {
+      "path": "Jenkinsfile",
+      "template": "Jenkinsfile.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
+      "description": "Jenkins pipeline"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
+      "template": "src/main/java/{{packagePath}}/config/ConfigurationReader.java.hbs",
+      "isTemplate": true,
+      "description": "Configuration reader"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/Environment.java",
+      "template": "src/main/java/{{packagePath}}/config/Environment.java.hbs",
+      "isTemplate": true,
+      "description": "Environment enum"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/DriverManager.java",
+      "template": "src/main/java/{{packagePath}}/core/DriverManager.java.hbs",
+      "isTemplate": true,
+      "description": "Driver lifecycle management"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/WinAppDriverFactory.java",
+      "template": "src/main/java/{{packagePath}}/core/WinAppDriverFactory.java.hbs",
+      "isTemplate": true,
+      "description": "WinAppDriver factory"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
+      "template": "src/main/java/{{packagePath}}/core/BaseTest.java.hbs",
+      "isTemplate": true,
+      "description": "Base test class"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/BasePage.java",
+      "template": "src/main/java/{{packagePath}}/pages/BasePage.java.hbs",
+      "isTemplate": true,
+      "description": "Base page class"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/MainWindowPage.java",
+      "template": "src/main/java/{{packagePath}}/pages/MainWindowPage.java.hbs",
+      "isTemplate": true,
+      "description": "Sample main window page"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/WaitUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/WaitUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Wait utilities"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Screenshot utilities"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/Log.java",
+      "template": "src/main/java/{{packagePath}}/utils/Log.java.hbs",
+      "isTemplate": true,
+      "description": "Logger wrapper"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
+      "template": "src/main/java/{{packagePath}}/listeners/TestListener.java.hbs",
+      "isTemplate": true,
+      "description": "TestNG listener"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/DesktopTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/DesktopTests.java.hbs",
+      "isTemplate": true,
+      "description": "Sample desktop tests"
+    },
+    {
+      "path": "src/main/resources/config/dev.properties",
+      "template": "src/main/resources/config/dev.properties.hbs",
+      "isTemplate": true,
+      "description": "Dev configuration"
+    },
+    {
+      "path": "src/main/resources/config/qa.properties",
+      "template": "src/main/resources/config/qa.properties.hbs",
+      "isTemplate": true,
+      "description": "QA configuration"
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "template": "src/main/resources/log4j2.xml.hbs",
+      "isTemplate": true,
+      "description": "Log4j2 configuration"
+    },
+    {
+      "path": "src/test/resources/testng.xml",
+      "template": "src/test/resources/testng.xml.hbs",
+      "isTemplate": true,
+      "description": "TestNG suite"
+    },
+    {
+      "path": "src/main/resources/allure.properties",
+      "template": "src/main/resources/allure.properties.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure config"
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "template": "src/main/resources/extent-config.xml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      },
+      "description": "ExtentReports config"
+    }
+  ],
+  "directories": [
+    "reports",
+    "logs"
+  ],
+  "supportedCombination": {
+    "testingType": "desktop",
+    "framework": "winappdriver",
+    "language": "java",
+    "testRunner": "testng",
+    "buildTool": "gradle"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  }
+}

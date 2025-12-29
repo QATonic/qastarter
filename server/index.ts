@@ -48,23 +48,23 @@ const corsOptions = {
     if (!origin) {
       return callback(null, true);
     }
-    
+
     // In development, allow all origins
     if (isDevelopment) {
       return callback(null, true);
     }
-    
+
     // Production: Check against allowed origins
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
     const replitPatterns = [
       /^https:\/\/.*\.replit\.app$/,
       /^https:\/\/.*\.replit\.dev$/,
     ];
-    
+
     // Check if origin matches any pattern
-    const isAllowed = allowedOrigins.includes(origin) || 
+    const isAllowed = allowedOrigins.includes(origin) ||
       replitPatterns.some(pattern => pattern.test(origin));
-    
+
     if (isAllowed) {
       callback(null, true);
     } else {
@@ -76,18 +76,55 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Response Compression (gzip/deflate)
-// Note: Using standard compression middleware (gzip/deflate only)
-// For brotli support, consider using shrink-ray-current package
+// Request Timeout Middleware - Prevents slow loris attacks
+// Different timeouts for different operations
+const REQUEST_TIMEOUT_MS = 30000; // 30 seconds for regular API
+const GENERATION_TIMEOUT_MS = 60000; // 60 seconds for project generation
+
+app.use((req, res, next) => {
+  // Skip timeout for streaming responses and project generation
+  if (req.path === '/api/generate-project') {
+    req.setTimeout(GENERATION_TIMEOUT_MS);
+    res.setTimeout(GENERATION_TIMEOUT_MS);
+  } else {
+    req.setTimeout(REQUEST_TIMEOUT_MS);
+    res.setTimeout(REQUEST_TIMEOUT_MS);
+  }
+
+  // Handle timeout
+  req.on('timeout', () => {
+    if (!res.headersSent) {
+      res.status(408).json({
+        success: false,
+        error: {
+          code: 'REQUEST_TIMEOUT',
+          message: 'Request timeout - the operation took too long',
+          timestamp: new Date().toISOString()
+        }
+      });
+    }
+  });
+
+  next();
+});
+
+// Response Compression (gzip/deflate with optimized settings)
+// Level 9 provides maximum compression for smaller payloads
 app.use(compression({
   filter: (req, res) => {
+    // Don't compress if client doesn't want it
     if (req.headers['x-no-compression']) {
       return false;
     }
+    // Don't compress streaming responses
+    if (req.path === '/api/generate-project') {
+      return false; // ZIP files are already compressed
+    }
     return compression.filter(req, res);
   },
-  level: 6, // Balance between speed and compression ratio
-  threshold: 1024, // Only compress responses larger than 1KB
+  level: 9, // Maximum compression for smallest payload size
+  threshold: 512, // Compress responses larger than 512 bytes
+  memLevel: 8, // Use more memory for better compression
 }));
 
 // Request body parsing with size limits

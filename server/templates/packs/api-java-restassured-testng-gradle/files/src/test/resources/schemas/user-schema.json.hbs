@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "User Schema",
+  "description": "Schema for user API response validation",
+  "required": ["id", "username", "email"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Unique identifier for the user"
+    },
+    "username": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50,
+      "pattern": "^[a-zA-Z0-9_]+$",
+      "description": "Username must be alphanumeric with underscores, 3-50 characters"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "Valid email address"
+    },
+    "firstName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "description": "User's first name"
+    },
+    "lastName": {
+      "type": "string", 
+      "minLength": 1,
+      "maxLength": 50,
+      "description": "User's last name"
+    },
+    "phone": {
+      "type": ["string", "null"],
+      "pattern": "^\\+?[1-9]\\d{1,14}$",
+      "description": "Phone number in E.164 format"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "admin", "suspended"],
+      "description": "Current status of the user"
+    },
+    "created": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when user was created"
+    },
+    "updated": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Timestamp when user was last updated"
+    }
+  },
+  "additionalProperties": false
+}

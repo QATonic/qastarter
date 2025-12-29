@@ -1,0 +1,114 @@
+name: Mobile Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        platform: [android, ios]
+      fail-fast: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK {{toolVersions.java}}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '{{toolVersions.java}}'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Install Node.js (for Appium)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Appium
+        run: |
+          npm install -g appium@{{toolVersions.appium}}
+          appium driver install uiautomator2
+          appium driver install xcuitest
+
+      {{#if (eq reportingTool "allure")}}
+      - name: Install Allure CLI
+        run: |
+          curl -o allure-{{toolVersions.allure}}.tgz -L https://github.com/allure-framework/allure2/releases/download/{{toolVersions.allure}}/allure-{{toolVersions.allure}}.tgz
+          tar -zxvf allure-{{toolVersions.allure}}.tgz -C $HOME
+          echo "$HOME/allure-{{toolVersions.allure}}/bin" >> $GITHUB_PATH
+
+      {{/if}}
+      - name: Run mobile tests
+        run: mvn clean test -P${{ matrix.platform }}
+        continue-on-error: true
+
+      {{#if (eq reportingTool "allure")}}
+      - name: Generate Allure report
+        if: always()
+        run: allure generate target/allure-results --clean -o target/allure-report
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.platform }}
+          path: target/allure-results
+          retention-days: 30
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ matrix.platform }}
+          path: target/allure-report
+          retention-days: 30
+      {{/if}}
+
+      {{#if (eq reportingTool "extent-reports")}}
+      - name: Upload ExtentReports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-report-${{ matrix.platform }}
+          path: reports/
+          retention-days: 30
+      {{/if}}
+
+      {{#if (eq reportingTool "testng-reports")}}
+      - name: Upload TestNG reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testng-report-${{ matrix.platform }}
+          path: test-output/
+          retention-days: 30
+      {{/if}}
+
+      {{#if (eq reportingTool "junit-reports")}}
+      - name: Generate JUnit HTML report
+        if: always()
+        run: mvn surefire-report:report-only
+
+      - name: Upload JUnit HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report-${{ matrix.platform }}
+          path: target/site/
+          retention-days: 30
+      {{/if}}
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs-${{ matrix.platform }}
+          path: logs/
+          retention-days: 7

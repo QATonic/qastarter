@@ -44,9 +44,7 @@
       "description": "Git ignore patterns"
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration for containerized testing"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
     },
     {
       "path": "Jenkinsfile",
@@ -233,9 +231,7 @@
       "description": "Sample JSON test data file"
     },
     {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose for Playwright testing"
+      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Playwright testing","conditional": {"utilities.includeDockerCompose": true}
     }
   ],
   "directories": [
@@ -270,3 +266,4 @@
     ]
   }
 }
+

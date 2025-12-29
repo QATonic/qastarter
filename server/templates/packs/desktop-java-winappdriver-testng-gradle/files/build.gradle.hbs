@@ -1,0 +1,112 @@
+plugins {
+id 'java'
+id 'jacoco'
+{{#if (eq reportingTool "allure")}}
+id 'io.qameta.allure' version '2.11.2'
+{{/if}}
+}
+
+group = '{{groupId}}'
+version = '1.0.0'
+description = '{{projectName}} - Desktop Automation Framework'
+
+java {
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+}
+
+repositories {
+mavenCentral()
+}
+
+ext {
+seleniumVersion = '4.16.0'
+testngVersion = '7.8.0'
+log4jVersion = '2.20.0'
+{{#if (eq reportingTool "extent-reports")}}
+extentReportsVersion = '5.0.9'
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+allureVersion = '2.24.0'
+{{/if}}
+
+// Test configuration
+appPath = project.hasProperty('appPath') ? project.property('appPath') : ''
+env = project.hasProperty('env') ? project.property('env') : 'dev'
+suite = project.hasProperty('suite') ? project.property('suite') : 'testng.xml'
+}
+
+dependencies {
+// Selenium (WinAppDriver uses Selenium WebDriver protocol)
+implementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+
+// TestNG
+testImplementation "org.testng:testng:${testngVersion}"
+{{#if (eq reportingTool "extent-reports")}}
+
+// ExtentReports
+implementation "com.aventstack:extentreports:${extentReportsVersion}"
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+
+// Allure
+testImplementation "io.qameta.allure:allure-testng:${allureVersion}"
+{{/if}}
+
+// Log4j2
+implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+}
+
+test {
+useTestNG() {
+suites "src/test/resources/${suite}"
+systemProperty 'appPath', appPath
+systemProperty 'env', env
+}
+
+testLogging {
+events "passed", "skipped", "failed"
+exceptionFormat "full"
+}
+
+reports {
+html.required = true
+junitXml.required = true
+}
+}
+
+jacoco {
+toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+dependsOn test
+reports {
+xml.required = true
+html.required = true
+}
+}
+
+clean {
+delete "logs"
+delete "reports"
+delete "screenshots"
+}
+
+wrapper {
+gradleVersion = '8.5'
+distributionType = Wrapper.DistributionType.BIN
+}
+{{#if (eq reportingTool "allure")}}
+
+allure {
+version = '2.24.0'
+autoconfigure = true
+aspectjweaver = true
+useTestNG {
+version = '2.24.0'
+}
+}
+{{/if}}

@@ -1,0 +1,42 @@
+package {{groupId}}.extensions;
+
+import {{groupId}}.core.DriverManager;
+import {{groupId}}.utils.ScreenshotUtils;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestWatcher;
+import org.openqa.selenium.WebDriver;
+
+import java.util.Optional;
+
+/**
+ * JUnit 5 Extension for capturing screenshots on test failure
+ * Implements TestWatcher to hook into test lifecycle
+ */
+public class ScreenshotExtension implements TestWatcher {
+
+    @Override
+    public void testFailed(ExtensionContext context, Throwable cause) {
+        String testName = context.getDisplayName();
+        WebDriver driver = DriverManager.getDriver();
+        
+        if (driver != null) {
+            String screenshotPath = ScreenshotUtils.captureScreenshot(driver, testName);
+            System.out.println("Screenshot saved: " + screenshotPath);
+        }
+    }
+
+    @Override
+    public void testSuccessful(ExtensionContext context) {
+        // Optional: log successful test
+    }
+
+    @Override
+    public void testAborted(ExtensionContext context, Throwable cause) {
+        // Handle aborted tests
+    }
+
+    @Override
+    public void testDisabled(ExtensionContext context, Optional<String> reason) {
+        // Handle disabled tests
+    }
+}

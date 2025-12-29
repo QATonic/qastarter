@@ -146,9 +146,7 @@
       }
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration with Xvfb for headless GUI testing"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration with Xvfb for headless GUI testing","conditional": {"utilities.includeDocker": true}
     }
   ],
   "supportedCombination": {
@@ -177,3 +175,4 @@
     ]
   }
 }
+

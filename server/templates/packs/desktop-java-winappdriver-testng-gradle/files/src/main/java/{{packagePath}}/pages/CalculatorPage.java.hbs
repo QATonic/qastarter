@@ -1,0 +1,522 @@
+package {{groupId}}.pages;
+
+import {{groupId}}.utils.Log;
+import org.openqa.selenium.By;
+
+/**
+ * Sample Windows Calculator page with POM implementation
+ * Demonstrates desktop automation for built-in Windows applications
+ */
+public class CalculatorPage extends BasePage {
+
+    // Calculator element locators using various strategies
+    private final By calculatorTitle = By.name("Calculator");
+    
+    // Number buttons (AutomationId preferred for cross-locale compatibility)
+    private final By button0 = By.accessibilityId("num0Button");
+    private final By button1 = By.accessibilityId("num1Button");
+    private final By button2 = By.accessibilityId("num2Button");
+    private final By button3 = By.accessibilityId("num3Button");
+    private final By button4 = By.accessibilityId("num4Button");
+    private final By button5 = By.accessibilityId("num5Button");
+    private final By button6 = By.accessibilityId("num6Button");
+    private final By button7 = By.accessibilityId("num7Button");
+    private final By button8 = By.accessibilityId("num8Button");
+    private final By button9 = By.accessibilityId("num9Button");
+    
+    // Fallback locators for older Calculator versions
+    private final By button0Fallback = By.name("Zero");
+    private final By button1Fallback = By.name("One");
+    private final By button2Fallback = By.name("Two");
+    private final By button3Fallback = By.name("Three");
+    private final By button4Fallback = By.name("Four");
+    private final By button5Fallback = By.name("Five");
+    private final By button6Fallback = By.name("Six");
+    private final By button7Fallback = By.name("Seven");
+    private final By button8Fallback = By.name("Eight");
+    private final By button9Fallback = By.name("Nine");
+    
+    // Operation buttons (AutomationId preferred)
+    private final By buttonAdd = By.accessibilityId("plusButton");
+    private final By buttonSubtract = By.accessibilityId("minusButton");
+    private final By buttonMultiply = By.accessibilityId("multiplyButton");
+    private final By buttonDivide = By.accessibilityId("divideButton");
+    private final By buttonEquals = By.accessibilityId("equalButton");
+    
+    // Fallback operation locators
+    private final By buttonAddFallback = By.name("Plus");
+    private final By buttonSubtractFallback = By.name("Minus");
+    private final By buttonMultiplyFallback = By.name("Multiply by");
+    private final By buttonDivideFallback = By.name("Divide by");
+    private final By buttonEqualsFallback = By.name("Equals");
+    
+    // Other buttons
+    private final By buttonClear = By.name("Clear");
+    private final By buttonClearEntry = By.name("Clear entry");
+    private final By buttonDecimal = By.name("Decimal separator");
+    private final By buttonPlusMinus = By.name("Plus Minus");
+    
+    // Display
+    private final By displayResult = By.xpath("//Text[@AutomationId='CalculatorResults']");
+    private final By displayExpression = By.xpath("//Text[contains(@Name, 'Display is')]");
+    
+    // Menu and navigation
+    private final By menuButton = By.name("Open Navigation");
+    private final By standardCalculator = By.name("Standard Calculator");
+    private final By scientificCalculator = By.name("Scientific Calculator");
+    private final By programmerCalculator = By.name("Programmer Calculator");
+    
+    // Memory buttons (if available)
+    private final By memoryStore = By.name("Memory store");
+    private final By memoryRecall = By.name("Memory recall");
+    private final By memoryClear = By.name("Memory clear");
+    private final By memoryAdd = By.name("Memory add");
+    private final By memorySubtract = By.name("Memory subtract");
+
+    @Override
+    public String getPageTitle() {
+        return "Calculator";
+    }
+
+    @Override
+    public boolean isPageLoaded() {
+        return isElementDisplayed(calculatorTitle) && isElementDisplayed(displayResult);
+    }
+
+    /**
+     * Click a number button with fallback support
+     * @param number Number to click (0-9)
+     * @return true if clicked successfully
+     */
+    public boolean clickNumber(int number) {
+        By locator = getNumberButtonLocator(number);
+        By fallbackLocator = getNumberButtonFallbackLocator(number);
+        
+        if (locator != null) {
+            // Try primary locator first
+            if (isElementDisplayed(locator)) {
+                boolean clicked = clickElement(locator);
+            if (clicked) {
+                Log.info("Clicked number: " + number);
+            }
+            return clicked;
+        }
+        Log.error("Invalid number: " + number);
+        return false;
+    }
+
+    /**
+     * Get locator for number button
+     * @param number Number (0-9)
+     * @return Button locator or null if invalid
+     */
+    private By getNumberButtonLocator(int number) {
+        switch (number) {
+            case 0: return button0;
+            case 1: return button1;
+            case 2: return button2;
+            case 3: return button3;
+            case 4: return button4;
+            case 5: return button5;
+            case 6: return button6;
+            case 7: return button7;
+            case 8: return button8;
+            case 9: return button9;
+            default: return null;
+        }
+    }
+
+    /**
+     * Click addition button
+     * @return true if clicked successfully
+     */
+    public boolean clickAdd() {
+        boolean clicked = clickElement(buttonAdd);
+        if (clicked) {
+            Log.info("Clicked add button");
+        }
+        return clicked;
+    }
+
+    /**
+     * Click subtraction button
+     * @return true if clicked successfully
+     */
+    public boolean clickSubtract() {
+        boolean clicked = clickElement(buttonSubtract);
+        if (clicked) {
+            Log.info("Clicked subtract button");
+        }
+        return clicked;
+    }
+
+    /**
+     * Click multiplication button
+     * @return true if clicked successfully
+     */
+    public boolean clickMultiply() {
+        boolean clicked = clickElement(buttonMultiply);
+        if (clicked) {
+            Log.info("Clicked multiply button");
+        }
+        return clicked;
+    }
+
+    /**
+     * Click division button
+     * @return true if clicked successfully
+     */
+    public boolean clickDivide() {
+        boolean clicked = clickElement(buttonDivide);
+        if (clicked) {
+            Log.info("Clicked divide button");
+        }
+        return clicked;
+    }
+
+    /**
+     * Click equals button
+     * @return true if clicked successfully
+     */
+    public boolean clickEquals() {
+        boolean clicked = clickElement(buttonEquals);
+        if (clicked) {
+            Log.info("Clicked equals button");
+        }
+        return clicked;
+    }
+
+    /**
+     * Click clear button
+     * @return true if clicked successfully
+     */
+    public boolean clickClear() {
+        boolean clicked = clickElement(buttonClear);
+        if (clicked) {
+            Log.info("Clicked clear button");
+        }
+        return clicked;
+    }
+
+    /**
+     * Click clear entry button
+     * @return true if clicked successfully
+     */
+    public boolean clickClearEntry() {
+        boolean clicked = clickElement(buttonClearEntry);
+        if (clicked) {
+            Log.info("Clicked clear entry button");
+        }
+        return clicked;
+    }
+
+    /**
+     * Click decimal button
+     * @return true if clicked successfully
+     */
+    public boolean clickDecimal() {
+        boolean clicked = clickElement(buttonDecimal);
+        if (clicked) {
+            Log.info("Clicked decimal button");
+        }
+        return clicked;
+    }
+
+    /**
+     * Get current result from display
+     * @return Display result text or null if not found
+     */
+    public String getDisplayResult() {
+        String result = getElementText(displayResult);
+        if (result != null) {
+            // Clean up the result (remove "Display is" prefix if present)
+            result = result.replaceAll("Display is\\s*", "").trim();
+            Log.info("Display result: " + result);
+        }
+        return result;
+    }
+
+    /**
+     * Get current expression from display
+     * @return Display expression or null if not found
+     */
+    public String getDisplayExpression() {
+        String expression = getElementText(displayExpression);
+        if (expression != null) {
+            Log.info("Display expression: " + expression);
+        }
+        return expression;
+    }
+
+    /**
+     * Perform simple arithmetic operation
+     * @param firstNumber First number
+     * @param operation Operation (+, -, *, /)
+     * @param secondNumber Second number
+     * @return Result of the calculation or null if failed
+     */
+    public String performCalculation(int firstNumber, String operation, int secondNumber) {
+        Log.info("Performing calculation: " + firstNumber + " " + operation + " " + secondNumber);
+        
+        // Clear calculator first
+        if (!clickClear()) {
+            Log.error("Failed to clear calculator");
+            return null;
+        }
+        
+        // Enter first number
+        if (!enterNumber(firstNumber)) {
+            Log.error("Failed to enter first number: " + firstNumber);
+            return null;
+        }
+        
+        // Click operation
+        boolean operationClicked = false;
+        switch (operation) {
+            case "+":
+                operationClicked = clickAdd();
+                break;
+            case "-":
+                operationClicked = clickSubtract();
+                break;
+            case "*":
+                operationClicked = clickMultiply();
+                break;
+            case "/":
+                operationClicked = clickDivide();
+                break;
+            default:
+                Log.error("Invalid operation: " + operation);
+                return null;
+        }
+        
+        if (!operationClicked) {
+            Log.error("Failed to click operation: " + operation);
+            return null;
+        }
+        
+        // Enter second number
+        if (!enterNumber(secondNumber)) {
+            Log.error("Failed to enter second number: " + secondNumber);
+            return null;
+        }
+        
+        // Click equals
+        if (!clickEquals()) {
+            Log.error("Failed to click equals");
+            return null;
+        }
+        
+        // Wait a moment for calculation to complete
+        waitFor(500);
+        
+        // Get result
+        String result = getDisplayResult();
+        Log.info("Calculation result: " + result);
+        return result;
+    }
+
+    /**
+     * Enter a multi-digit number
+     * @param number Number to enter
+     * @return true if entered successfully
+     */
+    public boolean enterNumber(int number) {
+        String numberStr = String.valueOf(number);
+        
+        for (char digit : numberStr.toCharArray()) {
+            int digitValue = Character.getNumericValue(digit);
+            if (!clickNumber(digitValue)) {
+                Log.error("Failed to enter digit: " + digit);
+                return false;
+            }
+            // Small delay between digits
+            waitFor(100);
+        }
+        
+        Log.info("Entered number: " + number);
+        return true;
+    }
+
+    /**
+     * Enter decimal number
+     * @param wholePart Whole number part
+     * @param decimalPart Decimal part (without decimal point)
+     * @return true if entered successfully
+     */
+    public boolean enterDecimalNumber(int wholePart, int decimalPart) {
+        // Enter whole part
+        if (!enterNumber(wholePart)) {
+            return false;
+        }
+        
+        // Click decimal
+        if (!clickDecimal()) {
+            return false;
+        }
+        
+        // Enter decimal part
+        if (!enterNumber(decimalPart)) {
+            return false;
+        }
+        
+        Log.info("Entered decimal number: " + wholePart + "." + decimalPart);
+        return true;
+    }
+
+    /**
+     * Switch calculator mode
+     * @param mode Calculator mode (standard, scientific, programmer)
+     * @return true if switched successfully
+     */
+    public boolean switchMode(String mode) {
+        // Open navigation menu
+        if (!clickElement(menuButton)) {
+            Log.error("Failed to open navigation menu");
+            return false;
+        }
+        
+        // Wait for menu to open
+        waitFor(500);
+        
+        // Click appropriate mode
+        boolean clicked = false;
+        switch (mode.toLowerCase()) {
+            case "standard":
+                clicked = clickElement(standardCalculator);
+                break;
+            case "scientific":
+                clicked = clickElement(scientificCalculator);
+                break;
+            case "programmer":
+                clicked = clickElement(programmerCalculator);
+                break;
+            default:
+                Log.error("Invalid calculator mode: " + mode);
+                return false;
+        }
+        
+        if (clicked) {
+            Log.info("Switched to " + mode + " calculator mode");
+            waitFor(1000); // Wait for mode switch to complete
+        }
+        
+        return clicked;
+    }
+
+    /**
+     * Store value in memory
+     * @return true if stored successfully
+     */
+    public boolean storeInMemory() {
+        boolean clicked = clickElement(memoryStore);
+        if (clicked) {
+            Log.info("Stored value in memory");
+        }
+        return clicked;
+    }
+
+    /**
+     * Recall value from memory
+     * @return true if recalled successfully
+     */
+    public boolean recallFromMemory() {
+        boolean clicked = clickElement(memoryRecall);
+        if (clicked) {
+            Log.info("Recalled value from memory");
+        }
+        return clicked;
+    }
+
+    /**
+     * Clear memory
+     * @return true if cleared successfully
+     */
+    public boolean clearMemory() {
+        boolean clicked = clickElement(memoryClear);
+        if (clicked) {
+            Log.info("Cleared memory");
+        }
+        return clicked;
+    }
+
+    /**
+     * Verify calculation result
+     * @param expectedResult Expected result
+     * @return true if result matches expected value
+     */
+    public boolean verifyResult(String expectedResult) {
+        String actualResult = getDisplayResult();
+        if (actualResult != null && actualResult.equals(expectedResult)) {
+            Log.info("Result verification passed. Expected: " + expectedResult + ", Actual: " + actualResult);
+            return true;
+        } else {
+            Log.error("Result verification failed. Expected: " + expectedResult + ", Actual: " + actualResult);
+            return false;
+        }
+    }
+
+    /**
+     * Verify calculation result with tolerance for floating point numbers
+     * @param expectedResult Expected result
+     * @param tolerance Tolerance for comparison
+     * @return true if result is within tolerance
+     */
+    public boolean verifyResult(double expectedResult, double tolerance) {
+        String resultText = getDisplayResult();
+        if (resultText == null) {
+            Log.error("Could not get display result for verification");
+            return false;
+        }
+        
+        try {
+            double actualResult = Double.parseDouble(resultText);
+            double difference = Math.abs(actualResult - expectedResult);
+            
+            if (difference <= tolerance) {
+                Log.info("Result verification passed within tolerance. Expected: " + expectedResult + 
+                        ", Actual: " + actualResult + ", Difference: " + difference);
+                return true;
+            } else {
+                Log.error("Result verification failed. Expected: " + expectedResult + 
+                         ", Actual: " + actualResult + ", Difference: " + difference + 
+                         ", Tolerance: " + tolerance);
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            Log.error("Could not parse result as number: " + resultText);
+            return false;
+        }
+    }
+
+    /**
+     * Check if calculator is in error state
+     * @return true if calculator shows error
+     */
+    public boolean isInErrorState() {
+        String result = getDisplayResult();
+        return result != null && (result.contains("Error") || result.contains("Cannot divide by zero"));
+    }
+
+    /**
+     * Reset calculator to clean state
+     * @return true if reset successfully
+     */
+    public boolean resetCalculator() {
+        // Clear display
+        if (!clickClear()) {
+            return false;
+        }
+        
+        // Clear memory if available
+        try {
+            clearMemory();
+        } catch (Exception e) {
+            // Memory operations might not be available in all modes
+            Log.debug("Memory clear not available or failed: " + e.getMessage());
+        }
+        
+        Log.info("Calculator reset to clean state");
+        return true;
+    }
+}

@@ -1,0 +1,123 @@
+package {{packageName}}.utils;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * Logger wrapper for consistent logging across mobile automation framework
+ * Provides convenient methods for different log levels
+ */
+public class Log {
+
+    private static final Logger logger = LogManager.getLogger(Log.class);
+
+    /**
+     * Log info message
+     * 
+     * @param message Info message
+     */
+    public static void info(String message) {
+        logger.info(message);
+    }
+
+    /**
+     * Log debug message
+     * 
+     * @param message Debug message
+     */
+    public static void debug(String message) {
+        logger.debug(message);
+    }
+
+    /**
+     * Log warning message
+     * 
+     * @param message Warning message
+     */
+    public static void warn(String message) {
+        logger.warn(message);
+    }
+
+    /**
+     * Log error message
+     * 
+     * @param message Error message
+     */
+    public static void error(String message) {
+        logger.error(message);
+    }
+
+    /**
+     * Log error message with exception
+     * 
+     * @param message Error message
+     * @param throwable Exception details
+     */
+    public static void error(String message, Throwable throwable) {
+        logger.error(message, throwable);
+    }
+
+    /**
+     * Log fatal message
+     * 
+     * @param message Fatal message
+     */
+    public static void fatal(String message) {
+        logger.fatal(message);
+    }
+
+    /**
+     * Log fatal message with exception
+     * 
+     * @param message Fatal message
+     * @param throwable Exception details
+     */
+    public static void fatal(String message, Throwable throwable) {
+        logger.fatal(message, throwable);
+    }
+
+    /**
+     * Start test logging
+     * 
+     * @param testName Name of the test starting
+     */
+    public static void startTest(String testName) {
+        info("========== STARTING TEST: " + testName + " ==========");
+    }
+
+    /**
+     * End test logging
+     * 
+     * @param testName Name of the test ending
+     */
+    public static void endTest(String testName) {
+        info("========== ENDING TEST: " + testName + " ==========");
+    }
+
+    /**
+     * Log step information
+     * 
+     * @param stepDescription Description of the test step
+     */
+    public static void step(String stepDescription) {
+        info("STEP: " + stepDescription);
+    }
+
+    /**
+     * Log action information
+     * 
+     * @param action Description of the action being performed
+     */
+    public static void action(String action) {
+        info("ACTION: " + action);
+    }
+
+    /**
+     * Log verification information
+     * 
+     * @param verification Description of the verification being performed
+     */
+    public static void verification(String verification) {
+        info("VERIFICATION: " + verification);
+    }
+}

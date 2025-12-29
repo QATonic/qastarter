@@ -1,0 +1,278 @@
+package {{packageName}}.utils;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+import {{packageName}}.config.ConfigurationReader;
+
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * ExtentReports configuration and management for API testing
+ * Provides comprehensive test reporting for REST API automation
+ */
+public class ExtentManager {
+
+    private static ExtentReports extentReports;
+    private static final ThreadLocal<ExtentTest> extentTest = new ThreadLocal<>();
+    private static final String REPORTS_PATH = ConfigurationReader.getProperty("reports.base.path", "reports");
+    private static final String REPORT_NAME = ConfigurationReader.getProperty("extent.report.name", "API_Automation_Report");
+    private static final String REPORT_TITLE = ConfigurationReader.getProperty("extent.report.title", "REST API Test Automation Report");
+
+    /**
+     * Initialize ExtentReports with configuration
+     */
+    public static synchronized void initializeExtentReports() {
+        if (extentReports == null) {
+            // Create reports directory
+            createReportsDirectory();
+            
+            // Generate report file name with timestamp
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+            String reportFileName = REPORTS_PATH + "/" + REPORT_NAME + "_" + timestamp + ".html";
+            
+            // Configure ExtentSparkReporter
+            ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportFileName);
+            configureSparkReporter(sparkReporter);
+            
+            // Initialize ExtentReports
+            extentReports = new ExtentReports();
+            extentReports.attachReporter(sparkReporter);
+            setSystemInformation();
+        }
+    }
+
+    /**
+     * Configure ExtentSparkReporter with custom settings
+     * 
+     * @param sparkReporter ExtentSparkReporter instance
+     */
+    private static void configureSparkReporter(ExtentSparkReporter sparkReporter) {
+        sparkReporter.config().setDocumentTitle(REPORT_TITLE);
+        sparkReporter.config().setReportName(REPORT_TITLE);
+        sparkReporter.config().setTheme(Theme.STANDARD);
+        sparkReporter.config().setTimeStampFormat("yyyy-MM-dd HH:mm:ss");
+        sparkReporter.config().setEncoding("utf-8");
+        
+        // Custom CSS for API testing
+        sparkReporter.config().setCss(
+            ".badge-primary { background-color: #007bff; } " +
+            ".badge-success { background-color: #28a745; } " +
+            ".badge-danger { background-color: #dc3545; } " +
+            ".badge-warning { background-color: #ffc107; color: #212529; } " +
+            ".api-request { background-color: #e7f3ff; padding: 10px; border-left: 4px solid #007bff; margin: 10px 0; } " +
+            ".api-response { background-color: #f0f8f0; padding: 10px; border-left: 4px solid #28a745; margin: 10px 0; }"
+        );
+    }
+
+    /**
+     * Set system information in the report
+     */
+    private static void setSystemInformation() {
+        extentReports.setSystemInfo("Framework", "REST Assured API Automation");
+        extentReports.setSystemInfo("Author", "QAStarter Generated Framework");
+        extentReports.setSystemInfo("Java Version", System.getProperty("java.version"));
+        extentReports.setSystemInfo("OS", System.getProperty("os.name"));
+        extentReports.setSystemInfo("User", System.getProperty("user.name"));
+        extentReports.setSystemInfo("Environment", ConfigurationReader.getEnvironment());
+        extentReports.setSystemInfo("API Base URL", ConfigurationReader.getProperty("api.base.url"));
+    }
+
+    /**
+     * Create a new test entry in the report
+     * 
+     * @param testName Name of the test
+     * @param description Description of the test
+     * @return ExtentTest instance
+     */
+    public static ExtentTest createTest(String testName, String description) {
+        ExtentTest test = extentReports.createTest(testName, description);
+        extentTest.set(test);
+        return test;
+    }
+
+    /**
+     * Create a new test entry with category
+     * 
+     * @param testName Name of the test
+     * @param description Description of the test
+     * @param category Test category (e.g., "API", "Authentication")
+     * @return ExtentTest instance
+     */
+    public static ExtentTest createTest(String testName, String description, String category) {
+        ExtentTest test = extentReports.createTest(testName, description);
+        test.assignCategory(category);
+        extentTest.set(test);
+        return test;
+    }
+
+    /**
+     * Get current test instance
+     * 
+     * @return Current ExtentTest instance
+     */
+    public static ExtentTest getTest() {
+        return extentTest.get();
+    }
+
+    /**
+     * Log info message to current test
+     * 
+     * @param message Info message
+     */
+    public static void logInfo(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.INFO, message);
+        }
+    }
+
+    /**
+     * Log pass message to current test
+     * 
+     * @param message Pass message
+     */
+    public static void logPass(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.PASS, message);
+        }
+    }
+
+    /**
+     * Log fail message to current test
+     * 
+     * @param message Fail message
+     */
+    public static void logFail(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.FAIL, message);
+        }
+    }
+
+    /**
+     * Log fail message with exception to current test
+     * 
+     * @param message Fail message
+     * @param throwable Exception details
+     */
+    public static void logFail(String message, Throwable throwable) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.FAIL, message);
+            test.log(Status.FAIL, throwable);
+        }
+    }
+
+    /**
+     * Log skip message to current test
+     * 
+     * @param message Skip message
+     */
+    public static void logSkip(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.SKIP, message);
+        }
+    }
+
+    /**
+     * Log warning message to current test
+     * 
+     * @param message Warning message
+     */
+    public static void logWarning(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.WARNING, message);
+        }
+    }
+
+    /**
+     * Log API request details
+     * 
+     * @param method HTTP method
+     * @param endpoint API endpoint
+     * @param requestBody Request body (can be null)
+     */
+    public static void logAPIRequest(String method, String endpoint, String requestBody) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            String requestDetails = "<div class='api-request'>" +
+                                  "<b>API REQUEST:</b><br>" +
+                                  "<b>Method:</b> " + method + "<br>" +
+                                  "<b>Endpoint:</b> " + endpoint;
+            
+            if (requestBody != null && !requestBody.isEmpty()) {
+                requestDetails += "<br><b>Request Body:</b><br><pre>" + requestBody + "</pre>";
+            }
+            
+            requestDetails += "</div>";
+            test.log(Status.INFO, requestDetails);
+        }
+    }
+
+    /**
+     * Log API response details
+     * 
+     * @param statusCode Response status code
+     * @param responseTime Response time in milliseconds
+     * @param responseBody Response body (can be null)
+     */
+    public static void logAPIResponse(int statusCode, long responseTime, String responseBody) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            String responseDetails = "<div class='api-response'>" +
+                                   "<b>API RESPONSE:</b><br>" +
+                                   "<b>Status Code:</b> " + statusCode + "<br>" +
+                                   "<b>Response Time:</b> " + responseTime + "ms";
+            
+            if (responseBody != null && !responseBody.isEmpty()) {
+                responseDetails += "<br><b>Response Body:</b><br><pre>" + responseBody + "</pre>";
+            }
+            
+            responseDetails += "</div>";
+            test.log(Status.INFO, responseDetails);
+        }
+    }
+
+    /**
+     * Create reports directory if it doesn't exist
+     */
+    private static void createReportsDirectory() {
+        File reportsDir = new File(REPORTS_PATH);
+        if (!reportsDir.exists()) {
+            reportsDir.mkdirs();
+        }
+    }
+
+    /**
+     * Flush and generate the report
+     */
+    public static synchronized void flushReports() {
+        if (extentReports != null) {
+            extentReports.flush();
+        }
+    }
+
+    /**
+     * Remove current test from thread local
+     */
+    public static void removeTest() {
+        extentTest.remove();
+    }
+
+    /**
+     * Get ExtentReports instance
+     * 
+     * @return ExtentReports instance
+     */
+    public static ExtentReports getExtentReports() {
+        return extentReports;
+    }
+}

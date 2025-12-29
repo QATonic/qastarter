@@ -38,8 +38,8 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
               Overview
             </h3>
             <p className="text-muted-foreground leading-relaxed">
-              QAStarter is a free, web-based application designed to simplify the setup of QA automation projects. 
-              Similar to Spring Initializr but tailored for quality assurance engineers, it provides a wizard-based 
+              QAStarter is a free, web-based application designed to simplify the setup of QA automation projects.
+              Similar to Spring Initializr but tailored for quality assurance engineers, it provides a wizard-based
               interface for configuring and generating complete QA automation project structures.
             </p>
           </div>
@@ -79,21 +79,6 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
                   <div className="text-xs text-muted-foreground">GitHub Actions, Azure DevOps, Jenkins</div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Technology Stack */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Technology Stack</h3>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">React</Badge>
-              <Badge variant="secondary">TypeScript</Badge>
-              <Badge variant="secondary">Express.js</Badge>
-              <Badge variant="secondary">Node.js</Badge>
-              <Badge variant="secondary">Tailwind CSS</Badge>
-              <Badge variant="secondary">Shadcn/ui</Badge>
-              <Badge variant="secondary">Zod</Badge>
-              <Badge variant="secondary">TanStack Query</Badge>
             </div>
           </div>
 
@@ -137,12 +122,12 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
               <h3 className="text-lg font-semibold">Our Mission</h3>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Empowering QA engineers worldwide with professional-grade automation tools. 
+              Empowering QA engineers worldwide with professional-grade automation tools.
               We believe quality assurance should be accessible, efficient, and enjoyable for everyone.
             </p>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center p-3 bg-background/50 rounded-lg">
-                <div className="text-2xl font-bold text-primary">34+</div>
+                <div className="text-2xl font-bold text-primary">39+</div>
                 <div className="text-xs text-muted-foreground">Templates</div>
               </div>
               <div className="text-center p-3 bg-background/50 rounded-lg">

@@ -1,0 +1,59 @@
+trigger:
+  - main
+  - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  BROWSER: 'chromium'
+  HEADLESS: 'true'
+  ENV: 'qa'
+
+stages:
+  - stage: Test
+    displayName: 'Run Playwright Tests'
+    jobs:
+      - job: PlaywrightTests
+        displayName: 'Playwright Tests'
+        steps:
+          - task: JavaToolInstaller@0
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - script: |
+              chmod +x gradlew
+              ./gradlew installPlaywrightBrowsers --no-daemon
+            displayName: 'Install Playwright Browsers'
+
+          - script: |
+              ./gradlew test \
+                -Pbrowser=$(BROWSER) \
+                -Pheadless=$(HEADLESS) \
+                -Penv=$(ENV) \
+                --no-daemon
+            displayName: 'Run Tests'
+            continueOnError: true
+
+          - task: PublishTestResults@2
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/build/test-results/test/*.xml'
+              failTaskOnFailedTests: true
+            displayName: 'Publish Test Results'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: 'build/reports'
+              artifactName: 'TestReports'
+            displayName: 'Publish Test Reports'
+            condition: always()
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: 'screenshots'
+              artifactName: 'Screenshots'
+            displayName: 'Publish Screenshots'
+            condition: always()

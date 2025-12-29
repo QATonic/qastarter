@@ -1,0 +1,79 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to run tests'
+        required: true
+        default: 'chromium'
+        type: choice
+        options:
+          - chromium
+          - firefox
+          - webkit
+      environment:
+        description: 'Test environment'
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+      
+      - name: Install Playwright Browsers
+        run: ./gradlew installPlaywrightBrowsers --no-daemon
+      
+      - name: Run Tests
+        run: |
+          ./gradlew test \
+            -Pbrowser=${{ github.event.inputs.browser || 'chromium' }} \
+            -Pheadless=true \
+            -Penv=${{ github.event.inputs.environment || 'qa' }} \
+            --no-daemon
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            build/reports/
+            build/test-results/
+      
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: screenshots
+          path: screenshots/
+      
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v4
+        if: always()
+        with:
+          report_paths: 'build/test-results/test/*.xml'

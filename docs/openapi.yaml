@@ -1,0 +1,460 @@
+openapi: 3.0.3
+info:
+  title: QAStarter API
+  description: |
+    API for generating QA automation project structures.
+    
+    QAStarter supports multiple testing frameworks, languages, and build tools
+    to generate complete project templates ready for test automation.
+  version: 1.0.0
+  contact:
+    name: QAStarter Team
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: https://qastarter.replit.app
+    description: Production server
+
+tags:
+  - name: Metadata
+    description: Available options and configuration
+  - name: Generation
+    description: Project generation endpoints
+  - name: Validation
+    description: Configuration validation
+
+paths:
+  /api/v1/metadata:
+    get:
+      tags:
+        - Metadata
+      summary: Get available options
+      description: Returns all available testing types, frameworks, languages, and tools
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetadataResponse'
+              example:
+                success: true
+                data:
+                  version: "1.0.0"
+                  testingTypes:
+                    - id: "web"
+                      label: "Web Testing"
+                      frameworks: ["selenium", "playwright", "cypress"]
+                  frameworks:
+                    - id: "playwright"
+                      label: "Playwright"
+                      languages: ["javascript", "typescript", "python", "java"]
+
+  /api/v1/config/options:
+    get:
+      tags:
+        - Metadata
+      summary: Get wizard configuration options
+      description: Returns configuration options for the project wizard
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigOptionsResponse'
+
+  /api/v1/config/filters:
+    get:
+      tags:
+        - Metadata
+      summary: Get compatibility filters
+      description: Returns framework/language compatibility rules
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FiltersResponse'
+
+  /api/v1/generate:
+    get:
+      tags:
+        - Generation
+      summary: Generate project (GET)
+      description: Generate a project using query parameters. Ideal for CLI/curl usage.
+      parameters:
+        - name: projectName
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Name of the project
+        - name: testingType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [web, api, mobile, desktop]
+            default: web
+        - name: framework
+          in: query
+          required: false
+          schema:
+            type: string
+            default: selenium
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+            default: java
+        - name: testRunner
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: buildTool
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: testingPattern
+          in: query
+          required: false
+          schema:
+            type: string
+            default: page-object-model
+        - name: cicdTool
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: reportingTool
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: utilities
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Comma-separated list of utilities
+        - name: includeSampleTests
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: ZIP file containing generated project
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+
+  /api/generate-project:
+    post:
+      tags:
+        - Generation
+      summary: Generate project (POST)
+      description: Generate a project using JSON body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectConfig'
+            example:
+              projectName: "my-test-project"
+              testingType: "web"
+              framework: "playwright"
+              language: "typescript"
+              testingPattern: "pom"
+              testRunner: "playwright-test"
+              buildTool: "npm"
+              cicdTool: ""
+              reportingTool: ""
+              utilities: {}
+      responses:
+        '200':
+          description: ZIP file containing generated project
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+
+  /api/project-preview:
+    post:
+      tags:
+        - Generation
+      summary: Preview project structure
+      description: Returns file structure without generating the project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectConfig'
+      responses:
+        '200':
+          description: Project preview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/validate-config:
+    post:
+      tags:
+        - Validation
+      summary: Validate configuration
+      description: Check if a configuration is valid without generating
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectConfig'
+      responses:
+        '200':
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isValid:
+                    type: boolean
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        field:
+                          type: string
+                        message:
+                          type: string
+
+  /api/stats:
+    get:
+      tags:
+        - Metadata
+      summary: Get generation statistics
+      description: Returns project generation analytics
+      responses:
+        '200':
+          description: Statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+
+components:
+  schemas:
+    ProjectConfig:
+      type: object
+      required:
+        - projectName
+        - testingType
+        - framework
+        - language
+        - testRunner
+        - buildTool
+        - testingPattern
+      properties:
+        projectName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        testingType:
+          type: string
+          enum: [web, api, mobile, desktop]
+        framework:
+          type: string
+        language:
+          type: string
+        testRunner:
+          type: string
+        buildTool:
+          type: string
+        testingPattern:
+          type: string
+        cicdTool:
+          type: string
+        reportingTool:
+          type: string
+        groupId:
+          type: string
+        artifactId:
+          type: string
+        utilities:
+          type: object
+          properties:
+            configReader:
+              type: boolean
+            jsonReader:
+              type: boolean
+            screenshotUtility:
+              type: boolean
+            logger:
+              type: boolean
+            dataProvider:
+              type: boolean
+        includeSampleTests:
+          type: boolean
+          default: true
+
+    MetadataResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            version:
+              type: string
+            testingTypes:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  label:
+                    type: string
+                  frameworks:
+                    type: array
+                    items:
+                      type: string
+            frameworks:
+              type: array
+              items:
+                type: object
+            languages:
+              type: array
+              items:
+                type: object
+            testRunners:
+              type: array
+              items:
+                type: object
+            buildTools:
+              type: array
+              items:
+                type: object
+
+    ConfigOptionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+        timestamp:
+          type: string
+        requestId:
+          type: string
+
+    FiltersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+
+    PreviewResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            projectStructure:
+              type: array
+            sampleFiles:
+              type: array
+            totalFiles:
+              type: integer
+            estimatedSize:
+              type: integer
+            keyFiles:
+              type: array
+            dependencyCount:
+              type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+            requestId:
+              type: string
+            timestamp:
+              type: string
+
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "VALIDATION_ERROR"
+              message: "Invalid project configuration"
+              requestId: "gen-1234567890"
+              timestamp: "2024-12-29T00:00:00.000Z"
+
+    RateLimitError:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: "RATE_LIMIT_EXCEEDED"
+              message: "Too many requests, please try again later"

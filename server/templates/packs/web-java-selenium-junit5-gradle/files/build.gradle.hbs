@@ -1,0 +1,196 @@
+plugins {
+id 'java'
+id 'jacoco'
+{{#if (eq reportingTool "allure")}}
+id 'io.qameta.allure' version '2.11.2'
+{{/if}}
+}
+
+group = '{{groupId}}'
+version = '1.0.0'
+description = '{{projectName}}'
+
+java {
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+}
+
+repositories {
+mavenCentral()
+}
+
+ext {
+// Dependency versions
+seleniumVersion = '4.16.0'
+junitVersion = '5.10.0'
+log4jVersion = '2.20.0'
+{{#if (eq reportingTool "extent-reports")}}
+extentReportsVersion = '5.0.9'
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+allureVersion = '2.24.0'
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+cucumberVersion = '7.14.0'
+{{/if}}
+jacksonVersion = '2.15.2'
+commonsCsvVersion = '1.10.0'
+
+// Test configuration
+browser = project.hasProperty('browser') ? project.property('browser') : 'chrome'
+headless = project.hasProperty('headless') ? project.property('headless') : 'false'
+env = project.hasProperty('env') ? project.property('env') : 'dev'
+parallel = project.hasProperty('parallel') ? project.property('parallel') : 'false'
+threadCount = project.hasProperty('threadCount') ? project.property('threadCount') : '1'
+}
+
+dependencies {
+// Selenium WebDriver
+implementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+
+// JUnit 5
+testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+testImplementation "org.junit.platform:junit-platform-suite:1.10.0"
+{{#if (eq reportingTool "extent-reports")}}
+
+// ExtentReports
+implementation "com.aventstack:extentreports:${extentReportsVersion}"
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+
+// Allure
+testImplementation "io.qameta.allure:allure-junit5:${allureVersion}"
+{{#if (eq testingPattern "bdd")}}
+testImplementation "io.qameta.allure:allure-cucumber7-jvm:${allureVersion}"
+{{/if}}
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+
+// Cucumber BDD
+testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+testImplementation "io.cucumber:cucumber-junit-platform-engine:${cucumberVersion}"
+{{/if}}
+
+// Log4j2
+implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+
+// JSON Processing
+implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+
+// CSV Processing
+implementation "org.apache.commons:commons-csv:${commonsCsvVersion}"
+}
+
+// Test task configuration
+test {
+useJUnitPlatform() {
+// Include/exclude tests by tag
+includeTags 'smoke', 'regression', 'integration'
+excludeTags 'slow'
+}
+
+// System properties for test execution
+systemProperty 'browser', browser
+systemProperty 'headless', headless
+systemProperty 'env', env
+
+// Configure parallel execution
+if ((project.findProperty('parallel') ?: 'false') == 'true') {
+systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
+systemProperty 'junit.jupiter.execution.parallel.mode.default', 'concurrent'
+maxParallelForks = Integer.parseInt(project.findProperty('threadCount') ?: '1')
+}
+
+// Test output
+testLogging {
+events "passed", "skipped", "failed"
+exceptionFormat "full"
+}
+
+// Generate reports
+reports {
+html.required = true
+junitXml.required = true
+}
+
+// Fail build on test failures
+ignoreFailures = false
+
+// JVM settings
+jvmArgs = ['-Xmx1024m']
+
+// Clean reports before test
+doFirst {
+delete fileTree(dir: "reports", include: "**/*")
+delete fileTree(dir: "test-output", include: "**/*")
+}
+}
+
+// Custom task for running smoke tests
+task smokeTest(type: Test) {
+useJUnitPlatform() {
+includeTags 'smoke'
+}
+systemProperty 'browser', browser
+systemProperty 'headless', headless
+systemProperty 'env', env
+}
+
+// Custom task for running regression tests
+task regressionTest(type: Test) {
+useJUnitPlatform() {
+includeTags 'regression'
+}
+maxParallelForks = Integer.parseInt(project.findProperty('threadCount') ?: '3')
+systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
+systemProperty 'browser', browser
+systemProperty 'headless', headless
+systemProperty 'env', env
+}
+
+// Code coverage with JaCoCo
+jacoco {
+toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+dependsOn test
+reports {
+xml.required = true
+csv.required = false
+html.required = true
+}
+}
+
+// Clean task enhancement
+clean {
+delete "logs"
+delete "reports"
+delete "test-output"
+delete "screenshots"
+}
+
+// Gradle wrapper task
+wrapper {
+gradleVersion = '8.4'
+distributionType = Wrapper.DistributionType.BIN
+}
+{{#if (eq reportingTool "allure")}}
+
+// Allure configuration
+allure {
+version = '2.24.0'
+autoconfigure = true
+aspectjweaver = true
+
+useJUnit5 {
+version = '2.24.0'
+}
+}
+{{/if}}

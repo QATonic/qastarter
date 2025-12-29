@@ -1,0 +1,147 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.extensions.ScreenshotExtension;
+import {{javaPackage}}.utils.Log;
+import com.microsoft.playwright.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+/**
+* Base test class with common setup and teardown methods for Playwright.
+* All test classes should extend this class.
+*/
+@ExtendWith(ScreenshotExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class BaseTest {
+
+protected static Playwright playwright;
+protected static Browser browser;
+protected BrowserContext context;
+protected Page page;
+
+@BeforeAll
+static void beforeAll() {
+Log.startSection("TEST SUITE SETUP");
+Log.info("Environment: " + ConfigurationReader.getCurrentEnvironment());
+Log.info("Base URL: " + ConfigurationReader.getBaseUrl());
+Log.info("Browser: " + ConfigurationReader.getBrowser());
+Log.info("Headless: " + ConfigurationReader.isHeadless());
+
+playwright = Playwright.create();
+
+BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions()
+.setHeadless(ConfigurationReader.isHeadless());
+
+String browserType = ConfigurationReader.getBrowser();
+switch (browserType.toLowerCase()) {
+case "firefox":
+browser = playwright.firefox().launch(launchOptions);
+break;
+case "webkit":
+browser = playwright.webkit().launch(launchOptions);
+break;
+default:
+browser = playwright.chromium().launch(launchOptions);
+}
+
+Log.endSection();
+}
+
+@AfterAll
+static void afterAll() {
+Log.startSection("TEST SUITE TEARDOWN");
+if (browser != null) {
+browser.close();
+}
+if (playwright != null) {
+playwright.close();
+}
+Log.info("Test suite execution completed");
+Log.endSection();
+}
+
+@BeforeEach
+void setUp() {
+Log.info("Setting up test method");
+context = browser.newContext();
+page = context.newPage();
+PlaywrightManager.setPage(page);
+
+// Navigate to base URL if configured
+String baseUrl = ConfigurationReader.getBaseUrl();
+if (baseUrl != null && !baseUrl.isEmpty()) {
+page.navigate(baseUrl);
+Log.info("Navigated to base URL: " + baseUrl);
+}
+}
+
+@AfterEach
+void tearDown() {
+Log.info("Tearing down test method");
+if (context != null) {
+context.close();
+}
+}
+
+/**
+* Navigate to specific URL
+* @param url URL to navigate to
+*/
+protected void navigateTo(String url) {
+Log.step("Navigating to: " + url);
+page.navigate(url);
+}
+
+/**
+* Get current page title
+* @return Page title
+*/
+protected String getPageTitle() {
+String title = page.title();
+Log.debug("Current page title: " + title);
+return title;
+}
+
+/**
+* Get current page URL
+* @return Current URL
+*/
+protected String getCurrentUrl() {
+String url = page.url();
+Log.debug("Current URL: " + url);
+return url;
+}
+
+/**
+* Refresh current page
+*/
+protected void refreshPage() {
+Log.step("Refreshing current page");
+page.reload();
+}
+
+/**
+* Navigate back
+*/
+protected void navigateBack() {
+Log.step("Navigating back");
+page.goBack();
+}
+
+/**
+* Navigate forward
+*/
+protected void navigateForward() {
+Log.step("Navigating forward");
+page.goForward();
+}
+
+/**
+* Get base URL from configuration
+* @return Base URL
+*/
+protected String getBaseUrl() {
+return ConfigurationReader.getBaseUrl();
+}
+}

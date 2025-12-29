@@ -22,16 +22,16 @@ interface ProjectPreviewProps {
   hideDownloadButton?: boolean;
 }
 
-export default function ProjectPreview({ 
-  projectName, 
-  configuration, 
+export default function ProjectPreview({
+  projectName,
+  configuration,
   onDownload,
   isGenerating = false,
   hideDownloadButton = false
 }: ProjectPreviewProps) {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
-  
+
   // Fetch real project preview data based on user configuration
   const { data: previewData, isLoading, error } = useQuery({
     queryKey: ['/api/project-preview', configuration],
@@ -70,12 +70,12 @@ export default function ProjectPreview({
         setSelectedFile(file.content);
         return;
       }
-      
+
       // If no content, try to find it in sample files
-      const sampleFile = sampleFiles.find((sf: any) => 
+      const sampleFile = sampleFiles.find((sf: any) =>
         sf.path.endsWith(file.name) || sf.path.includes(fullPath)
       );
-      
+
       if (sampleFile) {
         setSelectedFile(sampleFile.content);
       } else {
@@ -92,10 +92,10 @@ export default function ProjectPreview({
       const currentPath = parentPath ? `${parentPath}/${file.name}` : file.name;
       const isExpanded = expandedFolders.has(currentPath);
       const hasChildren = file.type === 'folder' && file.children && file.children.length > 0;
-      
+
       return (
         <div key={index} style={{ marginLeft: `${depth * 16}px` }}>
-          <div 
+          <div
             className="flex items-center space-x-1 py-1 px-2 hover:bg-muted/50 rounded cursor-pointer"
             onClick={() => handleFileClick(file, currentPath)}
             data-testid={`${file.type}-${file.name}`}
@@ -110,17 +110,17 @@ export default function ProjectPreview({
             ) : (
               <div className="w-3 h-3 flex-shrink-0" /> /* Spacer for alignment */
             )}
-            
+
             {/* File/folder icon */}
             {file.type === 'folder' ? (
               <Folder className="w-4 h-4 text-primary flex-shrink-0" />
             ) : (
               <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             )}
-            
+
             <span className="text-sm truncate">{file.name}</span>
           </div>
-          
+
           {/* Render children only if folder is expanded */}
           {file.type === 'folder' && file.children && isExpanded && (
             renderFileTree(file.children, depth + 1, currentPath)
@@ -309,7 +309,7 @@ export default function ProjectPreview({
                 )}
               </ScrollArea>
             </div>
-            
+
             {/* File Content */}
             <div>
               <h3 className="text-sm font-medium mb-2">File Preview</h3>
@@ -325,76 +325,6 @@ export default function ProjectPreview({
                 )}
               </ScrollArea>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Configuration Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Configuration Summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {Object.entries(configuration).map(([key, value]) => {
-              // Skip empty or undefined values
-              if (value === "" || value === null || value === undefined) {
-                return null;
-              }
-              
-              // Handle utilities object specially
-              if (key === 'utilities' && typeof value === 'object' && !Array.isArray(value)) {
-                const selectedUtilities = Object.entries(value)
-                  .filter(([_, enabled]) => enabled === true)
-                  .map(([utilityKey, _]) => utilityKey);
-                
-                // Don't show if no utilities selected
-                if (selectedUtilities.length === 0) {
-                  return null;
-                }
-                
-                return (
-                  <div key={key} className="flex items-center justify-between">
-                    <span className="text-sm font-medium capitalize">
-                      {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
-                    </span>
-                    <div className="flex flex-wrap gap-1 justify-end">
-                      {selectedUtilities.map((utility, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {utility.replace(/([A-Z])/g, ' $1').toLowerCase()}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                );
-              }
-              
-              return (
-                <div key={key} className="flex items-center justify-between">
-                  <span className="text-sm font-medium capitalize">
-                    {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {Array.isArray(value) ? (
-                      value.map((item: string, index: number) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {item}
-                        </Badge>
-                      ))
-                    ) : typeof value === 'object' ? (
-                      // For other objects, convert to JSON or show object structure
-                      <Badge variant="secondary" className="text-xs">
-                        {JSON.stringify(value)}
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-xs">
-                        {String(value)}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </CardContent>
       </Card>

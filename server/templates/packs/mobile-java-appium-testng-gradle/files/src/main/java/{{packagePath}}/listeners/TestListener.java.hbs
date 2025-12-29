@@ -1,0 +1,120 @@
+package {{javaPackage}}.listeners;
+
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.utils.ScreenshotUtils;
+import {{javaPackage}}.utils.Log;
+{{#if (eq reportingTool "allure")}}
+import {{javaPackage}}.utils.AllureManager;
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+{{/if}}
+
+/**
+ * TestNG listener for mobile test reporting and screenshot capture
+ * Handles test lifecycle events and integrates with reporting tools
+ */
+public class TestListener implements ITestListener {
+
+    @Override
+    public void onTestStart(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        String className = result.getTestClass().getName();
+        
+        Log.startTest(testName + " [" + className + "]");
+        
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.createTest(testName, result.getMethod().getDescription());
+        ExtentManager.logInfo("Test started: " + testName);
+        {{/if}}
+        
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Starting test: " + testName);
+        if (DriverManager.getDriver() != null) {
+            AllureManager.attachDeviceInfo(DriverManager.getDriver());
+        }
+        {{/if}}
+    }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        
+        Log.info("Test PASSED: " + testName);
+        Log.endTest(testName);
+        
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logPass("Test completed successfully");
+        {{/if}}
+        
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Test completed successfully");
+        {{/if}}
+    }
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Throwable throwable = result.getThrowable();
+        
+        Log.error("Test FAILED: " + testName, throwable);
+        
+        // Capture screenshot on failure
+        String screenshotPath = null;
+        try {
+            if (DriverManager.getDriver() != null) {
+                screenshotPath = ScreenshotUtils.takeScreenshot(testName + "_FAILED");
+            }
+        } catch (Exception e) {
+            Log.error("Failed to capture screenshot: " + e.getMessage());
+        }
+        
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logFail("Test failed: " + testName, throwable);
+        if (screenshotPath != null) {
+            ExtentManager.addFailureScreenshot(screenshotPath);
+        }
+        {{/if}}
+        
+        {{#if (eq reportingTool "allure")}}
+        if (DriverManager.getDriver() != null) {
+            AllureManager.attachScreenshotOnFailure(DriverManager.getDriver());
+        }
+        AllureManager.attachText("Failure Details", throwable.getMessage());
+        {{/if}}
+        
+        Log.endTest(testName);
+    }
+
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        
+        Log.warn("Test SKIPPED: " + testName);
+        
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.createTest(testName, result.getMethod().getDescription());
+        ExtentManager.logSkip("Test was skipped: " + (result.getThrowable() != null ? result.getThrowable().getMessage() : "No reason provided"));
+        {{/if}}
+        
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Test was skipped");
+        if (result.getThrowable() != null) {
+            AllureManager.attachText("Skip Reason", result.getThrowable().getMessage());
+        }
+        {{/if}}
+    }
+
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        
+        Log.warn("Test FAILED but within success percentage: " + testName);
+        
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logWarning("Test failed but within success percentage");
+        {{/if}}
+    }
+}

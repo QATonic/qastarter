@@ -1,0 +1,84 @@
+package {{packageName}}.config;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Properties;
+
+/**
+ * Configuration reader for API testing framework
+ * Reads environment-specific properties files and provides configuration values
+ */
+public class ConfigurationReader {
+
+    private static Properties properties;
+    private static String environment;
+
+    static {
+        initializeProperties();
+    }
+
+    /**
+     * Initialize properties based on environment
+     */
+    private static void initializeProperties() {
+        environment = System.getProperty("environment", "dev");
+        properties = new Properties();
+        
+        String configFile = "config/" + environment + ".properties";
+        
+        try (InputStream inputStream = ConfigurationReader.class.getClassLoader()
+                .getResourceAsStream(configFile)) {
+            
+            if (inputStream != null) {
+                properties.load(inputStream);
+                System.out.println("Loaded configuration for environment: " + environment);
+            } else {
+                throw new RuntimeException("Configuration file not found: " + configFile);
+            }
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load configuration file: " + configFile, e);
+        }
+    }
+
+    /**
+     * Get property value by key
+     * 
+     * @param key Property key
+     * @return Property value
+     */
+    public static String getProperty(String key) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            throw new RuntimeException("Property not found: " + key + " in environment: " + environment);
+        }
+        return value;
+    }
+
+    /**
+     * Get property value by key with default value
+     * 
+     * @param key Property key
+     * @param defaultValue Default value if property not found
+     * @return Property value or default value
+     */
+    public static String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    /**
+     * Get current environment
+     * 
+     * @return Current environment name
+     */
+    public static String getEnvironment() {
+        return environment;
+    }
+
+    /**
+     * Reload properties (useful for test scenarios)
+     */
+    public static void reloadProperties() {
+        initializeProperties();
+    }
+}

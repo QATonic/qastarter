@@ -153,9 +153,7 @@
       }
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration for Windows containers"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for Windows containers","conditional": {"utilities.includeDocker": true}
     }
   ],
   "supportedCombination": {
@@ -184,3 +182,4 @@
     ]
   }
 }
+

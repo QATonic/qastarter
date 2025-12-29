@@ -163,14 +163,10 @@
       }
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration for Android SDK"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for Android SDK","conditional": {"utilities.includeDocker": true}
     },
     {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose for Android emulator testing"
+      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Android emulator testing","conditional": {"utilities.includeDockerCompose": true}
     }
   ],
   "supportedCombination": {
@@ -200,3 +196,4 @@
     ]
   }
 }
+

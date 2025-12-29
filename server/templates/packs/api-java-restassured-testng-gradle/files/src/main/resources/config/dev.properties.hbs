@@ -1,0 +1,58 @@
+# ============================================
+# API CONFIGURATION FILE - UPDATE THESE VALUES
+# ============================================
+# This file contains your API settings.
+# Replace the placeholder values below with your actual API details.
+
+# API Base Configuration - UPDATE THESE
+api.base.url=https://your-api-url.com
+api.version=v1
+api.timeout=30000
+api.content.type=application/json
+api.accept.type=application/json
+
+# Connection Settings
+api.connection.timeout=10000
+api.socket.timeout=10000
+api.max.connections=50
+
+# Authentication Configuration - UPDATE THESE
+auth.method=credentials
+auth.login.endpoint=/auth/login
+auth.username=your-api-username
+auth.password=your-api-password
+auth.token.field=access_token
+
+# OAuth Configuration (if applicable) - UPDATE IF USING OAUTH
+auth.oauth.token.endpoint=/oauth/token
+auth.oauth.client.id=your-client-id
+auth.oauth.client.secret=your-client-secret
+
+# API Key Configuration (if applicable) - UPDATE IF USING API KEY
+auth.api.key=your-api-key-here
+auth.apikey.validation.endpoint=/auth/validate
+
+# Logging Configuration
+api.logging.enabled=true
+log.level=DEBUG
+log.file.path=logs/api-automation-dev.log
+
+# Test Data Configuration
+test.data.base.path=src/test/resources/testdata
+test.data.users.file=users.json
+test.data.requests.file=test-requests.json
+
+# Reporting Configuration
+reports.base.path=reports
+extent.report.name=API_Automation_Report_Dev
+extent.report.title=API Test Automation Report - Development Environment
+
+# Performance Settings
+api.retry.count=3
+api.retry.delay=1000
+api.response.timeout.threshold=5000
+
+# Database Configuration (if needed)
+db.url=jdbc:postgresql://dev-db:5432/testdb
+db.username=dev_db_user
+db.password=dev_db_password

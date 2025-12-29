@@ -1,0 +1,122 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.extensions.ScreenshotExtension;
+import {{javaPackage}}.utils.Log;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+/**
+* Base test class with common setup and teardown methods.
+* All test classes should extend this class.
+*/
+@ExtendWith(ScreenshotExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class BaseTest {
+
+@BeforeAll
+static void beforeAll() {
+Log.startSection("TEST SUITE SETUP");
+Log.info("Environment: " + ConfigurationReader.getCurrentEnvironment());
+Log.info("Base URL: " + ConfigurationReader.getBaseUrl());
+Log.info("Browser: " + ConfigurationReader.getBrowser());
+Log.info("Headless: " + ConfigurationReader.isHeadless());
+Log.endSection();
+}
+
+@AfterAll
+static void afterAll() {
+Log.startSection("TEST SUITE TEARDOWN");
+Log.info("Test suite execution completed");
+Log.endSection();
+}
+
+@BeforeEach
+void setUp() {
+Log.info("Setting up test method");
+DriverManager.initializeDriver();
+
+// Navigate to base URL if configured
+String baseUrl = ConfigurationReader.getBaseUrl();
+if (baseUrl != null && !baseUrl.isEmpty()) {
+DriverManager.getDriver().get(baseUrl);
+Log.info("Navigated to base URL: " + baseUrl);
+}
+}
+
+@AfterEach
+void tearDown() {
+Log.info("Tearing down test method");
+DriverManager.quitDriver();
+}
+
+/**
+* Navigate to specific URL
+* @param url URL to navigate to
+*/
+protected void navigateTo(String url) {
+Log.step("Navigating to: " + url);
+DriverManager.getDriver().get(url);
+}
+
+/**
+* Get current page title
+* @return Page title
+*/
+protected String getPageTitle() {
+String title = DriverManager.getDriver().getTitle();
+Log.debug("Current page title: " + title);
+return title;
+}
+
+/**
+* Get current page URL
+* @return Current URL
+*/
+protected String getCurrentUrl() {
+String url = DriverManager.getDriver().getCurrentUrl();
+Log.debug("Current URL: " + url);
+return url;
+}
+
+/**
+* Refresh current page
+*/
+protected void refreshPage() {
+Log.step("Refreshing current page");
+DriverManager.getDriver().navigate().refresh();
+}
+
+/**
+* Navigate back
+*/
+protected void navigateBack() {
+Log.step("Navigating back");
+DriverManager.getDriver().navigate().back();
+}
+
+/**
+* Navigate forward
+*/
+protected void navigateForward() {
+Log.step("Navigating forward");
+DriverManager.getDriver().navigate().forward();
+}
+
+/**
+* Get base URL from configuration
+* @return Base URL
+*/
+protected String getBaseUrl() {
+return ConfigurationReader.getBaseUrl();
+}
+
+/**
+* Get test data file path
+* @param fileName File name
+* @return Full file path for test data
+*/
+protected String getTestDataPath(String fileName) {
+return "testdata/" + fileName;
+}
+}

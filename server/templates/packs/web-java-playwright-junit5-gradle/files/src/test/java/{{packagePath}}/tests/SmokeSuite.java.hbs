@@ -1,0 +1,72 @@
+package {{javaPackage}}.tests;
+
+import {{javaPackage}}.core.BaseTest;
+import {{javaPackage}}.pages.HomePage;
+import {{javaPackage}}.utils.Log;
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+* Smoke test suite using Playwright and JUnit 5.
+* Run these tests first to ensure basic system health.
+*/
+@DisplayName("Smoke Test Suite")
+@Tag("smoke")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class SmokeSuite extends BaseTest {
+
+private HomePage homePage;
+
+@BeforeEach
+void setUpPages() {
+homePage = new HomePage(page);
+}
+
+@Test
+@DisplayName("Verify application is accessible")
+@Order(1)
+void testApplicationAccessible() {
+Log.step("Verifying application is accessible");
+
+String title = getPageTitle();
+assertNotNull(title, "Page title should not be null");
+assertFalse(title.isEmpty(), "Page title should not be empty");
+
+Log.info("Application is accessible with title: " + title);
+}
+
+@Test
+@DisplayName("Verify home page loads correctly")
+@Order(2)
+void testHomePageLoads() {
+Log.step("Verifying home page loads");
+
+assertTrue(homePage.isDisplayed(), "Home page should be displayed");
+Log.info("Home page loaded successfully");
+}
+
+@Test
+@DisplayName("Verify navigation elements are present")
+@Order(3)
+void testNavigationPresent() {
+Log.step("Verifying navigation elements");
+
+assertTrue(homePage.isNavigationVisible(), "Navigation should be visible");
+Log.info("Navigation elements are present");
+}
+
+@Test
+@DisplayName("Verify page responds within acceptable time")
+@Order(4)
+@Timeout(10)
+void testPagePerformance() {
+Log.step("Testing page performance");
+
+long startTime = System.currentTimeMillis();
+refreshPage();
+long endTime = System.currentTimeMillis();
+long loadTime = endTime - startTime;
+
+assertTrue(loadTime < 5000, "Page should load within 5 seconds, actual: " + loadTime + "ms" ); Log.info("Page load
+    time: " + loadTime + " ms"); } }

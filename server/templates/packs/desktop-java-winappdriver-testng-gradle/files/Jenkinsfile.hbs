@@ -1,0 +1,351 @@
+pipeline {
+    agent {
+        label 'windows'
+    }
+    
+    environment {
+        // Maven settings
+        MAVEN_OPTS = '-Dmaven.test.failure.ignore=true'
+        MAVEN_CLI_OPTS = '--batch-mode --errors --fail-at-end --show-version'
+        
+        // Test environment
+        ENVIRONMENT = "${params.ENVIRONMENT ?: 'dev'}"
+        
+        // WinAppDriver configuration
+        WINAPPDRIVER_URL = 'http://127.0.0.1:4723'
+        
+        // Project settings
+        PROJECT_NAME = '{{projectName}}'
+        JAVA_HOME = tool 'JDK-11'
+        PATH = "${JAVA_HOME}/bin:${PATH}"
+    }
+    
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'qa', 'staging'],
+            description: 'Environment to run tests against'
+        )
+        choice(
+            name: 'TEST_SUITE',
+            choices: ['smoke', 'regression', 'full'],
+            description: 'Test suite to execute'
+        )
+        booleanParam(
+            name: 'PARALLEL_EXECUTION',
+            defaultValue: false,
+            description: 'Run tests in parallel'
+        )
+        booleanParam(
+            name: 'GENERATE_REPORTS',
+            defaultValue: true,
+            description: 'Generate HTML reports'
+        )
+    }
+    
+    options {
+        buildDiscarder(logRotator(
+            numToKeepStr: '10',
+            daysToKeepStr: '30'
+        ))
+        timeout(time: 2, unit: 'HOURS')
+        timestamps()
+        ansiColor('xterm')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "🔄 Checking out source code..."
+                }
+                checkout scm
+                
+                script {
+                    // Set build display name
+                    currentBuild.displayName = "#${BUILD_NUMBER} - ${ENVIRONMENT} - ${params.TEST_SUITE}"
+                    currentBuild.description = "Desktop Tests on ${ENVIRONMENT} environment"
+                }
+            }
+        }
+        
+        stage('Environment Setup') {
+            parallel {
+                stage('Java Setup') {
+                    steps {
+                        script {
+                            echo "☕ Setting up Java environment..."
+                        }
+                        bat '''
+                            echo Java Version:
+                            java -version
+                            echo JAVA_HOME: %JAVA_HOME%
+                        '''
+                    }
+                }
+                
+                stage('Maven Setup') {
+                    steps {
+                        script {
+                            echo "🔧 Setting up Maven environment..."
+                        }
+                        bat '''
+                            echo Maven Version:
+                            mvn -version
+                        '''
+                    }
+                }
+                
+                stage('WinAppDriver Check') {
+                    steps {
+                        script {
+                            echo "🖥️ Checking WinAppDriver availability..."
+                        }
+                        bat '''
+                            echo Checking WinAppDriver at %WINAPPDRIVER_URL%
+                            powershell -Command "try { Invoke-WebRequest -Uri '%WINAPPDRIVER_URL%/status' -TimeoutSec 10; Write-Host 'WinAppDriver is running' } catch { Write-Host 'WinAppDriver is not running or not accessible' }"
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                script {
+                    echo "🏗️ Building project..."
+                }
+                bat """
+                    mvn ${MAVEN_CLI_OPTS} clean compile test-compile
+                """
+            }
+        }
+        
+        stage('Unit Tests') {
+            steps {
+                script {
+                    echo "🧪 Running unit tests..."
+                }
+                bat """
+                    mvn ${MAVEN_CLI_OPTS} test -Dtest=*UnitTest* -Denvironment=${ENVIRONMENT}
+                """
+            }
+            post {
+                always {
+                    // Archive unit test results
+                    publishTestResults(
+                        testResultsPattern: 'target/surefire-reports/*.xml',
+                        allowEmptyResults: true
+                    )
+                }
+            }
+        }
+        
+        stage('Desktop Integration Tests') {
+            steps {
+                script {
+                    echo "🖥️ Running desktop integration tests..."
+                    
+                    // Determine test suite file
+                    def testSuiteFile = 'src/test/resources/testng.xml'
+                    if (params.TEST_SUITE == 'smoke') {
+                        testSuiteFile = 'src/test/resources/testng.xml'
+                    } else if (params.TEST_SUITE == 'regression') {
+                        testSuiteFile = 'src/test/resources/regression-tests.xml'
+                    } else if (params.TEST_SUITE == 'full') {
+                        testSuiteFile = 'src/test/resources/desktop-tests.xml'
+                    }
+                    
+                    // Set parallel execution
+                    def parallelFlag = params.PARALLEL_EXECUTION ? '-Dparallel=true -DthreadCount=2' : ''
+                    
+                    echo "Running test suite: ${testSuiteFile}"
+                    echo "Parallel execution: ${params.PARALLEL_EXECUTION}"
+                }
+                
+                bat """
+                    mvn ${MAVEN_CLI_OPTS} test ^
+                        -Dsurefire.suiteXmlFiles=%TEST_SUITE_FILE% ^
+                        -Denvironment=${ENVIRONMENT} ^
+                        -Dwinappdriver.url=${WINAPPDRIVER_URL} ^
+                        -Dscreenshot.on.failure=true ^
+                        -Dextent.reports.enabled=true ^
+                        %PARALLEL_FLAGS%
+                """
+            }
+            post {
+                always {
+                    // Archive test results
+                    publishTestResults(
+                        testResultsPattern: 'target/surefire-reports/*.xml',
+                        allowEmptyResults: true
+                    )
+                    
+                    // Archive screenshots
+                    archiveArtifacts(
+                        artifacts: 'screenshots/**/*',
+                        allowEmptyArchive: true,
+                        fingerprint: false
+                    )
+                    
+                    // Archive logs
+                    archiveArtifacts(
+                        artifacts: 'logs/**/*.log',
+                        allowEmptyArchive: true,
+                        fingerprint: false
+                    )
+                }
+            }
+        }
+        
+        stage('Generate Reports') {
+            when {
+                expression { params.GENERATE_REPORTS }
+            }
+            parallel {
+                stage('ExtentReports') {
+                    steps {
+                        script {
+                            echo "📊 Generating ExtentReports..."
+                        }
+                        // ExtentReports are generated during test execution
+                        script {
+                            if (fileExists('reports')) {
+                                archiveArtifacts(
+                                    artifacts: 'reports/**/*',
+                                    allowEmptyArchive: true,
+                                    fingerprint: false
+                                )
+                                
+                                publishHTML([
+                                    allowMissing: false,
+                                    alwaysLinkToLastBuild: true,
+                                    keepAll: true,
+                                    reportDir: 'reports',
+                                    reportFiles: '*.html',
+                                    reportName: 'ExtentReport',
+                                    reportTitles: 'Desktop Test Execution Report'
+                                ])
+                            }
+                        }
+                    }
+                }
+                
+                stage('Allure Reports') {
+                    steps {
+                        script {
+                            echo "📈 Generating Allure reports..."
+                        }
+                        script {
+                            try {
+                                allure([
+                                    includeProperties: false,
+                                    jdk: '',
+                                    properties: [],
+                                    reportBuildPolicy: 'ALWAYS',
+                                    results: [[path: 'target/allure-results']]
+                                ])
+                            } catch (Exception e) {
+                                echo "Allure reporting failed: ${e.getMessage()}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Performance Analysis') {
+            when {
+                expression { params.TEST_SUITE == 'full' || params.TEST_SUITE == 'regression' }
+            }
+            steps {
+                script {
+                    echo "⚡ Analyzing test performance..."
+                }
+                bat '''
+                    echo Analyzing test execution times...
+                    powershell -Command "if (Test-Path 'logs/performance.log') { Get-Content 'logs/performance.log' | Select-String 'PERFORMANCE' | Measure-Object | Select-Object Count }"
+                '''
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                echo "🧹 Cleaning up..."
+            }
+            
+            // Clean up screenshots older than 7 days
+            bat '''
+                powershell -Command "if (Test-Path 'screenshots') { Get-ChildItem 'screenshots' -Recurse | Where-Object {$_.LastWriteTime -lt (Get-Date).AddDays(-7)} | Remove-Item -Force -Recurse }"
+            '''
+            
+            // Clean workspace
+            cleanWs(
+                cleanWhenAborted: true,
+                cleanWhenFailure: false,
+                cleanWhenNotBuilt: true,
+                cleanWhenSuccess: true,
+                cleanWhenUnstable: false,
+                deleteDirs: false
+            )
+        }
+        
+        success {
+            script {
+                echo "✅ Pipeline completed successfully!"
+            }
+            
+            // Send success notification
+            script {
+                if (env.TEAMS_WEBHOOK_URL) {
+                    office365ConnectorSend(
+                        webhookUrl: env.TEAMS_WEBHOOK_URL,
+                        message: "✅ Desktop Tests Passed",
+                        status: "Success",
+                        color: "good"
+                    )
+                }
+            }
+        }
+        
+        failure {
+            script {
+                echo "❌ Pipeline failed!"
+            }
+            
+            // Archive failure artifacts
+            archiveArtifacts(
+                artifacts: 'screenshots/**/*,logs/**/*,reports/**/*',
+                allowEmptyArchive: true,
+                fingerprint: false
+            )
+            
+            // Send failure notification
+            script {
+                if (env.TEAMS_WEBHOOK_URL) {
+                    office365ConnectorSend(
+                        webhookUrl: env.TEAMS_WEBHOOK_URL,
+                        message: "❌ Desktop Tests Failed",
+                        status: "Failed",
+                        color: "danger"
+                    )
+                }
+            }
+        }
+        
+        unstable {
+            script {
+                echo "⚠️ Pipeline completed with test failures!"
+            }
+            
+            // Archive unstable artifacts
+            archiveArtifacts(
+                artifacts: 'screenshots/**/*,logs/**/*,reports/**/*',
+                allowEmptyArchive: true,
+                fingerprint: false
+            )
+        }
+    }
+}

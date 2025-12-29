@@ -1,0 +1,300 @@
+package {{packageName}}.utils;
+
+import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import {{packageName}}.core.DriverManager;
+import {{packageName}}.config.ConfigurationReader;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.time.Duration;
+import java.util.List;
+
+/**
+ * Mobile-specific wait utilities for reliable element interactions
+ * Provides explicit waits for mobile elements and conditions
+ */
+public class MobileWaitUtils {
+
+    private static final int DEFAULT_TIMEOUT = Integer.parseInt(
+        ConfigurationReader.getProperty("mobile.explicit.wait", "20")
+    );
+    
+    private static final int DEFAULT_POLLING_INTERVAL = Integer.parseInt(
+        ConfigurationReader.getProperty("mobile.polling.interval", "500")
+    );
+
+    private static AppiumDriver getDriver() {
+        return DriverManager.getDriver();
+    }
+
+    /**
+     * Create WebDriverWait with default timeout
+     * 
+     * @return WebDriverWait instance
+     */
+    private static WebDriverWait getDefaultWait() {
+        return new WebDriverWait(getDriver(), Duration.ofSeconds(DEFAULT_TIMEOUT), 
+                                Duration.ofMillis(DEFAULT_POLLING_INTERVAL));
+    }
+
+    /**
+     * Create WebDriverWait with custom timeout
+     * 
+     * @param timeoutInSeconds Custom timeout in seconds
+     * @return WebDriverWait instance
+     */
+    private static WebDriverWait getCustomWait(int timeoutInSeconds) {
+        return new WebDriverWait(getDriver(), Duration.ofSeconds(timeoutInSeconds),
+                                Duration.ofMillis(DEFAULT_POLLING_INTERVAL));
+    }
+
+    /**
+     * Wait for element to be visible and return it
+     * 
+     * @param locator Element locator
+     * @return Visible WebElement
+     */
+    public static WebElement waitForElementToBeVisible(By locator) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for element to be visible: " + locator.toString());
+            {{/if}}
+            WebElement element = getDefaultWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
+            {{#if utilities.logger}}
+            Log.debug("Element is now visible: " + locator.toString());
+            {{/if}}
+            return element;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Element not visible within timeout: " + locator.toString(), e);
+            {{/if}}
+            throw new RuntimeException("Element not visible: " + locator.toString(), e);
+        }
+    }
+
+    /**
+     * Wait for element to be visible with custom timeout
+     * 
+     * @param locator Element locator
+     * @param timeoutInSeconds Custom timeout
+     * @return Visible WebElement
+     */
+    public static WebElement waitForElementToBeVisible(By locator, int timeoutInSeconds) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for element to be visible with timeout " + timeoutInSeconds + "s: " + locator.toString());
+            {{/if}}
+            WebElement element = getCustomWait(timeoutInSeconds).until(ExpectedConditions.visibilityOfElementLocated(locator));
+            {{#if utilities.logger}}
+            Log.debug("Element is now visible: " + locator.toString());
+            {{/if}}
+            return element;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Element not visible within " + timeoutInSeconds + "s: " + locator.toString(), e);
+            {{/if}}
+            throw new RuntimeException("Element not visible: " + locator.toString(), e);
+        }
+    }
+
+    /**
+     * Wait for element to be clickable and return it
+     * 
+     * @param locator Element locator
+     * @return Clickable WebElement
+     */
+    public static WebElement waitForElementToBeClickable(By locator) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for element to be clickable: " + locator.toString());
+            {{/if}}
+            WebElement element = getDefaultWait().until(ExpectedConditions.elementToBeClickable(locator));
+            {{#if utilities.logger}}
+            Log.debug("Element is now clickable: " + locator.toString());
+            {{/if}}
+            return element;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Element not clickable within timeout: " + locator.toString(), e);
+            {{/if}}
+            throw new RuntimeException("Element not clickable: " + locator.toString(), e);
+        }
+    }
+
+    /**
+     * Wait for element to be clickable with custom timeout
+     * 
+     * @param locator Element locator
+     * @param timeoutInSeconds Custom timeout
+     * @return Clickable WebElement
+     */
+    public static WebElement waitForElementToBeClickable(By locator, int timeoutInSeconds) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for element to be clickable with timeout " + timeoutInSeconds + "s: " + locator.toString());
+            {{/if}}
+            WebElement element = getCustomWait(timeoutInSeconds).until(ExpectedConditions.elementToBeClickable(locator));
+            {{#if utilities.logger}}
+            Log.debug("Element is now clickable: " + locator.toString());
+            {{/if}}
+            return element;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Element not clickable within " + timeoutInSeconds + "s: " + locator.toString(), e);
+            {{/if}}
+            throw new RuntimeException("Element not clickable: " + locator.toString(), e);
+        }
+    }
+
+    /**
+     * Wait for element to be present in DOM
+     * 
+     * @param locator Element locator
+     * @return Present WebElement
+     */
+    public static WebElement waitForElementToBePresent(By locator) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for element to be present: " + locator.toString());
+            {{/if}}
+            WebElement element = getDefaultWait().until(ExpectedConditions.presenceOfElementLocated(locator));
+            {{#if utilities.logger}}
+            Log.debug("Element is now present: " + locator.toString());
+            {{/if}}
+            return element;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Element not present within timeout: " + locator.toString(), e);
+            {{/if}}
+            throw new RuntimeException("Element not present: " + locator.toString(), e);
+        }
+    }
+
+    /**
+     * Wait for elements to be present in DOM
+     * 
+     * @param locator Element locator
+     * @return List of present WebElements
+     */
+    public static List<WebElement> waitForElementsToBePresent(By locator) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for elements to be present: " + locator.toString());
+            {{/if}}
+            List<WebElement> elements = getDefaultWait().until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
+            {{#if utilities.logger}}
+            Log.debug("Elements are now present (count: " + elements.size() + "): " + locator.toString());
+            {{/if}}
+            return elements;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Elements not present within timeout: " + locator.toString(), e);
+            {{/if}}
+            throw new RuntimeException("Elements not present: " + locator.toString(), e);
+        }
+    }
+
+    /**
+     * Wait for element to disappear (become invisible)
+     * 
+     * @param locator Element locator
+     */
+    public static void waitForElementToDisappear(By locator) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for element to disappear: " + locator.toString());
+            {{/if}}
+            getDefaultWait().until(ExpectedConditions.invisibilityOfElementLocated(locator));
+            {{#if utilities.logger}}
+            Log.debug("Element has disappeared: " + locator.toString());
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Element did not disappear within timeout: " + locator.toString(), e);
+            {{/if}}
+            throw new RuntimeException("Element did not disappear: " + locator.toString(), e);
+        }
+    }
+
+    /**
+     * Wait for text to be present in element
+     * 
+     * @param locator Element locator
+     * @param text Expected text
+     * @return true if text is present
+     */
+    public static boolean waitForTextToBePresent(By locator, String text) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for text '" + text + "' to be present in element: " + locator.toString());
+            {{/if}}
+            boolean result = getDefaultWait().until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+            {{#if utilities.logger}}
+            Log.debug("Text '" + text + "' is now present in element: " + locator.toString());
+            {{/if}}
+            return result;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Text '" + text + "' not present in element within timeout: " + locator.toString(), e);
+            {{/if}}
+            throw new RuntimeException("Text not present in element: " + locator.toString(), e);
+        }
+    }
+
+    /**
+     * Wait for custom condition with default timeout
+     * 
+     * @param condition ExpectedCondition to wait for
+     * @param <T> Return type of the condition
+     * @return Result of the condition
+     */
+    public static <T> T waitForCondition(ExpectedCondition<T> condition) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for custom condition");
+            {{/if}}
+            T result = getDefaultWait().until(condition);
+            {{#if utilities.logger}}
+            Log.debug("Custom condition satisfied");
+            {{/if}}
+            return result;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Custom condition not satisfied within timeout", e);
+            {{/if}}
+            throw new RuntimeException("Custom condition not satisfied", e);
+        }
+    }
+
+    /**
+     * Wait for custom condition with custom timeout
+     * 
+     * @param condition ExpectedCondition to wait for
+     * @param timeoutInSeconds Custom timeout
+     * @param <T> Return type of the condition
+     * @return Result of the condition
+     */
+    public static <T> T waitForCondition(ExpectedCondition<T> condition, int timeoutInSeconds) {
+        try {
+            {{#if utilities.logger}}
+            Log.debug("Waiting for custom condition with timeout " + timeoutInSeconds + "s");
+            {{/if}}
+            T result = getCustomWait(timeoutInSeconds).until(condition);
+            {{#if utilities.logger}}
+            Log.debug("Custom condition satisfied");
+            {{/if}}
+            return result;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Custom condition not satisfied within " + timeoutInSeconds + "s", e);
+            {{/if}}
+            throw new RuntimeException("Custom condition not satisfied", e);
+        }
+    }
+}

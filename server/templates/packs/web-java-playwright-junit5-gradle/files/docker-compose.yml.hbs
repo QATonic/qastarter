@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  playwright-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: {{projectName}}-tests
+    environment:
+      - BROWSER=${BROWSER:-chromium}
+      - HEADLESS=${HEADLESS:-true}
+      - ENV=${ENV:-dev}
+    volumes:
+      - ./reports:/app/build/reports
+      - ./screenshots:/app/screenshots
+      - ./logs:/app/logs
+    command: ./gradlew test -Pbrowser=${BROWSER:-chromium} -Pheadless=${HEADLESS:-true} -Penv=${ENV:-dev} --no-daemon

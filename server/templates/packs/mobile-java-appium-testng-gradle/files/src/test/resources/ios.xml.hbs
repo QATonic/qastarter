@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="{{projectName}}_iOS_Test_Suite" parallel="tests" thread-count="1">
+    
+    <parameter name="platform" value="ios"/>
+    <parameter name="environment" value="qa"/>
+    
+    <!-- iOS-specific Test Configuration -->
+    <test name="iOS_Login_Tests" preserve-order="true">
+        <parameter name="platform" value="ios"/>
+        <parameter name="environment" value="qa"/>
+        
+        <classes>
+            <class name="{{packageName}}.tests.LoginTests">
+                <methods>
+                    <include name="testValidLogin"/>
+                    <include name="testInvalidLogin"/>
+                    <include name="testEmptyCredentialsLogin"/>
+                    <include name="testCrossPlatformLogin"/>
+                </methods>
+            </class>
+        </classes>
+        
+        <groups>
+            <run>
+                <include name="ios"/>
+                <include name="mobile"/>
+                <include name="regression"/>
+            </run>
+        </groups>
+    </test>
+    
+    <test name="iOS_Smoke_Tests" preserve-order="true">
+        <parameter name="platform" value="ios"/>
+        <parameter name="environment" value="qa"/>
+        
+        <classes>
+            <class name="{{packageName}}.tests.SmokeSuite">
+                <methods>
+                    <include name="testAppLaunch"/>
+                    <include name="testBasicNavigation"/>
+                    <include name="testIOSSpecificFeatures"/>
+                </methods>
+            </class>
+        </classes>
+        
+        <groups>
+            <run>
+                <include name="smoke"/>
+                <include name="ios"/>
+            </run>
+        </groups>
+    </test>
+    
+    <listeners>
+        <listener class-name="{{packageName}}.listeners.TestListener"/>
+        <listener class-name="{{packageName}}.listeners.RetryAnalyzer"/>
+    </listeners>
+    
+</suite>

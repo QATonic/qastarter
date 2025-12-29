@@ -1,0 +1,345 @@
+# {{projectName}} - REST API Automation Framework
+
+A comprehensive REST API test automation framework built with **REST Assured**, **Java**, **TestNG**, and **Maven**.
+
+## 🚀 Features
+
+- **REST Assured** for powerful API testing capabilities
+- **JSON Schema Validation** with comprehensive response verification
+- **Data-driven testing** with JSON test data support
+- **Multiple authentication mechanisms** (Bearer Token, OAuth 2.0, API Key, Basic Auth)
+{{#if (eq reportingTool "extent-reports")}}
+- **ExtentReports** for detailed test reporting with API request/response logging
+{{else if (eq reportingTool "allure")}}
+- **Allure Reports** for rich test reporting with request/response details
+{{else}}
+- **TestNG Reports** for built-in test reporting
+{{/if}}
+- **Multi-environment support** (dev/qa/prod) with flexible configuration
+- **Parallel test execution** with TestNG for faster feedback
+{{#if cicdTool}}
+{{#if (eq cicdTool "jenkins")}}
+- **Jenkins** CI/CD pipeline integration
+{{else if (eq cicdTool "github-actions")}}
+- **GitHub Actions** CI/CD workflow integration
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI** pipeline integration
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps** pipeline integration
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI** workflow integration
+{{/if}}
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+- **Cucumber BDD** for Gherkin feature files
+{{/if}}
+
+## 🛠 Prerequisites
+
+- **Java {{toolVersions.java}}+** - Programming language
+- **Maven {{toolVersions.maven}}+** - Build and dependency management
+- **IDE** - IntelliJ IDEA, Eclipse, or VS Code with Java extensions
+
+## 📦 Dependencies
+
+- **REST Assured**: {{rest-assured.version}} - API testing framework
+- **TestNG**: {{testng.version}} - Test execution and reporting
+- **Jackson**: {{jackson.version}} - JSON processing and object mapping
+- **JSON Path**: {{json-path.version}} - JSON data extraction
+- **Hamcrest**: {{hamcrest.version}} - Assertion matchers
+{{#if (includes reporting "extent-reports")}}
+- **ExtentReports**: For detailed API test reporting
+{{/if}}
+{{#if utilities.logger}}
+- **Log4j2**: For comprehensive logging and debugging
+{{/if}}
+
+## 🏗 Project Structure
+
+```
+{{artifactId}}/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── {{packagePath}}/
+│   │   │       ├── config/          # Configuration management
+│   │   │       ├── core/            # Core framework components
+│   │   │       ├── models/          # Data models and POJOs
+│   │   │       ├── utils/           # Utility classes and helpers
+│   │   │       └── listeners/       # TestNG listeners
+│   │   └── resources/
+│   │       ├── config/              # Environment properties
+│   │       ├── log4j2.xml          # Logging configuration
+│   │       └── extent-config.xml    # ExtentReports configuration
+│   └── test/
+│       ├── java/
+│       │   └── {{packagePath}}/
+│       │       └── tests/           # API test classes
+│       └── resources/
+│           ├── testdata/           # Test data files (JSON)
+│           ├── schemas/            # JSON schema files
+│           ├── testng.xml          # TestNG suite configuration
+│           ├── api-tests.xml       # API-focused test suite
+│           └── regression-tests.xml # Regression test suite
+├── reports/                        # Test reports and logs
+├── pom.xml                        # Maven configuration
+└── Jenkinsfile                    # CI/CD pipeline
+```
+
+## ⚙️ Configuration
+
+### Environment Setup
+
+Update the environment-specific property files in `src/main/resources/config/`:
+
+1. **Development**: `dev.properties`
+2. **QA Testing**: `qa.properties`  
+3. **Production**: `prod.properties`
+
+#### Key Configuration Properties
+
+```properties
+# API Configuration
+api.base.url=https://api.example.com
+api.timeout=30000
+api.content.type=application/json
+
+# Authentication
+auth.method=credentials|oauth|apikey
+auth.login.endpoint=/auth/login
+auth.username=your_username
+auth.password=your_password
+
+# OAuth Configuration
+auth.oauth.client.id=your_client_id
+auth.oauth.client.secret=your_client_secret
+
+# Reporting
+reports.base.path=reports
+extent.report.name=API_Automation_Report
+```
+
+### Test Data Management
+
+- **User Data**: `src/test/resources/testdata/users.json`
+- **API Requests**: `src/test/resources/testdata/test-requests.json`
+- **JSON Schemas**: `src/test/resources/schemas/user-schema.json`
+
+## 🧪 Running Tests
+
+### Command Line Execution
+
+```bash
+# Run all tests (default QA environment)
+mvn clean test
+
+# Run tests in specific environment
+mvn clean test -Denvironment=dev
+mvn clean test -Denvironment=qa  
+mvn clean test -Denvironment=prod
+
+# Run specific test suite
+mvn clean test -DsuiteXmlFile=src/test/resources/api-tests.xml
+
+# Run with parallel execution
+mvn clean test -Dparallel=classes -DthreadCount=3
+
+# Run regression tests
+mvn clean test -Pregression
+```
+
+### Profile-Based Execution
+
+```bash
+# Development profile
+mvn clean test -Pdev
+
+# QA profile  
+mvn clean test -Pqa
+
+# Production profile
+mvn clean test -Pprod
+
+# API tests only
+mvn clean test -Papi-tests
+```
+
+### Test Categories
+
+Execute tests by groups using TestNG:
+
+```bash
+# Smoke tests
+mvn clean test -Dgroups=smoke
+
+# API tests
+mvn clean test -Dgroups=api
+
+# Authentication tests
+mvn clean test -Dgroups=auth
+
+# Negative tests
+mvn clean test -Dgroups=negative
+
+# Performance tests
+mvn clean test -Dgroups=performance
+```
+
+## 📊 Test Reporting
+
+{{#if (includes reporting "extent-reports")}}
+### ExtentReports
+
+- **Location**: `reports/API_Automation_Report_<timestamp>.html`
+- **Features**: 
+  - Detailed API request/response logging
+  - JSON request/response formatting
+  - Test execution timeline
+  - Environment and system information
+  - Screenshots for failures (if applicable)
+
+### TestNG Reports
+
+- **Location**: `target/surefire-reports/`
+- **Features**: HTML and XML reports with test results
+{{/if}}
+
+## 🔧 Framework Components
+
+### Core Classes
+
+- **APIClient**: Central HTTP client for all API requests
+- **RequestBuilder**: Fluent API for building HTTP requests
+- **ResponseValidator**: Comprehensive response validation utilities
+- **AuthenticationManager**: Multi-method authentication handling
+- **JSONUtils**: JSON processing and manipulation utilities
+
+### Test Structure
+
+```java
+public class UserAPITests extends BaseTest {
+    
+    @Test(groups = {"api", "smoke"})
+    public void testCreateUser() {
+        logStep("Creating a new user via API");
+        
+        User newUser = new User("testuser", "test@example.com", "Test", "User");
+        Response response = apiClient.post("/users", newUser);
+        
+        apiClient.getResponseValidator().validateStatusCode(response, 201);
+        apiClient.getResponseValidator().validateJsonField(response, "username", newUser.getUsername());
+        
+        logVerification("User created successfully");
+    }
+}
+```
+
+### Authentication Usage
+
+```java
+// Bearer Token Authentication
+AuthenticationManager authManager = new AuthenticationManager();
+String token = authManager.getBearerToken();
+Response response = apiClient.authenticatedGet("/protected/resource", token);
+
+// OAuth 2.0 Client Credentials
+String accessToken = authManager.authenticateWithOAuth(clientId, clientSecret);
+
+// Basic Authentication  
+RequestSpecification request = requestBuilder.buildBasicAuthRequest(username, password);
+```
+
+### Data-Driven Testing
+
+```java
+@Test(dataProvider = "userTestData", dataProviderClass = TestDataReader.class)
+public void testCreateUsersFromData(JsonNode userData) {
+    Response response = apiClient.post("/users", userData);
+    apiClient.getResponseValidator().validateStatusCode(response, 201);
+}
+```
+
+## 🚀 CI/CD Integration
+
+### Jenkins Pipeline
+
+The included `Jenkinsfile` provides:
+
+- **Multi-environment support** with parameter-driven execution
+- **Parallel test execution** for faster feedback
+- **Artifact archival** for reports and logs
+- **Email notifications** with detailed results
+- **Performance threshold monitoring**
+
+### Pipeline Parameters
+
+- **Environment**: dev, qa, staging, prod
+- **Test Suite**: all, smoke, regression, api-only
+- **Parallel Execution**: Enable/disable parallel test execution
+
+### Pipeline Stages
+
+1. **Checkout** - Source code retrieval
+2. **Build** - Maven compilation and dependency resolution  
+3. **Test Execution** - Parallel API test execution
+4. **Reporting** - Test report generation and publishing
+5. **Notification** - Email alerts with results
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Connection Timeout**:
+   - Check `api.connection.timeout` in properties
+   - Verify API server availability
+   - Review firewall/network restrictions
+
+2. **Authentication Failures**:
+   - Verify credentials in environment properties
+   - Check token expiration settings
+   - Validate OAuth client configuration
+
+3. **JSON Schema Validation Errors**:
+   - Update schema files in `src/test/resources/schemas/`
+   - Verify API response format matches schema
+   - Check for API version compatibility
+
+4. **Test Data Issues**:
+   - Validate JSON syntax in test data files
+   - Ensure data provider methods are configured correctly
+   - Check file path references
+
+### Debug Mode
+
+Enable detailed logging by setting:
+
+```properties
+log.level=DEBUG
+api.logging.enabled=true
+```
+
+## 📚 Best Practices
+
+1. **API Design**: Follow RESTful principles and consistent response formats
+2. **Test Data**: Use external JSON files for maintainable test data
+3. **Authentication**: Implement token caching for better performance  
+4. **Error Handling**: Validate both success and error scenarios
+5. **Schema Validation**: Use JSON schemas for response structure validation
+6. **Parallel Execution**: Design tests for independent parallel execution
+7. **Environment Management**: Keep environment-specific configurations separate
+
+## 🤝 Contributing
+
+1. Follow existing code structure and naming conventions
+2. Add appropriate tests for new functionality
+3. Update documentation for any changes
+4. Ensure all tests pass before submitting changes
+5. Use meaningful commit messages and PR descriptions
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Generated by QAStarter** - Your REST API Test Automation Framework Generator

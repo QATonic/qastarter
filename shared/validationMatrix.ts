@@ -41,18 +41,18 @@ export const validationMatrix: ValidationMatrix = {
     playwright: ['javascript', 'typescript', 'python', 'java', 'csharp'],
     cypress: ['javascript', 'typescript'],
     webdriverio: ['javascript', 'typescript'],
-    
+
     // Mobile frameworks
     appium: ['java', 'python', 'csharp', 'javascript', 'typescript'],
     espresso: ['java'],
     xcuitest: ['swift'],
-    
+
     // API frameworks
     restassured: ['java'],
     requests: ['python'],
     supertest: ['javascript', 'typescript'],
     restsharp: ['csharp'],
-    
+
     // Desktop frameworks
     winappdriver: ['csharp', 'java', 'python'],
     pyautogui: ['python']
@@ -87,53 +87,53 @@ export const validationMatrix: ValidationMatrix = {
     'selenium-csharp': ['nunit'],
     'selenium-javascript': ['jest'],
     'selenium-typescript': ['jest'],
-    
+
     // Web - Playwright
     'playwright-java': ['testng', 'junit5'],
     'playwright-python': ['pytest'],
     'playwright-csharp': ['nunit'],
     'playwright-javascript': ['jest'],
     'playwright-typescript': ['jest'],
-    
+
     // Web - Cypress (uses its own test runner)
     'cypress-javascript': ['cypress'],
     'cypress-typescript': ['cypress'],
-    
+
     // Web - WebdriverIO
     'webdriverio-javascript': ['mocha'],
     'webdriverio-typescript': ['mocha'],
-    
+
     // Mobile - Appium
     'appium-java': ['testng'],
     'appium-python': ['pytest'],
     'appium-csharp': ['nunit'],
     'appium-javascript': ['jest'],
     'appium-typescript': ['jest'],
-    
+
     // Mobile - Espresso
     'espresso-java': ['junit5'],
-    
+
     // Mobile - XCUITest
     'xcuitest-swift': ['xctest'],
-    
+
     // API - RestAssured
     'restassured-java': ['testng'],
-    
+
     // API - Requests
     'requests-python': ['pytest'],
-    
+
     // API - Supertest
     'supertest-javascript': ['jest'],
     'supertest-typescript': ['jest'],
-    
+
     // API - RestSharp
     'restsharp-csharp': ['nunit'],
-    
+
     // Desktop - WinAppDriver
     'winappdriver-csharp': ['nunit'],
     'winappdriver-java': ['testng'],
     'winappdriver-python': ['pytest'],
-    
+
     // Desktop - PyAutoGUI
     'pyautogui-python': ['pytest']
   },
@@ -147,53 +147,53 @@ export const validationMatrix: ValidationMatrix = {
     'selenium-csharp': ['nuget'],
     'selenium-javascript': ['npm'],
     'selenium-typescript': ['npm'],
-    
+
     // Web - Playwright
     'playwright-java': ['maven', 'gradle'],
     'playwright-python': ['pip'],
     'playwright-csharp': ['nuget'],
     'playwright-javascript': ['npm'],
     'playwright-typescript': ['npm'],
-    
+
     // Web - Cypress
     'cypress-javascript': ['npm'],
     'cypress-typescript': ['npm'],
-    
+
     // Web - WebdriverIO
     'webdriverio-javascript': ['npm'],
     'webdriverio-typescript': ['npm'],
-    
+
     // Mobile - Appium
-    'appium-java': ['maven'],
+    'appium-java': ['maven', 'gradle'],
     'appium-python': ['pip'],
     'appium-csharp': ['nuget'],
     'appium-javascript': ['npm'],
     'appium-typescript': ['npm'],
-    
+
     // Mobile - Espresso
     'espresso-java': ['gradle'],
-    
+
     // Mobile - XCUITest
     'xcuitest-swift': ['spm'],
-    
+
     // API - RestAssured
-    'restassured-java': ['maven'],
-    
+    'restassured-java': ['maven', 'gradle'],
+
     // API - Requests
     'requests-python': ['pip'],
-    
+
     // API - Supertest
     'supertest-javascript': ['npm'],
     'supertest-typescript': ['npm'],
-    
+
     // API - RestSharp
     'restsharp-csharp': ['nuget'],
-    
+
     // Desktop - WinAppDriver
     'winappdriver-csharp': ['nuget'],
-    'winappdriver-java': ['maven'],
+    'winappdriver-java': ['maven', 'gradle'],
     'winappdriver-python': ['pip'],
-    
+
     // Desktop - PyAutoGUI
     'pyautogui-python': ['pip']
   },
@@ -207,53 +207,53 @@ export const validationMatrix: ValidationMatrix = {
     'selenium-csharp': ['allure', 'extent-reports', 'nunit-reports'],
     'selenium-javascript': ['allure', 'jest-html-reporter', 'mochawesome'],
     'selenium-typescript': ['allure', 'jest-html-reporter', 'mochawesome'],
-    
+
     // Web - Playwright
     'playwright-java': ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
     'playwright-python': ['allure', 'pytest-html'],
     'playwright-csharp': ['allure', 'extent-reports', 'nunit-reports'],
     'playwright-javascript': ['allure', 'jest-html'],
     'playwright-typescript': ['allure', 'jest-html'],
-    
+
     // Web - Cypress
     'cypress-javascript': ['allure', 'mochawesome', 'jest-html-reporter'],
     'cypress-typescript': ['allure', 'mochawesome', 'jest-html-reporter'],
-    
+
     // Web - WebdriverIO
     'webdriverio-javascript': ['allure', 'mochawesome', 'jest-html-reporter'],
     'webdriverio-typescript': ['allure', 'mochawesome', 'jest-html-reporter'],
-    
+
     // Mobile - Appium
     'appium-java': ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
     'appium-python': ['allure', 'pytest-html'],
     'appium-csharp': ['allure', 'extent-reports', 'nunit-reports'],
     'appium-javascript': ['allure', 'jest-html-reporter', 'mochawesome'],
     'appium-typescript': ['allure', 'jest-html-reporter', 'mochawesome'],
-    
+
     // Mobile - Espresso
     'espresso-java': ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
-    
+
     // Mobile - XCUITest
     'xcuitest-swift': [],
-    
+
     // API - RestAssured
     'restassured-java': ['allure', 'extent-reports', 'testng-reports'],
-    
+
     // API - Requests
     'requests-python': ['allure', 'pytest-html'],
-    
+
     // API - Supertest
     'supertest-javascript': ['allure', 'jest-html'],
     'supertest-typescript': ['allure', 'jest-html-reporter', 'mochawesome'],
-    
+
     // API - RestSharp
     'restsharp-csharp': ['allure', 'extent-reports', 'nunit-reports'],
-    
+
     // Desktop - WinAppDriver
     'winappdriver-csharp': ['allure', 'extent-reports', 'nunit-reports'],
     'winappdriver-java': ['allure', 'extent-reports'],
     'winappdriver-python': ['allure', 'pytest-html'],
-    
+
     // Desktop - PyAutoGUI
     'pyautogui-python': ['allure', 'pytest-html']
   },
@@ -301,18 +301,18 @@ export const validationMatrix: ValidationMatrix = {
     playwright: ['page-object-model', 'bdd'],
     cypress: ['page-object-model', 'bdd'],
     webdriverio: ['page-object-model', 'bdd'],
-    
+
     // Mobile frameworks - POM is standard, BDD for Agile teams
     appium: ['page-object-model', 'bdd'],
     espresso: ['page-object-model', 'bdd'],
     xcuitest: ['page-object-model', 'bdd'],
-    
+
     // API frameworks - data-driven, BDD, and fluent patterns
     restassured: ['fluent', 'bdd'],
     requests: ['data-driven', 'bdd'],
     supertest: ['data-driven', 'bdd'],
     restsharp: ['data-driven', 'bdd'],
-    
+
     // Desktop frameworks - POM is standard, some have additional patterns
     winappdriver: ['page-object-model', 'bdd'],
     pyautogui: ['functional-patterns', 'bdd']
@@ -327,53 +327,53 @@ export const validationMatrix: ValidationMatrix = {
     'selenium-csharp': ['page-object-model', 'bdd'],
     'selenium-javascript': ['page-object-model', 'bdd'],
     'selenium-typescript': ['page-object-model', 'bdd'],
-    
+
     // Web - Playwright (all languages support POM + BDD)
     'playwright-java': ['page-object-model', 'bdd'],
     'playwright-python': ['page-object-model', 'bdd'],
     'playwright-csharp': ['page-object-model', 'bdd'],
     'playwright-javascript': ['page-object-model', 'bdd'],
     'playwright-typescript': ['page-object-model', 'bdd'],
-    
+
     // Web - Cypress (POM + BDD)
     'cypress-javascript': ['page-object-model', 'bdd'],
     'cypress-typescript': ['page-object-model', 'bdd'],
-    
+
     // Web - WebdriverIO (POM + BDD)
     'webdriverio-javascript': ['page-object-model', 'bdd'],
     'webdriverio-typescript': ['page-object-model', 'bdd'],
-    
+
     // Mobile - Appium (all languages support POM + BDD)
     'appium-java': ['page-object-model', 'bdd'],
     'appium-python': ['page-object-model', 'bdd'],
     'appium-csharp': ['page-object-model', 'bdd'],
     'appium-javascript': ['page-object-model', 'bdd'],
     'appium-typescript': ['page-object-model', 'bdd'],
-    
+
     // Mobile - Espresso (POM + BDD)
     'espresso-java': ['page-object-model', 'bdd'],
-    
+
     // Mobile - XCUITest (POM + BDD)
     'xcuitest-swift': ['page-object-model', 'bdd'],
-    
+
     // API - RestAssured (Fluent + BDD - Java specific)
     'restassured-java': ['fluent', 'bdd'],
-    
+
     // API - Requests (Data-driven + BDD - Python specific)
     'requests-python': ['data-driven', 'bdd'],
-    
+
     // API - Supertest (Data-driven + BDD)
     'supertest-javascript': ['data-driven', 'bdd'],
     'supertest-typescript': ['data-driven', 'bdd'],
-    
+
     // API - RestSharp (Data-driven + BDD - C# specific)
     'restsharp-csharp': ['data-driven', 'bdd'],
-    
+
     // Desktop - WinAppDriver (POM + BDD)
     'winappdriver-csharp': ['page-object-model', 'bdd'],
     'winappdriver-java': ['page-object-model', 'bdd'],
     'winappdriver-python': ['page-object-model', 'bdd'],
-    
+
     // Desktop - PyAutoGUI (Functional patterns + BDD)
     'pyautogui-python': ['functional-patterns', 'bdd']
   }
@@ -381,7 +381,7 @@ export const validationMatrix: ValidationMatrix = {
 
 // Validation helper functions
 export class WizardValidator {
-  
+
   /**
    * Get available frameworks for selected testing type
    */
@@ -526,41 +526,41 @@ export class WizardValidator {
     switch (step) {
       case 'framework':
         return config.testingType ? this.getAvailableFrameworks(config.testingType) : [];
-      
+
       case 'language':
         return config.framework ? this.getAvailableLanguages(config.framework) : [];
-      
+
       case 'testRunner':
         // Use precise mapping when both framework and language are selected
         if (config.framework && config.language) {
           return this.getAvailableTestRunnersForFramework(config.framework, config.language);
         }
         return config.language ? this.getAvailableTestRunners(config.language) : [];
-      
+
       case 'buildTool':
         // Use precise mapping when both framework and language are selected
         if (config.framework && config.language) {
           return this.getAvailableBuildToolsForFramework(config.framework, config.language);
         }
         return config.language ? this.getAvailableBuildTools(config.language) : [];
-      
+
       case 'cicdTool':
         return config.framework ? this.getAvailableCicdTools(config.framework) : [];
-      
+
       case 'reportingTool':
         // Use precise mapping when both framework and language are selected
         if (config.framework && config.language) {
           return this.getAvailableReportingToolsForFramework(config.framework, config.language);
         }
         return config.framework ? this.getAvailableReportingTools(config.framework) : [];
-      
+
       case 'testingPattern':
         // Use precise mapping when both framework and language are selected
         if (config.framework && config.language) {
           return this.getAvailableTestingPatternsForFramework(config.framework, config.language);
         }
         return config.framework ? this.getAvailableTestingPatterns(config.framework) : [];
-      
+
       default:
         return [];
     }
@@ -642,34 +642,34 @@ export class WizardValidator {
 export const validationLabels = {
   testingTypes: {
     web: 'Web Applications',
-    mobile: 'Mobile Applications', 
+    mobile: 'Mobile Applications',
     api: 'API Testing',
     desktop: 'Desktop Applications'
   },
-  
+
   frameworks: {
     // Web
     selenium: 'Selenium WebDriver',
     playwright: 'Playwright',
     cypress: 'Cypress',
     webdriverio: 'WebdriverIO',
-    
+
     // Mobile
     appium: 'Appium',
     espresso: 'Espresso',
     xcuitest: 'XCUITest',
-    
+
     // API
     restassured: 'REST Assured',
     requests: 'Python Requests',
     supertest: 'Supertest',
     restsharp: 'RestSharp',
-    
+
     // Desktop
     winappdriver: 'WinAppDriver',
     pyautogui: 'PyAutoGUI'
   },
-  
+
   languages: {
     java: 'Java',
     python: 'Python',
@@ -678,7 +678,7 @@ export const validationLabels = {
     csharp: 'C#',
     swift: 'Swift'
   },
-  
+
   testRunners: {
     junit5: 'JUnit 5',
     testng: 'TestNG',
@@ -689,7 +689,7 @@ export const validationLabels = {
     xctest: 'XCTest',
     cypress: 'Cypress'
   },
-  
+
   buildTools: {
     maven: 'Apache Maven',
     gradle: 'Gradle',
@@ -699,7 +699,7 @@ export const validationLabels = {
     'dotnet-cli': '.NET CLI',
     spm: 'Swift Package Manager'
   },
-  
+
   cicdTools: {
     jenkins: 'Jenkins',
     'github-actions': 'GitHub Actions',
@@ -707,7 +707,7 @@ export const validationLabels = {
     'azure-devops': 'Azure DevOps',
     circleci: 'CircleCI'
   },
-  
+
   reportingTools: {
     allure: 'Allure Reports',
     'extent-reports': 'ExtentReports',
@@ -727,7 +727,7 @@ export const validationLabels = {
     'jest-html': 'Jest HTML',
     'nunit-reports': 'NUnit Reports'
   },
-  
+
   testingPatterns: {
     'page-object-model': 'Page Object Model (POM)',
     pom: 'Page Object Model (POM)',

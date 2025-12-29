@@ -1,0 +1,44 @@
+package {{packageName}}.tests;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import {{packageName}}.core.BaseTest;
+import {{packageName}}.pages.LoginPage;
+import {{packageName}}.pages.HomePage;
+
+/**
+ * Sample Mobile Login Test
+ * 
+ * HOW TO USE THIS TEMPLATE:
+ * 1. Update the username and password below with your test credentials
+ * 2. Update LoginPage locators to match your mobile app's login screen
+ * 3. Update capabilities in capabilities/android.json or capabilities/ios.json
+ * 4. Run: mvn clean test
+ * 
+ * This is a simple positive login test to verify your framework setup.
+ * Add more test cases as needed for your project.
+ */
+public class LoginTests extends BaseTest {
+
+    // ========== UPDATE THESE VALUES ==========
+    private static final String TEST_USERNAME = "YOUR_USERNAME_HERE";
+    private static final String TEST_PASSWORD = "YOUR_PASSWORD_HERE";
+    // ==========================================
+
+    @Test(groups = {"smoke", "login"}, 
+          description = "Verify successful login with valid credentials")
+    public void testValidLogin() {
+        // Step 1: Verify login page is loaded
+        LoginPage loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isPageLoaded(), "Login page should be loaded");
+        
+        // Step 2: Enter credentials and login
+        loginPage.performLogin(TEST_USERNAME, TEST_PASSWORD);
+        
+        // Step 3: Verify successful login
+        HomePage homePage = new HomePage();
+        Assert.assertTrue(homePage.isPageLoaded(), "Home page should be loaded after login");
+        
+        // Test passed! Your framework is working correctly.
+    }
+}

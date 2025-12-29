@@ -1,0 +1,49 @@
+# {{projectName}} - Selenium Test Automation with Gradle
+# Multi-stage Dockerfile for running Selenium tests
+
+FROM gradle:8.5-jdk17 AS build
+WORKDIR /app
+
+# Copy Gradle files
+COPY build.gradle settings.gradle gradle.properties ./
+COPY gradle ./gradle
+
+# Download dependencies
+RUN gradle dependencies --no-daemon
+
+# Copy source code
+COPY src ./src
+
+# Build the project
+RUN gradle compileTestJava --no-daemon
+
+# Test stage
+FROM gradle:8.5-jdk17 AS test
+WORKDIR /app
+
+# Install Chrome
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    unzip \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy built application
+COPY --from=build /app ./
+COPY --from=build /home/gradle/.gradle /home/gradle/.gradle
+
+# Set environment variables
+ENV BROWSER=chrome
+ENV HEADLESS=true
+ENV TEST_ENV=qa
+
+# Create directories for test results
+RUN mkdir -p /app/build/reports /app/build/screenshots
+
+# Default command runs all tests
+ENTRYPOINT ["gradle", "test", "--no-daemon"]
+CMD ["-Dheadless=true", "-Dbrowser=chrome"]

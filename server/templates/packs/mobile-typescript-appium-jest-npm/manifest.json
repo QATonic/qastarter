@@ -57,9 +57,7 @@
       }
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration for containerized testing"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
     },
     {
       "path": ".gitignore",
@@ -209,3 +207,4 @@
     ]
   }
 }
+

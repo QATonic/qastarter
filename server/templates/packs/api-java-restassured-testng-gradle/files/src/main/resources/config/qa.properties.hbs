@@ -1,0 +1,54 @@
+# QA Environment Configuration for API Testing
+
+# API Base Configuration
+api.base.url=https://qa-api.example.com
+api.version=v1
+api.timeout=45000
+api.content.type=application/json
+api.accept.type=application/json
+
+# Connection Settings
+api.connection.timeout=15000
+api.socket.timeout=15000
+api.max.connections=100
+
+# Authentication Configuration
+auth.method=credentials
+auth.login.endpoint=/auth/login
+auth.username=qa_user
+auth.password=qa_password
+auth.token.field=access_token
+
+# OAuth Configuration (if applicable)
+auth.oauth.token.endpoint=/oauth/token
+auth.oauth.client.id=qa_client_id
+auth.oauth.client.secret=qa_client_secret
+
+# API Key Configuration (if applicable)
+auth.api.key=qa_api_key_here
+auth.apikey.validation.endpoint=/auth/validate
+
+# Logging Configuration
+api.logging.enabled=true
+log.level=INFO
+log.file.path=logs/api-automation-qa.log
+
+# Test Data Configuration
+test.data.base.path=src/test/resources/testdata
+test.data.users.file=users.json
+test.data.requests.file=test-requests.json
+
+# Reporting Configuration
+reports.base.path=reports
+extent.report.name=API_Automation_Report_QA
+extent.report.title=API Test Automation Report - QA Environment
+
+# Performance Settings
+api.retry.count=2
+api.retry.delay=2000
+api.response.timeout.threshold=10000
+
+# Database Configuration (if needed)
+db.url=jdbc:postgresql://qa-db:5432/testdb
+db.username=qa_db_user
+db.password=qa_db_password

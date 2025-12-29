@@ -1,0 +1,62 @@
+package pages;
+
+import com.microsoft.playwright.Page;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class BasePage {
+    protected Page page;
+    protected static final Logger logger = LogManager.getLogger(BasePage.class);
+
+    public BasePage(Page page) {
+        this.page = page;
+    }
+
+    public void navigate(String url) {
+        logger.info("Navigating to: " + url);
+        page.navigate(url);
+    }
+
+    public void click(String selector) {
+        logger.info("Clicking element: " + selector);
+        page.click(selector);
+    }
+
+    public void type(String selector, String text) {
+        logger.info("Typing '" + text + "' into element: " + selector);
+        page.fill(selector, text);
+    }
+
+    public String getText(String selector) {
+        String text = page.textContent(selector);
+        logger.info("Getting text from element: " + selector + " = '" + text + "'");
+        return text;
+    }
+
+    public boolean isVisible(String selector) {
+        boolean visible = page.isVisible(selector);
+        logger.info("Checking visibility of element: " + selector + " = " + visible);
+        return visible;
+    }
+
+    public void waitForSelector(String selector, int timeout) {
+        logger.info("Waiting for selector: " + selector);
+        page.waitForSelector(selector, new Page.WaitForSelectorOptions().setTimeout(timeout));
+    }
+
+    public void waitForSelector(String selector) {
+        waitForSelector(selector, 30000);
+    }
+
+    public String getPageTitle() {
+        String title = page.title();
+        logger.info("Page title: " + title);
+        return title;
+    }
+
+    public String getCurrentUrl() {
+        String url = page.url();
+        logger.info("Current URL: " + url);
+        return url;
+    }
+}

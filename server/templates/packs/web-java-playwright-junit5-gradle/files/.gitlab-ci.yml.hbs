@@ -1,0 +1,55 @@
+image: mcr.microsoft.com/playwright/java:v{{toolVersions.playwright}}-jammy
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  BROWSER: "chromium"
+  HEADLESS: "true"
+  ENV: "qa"
+
+stages:
+  - build
+  - test
+  - report
+
+cache:
+  key: gradle-cache
+  paths:
+    - .gradle/
+    - build/
+
+before_script:
+  - chmod +x gradlew
+  - ./gradlew installPlaywrightBrowsers --no-daemon
+
+build:
+  stage: build
+  script:
+    - ./gradlew clean build -x test --no-daemon
+  artifacts:
+    paths:
+      - build/
+
+test:
+  stage: test
+  script:
+    - ./gradlew test -Pbrowser=$BROWSER -Pheadless=$HEADLESS -Penv=$ENV --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - build/reports/
+      - screenshots/
+    reports:
+      junit: build/test-results/test/*.xml
+
+pages:
+  stage: report
+  dependencies:
+    - test
+  script:
+    - mkdir -p public
+    - cp -r build/reports/tests/test/* public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

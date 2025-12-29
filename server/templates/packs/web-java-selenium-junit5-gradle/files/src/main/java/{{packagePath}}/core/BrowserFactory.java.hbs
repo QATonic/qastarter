@@ -1,0 +1,203 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.utils.Log;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ * Factory class for creating WebDriver instances with Selenium Manager (Selenium 4+).
+ * Selenium Manager automatically handles driver downloads and management.
+ * Supports Chrome, Firefox, and Edge browsers with local and remote execution.
+ */
+public class BrowserFactory {
+    
+    private BrowserFactory() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Create WebDriver instance based on browser type
+     * @param browser Browser name (chrome, firefox, edge)
+     * @param headless Whether to run in headless mode
+     * @return WebDriver instance
+     */
+    public static WebDriver createDriver(String browser, boolean headless) {
+        WebDriver driver;
+        
+        if (ConfigurationReader.isRemoteExecution()) {
+            driver = createRemoteDriver(browser, headless);
+        } else {
+            driver = createLocalDriver(browser, headless);
+        }
+        
+        Log.info("Created " + browser + " driver (headless: " + headless + ", remote: " + 
+                ConfigurationReader.isRemoteExecution() + ")");
+        
+        return driver;
+    }
+    
+    /**
+     * Create local WebDriver instance
+     * @param browser Browser name
+     * @param headless Headless mode flag
+     * @return WebDriver instance
+     */
+    private static WebDriver createLocalDriver(String browser, boolean headless) {
+        switch (browser.toLowerCase()) {
+            case "chrome":
+                return createChromeDriver(headless);
+            case "firefox":
+                return createFirefoxDriver(headless);
+            case "edge":
+                return createEdgeDriver(headless);
+            default:
+                Log.warn("Unsupported browser: " + browser + ". Defaulting to Chrome.");
+                return createChromeDriver(headless);
+        }
+    }
+    
+    /**
+     * Create remote WebDriver instance for Selenium Grid
+     * @param browser Browser name
+     * @param headless Headless mode flag
+     * @return RemoteWebDriver instance
+     */
+    private static WebDriver createRemoteDriver(String browser, boolean headless) {
+        try {
+            String gridUrl = ConfigurationReader.getGridUrl();
+            if (gridUrl == null || gridUrl.isEmpty()) {
+                throw new RuntimeException("Grid URL is not configured for remote execution");
+            }
+            
+            URL hubUrl = new URL(gridUrl);
+            
+            switch (browser.toLowerCase()) {
+                case "chrome":
+                    return new RemoteWebDriver(hubUrl, getChromeOptions(headless));
+                case "firefox":
+                    return new RemoteWebDriver(hubUrl, getFirefoxOptions(headless));
+                case "edge":
+                    return new RemoteWebDriver(hubUrl, getEdgeOptions(headless));
+                default:
+                    Log.warn("Unsupported browser: " + browser + ". Defaulting to Chrome.");
+                    return new RemoteWebDriver(hubUrl, getChromeOptions(headless));
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid Grid URL: " + ConfigurationReader.getGridUrl(), e);
+        }
+    }
+    
+    /**
+     * Create Chrome driver with options using Selenium Manager
+     * @param headless Headless mode flag
+     * @return ChromeDriver instance
+     */
+    private static WebDriver createChromeDriver(boolean headless) {
+        return new ChromeDriver(getChromeOptions(headless));
+    }
+    
+    /**
+     * Create Firefox driver with options using Selenium Manager
+     * @param headless Headless mode flag
+     * @return FirefoxDriver instance
+     */
+    private static WebDriver createFirefoxDriver(boolean headless) {
+        return new FirefoxDriver(getFirefoxOptions(headless));
+    }
+    
+    /**
+     * Create Edge driver with options using Selenium Manager
+     * @param headless Headless mode flag
+     * @return EdgeDriver instance
+     */
+    private static WebDriver createEdgeDriver(boolean headless) {
+        return new EdgeDriver(getEdgeOptions(headless));
+    }
+    
+    /**
+     * Get Chrome options with common configurations
+     * @param headless Headless mode flag
+     * @return ChromeOptions instance
+     */
+    private static ChromeOptions getChromeOptions(boolean headless) {
+        ChromeOptions options = new ChromeOptions();
+        
+        // Common Chrome arguments
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-web-security");
+        options.addArguments("--disable-features=VizDisplayCompositor");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-plugins");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--disable-popup-blocking");
+        
+        if (headless) {
+            options.addArguments("--headless");
+            options.addArguments("--window-size=1920,1080");
+        }
+        
+        // Set download directory if needed
+        // Map<String, Object> prefs = new HashMap<>();
+        // prefs.put("download.default_directory", System.getProperty("user.dir") + "/downloads");
+        // options.setExperimentalOption("prefs", prefs);
+        
+        return options;
+    }
+    
+    /**
+     * Get Firefox options with common configurations
+     * @param headless Headless mode flag
+     * @return FirefoxOptions instance
+     */
+    private static FirefoxOptions getFirefoxOptions(boolean headless) {
+        FirefoxOptions options = new FirefoxOptions();
+        
+        // Common Firefox preferences
+        options.addPreference("dom.webnotifications.enabled", false);
+        options.addPreference("media.volume_scale", "0.0");
+        
+        if (headless) {
+            options.addArguments("--headless");
+            options.addArguments("--width=1920");
+            options.addArguments("--height=1080");
+        }
+        
+        return options;
+    }
+    
+    /**
+     * Get Edge options with common configurations
+     * @param headless Headless mode flag
+     * @return EdgeOptions instance
+     */
+    private static EdgeOptions getEdgeOptions(boolean headless) {
+        EdgeOptions options = new EdgeOptions();
+        
+        // Common Edge arguments
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-plugins");
+        
+        if (headless) {
+            options.addArguments("--headless");
+            options.addArguments("--window-size=1920,1080");
+        }
+        
+        return options;
+    }
+}

@@ -7,19 +7,28 @@ import { projectConfigSchema, type ProjectConfig } from "@shared/schema";
 import { ProjectTemplateGenerator } from "./templates";
 import { WizardValidator, validationMatrix, validationLabels } from "@shared/validationMatrix";
 import { sanitizeProjectName, sanitizeGroupId, sanitizeArtifactId, sanitizeFilePath } from "@shared/sanitize";
-import { 
-  AppError, 
-  ValidationError, 
+import {
+  AppError,
+  ValidationError,
   IncompatibleCombinationError,
-  ErrorCode, 
+  ErrorCode,
   generateRequestId,
-  asyncHandler 
+  asyncHandler
 } from "./errors";
+import { logger, createRequestLogger, logGeneration, logApiError } from "./utils/logger";
+import { rateLimitConfig } from "./config";
+import {
+  trackEvent,
+  trackProjectGeneration,
+  getAnalyticsStats,
+  getDeviceType,
+  generateSessionId
+} from "./services/analyticsService";
 
-// Rate limiting configuration
+// Rate limiting configuration (using centralized config)
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: rateLimitConfig.api.windowMs,
+  max: rateLimitConfig.api.max,
   message: {
     success: false,
     error: {
@@ -28,13 +37,13 @@ const apiLimiter = rateLimit({
       timestamp: new Date().toISOString()
     }
   },
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 const generateProjectLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Limit project generation to 10 per 15 minutes per IP
+  windowMs: rateLimitConfig.generation.windowMs,
+  max: rateLimitConfig.generation.max,
   message: {
     success: false,
     error: {
@@ -45,12 +54,12 @@ const generateProjectLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  skipSuccessfulRequests: false, // Count all requests
+  skipSuccessfulRequests: false,
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const templateGenerator = new ProjectTemplateGenerator();
-  
+
   // Apply rate limiting to all API routes
   app.use('/api/', apiLimiter);
 
@@ -58,10 +67,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/generate-project", generateProjectLimiter, asyncHandler(async (req, res) => {
     const startTime = Date.now();
     const requestId = generateRequestId('gen');
-    
+
     // Validate request body
     const validationResult = projectConfigSchema.safeParse(req.body);
-    
+
     if (!validationResult.success) {
       const errors = validationResult.error.errors.map(e => ({
         field: e.path.join('.'),
@@ -81,9 +90,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       config.artifactId = sanitizeArtifactId(config.artifactId);
     }
 
-    // Log generation request
-    console.log(`[${requestId}] Project generation started`);
-    console.log(`[${requestId}] Configuration:`, {
+    // Log generation request using structured logger
+    const reqLogger = createRequestLogger(requestId);
+    logGeneration(requestId, 'started', {
       projectName: config.projectName,
       testingType: config.testingType,
       framework: config.framework,
@@ -92,7 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       buildTool: config.buildTool,
       cicdTool: config.cicdTool || 'none',
       reportingTool: config.reportingTool || 'none',
-      utilities: config.utilities 
+      utilities: config.utilities
         ? Object.entries(config.utilities).filter(([_, enabled]) => enabled).map(([key, _]) => key)
         : []
     });
@@ -100,9 +109,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Validate compatibility using our validation matrix
     if (!WizardValidator.isCompatible(config.testingType, config.framework, config.language)) {
       throw new IncompatibleCombinationError(
-        config.testingType, 
-        config.framework, 
-        config.language, 
+        config.testingType,
+        config.framework,
+        config.language,
         requestId
       );
     }
@@ -126,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const totalSize = files.reduce((sum, file) => sum + Buffer.byteLength(file.content, 'utf8'), 0);
     const sizeInKB = (totalSize / 1024).toFixed(2);
 
-    console.log(`[${requestId}] Template generation completed:`, {
+    reqLogger.debug('Template generation completed', {
       filesGenerated: files.length,
       sizeKB: sizeInKB,
       durationMs: generationDuration
@@ -136,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       await storage.saveProjectGeneration(config);
     } catch (analyticsError) {
-      console.warn(`[${requestId}] Analytics save failed:`, analyticsError);
+      reqLogger.warn('Analytics save failed', { error: analyticsError });
       // Continue with project generation even if analytics fails
     }
 
@@ -152,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // Handle archive errors
     archive.on('error', (err: Error) => {
-      console.error(`[${requestId}] Archive error:`, err);
+      reqLogger.error('Archive error', { error: err.message });
       if (!res.headersSent) {
         const archiveError = new AppError(ErrorCode.ARCHIVE_ERROR, 'Error creating project archive', null, requestId);
         res.status(archiveError.statusCode).json(archiveError.toJSON());
@@ -163,7 +172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     archive.on('end', () => {
       const totalDuration = Date.now() - startTime;
       const archiveDuration = Date.now() - archiveStart;
-      console.log(`[${requestId}] ✅ Project generation successful:`, {
+      logGeneration(requestId, 'completed', {
         projectName: config.projectName,
         files: files.length,
         sizeKB: sizeInKB,
@@ -319,7 +328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Validate project configuration
   app.post("/api/validate-config", (req, res) => {
     const validationResult = projectConfigSchema.safeParse(req.body);
-    
+
     if (!validationResult.success) {
       return res.json({
         isValid: false,
@@ -332,10 +341,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     const config: ProjectConfig = validationResult.data;
-    
+
     // Validate compatibility using our validation matrix
     const isValid = WizardValidator.isCompatible(config.testingType, config.framework, config.language);
-    
+
     res.json({
       isValid,
       message: isValid ? "Configuration is valid" : "Invalid combination of testing type, framework, and language"
@@ -345,10 +354,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get project dependencies based on configuration
   app.post("/api/project-dependencies", asyncHandler(async (req, res) => {
     const requestId = generateRequestId('deps');
-    
+
     // Validate request body
     const validationResult = projectConfigSchema.safeParse(req.body);
-    
+
     if (!validationResult.success) {
       const errors = validationResult.error.errors.map(e => ({
         field: e.path.join('.'),
@@ -385,10 +394,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get project preview (structure and sample files) based on configuration
   app.post("/api/project-preview", asyncHandler(async (req, res) => {
     const requestId = generateRequestId('preview');
-    
+
     // Validate request body
     const validationResult = projectConfigSchema.safeParse(req.body);
-    
+
     if (!validationResult.success) {
       const errors = validationResult.error.errors.map(e => ({
         field: e.path.join('.'),
@@ -412,141 +421,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Generate project files for preview (same as actual generation)
     const files = await templateGenerator.generateProject(config);
 
-      // Transform files into preview structure
-      interface PreviewFile {
-        name: string;
-        type: 'file' | 'folder';
-        content?: string;
-        children?: PreviewFile[];
-      }
+    // Transform files into preview structure
+    interface PreviewFile {
+      name: string;
+      type: 'file' | 'folder';
+      content?: string;
+      children?: PreviewFile[];
+    }
 
-      // Build file tree structure
-      const buildFileTree = (files: any[]): PreviewFile[] => {
-        const tree: { [key: string]: any } = {};
-        
-        // Sort files to process folders first
-        const sortedFiles = files.sort((a, b) => {
-          const aDepth = a.path.split('/').length;
-          const bDepth = b.path.split('/').length;
-          return aDepth - bDepth;
-        });
+    // Build file tree structure
+    const buildFileTree = (files: any[]): PreviewFile[] => {
+      const tree: { [key: string]: any } = {};
 
-        sortedFiles.forEach(file => {
-          const pathParts = file.path.split('/');
-          let currentLevel = tree;
-          
-          pathParts.forEach((part: string, index: number) => {
-            if (index === pathParts.length - 1) {
-              // It's a file
+      // Sort files to process folders first
+      const sortedFiles = files.sort((a, b) => {
+        const aDepth = a.path.split('/').length;
+        const bDepth = b.path.split('/').length;
+        return aDepth - bDepth;
+      });
+
+      sortedFiles.forEach(file => {
+        const pathParts = file.path.split('/');
+        let currentLevel = tree;
+
+        pathParts.forEach((part: string, index: number) => {
+          if (index === pathParts.length - 1) {
+            // It's a file
+            currentLevel[part] = {
+              name: part,
+              type: 'file',
+              content: file.content
+            };
+          } else {
+            // It's a folder
+            if (!currentLevel[part]) {
               currentLevel[part] = {
                 name: part,
-                type: 'file',
-                content: file.content
+                type: 'folder',
+                children: {}
               };
-            } else {
-              // It's a folder
-              if (!currentLevel[part]) {
-                currentLevel[part] = {
-                  name: part,
-                  type: 'folder',
-                  children: {}
-                };
-              }
-              currentLevel = currentLevel[part].children;
             }
-          });
+            currentLevel = currentLevel[part].children;
+          }
         });
+      });
 
-        // Convert tree object to array format
-        const convertToArray = (obj: any): PreviewFile[] => {
-          return Object.values(obj).map((item: any) => {
-            if (item.type === 'folder' && item.children) {
-              return {
-                ...item,
-                children: convertToArray(item.children)
-              };
-            }
-            return item;
-          });
-        };
-
-        // Create root project folder
-        return [{
-          name: config.projectName,
-          type: 'folder' as const,
-          children: convertToArray(tree)
-        }];
+      // Convert tree object to array format
+      const convertToArray = (obj: any): PreviewFile[] => {
+        return Object.values(obj).map((item: any) => {
+          if (item.type === 'folder' && item.children) {
+            return {
+              ...item,
+              children: convertToArray(item.children)
+            };
+          }
+          return item;
+        });
       };
 
-      const projectStructure = buildFileTree(files);
+      // Create root project folder
+      return [{
+        name: config.projectName,
+        type: 'folder' as const,
+        children: convertToArray(tree)
+      }];
+    };
 
-      // Get sample file contents for key files (limit to prevent huge responses)
-      const sampleFiles = files
-        .filter(file => {
-          const fileName = file.path.split('/').pop()?.toLowerCase() || '';
-          return fileName.includes('pom.xml') || 
-                 fileName.includes('readme') || 
-                 fileName.includes('test') ||
-                 fileName.includes('base') ||
-                 fileName.includes('page') ||
-                 fileName.includes('config');
-        })
-        .slice(0, 8) // Limit to 8 sample files
-        .map(file => ({
-          path: file.path,
-          content: file.content.substring(0, 2000) + (file.content.length > 2000 ? '\n\n... (content truncated for preview)' : '')
-        }));
+    const projectStructure = buildFileTree(files);
 
-      // Calculate estimated project size
-      const estimatedSize = files.reduce((total, file) => {
-        return total + (file.content?.length || 0);
-      }, 0);
+    // Get sample file contents for key files (limit to prevent huge responses)
+    const sampleFiles = files
+      .filter(file => {
+        const fileName = file.path.split('/').pop()?.toLowerCase() || '';
+        return fileName.includes('pom.xml') ||
+          fileName.includes('readme') ||
+          fileName.includes('test') ||
+          fileName.includes('base') ||
+          fileName.includes('page') ||
+          fileName.includes('config');
+      })
+      .slice(0, 8) // Limit to 8 sample files
+      .map(file => ({
+        path: file.path,
+        content: file.content.substring(0, 2000) + (file.content.length > 2000 ? '\n\n... (content truncated for preview)' : '')
+      }));
 
-      // Identify key files (tests, configs, README)
-      const keyFiles = files
-        .filter(file => {
-          const fileName = file.path.split('/').pop()?.toLowerCase() || '';
-          const path = file.path.toLowerCase();
-          return path.includes('test') || 
-                 fileName.includes('readme') ||
-                 fileName.includes('pom.xml') ||
-                 fileName.includes('build.gradle') ||
-                 fileName.includes('package.json') ||
-                 fileName.includes('requirements.txt') ||
-                 fileName.includes('config') ||
-                 fileName.includes('.csproj') ||
-                 fileName.includes('jenkinsfile') ||
-                 fileName.includes('.yml') ||
-                 fileName.includes('.yaml');
-        })
-        .map(file => ({
-          path: file.path,
-          type: file.path.toLowerCase().includes('test') ? 'test' : 
-                file.path.toLowerCase().includes('readme') ? 'documentation' :
-                'configuration'
-        }));
+    // Calculate estimated project size
+    const estimatedSize = files.reduce((total, file) => {
+      return total + (file.content?.length || 0);
+    }, 0);
 
-      // Get actual dependency count from template manifest (filtered by user selections)
-      const dependencies = await templateGenerator.getDependencies(config);
-      const dependencyCount = Object.keys(dependencies).length;
+    // Identify key files (tests, configs, README)
+    const keyFiles = files
+      .filter(file => {
+        const fileName = file.path.split('/').pop()?.toLowerCase() || '';
+        const path = file.path.toLowerCase();
+        return path.includes('test') ||
+          fileName.includes('readme') ||
+          fileName.includes('pom.xml') ||
+          fileName.includes('build.gradle') ||
+          fileName.includes('package.json') ||
+          fileName.includes('requirements.txt') ||
+          fileName.includes('config') ||
+          fileName.includes('.csproj') ||
+          fileName.includes('jenkinsfile') ||
+          fileName.includes('.yml') ||
+          fileName.includes('.yaml');
+      })
+      .map(file => ({
+        path: file.path,
+        type: file.path.toLowerCase().includes('test') ? 'test' :
+          file.path.toLowerCase().includes('readme') ? 'documentation' :
+            'configuration'
+      }));
 
-      res.json({
-        success: true,
-        data: {
-          projectStructure,
-          sampleFiles,
-          totalFiles: files.length,
-          estimatedSize: Math.ceil(estimatedSize / 1024), // Convert to KB
-          keyFiles,
-          dependencyCount,
-          projectConfig: config
-        }
-      });
+    // Get actual dependency count from template manifest (filtered by user selections)
+    const dependencies = await templateGenerator.getDependencies(config);
+    const dependencyCount = Object.keys(dependencies).length;
+
+    res.json({
+      success: true,
+      data: {
+        projectStructure,
+        sampleFiles,
+        totalFiles: files.length,
+        estimatedSize: Math.ceil(estimatedSize / 1024), // Convert to KB
+        keyFiles,
+        dependencyCount,
+        projectConfig: config
+      }
+    });
   }));
 
   // ============ Public API v1 Routes ============
   // These endpoints are designed for CLI tools, curl usage, and third-party integrations
-  
+
   // GET /api/v1/metadata - List available options for project generation
   app.get("/api/v1/metadata", (req, res) => {
     // Build metadata response with all available options and compatibility info
@@ -595,175 +604,225 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/v1/generate", generateProjectLimiter, asyncHandler(async (req, res) => {
     const startTime = Date.now();
     const requestId = generateRequestId('api-gen');
-    
+
     // Extract query parameters
     const {
       projectName = 'my-qa-project',
       testingType: testingTypeParam = 'web',
-        framework = 'selenium',
-        language = 'java',
-        testRunner,
-        buildTool,
-        testingPattern = 'page-object-model',
-        cicdTool,
-        reportingTool,
-        includeSampleTests = 'true',
-        // Utilities as comma-separated string
-        utilities: utilitiesParam
-      } = req.query as Record<string, string>;
+      framework = 'selenium',
+      language = 'java',
+      testRunner,
+      buildTool,
+      testingPattern = 'page-object-model',
+      cicdTool,
+      reportingTool,
+      includeSampleTests = 'true',
+      // Utilities as comma-separated string
+      utilities: utilitiesParam
+    } = req.query as Record<string, string>;
 
-      // Validate and cast testingType
-      const validTestingTypes = ['web', 'mobile', 'api', 'desktop'] as const;
-      const testingType = validTestingTypes.includes(testingTypeParam as any) 
-        ? (testingTypeParam as 'web' | 'mobile' | 'api' | 'desktop')
-        : 'web';
+    // Validate and cast testingType
+    const validTestingTypes = ['web', 'mobile', 'api', 'desktop'] as const;
+    const testingType = validTestingTypes.includes(testingTypeParam as any)
+      ? (testingTypeParam as 'web' | 'mobile' | 'api' | 'desktop')
+      : 'web';
 
-      // Parse utilities - map to schema-compatible field names
-      const utilitiesArray = utilitiesParam ? utilitiesParam.split(',').map(u => u.trim()) : [];
-      const utilities = {
-        configReader: utilitiesArray.includes('configReader'),
-        jsonReader: utilitiesArray.includes('jsonReader'),
-        screenshotUtility: utilitiesArray.includes('screenshotUtility') || utilitiesArray.includes('screenshot'),
-        logger: utilitiesArray.includes('logger') || utilitiesArray.includes('logging'),
-        dataProvider: utilitiesArray.includes('dataProvider') || utilitiesArray.includes('dataDriver')
-      };
+    // Parse utilities - map to schema-compatible field names
+    const utilitiesArray = utilitiesParam ? utilitiesParam.split(',').map(u => u.trim()) : [];
+    const utilities = {
+      configReader: utilitiesArray.includes('configReader'),
+      jsonReader: utilitiesArray.includes('jsonReader'),
+      screenshotUtility: utilitiesArray.includes('screenshotUtility') || utilitiesArray.includes('screenshot'),
+      logger: utilitiesArray.includes('logger') || utilitiesArray.includes('logging'),
+      dataProvider: utilitiesArray.includes('dataProvider') || utilitiesArray.includes('dataDriver')
+    };
 
-      // Auto-select test runner and build tool if not provided
-      const availableTestRunners = WizardValidator.getAvailableTestRunners(language);
-      const availableBuildTools = WizardValidator.getAvailableBuildTools(language);
-      
-      const finalTestRunner = testRunner || availableTestRunners[0] || 'testng';
-      const finalBuildTool = buildTool || availableBuildTools[0] || 'maven';
+    // Auto-select test runner and build tool if not provided
+    const availableTestRunners = WizardValidator.getAvailableTestRunners(language);
+    const availableBuildTools = WizardValidator.getAvailableBuildTools(language);
 
-      // Build config object
-      const config: ProjectConfig = {
-        projectName,
-        testingType,
-        framework,
-        language,
-        testRunner: finalTestRunner,
-        buildTool: finalBuildTool,
-        testingPattern,
-        cicdTool: cicdTool || undefined,
-        reportingTool: reportingTool || undefined,
-        utilities,
-        includeSampleTests: includeSampleTests !== 'false'
-      };
+    const finalTestRunner = testRunner || availableTestRunners[0] || 'testng';
+    const finalBuildTool = buildTool || availableBuildTools[0] || 'maven';
 
-      // Validate config
-      const validationResult = projectConfigSchema.safeParse(config);
-      
-      if (!validationResult.success) {
-        const errors = validationResult.error.errors.map(e => ({
-          field: e.path.join('.'),
-          message: e.message
-        }));
-        throw new ValidationError('Invalid configuration', errors, requestId);
-      }
+    // Build config object
+    const config: ProjectConfig = {
+      projectName,
+      testingType,
+      framework,
+      language,
+      testRunner: finalTestRunner,
+      buildTool: finalBuildTool,
+      testingPattern,
+      cicdTool: cicdTool || undefined,
+      reportingTool: reportingTool || undefined,
+      utilities,
+      includeSampleTests: includeSampleTests !== 'false'
+    };
 
-      // Sanitize user inputs to prevent path traversal and injection attacks
-      config.projectName = sanitizeProjectName(config.projectName);
+    // Validate config
+    const validationResult = projectConfigSchema.safeParse(config);
 
-      // Log generation request
-      console.log(`[${requestId}] Public API project generation started`);
-      console.log(`[${requestId}] Configuration:`, {
-        projectName: config.projectName,
-        testingType: config.testingType,
-        framework: config.framework,
-        language: config.language,
-        testRunner: config.testRunner,
-        buildTool: config.buildTool,
-        cicdTool: config.cicdTool || 'none',
-        reportingTool: config.reportingTool || 'none'
-      });
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map(e => ({
+        field: e.path.join('.'),
+        message: e.message
+      }));
+      throw new ValidationError('Invalid configuration', errors, requestId);
+    }
 
-      // Validate compatibility
-      if (!WizardValidator.isCompatible(config.testingType, config.framework, config.language)) {
-        throw new IncompatibleCombinationError(
-          config.testingType,
-          config.framework,
-          config.language,
-          requestId
-        );
-      }
+    // Sanitize user inputs to prevent path traversal and injection attacks
+    config.projectName = sanitizeProjectName(config.projectName);
 
-      // Generate project files
-      const generationStart = Date.now();
-      let files;
-      try {
-        files = await templateGenerator.generateProject(config);
-      } catch (genError) {
-        throw new AppError(
-          ErrorCode.TEMPLATE_GENERATION_ERROR,
-          'Failed to generate project files',
-          { originalError: genError instanceof Error ? genError.message : 'Unknown error' },
-          requestId
-        );
-      }
-      const generationDuration = Date.now() - generationStart;
+    // Log generation request
+    console.log(`[${requestId}] Public API project generation started`);
+    console.log(`[${requestId}] Configuration:`, {
+      projectName: config.projectName,
+      testingType: config.testingType,
+      framework: config.framework,
+      language: config.language,
+      testRunner: config.testRunner,
+      buildTool: config.buildTool,
+      cicdTool: config.cicdTool || 'none',
+      reportingTool: config.reportingTool || 'none'
+    });
 
-      // Calculate total project size
-      const totalSize = files.reduce((sum, file) => sum + Buffer.byteLength(file.content, 'utf8'), 0);
-      const sizeInKB = (totalSize / 1024).toFixed(2);
+    // Validate compatibility
+    if (!WizardValidator.isCompatible(config.testingType, config.framework, config.language)) {
+      throw new IncompatibleCombinationError(
+        config.testingType,
+        config.framework,
+        config.language,
+        requestId
+      );
+    }
 
-      console.log(`[${requestId}] Template generation completed:`, {
-        filesGenerated: files.length,
-        sizeKB: sizeInKB,
-        durationMs: generationDuration
-      });
+    // Generate project files
+    const generationStart = Date.now();
+    let files;
+    try {
+      files = await templateGenerator.generateProject(config);
+    } catch (genError) {
+      throw new AppError(
+        ErrorCode.TEMPLATE_GENERATION_ERROR,
+        'Failed to generate project files',
+        { originalError: genError instanceof Error ? genError.message : 'Unknown error' },
+        requestId
+      );
+    }
+    const generationDuration = Date.now() - generationStart;
 
-      // Save generation for analytics
-      try {
-        await storage.saveProjectGeneration(config);
-      } catch (analyticsError) {
-        console.warn(`[${requestId}] Analytics save failed:`, analyticsError);
-      }
+    // Calculate total project size
+    const totalSize = files.reduce((sum, file) => sum + Buffer.byteLength(file.content, 'utf8'), 0);
+    const sizeInKB = (totalSize / 1024).toFixed(2);
 
-      // Create ZIP archive
-      const archiveStart = Date.now();
-      const archive = archiver('zip', {
-        zlib: { level: 9 }
-      });
+    console.log(`[${requestId}] Template generation completed:`, {
+      filesGenerated: files.length,
+      sizeKB: sizeInKB,
+      durationMs: generationDuration
+    });
 
-      // Set response headers
-      res.setHeader('Content-Type', 'application/zip');
-      res.setHeader('Content-Disposition', `attachment; filename="${config.projectName}.zip"`);
+    // Save generation for analytics
+    try {
+      await storage.saveProjectGeneration(config);
+    } catch (analyticsError) {
+      console.warn(`[${requestId}] Analytics save failed:`, analyticsError);
+    }
 
-      // Handle archive errors
-      archive.on('error', (err: Error) => {
-        console.error(`[${requestId}] Archive error:`, err);
-        if (!res.headersSent) {
-          res.status(500).json({
-            success: false,
-            message: "Error creating project archive"
-          });
-        }
-      });
+    // Create ZIP archive
+    const archiveStart = Date.now();
+    const archive = archiver('zip', {
+      zlib: { level: 9 }
+    });
 
-      // Track archive completion
-      archive.on('end', () => {
-        const totalDuration = Date.now() - startTime;
-        const archiveDuration = Date.now() - archiveStart;
-        console.log(`[${requestId}] ✅ Public API project generation successful:`, {
-          projectName: config.projectName,
-          files: files.length,
-          sizeKB: sizeInKB,
-          generationMs: generationDuration,
-          archiveMs: archiveDuration,
-          totalMs: totalDuration
+    // Set response headers
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${config.projectName}.zip"`);
+
+    // Handle archive errors
+    archive.on('error', (err: Error) => {
+      console.error(`[${requestId}] Archive error:`, err);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message: "Error creating project archive"
         });
+      }
+    });
+
+    // Track archive completion
+    archive.on('end', () => {
+      const totalDuration = Date.now() - startTime;
+      const archiveDuration = Date.now() - archiveStart;
+      console.log(`[${requestId}] ✅ Public API project generation successful:`, {
+        projectName: config.projectName,
+        files: files.length,
+        sizeKB: sizeInKB,
+        generationMs: generationDuration,
+        archiveMs: archiveDuration,
+        totalMs: totalDuration
       });
+    });
 
-      // Pipe archive to response
-      archive.pipe(res);
+    // Pipe archive to response
+    archive.pipe(res);
 
-      // Add files to archive
-      files.forEach(file => {
-        archive.append(file.content, { name: file.path });
+    // Add files to archive
+    files.forEach(file => {
+      archive.append(file.content, { name: file.path });
+    });
+
+    // Finalize the archive
+    await archive.finalize();
+  }));
+
+  // ============================================
+  // Analytics API Endpoints (Anonymous Tracking)
+  // ============================================
+
+  // Receive analytics events from client
+  app.post("/api/analytics/events", asyncHandler(async (req, res) => {
+    const { sessionId, events, metadata } = req.body;
+
+    if (!sessionId || !events || !Array.isArray(events)) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Invalid analytics payload' }
       });
+    }
 
-      // Finalize the archive
-      await archive.finalize();
+    const deviceType = metadata?.userAgent ? getDeviceType(metadata.userAgent) : 'desktop';
+
+    // Track each event
+    for (const event of events) {
+      trackEvent(
+        event.eventType,
+        sessionId,
+        event.data || {},
+        {
+          userAgent: metadata?.userAgent?.substring(0, 200), // Limit length
+          deviceType,
+          referrer: metadata?.referrer?.substring(0, 500),
+        }
+      );
+    }
+
+    res.json({ success: true, received: events.length });
+  }));
+
+  // Get aggregated analytics stats (for internal use/dashboard)
+  app.get("/api/analytics/stats", asyncHandler(async (req, res) => {
+    const stats = getAnalyticsStats();
+
+    res.json({
+      success: true,
+      data: stats
+    });
+  }));
+
+  // Get new session ID
+  app.get("/api/analytics/session", asyncHandler(async (req, res) => {
+    const sessionId = generateSessionId();
+    res.json({ success: true, sessionId });
   }));
 
   const httpServer = createServer(app);

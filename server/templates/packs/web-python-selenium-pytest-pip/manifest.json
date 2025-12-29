@@ -52,14 +52,10 @@
       "description": "Docker ignore rules"
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker container configuration"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker container configuration","conditional": {"utilities.includeDocker": true}
     },
     {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose configuration with Selenium Grid"
+      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose configuration with Selenium Grid","conditional": {"utilities.includeDockerCompose": true}
     },
     {
       "path": "setup.py",
@@ -238,3 +234,4 @@
     "allure-results"
   ]
 }
+

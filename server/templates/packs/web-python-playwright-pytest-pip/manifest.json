@@ -42,9 +42,7 @@
       }
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration for containerized testing"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
     },
     {
       "path": ".gitignore",
@@ -166,9 +164,7 @@
       }
     },
     {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose for Playwright testing"
+      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Playwright testing","conditional": {"utilities.includeDockerCompose": true}
     }
   ],
   "supportedCombination": {
@@ -197,3 +193,4 @@
     ]
   }
 }
+

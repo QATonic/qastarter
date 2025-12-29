@@ -1,0 +1,232 @@
+package {{javaPackage}}.utils;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * ExtentReports manager for HTML test reporting.
+ * Provides centralized control over ExtentReports instance and test logging.
+ */
+public class ExtentManager {
+    
+    private static ExtentReports extent;
+    private static ThreadLocal<ExtentTest> extentTest = new ThreadLocal<>();
+    private static final String REPORT_DIR = "reports";
+    
+    /**
+     * Create and configure ExtentReports instance
+     * @return ExtentReports instance
+     */
+    public static synchronized ExtentReports createInstance() {
+        if (extent == null) {
+            // Create reports directory
+            new File(REPORT_DIR).mkdirs();
+            
+            // Generate timestamped report name
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+            String reportPath = REPORT_DIR + "/ExtentReport_" + timestamp + ".html";
+            
+            // Configure Spark reporter
+            ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
+            sparkReporter.config().setTheme(Theme.STANDARD);
+            sparkReporter.config().setDocumentTitle("{{projectName}} - Test Report");
+            sparkReporter.config().setReportName("Playwright Automation Report");
+            sparkReporter.config().setTimeStampFormat("MMM dd, yyyy HH:mm:ss");
+            sparkReporter.config().setEncoding("UTF-8");
+            
+            // Load XML configuration if exists
+            File configFile = new File("src/main/resources/extent-config.xml");
+            if (configFile.exists()) {
+                try {
+                    sparkReporter.loadXMLConfig(configFile);
+                } catch (Exception e) {
+                    Log.warn("Could not load extent-config.xml: " + e.getMessage());
+                }
+            }
+            
+            // Create ExtentReports instance
+            extent = new ExtentReports();
+            extent.attachReporter(sparkReporter);
+            
+            // Set system info
+            extent.setSystemInfo("Project", "{{projectName}}");
+            extent.setSystemInfo("Framework", "Playwright");
+            extent.setSystemInfo("Java Version", System.getProperty("java.version"));
+            extent.setSystemInfo("OS", System.getProperty("os.name"));
+            extent.setSystemInfo("User", System.getProperty("user.name"));
+            
+            Log.info("ExtentReports initialized: " + reportPath);
+        }
+        return extent;
+    }
+    
+    /**
+     * Get ExtentReports instance
+     * @return ExtentReports instance
+     */
+    public static ExtentReports getInstance() {
+        if (extent == null) {
+            createInstance();
+        }
+        return extent;
+    }
+    
+    /**
+     * Create a new test in the report
+     * @param testName Test name
+     * @param description Test description
+     * @return ExtentTest instance
+     */
+    public static ExtentTest createTest(String testName, String description) {
+        ExtentTest test = getInstance().createTest(testName, description);
+        extentTest.set(test);
+        return test;
+    }
+    
+    /**
+     * Get current test instance
+     * @return Current ExtentTest
+     */
+    public static ExtentTest getTest() {
+        return extentTest.get();
+    }
+    
+    /**
+     * Remove test from ThreadLocal
+     */
+    public static void removeTest() {
+        extentTest.remove();
+    }
+    
+    /**
+     * Set test category
+     * @param categories Category names
+     */
+    public static void setTestCategory(String... categories) {
+        ExtentTest test = getTest();
+        if (test != null && categories != null) {
+            test.assignCategory(categories);
+        }
+    }
+    
+    /**
+     * Set test author
+     * @param author Author name
+     */
+    public static void setTestAuthor(String author) {
+        ExtentTest test = getTest();
+        if (test != null && author != null) {
+            test.assignAuthor(author);
+        }
+    }
+    
+    /**
+     * Set test device
+     * @param device Device name
+     */
+    public static void setTestDevice(String device) {
+        ExtentTest test = getTest();
+        if (test != null && device != null) {
+            test.assignDevice(device);
+        }
+    }
+    
+    /**
+     * Log info message
+     * @param message Message
+     */
+    public static void logInfo(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.INFO, message);
+        }
+    }
+    
+    /**
+     * Log pass message
+     * @param message Message
+     */
+    public static void logPass(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.PASS, message);
+        }
+    }
+    
+    /**
+     * Log fail message
+     * @param message Message
+     */
+    public static void logFail(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.FAIL, message);
+        }
+    }
+    
+    /**
+     * Log skip message
+     * @param message Message
+     */
+    public static void logSkip(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.SKIP, message);
+        }
+    }
+    
+    /**
+     * Log warning message
+     * @param message Message
+     */
+    public static void logWarning(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.log(Status.WARNING, message);
+        }
+    }
+    
+    /**
+     * Log exception
+     * @param throwable Exception
+     */
+    public static void logException(Throwable throwable) {
+        ExtentTest test = getTest();
+        if (test != null && throwable != null) {
+            test.fail(throwable);
+        }
+    }
+    
+    /**
+     * Add screenshot to report
+     * @param screenshotPath Path to screenshot
+     * @param title Screenshot title
+     */
+    public static void addScreenshot(String screenshotPath, String title) {
+        ExtentTest test = getTest();
+        if (test != null && screenshotPath != null) {
+            try {
+                test.addScreenCaptureFromPath(screenshotPath, title);
+            } catch (Exception e) {
+                Log.warn("Could not add screenshot: " + e.getMessage());
+            }
+        }
+    }
+    
+    /**
+     * Flush reports - must be called at end of test execution
+     */
+    public static void flush() {
+        if (extent != null) {
+            extent.flush();
+            Log.info("ExtentReports flushed");
+        }
+    }
+}

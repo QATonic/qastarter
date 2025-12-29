@@ -1,0 +1,41 @@
+package tests;
+
+import config.EnvConfig;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import pages.LoginPage;
+
+/**
+ * Sample Login Test
+ * 
+ * HOW TO USE THIS TEMPLATE:
+ * 1. Update the username and password below with your test credentials
+ * 2. Update LoginPage locators to match your website's login form
+ * 3. Run: mvn clean test
+ * 
+ * This is a simple positive login test to verify your framework setup.
+ * Add more test cases as needed for your project.
+ */
+public class LoginTest extends BaseTest {
+
+    // ========== UPDATE THESE VALUES ==========
+    private static final String TEST_USERNAME = "YOUR_USERNAME_HERE";
+    private static final String TEST_PASSWORD = "YOUR_PASSWORD_HERE";
+    // ==========================================
+
+    @Test(priority = 1, groups = {"smoke", "login"},
+          description = "Verify successful login with valid credentials")
+    public void testValidLogin() {
+        // Step 1: Navigate to login page
+        LoginPage loginPage = new LoginPage(page);
+        loginPage.navigateToLogin();
+        
+        // Step 2: Enter credentials and login
+        loginPage.login(TEST_USERNAME, TEST_PASSWORD);
+        
+        // Step 3: Verify successful login
+        Assert.assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
+        
+        // Test passed! Your framework is working correctly.
+    }
+}

@@ -1,0 +1,215 @@
+package {{packageName}}.core;
+
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import {{packageName}}.config.ConfigurationReader;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ * Mobile driver factory for creating platform-specific Appium drivers
+ * Supports both Android and iOS driver instantiation
+ */
+public class MobileDriverFactory {
+
+    private static final String APPIUM_SERVER_URL = ConfigurationReader.getProperty("appium.server.url");
+
+    /**
+     * Create AppiumDriver based on platform and capabilities
+     * 
+     * @param platform Target platform (android/ios)
+     * @param capabilities Desired capabilities for the driver
+     * @return Platform-specific AppiumDriver instance
+     */
+    public static AppiumDriver createDriver(String platform, DesiredCapabilities capabilities) {
+        try {
+            URL appiumUrl = new URL(APPIUM_SERVER_URL);
+            
+            {{#if utilities.logger}}
+            Log.info("Creating " + platform + " driver with Appium server: " + APPIUM_SERVER_URL);
+            Log.debug("Driver capabilities: " + capabilities.toString());
+            {{/if}}
+            
+            switch (platform.toLowerCase()) {
+                case "android":
+                    return createAndroidDriver(appiumUrl, capabilities);
+                    
+                case "ios":
+                    return createIOSDriver(appiumUrl, capabilities);
+                    
+                default:
+                    throw new IllegalArgumentException("Unsupported platform: " + platform + 
+                                                     ". Supported platforms: android, ios");
+            }
+            
+        } catch (MalformedURLException e) {
+            {{#if utilities.logger}}
+            Log.error("Invalid Appium server URL: " + APPIUM_SERVER_URL, e);
+            {{/if}}
+            throw new RuntimeException("Invalid Appium server URL", e);
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to create driver for platform: " + platform, e);
+            {{/if}}
+            throw new RuntimeException("Driver creation failed", e);
+        }
+    }
+
+    /**
+     * Create Android driver with specific capabilities
+     * 
+     * @param appiumUrl Appium server URL
+     * @param capabilities Android capabilities
+     * @return AndroidDriver instance
+     */
+    private static AndroidDriver createAndroidDriver(URL appiumUrl, DesiredCapabilities capabilities) {
+        try {
+            // Add Android-specific default capabilities if not present
+            if (!capabilities.asMap().containsKey("platformName")) {
+                capabilities.setCapability("platformName", "Android");
+            }
+            if (!capabilities.asMap().containsKey("automationName")) {
+                capabilities.setCapability("automationName", "UiAutomator2");
+            }
+            
+            {{#if utilities.logger}}
+            Log.info("Creating AndroidDriver with capabilities: " + capabilities.toString());
+            {{/if}}
+            
+            AndroidDriver driver = new AndroidDriver(appiumUrl, capabilities);
+            
+            {{#if utilities.logger}}
+            Log.info("AndroidDriver created successfully");
+            {{/if}}
+            
+            return driver;
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to create AndroidDriver", e);
+            {{/if}}
+            throw new RuntimeException("AndroidDriver creation failed", e);
+        }
+    }
+
+    /**
+     * Create iOS driver with specific capabilities
+     * 
+     * @param appiumUrl Appium server URL
+     * @param capabilities iOS capabilities
+     * @return IOSDriver instance
+     */
+    private static IOSDriver createIOSDriver(URL appiumUrl, DesiredCapabilities capabilities) {
+        try {
+            // Add iOS-specific default capabilities if not present
+            if (!capabilities.asMap().containsKey("platformName")) {
+                capabilities.setCapability("platformName", "iOS");
+            }
+            if (!capabilities.asMap().containsKey("automationName")) {
+                capabilities.setCapability("automationName", "XCUITest");
+            }
+            
+            {{#if utilities.logger}}
+            Log.info("Creating IOSDriver with capabilities: " + capabilities.toString());
+            {{/if}}
+            
+            IOSDriver driver = new IOSDriver(appiumUrl, capabilities);
+            
+            {{#if utilities.logger}}
+            Log.info("IOSDriver created successfully");
+            {{/if}}
+            
+            return driver;
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to create IOSDriver", e);
+            {{/if}}
+            throw new RuntimeException("IOSDriver creation failed", e);
+        }
+    }
+
+    /**
+     * Validate driver capabilities before creation
+     * 
+     * @param platform Target platform
+     * @param capabilities Capabilities to validate
+     * @return true if capabilities are valid, false otherwise
+     */
+    public static boolean validateCapabilities(String platform, DesiredCapabilities capabilities) {
+        try {
+            switch (platform.toLowerCase()) {
+                case "android":
+                    return validateAndroidCapabilities(capabilities);
+                    
+                case "ios":
+                    return validateIOSCapabilities(capabilities);
+                    
+                default:
+                    {{#if utilities.logger}}
+                    Log.warn("Unknown platform for validation: " + platform);
+                    {{/if}}
+                    return false;
+            }
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Error validating capabilities for platform: " + platform, e);
+            {{/if}}
+            return false;
+        }
+    }
+
+    /**
+     * Validate Android-specific capabilities
+     * 
+     * @param capabilities Android capabilities
+     * @return true if valid, false otherwise
+     */
+    private static boolean validateAndroidCapabilities(DesiredCapabilities capabilities) {
+        // Check required Android capabilities
+        String[] requiredCaps = {"platformName", "deviceName"};
+        
+        for (String cap : requiredCaps) {
+            if (!capabilities.asMap().containsKey(cap) || 
+                capabilities.getCapability(cap) == null || 
+                capabilities.getCapability(cap).toString().isEmpty()) {
+                {{#if utilities.logger}}
+                Log.error("Missing required Android capability: " + cap);
+                {{/if}}
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Validate iOS-specific capabilities
+     * 
+     * @param capabilities iOS capabilities
+     * @return true if valid, false otherwise
+     */
+    private static boolean validateIOSCapabilities(DesiredCapabilities capabilities) {
+        // Check required iOS capabilities
+        String[] requiredCaps = {"platformName", "deviceName"};
+        
+        for (String cap : requiredCaps) {
+            if (!capabilities.asMap().containsKey(cap) || 
+                capabilities.getCapability(cap) == null || 
+                capabilities.getCapability(cap).toString().isEmpty()) {
+                {{#if utilities.logger}}
+                Log.error("Missing required iOS capability: " + cap);
+                {{/if}}
+                return false;
+            }
+        }
+        
+        return true;
+    }
+}

@@ -1,0 +1,194 @@
+package {{groupId}}.core;
+
+import {{groupId}}.config.ConfigurationReader;
+import {{groupId}}.utils.Log;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+/**
+ * Factory class for creating desktop application drivers
+ * Supports different application types and configuration options
+ */
+public class DesktopDriverFactory {
+
+    // Common Windows applications
+    public static final String CALCULATOR = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
+    public static final String NOTEPAD = "C:\\Windows\\System32\\notepad.exe";
+    public static final String EXPLORER = "C:\\Windows\\explorer.exe";
+    public static final String PAINT = "C:\\Windows\\System32\\mspaint.exe";
+    public static final String CMD = "C:\\Windows\\System32\\cmd.exe";
+    public static final String POWERSHELL = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
+
+    /**
+     * Create driver for Calculator application
+     * @return Configured DesiredCapabilities for Calculator
+     */
+    public static void createCalculatorDriver() {
+        Log.info("Creating driver for Calculator application");
+        DriverManager.initializeDriver(CALCULATOR);
+    }
+
+    /**
+     * Create driver for Notepad application
+     * @return Configured DesiredCapabilities for Notepad
+     */
+    public static void createNotepadDriver() {
+        Log.info("Creating driver for Notepad application");
+        DriverManager.initializeDriver(NOTEPAD);
+    }
+
+    /**
+     * Create driver for Windows Explorer
+     * @return Configured DesiredCapabilities for Explorer
+     */
+    public static void createExplorerDriver() {
+        Log.info("Creating driver for Windows Explorer");
+        DriverManager.initializeDriver(EXPLORER);
+    }
+
+    /**
+     * Create driver for MS Paint
+     * @return Configured DesiredCapabilities for Paint
+     */
+    public static void createPaintDriver() {
+        Log.info("Creating driver for MS Paint application");
+        DriverManager.initializeDriver(PAINT);
+    }
+
+    /**
+     * Create driver for Command Prompt
+     * @return Configured DesiredCapabilities for CMD
+     */
+    public static void createCommandPromptDriver() {
+        Log.info("Creating driver for Command Prompt");
+        DriverManager.initializeDriver(CMD);
+    }
+
+    /**
+     * Create driver for PowerShell
+     * @return Configured DesiredCapabilities for PowerShell
+     */
+    public static void createPowerShellDriver() {
+        Log.info("Creating driver for PowerShell");
+        DriverManager.initializeDriver(POWERSHELL);
+    }
+
+    /**
+     * Create driver for custom application
+     * @param appPath Path to the application executable or app ID
+     * @return Configured DesiredCapabilities for custom application
+     */
+    public static void createCustomApplicationDriver(String appPath) {
+        Log.info("Creating driver for custom application: " + appPath);
+        DriverManager.initializeDriver(appPath);
+    }
+
+    /**
+     * Create root driver for desktop session (Windows Root)
+     * This allows interaction with desktop elements and launching applications
+     */
+    public static void createRootDriver() {
+        Log.info("Creating root driver for desktop session");
+        DriverManager.initializeRootDriver();
+    }
+
+    /**
+     * Get application path from configuration
+     * @param appKey Configuration key for the application
+     * @return Application path from configuration or default path
+     */
+    public static String getApplicationPath(String appKey) {
+        try {
+            String appPath = ConfigurationReader.getProperty("app." + appKey + ".path");
+            if (appPath != null && !appPath.trim().isEmpty()) {
+                Log.info("Using configured application path for " + appKey + ": " + appPath);
+                return appPath;
+            }
+        } catch (Exception e) {
+            Log.warn("Could not read application path from configuration for " + appKey + ": " + e.getMessage());
+        }
+        
+        // Return default paths for known applications
+        switch (appKey.toLowerCase()) {
+            case "calculator":
+                return CALCULATOR;
+            case "notepad":
+                return NOTEPAD;
+            case "explorer":
+                return EXPLORER;
+            case "paint":
+                return PAINT;
+            case "cmd":
+            case "commandprompt":
+                return CMD;
+            case "powershell":
+                return POWERSHELL;
+            default:
+                Log.warn("Unknown application key: " + appKey + ". Using as direct path.");
+                return appKey;
+        }
+    }
+
+    /**
+     * Create driver based on application type from configuration
+     * @param appType Application type (calculator, notepad, etc.)
+     */
+    public static void createDriverByType(String appType) {
+        Log.info("Creating driver for application type: " + appType);
+        
+        switch (appType.toLowerCase()) {
+            case "calculator":
+                createCalculatorDriver();
+                break;
+            case "notepad":
+                createNotepadDriver();
+                break;
+            case "explorer":
+                createExplorerDriver();
+                break;
+            case "paint":
+                createPaintDriver();
+                break;
+            case "cmd":
+            case "commandprompt":
+                createCommandPromptDriver();
+                break;
+            case "powershell":
+                createPowerShellDriver();
+                break;
+            case "root":
+            case "desktop":
+                createRootDriver();
+                break;
+            default:
+                // Treat as custom application path
+                createCustomApplicationDriver(appType);
+                break;
+        }
+    }
+
+    /**
+     * Check if application type is supported
+     * @param appType Application type to check
+     * @return true if application type is supported
+     */
+    public static boolean isSupportedApplicationType(String appType) {
+        if (appType == null || appType.trim().isEmpty()) {
+            return false;
+        }
+        
+        switch (appType.toLowerCase()) {
+            case "calculator":
+            case "notepad":
+            case "explorer":
+            case "paint":
+            case "cmd":
+            case "commandprompt":
+            case "powershell":
+            case "root":
+            case "desktop":
+                return true;
+            default:
+                return false;
+        }
+    }
+}

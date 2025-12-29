@@ -1,0 +1,85 @@
+# Production Environment Configuration
+# Base URL for the application under test
+base.url=https://prod.example.com
+
+# Browser Configuration
+browser=chrome
+headless=true
+
+# Selenium Grid Configuration (for remote execution)
+remote.execution=true
+grid.url=http://prod-selenium-grid:4444/wd/hub
+
+# Timeout Configuration (in seconds)
+implicit.wait=20
+explicit.wait=45
+page.load.timeout=60
+
+# Retry Configuration
+retry.count=3
+
+# Screenshot Configuration
+capture.screenshots.on.failure=true
+capture.screenshots.on.pass=false
+
+# Test Data Configuration
+test.data.path=src/test/resources/testdata/
+
+# Logging Configuration
+log.level=WARN
+enable.console.logging=false
+enable.file.logging=true
+
+# ExtentReports Configuration
+extent.report.path=reports/ExtentReport_PROD.html
+extent.report.title={{projectName}} - Production Test Results
+extent.report.name=Production Environment Test Execution Report
+
+# Database Configuration (if needed)
+# db.url=jdbc:mysql://prod-db:3306/proddb
+# db.username=produser
+# db.password=${DB_PASSWORD}
+
+# API Configuration (if needed)
+# api.base.url=https://api.example.com
+# api.timeout=60
+# api.version=v1
+
+# Environment Specific Settings
+environment=prod
+test.environment=production
+debug.mode=false
+enable.performance.tracking=true
+
+# Application Specific Configuration
+default.username=prod_admin
+default.password=${PROD_PASSWORD}
+app.version=1.0.0
+
+# Parallel Execution Configuration
+parallel.execution=true
+thread.count=5
+parallel.mode=classes
+
+# Video Recording (if supported)
+enable.video.recording=true
+video.folder=reports/videos/
+
+# Custom Properties
+custom.wait.polling=2000
+custom.retry.interval=5000
+enable.soft.assertions=false
+highlight.elements=false
+take.screenshot.on.element.interaction=false
+
+# CI/CD Specific Settings
+ci.mode=true
+jenkins.build.number=${BUILD_NUMBER}
+git.branch=${GIT_BRANCH}
+test.suite.timeout=7200
+
+# Production Safety Settings
+production.safety.checks=true
+max.test.duration=300
+enable.cleanup.after.tests=true
+sensitive.data.masking=true

@@ -1,0 +1,310 @@
+package {{javaPackage}}.utils;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+
+/**
+ * ExtentReports configuration and management utility.
+ * Manages ExtentReports lifecycle and provides methods for test reporting.
+ */
+public class ExtentManager {
+    private static ExtentReports extent;
+    private static final String REPORTS_DIR = System.getProperty("user.dir") + "/reports/";
+    private static final String CONFIG_FILE = "extent-config.xml";
+    private static final ThreadLocal<ExtentTest> extentTest = new ThreadLocal<>();
+    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+    
+    /**
+     * Initialize ExtentReports instance
+     * @return ExtentReports instance
+     */
+    public static ExtentReports createInstance() {
+        if (extent == null) {
+            String reportPath = REPORTS_DIR + "ExtentReport_" + getCurrentTimestamp() + ".html";
+            return createInstance(reportPath);
+        }
+        return extent;
+    }
+    
+    /**
+     * Initialize ExtentReports instance with custom path
+     * @param reportPath Path for the report file
+     * @return ExtentReports instance
+     */
+    public static ExtentReports createInstance(String reportPath) {
+        ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
+        
+        // Configure the reporter
+        sparkReporter.config().setTheme(Theme.STANDARD);
+        sparkReporter.config().setDocumentTitle("{{projectName}} - Test Execution Report");
+        sparkReporter.config().setReportName("Automation Test Results");
+        sparkReporter.config().setTimeStampFormat("dd/MM/yyyy hh:mm:ss a");
+        
+        // Load configuration from XML file if exists
+        try {
+            String configPath = System.getProperty("user.dir") + "/src/main/resources/" + CONFIG_FILE;
+            if (new java.io.File(configPath).exists()) {
+                sparkReporter.loadXMLConfig(configPath);
+                Log.info("Loaded ExtentReports configuration from: " + configPath);
+            }
+        } catch (Exception e) {
+            Log.warn("Could not load ExtentReports configuration file, using defaults");
+        }
+        
+        extent = new ExtentReports();
+        extent.attachReporter(sparkReporter);
+        
+        // Add system information
+        addSystemInfo();
+        
+        Log.info("ExtentReports initialized: " + reportPath);
+        return extent;
+    }
+    
+    /**
+     * Get ExtentReports instance
+     * @return ExtentReports instance
+     */
+    public static ExtentReports getInstance() {
+        if (extent == null) {
+            createInstance();
+        }
+        return extent;
+    }
+    
+    /**
+     * Create a new test in the report
+     * @param testName Test name
+     * @param description Test description
+     * @return ExtentTest instance
+     */
+    public static ExtentTest createTest(String testName, String description) {
+        ExtentTest test = getInstance().createTest(testName, description);
+        extentTest.set(test);
+        Log.debug("Created ExtentTest: " + testName);
+        return test;
+    }
+    
+    /**
+     * Create a new test in the report
+     * @param testName Test name
+     * @return ExtentTest instance
+     */
+    public static ExtentTest createTest(String testName) {
+        return createTest(testName, "");
+    }
+    
+    /**
+     * Get current thread's ExtentTest instance
+     * @return ExtentTest instance
+     */
+    public static ExtentTest getTest() {
+        return extentTest.get();
+    }
+    
+    /**
+     * Remove ExtentTest from ThreadLocal
+     */
+    public static void removeTest() {
+        extentTest.remove();
+    }
+    
+    /**
+     * Flush the reports
+     */
+    public static void flush() {
+        if (extent != null) {
+            extent.flush();
+            Log.info("ExtentReports flushed successfully");
+        }
+    }
+    
+    /**
+     * Add system information to the report
+     */
+    private static void addSystemInfo() {
+        extent.setSystemInfo("Environment", System.getProperty("env", "dev"));
+        extent.setSystemInfo("Browser", System.getProperty("browser", "chrome"));
+        extent.setSystemInfo("Headless", System.getProperty("headless", "false"));
+        extent.setSystemInfo("Java Version", System.getProperty("java.version"));
+        extent.setSystemInfo("OS", System.getProperty("os.name"));
+        extent.setSystemInfo("OS Version", System.getProperty("os.version"));
+        extent.setSystemInfo("User Name", System.getProperty("user.name"));
+        extent.setSystemInfo("Time Zone", System.getProperty("user.timezone"));
+        
+        // Add custom system info
+        String baseUrl = System.getProperty("base.url");
+        if (baseUrl != null) {
+            extent.setSystemInfo("Base URL", baseUrl);
+        }
+        
+        String gridUrl = System.getProperty("grid.url");
+        if (gridUrl != null) {
+            extent.setSystemInfo("Grid URL", gridUrl);
+        }
+        
+        extent.setSystemInfo("Framework", "Selenium WebDriver + TestNG + Maven");
+        extent.setSystemInfo("Report Generated", LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss a")));
+    }
+    
+    /**
+     * Get current timestamp for file naming
+     * @return Formatted timestamp string
+     */
+    private static String getCurrentTimestamp() {
+        return LocalDateTime.now().format(TIMESTAMP_FORMAT);
+    }
+    
+    /**
+     * Add screenshot to test report
+     * @param screenshotPath Path to screenshot file
+     * @param title Screenshot title
+     */
+    public static void addScreenshot(String screenshotPath, String title) {
+        ExtentTest test = getTest();
+        if (test != null && screenshotPath != null) {
+            try {
+                String relativePath = ScreenshotUtils.getRelativePath(screenshotPath);
+                test.addScreenCaptureFromPath(relativePath, title);
+                Log.debug("Screenshot added to report: " + title);
+            } catch (Exception e) {
+                Log.error("Failed to add screenshot to report", e);
+            }
+        }
+    }
+    
+    /**
+     * Log info message to test report
+     * @param message Info message
+     */
+    public static void logInfo(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.info(message);
+        }
+    }
+    
+    /**
+     * Log pass message to test report
+     * @param message Pass message
+     */
+    public static void logPass(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.pass(message);
+        }
+    }
+    
+    /**
+     * Log fail message to test report
+     * @param message Fail message
+     */
+    public static void logFail(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.fail(message);
+        }
+    }
+    
+    /**
+     * Log skip message to test report
+     * @param message Skip message
+     */
+    public static void logSkip(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.skip(message);
+        }
+    }
+    
+    /**
+     * Log warning message to test report
+     * @param message Warning message
+     */
+    public static void logWarning(String message) {
+        ExtentTest test = getTest();
+        if (test != null) {
+            test.warning(message);
+        }
+    }
+    
+    /**
+     * Add test step to report
+     * @param stepDescription Step description
+     */
+    public static void logStep(String stepDescription) {
+        logInfo("🔸 STEP: " + stepDescription);
+    }
+    
+    /**
+     * Add test assertion to report
+     * @param assertionDescription Assertion description
+     */
+    public static void logAssertion(String assertionDescription) {
+        logPass("✅ ASSERTION: " + assertionDescription);
+    }
+    
+    /**
+     * Add failed assertion to report
+     * @param assertionDescription Assertion description
+     * @param errorMessage Error message
+     */
+    public static void logFailedAssertion(String assertionDescription, String errorMessage) {
+        logFail("❌ ASSERTION FAILED: " + assertionDescription + " - " + errorMessage);
+    }
+    
+    /**
+     * Add exception details to report
+     * @param exception Exception to log
+     */
+    public static void logException(Throwable exception) {
+        ExtentTest test = getTest();
+        if (test != null && exception != null) {
+            test.fail(exception);
+        }
+    }
+    
+    /**
+     * Set test category/tag
+     * @param categories Category tags
+     */
+    public static void setTestCategory(String... categories) {
+        ExtentTest test = getTest();
+        if (test != null && categories != null) {
+            for (String category : categories) {
+                test.assignCategory(category);
+            }
+        }
+    }
+    
+    /**
+     * Set test author
+     * @param authors Author names
+     */
+    public static void setTestAuthor(String... authors) {
+        ExtentTest test = getTest();
+        if (test != null && authors != null) {
+            for (String author : authors) {
+                test.assignAuthor(author);
+            }
+        }
+    }
+    
+    /**
+     * Set test device/browser info
+     * @param device Device/browser information
+     */
+    public static void setTestDevice(String device) {
+        ExtentTest test = getTest();
+        if (test != null && device != null) {
+            test.assignDevice(device);
+        }
+    }
+}

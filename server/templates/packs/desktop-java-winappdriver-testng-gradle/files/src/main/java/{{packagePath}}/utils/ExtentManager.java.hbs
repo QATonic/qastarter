@@ -1,0 +1,313 @@
+package {{groupId}}.utils;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+import {{groupId}}.config.ConfigurationReader;
+
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * ExtentReports configuration and management for desktop test reporting
+ * Provides centralized report initialization and test management
+ */
+public class ExtentManager {
+
+    private static ExtentReports extent;
+    private static final String REPORTS_DIR = "reports";
+    private static final String DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss";
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    
+    static {
+        // Create reports directory if it doesn't exist
+        createReportsDirectory();
+    }
+
+    /**
+     * Initialize ExtentReports instance
+     */
+    public static void initializeReport() {
+        if (extent == null) {
+            // Generate report filename with timestamp
+            String timestamp = LocalDateTime.now().format(formatter);
+            String reportName = "DesktopTestReport_" + timestamp + ".html";
+            String reportPath = REPORTS_DIR + File.separator + reportName;
+
+            // Create ExtentSparkReporter
+            ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
+            
+            // Configure Spark Reporter
+            configureSparkReporter(sparkReporter);
+
+            // Initialize ExtentReports
+            extent = new ExtentReports();
+            extent.attachReporter(sparkReporter);
+            
+            // Set system information
+            setSystemInformation();
+            
+            Log.info("ExtentReports initialized: " + reportPath);
+        }
+    }
+
+    /**
+     * Configure ExtentSparkReporter settings
+     * @param sparkReporter SparkReporter instance to configure
+     */
+    private static void configureSparkReporter(ExtentSparkReporter sparkReporter) {
+        try {
+            // Set report name and document title
+            sparkReporter.config().setDocumentTitle("Desktop Automation Test Report");
+            sparkReporter.config().setReportName("{{projectName}} - Desktop Test Execution Report");
+            
+            // Set theme
+            sparkReporter.config().setTheme(Theme.DARK);
+            
+            // Set timeline enabled
+            sparkReporter.config().setTimelineEnabled(true);
+            
+            // Load configuration from file if available
+            File configFile = new File("src/main/resources/extent-config.xml");
+            if (configFile.exists()) {
+                sparkReporter.loadXMLConfig(configFile);
+                Log.info("Loaded ExtentReports configuration from: " + configFile.getAbsolutePath());
+            }
+            
+        } catch (Exception e) {
+            Log.warn("Could not configure ExtentSparkReporter: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Set system information in the report
+     */
+    private static void setSystemInformation() {
+        try {
+            extent.setSystemInfo("Application", "{{projectName}}");
+            extent.setSystemInfo("Framework", "WinAppDriver + Java + TestNG + Maven");
+            extent.setSystemInfo("Platform", System.getProperty("os.name"));
+            extent.setSystemInfo("Platform Version", System.getProperty("os.version"));
+            extent.setSystemInfo("Architecture", System.getProperty("os.arch"));
+            extent.setSystemInfo("Java Version", System.getProperty("java.version"));
+            extent.setSystemInfo("User", System.getProperty("user.name"));
+            
+            // Add environment information
+            String environment = ConfigurationReader.getEnvironment();
+            if (environment != null) {
+                extent.setSystemInfo("Environment", environment);
+            }
+            
+            // Add test execution timestamp
+            extent.setSystemInfo("Execution Time", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            
+        } catch (Exception e) {
+            Log.warn("Could not set system information in report: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Create a new test in the report
+     * @param testName Name of the test
+     * @return ExtentTest instance
+     */
+    public static ExtentTest createTest(String testName) {
+        if (extent == null) {
+            initializeReport();
+        }
+        
+        ExtentTest test = extent.createTest(testName);
+        Log.debug("Created ExtentTest: " + testName);
+        return test;
+    }
+
+    /**
+     * Create a new test with description
+     * @param testName Name of the test
+     * @param testDescription Description of the test
+     * @return ExtentTest instance
+     */
+    public static ExtentTest createTest(String testName, String testDescription) {
+        if (extent == null) {
+            initializeReport();
+        }
+        
+        ExtentTest test = extent.createTest(testName, testDescription);
+        Log.debug("Created ExtentTest with description: " + testName);
+        return test;
+    }
+
+    /**
+     * Create a child test (sub-test)
+     * @param parentTest Parent test instance
+     * @param childTestName Name of the child test
+     * @return Child ExtentTest instance
+     */
+    public static ExtentTest createChildTest(ExtentTest parentTest, String childTestName) {
+        ExtentTest childTest = parentTest.createNode(childTestName);
+        Log.debug("Created child ExtentTest: " + childTestName);
+        return childTest;
+    }
+
+    /**
+     * Create a child test with description
+     * @param parentTest Parent test instance
+     * @param childTestName Name of the child test
+     * @param childTestDescription Description of the child test
+     * @return Child ExtentTest instance
+     */
+    public static ExtentTest createChildTest(ExtentTest parentTest, String childTestName, String childTestDescription) {
+        ExtentTest childTest = parentTest.createNode(childTestName, childTestDescription);
+        Log.debug("Created child ExtentTest with description: " + childTestName);
+        return childTest;
+    }
+
+    /**
+     * Flush the report (write to file)
+     */
+    public static void flushReport() {
+        if (extent != null) {
+            extent.flush();
+            Log.info("ExtentReports flushed successfully");
+        }
+    }
+
+    /**
+     * Get the ExtentReports instance
+     * @return ExtentReports instance
+     */
+    public static ExtentReports getExtentReports() {
+        if (extent == null) {
+            initializeReport();
+        }
+        return extent;
+    }
+
+    /**
+     * Add author information to test
+     * @param test ExtentTest instance
+     * @param author Author name
+     */
+    public static void addAuthor(ExtentTest test, String author) {
+        if (test != null) {
+            test.assignAuthor(author);
+        }
+    }
+
+    /**
+     * Add category to test
+     * @param test ExtentTest instance
+     * @param category Category name
+     */
+    public static void addCategory(ExtentTest test, String category) {
+        if (test != null) {
+            test.assignCategory(category);
+        }
+    }
+
+    /**
+     * Add device information to test
+     * @param test ExtentTest instance
+     * @param device Device information
+     */
+    public static void addDevice(ExtentTest test, String device) {
+        if (test != null) {
+            test.assignDevice(device);
+        }
+    }
+
+    /**
+     * Create reports directory if it doesn't exist
+     */
+    private static void createReportsDirectory() {
+        try {
+            File dir = new File(REPORTS_DIR);
+            if (!dir.exists()) {
+                boolean created = dir.mkdirs();
+                if (created) {
+                    Log.info("Reports directory created: " + dir.getAbsolutePath());
+                } else {
+                    Log.warn("Failed to create reports directory: " + dir.getAbsolutePath());
+                }
+            }
+        } catch (Exception e) {
+            Log.error("Error creating reports directory: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Clean up old report files
+     * @param maxAgeInDays Maximum age of reports to keep
+     */
+    public static void cleanupOldReports(int maxAgeInDays) {
+        try {
+            File reportsDir = new File(REPORTS_DIR);
+            if (!reportsDir.exists() || !reportsDir.isDirectory()) {
+                Log.warn("Reports directory not found for cleanup");
+                return;
+            }
+            
+            long maxAgeMillis = maxAgeInDays * 24L * 60L * 60L * 1000L;
+            long cutoffTime = System.currentTimeMillis() - maxAgeMillis;
+            
+            File[] reports = reportsDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".html"));
+            if (reports == null) {
+                Log.info("No reports found for cleanup");
+                return;
+            }
+            
+            int deletedCount = 0;
+            for (File report : reports) {
+                if (report.lastModified() < cutoffTime) {
+                    if (report.delete()) {
+                        deletedCount++;
+                    } else {
+                        Log.warn("Failed to delete old report: " + report.getName());
+                    }
+                }
+            }
+            
+            Log.info("Report cleanup completed - deleted " + deletedCount + " old reports");
+            
+        } catch (Exception e) {
+            Log.error("Error during report cleanup: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get current report file path
+     * @return Path to current report file
+     */
+    public static String getCurrentReportPath() {
+        // This would require tracking the current report path
+        // For now, return the reports directory
+        return new File(REPORTS_DIR).getAbsolutePath();
+    }
+
+    /**
+     * Close the current report and create a new one
+     * Useful for long-running test suites or when switching environments
+     */
+    public static void closeAndCreateNewReport() {
+        if (extent != null) {
+            extent.flush();
+        }
+        extent = null;
+        initializeReport();
+        Log.info("Closed previous report and created new report");
+    }
+
+    /**
+     * Add custom system information
+     * @param key Information key
+     * @param value Information value
+     */
+    public static void addSystemInfo(String key, String value) {
+        if (extent == null) {
+            initializeReport();
+        }
+        extent.setSystemInfo(key, value);
+    }
+}

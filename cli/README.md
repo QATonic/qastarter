@@ -5,107 +5,87 @@ Command-line tool for generating QA automation project structures.
 ## Installation
 
 ```bash
-# Install globally
-npm install -g qastarter-cli
-
-# Or use directly with npx
-npx qastarter-cli new
+cd cli
+npm install
+npm run build
 ```
 
 ## Usage
 
 ### Interactive Mode
 
-Run without arguments to use the interactive wizard:
+Generate a project interactively:
 
 ```bash
-qastarter new
+npx qastarter new --interactive
 ```
 
-### Command Line Flags
-
-Generate a project with specific options:
+### Command Line Options
 
 ```bash
-qastarter new \
-  --name my-selenium-project \
-  --type web \
-  --framework selenium \
-  --language java \
-  --pattern page-object-model \
-  --cicd github-actions \
-  --reporting allure \
-  --output ./projects
+npx qastarter new [options]
 ```
 
-### Available Options
+**Options:**
+- `-n, --name <name>` - Project name (default: `my-qa-project`)
+- `-t, --type <type>` - Testing type: `web`, `mobile`, `api`, `desktop`
+- `-f, --framework <framework>` - Testing framework: `selenium`, `playwright`, `cypress`, etc.
+- `-l, --language <language>` - Programming language: `java`, `typescript`, `python`, `csharp`
+- `-r, --runner <runner>` - Test runner: `testng`, `junit5`, `pytest`, `jest`, etc.
+- `-b, --build <tool>` - Build tool: `maven`, `gradle`, `npm`, `pip`
+- `-p, --pattern <pattern>` - Testing pattern: `page-object-model`, `bdd`, `fluent`
+- `-c, --cicd <tool>` - CI/CD tool: `github-actions`, `gitlab-ci`, `jenkins`, etc.
+- `--reporting <tool>` - Reporting tool: `allure`, `extent-reports`, etc.
+- `-u, --utilities <list>` - Utilities (comma-separated)
+- `--no-samples` - Exclude sample tests
+- `-o, --output <path>` - Output directory (default: current directory)
+- `-i, --interactive` - Use interactive mode
 
+### Examples
+
+**Web + Playwright + TypeScript:**
+```bash
+npx qastarter new -n my-web-tests -t web -f playwright -l typescript
 ```
-Options:
-  -n, --name <name>        Project name (default: "my-qa-project")
-  -t, --type <type>        Testing type: web, mobile, api, desktop
-  -f, --framework <name>   Testing framework: selenium, playwright, cypress, etc.
-  -l, --language <lang>    Programming language: java, typescript, python, csharp
-  -r, --runner <runner>    Test runner (auto-selected based on language)
-  -b, --build <tool>       Build tool (auto-selected based on language)
-  -p, --pattern <pattern>  Testing pattern: page-object-model, bdd, fluent
-  -c, --cicd <tool>        CI/CD: github-actions, gitlab-ci, azure-devops, etc.
-  --reporting <tool>       Reporting: allure, extent-reports, etc.
-  -u, --utilities <list>   Utilities (comma-separated)
-  --no-samples             Exclude sample tests
-  -o, --output <path>      Output directory (default: ".")
-  -i, --interactive        Force interactive mode
+
+**API + RestAssured + Java:**
+```bash
+npx qastarter new -n my-api-tests -t api -f restassured -l java -b maven
+```
+
+**Mobile + Appium + Python:**
+```bash
+npx qastarter new -n my-mobile-tests -t mobile -f appium -l python
 ```
 
 ### List Available Options
 
-View all available frameworks, languages, and configurations:
-
 ```bash
-qastarter list
-
-# Filter by testing type
-qastarter list --type web
+npx qastarter list
 ```
 
-## Examples
-
-### Generate Playwright TypeScript Project
-
+Filter by testing type:
 ```bash
-qastarter new -f playwright -l typescript -p page-object-model
+npx qastarter list --type web
 ```
 
-### Generate Selenium Java Project with CI/CD
+## Configuration
+
+Set custom API URL (for local development):
 
 ```bash
-qastarter new -f selenium -l java -c github-actions --reporting allure
+export QASTARTER_API_URL=http://localhost:5000
 ```
-
-### Generate API Testing Project
-
-```bash
-qastarter new -t api -f rest-assured -l java
-```
-
-## Environment Variables
-
-- `QASTARTER_API_URL`: Override the API URL (default: https://qastarter.replit.app)
 
 ## Development
 
 ```bash
 # Install dependencies
-cd cli
 npm install
 
 # Build
 npm run build
 
 # Run locally
-node dist/index.js new
+node dist/index.js new --interactive
 ```
-
-## License
-
-MIT

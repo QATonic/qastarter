@@ -1,0 +1,118 @@
+package {{javaPackage}}.tests;
+
+import {{javaPackage}}.core.BaseTest;
+import {{javaPackage}}.pages.LoginPage;
+import {{javaPackage}}.pages.HomePage;
+import {{javaPackage}}.utils.Log;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+* Login functionality tests using Playwright and JUnit 5.
+* Uses parameterized tests for data-driven testing.
+*/
+@DisplayName("Login Tests")
+@Tag("smoke")
+@Tag("login")
+class LoginTests extends BaseTest {
+
+private LoginPage loginPage;
+private HomePage homePage;
+
+@BeforeEach
+void setUpPages() {
+loginPage = new LoginPage(page);
+homePage = new HomePage(page);
+}
+
+@Test
+@DisplayName("Verify login page loads successfully")
+@Order(1)
+void testLoginPageLoads() {
+Log.step("Verifying login page loads");
+assertTrue(loginPage.isDisplayed(), "Login page should be displayed");
+Log.info("Login page loaded successfully");
+}
+
+@Test
+@DisplayName("Verify successful login with valid credentials")
+@Order(2)
+void testSuccessfulLogin() {
+Log.step("Testing successful login");
+
+loginPage.login("testuser", "password123");
+
+assertTrue(homePage.isDisplayed(), "Home page should be displayed after login");
+Log.info("Login successful");
+}
+
+@Test
+@DisplayName("Verify error message for invalid credentials")
+@Order(3)
+void testInvalidLogin() {
+Log.step("Testing invalid login");
+
+loginPage.login("invalid", "wrongpassword");
+
+assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
+Log.info("Error message displayed correctly");
+}
+
+@ParameterizedTest(name = "Login with username: {0}")
+@DisplayName("Data-driven login tests from CSV")
+@CsvFileSource(resources = "/testdata/users.csv", numLinesToSkip = 1)
+@Tag("regression")
+void testLoginWithMultipleUsers(String username, String password, String expectedResult) {
+Log.step("Testing login with user: " + username);
+
+loginPage.login(username, password);
+
+if ("success".equals(expectedResult)) {
+assertTrue(homePage.isDisplayed(), "Should login successfully for " + username);
+} else {
+assertTrue(loginPage.isErrorDisplayed(), "Should show error for " + username);
+}
+}
+
+@ParameterizedTest(name = "Empty field validation: {0}")
+@DisplayName("Verify validation for empty fields")
+@ValueSource(strings = {"username", "password", "both"})
+@Tag("validation")
+void testEmptyFieldValidation(String emptyField) {
+Log.step("Testing empty field: " + emptyField);
+
+switch (emptyField) {
+case "username":
+loginPage.login("", "password");
+break;
+case "password":
+loginPage.login("user", "");
+break;
+case "both":
+loginPage.login("", "");
+break;
+}
+
+assertTrue(loginPage.isValidationMessageDisplayed(),
+"Validation message should appear for empty " + emptyField);
+}
+
+@Test
+@DisplayName("Verify logout functionality")
+@Order(4)
+void testLogout() {
+Log.step("Testing logout");
+
+loginPage.login("testuser", "password123");
+assertTrue(homePage.isDisplayed(), "Should be on home page");
+
+homePage.logout();
+assertTrue(loginPage.isDisplayed(), "Should return to login page after logout");
+
+Log.info("Logout test completed");
+}
+}

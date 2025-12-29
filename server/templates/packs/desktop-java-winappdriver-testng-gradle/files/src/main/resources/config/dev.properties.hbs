@@ -1,0 +1,78 @@
+# ============================================
+# DESKTOP CONFIGURATION FILE - UPDATE THESE VALUES
+# ============================================
+# This file contains your desktop app settings.
+# Replace the placeholder values below with your actual app details.
+
+# Environment Settings
+environment=dev
+environment.name=Development
+
+# WinAppDriver Configuration
+winappdriver.url=http://127.0.0.1:4723
+session.timeout=300
+implicit.wait=10
+explicit.wait=30
+
+# ============================================
+# APPLICATION PATHS - UPDATE THESE
+# ============================================
+# For UWP apps: Use the App ID (e.g., Microsoft.WindowsCalculator_8wekyb3d8bbwe!App)
+# For Win32 apps: Use the full path (e.g., C:\\Program Files\\YourApp\\app.exe)
+default.application=your-app
+app.your-app.path=C:\\Path\\To\\Your\\Application.exe
+app.calculator.path=Microsoft.WindowsCalculator_8wekyb3d8bbwe!App
+app.notepad.path=C:\\Windows\\System32\\notepad.exe
+
+# Test Configuration
+headless.mode=false
+screenshot.on.failure=true
+video.recording.enabled=false
+max.retry.count=1
+parallel.execution.enabled=false
+parallel.thread.count=1
+
+# Directory Configuration
+screenshot.directory=screenshots
+reports.directory=reports
+test.data.directory=src/test/resources/testdata
+
+# Logging Configuration
+log.level=DEBUG
+log.to.console=true
+log.to.file=true
+
+# ExtentReports Configuration
+extent.reports.enabled=true
+extent.reports.theme=DARK
+extent.report.name={{projectName}} Desktop Test Report - Development
+extent.report.document.title=Desktop Automation Test Results
+
+# Cleanup Configuration
+cleanup.enabled=true
+cleanup.age.days=7
+
+# Development Specific Settings
+debug.mode=true
+wait.after.action=500
+take.screenshots.on.pass=false
+take.screenshots.on.fail=true
+
+# Test Data Configuration
+test.data.calculator.numbers=1,2,3,4,5,10,25,100
+test.data.notepad.sample.text=This is sample text for development testing.
+test.data.notepad.large.text.lines=50
+
+# Performance Settings
+page.load.timeout=30
+element.timeout=15
+action.timeout=10
+
+# Browser/Application Settings (for comparison)
+app.startup.wait=3000
+app.cleanup.wait=2000
+
+# Integration Settings
+integration.tests.enabled=true
+stress.tests.enabled=false
+performance.tests.enabled=true

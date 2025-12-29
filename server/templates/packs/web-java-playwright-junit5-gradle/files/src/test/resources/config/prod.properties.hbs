@@ -1,0 +1,29 @@
+# Production Environment Configuration
+# {{projectName}} - Playwright Test Framework
+
+# Application URLs
+base.url=https://app.example.com
+api.url=https://api.example.com
+
+# Browser Configuration
+browser=chromium
+headless=true
+slow.mo=0
+viewport.width=1920
+viewport.height=1080
+
+# Timeouts (milliseconds)
+default.timeout=30000
+navigation.timeout=60000
+assertion.timeout=5000
+
+# Test Data
+test.data.dir=src/test/resources/testdata
+
+# Logging
+log.level=WARN
+
+# Reporting
+screenshots.enabled=true
+video.recording=false
+traces.enabled=false

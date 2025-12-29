@@ -1,0 +1,235 @@
+package {{groupId}}.core;
+
+import {{groupId}}.config.ConfigurationReader;
+import {{groupId}}.utils.Log;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+/**
+ * Manages desired capabilities for different desktop applications
+ * Provides configuration for WinAppDriver connections
+ */
+public class CapabilitiesManager {
+
+    /**
+     * Get capabilities for desktop application
+     * @param appPath Path to application executable or app ID
+     * @return Configured DesiredCapabilities
+     */
+    public static DesiredCapabilities getDesktopCapabilities(String appPath) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        
+        // Set platform and application
+        capabilities.setCapability("platformName", "Windows");
+        capabilities.setCapability("deviceName", "WindowsPC");
+        capabilities.setCapability("app", appPath);
+        
+        // Set session timeout
+        int sessionTimeout = ConfigurationReader.getSessionTimeout();
+        capabilities.setCapability("newCommandTimeout", sessionTimeout);
+        
+        // Set implicit wait timeout  
+        int implicitWait = ConfigurationReader.getImplicitWait();
+        capabilities.setCapability("implicitWaitTimeout", implicitWait * 1000); // Convert to milliseconds
+        
+        // Additional desktop-specific capabilities
+        capabilities.setCapability("ms:waitForAppLaunch", "25"); // Wait up to 25 seconds for app to launch
+        capabilities.setCapability("ms:experimental-webdriver", true); // Enable experimental features
+        
+        Log.info("Desktop capabilities configured for application: " + appPath);
+        logCapabilities(capabilities);
+        
+        return capabilities;
+    }
+
+    /**
+     * Get capabilities for Windows Root session (desktop)
+     * Allows interaction with desktop elements and launching applications
+     * @return Configured DesiredCapabilities for root session
+     */
+    public static DesiredCapabilities getRootCapabilities() {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        
+        // Set platform
+        capabilities.setCapability("platformName", "Windows");
+        capabilities.setCapability("deviceName", "WindowsPC");
+        
+        // Use Root for desktop session
+        capabilities.setCapability("app", "Root");
+        
+        // Set session timeout
+        int sessionTimeout = ConfigurationReader.getSessionTimeout();
+        capabilities.setCapability("newCommandTimeout", sessionTimeout);
+        
+        // Set implicit wait timeout
+        int implicitWait = ConfigurationReader.getImplicitWait();
+        capabilities.setCapability("implicitWaitTimeout", implicitWait * 1000);
+        
+        Log.info("Root desktop capabilities configured");
+        logCapabilities(capabilities);
+        
+        return capabilities;
+    }
+
+    /**
+     * Get capabilities for Calculator application
+     * @return Configured DesiredCapabilities for Calculator
+     */
+    public static DesiredCapabilities getCalculatorCapabilities() {
+        return getDesktopCapabilities("Microsoft.WindowsCalculator_8wekyb3d8bbwe!App");
+    }
+
+    /**
+     * Get capabilities for Notepad application
+     * @return Configured DesiredCapabilities for Notepad
+     */
+    public static DesiredCapabilities getNotepadCapabilities() {
+        return getDesktopCapabilities("C:\\Windows\\System32\\notepad.exe");
+    }
+
+    /**
+     * Get capabilities for custom UWP (Universal Windows Platform) application
+     * @param packageFamilyName Package family name of the UWP app
+     * @param applicationId Application ID within the package
+     * @return Configured DesiredCapabilities for UWP app
+     */
+    public static DesiredCapabilities getUWPCapabilities(String packageFamilyName, String applicationId) {
+        String appId = packageFamilyName + "!" + applicationId;
+        return getDesktopCapabilities(appId);
+    }
+
+    /**
+     * Get capabilities for Win32 application with working directory
+     * @param executablePath Path to the executable
+     * @param workingDirectory Working directory for the application
+     * @return Configured DesiredCapabilities for Win32 app
+     */
+    public static DesiredCapabilities getWin32Capabilities(String executablePath, String workingDirectory) {
+        DesiredCapabilities capabilities = getDesktopCapabilities(executablePath);
+        
+        if (workingDirectory != null && !workingDirectory.trim().isEmpty()) {
+            capabilities.setCapability("appWorkingDir", workingDirectory);
+            Log.info("Working directory set: " + workingDirectory);
+        }
+        
+        return capabilities;
+    }
+
+    /**
+     * Get capabilities with command line arguments
+     * @param appPath Path to application
+     * @param arguments Command line arguments
+     * @return Configured DesiredCapabilities with arguments
+     */
+    public static DesiredCapabilities getCapabilitiesWithArguments(String appPath, String arguments) {
+        DesiredCapabilities capabilities = getDesktopCapabilities(appPath);
+        
+        if (arguments != null && !arguments.trim().isEmpty()) {
+            capabilities.setCapability("appArguments", arguments);
+            Log.info("Application arguments set: " + arguments);
+        }
+        
+        return capabilities;
+    }
+
+    /**
+     * Get capabilities for application with top-level window
+     * Use when you want to attach to an already running application
+     * @param windowName Name of the top-level window to attach to
+     * @return Configured DesiredCapabilities for window attachment
+     */
+    public static DesiredCapabilities getWindowCapabilities(String windowName) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        
+        capabilities.setCapability("platformName", "Windows");
+        capabilities.setCapability("deviceName", "WindowsPC");
+        capabilities.setCapability("appTopLevelWindow", windowName);
+        
+        // Set timeouts
+        int sessionTimeout = ConfigurationReader.getSessionTimeout();
+        capabilities.setCapability("newCommandTimeout", sessionTimeout);
+        
+        int implicitWait = ConfigurationReader.getImplicitWait();
+        capabilities.setCapability("implicitWaitTimeout", implicitWait * 1000);
+        
+        Log.info("Window attachment capabilities configured for: " + windowName);
+        logCapabilities(capabilities);
+        
+        return capabilities;
+    }
+
+    /**
+     * Get enhanced capabilities with additional configuration options
+     * @param appPath Application path
+     * @param options Additional capability options
+     * @return Enhanced DesiredCapabilities
+     */
+    public static DesiredCapabilities getEnhancedCapabilities(String appPath, 
+                                                              CapabilityOptions options) {
+        DesiredCapabilities capabilities = getDesktopCapabilities(appPath);
+        
+        if (options != null) {
+            if (options.workingDirectory != null) {
+                capabilities.setCapability("appWorkingDir", options.workingDirectory);
+            }
+            
+            if (options.arguments != null) {
+                capabilities.setCapability("appArguments", options.arguments);
+            }
+            
+            if (options.waitForAppLaunch > 0) {
+                capabilities.setCapability("ms:waitForAppLaunch", String.valueOf(options.waitForAppLaunch));
+            }
+            
+            capabilities.setCapability("ms:experimental-webdriver", options.enableExperimentalFeatures);
+            
+            Log.info("Enhanced capabilities configured with custom options");
+        }
+        
+        return capabilities;
+    }
+
+    /**
+     * Log capability details for debugging
+     * @param capabilities Capabilities to log
+     */
+    private static void logCapabilities(DesiredCapabilities capabilities) {
+        if (Log.isDebugEnabled()) {
+            Log.debug("=== Desktop Capabilities ===");
+            capabilities.asMap().forEach((key, value) -> 
+                Log.debug(key + ": " + value));
+            Log.debug("=== End Capabilities ===");
+        }
+    }
+
+    /**
+     * Capability options for enhanced configuration
+     */
+    public static class CapabilityOptions {
+        public String workingDirectory;
+        public String arguments;
+        public int waitForAppLaunch = 25;
+        public boolean enableExperimentalFeatures = true;
+        
+        public CapabilityOptions() {}
+        
+        public CapabilityOptions workingDirectory(String dir) {
+            this.workingDirectory = dir;
+            return this;
+        }
+        
+        public CapabilityOptions arguments(String args) {
+            this.arguments = args;
+            return this;
+        }
+        
+        public CapabilityOptions waitForAppLaunch(int seconds) {
+            this.waitForAppLaunch = seconds;
+            return this;
+        }
+        
+        public CapabilityOptions experimentalFeatures(boolean enable) {
+            this.enableExperimentalFeatures = enable;
+            return this;
+        }
+    }
+}

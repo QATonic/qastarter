@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="LOG_DIR">logs</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- File Appender for General Logs -->
+        <File name="FileAppender" fileName="${LOG_DIR}/desktop-automation.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </File>
+
+        <!-- Rolling File Appender for General Logs -->
+        <RollingFile name="RollingFileAppender" 
+                     fileName="${LOG_DIR}/desktop-automation.log"
+                     filePattern="${LOG_DIR}/desktop-automation-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <!-- Test Results File Appender -->
+        <RollingFile name="TestResultsAppender" 
+                     fileName="${LOG_DIR}/test-results.log"
+                     filePattern="${LOG_DIR}/test-results-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <!-- Error File Appender -->
+        <RollingFile name="ErrorFileAppender" 
+                     fileName="${LOG_DIR}/errors.log"
+                     filePattern="${LOG_DIR}/errors-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <!-- Performance File Appender -->
+        <RollingFile name="PerformanceAppender" 
+                     fileName="${LOG_DIR}/performance.log"
+                     filePattern="${LOG_DIR}/performance-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="25MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="3"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger Configuration -->
+        <Root level="INFO">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="RollingFileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Root>
+
+        <!-- Framework Package Loggers -->
+        <Logger name="{{groupId}}" level="DEBUG" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="RollingFileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <!-- Test Results Logger -->
+        <Logger name="{{groupId}}.tests" level="INFO" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="TestResultsAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <!-- Core Framework Logger -->
+        <Logger name="{{groupId}}.core" level="DEBUG" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="RollingFileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <!-- Utils Logger -->
+        <Logger name="{{groupId}}.utils" level="DEBUG" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="RollingFileAppender"/>
+        </Logger>
+
+        <!-- Performance Logger -->
+        <Logger name="{{groupId}}.performance" level="INFO" additivity="false">
+            <AppenderRef ref="PerformanceAppender"/>
+        </Logger>
+
+        <!-- Selenium WebDriver Logger -->
+        <Logger name="org.openqa.selenium" level="WARN" additivity="false">
+            <AppenderRef ref="RollingFileAppender"/>
+        </Logger>
+
+        <!-- TestNG Logger -->
+        <Logger name="org.testng" level="WARN" additivity="false">
+            <AppenderRef ref="RollingFileAppender"/>
+        </Logger>
+
+        <!-- ExtentReports Logger -->
+        <Logger name="com.aventstack.extentreports" level="WARN" additivity="false">
+            <AppenderRef ref="RollingFileAppender"/>
+        </Logger>
+
+        <!-- Windows JNA Logger -->
+        <Logger name="com.sun.jna" level="WARN" additivity="false">
+            <AppenderRef ref="RollingFileAppender"/>
+        </Logger>
+
+        <!-- HTTP Client Logger (for WinAppDriver communication) -->
+        <Logger name="org.apache.http" level="WARN" additivity="false">
+            <AppenderRef ref="RollingFileAppender"/>
+        </Logger>
+
+        <!-- Jackson JSON Logger -->
+        <Logger name="com.fasterxml.jackson" level="WARN" additivity="false">
+            <AppenderRef ref="RollingFileAppender"/>
+        </Logger>
+
+        <!-- Appium Client Logger -->
+        <Logger name="io.appium.java_client" level="INFO" additivity="false">
+            <AppenderRef ref="RollingFileAppender"/>
+        </Logger>
+    </Loggers>
+</Configuration>

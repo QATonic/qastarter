@@ -165,9 +165,7 @@
       "description": "User test data"
     },
     {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration"
+      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration","conditional": {"utilities.includeDocker": true}
     },
     {
       "path": ".dockerignore",
@@ -191,9 +189,7 @@
       }
     },
     {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose for Selenium Grid"
+      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Selenium Grid","conditional": {"utilities.includeDockerCompose": true}
     }
   ],
   "directories": [
@@ -203,3 +199,4 @@
     "allure-results"
   ]
 }
+

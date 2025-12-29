@@ -1,0 +1,187 @@
+plugins {
+id 'java'
+id 'jacoco'
+{{#if (eq reportingTool "allure")}}
+id 'io.qameta.allure' version '2.11.2'
+{{/if}}
+}
+
+group = '{{groupId}}'
+version = '1.0.0'
+description = '{{projectName}} - Mobile Automation Framework'
+
+java {
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+}
+
+repositories {
+mavenCentral()
+}
+
+ext {
+// Dependency versions
+appiumVersion = '9.0.0'
+testngVersion = '7.8.0'
+log4jVersion = '2.22.0'
+{{#if (eq reportingTool "extent-reports")}}
+extentReportsVersion = '5.1.1'
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+allureVersion = '2.25.0'
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+cucumberVersion = '7.14.0'
+{{/if}}
+jacksonVersion = '2.15.2'
+commonsCsvVersion = '1.10.0'
+
+// Test configuration
+platform = project.hasProperty('platform') ? project.property('platform') : 'android'
+deviceName = project.hasProperty('deviceName') ? project.property('deviceName') : 'emulator-5554'
+appPath = project.hasProperty('appPath') ? project.property('appPath') : 'apps/app.apk'
+env = project.hasProperty('env') ? project.property('env') : 'dev'
+suite = project.hasProperty('suite') ? project.property('suite') : 'testng.xml'
+parallel = project.hasProperty('parallel') ? project.property('parallel') : 'false'
+threadCount = project.hasProperty('threadCount') ? project.property('threadCount') : '1'
+}
+
+dependencies {
+// Appium Java Client
+implementation "io.appium:java-client:${appiumVersion}"
+
+// TestNG
+testImplementation "org.testng:testng:${testngVersion}"
+{{#if (eq reportingTool "extent-reports")}}
+
+// ExtentReports
+implementation "com.aventstack:extentreports:${extentReportsVersion}"
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+
+// Allure
+testImplementation "io.qameta.allure:allure-testng:${allureVersion}"
+{{#if (eq testingPattern "bdd")}}
+testImplementation "io.qameta.allure:allure-cucumber7-jvm:${allureVersion}"
+{{/if}}
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+
+// Cucumber BDD
+testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+testImplementation "io.cucumber:cucumber-testng:${cucumberVersion}"
+{{/if}}
+
+// Log4j2
+implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+
+// JSON Processing
+implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+
+// CSV Processing
+implementation "org.apache.commons:commons-csv:${commonsCsvVersion}"
+}
+
+// Test task configuration
+test {
+useTestNG() {
+suites "src/test/resources/${suite}"
+
+// Configure parallel execution
+if ((project.findProperty('parallel') ?: 'false') == 'true') {
+parallel = 'methods'
+threadCount = Integer.parseInt(project.findProperty('threadCount') ?: '1')
+}
+
+// System properties for test execution
+systemProperty 'platform', platform
+systemProperty 'deviceName', deviceName
+systemProperty 'appPath', appPath
+systemProperty 'env', env
+}
+
+testLogging {
+events "passed", "skipped", "failed"
+exceptionFormat "full"
+}
+
+reports {
+html.required = true
+junitXml.required = true
+}
+
+ignoreFailures = false
+jvmArgs = ['-Xmx1024m']
+
+doFirst {
+delete fileTree(dir: "reports", include: "**/*")
+delete fileTree(dir: "test-output", include: "**/*")
+}
+}
+
+// Android tests
+task androidTest(type: Test) {
+useTestNG() {
+suites "src/test/resources/android.xml"
+systemProperty 'platform', 'android'
+systemProperty 'deviceName', deviceName
+systemProperty 'appPath', appPath
+systemProperty 'env', env
+}
+}
+
+// iOS tests
+task iosTest(type: Test) {
+useTestNG() {
+suites "src/test/resources/ios.xml"
+systemProperty 'platform', 'ios'
+systemProperty 'deviceName', deviceName
+systemProperty 'appPath', appPath
+systemProperty 'env', env
+}
+}
+
+// Code coverage with JaCoCo
+jacoco {
+toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+dependsOn test
+reports {
+xml.required = true
+csv.required = false
+html.required = true
+}
+}
+
+// Clean task enhancement
+clean {
+delete "logs"
+delete "reports"
+delete "test-output"
+delete "screenshots"
+}
+
+// Gradle wrapper task
+wrapper {
+gradleVersion = '8.5'
+distributionType = Wrapper.DistributionType.BIN
+}
+{{#if (eq reportingTool "allure")}}
+
+// Allure configuration
+allure {
+version = '2.25.0'
+autoconfigure = true
+aspectjweaver = true
+
+useTestNG {
+version = '2.25.0'
+}
+}
+{{/if}}

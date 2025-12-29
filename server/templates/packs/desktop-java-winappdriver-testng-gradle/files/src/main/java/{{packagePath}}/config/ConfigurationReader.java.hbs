@@ -1,0 +1,356 @@
+package {{groupId}}.config;
+
+import {{groupId}}.utils.Log;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+/**
+ * Type-safe configuration reader for desktop environment properties
+ * Handles loading and accessing configuration from property files
+ */
+public class ConfigurationReader {
+
+    private static Properties properties;
+    private static String currentEnvironment;
+    
+    // Default configuration values
+    private static final int DEFAULT_IMPLICIT_WAIT = 10;
+    private static final int DEFAULT_EXPLICIT_WAIT = 30;
+    private static final int DEFAULT_SESSION_TIMEOUT = 300;
+    private static final String DEFAULT_ENVIRONMENT = "dev";
+    private static final String DEFAULT_APPLICATION = "calculator";
+
+    /**
+     * Initialize configuration reader
+     */
+    public static void initialize() {
+        // Determine environment
+        currentEnvironment = System.getProperty("environment", DEFAULT_ENVIRONMENT);
+        
+        // Load properties
+        loadProperties();
+        
+        Log.info("Configuration initialized for environment: " + currentEnvironment);
+    }
+
+    /**
+     * Load properties from configuration file
+     */
+    private static void loadProperties() {
+        properties = new Properties();
+        
+        // Try to load environment-specific configuration
+        String configFileName = "config/" + currentEnvironment + ".properties";
+        
+        try (InputStream input = ConfigurationReader.class.getClassLoader().getResourceAsStream(configFileName)) {
+            if (input != null) {
+                properties.load(input);
+                Log.info("Loaded configuration from: " + configFileName);
+            } else {
+                Log.warn("Configuration file not found: " + configFileName + ". Using default values.");
+            }
+        } catch (IOException e) {
+            Log.error("Error loading configuration from " + configFileName + ": " + e.getMessage());
+            Log.warn("Using default configuration values");
+        }
+        
+        // Load additional properties if available
+        loadAdditionalProperties();
+    }
+
+    /**
+     * Load additional properties from external file if specified
+     */
+    private static void loadAdditionalProperties() {
+        String externalConfigPath = System.getProperty("config.file");
+        if (externalConfigPath != null) {
+            try (FileInputStream input = new FileInputStream(externalConfigPath)) {
+                Properties externalProps = new Properties();
+                externalProps.load(input);
+                
+                // Merge external properties (they take precedence)
+                externalProps.forEach((key, value) -> properties.setProperty(key.toString(), value.toString()));
+                
+                Log.info("Loaded external configuration from: " + externalConfigPath);
+            } catch (IOException e) {
+                Log.error("Error loading external configuration from " + externalConfigPath + ": " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Get property value
+     * @param key Property key
+     * @return Property value or null if not found
+     */
+    public static String getProperty(String key) {
+        if (properties == null) {
+            initialize();
+        }
+        
+        // First check system properties
+        String systemProperty = System.getProperty(key);
+        if (systemProperty != null) {
+            return systemProperty;
+        }
+        
+        // Then check loaded properties
+        return properties.getProperty(key);
+    }
+
+    /**
+     * Get property value with default
+     * @param key Property key
+     * @param defaultValue Default value if property not found
+     * @return Property value or default value
+     */
+    public static String getProperty(String key, String defaultValue) {
+        String value = getProperty(key);
+        return value != null ? value : defaultValue;
+    }
+
+    /**
+     * Get integer property value
+     * @param key Property key
+     * @param defaultValue Default value if property not found or invalid
+     * @return Integer property value or default
+     */
+    public static int getIntProperty(String key, int defaultValue) {
+        String value = getProperty(key);
+        if (value != null) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                Log.warn("Invalid integer property '" + key + "': " + value + ". Using default: " + defaultValue);
+            }
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get boolean property value
+     * @param key Property key
+     * @param defaultValue Default value if property not found
+     * @return Boolean property value or default
+     */
+    public static boolean getBooleanProperty(String key, boolean defaultValue) {
+        String value = getProperty(key);
+        if (value != null) {
+            return Boolean.parseBoolean(value);
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get current environment
+     * @return Current environment name
+     */
+    public static String getEnvironment() {
+        return currentEnvironment != null ? currentEnvironment : DEFAULT_ENVIRONMENT;
+    }
+
+    /**
+     * Get implicit wait timeout in seconds
+     * @return Implicit wait timeout
+     */
+    public static int getImplicitWait() {
+        return getIntProperty("implicit.wait", DEFAULT_IMPLICIT_WAIT);
+    }
+
+    /**
+     * Get explicit wait timeout in seconds
+     * @return Explicit wait timeout
+     */
+    public static int getExplicitWait() {
+        return getIntProperty("explicit.wait", DEFAULT_EXPLICIT_WAIT);
+    }
+
+    /**
+     * Get session timeout in seconds
+     * @return Session timeout
+     */
+    public static int getSessionTimeout() {
+        return getIntProperty("session.timeout", DEFAULT_SESSION_TIMEOUT);
+    }
+
+    /**
+     * Get WinAppDriver URL
+     * @return WinAppDriver server URL
+     */
+    public static String getWinAppDriverUrl() {
+        return getProperty("winappdriver.url", "http://127.0.0.1:4723");
+    }
+
+    /**
+     * Get default application to test
+     * @return Default application path or ID
+     */
+    public static String getDefaultApplication() {
+        return getProperty("default.application", DEFAULT_APPLICATION);
+    }
+
+    /**
+     * Get application path by name
+     * @param appName Application name
+     * @return Application path or null if not configured
+     */
+    public static String getApplicationPath(String appName) {
+        return getProperty("app." + appName + ".path");
+    }
+
+    /**
+     * Get screenshot directory
+     * @return Screenshot directory path
+     */
+    public static String getScreenshotDirectory() {
+        return getProperty("screenshot.directory", "screenshots");
+    }
+
+    /**
+     * Get reports directory
+     * @return Reports directory path
+     */
+    public static String getReportsDirectory() {
+        return getProperty("reports.directory", "reports");
+    }
+
+    /**
+     * Check if headless mode is enabled
+     * @return true if headless mode is enabled
+     */
+    public static boolean isHeadlessMode() {
+        return getBooleanProperty("headless.mode", false);
+    }
+
+    /**
+     * Check if screenshot on failure is enabled
+     * @return true if screenshot on failure is enabled
+     */
+    public static boolean isScreenshotOnFailure() {
+        return getBooleanProperty("screenshot.on.failure", true);
+    }
+
+    /**
+     * Check if video recording is enabled
+     * @return true if video recording is enabled
+     */
+    public static boolean isVideoRecordingEnabled() {
+        return getBooleanProperty("video.recording.enabled", false);
+    }
+
+    /**
+     * Get maximum retry count for failed tests
+     * @return Maximum retry count
+     */
+    public static int getMaxRetryCount() {
+        return getIntProperty("max.retry.count", 1);
+    }
+
+    /**
+     * Get test data directory
+     * @return Test data directory path
+     */
+    public static String getTestDataDirectory() {
+        return getProperty("test.data.directory", "src/test/resources/testdata");
+    }
+
+    /**
+     * Check if parallel execution is enabled
+     * @return true if parallel execution is enabled
+     */
+    public static boolean isParallelExecutionEnabled() {
+        return getBooleanProperty("parallel.execution.enabled", false);
+    }
+
+    /**
+     * Get thread count for parallel execution
+     * @return Thread count for parallel execution
+     */
+    public static int getParallelThreadCount() {
+        return getIntProperty("parallel.thread.count", 1);
+    }
+
+    /**
+     * Get log level
+     * @return Log level (DEBUG, INFO, WARN, ERROR)
+     */
+    public static String getLogLevel() {
+        return getProperty("log.level", "INFO");
+    }
+
+    /**
+     * Check if extent reports are enabled
+     * @return true if extent reports are enabled
+     */
+    public static boolean isExtentReportsEnabled() {
+        return getBooleanProperty("extent.reports.enabled", true);
+    }
+
+    /**
+     * Get extent reports theme
+     * @return Extent reports theme (DARK or STANDARD)
+     */
+    public static String getExtentReportsTheme() {
+        return getProperty("extent.reports.theme", "DARK");
+    }
+
+    /**
+     * Check if cleanup of old screenshots/reports is enabled
+     * @return true if cleanup is enabled
+     */
+    public static boolean isCleanupEnabled() {
+        return getBooleanProperty("cleanup.enabled", true);
+    }
+
+    /**
+     * Get cleanup age in days (files older than this will be deleted)
+     * @return Cleanup age in days
+     */
+    public static int getCleanupAgeInDays() {
+        return getIntProperty("cleanup.age.days", 7);
+    }
+
+    /**
+     * Get all properties for debugging
+     * @return Properties object (copy)
+     */
+    public static Properties getAllProperties() {
+        if (properties == null) {
+            initialize();
+        }
+        return (Properties) properties.clone();
+    }
+
+    /**
+     * Check if configuration is initialized
+     * @return true if configuration is initialized
+     */
+    public static boolean isInitialized() {
+        return properties != null;
+    }
+
+    /**
+     * Refresh configuration (reload from files)
+     */
+    public static void refresh() {
+        properties = null;
+        initialize();
+        Log.info("Configuration refreshed");
+    }
+
+    /**
+     * Override property programmatically
+     * @param key Property key
+     * @param value Property value
+     */
+    public static void setProperty(String key, String value) {
+        if (properties == null) {
+            initialize();
+        }
+        properties.setProperty(key, value);
+        Log.debug("Property overridden: " + key + " = " + value);
+    }
+}

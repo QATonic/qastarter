@@ -1,0 +1,177 @@
+package {{packageName}}.tests;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import {{packageName}}.core.BaseTest;
+import {{packageName}}.pages.LoginPage;
+import {{packageName}}.pages.HomePage;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+/**
+ * Smoke test suite for mobile application
+ * Contains basic functionality tests to verify app stability
+ */
+public class SmokeSuite extends BaseTest {
+
+    private LoginPage loginPage;
+    private HomePage homePage;
+
+    @Test(groups = {"smoke", "mobile"}, description = "Verify mobile application launches successfully")
+    public void testAppLaunch() {
+        {{#if utilities.logger}}
+        Log.info("Starting app launch smoke test for platform: " + getPlatform());
+        {{/if}}
+        
+        // Verify app launches and login page is displayed
+        loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isPageLoaded(), 
+                         "Application should launch successfully and show login page on " + getPlatform());
+        
+        String pageTitle = loginPage.getPageTitle();
+        Assert.assertNotNull(pageTitle, "Login page title should be available");
+        
+        {{#if utilities.logger}}
+        Log.info("App launch smoke test completed successfully. Page title: " + pageTitle);
+        {{/if}}
+    }
+
+    @Test(groups = {"smoke", "mobile"}, description = "Verify basic app navigation works")
+    public void testBasicNavigation() {
+        {{#if utilities.logger}}
+        Log.info("Starting basic navigation smoke test for platform: " + getPlatform());
+        {{/if}}
+        
+        loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isPageLoaded(), "Login page should be loaded");
+        
+        // Perform login to test navigation
+        loginPage.performLogin("testuser@example.com", "password123");
+        
+        // Verify navigation to home page
+        homePage = new HomePage();
+        Assert.assertTrue(homePage.isPageLoaded(), 
+                         "Should navigate to home page after login on " + getPlatform());
+        
+        {{#if utilities.logger}}
+        Log.info("Basic navigation smoke test completed successfully");
+        {{/if}}
+    }
+
+    @Test(groups = {"smoke", "android"}, description = "Verify Android-specific features work")
+    public void testAndroidSpecificFeatures() {
+        if (!isAndroid()) {
+            {{#if utilities.logger}}
+            Log.info("Skipping Android-specific test - not running on Android platform");
+            {{/if}}
+            return;
+        }
+        
+        {{#if utilities.logger}}
+        Log.info("Starting Android-specific features test");
+        {{/if}}
+        
+        loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isPageLoaded(), "Login page should be loaded on Android");
+        
+        // Test Android-specific functionality
+        // This could include back button behavior, menu button, etc.
+        
+        {{#if utilities.logger}}
+        Log.info("Android-specific features test completed successfully");
+        {{/if}}
+    }
+
+    @Test(groups = {"smoke", "ios"}, description = "Verify iOS-specific features work")
+    public void testIOSSpecificFeatures() {
+        if (!isIOS()) {
+            {{#if utilities.logger}}
+            Log.info("Skipping iOS-specific test - not running on iOS platform");
+            {{/if}}
+            return;
+        }
+        
+        {{#if utilities.logger}}
+        Log.info("Starting iOS-specific features test");
+        {{/if}}
+        
+        loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isPageLoaded(), "Login page should be loaded on iOS");
+        
+        // Test iOS-specific functionality
+        // This could include swipe gestures, notification handling, etc.
+        
+        {{#if utilities.logger}}
+        Log.info("iOS-specific features test completed successfully");
+        {{/if}}
+    }
+
+    @Test(groups = {"smoke", "mobile"}, description = "Verify app handles device rotation")
+    public void testDeviceRotation() {
+        {{#if utilities.logger}}
+        Log.info("Starting device rotation smoke test for platform: " + getPlatform());
+        {{/if}}
+        
+        loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isPageLoaded(), "Login page should be loaded");
+        
+        // Note: Device rotation testing would require specific mobile gestures
+        // This is a placeholder for rotation testing logic
+        
+        {{#if utilities.logger}}
+        Log.info("Device rotation smoke test completed successfully");
+        {{/if}}
+    }
+
+    @Test(groups = {"smoke", "mobile"}, description = "Verify app handles keyboard interactions")
+    public void testKeyboardInteractions() {
+        {{#if utilities.logger}}
+        Log.info("Starting keyboard interactions smoke test for platform: " + getPlatform());
+        {{/if}}
+        
+        loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isPageLoaded(), "Login page should be loaded");
+        
+        // Test keyboard appearance and hiding
+        loginPage.enterUsername("test");
+        
+        // Hide keyboard
+        loginPage.hideKeyboard();
+        
+        // Verify app state after keyboard interactions
+        Assert.assertTrue(loginPage.isPageLoaded(), 
+                         "Login page should remain stable after keyboard interactions");
+        
+        {{#if utilities.logger}}
+        Log.info("Keyboard interactions smoke test completed successfully");
+        {{/if}}
+    }
+
+    @Test(groups = {"smoke", "mobile"}, description = "Verify app performance and responsiveness")
+    public void testAppPerformance() {
+        {{#if utilities.logger}}
+        Log.info("Starting app performance smoke test for platform: " + getPlatform());
+        {{/if}}
+        
+        long startTime = System.currentTimeMillis();
+        
+        loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isPageLoaded(), "Login page should be loaded");
+        
+        // Perform basic operations and measure response time
+        loginPage.enterUsername("performance@test.com");
+        loginPage.enterPassword("testpass");
+        
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
+        
+        // Assert reasonable response time (adjust threshold as needed)
+        Assert.assertTrue(responseTime < 10000, 
+                         "App should respond within reasonable time (10 seconds). Actual: " + responseTime + "ms");
+        
+        {{#if utilities.logger}}
+        Log.info("App performance test completed. Response time: " + responseTime + "ms");
+        {{/if}}
+    }
+}

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Info, Coffee } from "lucide-react";
+import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "./ThemeToggle";
 import AboutModal from "./AboutModal";
+import SponsorModal from "./SponsorModal";
 import QAStarterLogo from "./QAStarterLogo";
 
 interface HeaderProps {
@@ -13,10 +14,6 @@ interface HeaderProps {
 export default function Header({ onLogoClick }: HeaderProps) {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [, setLocation] = useLocation();
-
-  const handleBuyMeCoffee = () => {
-    window.open('https://buymeacoffee.com/SantoshKarad', '_blank', 'noopener,noreferrer');
-  };
 
   const handleLogoClick = () => {
     if (onLogoClick) {
@@ -31,7 +28,7 @@ export default function Header({ onLogoClick }: HeaderProps) {
         <div className="container flex h-16 items-center justify-between px-4 lg:px-8">
           {/* Logo Section */}
           <div className="flex items-center space-x-3">
-            <button 
+            <button
               className="flex items-center space-x-2 cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
               onClick={handleLogoClick}
               data-testid="logo-link"
@@ -40,8 +37,8 @@ export default function Header({ onLogoClick }: HeaderProps) {
               <div className="transition-transform group-hover:scale-105">
                 <QAStarterLogo className="h-10 w-auto" />
               </div>
-              <span 
-                className="font-bold text-xl bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity" 
+              <span
+                className="font-bold text-xl bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent group-hover:opacity-80 transition-opacity"
                 data-testid="text-logo"
               >
                 QAStarter
@@ -64,18 +61,8 @@ export default function Header({ onLogoClick }: HeaderProps) {
               <span className="hidden sm:inline">About</span>
             </Button>
 
-            {/* Buy Me Coffee Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleBuyMeCoffee}
-              className="gap-1.5 bg-[#FFDD00] hover:bg-[#FFDD00]/90 dark:bg-[#FFDD00] dark:hover:bg-[#FFDD00]/90 text-black dark:text-black border-[#FFDD00] dark:border-[#FFDD00] font-medium"
-              data-testid="button-buy-coffee"
-              aria-label="Support us - Buy Me a Coffee"
-            >
-              <Coffee className="h-4 w-4" />
-              <span className="hidden sm:inline">Buy Me a Coffee</span>
-            </Button>
+            {/* Sponsor Button with Modal */}
+            <SponsorModal />
 
             {/* Theme Toggle */}
             <ThemeToggle />

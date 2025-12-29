@@ -1,4 +1,4 @@
-import { Linkedin, Twitter, Heart } from "lucide-react";
+import { Linkedin, Twitter, Youtube, Instagram, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import QAStarterLogo from "./QAStarterLogo";
 
@@ -17,6 +17,18 @@ export default function Footer() {
       testId: "button-twitter-x",
       icon: Twitter,
       url: "https://twitter.com/SantoshKarad"
+    },
+    {
+      name: "YouTube",
+      testId: "button-youtube",
+      icon: Youtube,
+      url: "https://youtube.com/@SantoshKarad"
+    },
+    {
+      name: "Instagram",
+      testId: "button-instagram",
+      icon: Instagram,
+      url: "https://instagram.com/SantoshKarad"
     }
   ];
 
@@ -56,22 +68,11 @@ export default function Footer() {
                 <span className="sr-only">{social.name}</span>
               </Button>
             ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 bg-[#FFDD00] hover:bg-[#FFDD00]/90 dark:bg-[#FFDD00] dark:hover:bg-[#FFDD00]/90 text-black dark:text-black border-[#FFDD00] dark:border-[#FFDD00] h-8 text-xs px-3 font-medium"
-              onClick={() => window.open('https://buymeacoffee.com/SantoshKarad', '_blank', 'noopener,noreferrer')}
-              data-testid="button-buy-coffee-footer"
-              aria-label="Support us - Buy Me a Coffee"
-            >
-              <Heart className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Buy Me a Coffee</span>
-            </Button>
           </div>
         </div>
-        
+
         {/* Copyright */}
-        <div className="mt-3 pt-3 border-t text-center sm:text-left">
+        <div className="mt-3 pt-3 border-t text-center">
           <p className="text-xs text-muted-foreground">
             © {currentYear} QAStarter by QATonic Innovations. All rights reserved.
           </p>

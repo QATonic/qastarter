@@ -11,6 +11,24 @@ const app = express();
 // Detect development mode - check multiple conditions
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
+// process.env.NODE_ENV !== 'production';
+import fs from 'fs';
+import path from 'path';
+
+// DEBUG: Check template files existence on startup
+try {
+  const checkPath = path.join(__dirname, 'templates/packs/web-java-selenium-testng-maven/files');
+  console.log(`[Startup Debug] Checking templates at: ${checkPath}`);
+  if (fs.existsSync(checkPath)) {
+    const files = fs.readdirSync(checkPath, { recursive: true });
+    console.log(`[Startup Debug] Found ${files.length} files/dirs in template pack:`, files);
+  } else {
+    console.error(`[Startup Debug] Template pack path does not exist: ${checkPath}`);
+  }
+} catch (e) {
+  console.error(`[Startup Debug] Error checking templates:`, e);
+}
+
 // In development, disable helmet CSP entirely to avoid issues with Vite HMR
 if (isDevelopment) {
   // Minimal security headers for development

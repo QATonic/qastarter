@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import rateLimit from "express-rate-limit";
 import archiver from "archiver";
 import { storage } from "./storage";
@@ -58,7 +59,11 @@ const generateProjectLimiter = rateLimit({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const templateGenerator = new ProjectTemplateGenerator();
+  // Use process.cwd() to correctly locate templates in both dev and prod (Docker)
+  // In Docker: /app/server/templates/packs
+  // In Dev: <project_root>/server/templates/packs
+  const templatesPath = path.join(process.cwd(), 'server', 'templates', 'packs');
+  const templateGenerator = new ProjectTemplateGenerator(templatesPath);
 
   // Apply rate limiting to all API routes
   app.use('/api/', apiLimiter);

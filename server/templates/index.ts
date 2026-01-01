@@ -12,9 +12,9 @@ export interface TemplateFile {
 export class ProjectTemplateGenerator {
   private templatePackEngine: TemplatePackEngine;
 
-  constructor() {
-    this.templatePackEngine = new TemplatePackEngine();
-    
+  constructor(packsDirectory?: string) {
+    this.templatePackEngine = new TemplatePackEngine(packsDirectory);
+
     // Register required Handlebars helpers for fallback
     handlebars.registerHelper('eq', (a: any, b: any) => a === b);
     handlebars.registerHelper('or', (...args: any[]) => {
@@ -27,7 +27,7 @@ export class ProjectTemplateGenerator {
   public async generateProject(config: ProjectConfig): Promise<TemplateFile[]> {
     // Try to use sophisticated template pack first
     const hasTemplatePack = await this.templatePackEngine.hasTemplatePack(config);
-    
+
     if (hasTemplatePack) {
       console.log('Using sophisticated template pack for:', {
         testingType: config.testingType,
@@ -52,7 +52,7 @@ export class ProjectTemplateGenerator {
   public async getDependencies(config: ProjectConfig): Promise<Record<string, string>> {
     // Try to get dependencies from template pack manifest
     const hasTemplatePack = await this.templatePackEngine.hasTemplatePack(config);
-    
+
     if (hasTemplatePack) {
       return await this.templatePackEngine.getDependencies(config);
     } else {
@@ -344,13 +344,13 @@ export class ProjectTemplateGenerator {
           // For CI/CD workflow files, mask GitHub Actions expressions before Handlebars compilation
           const isWorkflowFile = file.path.includes('.github/workflows/') || file.path.includes('azure-pipelines.yml');
           let content = file.content;
-          
+
           if (isWorkflowFile) {
             // Mask GitHub Actions and Azure DevOps expressions
             const GHA_OPEN = '%%GHA_OPEN%%';
             const GHA_CLOSE = '%%GHA_CLOSE%%';
             const AZURE_VAR = '%%AZURE_VAR%%';
-            
+
             // Replace GitHub Actions and Azure DevOps expressions (with optional backslash before $)
             content = content
               .replace(/(?:\\)?\$\{\{([\s\S]*?)\}\}/g, (_, inner) => `${GHA_OPEN}${inner}${GHA_CLOSE}`)
@@ -1497,15 +1497,15 @@ final class SampleTests: XCTestCase {
 }
 
 // Register Handlebars helpers
-handlebars.registerHelper('eq', function(a: any, b: any) {
+handlebars.registerHelper('eq', function (a: any, b: any) {
   return a === b;
 });
 
-handlebars.registerHelper('includes', function(array: any[], item: string) {
+handlebars.registerHelper('includes', function (array: any[], item: string) {
   return Array.isArray(array) && array.includes(item);
 });
 
-handlebars.registerHelper('or', function(...args: any[]) {
+handlebars.registerHelper('or', function (...args: any[]) {
   // Remove the last argument which is the options object
   const values = args.slice(0, -1);
   return values.some(Boolean);

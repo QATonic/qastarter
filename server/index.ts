@@ -25,11 +25,11 @@ if (isDevelopment) {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"], // Some Radix UI components need inline styles
+        scriptSrc: ["'self'", "https://replit.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Some Radix UI components need inline styles
         imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com"],
+        connectSrc: ["'self'", "https://replit.com"],
+        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'"],
         frameSrc: ["'none'"],
@@ -56,14 +56,14 @@ const corsOptions = {
 
     // Production: Check against allowed origins
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-    const replitPatterns = [
-      /^https:\/\/.*\.replit\.app$/,
-      /^https:\/\/.*\.replit\.dev$/,
+    const allowedPatterns = [
+      /^https:\/\/.*\.easypanel\.host$/,
+      /^https:\/\/.*\.qatonic\.com$/
     ];
 
     // Check if origin matches any pattern
     const isAllowed = allowedOrigins.includes(origin) ||
-      replitPatterns.some(pattern => pattern.test(origin));
+      allowedPatterns.some(pattern => pattern.test(origin));
 
     if (isAllowed) {
       callback(null, true);

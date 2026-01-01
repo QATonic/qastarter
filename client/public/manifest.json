@@ -1,0 +1,27 @@
+{
+    "name": "QAStarter",
+    "short_name": "QAStarter",
+    "description": "Free QA Automation Framework Generator. Create production-ready test automation frameworks instantly.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "icons": [
+        {
+            "src": "favicon.ico",
+            "sizes": "64x64 32x32 24x24 16x16",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "logo.svg",
+            "type": "image/svg+xml",
+            "sizes": "any"
+        }
+    ],
+    "orientation": "any",
+    "categories": [
+        "developer-tools",
+        "productivity",
+        "utilities"
+    ]
+}

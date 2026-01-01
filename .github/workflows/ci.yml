@@ -161,13 +161,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # Deployment placeholder (extend as needed)
-  # deploy:
-  #   name: Deploy to Production
-  #   runs-on: ubuntu-latest
-  #   needs: [docker]
-  #   if: github.ref == 'refs/heads/main'
-  #   environment: production
-  #   steps:
-  #     - name: Deploy to production
-  #       run: echo "Deploy commands here"
+  # Deploy to Easypanel via Webhook
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [docker]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Trigger Easypanel Deploy
+        run: curl -X POST ${{ secrets.EASYPANEL_WEBHOOK_URL }}

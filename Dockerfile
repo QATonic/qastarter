@@ -46,7 +46,7 @@ USER qastarter
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:5000/api/v1/metadata || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-5000}/api/v1/metadata || exit 1
 
 # Start the application
 CMD ["node", "dist/index.js"]

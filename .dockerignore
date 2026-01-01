@@ -48,7 +48,10 @@ e2e
 vitest.config.ts
 playwright.config.ts
 
-# Docker files (avoid recursive builds)
+# # Docker files (avoid recursive builds)
 Dockerfile
 docker-compose*.yml
 .dockerignore
+
+# Explicitly whitelist templates to ensure they are copied despite above rules
+!server/templates/**/*

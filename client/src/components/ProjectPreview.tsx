@@ -2,7 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Folder, Eye, AlertCircle, ChevronDown, ChevronRight, HardDrive, Package, FileCheck2 } from "lucide-react";
+import {
+  FileText, Folder, FolderOpen, Eye, AlertCircle,
+  ChevronDown, ChevronRight, HardDrive, Package, FileCheck2,
+  FileCode, FileJson, FileImage, Terminal, Settings, Database, Braces
+} from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -62,7 +66,57 @@ export default function ProjectPreview({
     setExpandedFolders(newExpanded);
   };
 
-  // Handle file selection - try to find content from sample files
+  // VS Code-style File Icon Helper
+  const getFileIcon = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+
+    switch (ext) {
+      case 'ts':
+      case 'tsx':
+        return <FileCode className="w-4 h-4 text-blue-500 flex-shrink-0" />;
+      case 'js':
+      case 'jsx':
+        return <FileCode className="w-4 h-4 text-yellow-500 flex-shrink-0" />;
+      case 'json':
+        return <FileJson className="w-4 h-4 text-yellow-700 flex-shrink-0" />;
+      case 'java':
+      case 'class':
+        return <FileCode className="w-4 h-4 text-red-500 flex-shrink-0" />;
+      case 'py':
+        return <FileCode className="w-4 h-4 text-blue-400 flex-shrink-0" />;
+      case 'cs':
+        return <FileCode className="w-4 h-4 text-green-600 flex-shrink-0" />;
+      case 'xml':
+      case 'html':
+        return <FileCode className="w-4 h-4 text-orange-500 flex-shrink-0" />;
+      case 'css':
+      case 'scss':
+        return <FileCode className="w-4 h-4 text-blue-300 flex-shrink-0" />;
+      case 'md':
+      case 'txt':
+        return <FileText className="w-4 h-4 text-gray-500 flex-shrink-0" />;
+      case 'yml':
+      case 'yaml':
+        return <Settings className="w-4 h-4 text-purple-500 flex-shrink-0" />;
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+      case 'svg':
+        return <FileImage className="w-4 h-4 text-pink-500 flex-shrink-0" />;
+      case 'sql':
+        return <Database className="w-4 h-4 text-yellow-600 flex-shrink-0" />;
+      case 'sh':
+      case 'bat':
+        return <Terminal className="w-4 h-4 text-green-500 flex-shrink-0" />;
+      case 'gradle':
+      case 'properties':
+      case 'gitignore':
+        return <Settings className="w-4 h-4 text-gray-600 flex-shrink-0" />;
+      default:
+        return <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />;
+    }
+  };
+
   const handleFileClick = (file: ProjectFile, fullPath: string = '') => {
     if (file.type === 'file') {
       // First try to get content from the file itself
@@ -93,10 +147,19 @@ export default function ProjectPreview({
       const isExpanded = expandedFolders.has(currentPath);
       const hasChildren = file.type === 'folder' && file.children && file.children.length > 0;
 
+      // Determine if this file is currently being viewed
+      // Note: We'd need to track selectedFilePath logic ideally, but checking content is a proxy for now
+      // Let's improve this by storing selectedPath in state instead of just content, but sticking to simple UI for now.
+
       return (
-        <div key={index} style={{ marginLeft: `${depth * 16}px` }}>
+        <div key={index}>
           <div
-            className="flex items-center space-x-1 py-1 px-2 hover:bg-muted/50 rounded cursor-pointer"
+            className={`
+              flex items-center space-x-1 py-1 px-2 cursor-pointer text-sm font-mono
+              ${file.type === 'file' ? 'hover:bg-accent hover:text-accent-foreground' : 'hover:bg-muted/50'}
+              rounded-sm transition-colors duration-200
+            `}
+            style={{ paddingLeft: `${depth * 12 + 8}px` }}
             onClick={() => handleFileClick(file, currentPath)}
             data-testid={`${file.type}-${file.name}`}
           >
@@ -113,17 +176,23 @@ export default function ProjectPreview({
 
             {/* File/folder icon */}
             {file.type === 'folder' ? (
-              <Folder className="w-4 h-4 text-primary flex-shrink-0" />
+              isExpanded ? (
+                <FolderOpen className="w-4 h-4 text-blue-500 flex-shrink-0" />
+              ) : (
+                <Folder className="w-4 h-4 text-blue-500 flex-shrink-0" />
+              )
             ) : (
-              <FileText className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+              getFileIcon(file.name)
             )}
 
-            <span className="text-sm truncate">{file.name}</span>
+            <span className="truncate">{file.name}</span>
           </div>
 
           {/* Render children only if folder is expanded */}
           {file.type === 'folder' && file.children && isExpanded && (
-            renderFileTree(file.children, depth + 1, currentPath)
+            <div className="border-l border-border/50 ml-3">
+              {renderFileTree(file.children, depth + 1, currentPath)}
+            </div>
           )}
         </div>
       );

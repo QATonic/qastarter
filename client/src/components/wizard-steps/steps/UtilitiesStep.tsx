@@ -116,85 +116,91 @@ export default function UtilitiesStep() {
         {/* Utility Modules Section */}
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Helper Utilities</h3>
-          {utilityItems.map((item) => {
-            const Icon = item.icon;
-            const isEnabled = config.utilities[item.key];
+          {utilityItems
+            // Filter out screenshot utility for API testing (UI-less)
+            .filter(item => !(config.testingType === 'api' && item.key === 'screenshotUtility'))
+            .map((item) => {
+              const Icon = item.icon;
+              const isEnabled = config.utilities[item.key];
 
-            return (
-              <div
-                key={item.key}
-                className={`
+              return (
+                <div
+                  key={item.key}
+                  className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
                   ${isEnabled
-                    ? 'bg-primary/5 border-primary/30'
-                    : 'bg-card hover:bg-muted/30'
-                  }
+                      ? 'bg-primary/5 border-primary/30'
+                      : 'bg-card hover:bg-muted/30'
+                    }
                 `}
-                onClick={() => toggleUtility(item.key)}
-              >
-                <div className={`
+                  onClick={() => toggleUtility(item.key)}
+                >
+                  <div className={`
                   flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0
                   ${isEnabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}
                 `}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Label className="text-sm font-medium cursor-pointer">{item.label}</Label>
-                    <HelpTooltip content={item.description} />
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm font-medium cursor-pointer">{item.label}</Label>
+                      <HelpTooltip content={item.description} />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+                  </div>
+                  <Switch
+                    checked={isEnabled}
+                    onCheckedChange={() => toggleUtility(item.key)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
                 </div>
-                <Switch
-                  checked={isEnabled}
-                  onCheckedChange={() => toggleUtility(item.key)}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
 
         {/* Docker Support Section */}
         <div className="space-y-3">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Docker Support (Optional)</h3>
-          {dockerItems.map((item) => {
-            const Icon = item.icon;
-            const isEnabled = config.utilities[item.key];
+          {dockerItems
+            // Filter out Docker Compose (Selenium Grid) for non-Web testing types
+            .filter(item => !(config.testingType !== 'web' && item.key === 'includeDockerCompose'))
+            .map((item) => {
+              const Icon = item.icon;
+              const isEnabled = config.utilities[item.key];
 
-            return (
-              <div
-                key={item.key}
-                className={`
+              return (
+                <div
+                  key={item.key}
+                  className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
                   ${isEnabled
-                    ? 'bg-blue-500/5 border-blue-500/30'
-                    : 'bg-card hover:bg-muted/30'
-                  }
+                      ? 'bg-blue-500/5 border-blue-500/30'
+                      : 'bg-card hover:bg-muted/30'
+                    }
                 `}
-                onClick={() => toggleDocker(item.key)}
-              >
-                <div className={`
+                  onClick={() => toggleDocker(item.key)}
+                >
+                  <div className={`
                   flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0
                   ${isEnabled ? 'bg-blue-500/10 text-blue-600' : 'bg-muted text-muted-foreground'}
                 `}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <Label className="text-sm font-medium cursor-pointer">{item.label}</Label>
-                    <HelpTooltip content={item.description} />
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm font-medium cursor-pointer">{item.label}</Label>
+                      <HelpTooltip content={item.description} />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">{item.description}</p>
+                  </div>
+                  <Switch
+                    checked={isEnabled}
+                    onCheckedChange={() => toggleDocker(item.key)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
                 </div>
-                <Switch
-                  checked={isEnabled}
-                  onCheckedChange={() => toggleDocker(item.key)}
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
 
         {/* Summary */}

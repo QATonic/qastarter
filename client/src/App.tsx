@@ -49,13 +49,17 @@ function Router() {
   );
 }
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <SkipLink />
-      <Toaster />
-      <Router />
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <QueryClientProvider client={queryClient}>
+        <SkipLink />
+        <Toaster />
+        <Router />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

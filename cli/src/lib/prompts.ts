@@ -110,11 +110,16 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       type: 'checkbox',
       name: 'utilities',
       message: 'Select utilities to include:',
-      choices: metadata.utilities.map(u => ({
-        name: u.split(/(?=[A-Z])/).join(' '),
-        value: u,
-        checked: true
-      }))
+      choices: metadata.utilities
+        // Filter: No Screenshot Utility for API
+        .filter(u => !(testingType === 'api' && u === 'screenshotUtility'))
+        // Filter: No Selenium Grid (Docker Compose) for non-Web
+        .filter(u => !(testingType !== 'web' && u === 'includeDockerCompose'))
+        .map(u => ({
+          name: u.split(/(?=[A-Z])/).join(' '),
+          value: u,
+          checked: !u.startsWith('include') // Default true for utils, false for docker
+        }))
     }
   ]);
 

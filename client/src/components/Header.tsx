@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Info } from "lucide-react";
+import { Info, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "./ThemeToggle";
 import AboutModal from "./AboutModal";
+import TrendsModal from "./TrendsModal";
 import SponsorModal from "./SponsorModal";
 import QAStarterLogo from "./QAStarterLogo";
 
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export default function Header({ onLogoClick }: HeaderProps) {
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [trendsOpen, setTrendsOpen] = useState(false);
   const [, setLocation] = useLocation();
 
   const handleLogoClick = () => {
@@ -48,6 +50,18 @@ export default function Header({ onLogoClick }: HeaderProps) {
 
           {/* Navigation Actions */}
           <nav className="flex items-center space-x-2" aria-label="Main navigation">
+            {/* Trends Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setTrendsOpen(true)}
+              className="gap-1.5 hidden md:flex bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 dark:from-primary dark:to-purple-600 text-white dark:text-white border-primary dark:border-primary font-medium"
+              aria-label="View Global Trends"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span>Trends</span>
+            </Button>
+
             {/* About Button */}
             <Button
               variant="outline"
@@ -72,6 +86,8 @@ export default function Header({ onLogoClick }: HeaderProps) {
 
       {/* About Modal */}
       <AboutModal open={aboutOpen} onOpenChange={setAboutOpen} />
+      {/* Trends Modal */}
+      <TrendsModal open={trendsOpen} onOpenChange={setTrendsOpen} />
     </>
   );
 }

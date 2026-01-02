@@ -3,10 +3,10 @@
 This document outlines the strategic vision for the next evolution of QATonic. It focuses on elevating the platform from a "Generator" to a "Lifecycle Management" tool.
 
 ## 1. 🎨 Frontend Experience (UX/UI)
-*   **Interactive File Explorer**: Replace the static list in "Preview" with a VS Code-like tree view, allowing users to *read* the generated code before downloading.
-*   **"My Configuration" Presets**: Allow users to save their favorite stack (e.g., "My Enterprise Java Stack") to skip the wizard steps next time.
-*   **Dark/Light Mode Sync**: Ensure system preference matching is flawless (already largely there, but can be polished).
-*   **Diff View**: If a user regenerates a project, show them what changed (requires versioning).
+- [x] **Interactive File Explorer**: Replace static list with VS Code-like tree view.
+- [ ] **"My Configuration" Presets**: Save/load previous wizard choices (profiles).
+- [x] **Dark/Light Mode Sync**: Ensure system preference matching is flawless.
+- [ ] **Diff View**: Show "What changed" when regenerating a project.
 
 ## 2. 🔐 Backend & Architecture
 *   **User Accounts & Auth**: Implement GitHub/Google Login.

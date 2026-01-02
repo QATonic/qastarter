@@ -30,6 +30,16 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'wouter'],
+          ui: ['@radix-ui/react-slot', '@radix-ui/react-accordion', '@radix-ui/react-dialog', 'lucide-react', 'clsx', 'tailwind-merge'],
+          query: ['@tanstack/react-query'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
   },
   server: {
     fs: {

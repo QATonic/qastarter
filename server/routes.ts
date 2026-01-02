@@ -1,11 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import path from "path";
+
 import rateLimit from "express-rate-limit";
-import archiver from "archiver";
 import { storage } from "./storage";
 import { projectConfigSchema, type ProjectConfig } from "@shared/schema";
-import { ProjectTemplateGenerator } from "./templates";
+import { projectService } from "./services/projectService";
 import { WizardValidator, validationMatrix, validationLabels } from "@shared/validationMatrix";
 import { sanitizeProjectName, sanitizeGroupId, sanitizeArtifactId, sanitizeFilePath } from "@shared/sanitize";
 import {
@@ -59,18 +58,11 @@ const generateProjectLimiter = rateLimit({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Use process.cwd() to correctly locate templates in both dev and prod (Docker)
-  // In Docker: /app/server/templates/packs
-  // In Dev: <project_root>/server/templates/packs
-  const templatesPath = path.join(process.cwd(), 'server', 'templates', 'packs');
-  const templateGenerator = new ProjectTemplateGenerator(templatesPath);
-
   // Apply rate limiting to all API routes
   app.use('/api/', apiLimiter);
 
   // Generate and download project (with stricter rate limiting)
   app.post("/api/generate-project", generateProjectLimiter, asyncHandler(async (req, res) => {
-    const startTime = Date.now();
     const requestId = generateRequestId('gen');
 
     // Validate request body
@@ -97,19 +89,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // Log generation request using structured logger
     const reqLogger = createRequestLogger(requestId);
-    logGeneration(requestId, 'started', {
-      projectName: config.projectName,
-      testingType: config.testingType,
-      framework: config.framework,
-      language: config.language,
-      testRunner: config.testRunner,
-      buildTool: config.buildTool,
-      cicdTool: config.cicdTool || 'none',
-      reportingTool: config.reportingTool || 'none',
-      utilities: config.utilities
-        ? Object.entries(config.utilities).filter(([_, enabled]) => enabled).map(([key, _]) => key)
-        : []
-    });
 
     // Validate compatibility using our validation matrix
     if (!WizardValidator.isCompatible(config.testingType, config.framework, config.language)) {
@@ -121,82 +100,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
     }
 
-    // Generate project files using sophisticated template pack engine
-    const generationStart = Date.now();
-    let files;
-    try {
-      files = await templateGenerator.generateProject(config);
-    } catch (genError) {
-      throw new AppError(
-        ErrorCode.TEMPLATE_GENERATION_ERROR,
-        'Failed to generate project files',
-        { originalError: genError instanceof Error ? genError.message : 'Unknown error' },
-        requestId
-      );
-    }
-    const generationDuration = Date.now() - generationStart;
-
-    // Calculate total project size
-    const totalSize = files.reduce((sum, file) => sum + Buffer.byteLength(file.content, 'utf8'), 0);
-    const sizeInKB = (totalSize / 1024).toFixed(2);
-
-    reqLogger.debug('Template generation completed', {
-      filesGenerated: files.length,
-      sizeKB: sizeInKB,
-      durationMs: generationDuration
-    });
-
-    // Save generation for analytics (non-blocking)
-    try {
-      await storage.saveProjectGeneration(config);
-    } catch (analyticsError) {
-      reqLogger.warn('Analytics save failed', { error: analyticsError });
-      // Continue with project generation even if analytics fails
-    }
-
-    // Create ZIP archive
-    const archiveStart = Date.now();
-    const archive = archiver('zip', {
-      zlib: { level: 9 } // Maximum compression
-    });
-
-    // Set response headers
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename="${config.projectName}.zip"`);
-
-    // Handle archive errors
-    archive.on('error', (err: Error) => {
-      reqLogger.error('Archive error', { error: err.message });
-      if (!res.headersSent) {
-        const archiveError = new AppError(ErrorCode.ARCHIVE_ERROR, 'Error creating project archive', null, requestId);
-        res.status(archiveError.statusCode).json(archiveError.toJSON());
-      }
-    });
-
-    // Track archive completion
-    archive.on('end', () => {
-      const totalDuration = Date.now() - startTime;
-      const archiveDuration = Date.now() - archiveStart;
-      logGeneration(requestId, 'completed', {
-        projectName: config.projectName,
-        files: files.length,
-        sizeKB: sizeInKB,
-        generationMs: generationDuration,
-        archiveMs: archiveDuration,
-        totalMs: totalDuration
-      });
-    });
-
-    // Pipe archive to response
-    archive.pipe(res);
-
-    // Add files to archive
-    files.forEach(file => {
-      archive.append(file.content, { name: file.path });
-    });
-
-    // Finalize the archive
-    await archive.finalize();
+    // Delegate to service layer for streaming generation
+    await projectService.generateAndStreamProject(config, res, requestId, reqLogger);
   }));
 
   // Get project generation stats (for analytics)
@@ -383,8 +288,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
     }
 
-    // Get dependencies from the template pack manifest
-    const dependencies = await templateGenerator.getDependencies(config);
+    // Get dependencies using service
+    const dependencies = await projectService.getDependencies(config);
 
     res.json({
       success: true,
@@ -423,8 +328,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
     }
 
-    // Generate project files for preview (same as actual generation)
-    const files = await templateGenerator.generateProject(config);
+    // Generate project files for preview
+    const files = await projectService.generatePreview(config);
 
     // Transform files into preview structure
     interface PreviewFile {
@@ -541,7 +446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }));
 
     // Get actual dependency count from template manifest (filtered by user selections)
-    const dependencies = await templateGenerator.getDependencies(config);
+    const dependencies = await projectService.getDependencies(config);
     const dependencyCount = Object.keys(dependencies).length;
 
     res.json({
@@ -701,83 +606,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
     }
 
-    // Generate project files
-    const generationStart = Date.now();
-    let files;
-    try {
-      files = await templateGenerator.generateProject(config);
-    } catch (genError) {
-      throw new AppError(
-        ErrorCode.TEMPLATE_GENERATION_ERROR,
-        'Failed to generate project files',
-        { originalError: genError instanceof Error ? genError.message : 'Unknown error' },
-        requestId
-      );
-    }
-    const generationDuration = Date.now() - generationStart;
-
-    // Calculate total project size
-    const totalSize = files.reduce((sum, file) => sum + Buffer.byteLength(file.content, 'utf8'), 0);
-    const sizeInKB = (totalSize / 1024).toFixed(2);
-
-    console.log(`[${requestId}] Template generation completed:`, {
-      filesGenerated: files.length,
-      sizeKB: sizeInKB,
-      durationMs: generationDuration
-    });
-
-    // Save generation for analytics
-    try {
-      await storage.saveProjectGeneration(config);
-    } catch (analyticsError) {
-      console.warn(`[${requestId}] Analytics save failed:`, analyticsError);
-    }
-
-    // Create ZIP archive
-    const archiveStart = Date.now();
-    const archive = archiver('zip', {
-      zlib: { level: 9 }
-    });
-
-    // Set response headers
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename="${config.projectName}.zip"`);
-
-    // Handle archive errors
-    archive.on('error', (err: Error) => {
-      console.error(`[${requestId}] Archive error:`, err);
-      if (!res.headersSent) {
-        res.status(500).json({
-          success: false,
-          message: "Error creating project archive"
-        });
-      }
-    });
-
-    // Track archive completion
-    archive.on('end', () => {
-      const totalDuration = Date.now() - startTime;
-      const archiveDuration = Date.now() - archiveStart;
-      console.log(`[${requestId}] ✅ Public API project generation successful:`, {
-        projectName: config.projectName,
-        files: files.length,
-        sizeKB: sizeInKB,
-        generationMs: generationDuration,
-        archiveMs: archiveDuration,
-        totalMs: totalDuration
-      });
-    });
-
-    // Pipe archive to response
-    archive.pipe(res);
-
-    // Add files to archive
-    files.forEach(file => {
-      archive.append(file.content, { name: file.path });
-    });
-
-    // Finalize the archive
-    await archive.finalize();
+    // Delegate to service layer for streaming generation
+    const reqLogger = createRequestLogger(requestId);
+    console.log(`[${requestId}] Public API generation request via Service Layer`);
+    await projectService.generateAndStreamProject(config, res, requestId, reqLogger);
   }));
 
   // ============================================

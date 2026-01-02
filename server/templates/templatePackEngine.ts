@@ -174,27 +174,26 @@ export class TemplatePackEngine {
 
       let processedContent = content;
 
+
+      const rawBlocks: string[] = [];
+      const hasRawBlocks = processedContent.includes('{{raw}}') || processedContent.includes('{{{{raw}}}}');
+
+      if (hasRawBlocks) {
+        // Handle {{{{raw}}}}...{{{{/raw}}}} format (4 braces - Handlebars native raw blocks)
+        processedContent = processedContent.replace(/\{\{\{\{raw\}\}\}\}([\s\S]*?)\{\{\{\{\/raw\}\}\}\}/g, (match, content) => {
+          const placeholder = `%%RAW_BLOCK_${rawBlocks.length}%%`;
+          rawBlocks.push(content);
+          return placeholder;
+        });
+        // Handle {{raw}}...{{/raw}} format (2 braces - custom raw blocks)
+        processedContent = processedContent.replace(/\{\{raw\}\}([\s\S]*?)\{\{\/raw\}\}/g, (match, content) => {
+          const placeholder = `%%RAW_BLOCK_${rawBlocks.length}%%`;
+          rawBlocks.push(content);
+          return placeholder;
+        });
+      }
+
       if (isWorkflowFile) {
-        // CRITICAL FIX: Extract raw blocks FIRST for ALL workflow files
-        // Support both {{raw}}...{{/raw}} and {{{{raw}}}}...{{{{/raw}}}} formats
-        const rawBlocks: string[] = [];
-        const hasRawBlocks = processedContent.includes('{{raw}}') || processedContent.includes('{{{{raw}}}}');
-
-        if (hasRawBlocks) {
-          // Handle {{{{raw}}}}...{{{{/raw}}}} format (4 braces - Handlebars native raw blocks)
-          processedContent = processedContent.replace(/\{\{\{\{raw\}\}\}\}([\s\S]*?)\{\{\{\{\/raw\}\}\}\}/g, (match, content) => {
-            const placeholder = `%%RAW_BLOCK_${rawBlocks.length}%%`;
-            rawBlocks.push(content);
-            return placeholder;
-          });
-          // Handle {{raw}}...{{/raw}} format (2 braces - custom raw blocks)
-          processedContent = processedContent.replace(/\{\{raw\}\}([\s\S]*?)\{\{\/raw\}\}/g, (match, content) => {
-            const placeholder = `%%RAW_BLOCK_${rawBlocks.length}%%`;
-            rawBlocks.push(content);
-            return placeholder;
-          });
-        }
-
         // Mask CI/CD expressions before Handlebars compilation
         const JENKINS_OPEN = '%%JENKINS_OPEN%%';
         const JENKINS_CLOSE = '%%JENKINS_CLOSE%%';
@@ -213,38 +212,18 @@ export class TemplatePackEngine {
           processedContent = processedContent
             .replace(/<<\s*parameters\.([a-zA-Z0-9_]+)\s*>>/g, '%%CIRCLECI_PARAM_OPEN%% parameters.$1 %%CIRCLECI_PARAM_CLOSE%%');
         }
-
-        // Now Handlebars can compile without seeing raw blocks
-        const template = handlebars.compile(processedContent);
-        let result = template(context);
-
-        // Restore raw blocks AFTER Handlebars rendering (if any were extracted)
-        if (hasRawBlocks) {
-          result = result.replace(/%%RAW_BLOCK_(\d+)%%/g, (match, index) => {
-            return rawBlocks[parseInt(index)];
-          });
-        }
-
-        // Restore CircleCI parameters (if CircleCI file)
-        if (filePath.includes('.circleci/config.yml')) {
-          result = result
-            .replace(/%%CIRCLECI_PARAM_OPEN%%/g, '<<')
-            .replace(/%%CIRCLECI_PARAM_CLOSE%%/g, '>>');
-        }
-
-        // CRITICAL: Restore Jenkins/GitHub sentinels for ALL workflow files
-        result = result
-          .replace(/%%JENKINS_OPEN%%/g, '${')
-          .replace(/%%JENKINS_CLOSE%%/g, '}')
-          .replace(/%%GHA_OPEN%%/g, '${{')
-          .replace(/%%GHA_CLOSE%%/g, '}}');
-
-        // Return result after full unmasking
-        return result;
       }
 
+      // Now Handlebars can compile without seeing raw blocks
       const template = handlebars.compile(processedContent);
       let result = template(context);
+
+      // Restore raw blocks AFTER Handlebars rendering (if any were extracted)
+      if (hasRawBlocks) {
+        result = result.replace(/%%RAW_BLOCK_(\d+)%%/g, (match, index) => {
+          return rawBlocks[parseInt(index)];
+        });
+      }
 
       // Restore CI/CD expressions after rendering
       if (isWorkflowFile) {
@@ -403,9 +382,21 @@ export class TemplatePackEngine {
   }
 
   /**
-   * Generate project using template pack
+   * Generate project using template pack (Array version)
    */
-  async generateProject(config: ProjectConfig): Promise<TemplateFile[]> {
+  async generateProject(config: ProjectConfig, options: { strict?: boolean } = { strict: true }): Promise<TemplateFile[]> {
+    const files: TemplateFile[] = [];
+    for await (const file of this.generateProjectStream(config, options)) {
+      files.push(file);
+    }
+    return files;
+  }
+
+  /**
+   * Generate project using template pack (Streaming version)
+   * Yields files one by one to avoid memory pressure
+   */
+  async *generateProjectStream(config: ProjectConfig, options: { strict?: boolean } = { strict: true }): AsyncGenerator<TemplateFile> {
     const packKey = this.getTemplatePackKey(config);
 
     try {
@@ -415,13 +406,9 @@ export class TemplatePackEngine {
       // Create template context
       const context = this.createTemplateContext(config, manifest.toolVersions);
 
-      // Process files
-      const files: TemplateFile[] = [];
-
       for (const fileConfig of manifest.files) {
         // Check if file should be included based on conditional rules
         if (!this.shouldIncludeFile(fileConfig, config)) {
-          console.log(`Skipping file ${fileConfig.path} - conditional not met`);
           continue;
         }
 
@@ -436,6 +423,9 @@ export class TemplatePackEngine {
           } catch (error) {
             // If file doesn't exist, skip it (allows for optional files)
             console.warn(`Template file not found: ${fileConfig.path}, skipping`);
+            if (options.strict) {
+              throw new Error(`Required template file not found: ${fileConfig.path}`);
+            }
             continue;
           }
 
@@ -444,21 +434,23 @@ export class TemplatePackEngine {
             ? this.processTemplate(templateContent, context, fileConfig.path)
             : templateContent;
 
-          files.push({
+          yield {
             path: processedPath,
             content: processedContent,
             isTemplate: fileConfig.isTemplate,
             mode: fileConfig.mode
-          });
+          };
 
         } catch (fileError) {
           console.error(`Error processing file ${fileConfig.path}:`, fileError);
-          // Continue with other files instead of failing completely
+
+          if (options.strict) {
+            throw fileError;
+          }
+          // Continue with other files instead of failing completely (Legacy non-strict mode)
           continue;
         }
       }
-
-      return files;
 
     } catch (error) {
       console.error(`Template pack generation failed for ${packKey}:`, error);

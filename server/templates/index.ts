@@ -36,16 +36,20 @@ export class ProjectTemplateGenerator {
         testRunner: config.testRunner,
         buildTool: config.buildTool
       });
-      return await this.templatePackEngine.generateProject(config);
+      // Use strict mode by default
+      return await this.templatePackEngine.generateProject(config, { strict: true });
     } else {
-      console.log('Template pack not found, falling back to simple generator for:', {
-        testingType: config.testingType,
-        language: config.language,
-        framework: config.framework,
-        testRunner: config.testRunner,
-        buildTool: config.buildTool
-      });
-      return this.generateProjectFallback(config);
+      console.error('Template pack not found for configuration:', config);
+      throw new Error(`No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}. Please verify your selection.`);
+    }
+  }
+
+  public async *generateProjectStream(config: ProjectConfig): AsyncGenerator<TemplateFile> {
+    const hasTemplatePack = await this.templatePackEngine.hasTemplatePack(config);
+    if (hasTemplatePack) {
+      yield* this.templatePackEngine.generateProjectStream(config, { strict: true });
+    } else {
+      throw new Error(`No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}.`);
     }
   }
 
@@ -56,8 +60,8 @@ export class ProjectTemplateGenerator {
     if (hasTemplatePack) {
       return await this.templatePackEngine.getDependencies(config);
     } else {
-      // Return fallback dependencies if no template pack exists
-      return this.getFallbackDependencies(config);
+      console.error('Template pack not found for dependencies:', config);
+      return {};
     }
   }
 

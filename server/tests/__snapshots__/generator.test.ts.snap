@@ -1,0 +1,6348 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ProjectTemplateGenerator Snapshots > should match snapshot for Java + Selenium + Maven 1`] = `
+[
+  {
+    "content": "# Compiled class files
+*.class
+
+# Log files
+*.log
+logs/
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+[Tt]humbs.db
+
+# Test Reports
+reports/
+test-output/
+screenshots/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Selenium
+*.json.log
+
+# ExtentReports
+extent-reports/",
+    "isTemplate": false,
+    "mode": undefined,
+    "path": ".gitignore",
+  },
+  {
+    "content": "<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId></groupId>
+    <artifactId></artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>demo-java-selenium</name>
+    <description>UI Automation Framework using Selenium WebDriver, TestNG, and Maven</description>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        
+        <!-- Dependency Versions -->
+        <selenium.version>4.16.0</selenium.version>
+        <testng.version>7.8.0</testng.version>
+        <log4j.version>2.22.0</log4j.version>
+        <jackson.version>2.15.2</jackson.version>
+        <commons-csv.version>1.10.0</commons-csv.version>
+        
+        <!-- Plugin Versions -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
+        
+        <!-- Test Configuration -->
+        <suite>testng.xml</suite>
+        <browser>chrome</browser>
+        <headless>false</headless>
+        <env>dev</env>
+    </properties>
+
+    <dependencies>
+        <!-- Selenium WebDriver -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>\${selenium.version}</version>
+        </dependency>
+
+        <!-- TestNG -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>\${testng.version}</version>
+        </dependency>
+
+
+        <!-- Log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>\${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>\${log4j.version}</version>
+        </dependency>
+
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>\${jackson.version}</version>
+        </dependency>
+
+        <!-- CSV Processing -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>\${commons-csv.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>\${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire Plugin for Test Execution -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>\${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/\${suite}</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <systemPropertyVariables>
+                        <browser>\${browser}</browser>
+                        <headless>\${headless}</headless>
+                        <env>\${env}</env>
+                    </systemPropertyVariables>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Development Environment -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <env>dev</env>
+            </properties>
+        </profile>
+
+        <!-- QA Environment -->
+        <profile>
+            <id>qa</id>
+            <properties>
+                <env>qa</env>
+            </properties>
+        </profile>
+
+        <!-- Staging Environment -->
+        <profile>
+            <id>stg</id>
+            <properties>
+                <env>stg</env>
+            </properties>
+        </profile>
+
+        <!-- Production Environment -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <env>prod</env>
+            </properties>
+        </profile>
+
+        <!-- Headless Execution -->
+        <profile>
+            <id>headless</id>
+            <properties>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+        <!-- Different Browser Profiles -->
+        <profile>
+            <id>chrome</id>
+            <properties>
+                <browser>chrome</browser>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>firefox</id>
+            <properties>
+                <browser>firefox</browser>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>edge</id>
+            <properties>
+                <browser>edge</browser>
+            </properties>
+        </profile>
+    </profiles>
+</project>",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pom.xml",
+  },
+  {
+    "content": "# demo-java-selenium
+
+A production-ready UI automation framework built with Java, Selenium WebDriver, TestNG, and Maven following industry best practices.
+
+## Framework Features
+
+- **Page Object Model (POM)** design pattern for maintainable test code
+- **Cross-browser support** (Chrome, Firefox, Edge) with local and remote execution
+- **Parallel test execution** for faster feedback
+- **Test Reporting** with screenshots and detailed execution logs
+- **Log4j2** structured logging with multiple appenders
+- **Data-driven testing** support with CSV and JSON test data
+- **Configurable environments** (dev, qa, staging, production)
+- **Retry mechanism** for handling flaky tests
+- **Thread-safe WebDriver management** for parallel execution
+
+## Technology Stack
+
+| Component | Technology | Version |
+|-----------|------------|---------|
+| Language | Java | 11 |
+| Build Tool | Apache Maven | 3.9.0 |
+| Test Runner | TestNG | 7.8.0 |
+| Web Automation | Selenium WebDriver | 4.16.0 |
+| Reporting | TestNG Reports | Built-in |
+| Logging | Log4j2 | 2.22.0 |
+
+## Project Structure
+
+\`\`\`
+/
+├── pom.xml                             # Maven build configuration
+├── Jenkinsfile                         # Jenkins CI/CD pipeline
+├── README.md                           # This file
+├── .gitignore                          # Git ignore rules
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/
+│   │   │   ├── config/                 # Configuration management
+│   │   │   │   ├── ConfigurationReader.java
+│   │   │   │   └── Environment.java
+│   │   │   ├── core/                   # Core framework components
+│   │   │   │   ├── DriverManager.java
+│   │   │   │   ├── BrowserFactory.java
+│   │   │   │   └── BaseTest.java
+│   │   │   ├── pages/                  # Page Object classes
+│   │   │   │   ├── BasePage.java
+│   │   │   │   ├── LoginPage.java
+│   │   │   │   └── HomePage.java
+│   │   │   ├── utils/                  # Utility classes
+│   │   │   │   ├── WaitUtils.java
+│   │   │   │   ├── WebActions.java
+│   │   │   │   ├── ScreenshotUtils.java
+│   │   │   │   ├── TestDataReader.java
+│   │   │   │   ├── ExtentManager.java
+│   │   │   │   └── Log.java
+│   │   │   └── listeners/              # TestNG listeners
+│   │   │       ├── TestListener.java
+│   │   │       └── RetryAnalyzer.java
+│   │   └── resources/
+│   │       ├── config/                 # Environment configurations
+│   │       │   ├── dev.properties
+│   │       │   ├── qa.properties
+│   │       │   └── prod.properties
+│   │       ├── log4j2.xml             # Logging configuration
+│   │       └── extent-config.xml      # ExtentReports configuration
+│   └── test/
+│       ├── java/com/example/tests/
+│       │   ├── LoginTests.java        # Login functionality tests
+│       │   └── SmokeSuite.java        # Critical path tests
+│       └── resources/
+│           ├── testng.xml             # TestNG suite configuration
+│           └── testdata/              # Test data files
+│               ├── users.csv
+│               └── sample.json
+├── reports/                           # Generated test reports
+└── logs/                              # Application logs
+\`\`\`
+
+## Quick Start
+
+### Prerequisites
+
+- Java 11 or higher
+- Maven 3.6 or higher
+- Chrome browser (for default configuration)
+
+### Setup
+
+1. **Clone/Download the project**
+   \`\`\`bash
+   cd 
+   \`\`\`
+
+2. **Install dependencies**
+   \`\`\`bash
+   mvn clean compile
+   \`\`\`
+
+3. **Update configuration**
+   - Edit \`src/main/resources/config/dev.properties\`
+   - Update \`base.url\` to point to your application
+   - Modify other settings as needed
+
+4. **Run tests**
+   \`\`\`bash
+   # Run smoke tests
+   mvn clean test -Denv=dev -Dsuite=smoke
+
+   # Run all tests
+   mvn clean test
+   \`\`\`
+
+## Running Tests
+
+### Basic Execution
+
+\`\`\`bash
+# Default execution (dev environment, Chrome)
+mvn clean test
+
+# Specific environment
+mvn clean test -Denv=qa
+
+# Specific browser
+mvn clean test -Dbrowser=firefox
+
+# Headless mode
+mvn clean test -Dheadless=true
+
+# Specific test suite
+mvn clean test -Dsuite=smoke
+\`\`\`
+
+### Environment Profiles
+
+\`\`\`bash
+# Development environment
+mvn clean test -Pdev
+
+# QA environment
+mvn clean test -Pqa -Dbrowser=chrome -Dheadless=true
+
+# Production environment (with extra precautions)
+mvn clean test -Pprod -Dsuite=smoke
+\`\`\`
+
+### Parallel Execution
+
+\`\`\`bash
+# Parallel execution with 3 threads
+mvn clean test -Dparallel=methods -DthreadCount=3
+
+# Using QA profile with parallel execution
+mvn clean test -Pqa -Dparallel=classes -DthreadCount=2
+\`\`\`
+
+### Test Suite Options
+
+Available test suites in \`testng.xml\`:
+- **smoke**: Critical path tests
+- **regression**: Comprehensive functional tests
+- **ui**: User interface focused tests
+- **data-driven**: Data-driven test scenarios
+- **performance**: Performance and load tests
+- **security**: Security and negative tests
+
+## Configuration
+
+### Environment Configuration
+
+Environment-specific settings are managed in properties files:
+
+- \`config/dev.properties\` - Development environment
+- \`config/qa.properties\` - QA/Testing environment  
+- \`config/prod.properties\` - Production environment
+
+Key configuration options:
+
+\`\`\`properties
+# Application URL
+base.url=https://your-app.com
+
+# Browser settings
+browser=chrome
+headless=false
+
+# Selenium Grid (for remote execution)
+remote.execution=false
+grid.url=http://selenium-grid:4444/wd/hub
+
+# Timeouts (seconds)
+implicit.wait=10
+explicit.wait=20
+page.load.timeout=30
+
+# Retry configuration
+retry.count=2
+\`\`\`
+
+### Logging Configuration
+
+Logging is configured in \`log4j2.xml\` with multiple appenders:
+
+- **Console**: INFO level and above
+- **File**: All logs to \`logs/automation.log\`
+- **Error File**: Error logs only to \`logs/errors.log\`
+- **Test Execution**: Test-specific logs to \`logs/test-execution.log\`
+
+## Test Data Management
+
+### CSV Test Data
+
+Place CSV files in \`src/test/resources/testdata/\`:
+
+\`\`\`csv
+username,password,expectedResult
+admin,password123,success
+testuser,testpass123,success
+invaliduser,wrongpass,failure
+\`\`\`
+
+Usage in tests:
+\`\`\`java
+@DataProvider(name = "loginData")
+public Object[][] getLoginTestData() {
+    return TestDataReader.getCSVDataAsArray("testdata/users.csv");
+}
+
+@Test(dataProvider = "loginData")
+public void testLogin(Map<String, String> testData) {
+    String username = testData.get("username");
+    String password = testData.get("password");
+    // ... test implementation
+}
+\`\`\`
+
+### JSON Test Data
+
+\`\`\`json
+{
+  "testUsers": [
+    {
+      "username": "admin",
+      "password": "password123",
+      "role": "administrator"
+    }
+  ]
+}
+\`\`\`
+
+Usage:
+\`\`\`java
+JsonNode testData = TestDataReader.readJSON("testdata/sample.json");
+\`\`\`
+
+## Reporting
+
+### ExtentReports
+
+HTML reports are generated in the \`reports/\` directory:
+- Rich HTML reports with screenshots
+- Test execution timeline
+- System information and environment details
+- Failed test screenshots automatically attached
+
+### Jenkins Integration
+
+The included \`Jenkinsfile\` provides:
+- Parameterized builds (browser, environment, suite)
+- Parallel execution support
+- Artifact archiving (reports, screenshots, logs)
+- HTML report publishing
+- JUnit test result publishing
+
+### Viewing Reports
+
+After test execution:
+1. Open \`reports/ExtentReport_[timestamp].html\` in a browser
+2. Review test results, screenshots, and execution details
+3. Check \`logs/\` directory for detailed logging information
+
+## Adding New Tests
+
+### 1. Create Page Objects
+
+\`\`\`java
+public class YourPage extends BasePage {
+    
+    private final By elementLocator = By.id("your-element");
+    
+    @Override
+    public boolean isLoaded() {
+        return isElementDisplayed(elementLocator);
+    }
+    
+    public YourPage performAction() {
+        logPageAction("Performing action");
+        clickElement(elementLocator);
+        return this;
+    }
+}
+\`\`\`
+
+### 2. Create Test Classes
+
+\`\`\`java
+public class YourTests extends BaseTest {
+    
+    @Test(groups = {"smoke"})
+    public void testYourFunctionality() {
+        YourPage page = new YourPage();
+        Assert.assertTrue(page.isLoaded());
+        
+        // Test implementation
+        page.performAction();
+        
+        // Assertions
+        Assert.assertTrue(page.isActionSuccessful());
+    }
+}
+\`\`\`
+
+### 3. Update TestNG Configuration
+
+Add your test class to \`testng.xml\`:
+
+\`\`\`xml
+<classes>
+    <class name="com.example.tests.YourTests"/>
+</classes>
+\`\`\`
+
+## Best Practices
+
+### Page Objects
+- Keep page objects focused on actions, not assertions
+- Use method chaining where appropriate
+- Include isLoaded() verification for each page
+- Use descriptive method and variable names
+
+### Test Classes
+- Extend BaseTest for setup/teardown
+- Use TestNG groups for test organization
+- Include meaningful test descriptions
+- Use data providers for data-driven tests
+
+### Logging
+- Log important test steps and actions
+- Use appropriate log levels (INFO, DEBUG, ERROR)
+- Include context in error messages
+- Use Log.step() for major test actions
+
+### Screenshots
+- Screenshots are automatically captured on failures
+- Use ScreenshotUtils for manual screenshots
+- Screenshots are linked in ExtentReports
+
+## Troubleshooting
+
+### Common Issues
+
+**Tests failing with WebDriver errors:**
+- Ensure Chrome/Firefox is installed
+- Selenium 4+ includes Selenium Manager which auto-downloads drivers
+- Verify firewall/antivirus isn't blocking driver downloads
+
+**Tests failing with timeouts:**
+- Increase timeout values in configuration
+- Check application responsiveness
+- Verify network connectivity to test environment
+
+**Reports not generating:**
+- Check file permissions in reports/ directory
+- Verify ExtentReports configuration
+- Check for IOException in logs
+
+**Parallel execution issues:**
+- Ensure tests are thread-safe
+- Check ThreadLocal usage in DriverManager
+- Verify test data isolation
+
+### Debug Mode
+
+Enable debug logging:
+\`\`\`bash
+mvn clean test -Dlog.level=DEBUG
+\`\`\`
+
+### Logs Location
+
+- Application logs: \`logs/automation.log\`
+- Error logs: \`logs/errors.log\`
+- Test execution logs: \`logs/test-execution.log\`
+
+## Jenkins Pipeline
+
+The included Jenkinsfile supports:
+
+\`\`\`groovy
+// Example Jenkins build
+pipeline {
+    parameters {
+        choice(name: 'BROWSER', choices: ['chrome', 'firefox'])
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'stg'])
+        booleanParam(name: 'HEADLESS', defaultValue: true)
+    }
+}
+\`\`\`
+
+Build with parameters:
+- Browser selection (Chrome, Firefox, Edge)
+- Environment selection (dev, qa, staging, prod)
+- Headless execution toggle
+- Test suite selection
+
+## Contributing
+
+When adding new functionality:
+
+1. Follow existing code patterns and naming conventions
+2. Add appropriate logging and error handling
+3. Include unit tests where applicable
+4. Update documentation for new features
+5. Ensure thread safety for parallel execution
+
+## Support
+
+For issues and questions:
+
+1. Check the logs in \`logs/\` directory
+2. Review ExtentReports for detailed test execution information
+3. Verify configuration settings in properties files
+4. Check WebDriver and browser compatibility
+
+---
+
+**Framework Version:** 1.0.0  
+**Last Updated:** 2024-01-01T12-00-00-000Z  
+**Java Version:** 11+  
+**Maven Version:** 3.9.0+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "README.md",
+  },
+  {
+    "content": "package com.example.config;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+/**
+ * Configuration reader for environment-specific properties.
+ * Reads properties based on the environment specified via -Denv system property.
+ * Default environment is 'dev' if not specified.
+ */
+public class ConfigurationReader {
+    private static Properties properties;
+    private static final String DEFAULT_ENV = "dev";
+    
+    static {
+        loadProperties();
+    }
+    
+    private static void loadProperties() {
+        String environment = System.getProperty("env", DEFAULT_ENV);
+        String configFile = "config/" + environment + ".properties";
+        
+        properties = new Properties();
+        
+        try (InputStream inputStream = ConfigurationReader.class
+                .getClassLoader()
+                .getResourceAsStream(configFile)) {
+            
+            if (inputStream != null) {
+                properties.load(inputStream);
+                System.out.println("✅ Loaded configuration from: " + configFile);
+            } else {
+                throw new RuntimeException("❌ Configuration file not found: " + configFile);
+            }
+            
+        } catch (IOException e) {
+            throw new RuntimeException("❌ Error loading configuration file: " + configFile, e);
+        }
+    }
+    
+    /**
+     * Get string property value
+     * @param key Property key
+     * @return Property value or null if not found
+     */
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+    
+    /**
+     * Get string property with default value
+     * @param key Property key
+     * @param defaultValue Default value if property not found
+     * @return Property value or default value
+     */
+    public static String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+    
+    /**
+     * Get integer property value
+     * @param key Property key
+     * @return Integer value or 0 if not found/invalid
+     */
+    public static int getIntProperty(String key) {
+        try {
+            return Integer.parseInt(getProperty(key, "0"));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+    
+    /**
+     * Get integer property with default value
+     * @param key Property key
+     * @param defaultValue Default value
+     * @return Integer value or default value
+     */
+    public static int getIntProperty(String key, int defaultValue) {
+        try {
+            return Integer.parseInt(getProperty(key, String.valueOf(defaultValue)));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+    
+    /**
+     * Get boolean property value
+     * @param key Property key
+     * @return Boolean value or false if not found
+     */
+    public static boolean getBooleanProperty(String key) {
+        return Boolean.parseBoolean(getProperty(key, "false"));
+    }
+    
+    /**
+     * Get boolean property with default value
+     * @param key Property key
+     * @param defaultValue Default value
+     * @return Boolean value or default value
+     */
+    public static boolean getBooleanProperty(String key, boolean defaultValue) {
+        return Boolean.parseBoolean(getProperty(key, String.valueOf(defaultValue)));
+    }
+    
+    // Commonly used configuration getters
+    public static String getBaseUrl() {
+        return getProperty("base.url");
+    }
+    
+    public static String getBrowser() {
+        return getProperty("browser", "chrome");
+    }
+    
+    public static boolean isHeadless() {
+        return getBooleanProperty("headless", false);
+    }
+    
+    public static int getImplicitWait() {
+        return getIntProperty("implicit.wait", 10);
+    }
+    
+    public static int getExplicitWait() {
+        return getIntProperty("explicit.wait", 20);
+    }
+    
+    public static int getPageLoadTimeout() {
+        return getIntProperty("page.load.timeout", 30);
+    }
+    
+    public static String getGridUrl() {
+        return getProperty("grid.url");
+    }
+    
+    public static boolean isRemoteExecution() {
+        return getBooleanProperty("remote.execution", false);
+    }
+    
+    public static int getRetryCount() {
+        return getIntProperty("retry.count", 1);
+    }
+    
+    public static String getCurrentEnvironment() {
+        return System.getProperty("env", DEFAULT_ENV);
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/config/ConfigurationReader.java",
+  },
+  {
+    "content": "package com.example.config;
+
+/**
+ * Enumeration representing different test environments.
+ * Used for environment-specific configurations and validations.
+ */
+public enum Environment {
+    DEV("dev", "Development"),
+    QA("qa", "Quality Assurance"),
+    STG("stg", "Staging"),
+    PROD("prod", "Production");
+    
+    private final String key;
+    private final String displayName;
+    
+    Environment(String key, String displayName) {
+        this.key = key;
+        this.displayName = displayName;
+    }
+    
+    public String getKey() {
+        return key;
+    }
+    
+    public String getDisplayName() {
+        return displayName;
+    }
+    
+    /**
+     * Get Environment enum from string key
+     * @param key Environment key (dev, qa, stg, prod)
+     * @return Environment enum or DEV if not found
+     */
+    public static Environment fromKey(String key) {
+        for (Environment env : Environment.values()) {
+            if (env.getKey().equalsIgnoreCase(key)) {
+                return env;
+            }
+        }
+        return DEV; // Default fallback
+    }
+    
+    /**
+     * Get current environment from system property
+     * @return Current Environment
+     */
+    public static Environment getCurrent() {
+        String envKey = System.getProperty("env", "dev");
+        return fromKey(envKey);
+    }
+    
+    /**
+     * Check if current environment is production
+     * @return true if production environment
+     */
+    public static boolean isProduction() {
+        return getCurrent() == PROD;
+    }
+    
+    /**
+     * Check if current environment allows debug features
+     * @return true if dev or qa environment
+     */
+    public static boolean isDebugAllowed() {
+        Environment current = getCurrent();
+        return current == DEV || current == QA;
+    }
+    
+    @Override
+    public String toString() {
+        return displayName + " (" + key + ")";
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/config/Environment.java",
+  },
+  {
+    "content": "package com.example.core;
+
+import com.example.config.ConfigurationReader;
+import com.example.listeners.RetryAnalyzer;
+import com.example.listeners.TestListener;
+import com.example.utils.Log;
+import org.testng.annotations.*;
+
+/**
+ * Base test class with common setup and teardown methods.
+ * All test classes should extend this class.
+ */
+@Listeners({TestListener.class})
+public class BaseTest {
+    
+    @BeforeSuite(alwaysRun = true)
+    public void beforeSuite() {
+        Log.startSection("TEST SUITE SETUP");
+        Log.info("Environment: " + ConfigurationReader.getCurrentEnvironment());
+        Log.info("Base URL: " + ConfigurationReader.getBaseUrl());
+        Log.info("Browser: " + ConfigurationReader.getBrowser());
+        Log.info("Headless: " + ConfigurationReader.isHeadless());
+        Log.endSection();
+    }
+    
+    @AfterSuite(alwaysRun = true)
+    public void afterSuite() {
+        Log.startSection("TEST SUITE TEARDOWN");
+        Log.info("Test suite execution completed");
+        Log.endSection();
+    }
+    
+    @BeforeMethod(alwaysRun = true)
+    public void setUp() {
+        Log.info("Setting up test method");
+        DriverManager.initializeDriver();
+        
+        // Navigate to base URL if configured
+        String baseUrl = ConfigurationReader.getBaseUrl();
+        if (baseUrl != null && !baseUrl.isEmpty()) {
+            DriverManager.getDriver().get(baseUrl);
+            Log.info("Navigated to base URL: " + baseUrl);
+        }
+    }
+    
+    @AfterMethod(alwaysRun = true)
+    public void tearDown() {
+        Log.info("Tearing down test method");
+        DriverManager.quitDriver();
+    }
+    
+    /**
+     * Get retry analyzer for flaky tests
+     * Override this method in test classes that need retry functionality
+     * @return RetryAnalyzer instance
+     */
+    protected IRetryAnalyzer getRetryAnalyzer() {
+        return new RetryAnalyzer();
+    }
+    
+    /**
+     * Navigate to specific URL
+     * @param url URL to navigate to
+     */
+    protected void navigateTo(String url) {
+        Log.step("Navigating to: " + url);
+        DriverManager.getDriver().get(url);
+    }
+    
+    /**
+     * Get current page title
+     * @return Page title
+     */
+    protected String getPageTitle() {
+        String title = DriverManager.getDriver().getTitle();
+        Log.debug("Current page title: " + title);
+        return title;
+    }
+    
+    /**
+     * Get current page URL
+     * @return Current URL
+     */
+    protected String getCurrentUrl() {
+        String url = DriverManager.getDriver().getCurrentUrl();
+        Log.debug("Current URL: " + url);
+        return url;
+    }
+    
+    /**
+     * Refresh current page
+     */
+    protected void refreshPage() {
+        Log.step("Refreshing current page");
+        DriverManager.getDriver().navigate().refresh();
+    }
+    
+    /**
+     * Navigate back
+     */
+    protected void navigateBack() {
+        Log.step("Navigating back");
+        DriverManager.getDriver().navigate().back();
+    }
+    
+    /**
+     * Navigate forward
+     */
+    protected void navigateForward() {
+        Log.step("Navigating forward");
+        DriverManager.getDriver().navigate().forward();
+    }
+    
+    /**
+     * Get base URL from configuration
+     * @return Base URL
+     */
+    protected String getBaseUrl() {
+        return ConfigurationReader.getBaseUrl();
+    }
+    
+    /**
+     * Get test data file path
+     * @param fileName File name
+     * @return Full file path for test data
+     */
+    protected String getTestDataPath(String fileName) {
+        return "testdata/" + fileName;
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/core/BaseTest.java",
+  },
+  {
+    "content": "package com.example.core;
+
+import com.example.config.ConfigurationReader;
+import com.example.utils.Log;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+/**
+ * Factory class for creating WebDriver instances with Selenium Manager (Selenium 4+).
+ * Selenium Manager automatically handles driver downloads and management.
+ * Supports Chrome, Firefox, and Edge browsers with local and remote execution.
+ */
+public class BrowserFactory {
+    
+    private BrowserFactory() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Create WebDriver instance based on browser type
+     * @param browser Browser name (chrome, firefox, edge)
+     * @param headless Whether to run in headless mode
+     * @return WebDriver instance
+     */
+    public static WebDriver createDriver(String browser, boolean headless) {
+        WebDriver driver;
+        
+        if (ConfigurationReader.isRemoteExecution()) {
+            driver = createRemoteDriver(browser, headless);
+        } else {
+            driver = createLocalDriver(browser, headless);
+        }
+        
+        Log.info("Created " + browser + " driver (headless: " + headless + ", remote: " + 
+                ConfigurationReader.isRemoteExecution() + ")");
+        
+        return driver;
+    }
+    
+    /**
+     * Create local WebDriver instance
+     * @param browser Browser name
+     * @param headless Headless mode flag
+     * @return WebDriver instance
+     */
+    private static WebDriver createLocalDriver(String browser, boolean headless) {
+        switch (browser.toLowerCase()) {
+            case "chrome":
+                return createChromeDriver(headless);
+            case "firefox":
+                return createFirefoxDriver(headless);
+            case "edge":
+                return createEdgeDriver(headless);
+            default:
+                Log.warn("Unsupported browser: " + browser + ". Defaulting to Chrome.");
+                return createChromeDriver(headless);
+        }
+    }
+    
+    /**
+     * Create remote WebDriver instance for Selenium Grid
+     * @param browser Browser name
+     * @param headless Headless mode flag
+     * @return RemoteWebDriver instance
+     */
+    private static WebDriver createRemoteDriver(String browser, boolean headless) {
+        try {
+            String gridUrl = ConfigurationReader.getGridUrl();
+            if (gridUrl == null || gridUrl.isEmpty()) {
+                throw new RuntimeException("Grid URL is not configured for remote execution");
+            }
+            
+            URL hubUrl = new URL(gridUrl);
+            
+            switch (browser.toLowerCase()) {
+                case "chrome":
+                    return new RemoteWebDriver(hubUrl, getChromeOptions(headless));
+                case "firefox":
+                    return new RemoteWebDriver(hubUrl, getFirefoxOptions(headless));
+                case "edge":
+                    return new RemoteWebDriver(hubUrl, getEdgeOptions(headless));
+                default:
+                    Log.warn("Unsupported browser: " + browser + ". Defaulting to Chrome.");
+                    return new RemoteWebDriver(hubUrl, getChromeOptions(headless));
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid Grid URL: " + ConfigurationReader.getGridUrl(), e);
+        }
+    }
+    
+    /**
+     * Create Chrome driver with options using Selenium Manager
+     * @param headless Headless mode flag
+     * @return ChromeDriver instance
+     */
+    private static WebDriver createChromeDriver(boolean headless) {
+        return new ChromeDriver(getChromeOptions(headless));
+    }
+    
+    /**
+     * Create Firefox driver with options using Selenium Manager
+     * @param headless Headless mode flag
+     * @return FirefoxDriver instance
+     */
+    private static WebDriver createFirefoxDriver(boolean headless) {
+        return new FirefoxDriver(getFirefoxOptions(headless));
+    }
+    
+    /**
+     * Create Edge driver with options using Selenium Manager
+     * @param headless Headless mode flag
+     * @return EdgeDriver instance
+     */
+    private static WebDriver createEdgeDriver(boolean headless) {
+        return new EdgeDriver(getEdgeOptions(headless));
+    }
+    
+    /**
+     * Get Chrome options with common configurations
+     * @param headless Headless mode flag
+     * @return ChromeOptions instance
+     */
+    private static ChromeOptions getChromeOptions(boolean headless) {
+        ChromeOptions options = new ChromeOptions();
+        
+        // Common Chrome arguments
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-web-security");
+        options.addArguments("--disable-features=VizDisplayCompositor");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-plugins");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--disable-popup-blocking");
+        
+        if (headless) {
+            options.addArguments("--headless");
+            options.addArguments("--window-size=1920,1080");
+        }
+        
+        // Set download directory if needed
+        // Map<String, Object> prefs = new HashMap<>();
+        // prefs.put("download.default_directory", System.getProperty("user.dir") + "/downloads");
+        // options.setExperimentalOption("prefs", prefs);
+        
+        return options;
+    }
+    
+    /**
+     * Get Firefox options with common configurations
+     * @param headless Headless mode flag
+     * @return FirefoxOptions instance
+     */
+    private static FirefoxOptions getFirefoxOptions(boolean headless) {
+        FirefoxOptions options = new FirefoxOptions();
+        
+        // Common Firefox preferences
+        options.addPreference("dom.webnotifications.enabled", false);
+        options.addPreference("media.volume_scale", "0.0");
+        
+        if (headless) {
+            options.addArguments("--headless");
+            options.addArguments("--width=1920");
+            options.addArguments("--height=1080");
+        }
+        
+        return options;
+    }
+    
+    /**
+     * Get Edge options with common configurations
+     * @param headless Headless mode flag
+     * @return EdgeOptions instance
+     */
+    private static EdgeOptions getEdgeOptions(boolean headless) {
+        EdgeOptions options = new EdgeOptions();
+        
+        // Common Edge arguments
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-plugins");
+        
+        if (headless) {
+            options.addArguments("--headless");
+            options.addArguments("--window-size=1920,1080");
+        }
+        
+        return options;
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/core/BrowserFactory.java",
+  },
+  {
+    "content": "package com.example.core;
+
+import com.example.config.ConfigurationReader;
+import com.example.utils.Log;
+import org.openqa.selenium.WebDriver;
+
+/**
+ * Thread-safe WebDriver manager using ThreadLocal.
+ * Ensures each thread gets its own WebDriver instance for parallel execution.
+ */
+public class DriverManager {
+    private static final ThreadLocal<WebDriver> driverThreadLocal = new ThreadLocal<>();
+    
+    private DriverManager() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Set WebDriver for current thread
+     * @param driver WebDriver instance
+     */
+    public static void setDriver(WebDriver driver) {
+        if (driver != null) {
+            driverThreadLocal.set(driver);
+            Log.info("WebDriver set for thread: " + Thread.currentThread().getName());
+        } else {
+            Log.error("Attempted to set null WebDriver for thread: " + Thread.currentThread().getName());
+        }
+    }
+    
+    /**
+     * Get WebDriver for current thread
+     * @return WebDriver instance or null if not set
+     */
+    public static WebDriver getDriver() {
+        WebDriver driver = driverThreadLocal.get();
+        if (driver == null) {
+            Log.warn("WebDriver not found for thread: " + Thread.currentThread().getName() + 
+                    ". Creating new driver instance.");
+            initializeDriver();
+            driver = driverThreadLocal.get();
+        }
+        return driver;
+    }
+    
+    /**
+     * Initialize WebDriver for current thread using configuration
+     */
+    public static void initializeDriver() {
+        try {
+            String browser = System.getProperty("browser", ConfigurationReader.getBrowser());
+            boolean headless = Boolean.parseBoolean(
+                System.getProperty("headless", String.valueOf(ConfigurationReader.isHeadless()))
+            );
+            
+            Log.info("Initializing WebDriver - Browser: " + browser + ", Headless: " + headless);
+            
+            WebDriver driver = BrowserFactory.createDriver(browser, headless);
+            setDriver(driver);
+            
+            // Configure timeouts
+            driver.manage().timeouts().implicitlyWait(
+                java.time.Duration.ofSeconds(ConfigurationReader.getImplicitWait())
+            );
+            driver.manage().timeouts().pageLoadTimeout(
+                java.time.Duration.ofSeconds(ConfigurationReader.getPageLoadTimeout())
+            );
+            
+            // Maximize window if not headless
+            if (!headless) {
+                driver.manage().window().maximize();
+                Log.info("Browser window maximized");
+            }
+            
+        } catch (Exception e) {
+            Log.error("Failed to initialize WebDriver", e);
+            throw new RuntimeException("WebDriver initialization failed", e);
+        }
+    }
+    
+    /**
+     * Quit and remove WebDriver for current thread
+     */
+    public static void quitDriver() {
+        WebDriver driver = driverThreadLocal.get();
+        if (driver != null) {
+            try {
+                Log.info("Quitting WebDriver for thread: " + Thread.currentThread().getName());
+                driver.quit();
+            } catch (Exception e) {
+                Log.error("Error while quitting WebDriver", e);
+            } finally {
+                driverThreadLocal.remove();
+                Log.info("WebDriver removed from ThreadLocal for thread: " + Thread.currentThread().getName());
+            }
+        } else {
+            Log.warn("No WebDriver found to quit for thread: " + Thread.currentThread().getName());
+        }
+    }
+    
+    /**
+     * Check if WebDriver is initialized for current thread
+     * @return true if WebDriver exists for current thread
+     */
+    public static boolean isDriverInitialized() {
+        return driverThreadLocal.get() != null;
+    }
+    
+    /**
+     * Get current thread name for logging purposes
+     * @return Current thread name
+     */
+    public static String getCurrentThreadName() {
+        return Thread.currentThread().getName();
+    }
+    
+    /**
+     * Restart WebDriver for current thread
+     */
+    public static void restartDriver() {
+        Log.info("Restarting WebDriver for thread: " + getCurrentThreadName());
+        quitDriver();
+        initializeDriver();
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/core/DriverManager.java",
+  },
+  {
+    "content": "package com.example.listeners;
+
+import com.example.config.ConfigurationReader;
+import com.example.utils.Log;
+import org.testng.IRetryAnalyzer;
+import org.testng.ITestResult;
+
+/**
+ * TestNG retry analyzer for handling flaky tests.
+ * Retries failed tests based on configuration.
+ */
+public class RetryAnalyzer implements IRetryAnalyzer {
+    private int retryCount = 0;
+    private final int maxRetryCount;
+    
+    public RetryAnalyzer() {
+        this.maxRetryCount = ConfigurationReader.getRetryCount();
+    }
+    
+    @Override
+    public boolean retry(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        
+        if (retryCount < maxRetryCount) {
+            retryCount++;
+            Log.warn("🔄 RETRY " + retryCount + "/" + maxRetryCount + " for test: " + testName);
+            Log.warn("Retry reason: " + (result.getThrowable() != null ? 
+                     result.getThrowable().getMessage() : "Unknown failure"));
+            
+            return true;
+        }
+        
+        Log.error("❌ MAX RETRIES REACHED (" + maxRetryCount + ") for test: " + testName);
+        return false;
+    }
+    
+    /**
+     * Reset retry count (called automatically by TestNG)
+     */
+    public void reset() {
+        retryCount = 0;
+    }
+    
+    /**
+     * Get current retry count
+     * @return Current retry count
+     */
+    public int getRetryCount() {
+        return retryCount;
+    }
+    
+    /**
+     * Get maximum retry count
+     * @return Maximum retry count
+     */
+    public int getMaxRetryCount() {
+        return maxRetryCount;
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/listeners/RetryAnalyzer.java",
+  },
+  {
+    "content": "package com.example.listeners;
+
+import com.example.core.DriverManager;
+import com.example.utils.ExtentManager;
+import com.example.utils.Log;
+import com.example.utils.ScreenshotUtils;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import org.testng.*;
+
+/**
+ * TestNG listener for ExtentReports integration and screenshot capture.
+ * Handles test lifecycle events and reporting.
+ */
+public class TestListener implements ITestListener, ISuiteListener, IConfigurationListener {
+    
+    @Override
+    public void onStart(ISuite suite) {
+        Log.startSection("TEST SUITE: " + suite.getName());
+        Log.info("Suite started: " + suite.getName());
+        
+        // Initialize ExtentReports
+        ExtentManager.createInstance();
+    }
+    
+    @Override
+    public void onFinish(ISuite suite) {
+        Log.info("Suite finished: " + suite.getName());
+        Log.endSection();
+        
+        // Flush ExtentReports
+        ExtentManager.flush();
+        
+        // Clean up old screenshots (keep for 7 days)
+        ScreenshotUtils.cleanupOldScreenshots(7);
+    }
+    
+    @Override
+    public void onTestStart(ITestResult result) {
+        String testName = getTestName(result);
+        String testDescription = getTestDescription(result);
+        
+        Log.testStart(testName);
+        
+        // Create ExtentTest
+        ExtentTest extentTest = ExtentManager.createTest(testName, testDescription);
+        
+        // Add test information
+        ExtentManager.setTestCategory(getTestGroups(result));
+        ExtentManager.setTestAuthor("QA Team");
+        ExtentManager.setTestDevice(getCurrentBrowser());
+        
+        // Log test start
+        ExtentManager.logInfo("Test started: " + testName);
+        
+        // Log test parameters if any
+        logTestParameters(result);
+    }
+    
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        String testName = getTestName(result);
+        long duration = result.getEndMillis() - result.getStartMillis();
+        
+        Log.testEnd(testName, "PASSED");
+        
+        // Log to ExtentReports
+        ExtentManager.logPass("✅ Test passed successfully");
+        ExtentManager.logInfo("Test duration: " + duration + "ms");
+        
+        // Remove test from ThreadLocal
+        ExtentManager.removeTest();
+    }
+    
+    @Override
+    public void onTestFailure(ITestResult result) {
+        String testName = getTestName(result);
+        Throwable throwable = result.getThrowable();
+        
+        Log.testEnd(testName, "FAILED");
+        Log.error("Test failed: " + testName, throwable);
+        
+        // Capture screenshot on failure
+        String screenshotPath = ScreenshotUtils.captureFailureScreenshot(testName);
+        
+        // Log to ExtentReports
+        ExtentManager.logFail("❌ Test failed: " + (throwable != null ? throwable.getMessage() : "Unknown error"));
+        ExtentManager.logException(throwable);
+        
+        // Add screenshot to report if captured
+        if (screenshotPath != null) {
+            ExtentManager.addScreenshot(screenshotPath, "Failure Screenshot");
+        }
+        
+        // Remove test from ThreadLocal
+        ExtentManager.removeTest();
+    }
+    
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        String testName = getTestName(result);
+        Throwable throwable = result.getThrowable();
+        
+        Log.testEnd(testName, "SKIPPED");
+        
+        // Create ExtentTest for skipped test
+        String testDescription = getTestDescription(result);
+        ExtentTest extentTest = ExtentManager.createTest(testName, testDescription);
+        ExtentManager.setTestCategory(getTestGroups(result));
+        
+        // Log to ExtentReports
+        String skipReason = throwable != null ? throwable.getMessage() : "Test was skipped";
+        ExtentManager.logSkip("⏭️ Test skipped: " + skipReason);
+        
+        if (throwable != null) {
+            ExtentManager.logException(throwable);
+        }
+        
+        // Remove test from ThreadLocal
+        ExtentManager.removeTest();
+    }
+    
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
+        String testName = getTestName(result);
+        Log.warn("Test failed but within success percentage: " + testName);
+        
+        ExtentManager.logWarning("⚠️ Test failed but within success percentage");
+    }
+    
+    /**
+     * Get formatted test name
+     * @param result Test result
+     * @return Formatted test name
+     */
+    private String getTestName(ITestResult result) {
+        String className = result.getTestClass().getName();
+        String methodName = result.getMethod().getMethodName();
+        
+        // Extract simple class name
+        String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
+        
+        return simpleClassName + "." + methodName;
+    }
+    
+    /**
+     * Get test description from TestNG annotations
+     * @param result Test result
+     * @return Test description
+     */
+    private String getTestDescription(ITestResult result) {
+        String description = result.getMethod().getDescription();
+        return description != null ? description : "No description provided";
+    }
+    
+    /**
+     * Get test groups as string array
+     * @param result Test result
+     * @return Test groups
+     */
+    private String[] getTestGroups(ITestResult result) {
+        return result.getMethod().getGroups();
+    }
+    
+    /**
+     * Get current browser from system property
+     * @return Browser name
+     */
+    private String getCurrentBrowser() {
+        String browser = System.getProperty("browser", "chrome");
+        boolean headless = Boolean.parseBoolean(System.getProperty("headless", "false"));
+        return browser + (headless ? " (headless)" : "");
+    }
+    
+    /**
+     * Log test parameters if present
+     * @param result Test result
+     */
+    private void logTestParameters(ITestResult result) {
+        Object[] parameters = result.getParameters();
+        if (parameters != null && parameters.length > 0) {
+            StringBuilder paramLog = new StringBuilder("Test parameters: ");
+            for (int i = 0; i < parameters.length; i++) {
+                if (i > 0) paramLog.append(", ");
+                paramLog.append("param").append(i + 1).append("=").append(parameters[i]);
+            }
+            
+            ExtentManager.logInfo(paramLog.toString());
+            Log.info(paramLog.toString());
+        }
+    }
+    
+    /**
+     * Handle configuration failures (BeforeMethod, AfterMethod, etc.)
+     * @param result Test result
+     */
+    @Override
+    public void onConfigurationFailure(ITestResult result) {
+        String configName = result.getMethod().getMethodName();
+        Throwable throwable = result.getThrowable();
+        
+        Log.error("Configuration method failed: " + configName, throwable);
+        
+        // Capture screenshot for configuration failure if driver is available
+        if (DriverManager.isDriverInitialized()) {
+            String screenshotPath = ScreenshotUtils.captureScreenshot("CONFIG_FAILURE_" + configName);
+            if (screenshotPath != null) {
+                Log.info("Configuration failure screenshot captured: " + screenshotPath);
+            }
+        }
+    }
+    
+    /**
+     * Handle configuration success
+     * @param result Test result
+     */
+    @Override
+    public void onConfigurationSuccess(ITestResult result) {
+        String configName = result.getMethod().getMethodName();
+        Log.debug("Configuration method passed: " + configName);
+    }
+    
+    /**
+     * Handle configuration skip
+     * @param result Test result
+     */
+    @Override
+    public void onConfigurationSkip(ITestResult result) {
+        String configName = result.getMethod().getMethodName();
+        Log.warn("Configuration method skipped: " + configName);
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/listeners/TestListener.java",
+  },
+  {
+    "content": "package com.example.pages;
+
+import com.example.core.DriverManager;
+import com.example.utils.Log;
+import com.example.utils.WaitUtils;
+import com.example.utils.WebActions;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
+
+/**
+ * Base page class containing common page functionality.
+ * All page objects should extend this class.
+ */
+public abstract class BasePage {
+    protected WebDriver driver;
+    
+    public BasePage() {
+        this.driver = DriverManager.getDriver();
+        PageFactory.initElements(driver, this);
+    }
+    
+    /**
+     * Get page title
+     * @return Page title
+     */
+    public String getPageTitle() {
+        String title = driver.getTitle();
+        Log.debug("Page title: " + title);
+        return title;
+    }
+    
+    /**
+     * Get current URL
+     * @return Current URL
+     */
+    public String getCurrentUrl() {
+        String url = driver.getCurrentUrl();
+        Log.debug("Current URL: " + url);
+        return url;
+    }
+    
+    /**
+     * Check if page is loaded by verifying page title
+     * @param expectedTitle Expected page title
+     * @return true if page is loaded
+     */
+    public boolean isPageLoaded(String expectedTitle) {
+        return WaitUtils.waitForTitle(expectedTitle);
+    }
+    
+    /**
+     * Check if page is loaded by verifying URL contains text
+     * @param urlPart Expected URL part
+     * @return true if page is loaded
+     */
+    public boolean isPageLoadedByUrl(String urlPart) {
+        return WaitUtils.waitForUrlContains(urlPart);
+    }
+    
+    /**
+     * Check if element is displayed
+     * @param locator Element locator
+     * @return true if element is displayed
+     */
+    protected boolean isElementDisplayed(By locator) {
+        return WebActions.isDisplayed(locator);
+    }
+    
+    /**
+     * Check if element is enabled
+     * @param locator Element locator
+     * @return true if element is enabled
+     */
+    protected boolean isElementEnabled(By locator) {
+        return WebActions.isEnabled(locator);
+    }
+    
+    /**
+     * Wait for element to be visible
+     * @param locator Element locator
+     * @return WebElement when visible
+     */
+    protected WebElement waitForElement(By locator) {
+        return WaitUtils.waitForVisibility(locator);
+    }
+    
+    /**
+     * Wait for element to be clickable
+     * @param locator Element locator
+     * @return WebElement when clickable
+     */
+    protected WebElement waitForClickableElement(By locator) {
+        return WaitUtils.waitForClickability(locator);
+    }
+    
+    /**
+     * Click element
+     * @param locator Element locator
+     */
+    protected void clickElement(By locator) {
+        WebActions.click(locator);
+    }
+    
+    /**
+     * Type text into element
+     * @param locator Element locator
+     * @param text Text to type
+     */
+    protected void typeText(By locator, String text) {
+        WebActions.type(locator, text);
+    }
+    
+    /**
+     * Get text from element
+     * @param locator Element locator
+     * @return Element text
+     */
+    protected String getElementText(By locator) {
+        return WebActions.getText(locator);
+    }
+    
+    /**
+     * Get attribute value from element
+     * @param locator Element locator
+     * @param attributeName Attribute name
+     * @return Attribute value
+     */
+    protected String getElementAttribute(By locator, String attributeName) {
+        return WebActions.getAttribute(locator, attributeName);
+    }
+    
+    /**
+     * Select dropdown option by text
+     * @param locator Dropdown locator
+     * @param optionText Option text
+     */
+    protected void selectDropdownByText(By locator, String optionText) {
+        WebActions.selectByText(locator, optionText);
+    }
+    
+    /**
+     * Scroll to element
+     * @param locator Element locator
+     */
+    protected void scrollToElement(By locator) {
+        WebActions.scrollToElement(locator);
+    }
+    
+    /**
+     * Hover over element
+     * @param locator Element locator
+     */
+    protected void hoverOverElement(By locator) {
+        WebActions.hover(locator);
+    }
+    
+    /**
+     * Refresh current page
+     */
+    public void refreshPage() {
+        Log.step("Refreshing page: " + getClass().getSimpleName());
+        driver.navigate().refresh();
+    }
+    
+    /**
+     * Navigate back
+     */
+    public void navigateBack() {
+        Log.step("Navigating back from: " + getClass().getSimpleName());
+        driver.navigate().back();
+    }
+    
+    /**
+     * Wait for page to load completely
+     * @param timeoutInSeconds Timeout in seconds
+     */
+    protected void waitForPageToLoad(int timeoutInSeconds) {
+        Log.debug("Waiting for page to load completely");
+        WaitUtils.hardWait(1000); // Give a moment for page to start loading
+        
+        // You can add more sophisticated page load checks here
+        // For example, wait for specific elements or JavaScript to complete
+    }
+    
+    /**
+     * Abstract method that each page should implement to verify page is loaded
+     * @return true if page is loaded correctly
+     */
+    public abstract boolean isLoaded();
+    
+    /**
+     * Get page name for logging
+     * @return Page name
+     */
+    protected String getPageName() {
+        return getClass().getSimpleName();
+    }
+    
+    /**
+     * Log page action
+     * @param action Action description
+     */
+    protected void logPageAction(String action) {
+        Log.step("[" + getPageName() + "] " + action);
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/pages/BasePage.java",
+  },
+  {
+    "content": "package com.example.pages;
+
+import com.example.utils.Log;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+import java.util.List;
+
+/**
+ * Home page object following Page Object Model pattern.
+ * Contains locators and actions for home page functionality.
+ */
+public class HomePage extends BasePage {
+    
+    // Page locators using @FindBy annotation
+    @FindBy(className = "welcome-message")
+    private WebElement welcomeMessage;
+    
+    @FindBy(id = "user-menu")
+    private WebElement userMenu;
+    
+    @FindBy(id = "logout-button")
+    private WebElement logoutButton;
+    
+    @FindBy(className = "navigation-menu")
+    private WebElement navigationMenu;
+    
+    @FindBy(css = ".main-content")
+    private WebElement mainContent;
+    
+    @FindBy(css = ".sidebar")
+    private WebElement sidebar;
+    
+    @FindBy(tagName = "footer")
+    private WebElement footer;
+    
+    // Alternative locators using By objects
+    private final By welcomeMessageLocator = By.className("welcome-message");
+    private final By userMenuLocator = By.id("user-menu");
+    private final By logoutButtonLocator = By.id("logout-button");
+    private final By pageHeaderLocator = By.h1("Dashboard");
+    private final By profileLinkLocator = By.linkText("Profile");
+    private final By settingsLinkLocator = By.linkText("Settings");
+    private final By notificationIconLocator = By.className("notification-icon");
+    private final By searchBoxLocator = By.id("search-box");
+    
+    /**
+     * Check if home page is loaded
+     * @return true if home page is loaded
+     */
+    @Override
+    public boolean isLoaded() {
+        try {
+            return isElementDisplayed(welcomeMessageLocator) && 
+                   isElementDisplayed(userMenuLocator) &&
+                   isElementDisplayed(pageHeaderLocator);
+        } catch (Exception e) {
+            Log.debug("Home page not loaded: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Get welcome message text
+     * @return Welcome message text
+     */
+    public String getWelcomeMessage() {
+        logPageAction("Getting welcome message");
+        return getElementText(welcomeMessageLocator);
+    }
+    
+    /**
+     * Check if user is logged in by verifying welcome message contains username
+     * @param expectedUsername Expected username in welcome message
+     * @return true if welcome message contains username
+     */
+    public boolean isUserLoggedIn(String expectedUsername) {
+        String welcomeText = getWelcomeMessage();
+        boolean isLoggedIn = welcomeText.toLowerCase().contains(expectedUsername.toLowerCase());
+        
+        if (isLoggedIn) {
+            Log.info("User is logged in. Welcome message: " + welcomeText);
+        } else {
+            Log.warn("User may not be logged in. Welcome message: " + welcomeText);
+        }
+        
+        return isLoggedIn;
+    }
+    
+    /**
+     * Click user menu to expand dropdown
+     * @return Current HomePage instance
+     */
+    public HomePage clickUserMenu() {
+        logPageAction("Clicking user menu");
+        clickElement(userMenuLocator);
+        return this;
+    }
+    
+    /**
+     * Click logout button
+     * @return LoginPage instance
+     */
+    public LoginPage logout() {
+        logPageAction("Performing logout");
+        clickUserMenu();
+        clickElement(logoutButtonLocator);
+        
+        // Return LoginPage instance
+        return new LoginPage();
+    }
+    
+    /**
+     * Navigate to profile page
+     * @return ProfilePage instance (you would create this page class)
+     */
+    public HomePage navigateToProfile() {
+        logPageAction("Navigating to profile page");
+        clickElement(profileLinkLocator);
+        // Return appropriate page object based on your application
+        return this;
+    }
+    
+    /**
+     * Navigate to settings page
+     * @return SettingsPage instance (you would create this page class)
+     */
+    public HomePage navigateToSettings() {
+        logPageAction("Navigating to settings page");
+        clickElement(settingsLinkLocator);
+        // Return appropriate page object based on your application
+        return this;
+    }
+    
+    /**
+     * Perform search
+     * @param searchTerm Search term to enter
+     * @return SearchResultsPage instance (you would create this page class)
+     */
+    public HomePage performSearch(String searchTerm) {
+        logPageAction("Performing search: " + searchTerm);
+        typeText(searchBoxLocator, searchTerm);
+        
+        // Press Enter or click search button
+        driver.findElement(searchBoxLocator).submit();
+        
+        // Return appropriate page object based on your application
+        return this;
+    }
+    
+    /**
+     * Check if notifications are available
+     * @return true if notification icon shows new notifications
+     */
+    public boolean hasNotifications() {
+        try {
+            WebElement notificationIcon = waitForElement(notificationIconLocator);
+            String notificationCount = notificationIcon.getAttribute("data-count");
+            boolean hasNotifications = notificationCount != null && !notificationCount.equals("0");
+            
+            if (hasNotifications) {
+                Log.info("Notifications available: " + notificationCount);
+            } else {
+                Log.debug("No new notifications");
+            }
+            
+            return hasNotifications;
+        } catch (Exception e) {
+            Log.debug("Could not check notifications status");
+            return false;
+        }
+    }
+    
+    /**
+     * Get notification count
+     * @return Number of notifications, or 0 if none
+     */
+    public int getNotificationCount() {
+        try {
+            WebElement notificationIcon = waitForElement(notificationIconLocator);
+            String countText = notificationIcon.getAttribute("data-count");
+            return countText != null ? Integer.parseInt(countText) : 0;
+        } catch (Exception e) {
+            Log.debug("Could not get notification count");
+            return 0;
+        }
+    }
+    
+    /**
+     * Click notification icon
+     * @return Current HomePage instance
+     */
+    public HomePage clickNotifications() {
+        logPageAction("Clicking notifications");
+        clickElement(notificationIconLocator);
+        return this;
+    }
+    
+    /**
+     * Check if sidebar is visible
+     * @return true if sidebar is displayed
+     */
+    public boolean isSidebarVisible() {
+        return isElementDisplayed(By.cssSelector(".sidebar"));
+    }
+    
+    /**
+     * Get main content text
+     * @return Main content text
+     */
+    public String getMainContentText() {
+        return getElementText(By.cssSelector(".main-content"));
+    }
+    
+    /**
+     * Navigate using sidebar menu
+     * @param menuItemText Text of the menu item to click
+     * @return Current HomePage instance
+     */
+    public HomePage navigateUsingSidebar(String menuItemText) {
+        logPageAction("Navigating using sidebar menu: " + menuItemText);
+        
+        By menuItemLocator = By.xpath("//nav[@class='sidebar']//a[contains(text(), '" + menuItemText + "')]");
+        clickElement(menuItemLocator);
+        
+        return this;
+    }
+    
+    /**
+     * Get all navigation menu items
+     * @return List of navigation menu item texts
+     */
+    public java.util.List<String> getNavigationMenuItems() {
+        logPageAction("Getting navigation menu items");
+        
+        List<WebElement> menuItems = driver.findElements(By.cssSelector(".navigation-menu a"));
+        java.util.List<String> menuTexts = new java.util.ArrayList<>();
+        
+        for (WebElement item : menuItems) {
+            menuTexts.add(item.getText());
+        }
+        
+        Log.info("Found " + menuTexts.size() + " navigation menu items: " + menuTexts);
+        return menuTexts;
+    }
+    
+    /**
+     * Verify page footer is displayed
+     * @return true if footer is visible
+     */
+    public boolean isFooterDisplayed() {
+        return isElementDisplayed(By.tagName("footer"));
+    }
+    
+    /**
+     * Get footer text
+     * @return Footer text content
+     */
+    public String getFooterText() {
+        return getElementText(By.tagName("footer"));
+    }
+    
+    /**
+     * Wait for page to fully load
+     * @return true if page loaded successfully
+     */
+    public boolean waitForPageLoad() {
+        logPageAction("Waiting for home page to fully load");
+        
+        try {
+            waitForElement(welcomeMessageLocator);
+            waitForElement(userMenuLocator);
+            waitForElement(By.cssSelector(".main-content"));
+            
+            Log.info("Home page loaded successfully");
+            return true;
+        } catch (Exception e) {
+            Log.error("Home page failed to load completely", e);
+            return false;
+        }
+    }
+    
+    /**
+     * Validate all critical page elements are present
+     * @return true if all critical elements are present
+     */
+    public boolean validatePageElements() {
+        logPageAction("Validating home page elements");
+        
+        boolean isValid = isElementDisplayed(welcomeMessageLocator) &&
+                         isElementDisplayed(userMenuLocator) &&
+                         isElementDisplayed(By.cssSelector(".main-content")) &&
+                         isElementDisplayed(By.tagName("footer"));
+        
+        if (isValid) {
+            Log.info("All home page elements are present and valid");
+        } else {
+            Log.error("Some home page elements are missing");
+        }
+        
+        return isValid;
+    }
+    
+    /**
+     * Take a screenshot of the current page state
+     * @param screenshotName Name for the screenshot
+     */
+    public void capturePageScreenshot(String screenshotName) {
+        logPageAction("Capturing page screenshot: " + screenshotName);
+        com.example.utils.ScreenshotUtils.captureScreenshot("homepage_" + screenshotName);
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/pages/HomePage.java",
+  },
+  {
+    "content": "package com.example.pages;
+
+import com.example.utils.Log;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
+/**
+ * Login Page Object
+ * 
+ * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+ * 1. Open your app's login page in a browser
+ * 2. Right-click on each element → Inspect → Copy selector
+ * 3. Replace the placeholder locators below with your actual locators
+ */
+public class LoginPage extends BasePage {
+    
+    // ============================================
+    // UPDATE THESE LOCATORS FOR YOUR APPLICATION
+    // ============================================
+    // Tip: Use browser DevTools (F12) to find correct selectors
+    
+    @FindBy(id = "username")           // Your username/email input field
+    private WebElement usernameField;
+    
+    @FindBy(id = "password")           // Your password input field
+    private WebElement passwordField;
+    
+    @FindBy(id = "login-button")       // Your login/submit button
+    private WebElement loginButton;
+    
+    @FindBy(className = "error-message") // Error message element
+    private WebElement errorMessage;
+    
+    @FindBy(linkText = "Forgot Password?")
+    private WebElement forgotPasswordLink;
+    
+    @FindBy(id = "remember-me")
+    private WebElement rememberMeCheckbox;
+    
+    // Alternative locators using By objects - UPDATE THESE TOO
+    private final By usernameFieldLocator = By.id("username");
+    private final By passwordFieldLocator = By.id("password");
+    private final By loginButtonLocator = By.id("login-button");
+    private final By errorMessageLocator = By.className("error-message");
+    private final By pageHeaderLocator = By.tagName("h1"); // Element visible on login page
+    // ============================================
+    
+    /**
+     * Check if login page is loaded
+     * @return true if login page is loaded
+     */
+    @Override
+    public boolean isLoaded() {
+        try {
+            return isElementDisplayed(pageHeaderLocator) && 
+                   isElementDisplayed(usernameFieldLocator) &&
+                   isElementDisplayed(passwordFieldLocator) &&
+                   isElementDisplayed(loginButtonLocator);
+        } catch (Exception e) {
+            Log.debug("Login page not loaded: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Enter username
+     * @param username Username to enter
+     * @return Current LoginPage instance for method chaining
+     */
+    public LoginPage enterUsername(String username) {
+        logPageAction("Entering username: " + username);
+        typeText(usernameFieldLocator, username);
+        return this;
+    }
+    
+    /**
+     * Enter password
+     * @param password Password to enter
+     * @return Current LoginPage instance for method chaining
+     */
+    public LoginPage enterPassword(String password) {
+        logPageAction("Entering password");
+        typeText(passwordFieldLocator, password);
+        return this;
+    }
+    
+    /**
+     * Click login button
+     * @return HomePage instance if login successful, or LoginPage if failed
+     */
+    public <T extends BasePage> T clickLoginButton(Class<T> expectedPageClass) {
+        logPageAction("Clicking login button");
+        clickElement(loginButtonLocator);
+        
+        try {
+            T page = expectedPageClass.getDeclaredConstructor().newInstance();
+            if (page.isLoaded()) {
+                Log.info("Login successful, navigated to: " + expectedPageClass.getSimpleName());
+                return page;
+            } else {
+                Log.warn("Login may have failed, staying on login page");
+                return expectedPageClass.cast(this);
+            }
+        } catch (Exception e) {
+            Log.error("Error creating page instance: " + expectedPageClass.getSimpleName(), e);
+            return expectedPageClass.cast(this);
+        }
+    }
+    
+    /**
+     * Perform complete login with username and password
+     * @param username Username
+     * @param password Password
+     * @param expectedPageClass Expected page class after login
+     * @return Expected page instance
+     */
+    public <T extends BasePage> T login(String username, String password, Class<T> expectedPageClass) {
+        logPageAction("Performing login with username: " + username);
+        enterUsername(username);
+        enterPassword(password);
+        return clickLoginButton(expectedPageClass);
+    }
+    
+    /**
+     * Perform login with remember me option
+     * @param username Username
+     * @param password Password
+     * @param rememberMe Remember me checkbox state
+     * @param expectedPageClass Expected page class after login
+     * @return Expected page instance
+     */
+    public <T extends BasePage> T loginWithRememberMe(String username, String password, 
+                                                     boolean rememberMe, Class<T> expectedPageClass) {
+        logPageAction("Performing login with remember me: " + rememberMe);
+        enterUsername(username);
+        enterPassword(password);
+        setRememberMe(rememberMe);
+        return clickLoginButton(expectedPageClass);
+    }
+    
+    /**
+     * Set remember me checkbox
+     * @param check Whether to check the checkbox
+     * @return Current LoginPage instance
+     */
+    public LoginPage setRememberMe(boolean check) {
+        logPageAction("Setting remember me checkbox: " + check);
+        if (check && !isRememberMeChecked()) {
+            clickElement(By.id("remember-me"));
+        } else if (!check && isRememberMeChecked()) {
+            clickElement(By.id("remember-me"));
+        }
+        return this;
+    }
+    
+    /**
+     * Check if remember me checkbox is checked
+     * @return true if checkbox is checked
+     */
+    public boolean isRememberMeChecked() {
+        return rememberMeCheckbox.isSelected();
+    }
+    
+    /**
+     * Click forgot password link
+     * @return ForgotPasswordPage instance (you would create this page class)
+     */
+    public LoginPage clickForgotPassword() {
+        logPageAction("Clicking forgot password link");
+        clickElement(By.linkText("Forgot Password?"));
+        // Return appropriate page object based on your application
+        return new LoginPage();
+    }
+    
+    /**
+     * Get error message text
+     * @return Error message text, or empty string if no error
+     */
+    public String getErrorMessage() {
+        try {
+            if (isElementDisplayed(errorMessageLocator)) {
+                String error = getElementText(errorMessageLocator);
+                Log.info("Error message displayed: " + error);
+                return error;
+            }
+        } catch (Exception e) {
+            Log.debug("No error message displayed");
+        }
+        return "";
+    }
+    
+    /**
+     * Check if error message is displayed
+     * @return true if error message is visible
+     */
+    public boolean isErrorMessageDisplayed() {
+        return isElementDisplayed(errorMessageLocator);
+    }
+    
+    /**
+     * Check if login button is enabled
+     * @return true if login button is enabled
+     */
+    public boolean isLoginButtonEnabled() {
+        return isElementEnabled(loginButtonLocator);
+    }
+    
+    /**
+     * Get username field value
+     * @return Username field value
+     */
+    public String getUsernameValue() {
+        return getElementAttribute(usernameFieldLocator, "value");
+    }
+    
+    /**
+     * Clear username field
+     * @return Current LoginPage instance
+     */
+    public LoginPage clearUsername() {
+        logPageAction("Clearing username field");
+        usernameField.clear();
+        return this;
+    }
+    
+    /**
+     * Clear password field
+     * @return Current LoginPage instance
+     */
+    public LoginPage clearPassword() {
+        logPageAction("Clearing password field");
+        passwordField.clear();
+        return this;
+    }
+    
+    /**
+     * Clear all form fields
+     * @return Current LoginPage instance
+     */
+    public LoginPage clearAllFields() {
+        logPageAction("Clearing all form fields");
+        clearUsername();
+        clearPassword();
+        return this;
+    }
+    
+    /**
+     * Wait for error message to appear
+     * @param timeoutInSeconds Timeout in seconds
+     * @return true if error message appears within timeout
+     */
+    public boolean waitForErrorMessage(int timeoutInSeconds) {
+        try {
+            waitForElement(errorMessageLocator);
+            return true;
+        } catch (Exception e) {
+            Log.debug("Error message did not appear within " + timeoutInSeconds + " seconds");
+            return false;
+        }
+    }
+    
+    /**
+     * Validate login page elements are present
+     * @return true if all required elements are present
+     */
+    public boolean validatePageElements() {
+        logPageAction("Validating login page elements");
+        
+        boolean isValid = isElementDisplayed(usernameFieldLocator) &&
+                         isElementDisplayed(passwordFieldLocator) &&
+                         isElementDisplayed(loginButtonLocator);
+        
+        if (isValid) {
+            Log.info("All login page elements are present and valid");
+        } else {
+            Log.error("Some login page elements are missing");
+        }
+        
+        return isValid;
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/pages/LoginPage.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * Logger wrapper utility for consistent logging across the framework.
+ * Uses Log4j2 for logging with different log levels.
+ */
+public class Log {
+    private static final Logger logger = LogManager.getLogger(Log.class);
+    
+    /**
+     * Log info message
+     * @param message Message to log
+     */
+    public static void info(String message) {
+        logger.info(message);
+    }
+    
+    /**
+     * Log debug message
+     * @param message Message to log
+     */
+    public static void debug(String message) {
+        logger.debug(message);
+    }
+    
+    /**
+     * Log warning message
+     * @param message Message to log
+     */
+    public static void warn(String message) {
+        logger.warn(message);
+    }
+    
+    /**
+     * Log error message
+     * @param message Message to log
+     */
+    public static void error(String message) {
+        logger.error(message);
+    }
+    
+    /**
+     * Log error message with exception
+     * @param message Message to log
+     * @param throwable Exception to log
+     */
+    public static void error(String message, Throwable throwable) {
+        logger.error(message, throwable);
+    }
+    
+    /**
+     * Log fatal message
+     * @param message Message to log
+     */
+    public static void fatal(String message) {
+        logger.fatal(message);
+    }
+    
+    /**
+     * Log fatal message with exception
+     * @param message Message to log
+     * @param throwable Exception to log
+     */
+    public static void fatal(String message, Throwable throwable) {
+        logger.fatal(message, throwable);
+    }
+    
+    /**
+     * Log test step with INFO level
+     * @param stepDescription Step description
+     */
+    public static void step(String stepDescription) {
+        logger.info("🔸 STEP: " + stepDescription);
+    }
+    
+    /**
+     * Log test assertion with INFO level
+     * @param assertionDescription Assertion description
+     */
+    public static void assertion(String assertionDescription) {
+        logger.info("✅ ASSERTION: " + assertionDescription);
+    }
+    
+    /**
+     * Log test start
+     * @param testName Test name
+     */
+    public static void testStart(String testName) {
+        logger.info("🚀 TEST START: " + testName);
+    }
+    
+    /**
+     * Log test end
+     * @param testName Test name
+     * @param status Test status (PASSED/FAILED/SKIPPED)
+     */
+    public static void testEnd(String testName, String status) {
+        String emoji = getStatusEmoji(status);
+        logger.info(emoji + " TEST END: " + testName + " - " + status);
+    }
+    
+    /**
+     * Get emoji for test status
+     * @param status Test status
+     * @return Emoji representation
+     */
+    private static String getStatusEmoji(String status) {
+        switch (status.toUpperCase()) {
+            case "PASSED":
+                return "✅";
+            case "FAILED":
+                return "❌";
+            case "SKIPPED":
+                return "⏭️";
+            default:
+                return "❓";
+        }
+    }
+    
+    /**
+     * Start a new log section with separator
+     * @param sectionName Section name
+     */
+    public static void startSection(String sectionName) {
+        logger.info("═══════════════════════════════════════");
+        logger.info("📋 " + sectionName);
+        logger.info("═══════════════════════════════════════");
+    }
+    
+    /**
+     * End log section with separator
+     */
+    public static void endSection() {
+        logger.info("═══════════════════════════════════════");
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/Log.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import com.example.core.DriverManager;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * Screenshot capture utility for test reporting and debugging.
+ * Provides methods to capture and save screenshots at various points during test execution.
+ */
+public class ScreenshotUtils {
+    private static final String SCREENSHOT_DIR = System.getProperty("user.dir") + "/reports/screenshots/";
+    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS");
+    
+    static {
+        // Create screenshots directory if it doesn't exist
+        createScreenshotDirectory();
+    }
+    
+    /**
+     * Create screenshots directory
+     */
+    private static void createScreenshotDirectory() {
+        File dir = new File(SCREENSHOT_DIR);
+        if (!dir.exists()) {
+            if (dir.mkdirs()) {
+                Log.debug("Created screenshots directory: " + SCREENSHOT_DIR);
+            } else {
+                Log.error("Failed to create screenshots directory: " + SCREENSHOT_DIR);
+            }
+        }
+    }
+    
+    /**
+     * Capture screenshot and save with timestamp
+     * @return Screenshot file path
+     */
+    public static String captureScreenshot() {
+        return captureScreenshot("screenshot_" + getCurrentTimestamp());
+    }
+    
+    /**
+     * Capture screenshot with custom filename
+     * @param fileName Custom filename (without extension)
+     * @return Screenshot file path
+     */
+    public static String captureScreenshot(String fileName) {
+        try {
+            WebDriver driver = DriverManager.getDriver();
+            if (driver == null) {
+                Log.error("WebDriver is null, cannot capture screenshot");
+                return null;
+            }
+            
+            TakesScreenshot takesScreenshot = (TakesScreenshot) driver;
+            File sourceFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
+            
+            String filePath = SCREENSHOT_DIR + fileName + ".png";
+            File destFile = new File(filePath);
+            
+            java.nio.file.Files.copy(sourceFile.toPath(), destFile.toPath(), 
+                                   java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            
+            Log.debug("Screenshot captured: " + filePath);
+            return filePath;
+            
+        } catch (IOException e) {
+            Log.error("Failed to capture screenshot: " + fileName, e);
+            return null;
+        }
+    }
+    
+    /**
+     * Capture screenshot for test method
+     * @param testMethodName Test method name
+     * @return Screenshot file path
+     */
+    public static String captureTestScreenshot(String testMethodName) {
+        String fileName = "test_" + testMethodName + "_" + getCurrentTimestamp();
+        return captureScreenshot(fileName);
+    }
+    
+    /**
+     * Capture screenshot for failed test
+     * @param testMethodName Test method name
+     * @return Screenshot file path
+     */
+    public static String captureFailureScreenshot(String testMethodName) {
+        String fileName = "FAILED_" + testMethodName + "_" + getCurrentTimestamp();
+        Log.info("Capturing failure screenshot for: " + testMethodName);
+        return captureScreenshot(fileName);
+    }
+    
+    /**
+     * Capture screenshot for test step
+     * @param testMethodName Test method name
+     * @param stepDescription Step description
+     * @return Screenshot file path
+     */
+    public static String captureStepScreenshot(String testMethodName, String stepDescription) {
+        String sanitizedStep = stepDescription.replaceAll("[^a-zA-Z0-9]", "_");
+        String fileName = "step_" + testMethodName + "_" + sanitizedStep + "_" + getCurrentTimestamp();
+        return captureScreenshot(fileName);
+    }
+    
+    /**
+     * Get current timestamp for file naming
+     * @return Formatted timestamp string
+     */
+    private static String getCurrentTimestamp() {
+        return LocalDateTime.now().format(TIMESTAMP_FORMAT);
+    }
+    
+    /**
+     * Get screenshots directory path
+     * @return Screenshots directory path
+     */
+    public static String getScreenshotDirectory() {
+        return SCREENSHOT_DIR;
+    }
+    
+    /**
+     * Clean up old screenshots (older than specified days)
+     * @param daysOld Number of days to keep screenshots
+     */
+    public static void cleanupOldScreenshots(int daysOld) {
+        try {
+            File screenshotDir = new File(SCREENSHOT_DIR);
+            if (!screenshotDir.exists()) {
+                return;
+            }
+            
+            File[] files = screenshotDir.listFiles();
+            if (files == null) {
+                return;
+            }
+            
+            long cutoffTime = System.currentTimeMillis() - (daysOld * 24L * 60L * 60L * 1000L);
+            int deletedCount = 0;
+            
+            for (File file : files) {
+                if (file.isFile() && file.getName().endsWith(".png") && 
+                    file.lastModified() < cutoffTime) {
+                    if (file.delete()) {
+                        deletedCount++;
+                    }
+                }
+            }
+            
+            if (deletedCount > 0) {
+                Log.info("Cleaned up " + deletedCount + " old screenshots");
+            }
+            
+        } catch (Exception e) {
+            Log.error("Error cleaning up old screenshots", e);
+        }
+    }
+    
+    /**
+     * Get relative path for ExtentReports
+     * @param absolutePath Absolute file path
+     * @return Relative path for reports
+     */
+    public static String getRelativePath(String absolutePath) {
+        if (absolutePath == null) {
+            return null;
+        }
+        
+        String userDir = System.getProperty("user.dir");
+        if (absolutePath.startsWith(userDir)) {
+            return absolutePath.substring(userDir.length() + 1).replace("\\\\", "/");
+        }
+        
+        return absolutePath;
+    }
+    
+    /**
+     * Check if screenshot capture is supported
+     * @return true if WebDriver supports screenshot capture
+     */
+    public static boolean isScreenshotSupported() {
+        try {
+            WebDriver driver = DriverManager.getDriver();
+            return driver != null && driver instanceof TakesScreenshot;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/ScreenshotUtils.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Utility class for reading test data from CSV and JSON files.
+ * Supports data-driven testing with various data formats.
+ */
+public class TestDataReader {
+    
+    /**
+     * Read CSV file and return list of maps
+     * @param filePath Path to CSV file in resources
+     * @return List of maps representing CSV data
+     */
+    public static List<Map<String, String>> readCSV(String filePath) {
+        List<Map<String, String>> data = new ArrayList<>();
+        
+        try (InputStream inputStream = TestDataReader.class.getClassLoader().getResourceAsStream(filePath);
+             InputStreamReader reader = new InputStreamReader(inputStream)) {
+            
+            if (inputStream == null) {
+                Log.error("CSV file not found: " + filePath);
+                return data;
+            }
+            
+            Iterable<CSVRecord> records = CSVFormat.DEFAULT
+                    .withFirstRecordAsHeader()
+                    .parse(reader);
+            
+            for (CSVRecord record : records) {
+                Map<String, String> row = new HashMap<>();
+                record.getParser().getHeaderMap().keySet()
+                        .forEach(header -> row.put(header, record.get(header)));
+                data.add(row);
+            }
+            
+            Log.info("Successfully read " + data.size() + " records from CSV: " + filePath);
+            
+        } catch (IOException e) {
+            Log.error("Error reading CSV file: " + filePath, e);
+        }
+        
+        return data;
+    }
+    
+    /**
+     * Read JSON file and return JsonNode
+     * @param filePath Path to JSON file in resources
+     * @return JsonNode representing JSON data
+     */
+    public static JsonNode readJSON(String filePath) {
+        try (InputStream inputStream = TestDataReader.class.getClassLoader().getResourceAsStream(filePath)) {
+            
+            if (inputStream == null) {
+                Log.error("JSON file not found: " + filePath);
+                return null;
+            }
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(inputStream);
+            
+            Log.info("Successfully read JSON file: " + filePath);
+            return jsonNode;
+            
+        } catch (IOException e) {
+            Log.error("Error reading JSON file: " + filePath, e);
+            return null;
+        }
+    }
+    
+    /**
+     * Read JSON file and convert to specific class
+     * @param filePath Path to JSON file in resources
+     * @param valueType Target class type
+     * @param <T> Generic type parameter
+     * @return Object of specified type
+     */
+    public static <T> T readJSON(String filePath, Class<T> valueType) {
+        try (InputStream inputStream = TestDataReader.class.getClassLoader().getResourceAsStream(filePath)) {
+            
+            if (inputStream == null) {
+                Log.error("JSON file not found: " + filePath);
+                return null;
+            }
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            T object = objectMapper.readValue(inputStream, valueType);
+            
+            Log.info("Successfully read JSON file and converted to " + valueType.getSimpleName() + ": " + filePath);
+            return object;
+            
+        } catch (IOException e) {
+            Log.error("Error reading JSON file: " + filePath, e);
+            return null;
+        }
+    }
+    
+    /**
+     * Read JSON array and return as list of maps
+     * @param filePath Path to JSON file in resources
+     * @return List of maps representing JSON array data
+     */
+    public static List<Map<String, Object>> readJSONArray(String filePath) {
+        List<Map<String, Object>> data = new ArrayList<>();
+        
+        try (InputStream inputStream = TestDataReader.class.getClassLoader().getResourceAsStream(filePath)) {
+            
+            if (inputStream == null) {
+                Log.error("JSON file not found: " + filePath);
+                return data;
+            }
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(inputStream);
+            
+            if (jsonNode.isArray()) {
+                for (JsonNode item : jsonNode) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> map = objectMapper.convertValue(item, Map.class);
+                    data.add(map);
+                }
+            } else {
+                Log.error("JSON file does not contain an array: " + filePath);
+            }
+            
+            Log.info("Successfully read " + data.size() + " records from JSON array: " + filePath);
+            
+        } catch (IOException e) {
+            Log.error("Error reading JSON array file: " + filePath, e);
+        }
+        
+        return data;
+    }
+    
+    /**
+     * Convert CSV data to 2D Object array for TestNG DataProvider
+     * @param filePath Path to CSV file in resources
+     * @return 2D Object array
+     */
+    public static Object[][] getCSVDataAsArray(String filePath) {
+        List<Map<String, String>> data = readCSV(filePath);
+        
+        if (data.isEmpty()) {
+            Log.warn("No data found in CSV file: " + filePath);
+            return new Object[0][0];
+        }
+        
+        Object[][] array = new Object[data.size()][];
+        for (int i = 0; i < data.size(); i++) {
+            array[i] = new Object[]{data.get(i)};
+        }
+        
+        Log.info("Converted CSV data to 2D array: " + data.size() + " rows");
+        return array;
+    }
+    
+    /**
+     * Convert JSON array to 2D Object array for TestNG DataProvider
+     * @param filePath Path to JSON file in resources
+     * @return 2D Object array
+     */
+    public static Object[][] getJSONDataAsArray(String filePath) {
+        List<Map<String, Object>> data = readJSONArray(filePath);
+        
+        if (data.isEmpty()) {
+            Log.warn("No data found in JSON file: " + filePath);
+            return new Object[0][0];
+        }
+        
+        Object[][] array = new Object[data.size()][];
+        for (int i = 0; i < data.size(); i++) {
+            array[i] = new Object[]{data.get(i)};
+        }
+        
+        Log.info("Converted JSON data to 2D array: " + data.size() + " rows");
+        return array;
+    }
+    
+    /**
+     * Get specific test data by key from CSV
+     * @param filePath Path to CSV file in resources
+     * @param keyColumn Name of column to use as key
+     * @param keyValue Value to search for
+     * @return Map representing the matching row, or null if not found
+     */
+    public static Map<String, String> getCSVDataByKey(String filePath, String keyColumn, String keyValue) {
+        List<Map<String, String>> data = readCSV(filePath);
+        
+        for (Map<String, String> row : data) {
+            if (keyValue.equals(row.get(keyColumn))) {
+                Log.info("Found matching row for key '" + keyColumn + "' = '" + keyValue + "' in " + filePath);
+                return row;
+            }
+        }
+        
+        Log.warn("No matching row found for key '" + keyColumn + "' = '" + keyValue + "' in " + filePath);
+        return null;
+    }
+    
+    /**
+     * Get specific test data by key from JSON array
+     * @param filePath Path to JSON file in resources
+     * @param keyField Name of field to use as key
+     * @param keyValue Value to search for
+     * @return Map representing the matching object, or null if not found
+     */
+    public static Map<String, Object> getJSONDataByKey(String filePath, String keyField, String keyValue) {
+        List<Map<String, Object>> data = readJSONArray(filePath);
+        
+        for (Map<String, Object> item : data) {
+            if (keyValue.equals(String.valueOf(item.get(keyField)))) {
+                Log.info("Found matching object for key '" + keyField + "' = '" + keyValue + "' in " + filePath);
+                return item;
+            }
+        }
+        
+        Log.warn("No matching object found for key '" + keyField + "' = '" + keyValue + "' in " + filePath);
+        return null;
+    }
+    
+    /**
+     * Validate that required columns exist in CSV data
+     * @param data CSV data
+     * @param requiredColumns Required column names
+     * @return true if all required columns exist
+     */
+    public static boolean validateCSVColumns(List<Map<String, String>> data, String... requiredColumns) {
+        if (data.isEmpty()) {
+            Log.error("CSV data is empty, cannot validate columns");
+            return false;
+        }
+        
+        Map<String, String> firstRow = data.get(0);
+        for (String column : requiredColumns) {
+            if (!firstRow.containsKey(column)) {
+                Log.error("Required column '" + column + "' not found in CSV data");
+                return false;
+            }
+        }
+        
+        Log.info("All required columns validated successfully");
+        return true;
+    }
+    
+    /**
+     * Print CSV data structure for debugging
+     * @param data CSV data
+     */
+    public static void printCSVStructure(List<Map<String, String>> data) {
+        if (data.isEmpty()) {
+            Log.info("CSV data is empty");
+            return;
+        }
+        
+        Log.info("CSV Structure:");
+        Log.info("Total rows: " + data.size());
+        Log.info("Columns: " + data.get(0).keySet());
+        
+        for (int i = 0; i < Math.min(data.size(), 3); i++) {
+            Log.info("Sample row " + (i + 1) + ": " + data.get(i));
+        }
+        
+        if (data.size() > 3) {
+            Log.info("... and " + (data.size() - 3) + " more rows");
+        }
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/TestDataReader.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import com.example.config.ConfigurationReader;
+import com.example.core.DriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+import java.util.List;
+
+/**
+ * Utility class for explicit waits and element interaction conditions.
+ * Provides methods for waiting for various element states.
+ */
+public class WaitUtils {
+    private static final int DEFAULT_TIMEOUT = ConfigurationReader.getExplicitWait();
+    
+    /**
+     * Get WebDriverWait instance with default timeout
+     * @return WebDriverWait instance
+     */
+    private static WebDriverWait getWait() {
+        return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(DEFAULT_TIMEOUT));
+    }
+    
+    /**
+     * Get WebDriverWait instance with custom timeout
+     * @param timeoutInSeconds Timeout in seconds
+     * @return WebDriverWait instance
+     */
+    private static WebDriverWait getWait(int timeoutInSeconds) {
+        return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeoutInSeconds));
+    }
+    
+    /**
+     * Wait for element to be present in DOM
+     * @param locator Element locator
+     * @return WebElement when present
+     */
+    public static WebElement waitForPresence(By locator) {
+        Log.debug("Waiting for element presence: " + locator);
+        return getWait().until(ExpectedConditions.presenceOfElementLocated(locator));
+    }
+    
+    /**
+     * Wait for element to be present in DOM with custom timeout
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     * @return WebElement when present
+     */
+    public static WebElement waitForPresence(By locator, int timeoutInSeconds) {
+        Log.debug("Waiting for element presence: " + locator + " (timeout: " + timeoutInSeconds + "s)");
+        return getWait(timeoutInSeconds).until(ExpectedConditions.presenceOfElementLocated(locator));
+    }
+    
+    /**
+     * Wait for element to be visible
+     * @param locator Element locator
+     * @return WebElement when visible
+     */
+    public static WebElement waitForVisibility(By locator) {
+        Log.debug("Waiting for element visibility: " + locator);
+        return getWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+    
+    /**
+     * Wait for element to be visible with custom timeout
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     * @return WebElement when visible
+     */
+    public static WebElement waitForVisibility(By locator, int timeoutInSeconds) {
+        Log.debug("Waiting for element visibility: " + locator + " (timeout: " + timeoutInSeconds + "s)");
+        return getWait(timeoutInSeconds).until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+    
+    /**
+     * Wait for element to be visible
+     * @param element WebElement
+     * @return WebElement when visible
+     */
+    public static WebElement waitForVisibility(WebElement element) {
+        Log.debug("Waiting for element visibility");
+        return getWait().until(ExpectedConditions.visibilityOf(element));
+    }
+    
+    /**
+     * Wait for element to be clickable
+     * @param locator Element locator
+     * @return WebElement when clickable
+     */
+    public static WebElement waitForClickability(By locator) {
+        Log.debug("Waiting for element clickability: " + locator);
+        return getWait().until(ExpectedConditions.elementToBeClickable(locator));
+    }
+    
+    /**
+     * Wait for element to be clickable with custom timeout
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     * @return WebElement when clickable
+     */
+    public static WebElement waitForClickability(By locator, int timeoutInSeconds) {
+        Log.debug("Waiting for element clickability: " + locator + " (timeout: " + timeoutInSeconds + "s)");
+        return getWait(timeoutInSeconds).until(ExpectedConditions.elementToBeClickable(locator));
+    }
+    
+    /**
+     * Wait for element to be clickable
+     * @param element WebElement
+     * @return WebElement when clickable
+     */
+    public static WebElement waitForClickability(WebElement element) {
+        Log.debug("Waiting for element clickability");
+        return getWait().until(ExpectedConditions.elementToBeClickable(element));
+    }
+    
+    /**
+     * Wait for element to be invisible
+     * @param locator Element locator
+     * @return true when invisible
+     */
+    public static boolean waitForInvisibility(By locator) {
+        Log.debug("Waiting for element invisibility: " + locator);
+        return getWait().until(ExpectedConditions.invisibilityOfElementLocated(locator));
+    }
+    
+    /**
+     * Wait for element to contain specific text
+     * @param locator Element locator
+     * @param text Expected text
+     * @return true when text is present
+     */
+    public static boolean waitForTextToBePresent(By locator, String text) {
+        Log.debug("Waiting for text '" + text + "' in element: " + locator);
+        return getWait().until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+    }
+    
+    /**
+     * Wait for element's value attribute to contain text
+     * @param locator Element locator
+     * @param text Expected text in value
+     * @return true when text is present in value
+     */
+    public static boolean waitForTextInValue(By locator, String text) {
+        Log.debug("Waiting for text '" + text + "' in element value: " + locator);
+        return getWait().until(ExpectedConditions.textToBePresentInElementValue(locator, text));
+    }
+    
+    /**
+     * Wait for specific number of elements to be present
+     * @param locator Element locator
+     * @param count Expected number of elements
+     * @return List of WebElements when count matches
+     */
+    public static List<WebElement> waitForNumberOfElements(By locator, int count) {
+        Log.debug("Waiting for " + count + " elements: " + locator);
+        return getWait().until(ExpectedConditions.numberOfElementsToBe(locator, count));
+    }
+    
+    /**
+     * Wait for at least specified number of elements to be present
+     * @param locator Element locator
+     * @param minCount Minimum expected number of elements
+     * @return List of WebElements when minimum count is reached
+     */
+    public static List<WebElement> waitForMinimumNumberOfElements(By locator, int minCount) {
+        Log.debug("Waiting for at least " + minCount + " elements: " + locator);
+        return getWait().until(ExpectedConditions.numberOfElementsToBeMoreThan(locator, minCount - 1));
+    }
+    
+    /**
+     * Wait for page title to be exact match
+     * @param title Expected title
+     * @return true when title matches
+     */
+    public static boolean waitForTitle(String title) {
+        Log.debug("Waiting for page title: " + title);
+        return getWait().until(ExpectedConditions.titleIs(title));
+    }
+    
+    /**
+     * Wait for page title to contain text
+     * @param titlePart Expected title part
+     * @return true when title contains text
+     */
+    public static boolean waitForTitleContains(String titlePart) {
+        Log.debug("Waiting for page title to contain: " + titlePart);
+        return getWait().until(ExpectedConditions.titleContains(titlePart));
+    }
+    
+    /**
+     * Wait for URL to be exact match
+     * @param url Expected URL
+     * @return true when URL matches
+     */
+    public static boolean waitForUrl(String url) {
+        Log.debug("Waiting for URL: " + url);
+        return getWait().until(ExpectedConditions.urlToBe(url));
+    }
+    
+    /**
+     * Wait for URL to contain text
+     * @param urlPart Expected URL part
+     * @return true when URL contains text
+     */
+    public static boolean waitForUrlContains(String urlPart) {
+        Log.debug("Waiting for URL to contain: " + urlPart);
+        return getWait().until(ExpectedConditions.urlContains(urlPart));
+    }
+    
+    /**
+     * Wait for alert to be present
+     * @return Alert when present
+     */
+    public static org.openqa.selenium.Alert waitForAlert() {
+        Log.debug("Waiting for alert to be present");
+        return getWait().until(ExpectedConditions.alertIsPresent());
+    }
+    
+    /**
+     * Hard wait - use sparingly and only when necessary
+     * @param milliseconds Time to wait in milliseconds
+     */
+    public static void hardWait(long milliseconds) {
+        try {
+            Log.debug("Hard wait for " + milliseconds + " milliseconds");
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Log.error("Hard wait interrupted", e);
+        }
+    }
+    
+    /**
+     * Check if element is present without waiting
+     * @param locator Element locator
+     * @return true if element is present
+     */
+    public static boolean isElementPresent(By locator) {
+        try {
+            DriverManager.getDriver().findElement(locator);
+            return true;
+        } catch (org.openqa.selenium.NoSuchElementException e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Check if element is visible without waiting
+     * @param locator Element locator
+     * @return true if element is visible
+     */
+    public static boolean isElementVisible(By locator) {
+        try {
+            WebElement element = DriverManager.getDriver().findElement(locator);
+            return element.isDisplayed();
+        } catch (org.openqa.selenium.NoSuchElementException e) {
+            return false;
+        }
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/WaitUtils.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import com.example.core.DriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
+
+import java.util.List;
+import java.util.Set;
+
+/**
+ * Reusable web interaction methods with built-in waits.
+ * Provides high-level actions that combine waiting and interaction.
+ */
+public class WebActions {
+    
+    /**
+     * Click element after waiting for it to be clickable
+     * @param locator Element locator
+     */
+    public static void click(By locator) {
+        Log.step("Clicking element: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator);
+        element.click();
+        Log.debug("Element clicked successfully");
+    }
+    
+    /**
+     * Click element with custom timeout
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     */
+    public static void click(By locator, int timeoutInSeconds) {
+        Log.step("Clicking element: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator, timeoutInSeconds);
+        element.click();
+        Log.debug("Element clicked successfully");
+    }
+    
+    /**
+     * Click element using JavaScript
+     * @param locator Element locator
+     */
+    public static void clickWithJS(By locator) {
+        Log.step("Clicking element with JavaScript: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("arguments[0].click();", element);
+        Log.debug("Element clicked with JavaScript successfully");
+    }
+    
+    /**
+     * Type text after clearing the field
+     * @param locator Element locator
+     * @param text Text to type
+     */
+    public static void type(By locator, String text) {
+        Log.step("Typing '" + text + "' into element: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        element.clear();
+        element.sendKeys(text);
+        Log.debug("Text typed successfully");
+    }
+    
+    /**
+     * Type text without clearing the field
+     * @param locator Element locator
+     * @param text Text to type
+     */
+    public static void appendText(By locator, String text) {
+        Log.step("Appending '" + text + "' to element: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        element.sendKeys(text);
+        Log.debug("Text appended successfully");
+    }
+    
+    /**
+     * Get text from element
+     * @param locator Element locator
+     * @return Element text
+     */
+    public static String getText(By locator) {
+        Log.step("Getting text from element: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        String text = element.getText();
+        Log.debug("Retrieved text: '" + text + "'");
+        return text;
+    }
+    
+    /**
+     * Get attribute value from element
+     * @param locator Element locator
+     * @param attributeName Attribute name
+     * @return Attribute value
+     */
+    public static String getAttribute(By locator, String attributeName) {
+        Log.step("Getting '" + attributeName + "' attribute from element: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        String attributeValue = element.getAttribute(attributeName);
+        Log.debug("Retrieved attribute value: '" + attributeValue + "'");
+        return attributeValue;
+    }
+    
+    /**
+     * Select dropdown option by visible text
+     * @param locator Dropdown locator
+     * @param optionText Option text to select
+     */
+    public static void selectByText(By locator, String optionText) {
+        Log.step("Selecting option '" + optionText + "' from dropdown: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Select select = new Select(element);
+        select.selectByVisibleText(optionText);
+        Log.debug("Option selected successfully");
+    }
+    
+    /**
+     * Select dropdown option by value
+     * @param locator Dropdown locator
+     * @param value Option value to select
+     */
+    public static void selectByValue(By locator, String value) {
+        Log.step("Selecting option with value '" + value + "' from dropdown: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Select select = new Select(element);
+        select.selectByValue(value);
+        Log.debug("Option selected successfully");
+    }
+    
+    /**
+     * Select dropdown option by index
+     * @param locator Dropdown locator
+     * @param index Option index to select
+     */
+    public static void selectByIndex(By locator, int index) {
+        Log.step("Selecting option at index " + index + " from dropdown: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Select select = new Select(element);
+        select.selectByIndex(index);
+        Log.debug("Option selected successfully");
+    }
+    
+    /**
+     * Get selected option text from dropdown
+     * @param locator Dropdown locator
+     * @return Selected option text
+     */
+    public static String getSelectedOptionText(By locator) {
+        Log.step("Getting selected option text from dropdown: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Select select = new Select(element);
+        String selectedText = select.getFirstSelectedOption().getText();
+        Log.debug("Selected option text: '" + selectedText + "'");
+        return selectedText;
+    }
+    
+    /**
+     * Hover over element
+     * @param locator Element locator
+     */
+    public static void hover(By locator) {
+        Log.step("Hovering over element: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        Actions actions = new Actions(DriverManager.getDriver());
+        actions.moveToElement(element).perform();
+        Log.debug("Hover action performed successfully");
+    }
+    
+    /**
+     * Double click element
+     * @param locator Element locator
+     */
+    public static void doubleClick(By locator) {
+        Log.step("Double clicking element: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator);
+        Actions actions = new Actions(DriverManager.getDriver());
+        actions.doubleClick(element).perform();
+        Log.debug("Double click performed successfully");
+    }
+    
+    /**
+     * Right click element
+     * @param locator Element locator
+     */
+    public static void rightClick(By locator) {
+        Log.step("Right clicking element: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator);
+        Actions actions = new Actions(DriverManager.getDriver());
+        actions.contextClick(element).perform();
+        Log.debug("Right click performed successfully");
+    }
+    
+    /**
+     * Drag and drop from source to target
+     * @param sourceLocator Source element locator
+     * @param targetLocator Target element locator
+     */
+    public static void dragAndDrop(By sourceLocator, By targetLocator) {
+        Log.step("Dragging from " + sourceLocator + " to " + targetLocator);
+        WebElement source = WaitUtils.waitForVisibility(sourceLocator);
+        WebElement target = WaitUtils.waitForVisibility(targetLocator);
+        Actions actions = new Actions(DriverManager.getDriver());
+        actions.dragAndDrop(source, target).perform();
+        Log.debug("Drag and drop performed successfully");
+    }
+    
+    /**
+     * Scroll to element
+     * @param locator Element locator
+     */
+    public static void scrollToElement(By locator) {
+        Log.step("Scrolling to element: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("arguments[0].scrollIntoView(true);", element);
+        Log.debug("Scrolled to element successfully");
+    }
+    
+    /**
+     * Scroll page by pixels
+     * @param x Horizontal pixels
+     * @param y Vertical pixels
+     */
+    public static void scrollBy(int x, int y) {
+        Log.step("Scrolling page by x:" + x + ", y:" + y);
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("window.scrollBy(" + x + "," + y + ");");
+        Log.debug("Page scrolled successfully");
+    }
+    
+    /**
+     * Scroll to top of page
+     */
+    public static void scrollToTop() {
+        Log.step("Scrolling to top of page");
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("window.scrollTo(0, 0);");
+        Log.debug("Scrolled to top successfully");
+    }
+    
+    /**
+     * Scroll to bottom of page
+     */
+    public static void scrollToBottom() {
+        Log.step("Scrolling to bottom of page");
+        JavascriptExecutor js = (JavascriptExecutor) DriverManager.getDriver();
+        js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+        Log.debug("Scrolled to bottom successfully");
+    }
+    
+    /**
+     * Check if element is displayed
+     * @param locator Element locator
+     * @return true if element is displayed
+     */
+    public static boolean isDisplayed(By locator) {
+        Log.debug("Checking if element is displayed: " + locator);
+        try {
+            return WaitUtils.waitForVisibility(locator, 5).isDisplayed();
+        } catch (Exception e) {
+            Log.debug("Element is not displayed: " + locator);
+            return false;
+        }
+    }
+    
+    /**
+     * Check if element is enabled
+     * @param locator Element locator
+     * @return true if element is enabled
+     */
+    public static boolean isEnabled(By locator) {
+        Log.debug("Checking if element is enabled: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        return element.isEnabled();
+    }
+    
+    /**
+     * Check if checkbox/radio button is selected
+     * @param locator Element locator
+     * @return true if element is selected
+     */
+    public static boolean isSelected(By locator) {
+        Log.debug("Checking if element is selected: " + locator);
+        WebElement element = WaitUtils.waitForPresence(locator);
+        return element.isSelected();
+    }
+    
+    /**
+     * Get count of elements matching locator
+     * @param locator Element locator
+     * @return Number of elements found
+     */
+    public static int getElementCount(By locator) {
+        Log.debug("Getting element count for: " + locator);
+        List<WebElement> elements = DriverManager.getDriver().findElements(locator);
+        int count = elements.size();
+        Log.debug("Found " + count + " elements");
+        return count;
+    }
+    
+    /**
+     * Switch to window by title
+     * @param windowTitle Window title
+     */
+    public static void switchToWindowByTitle(String windowTitle) {
+        Log.step("Switching to window with title: " + windowTitle);
+        WebDriver driver = DriverManager.getDriver();
+        Set<String> windowHandles = driver.getWindowHandles();
+        
+        for (String handle : windowHandles) {
+            driver.switchTo().window(handle);
+            if (driver.getTitle().equals(windowTitle)) {
+                Log.debug("Switched to window successfully");
+                return;
+            }
+        }
+        
+        Log.error("Window with title '" + windowTitle + "' not found");
+        throw new RuntimeException("Window not found: " + windowTitle);
+    }
+    
+    /**
+     * Close current window and switch to main window
+     */
+    public static void closeCurrentWindowAndSwitchToMain() {
+        Log.step("Closing current window and switching to main window");
+        WebDriver driver = DriverManager.getDriver();
+        Set<String> windowHandles = driver.getWindowHandles();
+        String mainWindow = windowHandles.iterator().next();
+        
+        driver.close();
+        driver.switchTo().window(mainWindow);
+        Log.debug("Window closed and switched to main window successfully");
+    }
+    
+    /**
+     * Accept alert
+     */
+    public static void acceptAlert() {
+        Log.step("Accepting alert");
+        WaitUtils.waitForAlert().accept();
+        Log.debug("Alert accepted successfully");
+    }
+    
+    /**
+     * Dismiss alert
+     */
+    public static void dismissAlert() {
+        Log.step("Dismissing alert");
+        WaitUtils.waitForAlert().dismiss();
+        Log.debug("Alert dismissed successfully");
+    }
+    
+    /**
+     * Get alert text
+     * @return Alert text
+     */
+    public static String getAlertText() {
+        Log.step("Getting alert text");
+        String alertText = WaitUtils.waitForAlert().getText();
+        Log.debug("Alert text: '" + alertText + "'");
+        return alertText;
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/WebActions.java",
+  },
+  {
+    "content": "# ============================================
+# CONFIGURATION FILE - UPDATE THESE VALUES
+# ============================================
+# This file contains your application settings.
+# Replace the placeholder values below with your actual test environment details.
+
+# Your application's base URL (no trailing slash)
+base.url=https://your-app-url.com
+
+# Browser settings
+browser=chrome
+headless=false
+
+# Timeouts (seconds)
+implicit.wait=10
+explicit.wait=20
+page.load.timeout=30
+
+# Test credentials - UPDATE THESE
+default.username=your-test-user@email.com
+default.password=YourTestPassword123
+
+# Reporting
+
+# Environment
+environment=dev
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/config/dev.properties",
+  },
+  {
+    "content": "# Production Environment Configuration
+# Base URL for the application under test
+base.url=https://prod.example.com
+
+# Browser Configuration
+browser=chrome
+headless=true
+
+# Selenium Grid Configuration (for remote execution)
+remote.execution=true
+grid.url=http://prod-selenium-grid:4444/wd/hub
+
+# Timeout Configuration (in seconds)
+implicit.wait=20
+explicit.wait=45
+page.load.timeout=60
+
+# Retry Configuration
+retry.count=3
+
+# Screenshot Configuration
+capture.screenshots.on.failure=true
+capture.screenshots.on.pass=false
+
+# Test Data Configuration
+test.data.path=src/test/resources/testdata/
+
+# Logging Configuration
+log.level=WARN
+enable.console.logging=false
+enable.file.logging=true
+
+# ExtentReports Configuration
+extent.report.path=reports/ExtentReport_PROD.html
+extent.report.title=demo-java-selenium - Production Test Results
+extent.report.name=Production Environment Test Execution Report
+
+# Database Configuration (if needed)
+# db.url=jdbc:mysql://prod-db:3306/proddb
+# db.username=produser
+# db.password=\${DB_PASSWORD}
+
+# API Configuration (if needed)
+# api.base.url=https://api.example.com
+# api.timeout=60
+# api.version=v1
+
+# Environment Specific Settings
+environment=prod
+test.environment=production
+debug.mode=false
+enable.performance.tracking=true
+
+# Application Specific Configuration
+default.username=prod_admin
+default.password=\${PROD_PASSWORD}
+app.version=1.0.0
+
+# Parallel Execution Configuration
+parallel.execution=true
+thread.count=5
+parallel.mode=classes
+
+# Video Recording (if supported)
+enable.video.recording=true
+video.folder=reports/videos/
+
+# Custom Properties
+custom.wait.polling=2000
+custom.retry.interval=5000
+enable.soft.assertions=false
+highlight.elements=false
+take.screenshot.on.element.interaction=false
+
+# CI/CD Specific Settings
+ci.mode=true
+jenkins.build.number=\${BUILD_NUMBER}
+git.branch=\${GIT_BRANCH}
+test.suite.timeout=7200
+
+# Production Safety Settings
+production.safety.checks=true
+max.test.duration=300
+enable.cleanup.after.tests=true
+sensitive.data.masking=true",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/config/prod.properties",
+  },
+  {
+    "content": "# QA Environment Configuration
+# Base URL for the application under test
+base.url=https://qa.example.com
+
+# Browser Configuration
+browser=chrome
+headless=true
+
+# Selenium Grid Configuration (for remote execution)
+remote.execution=true
+grid.url=http://qa-selenium-grid:4444/wd/hub
+
+# Timeout Configuration (in seconds)
+implicit.wait=15
+explicit.wait=30
+page.load.timeout=45
+
+# Retry Configuration
+retry.count=2
+
+# Screenshot Configuration
+capture.screenshots.on.failure=true
+capture.screenshots.on.pass=false
+
+# Test Data Configuration
+test.data.path=src/test/resources/testdata/
+
+# Logging Configuration
+log.level=INFO
+enable.console.logging=true
+enable.file.logging=true
+
+# ExtentReports Configuration
+extent.report.path=reports/ExtentReport_QA.html
+extent.report.title=demo-java-selenium - QA Test Results
+extent.report.name=QA Environment Test Execution Report
+
+# Database Configuration (if needed)
+# db.url=jdbc:mysql://qa-db:3306/qadb
+# db.username=qauser
+# db.password=qapass
+
+# API Configuration (if needed)
+# api.base.url=https://qa-api.example.com
+# api.timeout=45
+# api.version=v1
+
+# Environment Specific Settings
+environment=qa
+test.environment=quality_assurance
+debug.mode=false
+enable.performance.tracking=true
+
+# Application Specific Configuration
+default.username=qa_admin
+default.password=qa_password123
+app.version=1.0.0
+
+# Parallel Execution Configuration
+parallel.execution=true
+thread.count=3
+parallel.mode=methods
+
+# Video Recording (if supported)
+enable.video.recording=false
+video.folder=reports/videos/
+
+# Custom Properties
+custom.wait.polling=1000
+custom.retry.interval=2000
+enable.soft.assertions=true
+highlight.elements=false
+take.screenshot.on.element.interaction=false
+
+# CI/CD Specific Settings
+ci.mode=true
+jenkins.build.number=\${BUILD_NUMBER}
+git.branch=\${GIT_BRANCH}
+test.suite.timeout=3600",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/config/qa.properties",
+  },
+  {
+    "content": "<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="LOG_PATTERN_WITH_THREAD">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level [%c{1}] - %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="\${LOG_PATTERN}"/>
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+
+        <!-- File Appender - All Logs -->
+        <RollingFile name="FileAppender" fileName="logs/automation.log"
+                     filePattern="logs/automation-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="\${LOG_PATTERN_WITH_THREAD}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+
+        <!-- File Appender - Error Logs Only -->
+        <RollingFile name="ErrorFileAppender" fileName="logs/errors.log"
+                     filePattern="logs/errors-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="\${LOG_PATTERN_WITH_THREAD}"/>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="5MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+
+        <!-- File Appender - Test Execution Logs -->
+        <RollingFile name="TestExecutionAppender" fileName="logs/test-execution.log"
+                     filePattern="logs/test-execution-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="15"/>
+        </RollingFile>
+
+        <!-- File Appender - Debug Logs (Only in Development) -->
+        <RollingFile name="DebugFileAppender" fileName="logs/debug.log"
+                     filePattern="logs/debug-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout pattern="\${LOG_PATTERN_WITH_THREAD}"/>
+            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="50MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Selenium WebDriver Logging -->
+        <Logger name="org.openqa.selenium" level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+
+        <!-- TestNG Logging -->
+        <Logger name="org.testng" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+        </Logger>
+
+        <!-- ExtentReports Logging -->
+        <Logger name="com.aventstack.extentreports" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Selenium Logging -->
+        <Logger name="org.openqa.selenium" level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Apache HTTP Client (for API calls) -->
+        <Logger name="org.apache.http" level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Project Specific Loggers -->
+        <Logger name="com.example.core" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <Logger name="com.example.pages" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="DebugFileAppender"/>
+        </Logger>
+
+        <Logger name="com.example.tests" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <Logger name="com.example.utils" level="DEBUG" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="DebugFileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <Logger name="com.example.listeners" level="INFO" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestExecutionAppender"/>
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Logger>
+
+        <!-- Root Logger -->
+        <Root level="INFO">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="ErrorFileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/log4j2.xml",
+  },
+  {
+    "content": "# ============================================================
+#                    QUICK SETUP GUIDE
+# ============================================================
+# 
+# STEP 1: Update the values below with your website details
+# STEP 2: Run: mvn clean test
+# STEP 3: View reports in target/reports/ folder
+#
+# ============================================================
+
+# ========== CHANGE THESE VALUES ==========
+
+# Your website URL (e.g., https://mywebsite.com)
+BASE_URL=YOUR_WEBSITE_URL_HERE
+
+# Login credentials for testing
+TEST_USERNAME=YOUR_USERNAME_HERE
+TEST_PASSWORD=YOUR_PASSWORD_HERE
+
+# ==========================================
+
+# Browser settings (chrome, firefox, edge)
+BROWSER=chrome
+
+# Run tests without opening browser window (true/false)
+HEADLESS=false
+
+# Environment (dev, qa, prod)
+ENVIRONMENT=dev
+
+# Wait timeout in seconds
+TIMEOUT=10
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/setup.properties",
+  },
+  {
+    "content": "package com.example.tests;
+
+import com.example.config.ConfigurationReader;
+import com.example.core.BaseTest;
+import com.example.pages.HomePage;
+import com.example.pages.LoginPage;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+/**
+ * Login Test Suite
+ * 
+ * BEFORE RUNNING:
+ * 1. Update credentials in: src/main/resources/config/dev.properties
+ * 2. Update selectors in: src/main/java/.../pages/LoginPage.java
+ * 3. Run: mvn clean test
+ */
+public class LoginTests extends BaseTest {
+    
+    @Test(groups = {"smoke", "login"}, 
+          description = "Verify successful login with valid credentials")
+    public void testValidLogin() {
+        // Get credentials from config file (dev.properties)
+        String username = ConfigurationReader.getProperty("default.username");
+        String password = ConfigurationReader.getProperty("default.password");
+        
+        // Step 1: Navigate to login page
+        LoginPage loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.isLoaded(), "Login page should be loaded");
+        
+        // Step 2: Enter credentials and login
+        HomePage homePage = loginPage.login(username, password, HomePage.class);
+        
+        // Step 3: Verify successful login
+        Assert.assertTrue(homePage.isLoaded(), 
+            "Login failed. Check credentials in dev.properties and selectors in LoginPage.java");
+    }
+    
+    @Test(groups = {"smoke", "login"},
+          description = "Verify login page elements are visible")
+    public void testLoginPageElements() {
+        LoginPage loginPage = new LoginPage();
+        Assert.assertTrue(loginPage.validatePageElements(), "All login page elements should be present");
+    }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/java/com/example/tests/LoginTests.java",
+  },
+  {
+    "content": "package com.example.tests;
+
+import com.example.core.BaseTest;
+import com.example.pages.HomePage;
+import com.example.pages.LoginPage;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+/**
+ * Smoke test suite containing critical path tests.
+ * These tests verify basic application functionality.
+ */
+public class SmokeSuite extends BaseTest {
+    
+    @Test(groups = {"smoke", "critical"}, 
+          priority = 1,
+          description = "Verify application loads and login page is accessible")
+    public void testApplicationLoads() {
+        // Navigate to base URL (done in BaseTest setUp)
+        LoginPage loginPage = new LoginPage();
+        
+        // Verify login page loads
+        Assert.assertTrue(loginPage.isLoaded(), 
+                         "Login page should load successfully");
+        
+        // Verify page title
+        String pageTitle = loginPage.getPageTitle();
+        Assert.assertNotNull(pageTitle, "Page title should not be null");
+        Assert.assertFalse(pageTitle.isEmpty(), "Page title should not be empty");
+        
+        // Verify essential elements
+        Assert.assertTrue(loginPage.validatePageElements(), 
+                         "All essential login page elements should be present");
+    }
+    
+    @Test(groups = {"smoke", "critical"}, 
+          priority = 2,
+          dependsOnMethods = {"testApplicationLoads"},
+          description = "Verify user can login with valid credentials")
+    public void testUserCanLogin() {
+        LoginPage loginPage = new LoginPage();
+        
+        // Perform login with default credentials
+        HomePage homePage = loginPage.login("admin", "password123", HomePage.class);
+        
+        // Verify successful login
+        Assert.assertTrue(homePage.isLoaded(), 
+                         "Home page should load after successful login");
+        
+        // Verify user is logged in
+        Assert.assertTrue(homePage.isUserLoggedIn("admin"), 
+                         "User should be successfully logged in");
+        
+        // Verify welcome message
+        String welcomeMessage = homePage.getWelcomeMessage();
+        Assert.assertNotNull(welcomeMessage, "Welcome message should not be null");
+        Assert.assertFalse(welcomeMessage.isEmpty(), "Welcome message should not be empty");
+    }
+    
+    @Test(groups = {"smoke", "critical"}, 
+          priority = 3,
+          dependsOnMethods = {"testUserCanLogin"},
+          description = "Verify home page functionality and navigation")
+    public void testHomePageFunctionality() {
+        LoginPage loginPage = new LoginPage();
+        HomePage homePage = loginPage.login("admin", "password123", HomePage.class);
+        
+        // Verify page loaded completely
+        Assert.assertTrue(homePage.waitForPageLoad(), 
+                         "Home page should load completely");
+        
+        // Verify essential page elements
+        Assert.assertTrue(homePage.validatePageElements(), 
+                         "All essential home page elements should be present");
+        
+        // Verify sidebar is visible
+        Assert.assertTrue(homePage.isSidebarVisible(), 
+                         "Sidebar should be visible");
+        
+        // Verify footer is present
+        Assert.assertTrue(homePage.isFooterDisplayed(), 
+                         "Footer should be displayed");
+        
+        // Verify navigation menu items exist
+        java.util.List<String> menuItems = homePage.getNavigationMenuItems();
+        Assert.assertFalse(menuItems.isEmpty(), 
+                          "Navigation menu should have items");
+    }
+    
+    @Test(groups = {"smoke", "critical"}, 
+          priority = 4,
+          dependsOnMethods = {"testHomePageFunctionality"},
+          description = "Verify user can logout successfully")
+    public void testUserCanLogout() {
+        LoginPage loginPage = new LoginPage();
+        HomePage homePage = loginPage.login("admin", "password123", HomePage.class);
+        
+        // Verify user is logged in first
+        Assert.assertTrue(homePage.isUserLoggedIn("admin"), 
+                         "User should be logged in before logout test");
+        
+        // Perform logout
+        LoginPage logoutPage = homePage.logout();
+        
+        // Verify logout successful
+        Assert.assertTrue(logoutPage.isLoaded(), 
+                         "Should return to login page after logout");
+        
+        // Verify user is logged out by checking page state
+        String currentUrl = logoutPage.getCurrentUrl();
+        Assert.assertTrue(currentUrl.toLowerCase().contains("login") || 
+                         currentUrl.toLowerCase().contains("signin"),
+                         "URL should indicate login page after logout");
+    }
+    
+    @Test(groups = {"smoke", "negative"}, 
+          priority = 5,
+          description = "Verify login fails with invalid credentials")
+    public void testInvalidLoginBlocked() {
+        LoginPage loginPage = new LoginPage();
+        
+        // Attempt login with invalid credentials
+        LoginPage resultPage = loginPage.login("invaliduser", "wrongpassword", LoginPage.class);
+        
+        // Verify login was blocked
+        Assert.assertTrue(resultPage.isLoaded(), 
+                         "Should remain on login page with invalid credentials");
+        
+        // Verify error handling
+        boolean hasErrorFeedback = resultPage.isErrorMessageDisplayed() || 
+                                  !resultPage.isLoginButtonEnabled();
+        Assert.assertTrue(hasErrorFeedback, 
+                         "Should show error feedback for invalid credentials");
+    }
+    
+    @Test(groups = {"smoke", "ui"}, 
+          priority = 6,
+          description = "Verify critical UI elements and responsiveness")
+    public void testCriticalUIElements() {
+        LoginPage loginPage = new LoginPage();
+        
+        // Test login page UI
+        Assert.assertTrue(loginPage.validatePageElements(), 
+                         "Login page UI elements should be valid");
+        
+        // Test form interactions
+        loginPage.enterUsername("testuser");
+        Assert.assertEquals(loginPage.getUsernameValue(), "testuser", 
+                           "Username field should accept input");
+        
+        // Test field clearing
+        loginPage.clearUsername();
+        Assert.assertEquals(loginPage.getUsernameValue(), "", 
+                           "Username field should clear properly");
+        
+        // Test remember me checkbox
+        loginPage.setRememberMe(true);
+        Assert.assertTrue(loginPage.isRememberMeChecked(), 
+                         "Remember me checkbox should work");
+    }
+    
+    @Test(groups = {"smoke", "performance"}, 
+          priority = 7,
+          description = "Verify application loads within acceptable time")
+    public void testApplicationPerformance() {
+        long startTime = System.currentTimeMillis();
+        
+        LoginPage loginPage = new LoginPage();
+        
+        // Verify page loads within 10 seconds
+        Assert.assertTrue(loginPage.isLoaded(), 
+                         "Login page should load");
+        
+        long loadTime = System.currentTimeMillis() - startTime;
+        Assert.assertTrue(loadTime < 10000, 
+                         "Login page should load within 10 seconds. Actual: " + loadTime + "ms");
+        
+        // Test login performance
+        startTime = System.currentTimeMillis();
+        HomePage homePage = loginPage.login("admin", "password123", HomePage.class);
+        long loginTime = System.currentTimeMillis() - startTime;
+        
+        Assert.assertTrue(homePage.isLoaded(), 
+                         "Login should be successful");
+        Assert.assertTrue(loginTime < 15000, 
+                         "Login should complete within 15 seconds. Actual: " + loginTime + "ms");
+    }
+    
+    @Test(groups = {"smoke", "accessibility"}, 
+          priority = 8,
+          description = "Basic accessibility and usability checks")
+    public void testBasicAccessibility() {
+        LoginPage loginPage = new LoginPage();
+        
+        // Verify page has proper title for screen readers
+        String pageTitle = loginPage.getPageTitle();
+        Assert.assertNotNull(pageTitle, "Page should have a title");
+        Assert.assertTrue(pageTitle.trim().length() > 0, 
+                         "Page title should not be empty");
+        
+        // Verify login button is enabled by default
+        Assert.assertTrue(loginPage.isLoginButtonEnabled(), 
+                         "Login button should be enabled");
+        
+        // Test keyboard navigation (basic check)
+        loginPage.enterUsername("admin");
+        loginPage.enterPassword("password123");
+        
+        // Verify form accepts input
+        Assert.assertEquals(loginPage.getUsernameValue(), "admin", 
+                           "Form should accept keyboard input");
+    }
+    
+    @Test(groups = {"smoke", "data"}, 
+          priority = 9,
+          description = "Verify application handles data correctly")
+    public void testDataHandling() {
+        LoginPage loginPage = new LoginPage();
+        HomePage homePage = loginPage.login("admin", "password123", HomePage.class);
+        
+        // Verify user data is displayed
+        String welcomeMessage = homePage.getWelcomeMessage();
+        Assert.assertTrue(welcomeMessage.contains("admin") || welcomeMessage.contains("Admin"), 
+                         "Welcome message should contain user information");
+        
+        // Test search functionality if available
+        try {
+            homePage.performSearch("test search");
+            // If search doesn't throw an exception, it's working
+            Assert.assertTrue(true, "Search functionality is available");
+        } catch (Exception e) {
+            // Search might not be available in basic implementation
+            Assert.assertTrue(true, "Search functionality may not be implemented yet");
+        }
+        
+        // Verify navigation menu data
+        java.util.List<String> menuItems = homePage.getNavigationMenuItems();
+        for (String item : menuItems) {
+            Assert.assertNotNull(item, "Menu item should not be null");
+            Assert.assertFalse(item.trim().isEmpty(), "Menu item should not be empty");
+        }
+    }
+    
+    @Test(groups = {"smoke", "security"}, 
+          priority = 10,
+          description = "Basic security checks")
+    public void testBasicSecurity() {
+        LoginPage loginPage = new LoginPage();
+        
+        // Verify empty credentials are handled
+        LoginPage emptyCredsResult = loginPage.login("", "", LoginPage.class);
+        Assert.assertTrue(emptyCredsResult.isLoaded(), 
+                         "Should stay on login page with empty credentials");
+        
+        // Verify special characters in credentials are handled
+        LoginPage specialCharsResult = loginPage.login("admin'; DROP TABLE users; --", 
+                                                      "' OR '1'='1", LoginPage.class);
+        Assert.assertTrue(specialCharsResult.isLoaded(), 
+                         "Should handle special characters safely");
+        
+        // Clear fields for next test
+        specialCharsResult.clearAllFields();
+        
+        // Verify very long input is handled
+        String longInput = "a".repeat(1000);
+        specialCharsResult.enterUsername(longInput);
+        String enteredValue = specialCharsResult.getUsernameValue();
+        
+        // Should either truncate or handle gracefully
+        Assert.assertTrue(enteredValue.length() <= longInput.length(), 
+                         "Should handle long input gracefully");
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/java/com/example/tests/SmokeSuite.java",
+  },
+  {
+    "content": "{
+  "testEnvironments": [
+    {
+      "name": "dev",
+      "baseUrl": "https://dev.example.com",
+      "apiUrl": "https://dev-api.example.com",
+      "database": {
+        "host": "dev-db.example.com",
+        "port": 3306,
+        "name": "dev_testdb"
+      }
+    },
+    {
+      "name": "qa",
+      "baseUrl": "https://qa.example.com",
+      "apiUrl": "https://qa-api.example.com",
+      "database": {
+        "host": "qa-db.example.com",
+        "port": 3306,
+        "name": "qa_testdb"
+      }
+    },
+    {
+      "name": "staging",
+      "baseUrl": "https://staging.example.com",
+      "apiUrl": "https://staging-api.example.com",
+      "database": {
+        "host": "staging-db.example.com",
+        "port": 3306,
+        "name": "staging_testdb"
+      }
+    }
+  ],
+  
+  "testUsers": [
+    {
+      "role": "admin",
+      "username": "admin",
+      "password": "password123",
+      "email": "admin@example.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "permissions": ["read", "write", "delete", "admin"]
+    },
+    {
+      "role": "user",
+      "username": "testuser",
+      "password": "testpass123",
+      "email": "testuser@example.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "permissions": ["read", "write"]
+    },
+    {
+      "role": "readonly",
+      "username": "readonly",
+      "password": "readonly123",
+      "email": "readonly@example.com",
+      "firstName": "Read",
+      "lastName": "Only",
+      "permissions": ["read"]
+    }
+  ],
+  
+  "testData": {
+    "validCredentials": [
+      {"username": "admin", "password": "password123"},
+      {"username": "testuser", "password": "testpass123"},
+      {"username": "manager", "password": "manager123"}
+    ],
+    
+    "invalidCredentials": [
+      {"username": "invalid", "password": "wrongpass"},
+      {"username": "admin", "password": "wrongpassword"},
+      {"username": "", "password": "password123"},
+      {"username": "admin", "password": ""}
+    ],
+    
+    "searchTerms": [
+      "automation",
+      "testing",
+      "selenium",
+      "framework",
+      "invalid_search_term_12345"
+    ],
+    
+    "navigationMenus": [
+      "Home",
+      "Dashboard",
+      "Profile",
+      "Settings",
+      "Reports",
+      "Help"
+    ]
+  },
+  
+  "browserConfigurations": [
+    {
+      "browser": "chrome",
+      "version": "latest",
+      "platform": "Windows 10",
+      "headless": false
+    },
+    {
+      "browser": "firefox",
+      "version": "latest",
+      "platform": "Windows 10",
+      "headless": false
+    },
+    {
+      "browser": "chrome",
+      "version": "latest",
+      "platform": "macOS",
+      "headless": true
+    }
+  ],
+  
+  "timeouts": {
+    "implicit": 10,
+    "explicit": 20,
+    "pageLoad": 30,
+    "script": 30
+  },
+  
+  "retryConfiguration": {
+    "maxRetries": 2,
+    "retryInterval": 1000
+  },
+  
+  "reportConfiguration": {
+    "screenshotOnFailure": true,
+    "screenshotOnPass": false,
+    "videoRecording": false,
+    "logLevel": "INFO"
+  },
+  
+  "testSuites": [
+    {
+      "name": "smoke",
+      "description": "Critical path smoke tests",
+      "tests": [
+        "testApplicationLoads",
+        "testUserCanLogin",
+        "testUserCanLogout",
+        "testCriticalUIElements"
+      ]
+    },
+    {
+      "name": "regression",
+      "description": "Full regression test suite",
+      "tests": [
+        "testValidLogin",
+        "testInvalidLogin",
+        "testLoginPageValidation",
+        "testNegativeLoginScenarios"
+      ]
+    },
+    {
+      "name": "performance",
+      "description": "Performance and load tests",
+      "tests": [
+        "testApplicationPerformance",
+        "testPageLoadTimes"
+      ]
+    }
+  ],
+  
+  "applicationMetadata": {
+    "name": "demo-java-selenium",
+    "version": "1.0.0",
+    "environment": "test",
+    "buildDate": "2024-01-01",
+    "testFramework": "Selenium + TestNG + Maven"
+  }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/resources/testdata/sample.json",
+  },
+  {
+    "content": "username,password,expectedResult,description
+admin,password123,success,Valid admin user
+testuser,testpass123,success,Valid test user
+qa_user,qa_password,success,Valid QA user
+manager,manager123,success,Valid manager user
+developer,dev_password,success,Valid developer user
+invaliduser,wrongpass,failure,Invalid username
+admin,wrongpassword,failure,Valid user with invalid password
+,password123,failure,Empty username
+admin,,failure,Empty password
+,,failure,Both fields empty
+user_with_spaces, password123 ,failure,Username with spaces
+admin,PASSWORD123,failure,Case sensitive password
+ADMIN,password123,failure,Case sensitive username
+admin123,password123,failure,Non-existent user
+test@user,password123,failure,Special characters in username
+admin,pass,failure,Password too short
+locked_user,password123,failure,Account locked/disabled
+expired_user,password123,failure,Expired account
+temp_user,temp_pass,success,Temporary user account
+guest,guest123,success,Guest user account",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/resources/testdata/users.csv",
+  },
+  {
+    "content": "<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="demo-java-selenium Test Suite" verbose="1" parallel="methods" thread-count="3">
+    
+    <!-- Global Test Parameters -->
+    <parameter name="browser" value="chrome"/>
+    <parameter name="headless" value="false"/>
+    <parameter name="environment" value="dev"/>
+    
+    <!-- Listeners -->
+    <listeners>
+        <listener class-name="com.example.listeners.TestListener"/>
+        <!-- Add more listeners if needed -->
+    </listeners>
+    
+    <!-- Smoke Test Suite -->
+    <test name="Smoke Tests" preserve-order="true">
+        <parameter name="test.suite" value="smoke"/>
+        
+        <groups>
+            <run>
+                <include name="smoke"/>
+                <include name="critical"/>
+            </run>
+        </groups>
+        
+        <classes>
+            <class name="com.example.tests.SmokeSuite">
+                <methods>
+                    <include name="testApplicationLoads"/>
+                    <include name="testUserCanLogin"/>
+                    <include name="testHomePageFunctionality"/>
+                    <include name="testUserCanLogout"/>
+                    <include name="testInvalidLoginBlocked"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    
+    <!-- Regression Test Suite -->
+    <test name="Regression Tests" parallel="methods" thread-count="2">
+        <parameter name="test.suite" value="regression"/>
+        
+        <groups>
+            <run>
+                <include name="regression"/>
+                <include name="functional"/>
+                <exclude name="performance"/>
+            </run>
+        </groups>
+        
+        <classes>
+            <class name="com.example.tests.LoginTests">
+                <methods>
+                    <include name="testValidLogin"/>
+                    <include name="testInvalidLogin"/>
+                    <include name="testEmptyCredentials"/>
+                    <include name="testRememberMeCheckbox"/>
+                    <include name="testFieldClearing"/>
+                    <include name="testLoginWithMultipleUsers"/>
+                    <include name="testLoginPageValidation"/>
+                    <include name="testLogoutFunctionality"/>
+                    <include name="testNegativeLoginScenarios"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    
+    <!-- UI Test Suite -->
+    <test name="UI Tests" preserve-order="false">
+        <parameter name="test.suite" value="ui"/>
+        
+        <groups>
+            <run>
+                <include name="ui"/>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        
+        <classes>
+            <class name="com.example.tests.SmokeSuite">
+                <methods>
+                    <include name="testCriticalUIElements"/>
+                    <include name="testBasicAccessibility"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    
+    <!-- Data-Driven Test Suite -->
+    <test name="Data-Driven Tests">
+        <parameter name="test.suite" value="data-driven"/>
+        
+        <groups>
+            <run>
+                <include name="data-driven"/>
+            </run>
+        </groups>
+        
+        <classes>
+            <class name="com.example.tests.LoginTests">
+                <methods>
+                    <include name="testLoginWithMultipleUsers"/>
+                    <include name="testNegativeLoginScenarios"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    
+    <!-- Performance Test Suite -->
+    <test name="Performance Tests" preserve-order="true">
+        <parameter name="test.suite" value="performance"/>
+        
+        <groups>
+            <run>
+                <include name="performance"/>
+            </run>
+        </groups>
+        
+        <classes>
+            <class name="com.example.tests.SmokeSuite">
+                <methods>
+                    <include name="testApplicationPerformance"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    
+    <!-- Security Test Suite -->
+    <test name="Security Tests">
+        <parameter name="test.suite" value="security"/>
+        
+        <groups>
+            <run>
+                <include name="security"/>
+                <include name="negative"/>
+            </run>
+        </groups>
+        
+        <classes>
+            <class name="com.example.tests.SmokeSuite">
+                <methods>
+                    <include name="testBasicSecurity"/>
+                </methods>
+            </class>
+            <class name="com.example.tests.LoginTests">
+                <methods>
+                    <include name="testInvalidLogin"/>
+                    <include name="testNegativeLoginScenarios"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    
+</suite>",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/resources/testng.xml",
+  },
+]
+`;
+
+exports[`ProjectTemplateGenerator Snapshots > should match snapshot for Python + Playwright + Pytest 1`] = `
+[
+  {
+    "content": "__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.log
+logs/
+screenshots/
+test-results/
+.env
+.pytest_cache/
+htmlcov/
+.coverage
+*.egg-info/
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": ".gitignore",
+  },
+  {
+    "content": "# Config package
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "config/__init__.py",
+  },
+  {
+    "content": "import os
+import json
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class EnvConfig:
+    def __init__(self):
+        self.environment = os.getenv('TEST_ENV', 'dev')
+        self.env_data = self._load_environment_data()
+
+    def _load_environment_data(self):
+        data_path = Path(__file__).parent.parent / 'data' / f'{self.environment}.json'
+        with open(data_path, 'r') as file:
+            return json.load(file)
+
+    def get_base_url(self) -> str:
+        return self.env_data['baseUrl']
+
+    def get_credentials(self, user_type: str = 'validUser') -> dict:
+        return self.env_data['credentials'].get(user_type, self.env_data['credentials']['validUser'])
+
+    def get_timeout(self) -> int:
+        return self.env_data.get('timeout', 30000)
+
+    def get_environment(self) -> str:
+        return self.environment
+
+env_config = EnvConfig()
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "config/env_config.py",
+  },
+  {
+    "content": "import os
+
+class TestConfig:
+    DEFAULT_TIMEOUT = 60000
+    BROWSER_OPTIONS = {
+        'headless': os.getenv('HEADLESS', 'true').lower() == 'true',
+        'slow_mo': int(os.getenv('SLOWMO', '0'))
+    }
+    SCREENSHOT_ON_FAILURE = True
+    RETRY_FAILED_TESTS = 1
+
+test_config = TestConfig()
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "config/test_config.py",
+  },
+  {
+    "content": "import pytest
+import os
+from pathlib import Path
+from playwright.sync_api import Page, Browser
+from config.test_config import TestConfig
+from utils.screenshot_helper import ScreenshotHelper
+from utils.logger import logger
+
+# Create directories
+for directory in ['logs', 'screenshots', 'test-results']:
+    Path(directory).mkdir(exist_ok=True)
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    return {
+        **browser_context_args,
+        "viewport": {"width": 1920, "height": 1080},
+        "ignore_https_errors": True
+    }
+
+@pytest.fixture(scope="function", autouse=True)
+def capture_screenshot_on_failure(request, page: Page):
+    yield
+    if request.node.rep_call.failed if hasattr(request.node, 'rep_call') else False:
+        test_name = request.node.name
+        ScreenshotHelper.capture_on_failure(page, test_name)
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+    setattr(item, f"rep_{rep.when}", rep)
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "conftest.py",
+  },
+  {
+    "content": "{
+  "_comment": "UPDATE THESE VALUES FOR YOUR APPLICATION",
+  "baseUrl": "https://your-app-url.com",
+  "credentials": {
+    "validUser": {
+      "username": "your-test-user@email.com",
+      "password": "YourTestPassword123"
+    },
+    "adminUser": {
+      "username": "your-admin@email.com",
+      "password": "YourAdminPassword123"
+    }
+  },
+  "timeout": 30000
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "data/dev.json",
+  },
+  {
+    "content": "{
+  "baseUrl": "https://qa.example.com",
+  "credentials": {
+    "validUser": {
+      "username": "qauser@example.com",
+      "password": "QA@123"
+    },
+    "adminUser": {
+      "username": "qadmin@example.com",
+      "password": "QAAdmin@123"
+    }
+  },
+  "timeout": 30000
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "data/qa.json",
+  },
+  {
+    "content": "# Pages package
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pages/__init__.py",
+  },
+  {
+    "content": "from playwright.sync_api import Page
+from utils.logger import logger
+
+class BasePage:
+    def __init__(self, page: Page):
+        self.page = page
+
+    def navigate(self, url: str) -> None:
+        logger.info(f"Navigating to: {url}")
+        self.page.goto(url, wait_until='domcontentloaded')
+
+    def click(self, selector: str) -> None:
+        logger.info(f"Clicking element: {selector}")
+        self.page.click(selector)
+
+    def type(self, selector: str, text: str) -> None:
+        logger.info(f"Typing '{text}' into element: {selector}")
+        self.page.fill(selector, text)
+
+    def get_text(self, selector: str) -> str:
+        text = self.page.text_content(selector) or ''
+        logger.info(f"Getting text from element: {selector} = '{text}'")
+        return text
+
+    def is_visible(self, selector: str) -> bool:
+        visible = self.page.is_visible(selector)
+        logger.info(f"Checking visibility of element: {selector} = {visible}")
+        return visible
+
+    def wait_for_selector(self, selector: str, timeout: int = 30000) -> None:
+        logger.info(f"Waiting for selector: {selector}")
+        self.page.wait_for_selector(selector, timeout=timeout)
+
+    def get_page_title(self) -> str:
+        title = self.page.title()
+        logger.info(f"Page title: {title}")
+        return title
+
+    def get_current_url(self) -> str:
+        url = self.page.url
+        logger.info(f"Current URL: {url}")
+        return url
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pages/base_page.py",
+  },
+  {
+    "content": "from playwright.sync_api import Page
+from pages.base_page import BasePage
+from config.env_config import env_config
+
+class HomePage(BasePage):
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.selectors = {
+            'welcome_message': '.welcome-message, h1',
+            'user_profile': '.user-profile',
+            'logout_button': 'button[data-action="logout"], .logout'
+        }
+
+    def navigate_to_home(self) -> None:
+        self.navigate(env_config.get_base_url())
+
+    def get_welcome_message(self) -> str:
+        return self.get_text(self.selectors['welcome_message'])
+
+    def is_user_profile_visible(self) -> bool:
+        return self.is_visible(self.selectors['user_profile'])
+
+    def logout(self) -> None:
+        self.click(self.selectors['logout_button'])
+        self.page.wait_for_url('**/login', timeout=5000)
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pages/home_page.py",
+  },
+  {
+    "content": """"
+Login Page Object
+
+HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+1. Open your app's login page in a browser
+2. Right-click on each element → Inspect → Copy selector
+3. Replace the placeholder selectors below with your actual selectors
+4. Update the login URL path in navigate_to_login() method
+"""
+from playwright.sync_api import Page
+from pages.base_page import BasePage
+from config.env_config import env_config
+
+class LoginPage(BasePage):
+    def __init__(self, page: Page):
+        super().__init__(page)
+        # ============================================
+        # UPDATE THESE SELECTORS FOR YOUR APPLICATION
+        # ============================================
+        # Tip: Use browser DevTools (F12) to find correct selectors
+        self.selectors = {
+            'username_input': '#username',           # Your username/email input field
+            'password_input': '#password',           # Your password input field
+            'login_button': 'button[type="submit"]', # Your login/submit button
+            'error_message': '.error-message',       # Error message element
+            'success_indicator': '.dashboard, .home' # Element visible after successful login
+        }
+        # ============================================
+
+    def navigate_to_login(self) -> None:
+        """Navigate to login page. UPDATE: Change '/login' to your actual login page path"""
+        self.navigate(f"{env_config.get_base_url()}/login")
+
+    def login(self, username: str, password: str) -> None:
+        self.type(self.selectors['username_input'], username)
+        self.type(self.selectors['password_input'], password)
+        self.click(self.selectors['login_button'])
+
+    def is_login_successful(self) -> bool:
+        try:
+            self.wait_for_selector(self.selectors['success_indicator'], timeout=10000)
+            return True
+        except:
+            return False
+
+    def is_error_displayed(self) -> bool:
+        return self.is_visible(self.selectors['error_message'])
+
+    def get_error_message(self) -> str:
+        return self.get_text(self.selectors['error_message'])
+
+    def is_username_visible(self) -> bool:
+        return self.is_visible(self.selectors['username_input'])
+
+    def is_password_visible(self) -> bool:
+        return self.is_visible(self.selectors['password_input'])
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pages/login_page.py",
+  },
+  {
+    "content": "[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts = 
+    --html=test-results/report.html 
+    --self-contained-html
+    -v
+    --tb=short
+markers =
+    smoke: Smoke tests
+    regression: Regression tests
+    critical: Critical path tests
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pytest.ini",
+  },
+  {
+    "content": "# demo-python-playwright
+
+Playwright test automation framework with Python and Pytest.
+
+## Features
+
+- **Playwright 1.41.0**: Modern browser automation with multi-browser support
+- **Python 3.11**: Clean, readable test automation
+- **Pytest 8.0.0**: Powerful test framework with rich plugins
+- **Page Object Model**: Maintainable test structure
+- **Docker Support**: Containerized test execution
+- **HTML Reporting**: Beautiful test reports
+
+## Prerequisites
+
+- Python 3.11+
+- pip
+
+## Installation
+
+\`\`\`bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Install Playwright browsers
+playwright install
+\`\`\`
+
+## Running Tests
+
+\`\`\`bash
+# Run all tests
+pytest
+
+# Run tests in headed mode
+HEADLESS=false pytest
+
+# Run smoke tests
+pytest -m smoke
+
+# Run tests in parallel
+pytest -n auto
+
+# View HTML report
+open test-results/report.html
+\`\`\`
+
+## Environment Configuration
+
+Update test data in:
+- \`data/dev.json\` - Development environment
+- \`data/qa.json\` - QA environment
+
+Set environment with \`TEST_ENV=qa pytest\`
+
+## Page Objects
+
+All page objects extend \`BasePage\` and are located in the \`pages/\` directory:
+- \`login_page.py\` - Login page interactions
+- \`home_page.py\` - Home page interactions
+
+## Test Structure
+
+\`\`\`
+tests/
+  ├── test_login.py    # Login functionality tests
+  └── test_smoke.py    # Smoke tests
+\`\`\`
+
+## Docker
+
+\`\`\`bash
+docker build -t demo-python-playwright .
+docker run demo-python-playwright
+\`\`\`
+
+## CI/CD
+
+CI/CD pipeline configuration is included for automated testing.
+
+## Utilities
+
+- **Logger**: Python logging (\`utils/logger.py\`)
+- **Screenshots**: Auto-capture on failure (\`utils/screenshot_helper.py\`)
+- **Wait Helpers**: Custom wait utilities (\`utils/wait_helpers.py\`)
+- **Data Reader**: Test data utilities (\`utils/data_reader.py\`)
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "README.md",
+  },
+  {
+    "content": "# Core Testing Dependencies
+playwright==1.41.0
+pytest==8.0.0
+pytest-playwright==0.4.4
+pytest-xdist==3.5.0
+
+# Reporting Tools (conditional)
+
+# BDD Testing (conditional)
+
+# Utilities
+python-dotenv==1.0.0
+Pillow==10.1.0
+PyYAML==6.0.1
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "requirements.txt",
+  },
+  {
+    "content": "# Tests package
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "tests/__init__.py",
+  },
+  {
+    "content": """"
+Login Test Suite
+
+BEFORE RUNNING:
+1. Update credentials in: data/dev.json
+2. Update selectors in: pages/login_page.py
+3. Run: pytest
+"""
+import pytest
+from playwright.sync_api import Page
+from pages.login_page import LoginPage
+from config.env_config import env_config
+
+
+class TestLogin:
+    def test_login_with_valid_credentials(self, page: Page):
+        """Verify successful login with valid credentials"""
+        # Get credentials from config file (data/dev.json)
+        credentials = env_config.get_credentials('validUser')
+        
+        login_page = LoginPage(page)
+        
+        # Step 1: Navigate to login page
+        login_page.navigate_to_login()
+        
+        # Step 2: Enter credentials and submit
+        login_page.login(credentials['username'], credentials['password'])
+        
+        # Step 3: Verify login was successful
+        assert login_page.is_login_successful(), \\
+            "Login failed. Check credentials in data/dev.json and selectors in pages/login_page.py"
+
+    def test_login_page_elements_visible(self, page: Page):
+        """Verify login page elements are visible"""
+        login_page = LoginPage(page)
+        login_page.navigate_to_login()
+        
+        assert login_page.is_username_visible(), "Username field should be visible"
+        assert login_page.is_password_visible(), "Password field should be visible"
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "tests/test_login.py",
+  },
+  {
+    "content": "import pytest
+from playwright.sync_api import Page
+from pages.login_page import LoginPage
+from config.env_config import env_config
+
+@pytest.mark.smoke
+class TestSmoke:
+    def test_login_page_loads(self, page: Page):
+        login_page = LoginPage(page)
+        
+        login_page.navigate_to_login()
+        title = login_page.get_page_title()
+        
+        assert title, "Page title is empty"
+        assert login_page.is_username_visible(), "Username field not visible"
+        assert login_page.is_password_visible(), "Password field not visible"
+
+    def test_base_url_accessible(self, page: Page):
+        page.goto(env_config.get_base_url())
+        url = page.url
+        
+        assert env_config.get_base_url() in url, "Base URL is not accessible"
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "tests/test_smoke.py",
+  },
+  {
+    "content": "# Utils package
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/__init__.py",
+  },
+  {
+    "content": "import json
+import csv
+from pathlib import Path
+from utils.logger import logger
+
+class DataReader:
+    @staticmethod
+    def read_json(filename: str) -> dict:
+        filepath = Path('data') / filename
+        logger.info(f"Reading data from: {filepath}")
+        with open(filepath, 'r') as file:
+            return json.load(file)
+
+    @staticmethod
+    def read_csv(filename: str) -> list:
+        filepath = Path('data') / filename
+        logger.info(f"Reading CSV from: {filepath}")
+        with open(filepath, 'r') as file:
+            return list(csv.reader(file))
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/data_reader.py",
+  },
+  {
+    "content": "import logging
+from pathlib import Path
+
+# Create logs directory
+Path('logs').mkdir(exist_ok=True)
+
+# Configure logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# File handler
+file_handler = logging.FileHandler('logs/test.log')
+file_handler.setLevel(logging.INFO)
+
+# Console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+
+# Formatter
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# Add handlers
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/logger.py",
+  },
+  {
+    "content": "from playwright.sync_api import Page
+from pathlib import Path
+from datetime import datetime
+from utils.logger import logger
+
+class ScreenshotHelper:
+    @staticmethod
+    def capture_screenshot(page: Page, name: str) -> str:
+        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        filename = f"{name}-{timestamp}.png"
+        filepath = Path('screenshots') / filename
+        
+        page.screenshot(path=str(filepath), full_page=True)
+        logger.info(f"Screenshot saved: {filepath}")
+        return str(filepath)
+
+    @staticmethod
+    def capture_on_failure(page: Page, test_name: str) -> None:
+        try:
+            ScreenshotHelper.capture_screenshot(page, f"FAILED-{test_name}")
+        except Exception as e:
+            logger.error(f"Failed to capture screenshot: {e}")
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/screenshot_helper.py",
+  },
+  {
+    "content": "from playwright.sync_api import Page
+import time
+
+class WaitHelpers:
+    @staticmethod
+    def wait_for_element(page: Page, selector: str, timeout: int = 30000) -> None:
+        page.wait_for_selector(selector, timeout=timeout, state='visible')
+
+    @staticmethod
+    def wait_for_url(page: Page, url_pattern: str, timeout: int = 30000) -> None:
+        page.wait_for_url(url_pattern, timeout=timeout)
+
+    @staticmethod
+    def wait_for_text(page: Page, selector: str, text: str, timeout: int = 30000) -> None:
+        page.wait_for_function(
+            f"""
+            () => {{
+                const element = document.querySelector('{selector}');
+                return element && element.textContent.includes('{text}');
+            }}
+            """,
+            timeout=timeout
+        )
+
+    @staticmethod
+    def sleep(seconds: float) -> None:
+        time.sleep(seconds)
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/wait_helpers.py",
+  },
+]
+`;
+
+exports[`ProjectTemplateGenerator Snapshots > should match snapshot for TypeScript + Cypress 1`] = `
+[
+  {
+    "content": "node_modules/
+cypress/screenshots/
+cypress/videos/
+cypress/results/
+.DS_Store
+*.log
+npm-debug.log*
+.env
+*.js
+*.js.map
+!cypress.config.js
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": ".gitignore",
+  },
+  {
+    "content": "import { defineConfig } from 'cypress';
+
+export default defineConfig({
+  e2e: {
+    baseUrl: process.env.BASE_URL || 'https://dev.example.com',
+    viewportWidth: 1920,
+    viewportHeight: 1080,
+    video: true,
+    screenshotOnRunFailure: true,
+    defaultCommandTimeout: 10000,
+    pageLoadTimeout: 30000,
+    retries: {
+      runMode: 2,
+      openMode: 0
+    },
+    setupNodeEvents(on, config) {
+      // implement node event listeners here
+      return config;
+    },
+    specPattern: 'cypress/e2e/**/*.cy.{ts,tsx}',
+    supportFile: 'cypress/support/e2e.ts',
+    fixturesFolder: 'cypress/fixtures',
+    screenshotsFolder: 'cypress/screenshots',
+    videosFolder: 'cypress/videos'
+  },
+  reporter: 'mochawesome',
+  reporterOptions: {
+    reportDir: 'cypress/results',
+    overwrite: false,
+    html: true,
+    json: true,
+    timestamp: 'mmddyyyy_HHMMss'
+  }
+});
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress.config.ts",
+  },
+  {
+    "content": "/**
+ * Login Test Suite
+ * 
+ * BEFORE RUNNING:
+ * 1. Update baseUrl in cypress.config.ts
+ * 2. Update credentials in cypress/fixtures/users.json
+ * 3. Update selectors in cypress/pages/LoginPage.ts
+ * 4. Run: npx cypress open
+ */
+import LoginPage from '../pages/LoginPage';
+
+interface UserCredentials {
+  username: string;
+  password: string;
+}
+
+interface UsersFixture {
+  validUser: UserCredentials;
+  adminUser: UserCredentials;
+  invalidUser: UserCredentials;
+}
+
+describe('Login Tests', () => {
+  const loginPage = new LoginPage();
+
+  beforeEach(() => {
+    loginPage.visitLoginPage(Cypress.config('baseUrl') as string);
+  });
+
+  it('should login with valid credentials', () => {
+    // Load credentials from fixtures (cypress/fixtures/users.json)
+    cy.fixture('users').then((users: UsersFixture) => {
+      // Step 1: Enter credentials and submit
+      loginPage.login(users.validUser.username, users.validUser.password);
+      
+      // Step 2: Verify login was successful
+      loginPage.verifyLoginSuccess();
+    });
+  });
+
+  it('should display login page elements', () => {
+    loginPage.verifyUsernameVisible();
+    loginPage.verifyPasswordVisible();
+  });
+});
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/e2e/login.cy.ts",
+  },
+  {
+    "content": "import LoginPage from '../pages/LoginPage';
+
+interface Config {
+  baseUrl: string;
+}
+
+describe('Smoke Tests', () => {
+  const loginPage = new LoginPage();
+  let config: Config;
+
+  before(() => {
+    cy.fixture<Config>('config').then((data) => {
+      config = data;
+    });
+  });
+
+  it('should load login page', () => {
+    loginPage.visitLoginPage(config.baseUrl);
+    cy.title().should('exist');
+    loginPage.verifyUsernameVisible();
+    loginPage.verifyPasswordVisible();
+  });
+
+  it('should access base URL', () => {
+    cy.visit(config.baseUrl);
+    cy.url().should('include', config.baseUrl);
+  });
+});
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/e2e/smoke.cy.ts",
+  },
+  {
+    "content": "{
+  "baseUrl": "https://dev.example.com",
+  "environments": {
+    "dev": {
+      "url": "https://dev.example.com",
+      "apiUrl": "https://api-dev.example.com"
+    },
+    "qa": {
+      "url": "https://qa.example.com",
+      "apiUrl": "https://api-qa.example.com"
+    },
+    "staging": {
+      "url": "https://staging.example.com",
+      "apiUrl": "https://api-staging.example.com"
+    }
+  }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/fixtures/config.json",
+  },
+  {
+    "content": "{
+  "dev": {
+    "baseUrl": "https://dev.example.com",
+    "apiUrl": "https://api.dev.example.com",
+    "timeout": 30000
+  },
+  "qa": {
+    "baseUrl": "https://qa.example.com",
+    "apiUrl": "https://api.qa.example.com",
+    "timeout": 30000
+  },
+  "staging": {
+    "baseUrl": "https://staging.example.com",
+    "apiUrl": "https://api.staging.example.com",
+    "timeout": 30000
+  },
+  "prod": {
+    "baseUrl": "https://www.example.com",
+    "apiUrl": "https://api.example.com",
+    "timeout": 30000
+  }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/fixtures/environments.json",
+  },
+  {
+    "content": "{
+  "_comment": "UPDATE THESE VALUES FOR YOUR APPLICATION",
+  "validUser": {
+    "username": "your-test-user@email.com",
+    "password": "YourTestPassword123"
+  },
+  "adminUser": {
+    "username": "your-admin@email.com",
+    "password": "YourAdminPassword123"
+  },
+  "invalidUser": {
+    "username": "invalid@example.com",
+    "password": "wrongpassword"
+  }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/fixtures/users.json",
+  },
+  {
+    "content": "class BasePage {
+  visit(url: string): void {
+    cy.log(\`Navigating to: \${url}\`);
+    cy.visit(url);
+  }
+
+  click(selector: string): void {
+    cy.log(\`Clicking element: \${selector}\`);
+    cy.get(selector).click();
+  }
+
+  type(selector: string, text: string): void {
+    cy.log(\`Typing '\${text}' into element: \${selector}\`);
+    cy.get(selector).clear().type(text);
+  }
+
+  getText(selector: string): Cypress.Chainable<string> {
+    cy.log(\`Getting text from element: \${selector}\`);
+    return cy.get(selector).invoke('text');
+  }
+
+  isVisible(selector: string): void {
+    cy.log(\`Checking visibility of element: \${selector}\`);
+    cy.get(selector).should('be.visible');
+  }
+
+  waitForElement(selector: string, timeout: number = 10000): void {
+    cy.log(\`Waiting for selector: \${selector}\`);
+    cy.get(selector, { timeout }).should('be.visible');
+  }
+
+  getTitle(): Cypress.Chainable<string> {
+    return cy.title();
+  }
+
+  getCurrentUrl(): Cypress.Chainable<string> {
+    return cy.url();
+  }
+
+  assertUrlContains(text: string): void {
+    cy.url().should('include', text);
+  }
+
+  assertTitleContains(text: string): void {
+    cy.title().should('include', text);
+  }
+}
+
+export default BasePage;
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/pages/BasePage.ts",
+  },
+  {
+    "content": "import BasePage from './BasePage';
+
+class HomePage extends BasePage {
+  private readonly welcomeMessage = '.welcome-message, h1';
+  private readonly userProfile = '.user-profile';
+  private readonly logoutButton = 'button[data-action="logout"], .logout';
+
+  visitHomePage(baseUrl: string): void {
+    this.visit(baseUrl);
+  }
+
+  getWelcomeMessage(): Cypress.Chainable<string> {
+    return this.getText(this.welcomeMessage);
+  }
+
+  verifyUserProfileVisible(): void {
+    cy.get(this.userProfile).should('be.visible');
+  }
+
+  logout(): void {
+    this.click(this.logoutButton);
+    cy.url().should('include', '/login');
+  }
+}
+
+export default HomePage;
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/pages/HomePage.ts",
+  },
+  {
+    "content": "/**
+ * Login Page Object
+ * 
+ * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+ * 1. Open your app's login page in a browser
+ * 2. Right-click on each element → Inspect → Copy selector
+ * 3. Replace the placeholder selectors below with your actual selectors
+ */
+import BasePage from './BasePage';
+
+class LoginPage extends BasePage {
+  // ============================================
+  // UPDATE THESE SELECTORS FOR YOUR APPLICATION
+  // ============================================
+  // Tip: Use browser DevTools (F12) to find correct selectors
+  private readonly usernameInput = '#username';           // Your username/email input field
+  private readonly passwordInput = '#password';           // Your password input field
+  private readonly loginButton = 'button[type="submit"]'; // Your login/submit button
+  private readonly errorMessage = '.error-message';       // Error message element
+  private readonly successIndicator = '.dashboard, .home'; // Element visible after successful login
+  // ============================================
+
+  visitLoginPage(baseUrl: string): void {
+    // UPDATE: Change '/login' to your actual login page path
+    this.visit(\`\${baseUrl}/login\`);
+  }
+
+  login(username: string, password: string): void {
+    this.type(this.usernameInput, username);
+    this.type(this.passwordInput, password);
+    this.click(this.loginButton);
+  }
+
+  verifyLoginSuccess(): void {
+    cy.get(this.successIndicator, { timeout: 10000 }).should('be.visible');
+  }
+
+  verifyErrorDisplayed(): void {
+    cy.get(this.errorMessage).should('be.visible');
+  }
+
+  getErrorMessage(): Cypress.Chainable<string> {
+    return this.getText(this.errorMessage);
+  }
+
+  verifyUsernameVisible(): void {
+    cy.get(this.usernameInput).should('be.visible');
+  }
+
+  verifyPasswordVisible(): void {
+    cy.get(this.passwordInput).should('be.visible');
+  }
+}
+
+export default LoginPage;
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/pages/LoginPage.ts",
+  },
+  {
+    "content": "/// <reference types="cypress" />
+
+// Custom command for login
+Cypress.Commands.add('login', (username: string, password: string) => {
+  cy.get('#username').type(username);
+  cy.get('#password').type(password);
+  cy.get('button[type="submit"]').click();
+});
+
+// Custom command for logout
+Cypress.Commands.add('logout', () => {
+  cy.get('button[data-action="logout"], .logout').click();
+});
+
+// Custom command to check if element exists
+Cypress.Commands.add('elementExists', (selector: string) => {
+  return cy.get('body').then(($body) => {
+    return cy.wrap($body.find(selector).length > 0);
+  });
+});
+
+// Custom command for waiting with custom timeout
+Cypress.Commands.add('waitForElement', (selector: string, timeout: number = 10000) => {
+  cy.get(selector, { timeout }).should('be.visible');
+});
+
+// Custom command for taking full page screenshot
+Cypress.Commands.add('fullScreenshot', (filename: string) => {
+  cy.screenshot(filename, { capture: 'fullPage' });
+});
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/support/commands.ts",
+  },
+  {
+    "content": "// Import commands.ts using ES2015 syntax:
+import './commands';
+
+// Global before hook
+before(() => {
+  cy.log('Starting test suite');
+});
+
+// Global after hook
+after(() => {
+  cy.log('Test suite completed');
+});
+
+// Global beforeEach hook
+beforeEach(() => {
+  // Load fixtures or perform setup before each test
+  cy.fixture('config').as('config');
+});
+
+// Global afterEach hook for screenshots on failure
+afterEach(function() {
+  if (this.currentTest && this.currentTest.state === 'failed') {
+    cy.screenshot(\`FAILED-\${this.currentTest.title}\`);
+  }
+});
+
+// Uncaught exception handler
+Cypress.on('uncaught:exception', (err) => {
+  // returning false here prevents Cypress from failing the test
+  console.log('Uncaught exception:', err.message);
+  return false;
+});
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/support/e2e.ts",
+  },
+  {
+    "content": "/// <reference types="cypress" />
+
+declare namespace Cypress {
+  interface Chainable {
+    /**
+     * Custom command to login with username and password
+     * @example cy.login('user@example.com', 'password123')
+     */
+    login(username: string, password: string): Chainable<void>;
+
+    /**
+     * Custom command to logout
+     * @example cy.logout()
+     */
+    logout(): Chainable<void>;
+
+    /**
+     * Custom command to check if element exists
+     * @example cy.elementExists('.my-selector')
+     */
+    elementExists(selector: string): Chainable<boolean>;
+
+    /**
+     * Custom command for waiting with custom timeout
+     * @example cy.waitForElement('.my-selector', 5000)
+     */
+    waitForElement(selector: string, timeout?: number): Chainable<void>;
+
+    /**
+     * Custom command for taking full page screenshot
+     * @example cy.fullScreenshot('my-screenshot')
+     */
+    fullScreenshot(filename: string): Chainable<void>;
+  }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/support/index.d.ts",
+  },
+  {
+    "content": "/**
+ * Utility functions for Cypress tests.
+ */
+
+/**
+ * Logger utility for consistent test logging
+ */
+export const Logger = {
+  info: (message: string): void => {
+    cy.log(\`ℹ️ INFO: \${message}\`);
+  },
+
+  step: (message: string): void => {
+    cy.log(\`→ STEP: \${message}\`);
+  },
+
+  debug: (message: string): void => {
+    if (Cypress.env('DEBUG')) {
+      cy.log(\`🔍 DEBUG: \${message}\`);
+    }
+  },
+
+  warn: (message: string): void => {
+    cy.log(\`⚠️ WARN: \${message}\`);
+  },
+
+  error: (message: string): void => {
+    cy.log(\`❌ ERROR: \${message}\`);
+  },
+
+  startSection: (sectionName: string): void => {
+    cy.log('========================================');
+    cy.log(sectionName);
+    cy.log('========================================');
+  },
+
+  endSection: (): void => {
+    cy.log('========================================');
+  }
+};
+
+/**
+ * Wait utilities
+ */
+export const WaitUtils = {
+  waitForVisible: (selector: string, timeout = 10000): Cypress.Chainable => {
+    return cy.get(selector, { timeout }).should('be.visible');
+  },
+
+  waitForNotExist: (selector: string, timeout = 10000): Cypress.Chainable => {
+    return cy.get(selector, { timeout }).should('not.exist');
+  },
+
+  waitForUrlContains: (text: string, timeout = 10000): Cypress.Chainable => {
+    return cy.url({ timeout }).should('include', text);
+  },
+
+  waitForPageLoad: (): Cypress.Chainable => {
+    return cy.document().its('readyState').should('eq', 'complete');
+  }
+};
+
+/**
+ * Data utilities
+ */
+export const DataUtils = {
+  randomString: (length = 10): string => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  },
+
+  randomEmail: (domain = 'test.example.com'): string => {
+    const username = DataUtils.randomString(8).toLowerCase();
+    const timestamp = Date.now();
+    return \`\${username}.\${timestamp}@\${domain}\`;
+  },
+
+  randomNumber: (min = 0, max = 1000): number => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+};
+
+/**
+ * Screenshot utilities
+ */
+export const ScreenshotUtils = {
+  capture: (name: string): void => {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    cy.screenshot(\`\${name}_\${timestamp}\`);
+  },
+
+  captureOnFailure: (testName: string): void => {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9]/g, '_');
+    cy.screenshot(\`failed_\${sanitizedName}\`, { capture: 'fullPage' });
+  }
+};
+
+/**
+ * API utilities for Cypress
+ */
+export const ApiUtils = {
+  authenticatedRequest: <T>(
+    method: string,
+    url: string,
+    body: object | null = null,
+    token: string | null = null
+  ): Cypress.Chainable<Cypress.Response<T>> => {
+    const authToken = token || Cypress.env('authToken');
+
+    return cy.request({
+      method,
+      url,
+      body,
+      headers: {
+        'Authorization': \`Bearer \${authToken}\`,
+        'Content-Type': 'application/json'
+      },
+      failOnStatusCode: false
+    });
+  },
+
+  loginViaApi: (username: string, password: string): Cypress.Chainable<string> => {
+    return cy.request({
+      method: 'POST',
+      url: \`\${Cypress.env('apiUrl')}/auth/login\`,
+      body: { username, password }
+    }).then((response) => {
+      const token = response.body.token || response.body.accessToken;
+      Cypress.env('authToken', token);
+      return token;
+    });
+  }
+};
+
+export default {
+  Logger,
+  WaitUtils,
+  DataUtils,
+  ScreenshotUtils,
+  ApiUtils
+};
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/support/utils.ts",
+  },
+  {
+    "content": "{
+  "name": "demo-ts-cypress",
+  "version": "1.0.0",
+  "description": "Cypress test automation framework with TypeScript",
+  "scripts": {
+    "test": "cypress run",
+    "test:headed": "cypress run --headed",
+    "test:chrome": "cypress run --browser chrome",
+    "test:firefox": "cypress run --browser firefox",
+    "open": "cypress open",
+    "report": "open cypress/reports/index.html || xdg-open cypress/reports/index.html || start cypress/reports/index.html",
+    "clean": "rm -rf cypress/screenshots cypress/videos cypress/results",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": ["cypress", "testing", "automation", "e2e", "typescript"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.6.0",
+    "typescript": "^5.3.0",
+    "@types/node": "^20.10.0",
+    "dotenv": "^16.3.1"
+  }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "package.json",
+  },
+  {
+    "content": "# demo-ts-cypress
+
+Cypress test automation framework with TypeScript and npm.
+
+## Features
+
+- **Cypress 13.6.0**: Modern end-to-end testing framework
+- **TypeScript**: Type-safe test automation
+- **npm**: Package management
+- **Page Object Model**: Maintainable test structure
+- **Docker Support**: Containerized test execution
+- **Mochawesome Reports**: Beautiful HTML test reports
+- **Multi-Browser**: Chrome, Firefox support
+- **Type Definitions**: Custom command type safety
+
+## Prerequisites
+
+- Node.js 18+ and npm
+
+## Installation
+
+\`\`\`bash
+npm install
+\`\`\`
+
+## Running Tests
+
+\`\`\`bash
+# Run all tests (headless)
+npm test
+
+# Run tests in headed mode
+npm run test:headed
+
+# Run tests in specific browser
+npm run test:chrome
+npm run test:firefox
+
+# Open Cypress Test Runner
+npm run open
+
+# Type check
+npm run type-check
+
+# Clean test artifacts
+npm run clean
+\`\`\`
+
+## Configuration
+
+Update test data in:
+- \`cypress/fixtures/config.json\` - Environment URLs
+- \`cypress/fixtures/users.json\` - User credentials
+
+Set base URL with environment variable:
+\`\`\`bash
+BASE_URL=https://qa.example.com npm test
+\`\`\`
+
+## Page Objects
+
+All page objects extend \`BasePage\` and are located in \`cypress/pages/\`:
+- \`LoginPage.ts\` - Login page interactions
+- \`HomePage.ts\` - Home page interactions
+
+## Test Structure
+
+\`\`\`
+cypress/
+  ├── e2e/
+  │   ├── login.cy.ts     # Login functionality tests
+  │   └── smoke.cy.ts     # Smoke tests
+  ├── pages/
+  │   ├── BasePage.ts     # Base page class
+  │   ├── LoginPage.ts    # Login page object
+  │   └── HomePage.ts     # Home page object
+  ├── fixtures/
+  │   ├── config.json     # Environment config
+  │   └── users.json      # Test user data
+  └── support/
+      ├── e2e.ts          # Global setup
+      ├── commands.ts     # Custom commands
+      └── index.d.ts      # TypeScript definitions
+\`\`\`
+
+## Custom Commands
+
+Custom Cypress commands with TypeScript support:
+- \`cy.login(username, password)\` - Login helper
+- \`cy.logout()\` - Logout helper
+- \`cy.waitForElement(selector)\` - Wait for element
+- \`cy.elementExists(selector)\` - Check element existence
+- \`cy.fullScreenshot(filename)\` - Full page screenshot
+
+All commands have full TypeScript IntelliSense support.
+
+## TypeScript
+
+The project uses TypeScript with strict mode enabled. Path aliases are configured:
+- \`@pages/*\` - Maps to \`cypress/pages/*\`
+- \`@fixtures/*\` - Maps to \`cypress/fixtures/*\`
+
+## Docker
+
+\`\`\`bash
+docker build -t demo-ts-cypress .
+docker run demo-ts-cypress
+\`\`\`
+
+## CI/CD
+
+CI/CD pipeline configuration is included for automated testing.
+
+## Reports
+
+Mochawesome HTML reports are generated in \`cypress/results/\` after test execution.
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "README.md",
+  },
+  {
+    "content": "{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "types": ["cypress", "node"],
+    "baseUrl": "./",
+    "paths": {
+      "@pages/*": ["cypress/pages/*"],
+      "@fixtures/*": ["cypress/fixtures/*"]
+    }
+  },
+  "include": ["cypress/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "tsconfig.json",
+  },
+]
+`;

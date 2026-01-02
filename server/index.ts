@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import compression from "compression";
 import cors from "cors";
+import { exec } from "child_process";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { errorHandler, notFoundHandler } from "./errors";
@@ -132,6 +133,17 @@ app.use(compression({
 // Request body parsing with size limits
 app.use(express.json({ limit: '10mb' })); // Limit JSON payload size
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+
+// Verify template packs integrity on startup
+if (process.env.NODE_ENV !== 'production') {
+  exec('npx tsx server/scripts/verify-packs.ts', (error: Error | null, stdout: string, stderr: string) => {
+    if (error) {
+      console.warn(`[Startup Warning] Template Pack Verification Failed: ${error.message}`);
+      return;
+    }
+    console.log('[Startup] Template Pack Verification:\n' + stdout.trim());
+  });
+}
 
 app.use((req, res, next) => {
   const start = Date.now();

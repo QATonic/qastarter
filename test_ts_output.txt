@@ -1,0 +1,63 @@
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mD:/QAStarter[39m
+
+[90mstdout[2m | server/tests/generator.test.ts[2m > [22m[2mProjectTemplateGenerator Snapshots[2m > [22m[2mshould match snapshot for TypeScript + Cypress
+[22m[39mUsing sophisticated template pack for: {
+  testingType: [32m'web'[39m,
+  language: [32m'typescript'[39m,
+  framework: [32m'cypress'[39m,
+  testRunner: [32m'cypress'[39m,
+  buildTool: [32m'npm'[39m
+}
+
+[90mstderr[2m | server/tests/generator.test.ts[2m > [22m[2mProjectTemplateGenerator Snapshots[2m > [22m[2mshould match snapshot for TypeScript + Cypress
+[22m[39mTemplate file not found: .gitignore, skipping
+Error processing file .gitignore: Error: Required template file not found: .gitignore
+    at TemplatePackEngine.generateProjectStream [90m(D:\QAStarter\[39mserver\templates\templatePackEngine.ts:427:21[90m)[39m
+    at TemplatePackEngine.generateProject [90m(D:\QAStarter\[39mserver\templates\templatePackEngine.ts:389:22[90m)[39m
+    at ProjectTemplateGenerator.generateProject [90m(D:\QAStarter\[39mserver\templates\index.ts:40:14[90m)[39m
+    at [90mD:\QAStarter\[39mserver\tests\generator.test.ts:85:23
+    at [90mfile:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:5
+    at runTest [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:11[90m)[39m
+    at runSuite [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+    at runSuite [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+    at runFiles [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+    at startTests [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
+Template pack generation failed for web-typescript-cypress-cypress-npm: Error: Required template file not found: .gitignore
+    at TemplatePackEngine.generateProjectStream [90m(D:\QAStarter\[39mserver\templates\templatePackEngine.ts:427:21[90m)[39m
+    at TemplatePackEngine.generateProject [90m(D:\QAStarter\[39mserver\templates\templatePackEngine.ts:389:22[90m)[39m
+    at ProjectTemplateGenerator.generateProject [90m(D:\QAStarter\[39mserver\templates\index.ts:40:14[90m)[39m
+    at [90mD:\QAStarter\[39mserver\tests\generator.test.ts:85:23
+    at [90mfile:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:533:5
+    at runTest [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1056:11[90m)[39m
+    at runSuite [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+    at runSuite [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1205:15[90m)[39m
+    at runFiles [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1262:5[90m)[39m
+    at startTests [90m(file:///D:/QAStarter/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1271:3[90m)[39m
+
+ [31m❯[39m server/tests/generator.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m | [22m[33m2 skipped[39m[2m)[22m[90m 80[2mms[22m[39m
+[31m   [31m×[31m ProjectTemplateGenerator Snapshots[2m > [22mshould match snapshot for TypeScript + Cypress[90m 72[2mms[22m[31m[39m
+[31m     → Required template file not found: .gitignore[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[1m[7m Failed Tests 1 [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[31m[1m[7m FAIL [27m[22m[39m server/tests/generator.test.ts[2m > [22mProjectTemplateGenerator Snapshots[2m > [22mshould match snapshot for TypeScript + Cypress
+[31m[1mError[22m: Required template file not found: .gitignore[39m
+[36m [2m❯[22m TemplatePackEngine.generateProjectStream server/templates/templatePackEngine.ts:[2m427:21[22m[39m
+    [90m425| [39m            console[33m.[39m[34mwarn[39m([32m`Template file not found: [39m[36m${[39mfileConfig[33m.[39mpath[36m}[39m[32m,[39m…
+    [90m426| [39m            [35mif[39m (options[33m.[39mstrict) {
+    [90m427| [39m              [35mthrow[39m [35mnew[39m [33mError[39m([32m`Required template file not found: [39m[36m${[39mfil…
+    [90m   | [39m                    [31m^[39m
+    [90m428| [39m            }
+    [90m429| [39m            [35mcontinue[39m[33m;[39m
+[90m [2m❯[22m TemplatePackEngine.generateProject server/templates/templatePackEngine.ts:[2m389:22[22m[39m
+[90m [2m❯[22m ProjectTemplateGenerator.generateProject server/templates/index.ts:[2m40:14[22m[39m
+[90m [2m❯[22m server/tests/generator.test.ts:[2m85:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[33m2 skipped[39m[90m (3)[39m
+[2m   Start at [22m 01:09:21
+[2m   Duration [22m 6.37s[2m (transform 275ms, setup 0ms, collect 439ms, tests 80ms, environment 0ms, prepare 187ms)[22m
+

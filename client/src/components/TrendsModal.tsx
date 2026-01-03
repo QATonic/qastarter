@@ -49,8 +49,11 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
     const { data, isLoading } = useQuery({
         queryKey: ['/api/stats'],
         retry: false,
-        enabled: open // Only fetch when modal is open
+        enabled: open
     }) as { data: any, isLoading: boolean };
+
+    // Formatter for large numbers (e.g. 1,200)
+    const formatNumber = (num: number) => new Intl.NumberFormat('en-US').format(num);
 
     const renderContent = () => {
         if (isLoading) {
@@ -67,7 +70,6 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
         const stats = data?.data || {};
         const totalGenerations = stats.totalGenerated || 0;
 
-        // Transform data for charts
         const frameworkData = stats.byFramework?.map((f: any) => ({
             name: f.framework,
             value: parseInt(f.count)
@@ -83,15 +85,17 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
             value: parseInt(t.count)
         })) || [];
 
-        // Custom Tooltip for Recharts
         const CustomTooltip = ({ active, payload, label }: any) => {
             if (active && payload && payload.length) {
                 return (
-                    <div className="bg-popover border border-border p-3 rounded-lg shadow-lg">
-                        <p className="font-medium text-popover-foreground">{label}</p>
-                        <p className="text-sm text-primary">
-                            {`${payload[0].value} Projects`}
-                        </p>
+                    <div className="bg-background/95 border border-border/50 p-3 rounded-xl shadow-xl backdrop-blur-md ring-1 ring-black/5 dark:ring-white/10">
+                        <p className="font-semibold text-foreground mb-1">{label}</p>
+                        <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-primary" />
+                            <p className="text-sm font-medium text-muted-foreground">
+                                {formatNumber(payload[0].value)} Projects
+                            </p>
+                        </div>
                     </div>
                 );
             }
@@ -100,7 +104,7 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
 
         return (
             <motion.div
-                className="space-y-8 py-4 "
+                className="space-y-8 py-2"
                 variants={container}
                 initial="hidden"
                 animate="show"
@@ -108,52 +112,57 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
                 {/* KPI Cards */}
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                     <motion.div variants={item}>
-                        <Card className="hover:shadow-lg transition-all duration-300 border-primary/20 bg-card/50 backdrop-blur-sm">
+                        <Card className="overflow-hidden relative border-primary/10 dark:border-primary/20 bg-gradient-to-br from-card to-primary/5">
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                                <RefreshCw className="w-24 h-24 text-primary" />
+                            </div>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Total Projects</CardTitle>
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Total Projects</CardTitle>
                                 <RefreshCw className="h-4 w-4 text-primary" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">{totalGenerations}</div>
-                                <p className="text-xs text-muted-foreground mt-1">Generated & counting</p>
+                                <div className="text-4xl font-bold tracking-tight text-foreground">{formatNumber(totalGenerations)}</div>
+                                <p className="text-xs text-muted-foreground mt-2 font-medium flex items-center gap-1">
+                                    <span className="text-green-500">Live</span> generated & counting
+                                </p>
                             </CardContent>
                         </Card>
                     </motion.div>
 
                     <motion.div variants={item}>
-                        <Card className="hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
+                        <Card className="group hover:border-violet-500/50 transition-colors duration-300">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Top Language</CardTitle>
-                                <Code2 className="h-4 w-4 text-violet-500" />
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Top Language</CardTitle>
+                                <Code2 className="h-4 w-4 text-violet-500 group-hover:scale-110 transition-transform" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">{languageData[0]?.name || '-'}</div>
+                                <div className="text-3xl font-bold capitalize">{languageData[0]?.name || '-'}</div>
                                 <p className="text-xs text-muted-foreground mt-1">Community Favorite</p>
                             </CardContent>
                         </Card>
                     </motion.div>
 
                     <motion.div variants={item}>
-                        <Card className="hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
+                        <Card className="group hover:border-pink-500/50 transition-colors duration-300">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Top Framework</CardTitle>
-                                <TrendingUp className="h-4 w-4 text-pink-500" />
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Top Framework</CardTitle>
+                                <TrendingUp className="h-4 w-4 text-pink-500 group-hover:scale-110 transition-transform" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold">{frameworkData[0]?.name || '-'}</div>
+                                <div className="text-3xl font-bold capitalize">{frameworkData[0]?.name || '-'}</div>
                                 <p className="text-xs text-muted-foreground mt-1">Most Selected</p>
                             </CardContent>
                         </Card>
                     </motion.div>
 
                     <motion.div variants={item}>
-                        <Card className="hover:shadow-lg transition-all duration-300 bg-card/50 backdrop-blur-sm">
+                        <Card className="group hover:border-blue-500/50 transition-colors duration-300">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                <CardTitle className="text-sm font-medium">Primary Focus</CardTitle>
-                                <Globe className="h-4 w-4 text-blue-500" />
+                                <CardTitle className="text-sm font-medium text-muted-foreground">Primary Focus</CardTitle>
+                                <Globe className="h-4 w-4 text-blue-500 group-hover:scale-110 transition-transform" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-3xl font-bold text-wrap">{typeData[0]?.name || '-'}</div>
+                                <div className="text-3xl font-bold text-wrap truncate" title={typeData[0]?.name}>{typeData[0]?.name || '-'}</div>
                                 <p className="text-xs text-muted-foreground mt-1">Testing Type</p>
                             </CardContent>
                         </Card>
@@ -165,29 +174,28 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
 
                     {/* Framework Popularity */}
                     <motion.div variants={item} className="col-span-1">
-                        <Card className="h-full hover:shadow-lg transition-shadow bg-card/50 backdrop-blur-sm">
+                        <Card className="h-full border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <CardHeader>
                                 <CardTitle>Framework Popularity</CardTitle>
                                 <CardDescription>Tools chosen by engineers worldwide</CardDescription>
                             </CardHeader>
-                            <CardContent className="h-[300px]">
+                            <CardContent className="h-[350px]">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={frameworkData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                                    <BarChart data={frameworkData} layout="vertical" margin={{ left: 20, right: 30, top: 10, bottom: 10 }}>
                                         <XAxis type="number" hide />
                                         <YAxis
                                             dataKey="name"
                                             type="category"
                                             width={100}
-                                            tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                                            tick={{ fontSize: 13, fill: '#888888', fontWeight: 500 }}
                                             axisLine={false}
                                             tickLine={false}
                                         />
-                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--muted)', opacity: 0.1 }} />
+                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--primary)', opacity: 0.05 }} />
                                         <Bar
                                             dataKey="value"
-                                            fill="#8b5cf6"
-                                            radius={[0, 4, 4, 0]}
-                                            barSize={24}
+                                            radius={[0, 6, 6, 0]}
+                                            barSize={32}
                                             animationDuration={1500}
                                         >
                                             {frameworkData.map((entry: any, index: number) => (
@@ -202,25 +210,26 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
 
                     {/* Language Distribution */}
                     <motion.div variants={item} className="col-span-1">
-                        <Card className="h-full hover:shadow-lg transition-shadow bg-card/50 backdrop-blur-sm">
+                        <Card className="h-full border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <CardHeader>
                                 <CardTitle>Language Distribution</CardTitle>
                                 <CardDescription>Preferred ecosystem breakdown</CardDescription>
                             </CardHeader>
-                            <CardContent className="h-[300px]">
+                            <CardContent className="h-[350px]">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
                                             data={languageData}
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={60}
-                                            outerRadius={90}
-                                            paddingAngle={4}
+                                            innerRadius={80}
+                                            outerRadius={110}
+                                            paddingAngle={5}
                                             dataKey="value"
+                                            stroke="none"
                                         >
                                             {languageData.map((entry: any, index: number) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={2} stroke="var(--background)" />
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
                                         <Tooltip content={<CustomTooltip />} />
@@ -228,7 +237,16 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
                                             verticalAlign="bottom"
                                             height={36}
                                             iconType="circle"
-                                            formatter={(value) => <span className="text-sm text-muted-foreground">{value}</span>}
+                                            content={({ payload }) => (
+                                                <div className="flex flex-wrap justify-center gap-4 mt-4">
+                                                    {payload?.map((entry: any, index: number) => (
+                                                        <div key={`legend-${index}`} className="flex items-center gap-2">
+                                                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+                                                            <span className="text-sm font-medium text-muted-foreground capitalize">{entry.value}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -236,29 +254,28 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
                         </Card>
                     </motion.div>
 
-                    {/* Testing Type Distribution */}
+                    {/* Testing Type Distribution - Full Width */}
                     <motion.div variants={item} className="col-span-1 md:col-span-2">
-                        <Card className="hover:shadow-lg transition-shadow bg-card/50 backdrop-blur-sm">
+                        <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <CardHeader>
                                 <CardTitle>Testing Strategy Distribution</CardTitle>
                                 <CardDescription>What are teams testing the most?</CardDescription>
                             </CardHeader>
-                            <CardContent className="h-[200px]">
+                            <CardContent className="h-[250px]">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={typeData} margin={{ top: 20 }}>
+                                    <BarChart data={typeData} margin={{ top: 20, bottom: 20 }}>
                                         <XAxis
                                             dataKey="name"
-                                            tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+                                            tick={{ fontSize: 13, fill: '#888888', fontWeight: 500 }}
                                             axisLine={false}
                                             tickLine={false}
+                                            dy={10}
                                         />
-                                        <YAxis hide />
-                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--muted)', opacity: 0.1 }} />
+                                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--primary)', opacity: 0.05 }} />
                                         <Bar
                                             dataKey="value"
-                                            fill="#0ea5e9"
-                                            radius={[6, 6, 0, 0]}
-                                            barSize={50}
+                                            radius={[8, 8, 0, 0]}
+                                            barSize={60}
                                             animationDuration={1500}
                                         >
                                             {typeData.map((entry: any, index: number) => (
@@ -277,13 +294,15 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader className="space-y-2">
-                    <DialogTitle className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent w-fit">
-                        Global QA Trends
+            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50">
+                <DialogHeader className="space-y-2 pb-6 border-b border-border/40">
+                    <DialogTitle className="text-4xl font-black tracking-tighter">
+                        <span className="bg-gradient-to-r from-violet-600 via-pink-500 to-amber-500 bg-clip-text text-transparent">
+                            Global QA Trends
+                        </span>
                     </DialogTitle>
-                    <DialogDescription className="text-lg text-muted-foreground">
-                        Real-time insights generated by the QAStarter community.
+                    <DialogDescription className="text-lg text-muted-foreground font-medium">
+                        Real-time adoption metrics from the global QAStarter community.
                     </DialogDescription>
                 </DialogHeader>
 

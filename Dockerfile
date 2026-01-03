@@ -33,8 +33,8 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/server/templates ./server/templates
 COPY --from=builder /app/package.json ./package.json
 
-# Create logs directory
-RUN mkdir -p logs && chown -R qastarter:nodejs logs
+# Create logs and data directories
+RUN mkdir -p logs server/data && chown -R qastarter:nodejs logs server/data
 
 # Set environment variables
 ENV NODE_ENV=production

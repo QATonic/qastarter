@@ -55,11 +55,11 @@ export default function Header({ onLogoClick }: HeaderProps) {
               variant="outline"
               size="sm"
               onClick={() => setTrendsOpen(true)}
-              className="gap-1.5 hidden md:flex bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 dark:from-primary dark:to-purple-600 text-white dark:text-white border-primary dark:border-primary font-medium"
+              className="gap-1.5 flex bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 dark:from-primary dark:to-purple-600 text-white dark:text-white border-primary dark:border-primary font-medium"
               aria-label="View Global Trends"
             >
               <BarChart3 className="h-4 w-4" />
-              <span>Trends</span>
+              <span className="hidden sm:inline">Trends</span>
             </Button>
 
             {/* About Button */}

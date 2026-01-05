@@ -6,6 +6,7 @@ import { exec } from "child_process";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { errorHandler, notFoundHandler } from "./errors";
+import { correlationMiddleware } from "./middleware/correlationMiddleware";
 
 const app = express();
 
@@ -78,6 +79,10 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
+
+// Correlation ID middleware - adds request/correlation IDs for tracing
+// Must be early in the middleware chain for all subsequent logs to include IDs
+app.use(correlationMiddleware);
 
 // Request Timeout Middleware - Prevents slow loris attacks
 // Different timeouts for different operations

@@ -37,6 +37,25 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    depends_on:
+      - redis
+
+  # Redis for distributed caching (production ready)
+  redis:
+    image: redis:7-alpine
+    container_name: qastarter-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   # Development-only service for running tests
   test-runner:
@@ -54,6 +73,11 @@ services:
     profiles:
       - test
 
+volumes:
+  redis-data:
+    driver: local
+
 networks:
   default:
     name: qastarter-network
+

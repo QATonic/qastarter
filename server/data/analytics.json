@@ -37,5 +37,31 @@
     "cicdTool": null,
     "reportingTool": null,
     "createdAt": "2026-01-02T22:04:25.886Z"
+  },
+  {
+    "id": 4,
+    "projectName": "javaSelenium",
+    "testingType": "web",
+    "framework": "selenium",
+    "language": "java",
+    "testingPattern": "page-object-model",
+    "testRunner": "testng",
+    "buildTool": "maven",
+    "cicdTool": "jenkins",
+    "reportingTool": "extent-reports",
+    "createdAt": "2026-01-05T18:24:18.523Z"
+  },
+  {
+    "id": 5,
+    "projectName": "javaPlaywright",
+    "testingType": "web",
+    "framework": "playwright",
+    "language": "java",
+    "testingPattern": "page-object-model",
+    "testRunner": "testng",
+    "buildTool": "maven",
+    "cicdTool": "azure-devops",
+    "reportingTool": "allure",
+    "createdAt": "2026-01-05T18:49:09.526Z"
   }
 ]

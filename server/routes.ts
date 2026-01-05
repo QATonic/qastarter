@@ -24,6 +24,7 @@ import {
   getDeviceType,
   generateSessionId
 } from "./services/analyticsService";
+import { getCacheHealth } from "./services/cache";
 
 // Rate limiting configuration (using centralized config)
 const apiLimiter = rateLimit({
@@ -660,6 +661,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/analytics/session", asyncHandler(async (req, res) => {
     const sessionId = generateSessionId();
     res.json({ success: true, sessionId });
+  }));
+
+  // ============================================
+  // Health Check Endpoints
+  // ============================================
+
+  // Cache health check endpoint
+  app.get("/api/v1/health/cache", asyncHandler(async (req, res) => {
+    const cacheHealth = await getCacheHealth();
+
+    res.json({
+      success: true,
+      data: {
+        status: cacheHealth.healthy ? 'healthy' : 'unhealthy',
+        provider: cacheHealth.provider,
+        statistics: cacheHealth.stats,
+        timestamp: new Date().toISOString(),
+      }
+    });
   }));
 
   const httpServer = createServer(app);

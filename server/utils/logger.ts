@@ -2,13 +2,14 @@
  * Structured Logger for QAStarter
  * 
  * Provides JSON-formatted logging with file rotation,
- * request ID tracking, and appropriate log levels.
+ * request ID tracking, correlation IDs, and appropriate log levels.
  */
 
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getCorrelationContext } from '../middleware/correlationMiddleware';
 
 // Determine logs directory - handle Docker/Production environment explicitly
 // In Docker (Linux), we want to use /app/logs to match the Dockerfile & permissions
@@ -40,19 +41,45 @@ const LOG_COLORS = {
 
 winston.addColors(LOG_COLORS);
 
+/**
+ * Custom format that automatically injects correlation context into logs
+ */
+const correlationFormat = winston.format((info) => {
+    const context = getCorrelationContext();
+    if (context) {
+        info.correlationId = context.correlationId;
+        info.requestId = context.requestId;
+        if (context.traceId) info.traceId = context.traceId;
+        if (context.spanId) info.spanId = context.spanId;
+        info.path = context.path;
+        info.method = context.method;
+        info.durationMs = Date.now() - context.startTime;
+    }
+    return info;
+});
+
 // Custom format for console (colorized, readable)
 const consoleFormat = winston.format.combine(
+    correlationFormat(),
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.colorize({ all: true }),
-    winston.format.printf(({ timestamp, level, message, requestId, ...meta }) => {
-        const reqIdStr = requestId ? `[${requestId}]` : '';
-        const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
-        return `${timestamp} ${level}: ${reqIdStr} ${message}${metaStr}`;
+    winston.format.printf(({ timestamp, level, message, correlationId, requestId, durationMs, ...meta }) => {
+        const corrId = correlationId as string | undefined;
+        const reqId = requestId as string | undefined;
+        const duration = durationMs as number | undefined;
+        const corrIdStr = corrId ? `[${corrId.substring(0, 8)}]` : '';
+        const reqIdStr = reqId ? `[${reqId}]` : '';
+        const durationStr = duration ? `(${duration}ms)` : '';
+        // Filter out context fields from meta for cleaner output
+        const { path: _p, method: _m, traceId: _t, spanId: _s, ...cleanMeta } = meta;
+        const metaStr = Object.keys(cleanMeta).length ? ` ${JSON.stringify(cleanMeta)}` : '';
+        return `${timestamp} ${level}: ${corrIdStr}${reqIdStr} ${message} ${durationStr}${metaStr}`;
     })
 );
 
-// Custom format for files (JSON)
+// Custom format for files (JSON with full context)
 const fileFormat = winston.format.combine(
+    correlationFormat(),
     winston.format.timestamp(),
     winston.format.json()
 );
@@ -208,5 +235,14 @@ export function logShutdown(reason?: string): void {
     logger.info('Server shutting down', { reason });
 }
 
+// Re-export correlation context utilities for convenience
+export {
+    getCorrelationContext,
+    getCorrelationId,
+    getRequestId,
+    getRequestDuration
+} from '../middleware/correlationMiddleware';
+
 // Export default logger
 export default logger;
+

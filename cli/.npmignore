@@ -1,0 +1,31 @@
+# Source files - only publish compiled output
+src/
+*.ts
+!*.d.ts
+
+# Development config
+tsconfig.json
+.eslintrc*
+.prettierrc*
+
+# Build artifacts
+node_modules/
+.git/
+.gitignore
+*.log
+
+# Test files
+*.test.ts
+*.spec.ts
+__tests__/
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

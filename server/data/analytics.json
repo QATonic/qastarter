@@ -102,5 +102,44 @@
     "cicdTool": null,
     "reportingTool": null,
     "createdAt": "2026-01-07T17:14:03.432Z"
+  },
+  {
+    "id": 9,
+    "projectName": "CSharpSelenium",
+    "testingType": "web",
+    "framework": "selenium",
+    "language": "csharp",
+    "testingPattern": "page-object-model",
+    "testRunner": "nunit",
+    "buildTool": "nuget",
+    "cicdTool": "gitlab-ci",
+    "reportingTool": "nunit-reports",
+    "createdAt": "2026-01-07T19:00:10.711Z"
+  },
+  {
+    "id": 10,
+    "projectName": "iosMobile",
+    "testingType": "mobile",
+    "framework": "xcuitest",
+    "language": "swift",
+    "testingPattern": "page-object-model",
+    "testRunner": "xctest",
+    "buildTool": "spm",
+    "cicdTool": null,
+    "reportingTool": null,
+    "createdAt": "2026-01-07T19:14:45.321Z"
+  },
+  {
+    "id": 11,
+    "projectName": "DesktopPython",
+    "testingType": "desktop",
+    "framework": "winappdriver",
+    "language": "python",
+    "testingPattern": "page-object-model",
+    "testRunner": "pytest",
+    "buildTool": "pip",
+    "cicdTool": "circleci",
+    "reportingTool": "pytest-html",
+    "createdAt": "2026-01-07T19:29:34.739Z"
   }
 ]

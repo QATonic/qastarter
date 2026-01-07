@@ -7,6 +7,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { errorHandler, notFoundHandler } from "./errors";
 import { correlationMiddleware } from "./middleware/correlationMiddleware";
+import { setupSwagger } from "./swagger";
 
 const app = express();
 
@@ -182,6 +183,9 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = await registerRoutes(app);
+
+  // Setup Swagger API documentation
+  setupSwagger(app);
 
   // API 404 handler - must be before Vite/static serving
   app.use('/api/*', notFoundHandler);

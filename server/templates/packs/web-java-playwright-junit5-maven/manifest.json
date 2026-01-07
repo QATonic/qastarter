@@ -1,4 +1,6 @@
 {
+  "id": "web-java-playwright-junit5-maven",
+  "displayName": "Java Playwright JUnit5 Maven Framework",
   "name": "Java Playwright JUnit5 Maven Framework",
   "description": "Production-ready Playwright automation framework with flexible patterns, reporting, and CI/CD options",
   "version": "1.0.0",
@@ -268,10 +270,20 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Playwright testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Playwright testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "directories": [
@@ -281,4 +293,3 @@
     "playwright-screenshots"
   ]
 }
-

@@ -1,0 +1,80 @@
+package {{groupId}}.screens
+
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import {{groupId}}.R
+
+/**
+* Login screen page object.
+* Provides fluent API for login interactions.
+*/
+class LoginScreen : BaseScreen<LoginScreen>() {
+
+    // View IDs - Update these to match your actual layout
+    private val usernameField = onViewById(R.id.username_input)
+    private val passwordField = onViewById(R.id.password_input)
+    private val loginButton = onViewById(R.id.login_button)
+    private val errorMessage = onViewById(R.id.error_message)
+    private val forgotPasswordLink = onViewById(R.id.forgot_password)
+
+    /**
+    * Enter username.
+    */
+    fun enterUsername(username: String): LoginScreen {
+    return typeText(usernameField, username)
+    }
+
+    /**
+    * Enter password.
+    */
+    fun enterPassword(password: String): LoginScreen {
+    return typeText(passwordField, password)
+    }
+
+    /**
+    * Click the login button.
+    */
+    fun clickLogin(): LoginScreen {
+    closeKeyboard()
+    return click(loginButton)
+    }
+
+    /**
+    * Perform login with credentials.
+    */
+    fun loginWith(username: String, password: String): LoginScreen {
+    enterUsername(username)
+    enterPassword(password)
+    return clickLogin()
+    }
+
+    /**
+    * Verify error message is displayed.
+    */
+    fun verifyErrorMessage(expectedMessage: String): LoginScreen {
+    return verifyText(errorMessage, expectedMessage)
+    }
+
+    /**
+    * Verify login button is enabled.
+    */
+    fun verifyLoginButtonEnabled(): LoginScreen {
+    return verifyEnabled(loginButton)
+    }
+
+    /**
+    * Click forgot password link.
+    */
+    fun clickForgotPassword(): LoginScreen {
+    return click(forgotPasswordLink)
+    }
+
+    /**
+    * Verify login screen is displayed.
+    */
+    fun verifyScreenDisplayed(): LoginScreen {
+    verifyDisplayed(usernameField)
+    verifyDisplayed(passwordField)
+    return verifyDisplayed(loginButton)
+    }
+    }

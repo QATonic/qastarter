@@ -1,0 +1,60 @@
+*** Settings ***
+Documentation Login Test Suite for {{projectName}}
+Resource ../resources/common.resource
+Resource ../resources/pages/LoginPage.resource
+Resource ../resources/pages/HomePage.resource
+Suite Setup Open Browser To URL ${BASE_URL}
+Suite Teardown Close Browser Session
+Test Teardown Take Screenshot On Failure
+
+Force Tags login
+
+*** Variables ***
+${VALID_USERNAME} testuser
+${VALID_PASSWORD} testpass123
+
+*** Test Cases ***
+Valid Login Should Succeed
+[Documentation] Verify user can login with valid credentials
+[Tags] smoke regression
+Navigate To Login Page
+Login With Credentials ${VALID_USERNAME} ${VALID_PASSWORD}
+Verify Successful Login
+Verify User Is Logged In
+
+Invalid Username Should Show Error
+[Documentation] Verify error message for invalid username
+[Tags] regression negative
+Navigate To Login Page
+Login With Credentials invalid_user ${VALID_PASSWORD}
+Verify Login Error Message Invalid username or password
+
+Invalid Password Should Show Error
+[Documentation] Verify error message for invalid password
+[Tags] regression negative
+Navigate To Login Page
+Login With Credentials ${VALID_USERNAME} wrong_password
+Verify Login Error Message Invalid username or password
+
+Empty Username Should Show Error
+[Documentation] Verify error message for empty username
+[Tags] regression negative
+Navigate To Login Page
+Login With Credentials ${EMPTY} ${VALID_PASSWORD}
+Verify Login Error Message Username is required
+
+Empty Password Should Show Error
+[Documentation] Verify error message for empty password
+[Tags] regression negative
+Navigate To Login Page
+Login With Credentials ${VALID_USERNAME} ${EMPTY}
+Verify Login Error Message Password is required
+
+User Can Logout After Login
+[Documentation] Verify user can logout after successful login
+[Tags] smoke regression
+Navigate To Login Page
+Login With Credentials ${VALID_USERNAME} ${VALID_PASSWORD}
+Verify Successful Login
+Click Logout
+Page Should Contain Element ${LOGIN_BUTTON}

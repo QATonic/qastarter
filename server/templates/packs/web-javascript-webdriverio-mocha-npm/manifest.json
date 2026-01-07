@@ -1,5 +1,6 @@
 {
   "id": "web-javascript-webdriverio-mocha-npm",
+  "displayName": "WebdriverIO JavaScript Framework",
   "supportsDynamic": true,
   "name": "WebdriverIO JavaScript Framework",
   "description": "Modern web automation framework with WebdriverIO, Mocha, and JavaScript",
@@ -149,10 +150,20 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Selenium Grid","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Selenium Grid",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "supportedCombination": {
@@ -181,4 +192,3 @@
     ]
   }
 }
-

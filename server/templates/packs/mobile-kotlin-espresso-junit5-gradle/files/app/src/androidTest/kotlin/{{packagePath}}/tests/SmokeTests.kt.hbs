@@ -1,0 +1,54 @@
+package {{groupId}}.tests
+
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import {{groupId}}.MainActivity
+import {{groupId}}.screens.LoginScreen
+import {{groupId}}.screens.HomeScreen
+import {{groupId}}.utils.TestUtils
+
+/**
+* Smoke test suite.
+* Quick sanity checks for critical functionality.
+*/
+@RunWith(AndroidJUnit4::class)
+@SmallTest
+class SmokeTests {
+
+@get:Rule
+val activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+companion object {
+private const val VALID_USERNAME = "testuser"
+private const val VALID_PASSWORD = "password123"
+}
+
+@Test
+fun app_shouldLaunchSuccessfully() {
+TestUtils.logInfo("App launched successfully")
+LoginScreen()
+.verifyScreenDisplayed()
+}
+
+@Test
+fun login_quickValidation() {
+LoginScreen()
+.loginWith(VALID_USERNAME, VALID_PASSWORD)
+
+HomeScreen()
+.verifyScreenDisplayed()
+}
+
+@Test
+fun deviceInfo_shouldBeLogged() {
+val deviceInfo = TestUtils.getDeviceInfo()
+TestUtils.logInfo("Running on: ${deviceInfo["model"]} (SDK ${deviceInfo["sdk"]})")
+
+LoginScreen()
+.verifyScreenDisplayed()
+}
+}

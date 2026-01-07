@@ -1,4 +1,6 @@
 {
+  "id": "web-typescript-selenium-jest-npm",
+  "displayName": "TypeScript Selenium WebDriver Jest Framework",
   "name": "TypeScript Selenium WebDriver Jest Framework",
   "description": "Production-ready Selenium automation framework with TypeScript, Jest, and Page Object Model",
   "version": "1.0.0",
@@ -177,7 +179,12 @@
       "description": "TypeScript type definitions"
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".dockerignore",
@@ -201,7 +208,12 @@
       }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Selenium Grid","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Selenium Grid",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "directories": [
@@ -212,4 +224,3 @@
     "types"
   ]
 }
-

@@ -1,0 +1,45 @@
+*** Settings ***
+Documentation Common resources for {{projectName}}
+Library SeleniumLibrary
+Library Collections
+Library String
+Library OperatingSystem
+Library ../libraries/CustomLibrary.py
+
+*** Variables ***
+${BROWSER} chrome
+${HEADLESS} false
+${IMPLICIT_WAIT} 10
+${TIMEOUT} 30
+
+*** Keywords ***
+Open Browser To URL
+[Arguments] ${url}
+${options}= Evaluate selenium.webdriver.ChromeOptions() modules=selenium.webdriver
+Run Keyword If '${HEADLESS}' == 'true' Call Method ${options} add_argument --headless
+Open Browser ${url} ${BROWSER} options=${options}
+Set Selenium Implicit Wait ${IMPLICIT_WAIT}
+Set Selenium Timeout ${TIMEOUT}
+Maximize Browser Window
+
+Close Browser Session
+Close All Browsers
+
+Wait And Click Element
+[Arguments] ${locator}
+Wait Until Element Is Visible ${locator} timeout=${TIMEOUT}
+Click Element ${locator}
+
+Wait And Input Text
+[Arguments] ${locator} ${text}
+Wait Until Element Is Visible ${locator} timeout=${TIMEOUT}
+Input Text ${locator} ${text}
+
+Element Should Contain Text
+[Arguments] ${locator} ${expected_text}
+Wait Until Element Is Visible ${locator} timeout=${TIMEOUT}
+${actual_text}= Get Text ${locator}
+Should Contain ${actual_text} ${expected_text}
+
+Take Screenshot On Failure
+Run Keyword If Test Failed Capture Page Screenshot screenshots/${TEST NAME}.png

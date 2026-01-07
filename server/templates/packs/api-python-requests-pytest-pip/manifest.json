@@ -1,5 +1,6 @@
 {
   "id": "api-python-requests-pytest-pip",
+  "displayName": "API Testing Framework",
   "name": "API Testing Framework",
   "description": "REST API automation framework with Python, Requests, and Pytest",
   "tags": [
@@ -206,4 +207,3 @@
     }
   ]
 }
-

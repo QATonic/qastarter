@@ -1,5 +1,6 @@
 {
   "id": "api-csharp-restsharp-nunit-nuget",
+  "displayName": "API Testing Framework",
   "supportsDynamic": true,
   "name": "API Testing Framework",
   "description": "REST API automation framework with C#, RestSharp, and NUnit",
@@ -152,7 +153,12 @@
       "description": "Test data file reader"
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": "Features/Login.feature",
@@ -197,4 +203,3 @@
     ]
   }
 }
-

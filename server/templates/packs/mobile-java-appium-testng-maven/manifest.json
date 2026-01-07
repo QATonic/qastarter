@@ -1,6 +1,7 @@
 {
-  "name": "mobile-java-appium-testng-maven",
+  "id": "mobile-java-appium-testng-maven",
   "displayName": "Java + Appium + TestNG + Maven",
+  "name": "mobile-java-appium-testng-maven",
   "description": "Professional mobile automation framework with Java, Appium, TestNG, and Maven for iOS and Android testing",
   "version": "2.0.0",
   "category": "mobile-testing",
@@ -383,4 +384,3 @@
     ]
   }
 }
-

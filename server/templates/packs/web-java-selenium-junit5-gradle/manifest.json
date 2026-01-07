@@ -1,6 +1,7 @@
 {
-  "name": "web-java-selenium-junit5-gradle",
+  "id": "web-java-selenium-junit5-gradle",
   "displayName": "Java + Selenium + JUnit 5 + Gradle",
+  "name": "web-java-selenium-junit5-gradle",
   "description": "Professional QA automation framework with Java, Selenium WebDriver, JUnit 5, and Gradle for web application testing",
   "version": "1.0.0",
   "supportsDynamic": true,

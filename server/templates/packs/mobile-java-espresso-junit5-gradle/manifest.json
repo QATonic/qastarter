@@ -1,5 +1,6 @@
 {
   "id": "mobile-java-espresso-junit5-gradle",
+  "displayName": "Espresso Android Testing Framework",
   "supportsDynamic": true,
   "name": "Espresso Android Testing Framework",
   "description": "Native Android UI testing framework with Espresso, JUnit 5, and Java",
@@ -163,10 +164,20 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for Android SDK","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for Android SDK",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Android emulator testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Android emulator testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "supportedCombination": {
@@ -196,4 +207,3 @@
     ]
   }
 }
-

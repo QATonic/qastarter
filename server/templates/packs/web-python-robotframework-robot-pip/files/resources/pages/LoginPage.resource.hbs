@@ -1,0 +1,42 @@
+*** Settings ***
+Documentation Login Page Keywords
+Resource ../common.resource
+
+*** Variables ***
+${LOGIN_URL} ${BASE_URL}/login
+${USERNAME_FIELD} id=username
+${PASSWORD_FIELD} id=password
+${LOGIN_BUTTON} id=login-button
+${ERROR_MESSAGE} css=.error-message
+${WELCOME_MESSAGE} css=.welcome-message
+
+*** Keywords ***
+Navigate To Login Page
+Go To ${LOGIN_URL}
+Wait Until Element Is Visible ${USERNAME_FIELD}
+
+Enter Username
+[Arguments] ${username}
+Wait And Input Text ${USERNAME_FIELD} ${username}
+
+Enter Password
+[Arguments] ${password}
+Wait And Input Text ${PASSWORD_FIELD} ${password}
+
+Click Login Button
+Wait And Click Element ${LOGIN_BUTTON}
+
+Login With Credentials
+[Arguments] ${username} ${password}
+Enter Username ${username}
+Enter Password ${password}
+Click Login Button
+
+Verify Login Error Message
+[Arguments] ${expected_message}
+Wait Until Element Is Visible ${ERROR_MESSAGE}
+Element Should Contain Text ${ERROR_MESSAGE} ${expected_message}
+
+Verify Successful Login
+Wait Until Element Is Visible ${WELCOME_MESSAGE}
+Element Should Be Visible ${WELCOME_MESSAGE}

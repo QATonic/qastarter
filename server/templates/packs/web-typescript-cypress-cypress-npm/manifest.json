@@ -1,5 +1,6 @@
 {
   "id": "web-typescript-cypress-cypress-npm",
+  "displayName": "Web Automation Framework",
   "supportsDynamic": true,
   "name": "Web Automation Framework",
   "description": "Cypress test automation framework with TypeScript and npm for web testing",

@@ -1,5 +1,6 @@
 {
   "id": "mobile-csharp-appium-nunit-nuget",
+  "displayName": "Mobile Automation Framework",
   "supportsDynamic": true,
   "name": "Mobile Automation Framework",
   "description": "Appium test automation framework with C# (.NET 8) and NUnit for iOS/Android mobile testing",
@@ -47,7 +48,12 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".gitignore",
@@ -202,4 +208,3 @@
     ]
   }
 }
-

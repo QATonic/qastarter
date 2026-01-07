@@ -11,7 +11,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1">✓ Cross-browser testing (Chrome, Firefox, Edge, Safari)</p>
       <p className="text-xs">✓ Responsive design validation</p>
       <p className="text-xs">✓ Form interactions and validations</p>
-      <p className="text-xs mt-1 italic">Frameworks: Selenium, Playwright, Cypress</p>
+      <p className="text-xs mt-1 italic">Frameworks: Selenium, Playwright, Cypress, Robot Framework</p>
     </div>
   ),
   mobile: (
@@ -168,6 +168,16 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Accessibility testing</p>
     </div>
   ),
+  robotframework: (
+    <div>
+      <p className="font-medium mb-1">Robot Framework</p>
+      <p className="text-xs">Keyword-driven testing framework for acceptance testing and RPA.</p>
+      <p className="text-xs mt-1">✓ Human-readable test syntax</p>
+      <p className="text-xs">✓ Extensive library ecosystem</p>
+      <p className="text-xs">✓ SeleniumLibrary for web testing</p>
+      <p className="text-xs mt-1 italic">Best for: Acceptance testing and non-programmers</p>
+    </div>
+  ),
 
   // Languages
   java: (
@@ -228,6 +238,16 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ XCTest framework</p>
       <p className="text-xs">✓ Xcode integration</p>
       <p className="text-xs mt-1 italic">Best for: iOS development teams</p>
+    </div>
+  ),
+  kotlin: (
+    <div>
+      <p className="font-medium mb-1">Kotlin</p>
+      <p className="text-xs">Modern JVM language by JetBrains, official for Android development.</p>
+      <p className="text-xs mt-1">✓ Concise and expressive syntax</p>
+      <p className="text-xs">✓ Full Java interoperability</p>
+      <p className="text-xs">✓ Android Studio integration</p>
+      <p className="text-xs mt-1 italic">Best for: Android and modern JVM projects</p>
     </div>
   ),
 
@@ -302,6 +322,16 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: Complex projects with varied requirements</p>
     </div>
   ),
+  "contract-testing": (
+    <div>
+      <p className="font-medium mb-1">Contract Testing (Pact)</p>
+      <p className="text-xs">Consumer-driven contract testing for API integrations.</p>
+      <p className="text-xs mt-1">✓ Verify API compatibility between services</p>
+      <p className="text-xs">✓ Consumer defines expected interactions</p>
+      <p className="text-xs">✓ Provider verifies against contracts</p>
+      <p className="text-xs mt-1 italic">Best for: Microservices and API integrations</p>
+    </div>
+  ),
 
   // Test Runners
   testng: (
@@ -370,6 +400,16 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1">✓ UI and unit testing</p>
       <p className="text-xs">✓ Performance testing</p>
       <p className="text-xs">✓ Xcode integration</p>
+    </div>
+  ),
+  robot: (
+    <div>
+      <p className="font-medium mb-1">Robot Framework</p>
+      <p className="text-xs">Keyword-driven test runner for acceptance testing.</p>
+      <p className="text-xs mt-1">✓ .robot test files</p>
+      <p className="text-xs">✓ Built-in HTML reports</p>
+      <p className="text-xs">✓ Library-based extensibility</p>
+      <p className="text-xs mt-1 italic">Standard for Robot Framework projects</p>
     </div>
   ),
 
@@ -612,6 +652,15 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1">✓ Universal CI/CD support</p>
       <p className="text-xs">✓ Industry standard format</p>
       <p className="text-xs">✓ Tool agnostic</p>
+    </div>
+  ),
+  "robot-reports": (
+    <div>
+      <p className="font-medium mb-1">Robot Framework Reports</p>
+      <p className="text-xs">Built-in HTML reports from Robot Framework.</p>
+      <p className="text-xs mt-1">✓ Interactive log.html and report.html</p>
+      <p className="text-xs">✓ Screenshot and trace attachments</p>
+      <p className="text-xs">✓ No additional setup required</p>
     </div>
   ),
 

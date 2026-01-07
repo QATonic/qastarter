@@ -1,0 +1,72 @@
+{
+    "$comment": "Centralized tool versions for all QAStarter templates",
+    "java": {
+        "jdk": "11",
+        "maven": "3.9.0",
+        "gradle": "8.4"
+    },
+    "node": {
+        "node": "20",
+        "npm": "10"
+    },
+    "python": {
+        "python": "3.11",
+        "pip": "23.0"
+    },
+    "dotnet": {
+        "dotnet": "8.0",
+        "nuget": "6.8"
+    },
+    "swift": {
+        "swift": "5.9",
+        "xcode": "15"
+    },
+    "kotlin": {
+        "kotlin": "1.9.22"
+    },
+    "webTesting": {
+        "selenium": "4.16.0",
+        "playwright": "1.41.0",
+        "cypress": "13.6.3",
+        "webdriverio": "8.27.0"
+    },
+    "apiTesting": {
+        "restassured": "5.4.0",
+        "supertest": "6.3.4",
+        "requests": "2.31.0",
+        "restsharp": "110.2.0",
+        "pact": "4.6.3"
+    },
+    "mobileTesting": {
+        "appium": "9.0.0",
+        "espresso": "3.5.1",
+        "xcuitest": "15.0"
+    },
+    "desktopTesting": {
+        "winappdriver": "1.2.1",
+        "pyautogui": "0.9.54"
+    },
+    "testRunners": {
+        "testng": "7.8.0",
+        "junit5": "5.10.1",
+        "pytest": "7.4.4",
+        "jest": "29.7.0",
+        "mocha": "10.2.0",
+        "nunit": "3.14.0",
+        "xctest": "15.0",
+        "cucumber": "7.15.0",
+        "robotframework": "7.0"
+    },
+    "reporting": {
+        "allure": "2.25.0",
+        "extentreports": "5.1.1",
+        "jesthtmlreporter": "3.10.2",
+        "mochawesome": "7.1.3"
+    },
+    "utilities": {
+        "log4j": "2.22.0",
+        "winston": "3.11.0",
+        "jackson": "2.16.0",
+        "gson": "2.10.1"
+    }
+}

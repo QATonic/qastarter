@@ -1,4 +1,6 @@
 {
+  "id": "web-java-selenium-testng-maven",
+  "displayName": "Java Selenium WebDriver TestNG Maven Framework",
   "name": "Java Selenium WebDriver TestNG Maven Framework",
   "description": "Production-ready UI automation framework with flexible patterns, reporting, and CI/CD options",
   "version": "2.0.0",
@@ -11,9 +13,23 @@
     "buildTool": "maven"
   },
   "dynamicSupport": {
-    "reportingTools": ["allure", "extent-reports", "testng-reports", "junit-reports"],
-    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
-    "testingPatterns": ["page-object-model", "bdd"]
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "testng-reports",
+      "junit-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
   },
   "toolVersions": {
     "java": "11",
@@ -32,7 +48,7 @@
       "description": "Maven build configuration with all dependencies and profiles"
     },
     {
-      "path": "README.md", 
+      "path": "README.md",
       "isTemplate": true,
       "description": "Complete setup and usage documentation"
     },
@@ -45,31 +61,41 @@
       "path": "Jenkinsfile",
       "isTemplate": true,
       "description": "Jenkins declarative pipeline for CI/CD",
-      "conditional": {"cicdTool": "jenkins"}
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
     },
     {
       "path": ".github/workflows/tests.yml",
       "isTemplate": true,
       "description": "GitHub Actions workflow for CI/CD",
-      "conditional": {"cicdTool": "github-actions"}
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
     },
     {
       "path": ".gitlab-ci.yml",
       "isTemplate": true,
       "description": "GitLab CI pipeline configuration",
-      "conditional": {"cicdTool": "gitlab-ci"}
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
     },
     {
       "path": "azure-pipelines.yml",
       "isTemplate": true,
       "description": "Azure DevOps pipeline configuration",
-      "conditional": {"cicdTool": "azure-devops"}
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
     },
     {
       "path": ".circleci/config.yml",
       "isTemplate": true,
       "description": "CircleCI pipeline configuration",
-      "conditional": {"cicdTool": "circleci"}
+      "conditional": {
+        "cicdTool": "circleci"
+      }
     },
     {
       "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
@@ -135,13 +161,17 @@
       "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
       "isTemplate": true,
       "description": "ExtentReports configuration and management",
-      "conditional": {"reportingTool": "extent-reports"}
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
     },
     {
       "path": "src/main/java/{{packagePath}}/utils/AllureManager.java",
       "isTemplate": true,
       "description": "Allure Reports configuration and management",
-      "conditional": {"reportingTool": "allure"}
+      "conditional": {
+        "reportingTool": "allure"
+      }
     },
     {
       "path": "src/main/java/{{packagePath}}/utils/Log.java",
@@ -167,31 +197,41 @@
       "path": "src/test/java/{{packagePath}}/tests/SmokeSuite.java",
       "isTemplate": true,
       "description": "Sample smoke test suite",
-      "conditional": {"testingPattern": "page-object-model"}
+      "conditional": {
+        "testingPattern": "page-object-model"
+      }
     },
     {
       "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
       "isTemplate": true,
       "description": "Cucumber TestNG runner",
-      "conditional": {"testingPattern": "bdd"}
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     },
     {
       "path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java",
       "isTemplate": true,
       "description": "Step definitions for login scenarios",
-      "conditional": {"testingPattern": "bdd"}
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     },
     {
       "path": "src/test/java/{{packagePath}}/stepdefinitions/Hooks.java",
       "isTemplate": true,
       "description": "Cucumber hooks for setup and teardown",
-      "conditional": {"testingPattern": "bdd"}
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     },
     {
       "path": "src/test/resources/features/Login.feature",
       "isTemplate": true,
       "description": "Sample login feature with Gherkin scenarios",
-      "conditional": {"testingPattern": "bdd"}
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     },
     {
       "path": "src/main/resources/setup.properties",
@@ -222,13 +262,17 @@
       "path": "src/main/resources/extent-config.xml",
       "isTemplate": true,
       "description": "ExtentReports configuration",
-      "conditional": {"reportingTool": "extent-reports"}
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
     },
     {
       "path": "src/main/resources/allure.properties",
       "isTemplate": true,
       "description": "Allure Reports configuration",
-      "conditional": {"reportingTool": "allure"}
+      "conditional": {
+        "reportingTool": "allure"
+      }
     },
     {
       "path": "src/test/resources/testng.xml",
@@ -246,10 +290,20 @@
       "description": "Sample JSON test data file"
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Selenium Grid","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Selenium Grid",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "directories": [

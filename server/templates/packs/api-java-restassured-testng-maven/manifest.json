@@ -1,4 +1,6 @@
 {
+  "id": "api-java-restassured-testng-maven",
+  "displayName": "API Testing Framework",
   "name": "API Testing Framework",
   "supportsDynamic": true,
   "description": "Professional REST API automation framework using REST Assured, Java, TestNG, and Maven with comprehensive utilities and reporting",
@@ -246,7 +248,9 @@
       "path": "src/main/resources/extent-config.xml",
       "template": "src/main/resources/extent-config.xml.hbs",
       "isTemplate": true,
-      "conditional": {"reportingTool": "extent-reports"}
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
     },
     {
       "path": "src/test/resources/testng.xml",
@@ -318,4 +322,3 @@
     ]
   }
 }
-

@@ -1,4 +1,6 @@
 {
+  "id": "web-javascript-playwright-jest-npm",
+  "displayName": "JavaScript Playwright Jest Framework",
   "name": "JavaScript Playwright Jest Framework",
   "description": "Modern UI automation framework with Playwright, Page Object Model, and GitHub Actions CI/CD",
   "version": "1.0.0",
@@ -159,7 +161,12 @@
       "description": "User test data"
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".dockerignore",
@@ -183,7 +190,12 @@
       }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Playwright testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Playwright testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "directories": [
@@ -194,4 +206,3 @@
     "trace"
   ]
 }
-

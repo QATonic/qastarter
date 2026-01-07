@@ -1,0 +1,175 @@
+/**
+* Pact Consumer Test - User Service
+*
+* Contract tests for the User API from the consumer perspective.
+* These tests define the expected interactions with the provider.
+*/
+
+import { PactV3, MatchersV3 } from '@pact-foundation/pact';
+import path from 'path';
+import { UserApi } from '../../core/ApiClient';
+
+const { like, eachLike, regex, integer, string } = MatchersV3;
+
+// Configure the Pact provider
+const provider = new PactV3({
+consumer: '{{projectName}}Consumer',
+provider: 'UserService',
+dir: path.resolve(process.cwd(), 'pacts'),
+logLevel: 'warn',
+});
+
+describe('User API Contract Tests', () => {
+describe('GET /users', () => {
+it('returns a list of users', async () => {
+// Define the expected interaction
+await provider
+.given('users exist')
+.uponReceiving('a request for all users')
+.withRequest({
+method: 'GET',
+path: '/users',
+headers: {
+Accept: 'application/json',
+},
+})
+.willRespondWith({
+status: 200,
+headers: {
+'Content-Type': 'application/json',
+},
+body: eachLike({
+id: integer(1),
+name: string('John Doe'),
+email: regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'john@example.com'),
+createdAt: string('2024-01-01T00:00:00Z'),
+}),
+});
+
+// Execute the test
+await provider.executeTest(async (mockserver) => {
+const api = new UserApi(mockserver.url);
+const users = await api.getUsers();
+
+expect(users).toBeDefined();
+expect(Array.isArray(users)).toBe(true);
+expect(users.length).toBeGreaterThan(0);
+expect(users[0]).toHaveProperty('id');
+expect(users[0]).toHaveProperty('name');
+expect(users[0]).toHaveProperty('email');
+});
+});
+});
+
+describe('GET /users/:id', () => {
+it('returns a single user', async () => {
+const userId = 1;
+
+await provider
+.given('user with ID 1 exists')
+.uponReceiving('a request for user 1')
+.withRequest({
+method: 'GET',
+path: `/users/${userId}`,
+headers: {
+Accept: 'application/json',
+},
+})
+.willRespondWith({
+status: 200,
+headers: {
+'Content-Type': 'application/json',
+},
+body: {
+id: integer(userId),
+name: string('John Doe'),
+email: regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, 'john@example.com'),
+createdAt: string('2024-01-01T00:00:00Z'),
+},
+});
+
+await provider.executeTest(async (mockserver) => {
+const api = new UserApi(mockserver.url);
+const user = await api.getUserById(userId);
+
+expect(user).toBeDefined();
+expect(user.id).toBe(userId);
+});
+});
+
+it('returns 404 for non-existent user', async () => {
+const userId = 999;
+
+await provider
+.given('user with ID 999 does not exist')
+.uponReceiving('a request for non-existent user')
+.withRequest({
+method: 'GET',
+path: `/users/${userId}`,
+headers: {
+Accept: 'application/json',
+},
+})
+.willRespondWith({
+status: 404,
+headers: {
+'Content-Type': 'application/json',
+},
+body: {
+error: string('User not found'),
+code: string('NOT_FOUND'),
+},
+});
+
+await provider.executeTest(async (mockserver) => {
+const api = new UserApi(mockserver.url);
+
+await expect(api.getUserById(userId)).rejects.toThrow();
+});
+});
+});
+
+describe('POST /users', () => {
+it('creates a new user', async () => {
+const newUser = {
+name: 'Jane Doe',
+email: 'jane@example.com',
+};
+
+await provider
+.given('the user service is available')
+.uponReceiving('a request to create a user')
+.withRequest({
+method: 'POST',
+path: '/users',
+headers: {
+'Content-Type': 'application/json',
+Accept: 'application/json',
+},
+body: newUser,
+})
+.willRespondWith({
+status: 201,
+headers: {
+'Content-Type': 'application/json',
+},
+body: {
+id: integer(2),
+name: string(newUser.name),
+email: string(newUser.email),
+createdAt: string('2024-01-01T00:00:00Z'),
+},
+});
+
+await provider.executeTest(async (mockserver) => {
+const api = new UserApi(mockserver.url);
+const createdUser = await api.createUser(newUser);
+
+expect(createdUser).toBeDefined();
+expect(createdUser.name).toBe(newUser.name);
+expect(createdUser.email).toBe(newUser.email);
+expect(createdUser.id).toBeDefined();
+});
+});
+});
+});

@@ -4,7 +4,7 @@
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, CheckCircle2, Layers, FileText, Database } from "lucide-react";
+import { AlertCircle, CheckCircle2, Layers, FileText, Database, FileJson2 } from "lucide-react";
 import WizardStep from "../../WizardStep";
 import HelpTooltip from "../../HelpTooltip";
 import { getHelpContent } from "@/lib/helpContent";
@@ -18,6 +18,7 @@ const patternIcons: Record<string, React.ElementType> = {
   'data-driven': Database,
   fluent: Layers,
   'functional-patterns': Layers,
+  'contract-testing': FileJson2,
 };
 
 export default function TestingPatternStep() {
@@ -42,7 +43,7 @@ export default function TestingPatternStep() {
             </span>
           </div>
         )}
-        
+
         <RadioGroup
           value={config.testingPattern}
           onValueChange={(value) => updateConfig("testingPattern", value)}
@@ -53,14 +54,14 @@ export default function TestingPatternStep() {
             const Icon = patternIcons[pattern] || Layers;
             const isSelected = config.testingPattern === pattern;
             const label = validationLabels.testingPatterns[pattern as keyof typeof validationLabels.testingPatterns] || pattern;
-            
+
             return (
-              <div 
-                key={pattern} 
+              <div
+                key={pattern}
                 className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-                  ${isSelected 
-                    ? 'bg-primary/5 border-primary/30 shadow-sm' 
+                  ${isSelected
+                    ? 'bg-primary/5 border-primary/30 shadow-sm'
                     : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
                   }
                   ${!config.framework ? 'opacity-50 pointer-events-none' : ''}
@@ -75,8 +76,8 @@ export default function TestingPatternStep() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <RadioGroupItem 
-                      value={pattern} 
+                    <RadioGroupItem
+                      value={pattern}
                       id={pattern}
                       data-testid={`radio-${pattern}`}
                       className="sr-only"

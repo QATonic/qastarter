@@ -1,6 +1,7 @@
 {
-  "name": "web-java-playwright-junit5-gradle",
+  "id": "web-java-playwright-junit5-gradle",
   "displayName": "Java + Playwright + JUnit 5 + Gradle",
+  "name": "web-java-playwright-junit5-gradle",
   "description": "Professional QA automation framework with Java, Playwright, JUnit 5, and Gradle for web application testing",
   "version": "1.0.0",
   "supportsDynamic": true,

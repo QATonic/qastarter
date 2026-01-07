@@ -1,5 +1,6 @@
 {
   "id": "mobile-python-appium-pytest-pip",
+  "displayName": "Mobile Automation Framework",
   "supportsDynamic": true,
   "name": "Mobile Automation Framework",
   "description": "Appium test automation framework with Python and Pytest for iOS/Android mobile testing",
@@ -40,7 +41,12 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".gitignore",
@@ -157,7 +163,12 @@
       }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Appium testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Appium testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "supportedCombination": {
@@ -186,4 +197,3 @@
     ]
   }
 }
-

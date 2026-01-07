@@ -1,4 +1,6 @@
 {
+  "id": "web-javascript-selenium-jest-npm",
+  "displayName": "JavaScript Selenium WebDriver Jest Framework",
   "name": "JavaScript Selenium WebDriver Jest Framework",
   "description": "Production-ready Selenium automation framework with JavaScript, Jest, and Page Object Model",
   "version": "1.0.0",
@@ -165,7 +167,12 @@
       "description": "User test data"
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".dockerignore",
@@ -189,7 +196,12 @@
       }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Selenium Grid","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Selenium Grid",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "directories": [
@@ -199,4 +211,3 @@
     "allure-results"
   ]
 }
-

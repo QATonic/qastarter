@@ -1,0 +1,40 @@
+*** Settings ***
+Documentation Smoke Test Suite for {{projectName}}
+Resource ../resources/common.resource
+Resource ../resources/pages/LoginPage.resource
+Resource ../resources/pages/HomePage.resource
+Suite Setup Open Browser To URL ${BASE_URL}
+Suite Teardown Close Browser Session
+Test Teardown Take Screenshot On Failure
+
+Force Tags smoke
+
+*** Test Cases ***
+Home Page Should Load Successfully
+[Documentation] Verify home page loads without errors
+[Tags] critical
+Navigate To Home Page
+Verify Navigation Menu Is Visible
+Title Should Not Be Empty
+
+Login Page Should Be Accessible
+[Documentation] Verify login page is accessible
+[Tags] critical
+Navigate To Login Page
+Page Should Contain Element ${USERNAME_FIELD}
+Page Should Contain Element ${PASSWORD_FIELD}
+Page Should Contain Element ${LOGIN_BUTTON}
+
+Valid User Can Login And Logout
+[Documentation] End-to-end login and logout flow
+[Tags] critical
+Navigate To Login Page
+Login With Credentials ${VALID_USERNAME} ${VALID_PASSWORD}
+Verify Successful Login
+Click Logout
+
+Page Title Should Be Correct
+[Documentation] Verify page title is correct
+[Tags] basic
+Navigate To Home Page
+Title Should Contain {{projectName}}

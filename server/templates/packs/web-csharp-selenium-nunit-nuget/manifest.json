@@ -1,4 +1,6 @@
 {
+  "id": "web-csharp-selenium-nunit-nuget",
+  "displayName": "C# Selenium WebDriver NUnit Framework",
   "name": "C# Selenium WebDriver NUnit Framework",
   "description": "Production-ready Selenium automation framework with C#, NUnit, and Page Object Model",
   "version": "1.0.0",
@@ -160,7 +162,12 @@
       "description": "User test data"
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".dockerignore",
@@ -191,4 +198,3 @@
     "Reports"
   ]
 }
-

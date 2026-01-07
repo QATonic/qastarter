@@ -1,0 +1,162 @@
+{
+    "id": "web-python-robotframework-robot-pip",
+    "displayName": "Robot Framework Web Testing",
+    "name": "Robot Framework Web Automation",
+    "description": "Keyword-driven test automation framework with Selenium integration for web testing",
+    "version": "1.0.0",
+    "supportsDynamic": true,
+    "supportedCombination": {
+        "testingType": "web",
+        "framework": "robotframework",
+        "language": "python",
+        "testRunner": "robot",
+        "buildTool": "pip"
+    },
+    "dynamicSupport": {
+        "reportingTools": [
+            "robot-reports",
+            "allure"
+        ],
+        "cicdTools": [
+            "github-actions",
+            "gitlab-ci",
+            "jenkins",
+            "azure-devops",
+            "circleci"
+        ],
+        "testingPatterns": [
+            "page-object-model",
+            "bdd"
+        ]
+    },
+    "toolVersions": {
+        "python": "3.11",
+        "robotframework": "7.0",
+        "robotframework-seleniumlibrary": "6.2.0",
+        "robotframework-browser": "18.0.0",
+        "allure-robotframework": "2.13.2"
+    },
+    "files": [
+        {
+            "path": "requirements.txt",
+            "isTemplate": true,
+            "description": "Python dependencies"
+        },
+        {
+            "path": "README.md",
+            "isTemplate": true,
+            "description": "Project documentation"
+        },
+        {
+            "path": ".gitignore",
+            "isTemplate": false,
+            "description": "Git ignore patterns"
+        },
+        {
+            "path": "robot.yaml",
+            "isTemplate": true,
+            "description": "Robot Framework configuration"
+        },
+        {
+            "path": ".github/workflows/tests.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "github-actions"
+            },
+            "description": "GitHub Actions workflow"
+        },
+        {
+            "path": ".gitlab-ci.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "gitlab-ci"
+            },
+            "description": "GitLab CI configuration"
+        },
+        {
+            "path": "Jenkinsfile",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "jenkins"
+            },
+            "description": "Jenkins pipeline"
+        },
+        {
+            "path": "azure-pipelines.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "azure-devops"
+            },
+            "description": "Azure DevOps pipeline"
+        },
+        {
+            "path": ".circleci/config.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "circleci"
+            },
+            "description": "CircleCI configuration"
+        },
+        {
+            "path": "resources/common.resource",
+            "isTemplate": true,
+            "description": "Common keywords and variables"
+        },
+        {
+            "path": "resources/pages/LoginPage.resource",
+            "isTemplate": true,
+            "description": "Login page keywords"
+        },
+        {
+            "path": "resources/pages/HomePage.resource",
+            "isTemplate": true,
+            "description": "Home page keywords"
+        },
+        {
+            "path": "libraries/CustomLibrary.py",
+            "isTemplate": true,
+            "description": "Custom Python library"
+        },
+        {
+            "path": "variables/dev.yaml",
+            "isTemplate": true,
+            "description": "Development environment variables"
+        },
+        {
+            "path": "variables/qa.yaml",
+            "isTemplate": true,
+            "description": "QA environment variables"
+        },
+        {
+            "path": "tests/login_tests.robot",
+            "isTemplate": true,
+            "description": "Login test suite"
+        },
+        {
+            "path": "tests/smoke_tests.robot",
+            "isTemplate": true,
+            "description": "Smoke test suite"
+        },
+        {
+            "path": "Dockerfile",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.includeDocker": true
+            },
+            "description": "Docker configuration"
+        },
+        {
+            "path": "docker-compose.yml",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.includeDockerCompose": true
+            },
+            "description": "Docker Compose configuration"
+        }
+    ],
+    "directories": [
+        "results",
+        "logs",
+        "screenshots"
+    ]
+}

@@ -1,4 +1,6 @@
 {
+  "id": "desktop-java-winappdriver-testng-maven",
+  "displayName": "Desktop Testing Framework",
   "name": "Desktop Testing Framework",
   "description": "Professional Windows desktop application automation framework using WinAppDriver, Java, TestNG, and Maven with comprehensive utilities and reporting",
   "version": "1.0.0",
@@ -313,4 +315,3 @@
     ]
   }
 }
-

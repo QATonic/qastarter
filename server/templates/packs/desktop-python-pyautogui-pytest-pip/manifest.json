@@ -1,5 +1,6 @@
 {
   "id": "desktop-python-pyautogui-pytest-pip",
+  "displayName": "Desktop GUI Automation Framework",
   "supportsDynamic": true,
   "name": "Desktop GUI Automation Framework",
   "description": "Cross-platform desktop GUI automation with Python, PyAutoGUI, and Pytest",
@@ -146,7 +147,12 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration with Xvfb for headless GUI testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration with Xvfb for headless GUI testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     }
   ],
   "supportedCombination": {
@@ -175,4 +181,3 @@
     ]
   }
 }
-

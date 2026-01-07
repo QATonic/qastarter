@@ -1,5 +1,6 @@
 {
   "id": "web-python-playwright-pytest-pip",
+  "displayName": "Web Automation Framework",
   "supportsDynamic": true,
   "name": "Web Automation Framework",
   "description": "Playwright test automation framework with Python and Pytest for web testing",
@@ -42,7 +43,12 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".gitignore",
@@ -164,7 +170,12 @@
       }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Playwright testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Playwright testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ],
   "supportedCombination": {
@@ -193,4 +204,3 @@
     ]
   }
 }
-

@@ -1,5 +1,6 @@
 {
   "id": "api-javascript-supertest-jest-npm",
+  "displayName": "API Testing Framework",
   "name": "API Testing Framework",
   "description": "REST API automation framework with JavaScript, Supertest, and Jest",
   "tags": [
@@ -172,11 +173,20 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for API testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for API testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ]
 }
-

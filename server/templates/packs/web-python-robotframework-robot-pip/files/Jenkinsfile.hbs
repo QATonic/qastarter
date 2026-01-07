@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+    
+    environment {
+        BROWSER = 'chrome'
+        HEADLESS = 'true'
+    }
+    
+    stages {
+        stage('Setup') {
+            steps {
+                sh '''
+                    python -m pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh '''
+                    robot --variable HEADLESS:true --outputdir results tests/
+                '''
+            }
+            post {
+                always {
+                    robot outputPath: 'results/',
+                          logFileName: 'log.html',
+                          outputFileName: 'output.xml',
+                          reportFileName: 'report.html',
+                          passThreshold: 80.0,
+                          unstableThreshold: 60.0
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            archiveArtifacts artifacts: 'results/**', allowEmptyArchive: true
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'results',
+                reportFiles: 'report.html',
+                reportName: 'Robot Framework Report'
+            ])
+        }
+    }
+}

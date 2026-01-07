@@ -1,8 +1,17 @@
 {
   "id": "web-typescript-playwright-jest-npm",
+  "displayName": "Web Automation Framework",
   "name": "Web Automation Framework",
   "description": "Playwright test automation framework with TypeScript, Jest, and npm for web testing",
-  "tags": ["web", "playwright", "typescript", "jest", "npm", "pom", "bdd"],
+  "tags": [
+    "web",
+    "playwright",
+    "typescript",
+    "jest",
+    "npm",
+    "pom",
+    "bdd"
+  ],
   "supportsDynamic": true,
   "supportedCombination": {
     "testingType": "web",
@@ -12,9 +21,22 @@
     "buildTool": "npm"
   },
   "dynamicSupport": {
-    "reportingTools": ["jest-html", "allure", "junit"],
-    "cicdTools": ["github-actions", "gitlab-ci", "azure-devops", "circleci", "jenkins"],
-    "testingPatterns": ["page-object-model", "bdd"]
+    "reportingTools": [
+      "jest-html",
+      "allure",
+      "junit"
+    ],
+    "cicdTools": [
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci",
+      "jenkins"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
   },
   "toolVersions": {
     "node": "20",
@@ -53,35 +75,50 @@
     {
       "path": ".github/workflows/tests.yml",
       "isTemplate": true,
-      "conditional": {"cicdTool": "github-actions"},
+      "conditional": {
+        "cicdTool": "github-actions"
+      },
       "description": "GitHub Actions CI/CD workflow"
     },
     {
       "path": ".gitlab-ci.yml",
       "isTemplate": true,
-      "conditional": {"cicdTool": "gitlab-ci"},
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
       "description": "GitLab CI/CD configuration"
     },
     {
       "path": "azure-pipelines.yml",
       "isTemplate": true,
-      "conditional": {"cicdTool": "azure-devops"},
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
       "description": "Azure DevOps pipeline configuration"
     },
     {
       "path": ".circleci/config.yml",
       "isTemplate": true,
-      "conditional": {"cicdTool": "circleci"},
+      "conditional": {
+        "cicdTool": "circleci"
+      },
       "description": "CircleCI configuration"
     },
     {
       "path": "Jenkinsfile",
       "isTemplate": true,
-      "conditional": {"cicdTool": "jenkins"},
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
       "description": "Jenkins pipeline configuration"
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".gitignore",
@@ -141,43 +178,57 @@
     {
       "path": "tests/login.test.ts",
       "isTemplate": true,
-      "conditional": {"testingPattern": "page-object-model"},
+      "conditional": {
+        "testingPattern": "page-object-model"
+      },
       "description": "Login test suite (POM)"
     },
     {
       "path": "tests/smoke.test.ts",
       "isTemplate": true,
-      "conditional": {"testingPattern": "page-object-model"},
+      "conditional": {
+        "testingPattern": "page-object-model"
+      },
       "description": "Smoke test suite (POM)"
     },
     {
       "path": "cucumber.js",
       "isTemplate": true,
-      "conditional": {"testingPattern": "bdd"},
+      "conditional": {
+        "testingPattern": "bdd"
+      },
       "description": "Cucumber configuration"
     },
     {
       "path": "features/login.feature",
       "isTemplate": true,
-      "conditional": {"testingPattern": "bdd"},
+      "conditional": {
+        "testingPattern": "bdd"
+      },
       "description": "Login feature file (BDD)"
     },
     {
       "path": "step-definitions/loginSteps.ts",
       "isTemplate": true,
-      "conditional": {"testingPattern": "bdd"},
+      "conditional": {
+        "testingPattern": "bdd"
+      },
       "description": "Login step definitions (BDD)"
     },
     {
       "path": "support/world.ts",
       "isTemplate": true,
-      "conditional": {"testingPattern": "bdd"},
+      "conditional": {
+        "testingPattern": "bdd"
+      },
       "description": "Cucumber world for shared context (BDD)"
     },
     {
       "path": "support/hooks.ts",
       "isTemplate": true,
-      "conditional": {"testingPattern": "bdd"},
+      "conditional": {
+        "testingPattern": "bdd"
+      },
       "description": "Cucumber hooks for setup/teardown (BDD)"
     },
     {
@@ -201,8 +252,12 @@
       "description": "Global TypeScript type definitions"
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for Playwright testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for Playwright testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     }
   ]
 }
-

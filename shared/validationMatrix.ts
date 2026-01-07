@@ -28,7 +28,7 @@ export const validationMatrix: ValidationMatrix = {
 
   // Testing Type -> Available Frameworks
   frameworks: {
-    web: ['selenium', 'playwright', 'cypress', 'webdriverio'],
+    web: ['selenium', 'playwright', 'cypress', 'webdriverio', 'robotframework'],
     mobile: ['appium', 'espresso', 'xcuitest'],
     api: ['restassured', 'requests', 'supertest', 'restsharp'],
     desktop: ['winappdriver', 'pyautogui']
@@ -41,10 +41,11 @@ export const validationMatrix: ValidationMatrix = {
     playwright: ['javascript', 'typescript', 'python', 'java', 'csharp'],
     cypress: ['javascript', 'typescript'],
     webdriverio: ['javascript', 'typescript'],
+    robotframework: ['python'],  // Robot Framework uses Python
 
     // Mobile frameworks
     appium: ['java', 'python', 'csharp', 'javascript', 'typescript'],
-    espresso: ['java'],
+    espresso: ['java', 'kotlin'],
     xcuitest: ['swift'],
 
     // API frameworks
@@ -61,9 +62,10 @@ export const validationMatrix: ValidationMatrix = {
   // Language -> Available Test Runners (general mapping)
   testRunners: {
     java: ['testng', 'junit5'],
-    python: ['pytest'],
-    javascript: ['jest', 'mocha', 'cypress'],  // Added 'cypress' for Cypress framework
-    typescript: ['jest', 'mocha', 'cypress'],  // Added 'cypress' for Cypress framework
+    kotlin: ['junit5'],
+    python: ['pytest', 'robot'],  // Added 'robot' for Robot Framework
+    javascript: ['jest', 'mocha', 'cypress'],
+    typescript: ['jest', 'mocha', 'cypress'],
     csharp: ['nunit'],
     swift: ['xctest']
   },
@@ -71,6 +73,7 @@ export const validationMatrix: ValidationMatrix = {
   // Language -> Available Build Tools (general mapping)
   buildTools: {
     java: ['maven', 'gradle'],
+    kotlin: ['gradle'],
     python: ['pip'],
     javascript: ['npm'],
     typescript: ['npm'],
@@ -103,6 +106,9 @@ export const validationMatrix: ValidationMatrix = {
     'webdriverio-javascript': ['mocha'],
     'webdriverio-typescript': ['mocha'],
 
+    // Web - Robot Framework
+    'robotframework-python': ['robot'],
+
     // Mobile - Appium
     'appium-java': ['testng'],
     'appium-python': ['pytest'],
@@ -112,6 +118,7 @@ export const validationMatrix: ValidationMatrix = {
 
     // Mobile - Espresso
     'espresso-java': ['junit5'],
+    'espresso-kotlin': ['junit5'],
 
     // Mobile - XCUITest
     'xcuitest-swift': ['xctest'],
@@ -163,6 +170,9 @@ export const validationMatrix: ValidationMatrix = {
     'webdriverio-javascript': ['npm'],
     'webdriverio-typescript': ['npm'],
 
+    // Web - Robot Framework
+    'robotframework-python': ['pip'],
+
     // Mobile - Appium
     'appium-java': ['maven', 'gradle'],
     'appium-python': ['pip'],
@@ -172,6 +182,7 @@ export const validationMatrix: ValidationMatrix = {
 
     // Mobile - Espresso
     'espresso-java': ['gradle'],
+    'espresso-kotlin': ['gradle'],
 
     // Mobile - XCUITest
     'xcuitest-swift': ['spm'],
@@ -223,6 +234,9 @@ export const validationMatrix: ValidationMatrix = {
     'webdriverio-javascript': ['allure', 'mochawesome', 'jest-html-reporter'],
     'webdriverio-typescript': ['allure', 'mochawesome', 'jest-html-reporter'],
 
+    // Web - Robot Framework
+    'robotframework-python': ['robot-reports', 'allure'],
+
     // Mobile - Appium
     'appium-java': ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
     'appium-python': ['allure', 'pytest-html'],
@@ -232,6 +246,7 @@ export const validationMatrix: ValidationMatrix = {
 
     // Mobile - Espresso
     'espresso-java': ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
+    'espresso-kotlin': ['allure', 'junit-reports'],
 
     // Mobile - XCUITest
     'xcuitest-swift': [],
@@ -264,6 +279,7 @@ export const validationMatrix: ValidationMatrix = {
     playwright: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     cypress: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     webdriverio: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
+    robotframework: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     appium: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     espresso: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     xcuitest: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
@@ -282,6 +298,7 @@ export const validationMatrix: ValidationMatrix = {
     playwright: ['allure', 'extent-reports', 'testng-reports', 'junit-reports', 'jest-html', 'pytest-html', 'nunit-reports'],
     cypress: ['allure', 'jest-html-reporter', 'mochawesome'],
     webdriverio: ['allure', 'jest-html-reporter', 'mochawesome'],
+    robotframework: ['robot-reports', 'allure'],
     appium: ['allure', 'extent-reports', 'testng-reports', 'junit-reports', 'jest-html-reporter', 'mochawesome', 'pytest-html', 'nunit-reports'],
     espresso: ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
     xcuitest: [],
@@ -301,17 +318,18 @@ export const validationMatrix: ValidationMatrix = {
     playwright: ['page-object-model', 'bdd'],
     cypress: ['page-object-model', 'bdd'],
     webdriverio: ['page-object-model', 'bdd'],
+    robotframework: ['page-object-model', 'bdd'],
 
     // Mobile frameworks - POM is standard, BDD for Agile teams
     appium: ['page-object-model', 'bdd'],
     espresso: ['page-object-model', 'bdd'],
     xcuitest: ['page-object-model', 'bdd'],
 
-    // API frameworks - data-driven, BDD, and fluent patterns
-    restassured: ['fluent', 'bdd'],
-    requests: ['data-driven', 'bdd'],
-    supertest: ['data-driven', 'bdd'],
-    restsharp: ['data-driven', 'bdd'],
+    // API frameworks - data-driven, BDD, contract-testing, and fluent patterns
+    restassured: ['fluent', 'bdd', 'contract-testing'],
+    requests: ['data-driven', 'bdd', 'contract-testing'],
+    supertest: ['data-driven', 'bdd', 'contract-testing'],
+    restsharp: ['data-driven', 'bdd', 'contract-testing'],
 
     // Desktop frameworks - POM is standard, some have additional patterns
     winappdriver: ['page-object-model', 'bdd'],
@@ -343,6 +361,9 @@ export const validationMatrix: ValidationMatrix = {
     'webdriverio-javascript': ['page-object-model', 'bdd'],
     'webdriverio-typescript': ['page-object-model', 'bdd'],
 
+    // Web - Robot Framework (POM + BDD)
+    'robotframework-python': ['page-object-model', 'bdd'],
+
     // Mobile - Appium (all languages support POM + BDD)
     'appium-java': ['page-object-model', 'bdd'],
     'appium-python': ['page-object-model', 'bdd'],
@@ -352,19 +373,20 @@ export const validationMatrix: ValidationMatrix = {
 
     // Mobile - Espresso (POM + BDD)
     'espresso-java': ['page-object-model', 'bdd'],
+    'espresso-kotlin': ['page-object-model', 'bdd'],
 
     // Mobile - XCUITest (POM + BDD)
     'xcuitest-swift': ['page-object-model', 'bdd'],
 
-    // API - RestAssured (Fluent + BDD - Java specific)
-    'restassured-java': ['fluent', 'bdd'],
+    // API - RestAssured (Fluent + BDD + Contract Testing - Java specific)
+    'restassured-java': ['fluent', 'bdd', 'contract-testing'],
 
-    // API - Requests (Data-driven + BDD - Python specific)
-    'requests-python': ['data-driven', 'bdd'],
+    // API - Requests (Data-driven + BDD + Contract Testing - Python specific)
+    'requests-python': ['data-driven', 'bdd', 'contract-testing'],
 
-    // API - Supertest (Data-driven + BDD)
-    'supertest-javascript': ['data-driven', 'bdd'],
-    'supertest-typescript': ['data-driven', 'bdd'],
+    // API - Supertest (Data-driven + BDD + Contract Testing)
+    'supertest-javascript': ['data-driven', 'bdd', 'contract-testing'],
+    'supertest-typescript': ['data-driven', 'bdd', 'contract-testing'],
 
     // API - RestSharp (Data-driven + BDD - C# specific)
     'restsharp-csharp': ['data-driven', 'bdd'],
@@ -653,6 +675,7 @@ export const validationLabels = {
     playwright: 'Playwright',
     cypress: 'Cypress',
     webdriverio: 'WebdriverIO',
+    robotframework: 'Robot Framework',
 
     // Mobile
     appium: 'Appium',
@@ -672,6 +695,7 @@ export const validationLabels = {
 
   languages: {
     java: 'Java',
+    kotlin: 'Kotlin',
     python: 'Python',
     javascript: 'JavaScript',
     typescript: 'TypeScript',
@@ -687,7 +711,8 @@ export const validationLabels = {
     mocha: 'Mocha',
     nunit: 'NUnit',
     xctest: 'XCTest',
-    cypress: 'Cypress'
+    cypress: 'Cypress',
+    robot: 'Robot Framework'
   },
 
   buildTools: {
@@ -725,7 +750,8 @@ export const validationLabels = {
     'pytest-json-report': 'PyTest JSON Report',
     'jest-html-reporter': 'Jest HTML Reporter',
     'jest-html': 'Jest HTML',
-    'nunit-reports': 'NUnit Reports'
+    'nunit-reports': 'NUnit Reports',
+    'robot-reports': 'Robot Framework Reports'
   },
 
   testingPatterns: {
@@ -734,6 +760,7 @@ export const validationLabels = {
     bdd: 'Behavior-Driven Development (BDD)',
     fluent: 'Fluent Pattern',
     'data-driven': 'Data-Driven Testing',
+    'contract-testing': 'Contract Testing (Pact)',
     'functional-patterns': 'Functional Patterns',
     hybrid: 'Hybrid Pattern'
   }

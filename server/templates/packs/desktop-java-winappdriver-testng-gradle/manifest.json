@@ -1,6 +1,7 @@
 {
-  "name": "desktop-java-winappdriver-testng-gradle",
+  "id": "desktop-java-winappdriver-testng-gradle",
   "displayName": "Java + WinAppDriver + TestNG + Gradle",
+  "name": "desktop-java-winappdriver-testng-gradle",
   "description": "Professional desktop automation framework with Java, WinAppDriver, TestNG, and Gradle for Windows application testing",
   "version": "1.0.0",
   "category": "desktop-testing",

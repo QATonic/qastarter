@@ -1,5 +1,6 @@
 {
   "id": "web-csharp-playwright-nunit-nuget",
+  "displayName": "Web Automation Framework",
   "supportsDynamic": true,
   "name": "Web Automation Framework",
   "description": "Playwright test automation framework with C#, NUnit, and NuGet for web testing",
@@ -47,7 +48,12 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".gitignore",
@@ -187,4 +193,3 @@
     ]
   }
 }
-

@@ -1,5 +1,6 @@
 {
   "id": "api-typescript-supertest-jest-npm",
+  "displayName": "API Testing Framework",
   "supportsDynamic": true,
   "name": "API Testing Framework",
   "description": "REST API automation framework with TypeScript, Supertest, and Jest",
@@ -15,7 +16,8 @@
     "typescript": "5.3.0",
     "supertest": "6.3.3",
     "jest": "29.7.0",
-    "ajv": "8.12.0"
+    "ajv": "8.12.0",
+    "pact": "12.1.0"
   },
   "files": [
     {
@@ -144,10 +146,44 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for API testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for API testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "tests/contracts/userConsumer.pact.spec.ts",
+      "isTemplate": true,
+      "description": "Pact consumer contract tests",
+      "conditional": {
+        "testingPattern": "contract-testing"
+      }
+    },
+    {
+      "path": "tests/contracts/providerVerification.spec.ts",
+      "isTemplate": true,
+      "description": "Pact provider verification tests",
+      "conditional": {
+        "testingPattern": "contract-testing"
+      }
+    },
+    {
+      "path": "config/pactBroker.ts",
+      "isTemplate": true,
+      "description": "Pact Broker configuration",
+      "conditional": {
+        "testingPattern": "contract-testing"
+      }
     }
   ],
   "supportedCombination": {
@@ -172,8 +208,8 @@
     ],
     "testingPatterns": [
       "data-driven",
-      "bdd"
+      "bdd",
+      "contract-testing"
     ]
   }
 }
-

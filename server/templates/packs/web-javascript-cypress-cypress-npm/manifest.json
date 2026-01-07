@@ -1,5 +1,6 @@
 {
   "id": "web-javascript-cypress-cypress-npm",
+  "displayName": "Web Automation Framework",
   "supportsDynamic": true,
   "name": "Web Automation Framework",
   "description": "Cypress test automation framework with JavaScript and npm for web testing",
@@ -51,7 +52,12 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for containerized testing","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for containerized testing",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": ".gitignore",
@@ -119,7 +125,12 @@
       "description": "Common utility functions"
     },
     {
-      "path": "docker-compose.yml","isTemplate": true,"description": "Docker Compose for parallel testing","conditional": {"utilities.includeDockerCompose": true}
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "description": "Docker Compose for parallel testing",
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     },
     {
       "path": "cypress/e2e/features/login.feature",
@@ -164,4 +175,3 @@
     ]
   }
 }
-

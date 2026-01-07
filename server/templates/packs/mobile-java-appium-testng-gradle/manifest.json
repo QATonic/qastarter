@@ -1,6 +1,7 @@
 {
-  "name": "mobile-java-appium-testng-gradle",
+  "id": "mobile-java-appium-testng-gradle",
   "displayName": "Java + Appium + TestNG + Gradle",
+  "name": "mobile-java-appium-testng-gradle",
   "description": "Professional mobile automation framework with Java, Appium, TestNG, and Gradle for iOS and Android testing",
   "version": "2.0.0",
   "category": "mobile-testing",

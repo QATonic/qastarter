@@ -12,6 +12,7 @@ import {
   isCacheEnabled,
   getCacheStats
 } from '../services/cacheService';
+import { loadSharedVersions, mergeVersions } from './shared/versionLoader';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -88,6 +89,7 @@ export class TemplatePackEngine {
 
   /**
    * Load template pack manifest (with caching)
+   * Merges manifest-specific versions with shared versions from versions.json
    */
   private async loadManifest(packKey: string): Promise<TemplatePackManifest> {
     // Check cache first
@@ -104,7 +106,14 @@ export class TemplatePackEngine {
       const manifestContent = await fs.readFile(manifestPath, 'utf-8');
       const manifest = JSON.parse(manifestContent) as TemplatePackManifest;
 
-      // Cache the manifest
+      // Load shared versions and merge with manifest-specific versions
+      const sharedVersions = await loadSharedVersions();
+      manifest.toolVersions = mergeVersions(
+        manifest.toolVersions || {},
+        sharedVersions
+      );
+
+      // Cache the manifest (with merged versions)
       if (isCacheEnabled()) {
         setCachedManifest(packKey, manifest);
       }

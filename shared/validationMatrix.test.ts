@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { 
-  validationMatrix, 
-  WizardValidator, 
+import {
+  validationMatrix,
+  WizardValidator,
   validationLabels,
-  ValidationMatrix 
+  ValidationMatrix
 } from './validationMatrix';
 
 describe('ValidationMatrix', () => {
@@ -80,8 +80,8 @@ describe('ValidationMatrix', () => {
       expect(appiumLanguages).toContain('csharp');
     });
 
-    it('should have Java only for Espresso', () => {
-      expect(validationMatrix.languages.espresso).toEqual(['java']);
+    it('should have Java and Kotlin for Espresso', () => {
+      expect(validationMatrix.languages.espresso).toEqual(['java', 'kotlin']);
     });
 
     it('should have Swift only for XCUITest', () => {
@@ -441,18 +441,18 @@ describe('WizardValidator', () => {
     });
 
     it('should return test runners for testRunner step', () => {
-      const options = WizardValidator.getFilteredOptions('testRunner', { 
-        framework: 'selenium', 
-        language: 'java' 
+      const options = WizardValidator.getFilteredOptions('testRunner', {
+        framework: 'selenium',
+        language: 'java'
       });
       expect(options).toContain('testng');
       expect(options).toContain('junit5');
     });
 
     it('should return build tools for buildTool step', () => {
-      const options = WizardValidator.getFilteredOptions('buildTool', { 
-        framework: 'selenium', 
-        language: 'java' 
+      const options = WizardValidator.getFilteredOptions('buildTool', {
+        framework: 'selenium',
+        language: 'java'
       });
       expect(options).toContain('maven');
       expect(options).toContain('gradle');
@@ -465,7 +465,7 @@ describe('WizardValidator', () => {
     });
 
     it('should return reporting tools for reportingTool step', () => {
-      const options = WizardValidator.getFilteredOptions('reportingTool', { 
+      const options = WizardValidator.getFilteredOptions('reportingTool', {
         framework: 'selenium',
         language: 'java'
       });
@@ -474,7 +474,7 @@ describe('WizardValidator', () => {
     });
 
     it('should return testing patterns for testingPattern step', () => {
-      const options = WizardValidator.getFilteredOptions('testingPattern', { 
+      const options = WizardValidator.getFilteredOptions('testingPattern', {
         framework: 'selenium',
         language: 'java'
       });

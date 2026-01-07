@@ -1,5 +1,6 @@
 {
   "id": "mobile-swift-xcuitest-xctest-spm",
+  "displayName": "XCUITest iOS Testing Framework",
   "supportsDynamic": true,
   "name": "XCUITest iOS Testing Framework",
   "description": "Native iOS UI testing framework with XCUITest, XCTest, and Swift",
@@ -153,4 +154,3 @@
     ]
   }
 }
-

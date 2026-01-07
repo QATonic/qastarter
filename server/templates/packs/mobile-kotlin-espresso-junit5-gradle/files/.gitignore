@@ -1,0 +1,26 @@
+# Android Studio
+*.iml
+.idea/
+.gradle/
+local.properties
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Kotlin
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Test outputs
+reports/
+test-results/
+
+# Allure
+allure-results/
+allure-report/

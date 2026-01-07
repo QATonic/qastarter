@@ -1,6 +1,7 @@
 {
-  "name": "api-java-restassured-testng-gradle",
+  "id": "api-java-restassured-testng-gradle",
   "displayName": "Java + RestAssured + TestNG + Gradle",
+  "name": "api-java-restassured-testng-gradle",
   "description": "Professional API automation framework with Java, RestAssured, TestNG, and Gradle for REST API testing",
   "version": "1.0.0",
   "category": "api-testing",

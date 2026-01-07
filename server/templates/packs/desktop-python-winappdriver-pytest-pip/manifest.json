@@ -1,5 +1,6 @@
 {
   "id": "desktop-python-winappdriver-pytest-pip",
+  "displayName": "Desktop Automation Framework",
   "supportsDynamic": true,
   "name": "Desktop Automation Framework",
   "description": "Windows desktop application automation with Python, WinAppDriver, and Pytest",
@@ -160,7 +161,12 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for Windows containers","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for Windows containers",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     }
   ],
   "supportedCombination": {
@@ -189,4 +195,3 @@
     ]
   }
 }
-

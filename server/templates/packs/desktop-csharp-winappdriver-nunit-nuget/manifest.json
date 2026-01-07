@@ -1,5 +1,6 @@
 {
   "id": "desktop-csharp-winappdriver-nunit-nuget",
+  "displayName": "Desktop Automation Framework",
   "supportsDynamic": true,
   "name": "Desktop Automation Framework",
   "description": "Windows desktop application automation with C#, WinAppDriver, and NUnit",
@@ -153,7 +154,12 @@
       }
     },
     {
-      "path": "Dockerfile","isTemplate": true,"description": "Docker configuration for Windows containers","conditional": {"utilities.includeDocker": true}
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "description": "Docker configuration for Windows containers",
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     }
   ],
   "supportedCombination": {
@@ -182,4 +188,3 @@
     ]
   }
 }
-

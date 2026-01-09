@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -49,7 +49,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -78,7 +78,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies
@@ -91,13 +91,17 @@ jobs:
         run: npm run build
 
       - name: Start server
-        run: npm run start &
+        run: npm run start > server.log 2>&1 &
         env:
           NODE_ENV: production
           PORT: 5000
 
       - name: Wait for server
-        run: npx wait-on http://localhost:5000/api/v1/metadata --timeout 30000
+        run: npx wait-on http://localhost:5000/api/v1/metadata --timeout 60000
+
+      - name: Print server logs on failure
+        if: failure()
+        run: cat server.log
 
       - name: Run E2E tests
         run: npm run test:e2e
@@ -124,7 +128,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Install dependencies

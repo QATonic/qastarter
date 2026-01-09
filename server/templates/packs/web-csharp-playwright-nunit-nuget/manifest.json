@@ -116,11 +116,6 @@
       "description": "Login test suite"
     },
     {
-      "path": "Tests/SmokeTests.cs",
-      "isTemplate": true,
-      "description": "Smoke test suite"
-    },
-    {
       "path": "Data/dev.json",
       "isTemplate": true,
       "description": "Development environment test data"

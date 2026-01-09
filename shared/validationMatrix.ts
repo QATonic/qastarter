@@ -30,7 +30,7 @@ export const validationMatrix: ValidationMatrix = {
   frameworks: {
     web: ['selenium', 'playwright', 'cypress', 'webdriverio', 'robotframework'],
     mobile: ['appium', 'espresso', 'xcuitest'],
-    api: ['restassured', 'requests', 'supertest', 'restsharp'],
+    api: ['restassured', 'requests', 'supertest', 'restsharp', 'graphql', 'grpc'],
     desktop: ['winappdriver', 'pyautogui']
   },
 
@@ -53,6 +53,8 @@ export const validationMatrix: ValidationMatrix = {
     requests: ['python'],
     supertest: ['javascript', 'typescript'],
     restsharp: ['csharp'],
+    graphql: ['typescript'],
+    grpc: ['typescript'],
 
     // Desktop frameworks
     winappdriver: ['csharp', 'java', 'python'],
@@ -136,6 +138,12 @@ export const validationMatrix: ValidationMatrix = {
     // API - RestSharp
     'restsharp-csharp': ['nunit'],
 
+    // API - GraphQL
+    'graphql-typescript': ['jest'],
+
+    // API - gRPC
+    'grpc-typescript': ['jest'],
+
     // Desktop - WinAppDriver
     'winappdriver-csharp': ['nunit'],
     'winappdriver-java': ['testng'],
@@ -199,6 +207,12 @@ export const validationMatrix: ValidationMatrix = {
 
     // API - RestSharp
     'restsharp-csharp': ['nuget'],
+
+    // API - GraphQL
+    'graphql-typescript': ['npm'],
+
+    // API - gRPC
+    'grpc-typescript': ['npm'],
 
     // Desktop - WinAppDriver
     'winappdriver-csharp': ['nuget'],
@@ -264,6 +278,12 @@ export const validationMatrix: ValidationMatrix = {
     // API - RestSharp
     'restsharp-csharp': ['allure', 'extent-reports', 'nunit-reports'],
 
+    // API - GraphQL
+    'graphql-typescript': ['jest-html-reporter', 'allure'],
+
+    // API - gRPC
+    'grpc-typescript': ['jest-html-reporter', 'allure'],
+
     // Desktop - WinAppDriver
     'winappdriver-csharp': ['allure', 'extent-reports', 'nunit-reports'],
     'winappdriver-java': ['allure', 'extent-reports'],
@@ -287,6 +307,8 @@ export const validationMatrix: ValidationMatrix = {
     requests: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     supertest: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     restsharp: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
+    graphql: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
+    grpc: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     winappdriver: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     pyautogui: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci']
   },
@@ -306,6 +328,8 @@ export const validationMatrix: ValidationMatrix = {
     requests: ['allure', 'pytest-html', 'pytest-json'],
     supertest: ['allure', 'jest-html', 'jest-html-reporter', 'mochawesome'],
     restsharp: ['allure', 'extent-reports', 'nunit-reports'],
+    graphql: ['jest-html-reporter', 'allure'],
+    grpc: ['jest-html-reporter', 'allure'],
     winappdriver: ['allure', 'extent-reports', 'pytest-html', 'nunit-reports'],
     pyautogui: ['allure', 'pytest-html']
   },
@@ -330,6 +354,8 @@ export const validationMatrix: ValidationMatrix = {
     requests: ['data-driven', 'bdd', 'contract-testing'],
     supertest: ['data-driven', 'bdd', 'contract-testing'],
     restsharp: ['data-driven', 'bdd', 'contract-testing'],
+    graphql: ['contract-testing', 'schema-validation'],
+    grpc: ['contract-testing'],
 
     // Desktop frameworks - POM is standard, some have additional patterns
     winappdriver: ['page-object-model', 'bdd'],
@@ -390,6 +416,12 @@ export const validationMatrix: ValidationMatrix = {
 
     // API - RestSharp (Data-driven + BDD - C# specific)
     'restsharp-csharp': ['data-driven', 'bdd'],
+
+    // API - GraphQL (Contract Testing + Schema Validation)
+    'graphql-typescript': ['contract-testing', 'schema-validation'],
+
+    // API - gRPC (Contract Testing)
+    'grpc-typescript': ['contract-testing'],
 
     // Desktop - WinAppDriver (POM + BDD)
     'winappdriver-csharp': ['page-object-model', 'bdd'],
@@ -687,6 +719,8 @@ export const validationLabels = {
     requests: 'Python Requests',
     supertest: 'Supertest',
     restsharp: 'RestSharp',
+    graphql: 'GraphQL Testing',
+    grpc: 'gRPC Testing',
 
     // Desktop
     winappdriver: 'WinAppDriver',
@@ -761,6 +795,7 @@ export const validationLabels = {
     fluent: 'Fluent Pattern',
     'data-driven': 'Data-Driven Testing',
     'contract-testing': 'Contract Testing (Pact)',
+    'schema-validation': 'Schema Validation',
     'functional-patterns': 'Functional Patterns',
     hybrid: 'Hybrid Pattern'
   }

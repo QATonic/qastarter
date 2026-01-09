@@ -131,11 +131,6 @@
       "description": "Login test suite"
     },
     {
-      "path": "tests/test_smoke.py",
-      "isTemplate": true,
-      "description": "Smoke test suite"
-    },
-    {
       "path": "data/dev.json",
       "isTemplate": true,
       "description": "Development environment test data"

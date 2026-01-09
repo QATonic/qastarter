@@ -22,6 +22,8 @@ const frameworkIcons: Record<string, React.ElementType> = {
   requests: Server,
   supertest: Server,
   restsharp: Server,
+  graphql: Server,
+  grpc: Server,
   winappdriver: MonitorSmartphone,
   pyautogui: MonitorSmartphone,
   espresso: Smartphone,
@@ -50,9 +52,9 @@ export default function FrameworkStep() {
             </span>
           </div>
         )}
-        
-        <RadioGroup 
-          value={config.framework} 
+
+        <RadioGroup
+          value={config.framework}
           onValueChange={(value) => updateConfig("framework", value)}
           disabled={!config.testingType}
           className="grid gap-3"
@@ -61,12 +63,12 @@ export default function FrameworkStep() {
             const Icon = frameworkIcons[framework] || Layers;
             const isSelected = config.framework === framework;
             return (
-              <div 
-                key={framework} 
+              <div
+                key={framework}
                 className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-                  ${isSelected 
-                    ? 'bg-primary/5 border-primary/30 shadow-sm' 
+                  ${isSelected
+                    ? 'bg-primary/5 border-primary/30 shadow-sm'
                     : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
                   }
                   ${!config.testingType ? 'opacity-50 pointer-events-none' : ''}
@@ -81,8 +83,8 @@ export default function FrameworkStep() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <RadioGroupItem 
-                      value={framework} 
+                    <RadioGroupItem
+                      value={framework}
                       id={framework}
                       data-testid={`radio-${framework}`}
                       className="sr-only"
@@ -100,7 +102,7 @@ export default function FrameworkStep() {
             );
           })}
         </RadioGroup>
-        
+
         {config.framework && (
           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2 mb-2">

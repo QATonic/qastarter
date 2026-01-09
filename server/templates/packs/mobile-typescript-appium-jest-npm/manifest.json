@@ -161,11 +161,6 @@
       "description": "Login test suite"
     },
     {
-      "path": "tests/smoke.test.ts",
-      "isTemplate": true,
-      "description": "Smoke test suite"
-    },
-    {
       "path": "tests/setup.ts",
       "isTemplate": true,
       "description": "Test setup and teardown"

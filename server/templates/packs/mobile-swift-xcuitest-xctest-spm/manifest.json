@@ -114,11 +114,6 @@
       "description": "Login functionality tests"
     },
     {
-      "path": "{{projectName}}UITests/Tests/SmokeTests.swift",
-      "isTemplate": true,
-      "description": "Smoke tests for critical functionality"
-    },
-    {
       "path": "{{projectName}}UITests/SampleUITest.swift",
       "isTemplate": true,
       "description": "Sample XCUITest"

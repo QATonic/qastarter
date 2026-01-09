@@ -1,0 +1,174 @@
+# {{projectName}}
+
+A gRPC API testing framework built with TypeScript, Jest, and @grpc/grpc-js.
+
+## Features
+
+- **gRPC Service Testing** - Test unary, streaming, and bidirectional RPCs
+- **Protocol Buffer Support** - Native .proto file handling
+- **Type-Safe** - Auto-generated TypeScript types from proto files
+- **Error Handling** - Test gRPC status codes and error scenarios
+- **Environment Configuration** - Support for multiple environments
+
+## Technology Stack
+
+| Component | Technology | Version |
+|-----------|------------|---------|
+| Language | TypeScript | 5.3.0 |
+| Test Runner | Jest | 29.7.0 |
+| gRPC Client | @grpc/grpc-js | 1.9.13 |
+| Proto Loader | @grpc/proto-loader | 0.7.10 |
+
+## Project Structure
+
+```
+{{projectName}}/
+├── package.json
+├── tsconfig.json
+├── jest.config.ts
+├── protos/
+│ ├── user.proto # User service definition
+│ └── common.proto # Common types
+├── generated/ # Auto-generated types
+├── src/
+│ ├── client/
+│ │ └── grpc-client.ts # gRPC client setup
+│ ├── services/
+│ │ └── user-service.ts # Service client wrapper
+│ ├── types/
+│ │ └── grpc.types.ts # TypeScript types
+│ ├── utils/
+│ │ └── test-helpers.ts # Test utilities
+│ └── config/
+│ └── environments.ts # Environment config
+├── tests/
+│ ├── user-service.test.ts # User service tests
+│ ├── streaming.test.ts # Streaming RPC tests
+│ ├── error-handling.test.ts # Error handling tests
+│ └── setup.ts # Test setup
+└── reports/ # Test reports
+```
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- A running gRPC server
+
+### Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Generate TypeScript types from protos:
+```bash
+npm run proto:generate
+```
+
+3. Configure environment:
+```bash
+cp .env.example .env
+# Edit .env with your gRPC server address
+```
+
+4. Run tests:
+```bash
+npm test
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Run in watch mode
+npm run test:watch
+
+# Generate HTML report
+npm run test:report
+```
+
+## Writing Tests
+
+### Unary RPC Test
+
+```typescript
+import { userService } from '../src/services/user-service';
+
+describe('User Service - Unary', () => {
+it('should get user by ID', async () => {
+const response = await userService.getUser({ id: '1' });
+
+expect(response.id).toBe('1');
+expect(response.name).toBeDefined();
+});
+});
+```
+
+### Server Streaming Test
+
+```typescript
+describe('User Service - Streaming', () => {
+it('should stream users', async () => {
+const users: User[] = [];
+
+await new Promise((resolve, reject) => {
+const stream = userService.streamUsers({ limit: 10 });
+
+stream.on('data', (user) => users.push(user));
+stream.on('end', resolve);
+stream.on('error', reject);
+});
+
+expect(users.length).toBeGreaterThan(0);
+});
+});
+```
+
+### Error Handling Test
+
+```typescript
+describe('Error Handling', () => {
+it('should handle NOT_FOUND error', async () => {
+try {
+await userService.getUser({ id: 'non-existent' });
+fail('Should throw error');
+} catch (error) {
+expect(error.code).toBe(grpc.status.NOT_FOUND);
+}
+});
+});
+```
+
+## gRPC Status Codes
+
+| Code | Name | Description |
+|------|------|-------------|
+| 0 | OK | Success |
+| 1 | CANCELLED | Operation cancelled |
+| 2 | UNKNOWN | Unknown error |
+| 3 | INVALID_ARGUMENT | Invalid argument |
+| 4 | DEADLINE_EXCEEDED | Timeout |
+| 5 | NOT_FOUND | Resource not found |
+| 7 | PERMISSION_DENIED | Permission denied |
+| 16 | UNAUTHENTICATED | Not authenticated |
+
+## Best Practices
+
+1. **Generate Types** - Always regenerate types after proto changes
+2. **Test All RPC Types** - Cover unary, streaming, and bidirectional
+3. **Error Handling** - Test all expected error codes
+4. **Timeouts** - Set appropriate deadline for each call
+5. **Metadata** - Test authentication via metadata headers
+
+---
+
+**Framework Version:** 1.0.0

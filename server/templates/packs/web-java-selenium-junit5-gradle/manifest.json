@@ -220,12 +220,6 @@
       "description": "Sample login tests using JUnit 5 with parameterized tests"
     },
     {
-      "path": "src/test/java/{{packagePath}}/tests/SmokeSuite.java",
-      "template": "src/test/java/{{packagePath}}/tests/SmokeSuite.java.hbs",
-      "isTemplate": true,
-      "description": "Sample smoke test suite using JUnit 5 @Tag annotations"
-    },
-    {
       "path": "src/main/resources/config/dev.properties",
       "template": "src/main/resources/config/dev.properties.hbs",
       "isTemplate": true,

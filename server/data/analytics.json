@@ -141,5 +141,57 @@
     "cicdTool": "circleci",
     "reportingTool": "pytest-html",
     "createdAt": "2026-01-07T19:29:34.739Z"
+  },
+  {
+    "id": 12,
+    "projectName": "APIRestAssured",
+    "testingType": "api",
+    "framework": "restassured",
+    "language": "java",
+    "testingPattern": "bdd",
+    "testRunner": "testng",
+    "buildTool": "maven",
+    "cicdTool": "jenkins",
+    "reportingTool": "extent-reports",
+    "createdAt": "2026-01-07T20:01:12.252Z"
+  },
+  {
+    "id": 13,
+    "projectName": "apiGraphQl",
+    "testingType": "api",
+    "framework": "graphql",
+    "language": "typescript",
+    "testingPattern": "schema-validation",
+    "testRunner": "jest",
+    "buildTool": "npm",
+    "cicdTool": null,
+    "reportingTool": null,
+    "createdAt": "2026-01-07T20:30:32.981Z"
+  },
+  {
+    "id": 14,
+    "projectName": "SeleniumJava",
+    "testingType": "web",
+    "framework": "selenium",
+    "language": "java",
+    "testingPattern": "page-object-model",
+    "testRunner": "testng",
+    "buildTool": "maven",
+    "cicdTool": "jenkins",
+    "reportingTool": "extent-reports",
+    "createdAt": "2026-01-07T20:33:11.606Z"
+  },
+  {
+    "id": 15,
+    "projectName": "graphqltest",
+    "testingType": "api",
+    "framework": "graphql",
+    "language": "typescript",
+    "testingPattern": "contract-testing",
+    "testRunner": "jest",
+    "buildTool": "npm",
+    "cicdTool": null,
+    "reportingTool": null,
+    "createdAt": "2026-01-09T17:04:07.738Z"
   }
 ]

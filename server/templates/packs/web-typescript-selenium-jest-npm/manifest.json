@@ -149,11 +149,6 @@
       "description": "Login tests"
     },
     {
-      "path": "tests/smoke.test.ts",
-      "isTemplate": true,
-      "description": "Smoke tests"
-    },
-    {
       "path": "tests/setup.ts",
       "isTemplate": true,
       "description": "Test setup/teardown"

@@ -188,14 +188,6 @@
       "description": "Sample login tests with data-driven approach"
     },
     {
-      "path": "src/test/java/{{packagePath}}/tests/SmokeSuite.java",
-      "isTemplate": true,
-      "description": "Sample smoke test suite",
-      "conditional": {
-        "testingPattern": "page-object-model"
-      }
-    },
-    {
       "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
       "isTemplate": true,
       "description": "Cucumber JUnit5 runner",

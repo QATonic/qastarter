@@ -250,15 +250,6 @@
       "description": "Sample mobile login tests with data-driven approach"
     },
     {
-      "path": "src/test/java/{{packagePath}}/tests/SmokeSuite.java",
-      "template": "src/test/java/{{packagePath}}/tests/SmokeSuite.java.hbs",
-      "isTemplate": true,
-      "conditional": {
-        "testingPattern": "page-object-model"
-      },
-      "description": "Sample mobile smoke test suite using TestNG (POM pattern)"
-    },
-    {
       "path": "src/test/java/{{packagePath}}/bdd/TestRunner.java",
       "template": "src/test/java/{{packagePath}}/bdd/TestRunner.java.hbs",
       "isTemplate": true,

@@ -1,161 +1,156 @@
 {
-    "id": "mobile-kotlin-espresso-junit5-gradle",
-    "displayName": "Kotlin Espresso Android Testing",
-    "name": "Kotlin Espresso UI Testing Framework",
-    "description": "Native Android UI testing framework with Kotlin, Espresso, and JUnit 5",
-    "version": "1.0.0",
-    "supportsDynamic": true,
-    "supportedCombination": {
-        "testingType": "mobile",
-        "framework": "espresso",
-        "language": "kotlin",
-        "testRunner": "junit5",
-        "buildTool": "gradle"
-    },
-    "dynamicSupport": {
-        "reportingTools": [
-            "allure",
-            "junit-reports"
-        ],
-        "cicdTools": [
-            "github-actions",
-            "gitlab-ci",
-            "jenkins",
-            "azure-devops",
-            "circleci"
-        ],
-        "testingPatterns": [
-            "page-object-model",
-            "bdd"
-        ]
-    },
-    "toolVersions": {
-        "kotlin": "1.9.22",
-        "espresso": "3.5.1",
-        "junit5": "5.10.1",
-        "gradle": "8.4",
-        "androidGradlePlugin": "8.2.0",
-        "allure": "2.25.0"
-    },
-    "files": [
-        {
-            "path": "build.gradle.kts",
-            "isTemplate": true,
-            "description": "Kotlin DSL Gradle build configuration"
-        },
-        {
-            "path": "settings.gradle.kts",
-            "isTemplate": true,
-            "description": "Gradle settings file"
-        },
-        {
-            "path": "gradle.properties",
-            "isTemplate": true,
-            "description": "Gradle properties"
-        },
-        {
-            "path": "README.md",
-            "isTemplate": true,
-            "description": "Project documentation"
-        },
-        {
-            "path": ".gitignore",
-            "isTemplate": false,
-            "description": "Git ignore patterns"
-        },
-        {
-            "path": ".github/workflows/tests.yml",
-            "isTemplate": true,
-            "conditional": {
-                "cicdTool": "github-actions"
-            },
-            "description": "GitHub Actions workflow"
-        },
-        {
-            "path": ".gitlab-ci.yml",
-            "isTemplate": true,
-            "conditional": {
-                "cicdTool": "gitlab-ci"
-            },
-            "description": "GitLab CI configuration"
-        },
-        {
-            "path": "Jenkinsfile",
-            "isTemplate": true,
-            "conditional": {
-                "cicdTool": "jenkins"
-            },
-            "description": "Jenkins pipeline"
-        },
-        {
-            "path": "azure-pipelines.yml",
-            "isTemplate": true,
-            "conditional": {
-                "cicdTool": "azure-devops"
-            },
-            "description": "Azure DevOps pipeline"
-        },
-        {
-            "path": ".circleci/config.yml",
-            "isTemplate": true,
-            "conditional": {
-                "cicdTool": "circleci"
-            },
-            "description": "CircleCI configuration"
-        },
-        {
-            "path": "app/build.gradle.kts",
-            "isTemplate": true,
-            "description": "App module Gradle build"
-        },
-        {
-            "path": "app/src/main/AndroidManifest.xml",
-            "isTemplate": true,
-            "description": "Android manifest"
-        },
-        {
-            "path": "app/src/androidTest/kotlin/{{packagePath}}/screens/BaseScreen.kt",
-            "isTemplate": true,
-            "description": "Base screen class"
-        },
-        {
-            "path": "app/src/androidTest/kotlin/{{packagePath}}/screens/LoginScreen.kt",
-            "isTemplate": true,
-            "description": "Login screen object"
-        },
-        {
-            "path": "app/src/androidTest/kotlin/{{packagePath}}/screens/HomeScreen.kt",
-            "isTemplate": true,
-            "description": "Home screen object"
-        },
-        {
-            "path": "app/src/androidTest/kotlin/{{packagePath}}/utils/TestUtils.kt",
-            "isTemplate": true,
-            "description": "Test utility functions"
-        },
-        {
-            "path": "app/src/androidTest/kotlin/{{packagePath}}/utils/WaitHelper.kt",
-            "isTemplate": true,
-            "description": "Wait helper utilities"
-        },
-        {
-            "path": "app/src/androidTest/kotlin/{{packagePath}}/tests/LoginTests.kt",
-            "isTemplate": true,
-            "description": "Login test suite"
-        },
-        {
-            "path": "app/src/androidTest/kotlin/{{packagePath}}/tests/SmokeTests.kt",
-            "isTemplate": true,
-            "description": "Smoke test suite"
-        },
-        {
-            "path": "app/src/androidTest/kotlin/{{packagePath}}/runner/CustomTestRunner.kt",
-            "isTemplate": true,
-            "description": "Custom test runner"
-        }
+  "id": "mobile-kotlin-espresso-junit5-gradle",
+  "displayName": "Kotlin Espresso Android Testing",
+  "name": "Kotlin Espresso UI Testing Framework",
+  "description": "Native Android UI testing framework with Kotlin, Espresso, and JUnit 5",
+  "version": "1.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "mobile",
+    "framework": "espresso",
+    "language": "kotlin",
+    "testRunner": "junit5",
+    "buildTool": "gradle"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "junit-reports"
     ],
-    "directories": [
-        "app/src/androidTest/assets",
-        "reports"
+    "cicdTools": [
+      "github-actions",
+      "gitlab-ci",
+      "jenkins",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
     ]
+  },
+  "toolVersions": {
+    "kotlin": "1.9.22",
+    "espresso": "3.5.1",
+    "junit5": "5.10.1",
+    "gradle": "8.4",
+    "androidGradlePlugin": "8.2.0",
+    "allure": "2.25.0"
+  },
+  "files": [
+    {
+      "path": "build.gradle.kts",
+      "isTemplate": true,
+      "description": "Kotlin DSL Gradle build configuration"
+    },
+    {
+      "path": "settings.gradle.kts",
+      "isTemplate": true,
+      "description": "Gradle settings file"
+    },
+    {
+      "path": "gradle.properties",
+      "isTemplate": true,
+      "description": "Gradle properties"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false,
+      "description": "Git ignore patterns"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      },
+      "description": "GitHub Actions workflow"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI configuration"
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
+      "description": "Jenkins pipeline"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline"
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      },
+      "description": "CircleCI configuration"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "isTemplate": true,
+      "description": "App module Gradle build"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "isTemplate": true,
+      "description": "Android manifest"
+    },
+    {
+      "path": "app/src/androidTest/kotlin/{{packagePath}}/screens/BaseScreen.kt",
+      "isTemplate": true,
+      "description": "Base screen class"
+    },
+    {
+      "path": "app/src/androidTest/kotlin/{{packagePath}}/screens/LoginScreen.kt",
+      "isTemplate": true,
+      "description": "Login screen object"
+    },
+    {
+      "path": "app/src/androidTest/kotlin/{{packagePath}}/screens/HomeScreen.kt",
+      "isTemplate": true,
+      "description": "Home screen object"
+    },
+    {
+      "path": "app/src/androidTest/kotlin/{{packagePath}}/utils/TestUtils.kt",
+      "isTemplate": true,
+      "description": "Test utility functions"
+    },
+    {
+      "path": "app/src/androidTest/kotlin/{{packagePath}}/utils/WaitHelper.kt",
+      "isTemplate": true,
+      "description": "Wait helper utilities"
+    },
+    {
+      "path": "app/src/androidTest/kotlin/{{packagePath}}/tests/LoginTests.kt",
+      "isTemplate": true,
+      "description": "Login test suite"
+    },
+    {
+      "path": "app/src/androidTest/kotlin/{{packagePath}}/runner/CustomTestRunner.kt",
+      "isTemplate": true,
+      "description": "Custom test runner"
+    }
+  ],
+  "directories": [
+    "app/src/androidTest/assets",
+    "reports"
+  ]
 }

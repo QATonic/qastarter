@@ -1,0 +1,141 @@
+{
+    "id": "api-typescript-grpc-jest-npm",
+    "displayName": "gRPC API Testing",
+    "name": "gRPC API Testing Framework",
+    "description": "gRPC API testing framework with TypeScript, Jest, and @grpc/grpc-js",
+    "version": "1.0.0",
+    "supportsDynamic": true,
+    "supportedCombination": {
+        "testingType": "api",
+        "framework": "grpc",
+        "language": "typescript",
+        "testRunner": "jest",
+        "buildTool": "npm"
+    },
+    "dynamicSupport": {
+        "reportingTools": [
+            "jest-html-reporter",
+            "allure"
+        ],
+        "cicdTools": [
+            "github-actions",
+            "gitlab-ci",
+            "jenkins",
+            "azure-devops",
+            "circleci"
+        ],
+        "testingPatterns": [
+            "contract-testing"
+        ]
+    },
+    "toolVersions": {
+        "node": "18+",
+        "typescript": "5.3.0",
+        "jest": "29.7.0",
+        "grpc-js": "1.9.13",
+        "proto-loader": "0.7.10"
+    },
+    "files": [
+        {
+            "path": "package.json",
+            "isTemplate": true,
+            "description": "NPM package configuration"
+        },
+        {
+            "path": "tsconfig.json",
+            "isTemplate": true,
+            "description": "TypeScript configuration"
+        },
+        {
+            "path": "jest.config.ts",
+            "isTemplate": true,
+            "description": "Jest configuration"
+        },
+        {
+            "path": ".gitignore",
+            "isTemplate": false,
+            "description": "Git ignore patterns"
+        },
+        {
+            "path": "README.md",
+            "isTemplate": true,
+            "description": "Project documentation"
+        },
+        {
+            "path": ".github/workflows/tests.yml",
+            "isTemplate": true,
+            "description": "GitHub Actions CI/CD",
+            "conditional": {
+                "cicdTool": "github-actions"
+            }
+        },
+        {
+            "path": "Jenkinsfile",
+            "isTemplate": true,
+            "description": "Jenkins CI/CD pipeline",
+            "conditional": {
+                "cicdTool": "jenkins"
+            }
+        },
+        {
+            "path": "protos/user.proto",
+            "isTemplate": true,
+            "description": "User service protocol buffer"
+        },
+        {
+            "path": "protos/common.proto",
+            "isTemplate": true,
+            "description": "Common message definitions"
+        },
+        {
+            "path": "src/client/grpc-client.ts",
+            "isTemplate": true,
+            "description": "gRPC client configuration"
+        },
+        {
+            "path": "src/services/user-service.ts",
+            "isTemplate": true,
+            "description": "User service client wrapper"
+        },
+        {
+            "path": "src/types/grpc.types.ts",
+            "isTemplate": true,
+            "description": "gRPC type definitions"
+        },
+        {
+            "path": "src/utils/test-helpers.ts",
+            "isTemplate": true,
+            "description": "Test helper utilities"
+        },
+        {
+            "path": "src/config/environments.ts",
+            "isTemplate": true,
+            "description": "Environment configuration"
+        },
+        {
+            "path": "tests/user-service.test.ts",
+            "isTemplate": true,
+            "description": "User service tests"
+        },
+        {
+            "path": "tests/streaming.test.ts",
+            "isTemplate": true,
+            "description": "Streaming RPC tests"
+        },
+        {
+            "path": "tests/error-handling.test.ts",
+            "isTemplate": true,
+            "description": "Error handling tests"
+        },
+        {
+            "path": "tests/setup.ts",
+            "isTemplate": true,
+            "description": "Test setup"
+        }
+    ],
+    "directories": [
+        "reports",
+        "coverage",
+        "generated"
+    ]
+}

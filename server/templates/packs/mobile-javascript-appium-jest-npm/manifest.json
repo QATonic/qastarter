@@ -125,11 +125,6 @@
       "description": "Login test suite"
     },
     {
-      "path": "tests/smoke.test.js",
-      "isTemplate": true,
-      "description": "Smoke test suite"
-    },
-    {
       "path": "tests/setup.js",
       "isTemplate": true,
       "description": "Test setup and teardown"

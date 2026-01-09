@@ -1,0 +1,170 @@
+# {{projectName}}
+
+A GraphQL API testing framework built with TypeScript, Jest, and Apollo Client.
+
+## Features
+
+- **GraphQL Query/Mutation Testing** - Test queries, mutations, and subscriptions
+- **Schema Validation** - Validate GraphQL schemas against expected structure
+- **Type-Safe** - Full TypeScript support with generated types
+- **Authentication Testing** - Test authenticated GraphQL operations
+- **Environment Configuration** - Support for multiple environments
+
+## Technology Stack
+
+| Component | Technology | Version |
+|-----------|------------|---------|
+| Language | TypeScript | 5.3.0 |
+| Test Runner | Jest | 29.7.0 |
+| GraphQL Client | Apollo Client | 3.8.8 |
+| GraphQL | graphql-js | 16.8.1 |
+
+## Project Structure
+
+```
+{{projectName}}/
+├── package.json
+├── tsconfig.json
+├── jest.config.ts
+├── src/
+│   ├── client/
+│   │   └── graphql-client.ts      # Apollo Client setup
+│   ├── queries/
+│   │   └── user.queries.ts        # GraphQL queries
+│   ├── mutations/
+│   │   └── user.mutations.ts      # GraphQL mutations
+│   ├── fragments/
+│   │   └── user.fragments.ts      # Reusable fragments
+│   ├── types/
+│   │   └── graphql.types.ts       # TypeScript types
+│   ├── utils/
+│   │   └── test-helpers.ts        # Test utilities
+│   └── config/
+│       └── environments.ts        # Environment config
+├── tests/
+│   ├── queries/
+│   │   └── user.queries.test.ts   # Query tests
+│   ├── mutations/
+│   │   └── user.mutations.test.ts # Mutation tests
+│   ├── schema/
+│   │   └── schema.validation.test.ts
+│   └── integration/
+│       └── auth.integration.test.ts
+└── reports/                       # Test reports
+```
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Setup
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Configure environment:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your GraphQL endpoint
+   ```
+
+3. Run tests:
+   ```bash
+   npm test
+   ```
+
+## Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Run in watch mode
+npm run test:watch
+
+# Generate HTML report
+npm run test:report
+```
+
+## Writing Tests
+
+### Query Test Example
+
+```typescript
+import { graphqlClient } from '../src/client/graphql-client';
+import { GET_USER } from '../src/queries/user.queries';
+
+describe('User Queries', () => {
+  it('should fetch user by ID', async () => {
+    const { data } = await graphqlClient.query({
+      query: GET_USER,
+      variables: { id: '1' }
+    });
+
+    expect(data.user).toBeDefined();
+    expect(data.user.id).toBe('1');
+  });
+});
+```
+
+### Mutation Test Example
+
+```typescript
+import { graphqlClient } from '../src/client/graphql-client';
+import { CREATE_USER } from '../src/mutations/user.mutations';
+
+describe('User Mutations', () => {
+  it('should create a new user', async () => {
+    const { data } = await graphqlClient.mutate({
+      mutation: CREATE_USER,
+      variables: {
+        input: {
+          name: 'Test User',
+          email: 'test@example.com'
+        }
+      }
+    });
+
+    expect(data.createUser).toBeDefined();
+    expect(data.createUser.name).toBe('Test User');
+  });
+});
+```
+
+## Environment Configuration
+
+Configure your GraphQL endpoint in `src/config/environments.ts`:
+
+```typescript
+export const environments = {
+  dev: {
+    graphqlEndpoint: 'http://localhost:4000/graphql',
+  },
+  qa: {
+    graphqlEndpoint: 'https://qa-api.example.com/graphql',
+  },
+  prod: {
+    graphqlEndpoint: 'https://api.example.com/graphql',
+  }
+};
+```
+
+## Best Practices
+
+1. **Use Fragments** - Define reusable fragments for common fields
+2. **Type Safety** - Generate TypeScript types from your schema
+3. **Error Handling** - Test error cases and edge conditions
+4. **Mock Server** - Use mock server for isolated testing
+5. **Authentication** - Test both authenticated and unauthenticated scenarios
+
+---
+
+**Framework Version:** 1.0.0

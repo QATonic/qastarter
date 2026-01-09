@@ -184,14 +184,6 @@
       "description": "Login test suite (POM)"
     },
     {
-      "path": "tests/smoke.test.ts",
-      "isTemplate": true,
-      "conditional": {
-        "testingPattern": "page-object-model"
-      },
-      "description": "Smoke test suite (POM)"
-    },
-    {
       "path": "cucumber.js",
       "isTemplate": true,
       "conditional": {

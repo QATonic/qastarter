@@ -179,14 +179,6 @@
       "description": "Login test suite"
     },
     {
-      "path": "src/test/java/tests/SmokeTest.java",
-      "isTemplate": true,
-      "description": "Smoke test suite",
-      "conditional": {
-        "testingPattern": "page-object-model"
-      }
-    },
-    {
       "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
       "isTemplate": true,
       "description": "Cucumber TestNG runner",

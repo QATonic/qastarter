@@ -1,0 +1,32 @@
+import { resetClient } from '../src/client/graphql-client';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Global test setup
+beforeAll(() => {
+console.log(`Running tests in ${process.env.TEST_ENV || 'dev'} environment`);
+});
+
+// Reset client between tests
+beforeEach(() => {
+resetClient();
+});
+
+// Global test teardown
+afterAll(() => {
+console.log('Test suite completed');
+});
+
+// Extend Jest matchers if needed
+expect.extend({
+toBeValidEmail(received: string) {
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const pass = emailRegex.test(received);
+return {
+message: () => `expected ${received} ${pass ? 'not ' : ''}to be a valid email`,
+pass,
+};
+},
+});

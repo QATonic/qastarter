@@ -316,7 +316,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                     <Server className="h-12 w-12 text-purple-600 mb-4 mx-auto" />
                     <h3 className="text-lg font-bold mb-2">API Testing</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      RestAssured, Supertest, Requests with Contract Testing (Pact) for API automation
+                      RestAssured, Supertest, GraphQL, gRPC with Contract Testing and Schema Validation
                     </p>
                     <div className="text-xs text-muted-foreground space-y-1">
                       <div>✓ Contract Testing (Pact)</div>
@@ -370,7 +370,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                       <span className="text-sm font-medium">Which frameworks are supported?</span>
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
-                      41 templates: Web (Selenium, Playwright, Cypress, Robot Framework), Mobile (Appium, Espresso with Kotlin), API (RestAssured, Supertest with Contract Testing), and Desktop (WinAppDriver) with POM, BDD, and Docker support.
+                      43 templates: Web (Selenium, Playwright, Cypress, Robot Framework), Mobile (Appium, Espresso with Kotlin), API (RestAssured, Supertest, GraphQL, gRPC), and Desktop (WinAppDriver) with POM, BDD, and Docker support.
                     </AccordionContent>
                   </AccordionItem>
 

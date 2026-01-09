@@ -1,0 +1,38 @@
+import { gql } from '@apollo/client/core';
+import { USER_FRAGMENT } from '../fragments/user.fragments';
+
+export const GET_USER = gql`
+${USER_FRAGMENT}
+query GetUser($id: ID!) {
+user(id: $id) {
+...UserFields
+}
+}
+`;
+
+export const GET_USERS = gql`
+${USER_FRAGMENT}
+query GetUsers($limit: Int, $offset: Int) {
+users(limit: $limit, offset: $offset) {
+...UserFields
+}
+}
+`;
+
+export const GET_USER_BY_EMAIL = gql`
+${USER_FRAGMENT}
+query GetUserByEmail($email: String!) {
+userByEmail(email: $email) {
+...UserFields
+}
+}
+`;
+
+export const SEARCH_USERS = gql`
+${USER_FRAGMENT}
+query SearchUsers($query: String!, $limit: Int) {
+searchUsers(query: $query, limit: $limit) {
+...UserFields
+}
+}
+`;

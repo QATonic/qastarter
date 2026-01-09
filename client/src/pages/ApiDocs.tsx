@@ -273,7 +273,7 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
     "testingTypes": [
       { "id": "web", "label": "Web Applications", "frameworks": ["selenium", "playwright", "cypress", "webdriverio"] },
       { "id": "mobile", "label": "Mobile Applications", "frameworks": ["appium", "espresso", "xcuitest"] },
-      { "id": "api", "label": "API Testing", "frameworks": ["restassured", "requests", "supertest", "restsharp"] },
+      { "id": "api", "label": "API Testing", "frameworks": ["restassured", "requests", "supertest", "restsharp", "graphql", "grpc"] },
       { "id": "desktop", "label": "Desktop Applications", "frameworks": ["winappdriver", "pyautogui"] }
     ],
     "frameworks": [

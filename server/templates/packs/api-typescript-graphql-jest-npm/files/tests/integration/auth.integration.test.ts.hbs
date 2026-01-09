@@ -1,0 +1,125 @@
+import { graphqlClient, setAuthToken, resetClient } from '../../src/client/graphql-client';
+import { LOGIN, LOGOUT } from '../../src/mutations/user.mutations';
+import { GET_USER } from '../../src/queries/user.queries';
+
+describe('Authentication Integration Tests', () => {
+beforeEach(() => {
+resetClient();
+setAuthToken('');
+});
+
+describe('Login Flow', () => {
+it('should complete full login flow', async () => {
+// 1. Login
+const { data: loginData } = await graphqlClient.mutate({
+mutation: LOGIN,
+variables: {
+email: 'test@example.com',
+password: 'password123',
+},
+});
+
+expect(loginData.login.token).toBeDefined();
+expect(loginData.login.user).toBeDefined();
+
+// 2. Set auth token
+setAuthToken(loginData.login.token);
+
+// 3. Access protected resource
+const { data: userData } = await graphqlClient.query({
+query: GET_USER,
+variables: { id: loginData.login.user.id },
+});
+
+expect(userData.user.id).toBe(loginData.login.user.id);
+});
+
+it('should reject unauthenticated requests to protected endpoints', async () => {
+// Ensure no token is set
+setAuthToken('');
+
+// Try to access protected resource
+try {
+await graphqlClient.query({
+query: GET_USER,
+variables: { id: '1' },
+});
+// If no error, the endpoint might not require auth
+} catch (error: any) {
+expect(error.message.toLowerCase()).toContain('unauthorized');
+}
+});
+
+it('should handle expired token', async () => {
+// Set an expired/invalid token
+setAuthToken('expired-token-12345');
+
+try {
+await graphqlClient.query({
+query: GET_USER,
+variables: { id: '1' },
+});
+} catch (error: any) {
+expect(
+error.message.toLowerCase().includes('unauthorized') ||
+error.message.toLowerCase().includes('expired') ||
+error.message.toLowerCase().includes('invalid')
+).toBe(true);
+}
+});
+});
+
+describe('Logout Flow', () => {
+it('should complete full logout flow', async () => {
+// 1. Login first
+const { data: loginData } = await graphqlClient.mutate({
+mutation: LOGIN,
+variables: {
+email: 'test@example.com',
+password: 'password123',
+},
+});
+
+setAuthToken(loginData.login.token);
+
+// 2. Logout
+const { data: logoutData } = await graphqlClient.mutate({
+mutation: LOGOUT,
+});
+
+expect(logoutData.logout.success).toBe(true);
+
+// 3. Clear token
+setAuthToken('');
+
+// 4. Verify logged out (protected resources should fail)
+// This depends on your API implementation
+});
+});
+
+describe('Session Management', () => {
+it('should handle concurrent sessions', async () => {
+// Login from first "device"
+const { data: session1 } = await graphqlClient.mutate({
+mutation: LOGIN,
+variables: {
+email: 'test@example.com',
+password: 'password123',
+},
+});
+
+// Login from second "device"
+const { data: session2 } = await graphqlClient.mutate({
+mutation: LOGIN,
+variables: {
+email: 'test@example.com',
+password: 'password123',
+},
+});
+
+// Both sessions should be valid (or first invalidated based on API policy)
+expect(session1.login.token).toBeDefined();
+expect(session2.login.token).toBeDefined();
+});
+});
+});

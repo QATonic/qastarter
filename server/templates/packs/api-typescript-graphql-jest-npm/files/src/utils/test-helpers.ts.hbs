@@ -1,0 +1,70 @@
+import { ApolloError } from '@apollo/client/core';
+import { User, CreateUserInput } from '../types/graphql.types';
+
+/**
+* Generate a random email for testing
+*/
+export const generateTestEmail = (): string => {
+const timestamp = Date.now();
+const random = Math.random().toString(36).substring(7);
+return `test-${timestamp}-${random}@example.com`;
+};
+
+/**
+* Generate test user data
+*/
+export const generateTestUser = (overrides?: Partial<CreateUserInput>): CreateUserInput => {
+    return {
+    email: generateTestEmail(),
+    name: `Test User ${Date.now()}`,
+    password: 'TestPassword123!',
+    ...overrides,
+    };
+    };
+
+    /**
+    * Extract error message from Apollo error
+    */
+    export const getErrorMessage = (error: ApolloError): string => {
+    if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+    return error.graphQLErrors[0].message;
+    }
+    if (error.networkError) {
+    return error.networkError.message;
+    }
+    return error.message;
+    };
+
+    /**
+    * Check if error contains specific message
+    */
+    export const hasErrorMessage = (error: ApolloError, message: string): boolean => {
+    const errorMessage = getErrorMessage(error).toLowerCase();
+    return errorMessage.includes(message.toLowerCase());
+    };
+
+    /**
+    * Wait for specified milliseconds
+    */
+    export const wait = (ms: number): Promise<void> => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+        };
+
+        /**
+        * Retry function with exponential backoff
+        */
+        export const retryWithBackoff = async <T>(
+            fn: () => Promise<T>,
+                maxRetries: number = 3,
+                baseDelay: number = 1000
+                ): Promise<T> => {
+                    let lastError: Error | undefined;
+
+                    for (let i = 0; i < maxRetries; i++) { try { return await fn(); } catch (error) { lastError=error as
+                        Error; const delay=baseDelay * Math.pow(2, i); await wait(delay); } } throw lastError; }; /** *
+                        Validate user object structure */ export const validateUserStructure=(user: User): void=> {
+                        expect(user).toHaveProperty('id');
+                        expect(user).toHaveProperty('email');
+                        expect(user).toHaveProperty('name');
+                        expect(user).toHaveProperty('createdAt');
+                        };

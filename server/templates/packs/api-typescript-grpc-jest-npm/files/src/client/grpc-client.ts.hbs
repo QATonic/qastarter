@@ -1,0 +1,64 @@
+import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import path from 'path';
+import { getEnvironmentConfig } from '../config/environments';
+
+const config = getEnvironmentConfig();
+
+// Proto loader options
+const loaderOptions: protoLoader.Options = {
+keepCase: true,
+longs: String,
+enums: String,
+defaults: true,
+oneofs: true,
+};
+
+// Load proto files
+const PROTO_PATH = path.join(__dirname, '../../protos/user.proto');
+const packageDefinition = protoLoader.loadSync(PROTO_PATH, loaderOptions);
+const protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
+
+// Get service definition
+const userPackage = protoDescriptor.user as any;
+
+// Create client with credentials and options
+const createClient = <T>(ServiceClient: any): T => {
+    const credentials = config.useTLS
+    ? grpc.credentials.createSsl()
+    : grpc.credentials.createInsecure();
+
+    const options: grpc.ClientOptions = {
+    'grpc.keepalive_time_ms': 10000,
+    'grpc.keepalive_timeout_ms': 5000,
+    'grpc.keepalive_permit_without_calls': 1,
+    };
+
+    return new ServiceClient(config.grpcEndpoint, credentials, options);
+    };
+
+    // User service client
+    export const userServiceClient = createClient<any>(userPackage.UserService);
+
+        // Add metadata for authentication
+        export const createMetadata = (token?: string): grpc.Metadata => {
+        const metadata = new grpc.Metadata();
+
+        if (token) {
+        metadata.set('authorization', `Bearer ${token}`);
+        }
+
+        metadata.set('x-request-id', `test-${Date.now()}`);
+
+        return metadata;
+        };
+
+        // Create deadline for timeout
+        export const createDeadline = (timeoutMs: number = 30000): grpc.Deadline => {
+        return new Date(Date.now() + timeoutMs);
+        };
+
+        // Close client connection
+        export const closeClient = () => {
+        userServiceClient.close();
+        };

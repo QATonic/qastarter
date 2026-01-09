@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package user;
+
+import "common.proto";
+
+service UserService {
+// Unary RPCs
+rpc GetUser (GetUserRequest) returns (User);
+rpc CreateUser (CreateUserRequest) returns (User);
+rpc UpdateUser (UpdateUserRequest) returns (User);
+rpc DeleteUser (DeleteUserRequest) returns (DeleteResponse);
+
+// Server Streaming
+rpc ListUsers (ListUsersRequest) returns (stream User);
+
+// Client Streaming
+rpc BatchCreateUsers (stream CreateUserRequest) returns (BatchCreateResponse);
+
+// Bidirectional Streaming
+rpc Chat (stream ChatMessage) returns (stream ChatMessage);
+}
+
+message GetUserRequest {
+string id = 1;
+}
+
+message CreateUserRequest {
+string name = 1;
+string email = 2;
+string password = 3;
+UserRole role = 4;
+}
+
+message UpdateUserRequest {
+string id = 1;
+optional string name = 2;
+optional string email = 3;
+optional UserRole role = 4;
+}
+
+message DeleteUserRequest {
+string id = 1;
+}
+
+message ListUsersRequest {
+int32 limit = 1;
+int32 offset = 2;
+optional string search = 3;
+}
+
+message BatchCreateResponse {
+repeated User users = 1;
+int32 created_count = 2;
+}
+
+message User {
+string id = 1;
+string name = 2;
+string email = 3;
+UserRole role = 4;
+string created_at = 5;
+string updated_at = 6;
+}
+
+enum UserRole {
+USER_ROLE_UNSPECIFIED = 0;
+USER_ROLE_ADMIN = 1;
+USER_ROLE_USER = 2;
+USER_ROLE_GUEST = 3;
+}
+
+message ChatMessage {
+string id = 1;
+string user_id = 2;
+string content = 3;
+string timestamp = 4;
+}

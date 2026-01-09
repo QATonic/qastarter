@@ -218,14 +218,6 @@
       "description": "Sample login tests with parametrization"
     },
     {
-      "path": "tests/test_smoke.py",
-      "isTemplate": true,
-      "description": "Sample smoke test suite",
-      "conditional": {
-        "testingPattern": "page-object-model"
-      }
-    },
-    {
       "path": "features/login.feature",
       "isTemplate": true,
       "description": "Sample login feature file for BDD",

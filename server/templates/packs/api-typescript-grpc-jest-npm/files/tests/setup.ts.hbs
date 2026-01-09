@@ -1,0 +1,19 @@
+import dotenv from 'dotenv';
+import { closeClient } from '../src/client/grpc-client';
+
+// Load environment variables
+dotenv.config();
+
+// Global test setup
+beforeAll(() => {
+console.log(`Running gRPC tests in ${process.env.TEST_ENV || 'dev'} environment`);
+});
+
+// Global test teardown
+afterAll(() => {
+closeClient();
+console.log('gRPC test suite completed');
+});
+
+// Increase test timeout for gRPC calls
+jest.setTimeout(30000);

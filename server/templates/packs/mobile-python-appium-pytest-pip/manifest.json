@@ -134,11 +134,6 @@
       "description": "Login test suite"
     },
     {
-      "path": "tests/test_smoke.py",
-      "isTemplate": true,
-      "description": "Smoke test suite"
-    },
-    {
       "path": "features/login.feature",
       "isTemplate": true,
       "description": "Sample login feature",

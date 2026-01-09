@@ -182,12 +182,6 @@
       "description": "Sample API tests"
     },
     {
-      "path": "src/test/java/{{packagePath}}/tests/SmokeTests.java",
-      "template": "src/test/java/{{packagePath}}/tests/SmokeTests.java.hbs",
-      "isTemplate": true,
-      "description": "API smoke tests"
-    },
-    {
       "path": "src/main/resources/config/dev.properties",
       "template": "src/main/resources/config/dev.properties.hbs",
       "isTemplate": true,

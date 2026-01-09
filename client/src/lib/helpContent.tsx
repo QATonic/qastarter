@@ -27,11 +27,11 @@ export const helpContent: HelpContent = {
   api: (
     <div>
       <p className="font-medium mb-1">API Testing</p>
-      <p className="text-xs">Validate REST/GraphQL APIs for functionality, reliability, and performance.</p>
+      <p className="text-xs">Validate REST, GraphQL, and gRPC APIs for functionality, reliability, and performance.</p>
       <p className="text-xs mt-1">✓ Request/Response validation</p>
       <p className="text-xs">✓ Schema validation</p>
       <p className="text-xs">✓ Authentication testing</p>
-      <p className="text-xs mt-1 italic">Frameworks: RestAssured, Requests, Supertest</p>
+      <p className="text-xs mt-1 italic">Frameworks: RestAssured, Supertest, GraphQL, gRPC</p>
     </div>
   ),
   desktop: (
@@ -176,6 +176,26 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Extensive library ecosystem</p>
       <p className="text-xs">✓ SeleniumLibrary for web testing</p>
       <p className="text-xs mt-1 italic">Best for: Acceptance testing and non-programmers</p>
+    </div>
+  ),
+  graphql: (
+    <div>
+      <p className="font-medium mb-1">GraphQL Testing</p>
+      <p className="text-xs">GraphQL API testing with Apollo Client and Jest.</p>
+      <p className="text-xs mt-1">✓ Query and mutation testing</p>
+      <p className="text-xs">✓ Schema validation</p>
+      <p className="text-xs">✓ Authentication testing</p>
+      <p className="text-xs mt-1 italic">Language: TypeScript</p>
+    </div>
+  ),
+  grpc: (
+    <div>
+      <p className="font-medium mb-1">gRPC Testing</p>
+      <p className="text-xs">gRPC API testing with @grpc/grpc-js and Jest.</p>
+      <p className="text-xs mt-1">✓ Unary and streaming RPCs</p>
+      <p className="text-xs">✓ Protocol buffer support</p>
+      <p className="text-xs">✓ Error handling tests</p>
+      <p className="text-xs mt-1 italic">Language: TypeScript</p>
     </div>
   ),
 

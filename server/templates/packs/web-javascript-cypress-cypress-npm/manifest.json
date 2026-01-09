@@ -100,11 +100,6 @@
       "description": "Login test suite"
     },
     {
-      "path": "cypress/e2e/smoke.cy.js",
-      "isTemplate": true,
-      "description": "Smoke test suite"
-    },
-    {
       "path": "cypress/fixtures/users.json",
       "isTemplate": true,
       "description": "User test data"

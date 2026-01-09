@@ -1,0 +1,79 @@
+import * as grpc from '@grpc/grpc-js';
+import { User, CreateUserRequest, GrpcStatus, GrpcStatusCode } from '../types/grpc.types';
+
+/**
+* Generate a random email for testing
+*/
+export const generateTestEmail = (): string => {
+const timestamp = Date.now();
+const random = Math.random().toString(36).substring(7);
+return `test-${timestamp}-${random}@example.com`;
+};
+
+/**
+* Generate test user data
+*/
+export const generateTestUser = (overrides?: Partial<CreateUserRequest>): CreateUserRequest => {
+    return {
+    email: generateTestEmail(),
+    name: `Test User ${Date.now()}`,
+    password: 'TestPassword123!',
+    ...overrides,
+    };
+    };
+
+    /**
+    * Check if error is specific gRPC status
+    */
+    export const isGrpcStatus = (error: grpc.ServiceError, status: GrpcStatusCode): boolean => {
+    return error.code === status;
+    };
+
+    /**
+    * Get error message from gRPC error
+    */
+    export const getGrpcErrorMessage = (error: grpc.ServiceError): string => {
+    return error.details || error.message;
+    };
+
+    /**
+    * Wait for specified milliseconds
+    */
+    export const wait = (ms: number): Promise<void> => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+        };
+
+        /**
+        * Retry function with exponential backoff
+        */
+        export const retryWithBackoff = async <T>(
+            fn: () => Promise<T>,
+                maxRetries: number = 3,
+                baseDelay: number = 1000
+                ): Promise<T> => {
+                    let lastError: Error | undefined;
+
+                    for (let i = 0; i < maxRetries; i++) { try { return await fn(); } catch (error) { lastError=error as
+                        Error; // Don't retry on certain errors if ((error as
+                        grpc.ServiceError).code===GrpcStatus.INVALID_ARGUMENT || (error as
+                        grpc.ServiceError).code===GrpcStatus.UNAUTHENTICATED) { throw error; } const delay=baseDelay *
+                        Math.pow(2, i); await wait(delay); } } throw lastError; }; /** * Validate user object structure
+                        */ export const validateUserStructure=(user: User): void=> {
+                        expect(user).toHaveProperty('id');
+                        expect(user).toHaveProperty('email');
+                        expect(user).toHaveProperty('name');
+                        expect(user).toHaveProperty('created_at');
+                        };
+
+                        /**
+                        * Collect stream data to array
+                        */
+                        export const collectStream = <T>(stream: grpc.ClientReadableStream<T>): Promise<T[]> => {
+                                    return new Promise((resolve, reject) => {
+                                    const items: T[] = [];
+
+                                    stream.on('data', (item: T) => items.push(item));
+                                    stream.on('end', () => resolve(items));
+                                    stream.on('error', reject);
+                                    });
+                                    };

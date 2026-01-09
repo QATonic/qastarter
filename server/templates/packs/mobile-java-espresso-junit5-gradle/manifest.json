@@ -130,11 +130,6 @@
       "description": "Login functionality tests"
     },
     {
-      "path": "app/src/androidTest/java/{{packagePath}}/tests/SmokeTests.java",
-      "isTemplate": true,
-      "description": "Smoke tests for critical functionality"
-    },
-    {
       "path": "app/src/androidTest/assets/testdata/users.json",
       "isTemplate": true,
       "description": "Test user data"

@@ -1,0 +1,168 @@
+import { graphqlClient, resetClient } from '../../src/client/graphql-client';
+import { CREATE_USER, UPDATE_USER, DELETE_USER, LOGIN } from '../../src/mutations/user.mutations';
+import { generateTestUser, validateUserStructure } from '../../src/utils/test-helpers';
+
+describe('User Mutations', () => {
+let createdUserId: string;
+
+beforeEach(() => {
+resetClient();
+});
+
+describe('CREATE_USER', () => {
+it('should create a new user', async () => {
+const testUser = generateTestUser();
+
+const { data, errors } = await graphqlClient.mutate({
+mutation: CREATE_USER,
+variables: { input: testUser },
+});
+
+if (errors) {
+console.log('GraphQL Errors:', errors);
+}
+
+expect(data).toBeDefined();
+expect(data.createUser).toBeDefined();
+expect(data.createUser.email).toBe(testUser.email);
+expect(data.createUser.name).toBe(testUser.name);
+
+validateUserStructure(data.createUser);
+createdUserId = data.createUser.id;
+});
+
+it('should fail with duplicate email', async () => {
+const testUser = generateTestUser({ email: 'duplicate@example.com' });
+
+// Create first user
+await graphqlClient.mutate({
+mutation: CREATE_USER,
+variables: { input: testUser },
+});
+
+// Try to create with same email
+try {
+await graphqlClient.mutate({
+mutation: CREATE_USER,
+variables: { input: testUser },
+});
+fail('Should have thrown error');
+} catch (error: any) {
+expect(error.message).toContain('already exists');
+}
+});
+
+it('should validate email format', async () => {
+const testUser = generateTestUser({ email: 'invalid-email' });
+
+try {
+await graphqlClient.mutate({
+mutation: CREATE_USER,
+variables: { input: testUser },
+});
+fail('Should have thrown validation error');
+} catch (error: any) {
+expect(error.message.toLowerCase()).toContain('valid email');
+}
+});
+});
+
+describe('UPDATE_USER', () => {
+it('should update user name', async () => {
+const newName = 'Updated Name';
+
+const { data } = await graphqlClient.mutate({
+mutation: UPDATE_USER,
+variables: {
+id: createdUserId,
+input: { name: newName },
+},
+});
+
+expect(data.updateUser.name).toBe(newName);
+});
+
+it('should update user email', async () => {
+const newEmail = `updated-${Date.now()}@example.com`;
+
+const { data } = await graphqlClient.mutate({
+mutation: UPDATE_USER,
+variables: {
+id: createdUserId,
+input: { email: newEmail },
+},
+});
+
+expect(data.updateUser.email).toBe(newEmail);
+});
+
+it('should fail for non-existent user', async () => {
+try {
+await graphqlClient.mutate({
+mutation: UPDATE_USER,
+variables: {
+id: 'non-existent-id',
+input: { name: 'Test' },
+},
+});
+fail('Should have thrown error');
+} catch (error: any) {
+expect(error.message).toContain('not found');
+}
+});
+});
+
+describe('DELETE_USER', () => {
+it('should delete user', async () => {
+const { data } = await graphqlClient.mutate({
+mutation: DELETE_USER,
+variables: { id: createdUserId },
+});
+
+expect(data.deleteUser.success).toBe(true);
+});
+
+it('should fail for non-existent user', async () => {
+try {
+await graphqlClient.mutate({
+mutation: DELETE_USER,
+variables: { id: 'non-existent-id' },
+});
+fail('Should have thrown error');
+} catch (error: any) {
+expect(error.message).toContain('not found');
+}
+});
+});
+
+describe('LOGIN', () => {
+it('should authenticate valid user', async () => {
+const { data } = await graphqlClient.mutate({
+mutation: LOGIN,
+variables: {
+email: 'test@example.com',
+password: 'password123',
+},
+});
+
+expect(data.login).toBeDefined();
+expect(data.login.token).toBeDefined();
+expect(data.login.user).toBeDefined();
+});
+
+it('should reject invalid credentials', async () => {
+try {
+await graphqlClient.mutate({
+mutation: LOGIN,
+variables: {
+email: 'test@example.com',
+password: 'wrongpassword',
+},
+});
+fail('Should have thrown error');
+} catch (error: any) {
+expect(error.message.toLowerCase()).toContain('invalid');
+}
+});
+});
+});

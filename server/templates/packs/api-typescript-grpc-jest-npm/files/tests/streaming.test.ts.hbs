@@ -1,0 +1,104 @@
+import { userService } from '../src/services/user-service';
+import { collectStream } from '../src/utils/test-helpers';
+import { User } from '../src/types/grpc.types';
+
+describe('Streaming RPC Tests', () => {
+describe('Server Streaming - ListUsers', () => {
+it('should stream users', async () => {
+const users = await userService.listUsersAsync({ limit: 10 });
+
+expect(Array.isArray(users)).toBe(true);
+expect(users.length).toBeGreaterThan(0);
+});
+
+it('should respect limit parameter', async () => {
+const limit = 5;
+const users = await userService.listUsersAsync({ limit });
+
+expect(users.length).toBeLessThanOrEqual(limit);
+});
+
+it('should handle empty stream gracefully', async () => {
+const users = await userService.listUsersAsync({
+limit: 10,
+search: 'non-existent-search-query-xyz'
+});
+
+expect(Array.isArray(users)).toBe(true);
+expect(users.length).toBe(0);
+});
+
+it('should receive all user fields in streamed data', async () => {
+const users = await userService.listUsersAsync({ limit: 1 });
+
+if (users.length > 0) {
+const user = users[0];
+expect(user).toHaveProperty('id');
+expect(user).toHaveProperty('name');
+expect(user).toHaveProperty('email');
+expect(user).toHaveProperty('role');
+}
+});
+
+it('should handle stream using event listeners', async () => {
+const users: User[] = [];
+const stream = userService.listUsers({ limit: 5 });
+
+await new Promise<void>((resolve, reject) => {
+    stream.on('data', (user: User) => {
+    users.push(user);
+    });
+
+    stream.on('end', () => {
+    resolve();
+    });
+
+    stream.on('error', (error) => {
+    reject(error);
+    });
+    });
+
+    expect(users.length).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should support cancelling stream', async () => {
+    const users: User[] = [];
+    const stream = userService.listUsers({ limit: 100 });
+
+    await new Promise<void>((resolve) => {
+        stream.on('data', (user: User) => {
+        users.push(user);
+
+        // Cancel after receiving 3 users
+        if (users.length >= 3) {
+        stream.cancel();
+        resolve();
+        }
+        });
+
+        stream.on('end', () => {
+        resolve();
+        });
+
+        stream.on('error', () => {
+        // Cancelled streams emit error
+        resolve();
+        });
+        });
+
+        expect(users.length).toBeGreaterThanOrEqual(3);
+        });
+        });
+
+        describe('Stream Performance', () => {
+        it('should handle large dataset stream', async () => {
+        const startTime = Date.now();
+        const users = await userService.listUsersAsync({ limit: 100 });
+        const duration = Date.now() - startTime;
+
+        console.log(`Streamed ${users.length} users in ${duration}ms`);
+
+        expect(duration).toBeLessThan(10000); // Should complete within 10 seconds
+        });
+        });
+        });

@@ -137,11 +137,6 @@
       "description": "Login tests"
     },
     {
-      "path": "Tests/SmokeTests.cs",
-      "isTemplate": true,
-      "description": "Smoke tests"
-    },
-    {
       "path": "Tests/BaseTest.cs",
       "isTemplate": true,
       "description": "Base test setup/teardown"

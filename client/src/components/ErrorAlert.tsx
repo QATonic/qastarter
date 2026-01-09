@@ -1,6 +1,6 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, RefreshCw, X } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, RefreshCw, X } from 'lucide-react';
 
 interface ErrorAlertProps {
   title?: string;
@@ -12,19 +12,15 @@ interface ErrorAlertProps {
 }
 
 export function ErrorAlert({
-  title = "Error",
+  title = 'Error',
   message,
   onRetry,
   onDismiss,
-  className = "",
+  className = '',
   showRetry = true,
 }: ErrorAlertProps) {
   return (
-    <Alert 
-      variant="destructive" 
-      className={`relative ${className}`}
-      data-testid="alert-error"
-    >
+    <Alert variant="destructive" className={`relative ${className}`} data-testid="alert-error">
       <AlertCircle className="h-4 w-4" />
       <AlertTitle className="flex items-center justify-between">
         <span>{title}</span>

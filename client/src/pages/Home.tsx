@@ -1,9 +1,9 @@
-import { useState } from "react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import LandingPage from "@/components/LandingPage";
-import Wizard from "@/components/Wizard";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from 'react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import LandingPage from '@/components/LandingPage';
+import Wizard from '@/components/Wizard';
+import { useToast } from '@/hooks/use-toast';
 
 type AppState = 'landing' | 'wizard' | 'generating';
 
@@ -55,7 +55,7 @@ export default function Home() {
     }
 
     const contentType = response.headers.get('content-type');
-    
+
     if (contentType?.includes('application/json')) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Project generation failed');
@@ -72,14 +72,14 @@ export default function Home() {
     URL.revokeObjectURL(url);
 
     toast({
-      title: "Project Generated Successfully!",
+      title: 'Project Generated Successfully!',
       description: `${config.projectName} has been downloaded to your device.`,
     });
   };
 
   const handleWizardComplete = async (config: WizardConfig) => {
     setAppState('generating');
-    
+
     try {
       console.log('Generating project with config:', config);
       await handleDownload(config);
@@ -87,9 +87,12 @@ export default function Home() {
     } catch (error) {
       console.error('Error generating project:', error);
       toast({
-        title: "Generation Failed",
-        description: error instanceof Error ? error.message : "There was an error generating your project. Please try again.",
-        variant: "destructive",
+        title: 'Generation Failed',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'There was an error generating your project. Please try again.',
+        variant: 'destructive',
       });
       setAppState('wizard');
     }
@@ -98,23 +101,25 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header onLogoClick={handleBackToLanding} />
-      
+
       <main id="main-content" className="flex-1" role="main">
-        {appState === 'landing' && (
-          <LandingPage onStartGeneration={handleStartGeneration} />
-        )}
-        
+        {appState === 'landing' && <LandingPage onStartGeneration={handleStartGeneration} />}
+
         {appState === 'wizard' && (
-          <Wizard 
-            onComplete={handleWizardComplete}
-            onBack={handleBackToLanding}
-          />
+          <Wizard onComplete={handleWizardComplete} onBack={handleBackToLanding} />
         )}
-        
+
         {appState === 'generating' && (
-          <div className="flex items-center justify-center min-h-[60vh]" role="status" aria-label="Generating project">
+          <div
+            className="flex items-center justify-center min-h-[60vh]"
+            role="status"
+            aria-label="Generating project"
+          >
             <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" aria-hidden="true"></div>
+              <div
+                className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"
+                aria-hidden="true"
+              ></div>
               <h2 className="text-xl font-semibold">Generating Your Project...</h2>
               <p className="text-muted-foreground">This may take a few seconds</p>
             </div>

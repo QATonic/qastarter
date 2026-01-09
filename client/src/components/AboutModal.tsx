@@ -4,10 +4,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Heart, Zap, Shield, Download } from "lucide-react";
-import QAStarterLogo from "./QAStarterLogo";
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Heart, Zap, Shield, Download } from 'lucide-react';
+import QAStarterLogo from './QAStarterLogo';
 
 interface AboutModalProps {
   open: boolean;
@@ -38,9 +38,10 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
               Overview
             </h3>
             <p className="text-muted-foreground leading-relaxed">
-              QAStarter is a free, web-based application designed to simplify the setup of QA automation projects.
-              Similar to Spring Initializr but tailored for quality assurance engineers, it provides a wizard-based
-              interface for configuring and generating complete QA automation project structures.
+              QAStarter is a free, web-based application designed to simplify the setup of QA
+              automation projects. Similar to Spring Initializr but tailored for quality assurance
+              engineers, it provides a wizard-based interface for configuring and generating
+              complete QA automation project structures.
             </p>
           </div>
 
@@ -55,28 +56,36 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
                 <Shield className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-sm">Multiple Frameworks</div>
-                  <div className="text-xs text-muted-foreground">Selenium, Playwright, Cypress, Appium</div>
+                  <div className="text-xs text-muted-foreground">
+                    Selenium, Playwright, Cypress, Appium
+                  </div>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
                 <Shield className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-sm">Language Support</div>
-                  <div className="text-xs text-muted-foreground">Java, Python, JavaScript, TypeScript, C#</div>
+                  <div className="text-xs text-muted-foreground">
+                    Java, Python, JavaScript, TypeScript, C#
+                  </div>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
                 <Shield className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-sm">Testing Patterns</div>
-                  <div className="text-xs text-muted-foreground">POM, BDD, Hybrid, Keyword-Driven</div>
+                  <div className="text-xs text-muted-foreground">
+                    POM, BDD, Hybrid, Keyword-Driven
+                  </div>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
                 <Shield className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
                 <div>
                   <div className="font-medium text-sm">CI/CD Ready</div>
-                  <div className="text-xs text-muted-foreground">GitHub Actions, Azure DevOps, Jenkins</div>
+                  <div className="text-xs text-muted-foreground">
+                    GitHub Actions, Azure DevOps, Jenkins
+                  </div>
                 </div>
               </div>
             </div>
@@ -90,19 +99,27 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </h3>
             <ol className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-start space-x-2">
-                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">1</span>
+                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                  1
+                </span>
                 <span>Configure your testing preferences using the step-by-step wizard</span>
               </li>
               <li className="flex items-start space-x-2">
-                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">2</span>
+                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                  2
+                </span>
                 <span>Select your testing framework, language, and build tools</span>
               </li>
               <li className="flex items-start space-x-2">
-                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">3</span>
+                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                  3
+                </span>
                 <span>Choose CI/CD pipelines, reporting tools, and utility libraries</span>
               </li>
               <li className="flex items-start space-x-2">
-                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">4</span>
+                <span className="bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium flex-shrink-0 mt-0.5">
+                  4
+                </span>
                 <span>Generate and download your customized project template</span>
               </li>
             </ol>
@@ -122,8 +139,8 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
               <h3 className="text-lg font-semibold">Our Mission</h3>
             </div>
             <p className="text-muted-foreground leading-relaxed">
-              Empowering QA engineers worldwide with professional-grade automation tools.
-              We believe quality assurance should be accessible, efficient, and enjoyable for everyone.
+              Empowering QA engineers worldwide with professional-grade automation tools. We believe
+              quality assurance should be accessible, efficient, and enjoyable for everyone.
             </p>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center p-3 bg-background/50 rounded-lg">

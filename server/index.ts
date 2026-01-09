@@ -1,13 +1,13 @@
-import express, { type Request, Response, NextFunction } from "express";
-import helmet from "helmet";
-import compression from "compression";
-import cors from "cors";
-import { exec } from "child_process";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
-import { errorHandler, notFoundHandler } from "./errors";
-import { correlationMiddleware } from "./middleware/correlationMiddleware";
-import { setupSwagger } from "./swagger";
+import express, { type Request, Response, NextFunction } from 'express';
+import helmet from 'helmet';
+import compression from 'compression';
+import cors from 'cors';
+import { exec } from 'child_process';
+import { registerRoutes } from './routes';
+import { setupVite, serveStatic, log } from './vite';
+import { errorHandler, notFoundHandler } from './errors';
+import { correlationMiddleware } from './middleware/correlationMiddleware';
+import { setupSwagger } from './swagger';
 
 const app = express();
 
@@ -19,31 +19,35 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 // In development, disable helmet CSP entirely to avoid issues with Vite HMR
 if (isDevelopment) {
   // Minimal security headers for development
-  app.use(helmet({
-    contentSecurityPolicy: false, // Disable CSP in development for Vite HMR
-    crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: false,
-  }));
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // Disable CSP in development for Vite HMR
+      crossOriginEmbedderPolicy: false,
+      crossOriginResourcePolicy: false,
+    })
+  );
 } else {
   // Full security headers for production
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://replit.com"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Some Radix UI components need inline styles
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https://replit.com"],
-        fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-        objectSrc: ["'none'"],
-        mediaSrc: ["'self'"],
-        frameSrc: ["'none'"],
-        upgradeInsecureRequests: [],
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", 'https://replit.com'],
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'], // Some Radix UI components need inline styles
+          imgSrc: ["'self'", 'data:', 'https:'],
+          connectSrc: ["'self'", 'https://replit.com'],
+          fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://fonts.googleapis.com'],
+          objectSrc: ["'none'"],
+          mediaSrc: ["'self'"],
+          frameSrc: ["'none'"],
+          upgradeInsecureRequests: [],
+        },
       },
-    },
-    crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  }));
+      crossOriginEmbedderPolicy: false,
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    })
+  );
 }
 
 // CORS Configuration - permissive in development
@@ -61,14 +65,11 @@ const corsOptions = {
 
     // Production: Check against allowed origins
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-    const allowedPatterns = [
-      /^https:\/\/.*\.easypanel\.host$/,
-      /^https:\/\/.*\.qatonic\.com$/
-    ];
+    const allowedPatterns = [/^https:\/\/.*\.easypanel\.host$/, /^https:\/\/.*\.qatonic\.com$/];
 
     // Check if origin matches any pattern
-    const isAllowed = allowedOrigins.includes(origin) ||
-      allowedPatterns.some(pattern => pattern.test(origin));
+    const isAllowed =
+      allowedOrigins.includes(origin) || allowedPatterns.some((pattern) => pattern.test(origin));
 
     if (isAllowed) {
       callback(null, true);
@@ -108,8 +109,8 @@ app.use((req, res, next) => {
         error: {
           code: 'REQUEST_TIMEOUT',
           message: 'Request timeout - the operation took too long',
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       });
     }
   });
@@ -119,22 +120,24 @@ app.use((req, res, next) => {
 
 // Response Compression (gzip/deflate with optimized settings)
 // Level 9 provides maximum compression for smaller payloads
-app.use(compression({
-  filter: (req, res) => {
-    // Don't compress if client doesn't want it
-    if (req.headers['x-no-compression']) {
-      return false;
-    }
-    // Don't compress streaming responses
-    if (req.path === '/api/generate-project') {
-      return false; // ZIP files are already compressed
-    }
-    return compression.filter(req, res);
-  },
-  level: 9, // Maximum compression for smallest payload size
-  threshold: 512, // Compress responses larger than 512 bytes
-  memLevel: 8, // Use more memory for better compression
-}));
+app.use(
+  compression({
+    filter: (req, res) => {
+      // Don't compress if client doesn't want it
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      // Don't compress streaming responses
+      if (req.path === '/api/generate-project') {
+        return false; // ZIP files are already compressed
+      }
+      return compression.filter(req, res);
+    },
+    level: 9, // Maximum compression for smallest payload size
+    threshold: 512, // Compress responses larger than 512 bytes
+    memLevel: 8, // Use more memory for better compression
+  })
+);
 
 // Request body parsing with size limits
 app.use(express.json({ limit: '10mb' })); // Limit JSON payload size
@@ -142,13 +145,16 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
 // Verify template packs integrity on startup
 if (process.env.NODE_ENV !== 'production') {
-  exec('npx tsx server/scripts/verify-packs.ts', (error: Error | null, stdout: string, stderr: string) => {
-    if (error) {
-      console.warn(`[Startup Warning] Template Pack Verification Failed: ${error.message}`);
-      return;
+  exec(
+    'npx tsx server/scripts/verify-packs.ts',
+    (error: Error | null, stdout: string, stderr: string) => {
+      if (error) {
+        console.warn(`[Startup Warning] Template Pack Verification Failed: ${error.message}`);
+        return;
+      }
+      console.log('[Startup] Template Pack Verification:\n' + stdout.trim());
     }
-    console.log('[Startup] Template Pack Verification:\n' + stdout.trim());
-  });
+  );
 }
 
 app.use((req, res, next) => {
@@ -162,16 +168,16 @@ app.use((req, res, next) => {
     return originalResJson.apply(res, [bodyJson, ...args]);
   };
 
-  res.on("finish", () => {
+  res.on('finish', () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
+    if (path.startsWith('/api')) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
       if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+        logLine = logLine.slice(0, 79) + '…';
       }
 
       log(logLine);
@@ -207,7 +213,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen(port, "0.0.0.0", () => {
+  server.listen(port, '0.0.0.0', () => {
     log(`serving on port ${port}`);
   });
 })();

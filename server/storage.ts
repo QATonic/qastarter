@@ -1,7 +1,7 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import { desc, count } from "drizzle-orm";
-import { ProjectConfig, projectGenerations } from "@shared/schema";
+import { drizzle } from 'drizzle-orm/node-postgres';
+import pg from 'pg';
+import { desc, count } from 'drizzle-orm';
+import { ProjectConfig, projectGenerations } from '@shared/schema';
 
 const { Pool } = pg;
 
@@ -11,9 +11,8 @@ const pool = new Pool({
 });
 
 const db = drizzle(pool);
-import fs from "fs/promises";
-import path from "path";
-
+import fs from 'fs/promises';
+import path from 'path';
 
 // Storage interface for QAStarter
 export interface IStorage {
@@ -29,17 +28,20 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async saveProjectGeneration(config: ProjectConfig): Promise<string> {
-    const result = await db.insert(projectGenerations).values({
-      projectName: config.projectName,
-      testingType: config.testingType,
-      framework: config.framework,
-      language: config.language,
-      testingPattern: config.testingPattern,
-      testRunner: config.testRunner,
-      buildTool: config.buildTool,
-      cicdTool: config.cicdTool || null,
-      reportingTool: config.reportingTool || null,
-    }).returning({ id: projectGenerations.id });
+    const result = await db
+      .insert(projectGenerations)
+      .values({
+        projectName: config.projectName,
+        testingType: config.testingType,
+        framework: config.framework,
+        language: config.language,
+        testingPattern: config.testingPattern,
+        testRunner: config.testRunner,
+        buildTool: config.buildTool,
+        cicdTool: config.cicdTool || null,
+        reportingTool: config.reportingTool || null,
+      })
+      .returning({ id: projectGenerations.id });
 
     return result[0].id.toString();
   }
@@ -57,7 +59,7 @@ export class DatabaseStorage implements IStorage {
     const byTestingType = await db
       .select({
         testingType: projectGenerations.testingType,
-        count: count()
+        count: count(),
       })
       .from(projectGenerations)
       .groupBy(projectGenerations.testingType)
@@ -66,7 +68,7 @@ export class DatabaseStorage implements IStorage {
     const byFramework = await db
       .select({
         framework: projectGenerations.framework,
-        count: count()
+        count: count(),
       })
       .from(projectGenerations)
       .groupBy(projectGenerations.framework)
@@ -76,7 +78,7 @@ export class DatabaseStorage implements IStorage {
     const byLanguage = await db
       .select({
         language: projectGenerations.language,
-        count: count()
+        count: count(),
       })
       .from(projectGenerations)
       .groupBy(projectGenerations.language)
@@ -121,7 +123,7 @@ export class FileStorage implements IStorage {
       }
       this.initialized = true;
     } catch (error) {
-      console.error("Failed to initialize FileStorage:", error);
+      console.error('Failed to initialize FileStorage:', error);
     }
   }
 
@@ -129,7 +131,7 @@ export class FileStorage implements IStorage {
     try {
       await fs.writeFile(this.filePath, JSON.stringify(this.memoryCache, null, 2));
     } catch (error) {
-      console.error("Failed to persist analytics:", error);
+      console.error('Failed to persist analytics:', error);
     }
   }
 
@@ -147,7 +149,7 @@ export class FileStorage implements IStorage {
       buildTool: config.buildTool,
       cicdTool: config.cicdTool || null,
       reportingTool: config.reportingTool || null,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     this.memoryCache.push(record);
@@ -179,9 +181,15 @@ export class FileStorage implements IStorage {
         .sort((a: any, b: any) => b.count - a.count);
     };
 
-    const byTestingType = countBy('testingType').map(i => ({ testingType: i.testingType, count: i.count }));
-    const byFramework = countBy('framework').map(i => ({ framework: i.framework, count: i.count }));
-    const byLanguage = countBy('language').map(i => ({ language: i.language, count: i.count }));
+    const byTestingType = countBy('testingType').map((i) => ({
+      testingType: i.testingType,
+      count: i.count,
+    }));
+    const byFramework = countBy('framework').map((i) => ({
+      framework: i.framework,
+      count: i.count,
+    }));
+    const byLanguage = countBy('language').map((i) => ({ language: i.language, count: i.count }));
 
     const recentGenerations = [...data]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -192,12 +200,12 @@ export class FileStorage implements IStorage {
       byTestingType,
       byFramework,
       byLanguage,
-      recentGenerations
+      recentGenerations,
     };
   }
 }
 
-// Fallback logic could be fancier (try DB, fail to File), but for now, 
+// Fallback logic could be fancier (try DB, fail to File), but for now,
 // since we know DB is likely missing in this dev env, we can check env var or defaulting.
 // For robustness, let's wrap the export.
 export class ResilientStorage implements IStorage {
@@ -213,11 +221,14 @@ export class ResilientStorage implements IStorage {
     try {
       // Check if DB URL is obviously dummy or missing
       if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes('user:password')) {
-        throw new Error("Using default or empty connection string");
+        throw new Error('Using default or empty connection string');
       }
       return await this.primary.saveProjectGeneration(config);
     } catch (error) {
-      console.warn("Storage: Database save failed, falling back to file system.", (error as Error).message);
+      console.warn(
+        'Storage: Database save failed, falling back to file system.',
+        (error as Error).message
+      );
       return await this.fallback.saveProjectGeneration(config);
     }
   }
@@ -231,11 +242,14 @@ export class ResilientStorage implements IStorage {
   }> {
     try {
       if (!process.env.DATABASE_URL || process.env.DATABASE_URL.includes('user:password')) {
-        throw new Error("Using default or empty connection string");
+        throw new Error('Using default or empty connection string');
       }
       return await this.primary.getProjectGenerationStats();
     } catch (error) {
-      console.warn("Storage: Database read failed, falling back to file system.", (error as Error).message);
+      console.warn(
+        'Storage: Database read failed, falling back to file system.',
+        (error as Error).message
+      );
       return await this.fallback.getProjectGenerationStats();
     }
   }

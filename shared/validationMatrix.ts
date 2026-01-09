@@ -31,7 +31,7 @@ export const validationMatrix: ValidationMatrix = {
     web: ['selenium', 'playwright', 'cypress', 'webdriverio', 'robotframework'],
     mobile: ['appium', 'espresso', 'xcuitest'],
     api: ['restassured', 'requests', 'supertest', 'restsharp', 'graphql', 'grpc'],
-    desktop: ['winappdriver', 'pyautogui']
+    desktop: ['winappdriver', 'pyautogui'],
   },
 
   // Framework -> Available Languages
@@ -41,7 +41,7 @@ export const validationMatrix: ValidationMatrix = {
     playwright: ['javascript', 'typescript', 'python', 'java', 'csharp'],
     cypress: ['javascript', 'typescript'],
     webdriverio: ['javascript', 'typescript'],
-    robotframework: ['python'],  // Robot Framework uses Python
+    robotframework: ['python'], // Robot Framework uses Python
 
     // Mobile frameworks
     appium: ['java', 'python', 'csharp', 'javascript', 'typescript'],
@@ -58,18 +58,18 @@ export const validationMatrix: ValidationMatrix = {
 
     // Desktop frameworks
     winappdriver: ['csharp', 'java', 'python'],
-    pyautogui: ['python']
+    pyautogui: ['python'],
   },
 
   // Language -> Available Test Runners (general mapping)
   testRunners: {
     java: ['testng', 'junit5'],
     kotlin: ['junit5'],
-    python: ['pytest', 'robot'],  // Added 'robot' for Robot Framework
+    python: ['pytest', 'robot'], // Added 'robot' for Robot Framework
     javascript: ['jest', 'mocha', 'cypress'],
     typescript: ['jest', 'mocha', 'cypress'],
     csharp: ['nunit'],
-    swift: ['xctest']
+    swift: ['xctest'],
   },
 
   // Language -> Available Build Tools (general mapping)
@@ -80,7 +80,7 @@ export const validationMatrix: ValidationMatrix = {
     javascript: ['npm'],
     typescript: ['npm'],
     csharp: ['nuget', 'dotnet-cli'],
-    swift: ['spm']
+    swift: ['spm'],
   },
 
   // Framework + Language -> Test Runner (precise mapping based on actual templates)
@@ -150,7 +150,7 @@ export const validationMatrix: ValidationMatrix = {
     'winappdriver-python': ['pytest'],
 
     // Desktop - PyAutoGUI
-    'pyautogui-python': ['pytest']
+    'pyautogui-python': ['pytest'],
   },
 
   // Framework + Language -> Build Tool (precise mapping based on actual templates)
@@ -220,7 +220,7 @@ export const validationMatrix: ValidationMatrix = {
     'winappdriver-python': ['pip'],
 
     // Desktop - PyAutoGUI
-    'pyautogui-python': ['pip']
+    'pyautogui-python': ['pip'],
   },
 
   // Framework + Language -> Reporting Tool (precise mapping based on actual templates)
@@ -290,7 +290,7 @@ export const validationMatrix: ValidationMatrix = {
     'winappdriver-python': ['allure', 'pytest-html'],
 
     // Desktop - PyAutoGUI
-    'pyautogui-python': ['allure', 'pytest-html']
+    'pyautogui-python': ['allure', 'pytest-html'],
   },
 
   // Framework -> Available CI/CD Tools (standardized across all templates)
@@ -310,18 +310,44 @@ export const validationMatrix: ValidationMatrix = {
     graphql: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     grpc: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     winappdriver: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
-    pyautogui: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci']
+    pyautogui: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
   },
 
   // Framework -> Available Reporting Tools
   // Updated to match actual template dynamicSupport configurations
   reportingTools: {
-    selenium: ['allure', 'extent-reports', 'testng-reports', 'junit-reports', 'jest-html-reporter', 'mochawesome', 'pytest-html', 'nunit-reports'],
-    playwright: ['allure', 'extent-reports', 'testng-reports', 'junit-reports', 'jest-html', 'pytest-html', 'nunit-reports'],
+    selenium: [
+      'allure',
+      'extent-reports',
+      'testng-reports',
+      'junit-reports',
+      'jest-html-reporter',
+      'mochawesome',
+      'pytest-html',
+      'nunit-reports',
+    ],
+    playwright: [
+      'allure',
+      'extent-reports',
+      'testng-reports',
+      'junit-reports',
+      'jest-html',
+      'pytest-html',
+      'nunit-reports',
+    ],
     cypress: ['allure', 'jest-html-reporter', 'mochawesome'],
     webdriverio: ['allure', 'jest-html-reporter', 'mochawesome'],
     robotframework: ['robot-reports', 'allure'],
-    appium: ['allure', 'extent-reports', 'testng-reports', 'junit-reports', 'jest-html-reporter', 'mochawesome', 'pytest-html', 'nunit-reports'],
+    appium: [
+      'allure',
+      'extent-reports',
+      'testng-reports',
+      'junit-reports',
+      'jest-html-reporter',
+      'mochawesome',
+      'pytest-html',
+      'nunit-reports',
+    ],
     espresso: ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
     xcuitest: [],
     restassured: ['allure', 'extent-reports', 'testng-reports', 'junit-html'],
@@ -331,7 +357,7 @@ export const validationMatrix: ValidationMatrix = {
     graphql: ['jest-html-reporter', 'allure'],
     grpc: ['jest-html-reporter', 'allure'],
     winappdriver: ['allure', 'extent-reports', 'pytest-html', 'nunit-reports'],
-    pyautogui: ['allure', 'pytest-html']
+    pyautogui: ['allure', 'pytest-html'],
   },
 
   // Framework -> Available Testing Patterns
@@ -359,7 +385,7 @@ export const validationMatrix: ValidationMatrix = {
 
     // Desktop frameworks - POM is standard, some have additional patterns
     winappdriver: ['page-object-model', 'bdd'],
-    pyautogui: ['functional-patterns', 'bdd']
+    pyautogui: ['functional-patterns', 'bdd'],
   },
 
   // Framework + Language -> Testing Pattern (precise mapping based on actual templates)
@@ -429,13 +455,12 @@ export const validationMatrix: ValidationMatrix = {
     'winappdriver-python': ['page-object-model', 'bdd'],
 
     // Desktop - PyAutoGUI (Functional patterns + BDD)
-    'pyautogui-python': ['functional-patterns', 'bdd']
-  }
+    'pyautogui-python': ['functional-patterns', 'bdd'],
+  },
 };
 
 // Validation helper functions
 export class WizardValidator {
-
   /**
    * Get available frameworks for selected testing type
    */
@@ -463,7 +488,9 @@ export class WizardValidator {
    */
   static getAvailableTestRunnersForFramework(framework: string, language: string): string[] {
     const key = `${framework}-${language}`;
-    return validationMatrix.frameworkLanguageTestRunners[key] || this.getAvailableTestRunners(language);
+    return (
+      validationMatrix.frameworkLanguageTestRunners[key] || this.getAvailableTestRunners(language)
+    );
   }
 
   /**
@@ -479,7 +506,9 @@ export class WizardValidator {
    */
   static getAvailableBuildToolsForFramework(framework: string, language: string): string[] {
     const key = `${framework}-${language}`;
-    return validationMatrix.frameworkLanguageBuildTools[key] || this.getAvailableBuildTools(language);
+    return (
+      validationMatrix.frameworkLanguageBuildTools[key] || this.getAvailableBuildTools(language)
+    );
   }
 
   /**
@@ -502,7 +531,10 @@ export class WizardValidator {
    */
   static getAvailableReportingToolsForFramework(framework: string, language: string): string[] {
     const key = `${framework}-${language}`;
-    return validationMatrix.frameworkLanguageReportingTools[key] || this.getAvailableReportingTools(framework);
+    return (
+      validationMatrix.frameworkLanguageReportingTools[key] ||
+      this.getAvailableReportingTools(framework)
+    );
   }
 
   /**
@@ -518,7 +550,10 @@ export class WizardValidator {
    */
   static getAvailableTestingPatternsForFramework(framework: string, language: string): string[] {
     const key = `${framework}-${language}`;
-    return validationMatrix.frameworkLanguageTestingPatterns[key] || this.getAvailableTestingPatterns(framework);
+    return (
+      validationMatrix.frameworkLanguageTestingPatterns[key] ||
+      this.getAvailableTestingPatterns(framework)
+    );
   }
 
   /**
@@ -545,7 +580,13 @@ export class WizardValidator {
   /**
    * Validate if a complete configuration has a matching template
    */
-  static hasMatchingTemplate(testingType: string, framework: string, language: string, testRunner: string, buildTool: string): boolean {
+  static hasMatchingTemplate(
+    testingType: string,
+    framework: string,
+    language: string,
+    testRunner: string,
+    buildTool: string
+  ): boolean {
     // First check basic compatibility
     if (!this.isCompatible(testingType, framework, language)) {
       return false;
@@ -569,7 +610,13 @@ export class WizardValidator {
   /**
    * Get the template pack name for a configuration
    */
-  static getTemplatePackName(testingType: string, framework: string, language: string, testRunner: string, buildTool: string): string {
+  static getTemplatePackName(
+    testingType: string,
+    framework: string,
+    language: string,
+    testRunner: string,
+    buildTool: string
+  ): string {
     return `${testingType}-${language}-${framework}-${testRunner}-${buildTool}`;
   }
 
@@ -674,7 +721,10 @@ export class WizardValidator {
 
     // Reset reporting tool if framework or language changed
     if (config.framework && config.language && config.reportingTool) {
-      const availableReportingTools = this.getAvailableReportingToolsForFramework(config.framework, config.language);
+      const availableReportingTools = this.getAvailableReportingToolsForFramework(
+        config.framework,
+        config.language
+      );
       if (!availableReportingTools.includes(config.reportingTool)) {
         newConfig.reportingTool = '';
       }
@@ -682,7 +732,10 @@ export class WizardValidator {
 
     // Reset testing pattern if framework or language changed
     if (config.framework && config.language && config.testingPattern) {
-      const availableTestingPatterns = this.getAvailableTestingPatternsForFramework(config.framework, config.language);
+      const availableTestingPatterns = this.getAvailableTestingPatternsForFramework(
+        config.framework,
+        config.language
+      );
       if (!availableTestingPatterns.includes(config.testingPattern)) {
         newConfig.testingPattern = '';
       }
@@ -698,7 +751,7 @@ export const validationLabels = {
     web: 'Web Applications',
     mobile: 'Mobile Applications',
     api: 'API Testing',
-    desktop: 'Desktop Applications'
+    desktop: 'Desktop Applications',
   },
 
   frameworks: {
@@ -724,7 +777,7 @@ export const validationLabels = {
 
     // Desktop
     winappdriver: 'WinAppDriver',
-    pyautogui: 'PyAutoGUI'
+    pyautogui: 'PyAutoGUI',
   },
 
   languages: {
@@ -734,7 +787,7 @@ export const validationLabels = {
     javascript: 'JavaScript',
     typescript: 'TypeScript',
     csharp: 'C#',
-    swift: 'Swift'
+    swift: 'Swift',
   },
 
   testRunners: {
@@ -746,7 +799,7 @@ export const validationLabels = {
     nunit: 'NUnit',
     xctest: 'XCTest',
     cypress: 'Cypress',
-    robot: 'Robot Framework'
+    robot: 'Robot Framework',
   },
 
   buildTools: {
@@ -756,7 +809,7 @@ export const validationLabels = {
     npm: 'npm',
     nuget: 'NuGet',
     'dotnet-cli': '.NET CLI',
-    spm: 'Swift Package Manager'
+    spm: 'Swift Package Manager',
   },
 
   cicdTools: {
@@ -764,7 +817,7 @@ export const validationLabels = {
     'github-actions': 'GitHub Actions',
     'gitlab-ci': 'GitLab CI',
     'azure-devops': 'Azure DevOps',
-    circleci: 'CircleCI'
+    circleci: 'CircleCI',
   },
 
   reportingTools: {
@@ -785,7 +838,7 @@ export const validationLabels = {
     'jest-html-reporter': 'Jest HTML Reporter',
     'jest-html': 'Jest HTML',
     'nunit-reports': 'NUnit Reports',
-    'robot-reports': 'Robot Framework Reports'
+    'robot-reports': 'Robot Framework Reports',
   },
 
   testingPatterns: {
@@ -797,6 +850,6 @@ export const validationLabels = {
     'contract-testing': 'Contract Testing (Pact)',
     'schema-validation': 'Schema Validation',
     'functional-patterns': 'Functional Patterns',
-    hybrid: 'Hybrid Pattern'
-  }
+    hybrid: 'Hybrid Pattern',
+  },
 };

@@ -1,11 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Link } from "wouter";
-import { ArrowLeft, Copy, Check, Terminal, Code, Database, Zap } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Link } from 'wouter';
+import { ArrowLeft, Copy, Check, Terminal, Code, Database, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -29,7 +29,7 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
-function CodeBlock({ code, language = "bash" }: { code: string; language?: string }) {
+function CodeBlock({ code, language = 'bash' }: { code: string; language?: string }) {
   return (
     <div className="relative group">
       <pre className="bg-muted p-4 rounded-md overflow-x-auto text-sm font-mono">
@@ -54,9 +54,12 @@ export default function ApiDocs() {
         </Link>
 
         <div className="space-y-2 mb-8">
-          <h1 className="text-4xl font-bold" data-testid="text-page-title">API Documentation</h1>
+          <h1 className="text-4xl font-bold" data-testid="text-page-title">
+            API Documentation
+          </h1>
           <p className="text-muted-foreground text-lg">
-            Use our public API to generate QA automation projects programmatically via curl, scripts, or CLI tools.
+            Use our public API to generate QA automation projects programmatically via curl,
+            scripts, or CLI tools.
           </p>
         </div>
 
@@ -98,8 +101,12 @@ export default function ApiDocs() {
 
         <Tabs defaultValue="generate" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="generate" data-testid="tab-generate">Generate Project</TabsTrigger>
-            <TabsTrigger value="metadata" data-testid="tab-metadata">Metadata</TabsTrigger>
+            <TabsTrigger value="generate" data-testid="tab-generate">
+              Generate Project
+            </TabsTrigger>
+            <TabsTrigger value="metadata" data-testid="tab-metadata">
+              Metadata
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="generate" className="space-y-6">
@@ -116,14 +123,16 @@ export default function ApiDocs() {
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="font-semibold mb-3">Quick Start</h3>
-                  <CodeBlock code={`# Generate a Selenium + Java project
+                  <CodeBlock
+                    code={`# Generate a Selenium + Java project
 curl "https://qastarter.com/api/v1/generate?framework=selenium&language=java" -o project.zip
 
 # Generate a Playwright + TypeScript project
 curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typescript" -o project.zip
 
 # Generate a Cypress project with GitHub Actions CI/CD
-curl "https://qastarter.com/api/v1/generate?framework=cypress&language=typescript&cicdTool=github-actions" -o project.zip`} />
+curl "https://qastarter.com/api/v1/generate?framework=cypress&language=typescript&cicdTool=github-actions" -o project.zip`}
+                  />
                 </div>
 
                 <div>
@@ -140,57 +149,94 @@ curl "https://qastarter.com/api/v1/generate?framework=cypress&language=typescrip
                       <tbody className="divide-y">
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">projectName</td>
-                          <td className="py-2 pr-4"><code>my-qa-project</code></td>
+                          <td className="py-2 pr-4">
+                            <code>my-qa-project</code>
+                          </td>
                           <td className="py-2">Name of the generated project</td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">testingType</td>
-                          <td className="py-2 pr-4"><code>web</code></td>
+                          <td className="py-2 pr-4">
+                            <code>web</code>
+                          </td>
                           <td className="py-2">Type: web, mobile, api, desktop</td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">framework</td>
-                          <td className="py-2 pr-4"><code>selenium</code></td>
-                          <td className="py-2">Testing framework (selenium, playwright, cypress, etc.)</td>
+                          <td className="py-2 pr-4">
+                            <code>selenium</code>
+                          </td>
+                          <td className="py-2">
+                            Testing framework (selenium, playwright, cypress, etc.)
+                          </td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">language</td>
-                          <td className="py-2 pr-4"><code>java</code></td>
-                          <td className="py-2">Programming language (java, python, typescript, etc.)</td>
+                          <td className="py-2 pr-4">
+                            <code>java</code>
+                          </td>
+                          <td className="py-2">
+                            Programming language (java, python, typescript, etc.)
+                          </td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">testRunner</td>
-                          <td className="py-2 pr-4"><em>auto</em></td>
-                          <td className="py-2">Auto-selected based on language (testng, junit5, pytest, jest, etc.)</td>
+                          <td className="py-2 pr-4">
+                            <em>auto</em>
+                          </td>
+                          <td className="py-2">
+                            Auto-selected based on language (testng, junit5, pytest, jest, etc.)
+                          </td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">buildTool</td>
-                          <td className="py-2 pr-4"><em>auto</em></td>
-                          <td className="py-2">Auto-selected based on language (maven, gradle, npm, pip)</td>
+                          <td className="py-2 pr-4">
+                            <em>auto</em>
+                          </td>
+                          <td className="py-2">
+                            Auto-selected based on language (maven, gradle, npm, pip)
+                          </td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">testingPattern</td>
-                          <td className="py-2 pr-4"><code>page-object-model</code></td>
+                          <td className="py-2 pr-4">
+                            <code>page-object-model</code>
+                          </td>
                           <td className="py-2">Pattern: page-object-model, bdd, fluent</td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">cicdTool</td>
-                          <td className="py-2 pr-4"><em>none</em></td>
-                          <td className="py-2">CI/CD: github-actions, jenkins, gitlab-ci, azure-devops, circleci</td>
+                          <td className="py-2 pr-4">
+                            <em>none</em>
+                          </td>
+                          <td className="py-2">
+                            CI/CD: github-actions, jenkins, gitlab-ci, azure-devops, circleci
+                          </td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">reportingTool</td>
-                          <td className="py-2 pr-4"><em>none</em></td>
-                          <td className="py-2">Reporting: allure, extent-reports, mochawesome, etc.</td>
+                          <td className="py-2 pr-4">
+                            <em>none</em>
+                          </td>
+                          <td className="py-2">
+                            Reporting: allure, extent-reports, mochawesome, etc.
+                          </td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">utilities</td>
-                          <td className="py-2 pr-4"><em>none</em></td>
-                          <td className="py-2">Comma-separated: configReader, jsonReader, screenshotUtility, logger, dataProvider</td>
+                          <td className="py-2 pr-4">
+                            <em>none</em>
+                          </td>
+                          <td className="py-2">
+                            Comma-separated: configReader, jsonReader, screenshotUtility, logger,
+                            dataProvider
+                          </td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">includeSampleTests</td>
-                          <td className="py-2 pr-4"><code>true</code></td>
+                          <td className="py-2 pr-4">
+                            <code>true</code>
+                          </td>
                           <td className="py-2">Include sample test files (true/false)</td>
                         </tr>
                       </tbody>
@@ -203,21 +249,26 @@ curl "https://qastarter.com/api/v1/generate?framework=cypress&language=typescrip
                   <p className="text-sm text-muted-foreground mb-2">
                     Returns a ZIP file with <code>Content-Type: application/zip</code>
                   </p>
-                  <CodeBlock code={`# The response is a binary ZIP file
+                  <CodeBlock
+                    code={`# The response is a binary ZIP file
 # Save it with the -o flag:
 curl "https://qastarter.com/api/v1/generate?framework=selenium&language=java" -o selenium-project.zip
 
 # Extract immediately:
-curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typescript" | tar -xzf -`} />
+curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typescript" | tar -xzf -`}
+                  />
                 </div>
 
                 <div>
                   <h3 className="font-semibold mb-3">Error Response</h3>
-                  <CodeBlock code={`{
+                  <CodeBlock
+                    code={`{
   "success": false,
   "message": "Invalid combination of testing type, framework, and language",
   "hint": "Use GET /api/v1/metadata to see compatible options"
-}`} language="json" />
+}`}
+                    language="json"
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -230,7 +281,8 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <CodeBlock code={`curl "https://qastarter.com/api/v1/generate?\\
+                <CodeBlock
+                  code={`curl "https://qastarter.com/api/v1/generate?\\
   projectName=my-selenium-tests&\\
   testingType=web&\\
   framework=selenium&\\
@@ -242,7 +294,8 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
   reportingTool=allure&\\
   utilities=logger,screenshotUtility,configReader&\\
   includeSampleTests=true" \\
-  -o my-selenium-tests.zip`} />
+  -o my-selenium-tests.zip`}
+                />
               </CardContent>
             </Card>
           </TabsContent>
@@ -266,7 +319,8 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
 
                 <div>
                   <h3 className="font-semibold mb-3">Response Structure</h3>
-                  <CodeBlock code={`{
+                  <CodeBlock
+                    code={`{
   "success": true,
   "data": {
     "version": "1.0.0",
@@ -300,7 +354,9 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
     "testingPatterns": [...],
     "utilities": [...]
   }
-}`} language="json" />
+}`}
+                    language="json"
+                  />
                 </div>
 
                 <div>
@@ -329,11 +385,16 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
               To ensure fair usage, our API has the following rate limits:
             </p>
             <ul className="list-disc list-inside space-y-2 text-sm">
-              <li><strong>General API:</strong> 100 requests per 15 minutes</li>
-              <li><strong>Project Generation:</strong> 10 requests per 15 minutes</li>
+              <li>
+                <strong>General API:</strong> 100 requests per 15 minutes
+              </li>
+              <li>
+                <strong>Project Generation:</strong> 10 requests per 15 minutes
+              </li>
             </ul>
             <p className="text-sm text-muted-foreground">
-              Rate limit information is included in response headers: <code>RateLimit-Limit</code>, <code>RateLimit-Remaining</code>, <code>RateLimit-Reset</code>
+              Rate limit information is included in response headers: <code>RateLimit-Limit</code>,{' '}
+              <code>RateLimit-Remaining</code>, <code>RateLimit-Reset</code>
             </p>
           </CardContent>
         </Card>

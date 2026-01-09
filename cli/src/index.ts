@@ -34,7 +34,7 @@ program
     console.log(chalk.cyan('\n  QAStarter CLI\n'));
 
     const spinner = ora('Fetching available options...').start();
-    
+
     try {
       const metadata = await fetchMetadata();
       spinner.succeed('Options loaded');
@@ -55,7 +55,7 @@ program
           cicdTool: options.cicd,
           reportingTool: options.reporting,
           utilities: options.utilities ? options.utilities.split(',') : undefined,
-          includeSampleTests: options.samples !== false
+          includeSampleTests: options.samples !== false,
         };
       }
 
@@ -65,13 +65,16 @@ program
       downloadSpinner.succeed(`Project saved to ${chalk.green(filePath)}`);
 
       console.log(chalk.cyan('\n  Next steps:\n'));
-      console.log(chalk.white(`    1. Unzip the project: ${chalk.yellow(`unzip ${path.basename(filePath)}`)}`));
+      console.log(
+        chalk.white(`    1. Unzip the project: ${chalk.yellow(`unzip ${path.basename(filePath)}`)}`)
+      );
       console.log(chalk.white(`    2. Navigate to the project directory`));
       console.log(chalk.white(`    3. Follow the README.md for setup instructions\n`));
-
     } catch (error) {
       spinner.fail('Failed to generate project');
-      console.error(chalk.red(`\nError: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(
+        chalk.red(`\nError: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      );
       process.exit(1);
     }
   });
@@ -82,7 +85,7 @@ program
   .option('-t, --type <type>', 'Filter by testing type (web, mobile, api, desktop)')
   .action(async (options) => {
     const spinner = ora('Fetching available options...').start();
-    
+
     try {
       const metadata = await fetchMetadata();
       spinner.stop();
@@ -90,7 +93,7 @@ program
       console.log(chalk.cyan('\n  Available Options\n'));
 
       console.log(chalk.white.bold('  Testing Types:'));
-      metadata.testingTypes.forEach(t => {
+      metadata.testingTypes.forEach((t) => {
         console.log(chalk.gray(`    - ${t}`));
       });
 
@@ -104,25 +107,26 @@ program
       });
 
       console.log(chalk.white.bold('\n  Testing Patterns:'));
-      metadata.testingPatterns.forEach(p => {
+      metadata.testingPatterns.forEach((p) => {
         console.log(chalk.gray(`    - ${p}`));
       });
 
       console.log(chalk.white.bold('\n  CI/CD Tools:'));
-      metadata.cicdTools.forEach(c => {
+      metadata.cicdTools.forEach((c) => {
         console.log(chalk.gray(`    - ${c}`));
       });
 
       console.log(chalk.white.bold('\n  Reporting Tools:'));
-      metadata.reportingTools.forEach(r => {
+      metadata.reportingTools.forEach((r) => {
         console.log(chalk.gray(`    - ${r}`));
       });
 
       console.log();
-
     } catch (error) {
       spinner.fail('Failed to fetch options');
-      console.error(chalk.red(`\nError: ${error instanceof Error ? error.message : 'Unknown error'}`));
+      console.error(
+        chalk.red(`\nError: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      );
       process.exit(1);
     }
   });

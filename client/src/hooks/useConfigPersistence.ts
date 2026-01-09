@@ -53,7 +53,7 @@ export function useConfigPersistence() {
       if (!saved) return null;
 
       const data: SavedConfig = JSON.parse(saved);
-      
+
       // Validate version compatibility
       if (data.version !== STORAGE_VERSION) {
         console.warn('Saved configuration version mismatch, clearing...');
@@ -62,7 +62,8 @@ export function useConfigPersistence() {
       }
 
       // Check if config is expired
-      if (Date.now() - data.timestamp > MAX_AGE_MS) {
+      const currentTime = Date.now();
+      if (currentTime - data.timestamp > MAX_AGE_MS) {
         console.warn('Saved configuration expired, clearing...');
         clearConfig();
         return null;

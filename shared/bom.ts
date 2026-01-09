@@ -20,7 +20,7 @@ export const BOM = {
     pytest: '8.0.0',
     requests: '2.31.0',
     appium: '3.1.0', // Python client
-    pyautogui: '0.9.54'
+    pyautogui: '0.9.54',
   },
   javascript: {
     node: '18+',
@@ -31,7 +31,7 @@ export const BOM = {
     playwright: '1.40.0',
     webdriverio: '8.24.0',
     appium: '9.0.0', // JS client
-    supertest: '6.3.3'
+    supertest: '6.3.3',
   },
   csharp: {
     dotnet: '8.0',
@@ -40,12 +40,12 @@ export const BOM = {
     nunitTestAdapter: '4.5.0',
     testSdk: '17.8.0',
     restsharp: '110.2.0',
-    appium: '5.0.0' // Dotnet client
+    appium: '5.0.0', // Dotnet client
   },
   swift: {
     swift: '5.9',
-    xctest: 'latest' // Part of Xcode
-  }
+    xctest: 'latest', // Part of Xcode
+  },
 };
 
 export type BOMType = typeof BOM;

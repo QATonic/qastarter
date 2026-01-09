@@ -2,11 +2,11 @@
  * Wizard Context - Centralized state management for the wizard
  */
 
-import { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useConfigPersistence } from "@/hooks/useConfigPersistence";
-import { WizardValidator } from "../../../../shared/validationMatrix";
-import { WizardConfig, DEFAULT_CONFIG, WIZARD_STEPS } from "./types";
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { useConfigPersistence } from '@/hooks/useConfigPersistence';
+import { WizardValidator } from '../../../../shared/validationMatrix';
+import { WizardConfig, DEFAULT_CONFIG, WIZARD_STEPS } from './types';
 
 interface WizardContextType {
   // State
@@ -14,28 +14,28 @@ interface WizardContextType {
   currentStep: number;
   completedSteps: number[];
   isGenerating: boolean;
-  
+
   // Actions
   updateConfig: (key: string, value: any) => void;
   setCurrentStep: (step: number) => void;
   markStepCompleted: (step: number) => void;
   setIsGenerating: (value: boolean) => void;
-  
+
   // Validation
   validateStep: (step: number) => boolean;
   getFilteredOptions: (step: string) => string[];
-  
+
   // Navigation
   handleNext: () => void;
   handlePrevious: () => void;
   handleStepNavigation: (stepIndex: number) => void;
-  
+
   // Persistence
   showResumeDialog: boolean;
   savedTimestamp: number;
   handleResume: () => void;
   handleStartFresh: () => void;
-  
+
   // Constants
   steps: readonly string[];
 }
@@ -93,7 +93,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
       setConfig(saved.config as WizardConfig);
       setCurrentStep(saved.currentStep);
       toast({
-        title: "Configuration Restored",
+        title: 'Configuration Restored',
         description: `Your previous configuration has been loaded. Resuming at step ${saved.currentStep + 1}.`,
       });
     }
@@ -107,71 +107,86 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
     hasResumedOrStartedFresh.current = true;
     setShowResumeDialog(false);
     toast({
-      title: "Starting Fresh",
-      description: "Previous configuration cleared.",
+      title: 'Starting Fresh',
+      description: 'Previous configuration cleared.',
     });
   };
 
   // Validate step
   const validateStep = (step: number): boolean => {
     switch (step) {
-      case 0: return config.testingType !== "";
-      case 1: return config.framework !== "";
-      case 2: return config.language !== "";
-      case 3: return config.testingPattern !== "";
-      case 4: return config.testRunner !== "";
-      case 5: return config.buildTool !== "";
+      case 0:
+        return config.testingType !== '';
+      case 1:
+        return config.framework !== '';
+      case 2:
+        return config.language !== '';
+      case 3:
+        return config.testingPattern !== '';
+      case 4:
+        return config.testRunner !== '';
+      case 5:
+        return config.buildTool !== '';
       case 6: {
         const projectName = config.projectName.trim();
         if (!projectName) return false;
         if (!/^[a-zA-Z0-9_-]+$/.test(projectName)) return false;
         if (projectName.length > 100) return false;
-        
-        const isJavaProject = config.language === "java";
-        const needsJavaMetadata = isJavaProject && (config.buildTool === "maven" || config.buildTool === "gradle");
-        
+
+        const isJavaProject = config.language === 'java';
+        const needsJavaMetadata =
+          isJavaProject && (config.buildTool === 'maven' || config.buildTool === 'gradle');
+
         if (needsJavaMetadata) {
-          const groupId = config.groupId?.trim() || "";
-          const artifactId = config.artifactId?.trim() || "";
-          if (!groupId || !/^[a-zA-Z][a-zA-Z0-9]*(\.[a-zA-Z][a-zA-Z0-9]*)*$/.test(groupId)) return false;
+          const groupId = config.groupId?.trim() || '';
+          const artifactId = config.artifactId?.trim() || '';
+          if (!groupId || !/^[a-zA-Z][a-zA-Z0-9]*(\.[a-zA-Z][a-zA-Z0-9]*)*$/.test(groupId))
+            return false;
           if (!artifactId || !/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(artifactId)) return false;
         }
         return true;
       }
-      case 7: return true; // CI/CD is optional
-      case 8: return true; // Reporting is optional
-      default: return true;
+      case 7:
+        return true; // CI/CD is optional
+      case 8:
+        return true; // Reporting is optional
+      default:
+        return true;
     }
   };
 
   // Update config and reset invalid downstream selections
   const updateConfig = (key: string, value: any) => {
     let newConfig = { ...config, [key]: value };
-    
+
     // Auto-populate Java metadata defaults
-    if (key === "language" && value === "java") {
-      if (!newConfig.groupId) newConfig.groupId = "com.qastarter";
+    if (key === 'language' && value === 'java') {
+      if (!newConfig.groupId) newConfig.groupId = 'com.qastarter';
       if (!newConfig.artifactId) {
-        newConfig.artifactId = newConfig.projectName 
+        newConfig.artifactId = newConfig.projectName
           ? newConfig.projectName.toLowerCase().replace(/[^a-z0-9-]/g, '-')
-          : "qa-automation";
+          : 'qa-automation';
       }
     }
-    
+
     // Sync artifactId with projectName for Java projects
-    if (key === "projectName" && newConfig.language === "java" && 
-        (newConfig.buildTool === "maven" || newConfig.buildTool === "gradle")) {
+    if (
+      key === 'projectName' &&
+      newConfig.language === 'java' &&
+      (newConfig.buildTool === 'maven' || newConfig.buildTool === 'gradle')
+    ) {
       newConfig.artifactId = value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
     }
-    
+
     const validatedConfig = WizardValidator.resetInvalidSelections(newConfig);
     setConfig(validatedConfig);
 
     if (JSON.stringify(newConfig) !== JSON.stringify(validatedConfig)) {
       toast({
-        title: "Selections Updated",
-        description: "Some selections were automatically updated due to compatibility requirements.",
-        variant: "default",
+        title: 'Selections Updated',
+        description:
+          'Some selections were automatically updated due to compatibility requirements.',
+        variant: 'default',
       });
     }
   };
@@ -184,7 +199,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
   // Mark step as completed
   const markStepCompleted = (step: number) => {
     if (!completedSteps.includes(step)) {
-      setCompletedSteps(prev => [...prev, step]);
+      setCompletedSteps((prev) => [...prev, step]);
     }
   };
 
@@ -192,9 +207,9 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
   const handleNext = () => {
     if (!validateStep(currentStep)) {
       toast({
-        title: "Validation Error",
-        description: "Please complete all required fields before proceeding.",
-        variant: "destructive",
+        title: 'Validation Error',
+        description: 'Please complete all required fields before proceeding.',
+        variant: 'destructive',
       });
       return;
     }
@@ -215,9 +230,9 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
       await onComplete(config);
     } catch (error) {
       toast({
-        title: "Generation Failed",
-        description: error instanceof Error ? error.message : "An error occurred",
-        variant: "destructive",
+        title: 'Generation Failed',
+        description: error instanceof Error ? error.message : 'An error occurred',
+        variant: 'destructive',
       });
     } finally {
       setIsGenerating(false);
@@ -261,17 +276,13 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
     steps: WIZARD_STEPS,
   };
 
-  return (
-    <WizardContext.Provider value={value}>
-      {children}
-    </WizardContext.Provider>
-  );
+  return <WizardContext.Provider value={value}>{children}</WizardContext.Provider>;
 }
 
 export function useWizard() {
   const context = useContext(WizardContext);
   if (!context) {
-    throw new Error("useWizard must be used within a WizardProvider");
+    throw new Error('useWizard must be used within a WizardProvider');
   }
   return context;
 }

@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { Info, BarChart3 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import ThemeToggle from "./ThemeToggle";
-import AboutModal from "./AboutModal";
-import TrendsModal from "./TrendsModal";
-import SponsorModal from "./SponsorModal";
-import QAStarterLogo from "./QAStarterLogo";
+import { useState } from 'react';
+import { useLocation } from 'wouter';
+import { Info, BarChart3 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import ThemeToggle from './ThemeToggle';
+import AboutModal from './AboutModal';
+import TrendsModal from './TrendsModal';
+import SponsorModal from './SponsorModal';
+import QAStarterLogo from './QAStarterLogo';
 
 interface HeaderProps {
   onLogoClick?: () => void;

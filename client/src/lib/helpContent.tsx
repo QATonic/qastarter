@@ -1,3 +1,5 @@
+import React, { JSX } from 'react';
+
 interface HelpContent {
   [key: string]: string | React.ReactNode;
 }
@@ -7,17 +9,23 @@ export const helpContent: HelpContent = {
   web: (
     <div>
       <p className="font-medium mb-1">Web Testing</p>
-      <p className="text-xs">Automate browser-based web applications across different browsers and platforms.</p>
+      <p className="text-xs">
+        Automate browser-based web applications across different browsers and platforms.
+      </p>
       <p className="text-xs mt-1">✓ Cross-browser testing (Chrome, Firefox, Edge, Safari)</p>
       <p className="text-xs">✓ Responsive design validation</p>
       <p className="text-xs">✓ Form interactions and validations</p>
-      <p className="text-xs mt-1 italic">Frameworks: Selenium, Playwright, Cypress, Robot Framework</p>
+      <p className="text-xs mt-1 italic">
+        Frameworks: Selenium, Playwright, Cypress, Robot Framework
+      </p>
     </div>
   ),
   mobile: (
     <div>
       <p className="font-medium mb-1">Mobile Testing</p>
-      <p className="text-xs">Test native and hybrid mobile applications on iOS and Android devices.</p>
+      <p className="text-xs">
+        Test native and hybrid mobile applications on iOS and Android devices.
+      </p>
       <p className="text-xs mt-1">✓ Native app automation</p>
       <p className="text-xs">✓ Real device and emulator support</p>
       <p className="text-xs">✓ Gesture and touch interactions</p>
@@ -27,7 +35,9 @@ export const helpContent: HelpContent = {
   api: (
     <div>
       <p className="font-medium mb-1">API Testing</p>
-      <p className="text-xs">Validate REST, GraphQL, and gRPC APIs for functionality, reliability, and performance.</p>
+      <p className="text-xs">
+        Validate REST, GraphQL, and gRPC APIs for functionality, reliability, and performance.
+      </p>
       <p className="text-xs mt-1">✓ Request/Response validation</p>
       <p className="text-xs">✓ Schema validation</p>
       <p className="text-xs">✓ Authentication testing</p>
@@ -49,7 +59,9 @@ export const helpContent: HelpContent = {
   selenium: (
     <div>
       <p className="font-medium mb-1">Selenium WebDriver</p>
-      <p className="text-xs">Industry-standard browser automation framework with multi-language support.</p>
+      <p className="text-xs">
+        Industry-standard browser automation framework with multi-language support.
+      </p>
       <p className="text-xs mt-1">✓ Supports all major browsers</p>
       <p className="text-xs">✓ Large community and ecosystem</p>
       <p className="text-xs">✓ Selenium Grid for parallel execution</p>
@@ -59,7 +71,9 @@ export const helpContent: HelpContent = {
   playwright: (
     <div>
       <p className="font-medium mb-1">Playwright</p>
-      <p className="text-xs">Modern automation framework by Microsoft with auto-wait and powerful selectors.</p>
+      <p className="text-xs">
+        Modern automation framework by Microsoft with auto-wait and powerful selectors.
+      </p>
       <p className="text-xs mt-1">✓ Auto-waiting for elements</p>
       <p className="text-xs">✓ Network interception</p>
       <p className="text-xs">✓ Built-in test runner</p>
@@ -69,7 +83,9 @@ export const helpContent: HelpContent = {
   cypress: (
     <div>
       <p className="font-medium mb-1">Cypress</p>
-      <p className="text-xs">JavaScript-based E2E testing framework with real-time reloading and debugging.</p>
+      <p className="text-xs">
+        JavaScript-based E2E testing framework with real-time reloading and debugging.
+      </p>
       <p className="text-xs mt-1">✓ Time-travel debugging</p>
       <p className="text-xs">✓ Automatic waiting</p>
       <p className="text-xs">✓ Network stubbing</p>
@@ -275,17 +291,21 @@ export const helpContent: HelpContent = {
   pom: (
     <div>
       <p className="font-medium mb-1">Page Object Model (POM)</p>
-      <p className="text-xs">Design pattern that creates an object for each page in your application.</p>
+      <p className="text-xs">
+        Design pattern that creates an object for each page in your application.
+      </p>
       <p className="text-xs mt-1">✓ Separates UI structure from test logic</p>
       <p className="text-xs">✓ Reduces code duplication</p>
       <p className="text-xs">✓ Easy maintenance when UI changes</p>
       <p className="text-xs mt-1 italic">Recommended for most projects</p>
     </div>
   ),
-  "page-object-model": (
+  'page-object-model': (
     <div>
       <p className="font-medium mb-1">Page Object Model (POM)</p>
-      <p className="text-xs">Design pattern that creates an object for each page in your application.</p>
+      <p className="text-xs">
+        Design pattern that creates an object for each page in your application.
+      </p>
       <p className="text-xs mt-1">✓ Separates UI structure from test logic</p>
       <p className="text-xs">✓ Reduces code duplication</p>
       <p className="text-xs">✓ Easy maintenance when UI changes</p>
@@ -312,7 +332,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: API testing with REST Assured</p>
     </div>
   ),
-  "data-driven": (
+  'data-driven': (
     <div>
       <p className="font-medium mb-1">Data-Driven Testing</p>
       <p className="text-xs">Run the same test with multiple data sets from external sources.</p>
@@ -322,7 +342,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: Testing with multiple input combinations</p>
     </div>
   ),
-  "functional-patterns": (
+  'functional-patterns': (
     <div>
       <p className="font-medium mb-1">Functional Patterns</p>
       <p className="text-xs">Organize tests around functional areas and user workflows.</p>
@@ -342,7 +362,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: Complex projects with varied requirements</p>
     </div>
   ),
-  "contract-testing": (
+  'contract-testing': (
     <div>
       <p className="font-medium mb-1">Contract Testing (Pact)</p>
       <p className="text-xs">Consumer-driven contract testing for API integrations.</p>
@@ -496,7 +516,7 @@ export const helpContent: HelpContent = {
   ),
 
   // CI/CD Tools
-  "github-actions": (
+  'github-actions': (
     <div>
       <p className="font-medium mb-1">GitHub Actions</p>
       <p className="text-xs">Built-in CI/CD for GitHub with marketplace of reusable actions.</p>
@@ -516,7 +536,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: Enterprise environments</p>
     </div>
   ),
-  "gitlab-ci": (
+  'gitlab-ci': (
     <div>
       <p className="font-medium mb-1">GitLab CI/CD</p>
       <p className="text-xs">Built-in CI/CD for GitLab with Docker support.</p>
@@ -526,7 +546,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: GitLab-hosted projects</p>
     </div>
   ),
-  "azure-devops": (
+  'azure-devops': (
     <div>
       <p className="font-medium mb-1">Azure DevOps</p>
       <p className="text-xs">Microsoft's comprehensive DevOps platform.</p>
@@ -565,7 +585,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: Detailed test analytics</p>
     </div>
   ),
-  "extent-reports": (
+  'extent-reports': (
     <div>
       <p className="font-medium mb-1">ExtentReports</p>
       <p className="text-xs">Lightweight HTML/PDF reporting library.</p>
@@ -575,7 +595,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: Quick setup and simple reports</p>
     </div>
   ),
-  "testng-reports": (
+  'testng-reports': (
     <div>
       <p className="font-medium mb-1">TestNG Reports</p>
       <p className="text-xs">Built-in HTML reports from TestNG framework.</p>
@@ -584,7 +604,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Suite and test details</p>
     </div>
   ),
-  "junit-reports": (
+  'junit-reports': (
     <div>
       <p className="font-medium mb-1">JUnit Reports</p>
       <p className="text-xs">Standard XML/HTML reports from JUnit.</p>
@@ -593,7 +613,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Widely supported</p>
     </div>
   ),
-  "pytest-html": (
+  'pytest-html': (
     <div>
       <p className="font-medium mb-1">pytest-html</p>
       <p className="text-xs">HTML report plugin for pytest.</p>
@@ -602,7 +622,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Customizable appearance</p>
     </div>
   ),
-  "mochawesome": (
+  mochawesome: (
     <div>
       <p className="font-medium mb-1">Mochawesome</p>
       <p className="text-xs">Beautiful HTML reporter for Mocha/Cypress.</p>
@@ -611,7 +631,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ JSON output for CI/CD</p>
     </div>
   ),
-  "nunit-reports": (
+  'nunit-reports': (
     <div>
       <p className="font-medium mb-1">NUnit Reports</p>
       <p className="text-xs">Built-in XML reports from NUnit framework.</p>
@@ -620,7 +640,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Azure DevOps compatible</p>
     </div>
   ),
-  "jest-html": (
+  'jest-html': (
     <div>
       <p className="font-medium mb-1">Jest HTML Report</p>
       <p className="text-xs">Simple HTML report generator for Jest tests.</p>
@@ -629,7 +649,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Easy to share</p>
     </div>
   ),
-  "jest-html-reporter": (
+  'jest-html-reporter': (
     <div>
       <p className="font-medium mb-1">Jest HTML Reporter</p>
       <p className="text-xs">Customizable HTML reporter for Jest test results.</p>
@@ -638,7 +658,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ CI/CD friendly</p>
     </div>
   ),
-  "junit-html": (
+  'junit-html': (
     <div>
       <p className="font-medium mb-1">JUnit HTML Reports</p>
       <p className="text-xs">HTML formatted JUnit test reports.</p>
@@ -647,7 +667,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Easy to navigate</p>
     </div>
   ),
-  "pytest-json": (
+  'pytest-json': (
     <div>
       <p className="font-medium mb-1">PyTest JSON Report</p>
       <p className="text-xs">JSON format test results for pytest.</p>
@@ -656,7 +676,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Custom processing support</p>
     </div>
   ),
-  "pytest-json-report": (
+  'pytest-json-report': (
     <div>
       <p className="font-medium mb-1">PyTest JSON Report</p>
       <p className="text-xs">Detailed JSON reporting plugin for pytest.</p>
@@ -674,7 +694,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Tool agnostic</p>
     </div>
   ),
-  "robot-reports": (
+  'robot-reports': (
     <div>
       <p className="font-medium mb-1">Robot Framework Reports</p>
       <p className="text-xs">Built-in HTML reports from Robot Framework.</p>
@@ -708,7 +728,9 @@ export const helpContent: HelpContent = {
   screenshotUtility: (
     <div>
       <p className="font-medium mb-1">Screenshot Utility</p>
-      <p className="text-xs">Capture screenshots during test execution for debugging and reporting.</p>
+      <p className="text-xs">
+        Capture screenshots during test execution for debugging and reporting.
+      </p>
       <p className="text-xs mt-1">✓ Auto-capture on test failure</p>
       <p className="text-xs">✓ Manual screenshot capture</p>
       <p className="text-xs">✓ Integration with test reports</p>
@@ -766,5 +788,5 @@ export const helpContent: HelpContent = {
 
 // Helper function to get help content by key
 export function getHelpContent(key: string): string | React.ReactNode {
-  return helpContent[key] || "No help available for this item.";
+  return helpContent[key] || 'No help available for this item.';
 }

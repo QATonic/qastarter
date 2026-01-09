@@ -1,30 +1,30 @@
-import { Storage, File } from "@google-cloud/storage";
-import { Response } from "express";
+import { Storage, File } from '@google-cloud/storage';
+import { Response } from 'express';
 
-const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
+const REPLIT_SIDECAR_ENDPOINT = 'http://127.0.0.1:1106';
 
 export const objectStorageClient = new Storage({
   credentials: {
-    audience: "replit",
-    subject_token_type: "access_token",
+    audience: 'replit',
+    subject_token_type: 'access_token',
     token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-    type: "external_account",
+    type: 'external_account',
     credential_source: {
       url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
       format: {
-        type: "json",
-        subject_token_field_name: "access_token",
+        type: 'json',
+        subject_token_field_name: 'access_token',
       },
     },
-    universe_domain: "googleapis.com",
+    universe_domain: 'googleapis.com',
   },
-  projectId: "",
+  projectId: '',
 });
 
 export class ObjectNotFoundError extends Error {
   constructor() {
-    super("Object not found");
-    this.name = "ObjectNotFoundError";
+    super('Object not found');
+    this.name = 'ObjectNotFoundError';
     Object.setPrototypeOf(this, ObjectNotFoundError.prototype);
   }
 }
@@ -33,11 +33,11 @@ export class ObjectStorageService {
   constructor() {}
 
   getPublicObjectSearchPaths(): Array<string> {
-    const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
+    const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || '';
     const paths = Array.from(
       new Set(
         pathsStr
-          .split(",")
+          .split(',')
           .map((path) => path.trim())
           .filter((path) => path.length > 0)
       )
@@ -45,7 +45,7 @@ export class ObjectStorageService {
     if (paths.length === 0) {
       throw new Error(
         "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
-          "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var (comma-separated paths)."
+          'tool and set PUBLIC_OBJECT_SEARCH_PATHS env var (comma-separated paths).'
       );
     }
     return paths;
@@ -72,25 +72,25 @@ export class ObjectStorageService {
     try {
       const [metadata] = await file.getMetadata();
       res.set({
-        "Content-Type": metadata.contentType || "application/octet-stream",
-        "Content-Length": metadata.size,
-        "Cache-Control": `public, max-age=${cacheTtlSec}`,
+        'Content-Type': metadata.contentType || 'application/octet-stream',
+        'Content-Length': metadata.size,
+        'Cache-Control': `public, max-age=${cacheTtlSec}`,
       });
 
       const stream = file.createReadStream();
 
-      stream.on("error", (err: Error) => {
-        console.error("Stream error:", err);
+      stream.on('error', (err: Error) => {
+        console.error('Stream error:', err);
         if (!res.headersSent) {
-          res.status(500).json({ error: "Error streaming file" });
+          res.status(500).json({ error: 'Error streaming file' });
         }
       });
 
       stream.pipe(res);
     } catch (error) {
-      console.error("Error downloading file:", error);
+      console.error('Error downloading file:', error);
       if (!res.headersSent) {
-        res.status(500).json({ error: "Error downloading file" });
+        res.status(500).json({ error: 'Error downloading file' });
       }
     }
   }
@@ -100,16 +100,16 @@ function parseObjectPath(path: string): {
   bucketName: string;
   objectName: string;
 } {
-  if (!path.startsWith("/")) {
+  if (!path.startsWith('/')) {
     path = `/${path}`;
   }
-  const pathParts = path.split("/");
+  const pathParts = path.split('/');
   if (pathParts.length < 3) {
-    throw new Error("Invalid path: must contain at least a bucket name");
+    throw new Error('Invalid path: must contain at least a bucket name');
   }
 
   const bucketName = pathParts[1];
-  const objectName = pathParts.slice(2).join("/");
+  const objectName = pathParts.slice(2).join('/');
 
   return {
     bucketName,

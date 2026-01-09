@@ -10,7 +10,7 @@ import {
   getCachedTemplate,
   setCachedTemplate,
   isCacheEnabled,
-  getCacheStats
+  getCacheStats,
 } from '../services/cacheService';
 import { loadSharedVersions, mergeVersions } from './shared/versionLoader';
 
@@ -38,17 +38,14 @@ export class TemplatePackEngine {
       const opts = args.pop();
       return args.some(Boolean);
     });
-    handlebars.registerHelper('includes', (arr: any[], val: any) =>
-      Array.isArray(arr) && arr.includes(val)
+    handlebars.registerHelper(
+      'includes',
+      (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val)
     );
 
     // New helpers for sophisticated templates
-    handlebars.registerHelper('lowerCase', (str: string) =>
-      str ? str.toLowerCase() : ''
-    );
-    handlebars.registerHelper('upperCase', (str: string) =>
-      str ? str.toUpperCase() : ''
-    );
+    handlebars.registerHelper('lowerCase', (str: string) => (str ? str.toLowerCase() : ''));
+    handlebars.registerHelper('upperCase', (str: string) => (str ? str.toUpperCase() : ''));
     handlebars.registerHelper('pascalCase', (str: string) => {
       if (!str) return '';
       return str.replace(/(?:^|[-_])([a-z])/g, (_, char) => char.toUpperCase());
@@ -65,7 +62,7 @@ export class TemplatePackEngine {
           '>': '&gt;',
           '&': '&amp;',
           "'": '&apos;',
-          '"': '&quot;'
+          '"': '&quot;',
         };
         return entities[char] || char;
       });
@@ -108,10 +105,7 @@ export class TemplatePackEngine {
 
       // Load shared versions and merge with manifest-specific versions
       const sharedVersions = await loadSharedVersions();
-      manifest.toolVersions = mergeVersions(
-        manifest.toolVersions || {},
-        sharedVersions
-      );
+      manifest.toolVersions = mergeVersions(manifest.toolVersions || {}, sharedVersions);
 
       // Cache the manifest (with merged versions)
       if (isCacheEnabled()) {
@@ -127,7 +121,11 @@ export class TemplatePackEngine {
   /**
    * Load template file content
    */
-  private async loadTemplateFile(packKey: string, filePath: string, isTemplate: boolean = false): Promise<string> {
+  private async loadTemplateFile(
+    packKey: string,
+    filePath: string,
+    isTemplate: boolean = false
+  ): Promise<string> {
     // For template files, append .hbs extension to the file path
     const actualFilePath = isTemplate ? `${filePath}.hbs` : filePath;
     const fullPath = path.join(this.packsDirectory, packKey, 'files', actualFilePath);
@@ -135,14 +133,19 @@ export class TemplatePackEngine {
     try {
       return await fs.readFile(fullPath, 'utf-8');
     } catch (error) {
-      throw new Error(`Failed to load template file: ${filePath} in pack ${packKey}. Error: ${error}`);
+      throw new Error(
+        `Failed to load template file: ${filePath} in pack ${packKey}. Error: ${error}`
+      );
     }
   }
 
   /**
    * Create template context with computed fields
    */
-  private createTemplateContext(config: ProjectConfig, toolVersions: Record<string, string>): TemplateContext {
+  private createTemplateContext(
+    config: ProjectConfig,
+    toolVersions: Record<string, string>
+  ): TemplateContext {
     // Safe path sanitization
     const sanitizePath = (input: string): string => {
       return input
@@ -152,7 +155,8 @@ export class TemplatePackEngine {
     };
 
     const groupId = config.groupId || 'com.example';
-    const artifactId = config.artifactId || config.projectName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-');
+    const artifactId =
+      config.artifactId || config.projectName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-');
 
     return {
       ...config,
@@ -162,7 +166,7 @@ export class TemplatePackEngine {
       safeGroupId: sanitizePath(groupId),
       envs: ['dev', 'qa', 'prod'],
       toolVersions,
-      timestamp: new Date().toISOString().replace(/[:.]/g, '-')
+      timestamp: new Date().toISOString().replace(/[:.]/g, '-'),
     };
   }
 
@@ -175,7 +179,8 @@ export class TemplatePackEngine {
       const cacheKey = `${filePath}:${content.length}:${content.substring(0, 100)}`;
 
       // Handle CI/CD workflow files with special expression masking
-      const isWorkflowFile = filePath.includes('Jenkinsfile') ||
+      const isWorkflowFile =
+        filePath.includes('Jenkinsfile') ||
         filePath.includes('.github/workflows/') ||
         filePath.includes('azure-pipelines.yml') ||
         filePath.includes('.gitlab-ci.yml') ||
@@ -183,23 +188,29 @@ export class TemplatePackEngine {
 
       let processedContent = content;
 
-
       const rawBlocks: string[] = [];
-      const hasRawBlocks = processedContent.includes('{{raw}}') || processedContent.includes('{{{{raw}}}}');
+      const hasRawBlocks =
+        processedContent.includes('{{raw}}') || processedContent.includes('{{{{raw}}}}');
 
       if (hasRawBlocks) {
         // Handle {{{{raw}}}}...{{{{/raw}}}} format (4 braces - Handlebars native raw blocks)
-        processedContent = processedContent.replace(/\{\{\{\{raw\}\}\}\}([\s\S]*?)\{\{\{\{\/raw\}\}\}\}/g, (match, content) => {
-          const placeholder = `%%RAW_BLOCK_${rawBlocks.length}%%`;
-          rawBlocks.push(content);
-          return placeholder;
-        });
+        processedContent = processedContent.replace(
+          /\{\{\{\{raw\}\}\}\}([\s\S]*?)\{\{\{\{\/raw\}\}\}\}/g,
+          (match, content) => {
+            const placeholder = `%%RAW_BLOCK_${rawBlocks.length}%%`;
+            rawBlocks.push(content);
+            return placeholder;
+          }
+        );
         // Handle {{raw}}...{{/raw}} format (2 braces - custom raw blocks)
-        processedContent = processedContent.replace(/\{\{raw\}\}([\s\S]*?)\{\{\/raw\}\}/g, (match, content) => {
-          const placeholder = `%%RAW_BLOCK_${rawBlocks.length}%%`;
-          rawBlocks.push(content);
-          return placeholder;
-        });
+        processedContent = processedContent.replace(
+          /\{\{raw\}\}([\s\S]*?)\{\{\/raw\}\}/g,
+          (match, content) => {
+            const placeholder = `%%RAW_BLOCK_${rawBlocks.length}%%`;
+            rawBlocks.push(content);
+            return placeholder;
+          }
+        );
       }
 
       if (isWorkflowFile) {
@@ -218,8 +229,10 @@ export class TemplatePackEngine {
         // CircleCI-specific masking (in addition to raw block extraction)
         if (filePath.includes('.circleci/config.yml')) {
           // Mask CircleCI's << parameters.* >>
-          processedContent = processedContent
-            .replace(/<<\s*parameters\.([a-zA-Z0-9_]+)\s*>>/g, '%%CIRCLECI_PARAM_OPEN%% parameters.$1 %%CIRCLECI_PARAM_CLOSE%%');
+          processedContent = processedContent.replace(
+            /<<\s*parameters\.([a-zA-Z0-9_]+)\s*>>/g,
+            '%%CIRCLECI_PARAM_OPEN%% parameters.$1 %%CIRCLECI_PARAM_CLOSE%%'
+          );
         }
       }
 
@@ -294,15 +307,15 @@ export class TemplatePackEngine {
       lowerPath.includes('/tests/') ||
       lowerPath.includes('/test/') ||
       lowerPath.includes('/src/test/') ||
-      lowerPath.includes('/androidtest/') ||      // Android Espresso
-      lowerPath.includes('/uitests/') ||           // Swift XCUITest
-      lowerPath.includes('/features/') ||          // BDD feature files
-      lowerPath.includes('/step_defs/') ||         // Python BDD steps
-      lowerPath.includes('/step-definitions/') ||  // TypeScript BDD steps
-      lowerPath.includes('/stepdefinitions/') ||   // Java BDD steps
-      lowerPath.includes('/steps/') ||             // Generic BDD steps
-      lowerPath.includes('/bdd/') ||               // BDD directory
-      lowerPath.includes('/cypress/e2e/') ||       // Cypress E2E tests
+      lowerPath.includes('/androidtest/') || // Android Espresso
+      lowerPath.includes('/uitests/') || // Swift XCUITest
+      lowerPath.includes('/features/') || // BDD feature files
+      lowerPath.includes('/step_defs/') || // Python BDD steps
+      lowerPath.includes('/step-definitions/') || // TypeScript BDD steps
+      lowerPath.includes('/stepdefinitions/') || // Java BDD steps
+      lowerPath.includes('/steps/') || // Generic BDD steps
+      lowerPath.includes('/bdd/') || // BDD directory
+      lowerPath.includes('/cypress/e2e/') || // Cypress E2E tests
       lowerPath.includes('/cypress/integration/') || // Cypress integration (old)
       lowerPath.match(/\/tests\//i) ||
       lowerPath.match(/\/test\//i) ||
@@ -337,12 +350,12 @@ export class TemplatePackEngine {
       fileName.endsWith('.test.ts.hbs') ||
       fileName.endsWith('.spec.js.hbs') ||
       fileName.endsWith('.spec.ts.hbs') ||
-      fileName.endsWith('.steps.js.hbs') ||  // BDD step definitions
-      fileName.endsWith('.steps.ts.hbs') ||  // BDD step definitions
-      fileName.endsWith('_steps.js.hbs') ||  // Alternative BDD naming
-      fileName.endsWith('_steps.ts.hbs') ||  // Alternative BDD naming
-      fileName.endsWith('.cy.js.hbs') ||     // Cypress tests
-      fileName.endsWith('.cy.ts.hbs') ||     // Cypress tests
+      fileName.endsWith('.steps.js.hbs') || // BDD step definitions
+      fileName.endsWith('.steps.ts.hbs') || // BDD step definitions
+      fileName.endsWith('_steps.js.hbs') || // Alternative BDD naming
+      fileName.endsWith('_steps.ts.hbs') || // Alternative BDD naming
+      fileName.endsWith('.cy.js.hbs') || // Cypress tests
+      fileName.endsWith('.cy.ts.hbs') || // Cypress tests
       // C# test patterns
       fileName.endsWith('tests.cs.hbs') ||
       fileName.endsWith('test.cs.hbs') ||
@@ -393,7 +406,10 @@ export class TemplatePackEngine {
   /**
    * Generate project using template pack (Array version)
    */
-  async generateProject(config: ProjectConfig, options: { strict?: boolean } = { strict: true }): Promise<TemplateFile[]> {
+  async generateProject(
+    config: ProjectConfig,
+    options: { strict?: boolean } = { strict: true }
+  ): Promise<TemplateFile[]> {
     const files: TemplateFile[] = [];
     for await (const file of this.generateProjectStream(config, options)) {
       files.push(file);
@@ -405,7 +421,10 @@ export class TemplatePackEngine {
    * Generate project using template pack (Streaming version)
    * Yields files one by one to avoid memory pressure
    */
-  async *generateProjectStream(config: ProjectConfig, options: { strict?: boolean } = { strict: true }): AsyncGenerator<TemplateFile> {
+  async *generateProjectStream(
+    config: ProjectConfig,
+    options: { strict?: boolean } = { strict: true }
+  ): AsyncGenerator<TemplateFile> {
     const packKey = this.getTemplatePackKey(config);
 
     try {
@@ -428,7 +447,11 @@ export class TemplatePackEngine {
           // Load file content - try with conditional suffix first if file has conditionals
           let templateContent: string;
           try {
-            templateContent = await this.loadTemplateFile(packKey, fileConfig.path, fileConfig.isTemplate);
+            templateContent = await this.loadTemplateFile(
+              packKey,
+              fileConfig.path,
+              fileConfig.isTemplate
+            );
           } catch (error) {
             // If file doesn't exist, skip it (allows for optional files)
             console.warn(`Template file not found: ${fileConfig.path}, skipping`);
@@ -447,9 +470,8 @@ export class TemplatePackEngine {
             path: processedPath,
             content: processedContent,
             isTemplate: fileConfig.isTemplate,
-            mode: fileConfig.mode
+            mode: fileConfig.mode,
           };
-
         } catch (fileError) {
           console.error(`Error processing file ${fileConfig.path}:`, fileError);
 
@@ -460,7 +482,6 @@ export class TemplatePackEngine {
           continue;
         }
       }
-
     } catch (error) {
       console.error(`Template pack generation failed for ${packKey}:`, error);
       throw error;
@@ -497,10 +518,10 @@ export class TemplatePackEngine {
 
       // Core dependencies that are always included based on the template
       const coreDependencies = [
-        config.language.toLowerCase(),           // java, python, javascript, typescript
-        config.framework.toLowerCase(),          // playwright, selenium, cypress, etc.
-        config.testRunner?.toLowerCase(),        // testng, junit5, pytest, jest, etc.
-        config.buildTool?.toLowerCase(),         // maven, gradle, npm, pip, etc.
+        config.language.toLowerCase(), // java, python, javascript, typescript
+        config.framework.toLowerCase(), // playwright, selenium, cypress, etc.
+        config.testRunner?.toLowerCase(), // testng, junit5, pytest, jest, etc.
+        config.buildTool?.toLowerCase(), // maven, gradle, npm, pip, etc.
       ];
 
       // Add core dependencies
@@ -508,13 +529,17 @@ export class TemplatePackEngine {
         const keyLower = key.toLowerCase();
 
         // Always include core dependencies
-        if (coreDependencies.some(core => core && keyLower.includes(core.replace('-', '')))) {
+        if (coreDependencies.some((core) => core && keyLower.includes(core.replace('-', '')))) {
           filteredDependencies[key] = version as string;
           continue;
         }
 
         // Include logging dependencies (always needed)
-        if (keyLower.includes('log4j') || keyLower.includes('logging') || keyLower.includes('winston')) {
+        if (
+          keyLower.includes('log4j') ||
+          keyLower.includes('logging') ||
+          keyLower.includes('winston')
+        ) {
           filteredDependencies[key] = version as string;
           continue;
         }
@@ -525,9 +550,11 @@ export class TemplatePackEngine {
         const reportingToolLower = config.reportingTool.toLowerCase().replace('-', '');
         for (const [key, version] of Object.entries(allDependencies)) {
           const keyLower = key.toLowerCase().replace('-', '');
-          if (keyLower.includes(reportingToolLower) ||
+          if (
+            keyLower.includes(reportingToolLower) ||
             (config.reportingTool === 'extent-reports' && keyLower.includes('extent')) ||
-            (config.reportingTool === 'allure' && keyLower.includes('allure'))) {
+            (config.reportingTool === 'allure' && keyLower.includes('allure'))
+          ) {
             filteredDependencies[key] = version as string;
           }
         }
@@ -537,7 +564,11 @@ export class TemplatePackEngine {
       if (config.testingPattern === 'bdd') {
         for (const [key, version] of Object.entries(allDependencies)) {
           const keyLower = key.toLowerCase();
-          if (keyLower.includes('cucumber') || keyLower.includes('behave') || keyLower.includes('gherkin')) {
+          if (
+            keyLower.includes('cucumber') ||
+            keyLower.includes('behave') ||
+            keyLower.includes('gherkin')
+          ) {
             filteredDependencies[key] = version as string;
           }
         }
@@ -547,7 +578,11 @@ export class TemplatePackEngine {
       if (config.testingType === 'mobile') {
         for (const [key, version] of Object.entries(allDependencies)) {
           const keyLower = key.toLowerCase();
-          if (keyLower.includes('appium') || keyLower.includes('espresso') || keyLower.includes('xcuitest')) {
+          if (
+            keyLower.includes('appium') ||
+            keyLower.includes('espresso') ||
+            keyLower.includes('xcuitest')
+          ) {
             filteredDependencies[key] = version as string;
           }
         }
@@ -557,8 +592,13 @@ export class TemplatePackEngine {
       if (config.testingType === 'api') {
         for (const [key, version] of Object.entries(allDependencies)) {
           const keyLower = key.toLowerCase();
-          if (keyLower.includes('rest') || keyLower.includes('request') || keyLower.includes('supertest') ||
-            keyLower.includes('jackson') || keyLower.includes('gson')) {
+          if (
+            keyLower.includes('rest') ||
+            keyLower.includes('request') ||
+            keyLower.includes('supertest') ||
+            keyLower.includes('jackson') ||
+            keyLower.includes('gson')
+          ) {
             filteredDependencies[key] = version as string;
           }
         }
@@ -577,9 +617,7 @@ export class TemplatePackEngine {
   async getAvailableTemplatePacks(): Promise<string[]> {
     try {
       const entries = await fs.readdir(this.packsDirectory, { withFileTypes: true });
-      const packDirs = entries
-        .filter(entry => entry.isDirectory())
-        .map(entry => entry.name);
+      const packDirs = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
 
       // Filter only directories that have a valid manifest
       const validPacks: string[] = [];

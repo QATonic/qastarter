@@ -9,7 +9,7 @@ import {
   sanitizeXmlValue,
   sanitizeJsonValue,
   sanitizeFilename,
-  sanitizeProjectConfig
+  sanitizeProjectConfig,
 } from './sanitize';
 
 describe('sanitizeProjectName', () => {
@@ -224,7 +224,7 @@ describe('Security: Path Traversal Prevention', () => {
   ];
 
   it('should sanitize all malicious project names', () => {
-    maliciousInputs.forEach(input => {
+    maliciousInputs.forEach((input) => {
       const result = sanitizeProjectName(input);
       expect(result).not.toContain('..');
       expect(result).not.toContain('/');
@@ -234,7 +234,7 @@ describe('Security: Path Traversal Prevention', () => {
   });
 
   it('should sanitize all malicious file paths', () => {
-    maliciousInputs.forEach(input => {
+    maliciousInputs.forEach((input) => {
       const result = sanitizeFilePath(input);
       expect(result).not.toContain('..');
       expect(result).not.toMatch(/^[a-zA-Z]:/);
@@ -243,7 +243,6 @@ describe('Security: Path Traversal Prevention', () => {
     });
   });
 });
-
 
 describe('sanitizeFilename', () => {
   it('should return valid filename unchanged', () => {
@@ -285,7 +284,7 @@ describe('sanitizeProjectConfig', () => {
       groupId: 'Com.Example',
       artifactId: 'My_Artifact',
       framework: 'selenium',
-      language: 'java'
+      language: 'java',
     };
 
     const result = sanitizeProjectConfig(config);
@@ -301,7 +300,7 @@ describe('sanitizeProjectConfig', () => {
   it('should handle missing optional fields', () => {
     const config = {
       projectName: 'my-project',
-      framework: 'playwright'
+      framework: 'playwright',
     };
 
     const result = sanitizeProjectConfig(config);

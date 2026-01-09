@@ -1,15 +1,29 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
-  FileText, Folder, FolderOpen, Eye, AlertCircle,
-  ChevronDown, ChevronRight, HardDrive, Package, FileCheck2,
-  FileCode, FileJson, FileImage, Terminal, Settings, Database, Braces
-} from "lucide-react";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+  FileText,
+  Folder,
+  FolderOpen,
+  Eye,
+  AlertCircle,
+  ChevronDown,
+  ChevronRight,
+  HardDrive,
+  Package,
+  FileCheck2,
+  FileCode,
+  FileJson,
+  FileImage,
+  Terminal,
+  Settings,
+  Database,
+  Braces,
+} from 'lucide-react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 interface ProjectFile {
   name: string;
@@ -31,13 +45,17 @@ export default function ProjectPreview({
   configuration,
   onDownload,
   isGenerating = false,
-  hideDownloadButton = false
+  hideDownloadButton = false,
 }: ProjectPreviewProps) {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
 
   // Fetch real project preview data based on user configuration
-  const { data: previewData, isLoading, error } = useQuery({
+  const {
+    data: previewData,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['/api/project-preview', configuration],
     queryFn: async () => {
       const response = await apiRequest('POST', '/api/project-preview', configuration);
@@ -45,7 +63,7 @@ export default function ProjectPreview({
     },
     enabled: !!configuration && Object.keys(configuration).length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1
+    retry: 1,
   });
 
   const projectStructure = previewData?.data?.projectStructure || [];
@@ -126,14 +144,16 @@ export default function ProjectPreview({
       }
 
       // If no content, try to find it in sample files
-      const sampleFile = sampleFiles.find((sf: any) =>
-        sf.path.endsWith(file.name) || sf.path.includes(fullPath)
+      const sampleFile = sampleFiles.find(
+        (sf: any) => sf.path.endsWith(file.name) || sf.path.includes(fullPath)
       );
 
       if (sampleFile) {
         setSelectedFile(sampleFile.content);
       } else {
-        setSelectedFile(`// File: ${file.name}\n// Click "Generate and Download Project" to see the full content`);
+        setSelectedFile(
+          `// File: ${file.name}\n// Click "Generate and Download Project" to see the full content`
+        );
       }
     } else {
       // If it's a folder, toggle its expanded state
@@ -384,9 +404,7 @@ export default function ProjectPreview({
               <h3 className="text-sm font-medium mb-2">File Preview</h3>
               <ScrollArea className="h-64 border rounded-md p-2">
                 {selectedFile ? (
-                  <pre className="text-xs font-mono whitespace-pre-wrap">
-                    {selectedFile}
-                  </pre>
+                  <pre className="text-xs font-mono whitespace-pre-wrap">{selectedFile}</pre>
                 ) : (
                   <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
                     Click on a file to preview its content

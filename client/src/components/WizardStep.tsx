@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useRef } from "react";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 interface WizardStepProps {
   title: string;
@@ -67,8 +68,8 @@ export default function WizardStep({
   }, [canGoNext, canGoPrevious, showSkip, onNext, onPrevious, onSkip]);
 
   return (
-    <Card 
-      className="w-full" 
+    <Card
+      className="w-full"
       ref={stepRef}
       tabIndex={-1}
       role="region"
@@ -92,9 +93,9 @@ export default function WizardStep({
         <div role="form" aria-label={`${title} configuration`}>
           {children}
         </div>
-        
-        <nav 
-          className="flex flex-wrap justify-between items-center gap-2 pt-6" 
+
+        <nav
+          className="flex flex-wrap justify-between items-center gap-2 pt-6"
           aria-label="Wizard navigation"
           role="navigation"
         >
@@ -128,10 +129,12 @@ export default function WizardStep({
               disabled={!canGoNext}
               data-testid="button-next"
               className="hover-elevate active-elevate-2"
-              aria-label={isLastStep ? "Generate and download your project" : "Go to next step (Alt+N)"}
+              aria-label={
+                isLastStep ? 'Generate and download your project' : 'Go to next step (Alt+N)'
+              }
               aria-disabled={!canGoNext}
             >
-              {isLastStep ? "Generate and Download Project" : "Next"}
+              {isLastStep ? 'Generate and Download Project' : 'Next'}
               {!isLastStep && <ChevronRight className="w-4 h-4 ml-2" aria-hidden="true" />}
             </Button>
           </div>

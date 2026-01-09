@@ -41,7 +41,7 @@ export enum ErrorCode {
   CACHE_ERROR = 'CACHE_ERROR',
 
   // Unknown
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
 }
 
 /**
@@ -67,7 +67,7 @@ const errorStatusCodes: Record<ErrorCode, number> = {
   [ErrorCode.EXTERNAL_SERVICE_ERROR]: 502,
   [ErrorCode.SERVICE_UNAVAILABLE]: 503,
   [ErrorCode.CACHE_ERROR]: 500,
-  [ErrorCode.UNKNOWN_ERROR]: 500
+  [ErrorCode.UNKNOWN_ERROR]: 500,
 };
 
 /**
@@ -76,7 +76,8 @@ const errorStatusCodes: Record<ErrorCode, number> = {
 const errorMessages: Record<ErrorCode, string> = {
   [ErrorCode.VALIDATION_ERROR]: 'The request contains invalid data',
   [ErrorCode.INVALID_CONFIG]: 'Invalid project configuration',
-  [ErrorCode.INCOMPATIBLE_COMBINATION]: 'Invalid combination of testing type, framework, and language',
+  [ErrorCode.INCOMPATIBLE_COMBINATION]:
+    'Invalid combination of testing type, framework, and language',
   [ErrorCode.MISSING_REQUIRED_FIELD]: 'Required field is missing',
   [ErrorCode.INVALID_PROJECT_NAME]: 'Project name contains invalid characters',
   [ErrorCode.CONFIGURATION_ERROR]: 'Invalid configuration provided',
@@ -93,7 +94,7 @@ const errorMessages: Record<ErrorCode, string> = {
   [ErrorCode.EXTERNAL_SERVICE_ERROR]: 'External service error',
   [ErrorCode.SERVICE_UNAVAILABLE]: 'Service temporarily unavailable',
   [ErrorCode.CACHE_ERROR]: 'Cache operation failed',
-  [ErrorCode.UNKNOWN_ERROR]: 'An unexpected error occurred'
+  [ErrorCode.UNKNOWN_ERROR]: 'An unexpected error occurred',
 };
 /**
  * Request metadata for enhanced error context
@@ -155,8 +156,8 @@ export class AppError extends Error {
         ...(this.details && { details: this.details }),
         ...(this.requestId && { requestId: this.requestId }),
         ...(this.retryAfter && { retryAfter: this.retryAfter }),
-        timestamp: this.timestamp
-      }
+        timestamp: this.timestamp,
+      },
     };
   }
 
@@ -191,12 +192,7 @@ export class ValidationError extends AppError {
  * Template not found error
  */
 export class TemplateNotFoundError extends AppError {
-  constructor(
-    testingType: string,
-    framework: string,
-    language: string,
-    requestId?: string
-  ) {
+  constructor(testingType: string, framework: string, language: string, requestId?: string) {
     super(
       ErrorCode.TEMPLATE_NOT_FOUND,
       `No template found for ${testingType} + ${framework} + ${language}`,
@@ -210,16 +206,16 @@ export class TemplateNotFoundError extends AppError {
  * Incompatible combination error
  */
 export class IncompatibleCombinationError extends AppError {
-  constructor(
-    testingType: string,
-    framework: string,
-    language: string,
-    requestId?: string
-  ) {
+  constructor(testingType: string, framework: string, language: string, requestId?: string) {
     super(
       ErrorCode.INCOMPATIBLE_COMBINATION,
       `Invalid combination: ${testingType} + ${framework} + ${language}`,
-      { testingType, framework, language, hint: 'Use GET /api/v1/metadata to see compatible options' },
+      {
+        testingType,
+        framework,
+        language,
+        hint: 'Use GET /api/v1/metadata to see compatible options',
+      },
       requestId
     );
   }
@@ -235,13 +231,7 @@ export class ConfigurationError extends AppError {
     requestId?: string,
     cause?: Error
   ) {
-    super(
-      ErrorCode.CONFIGURATION_ERROR,
-      message,
-      { invalidFields },
-      requestId,
-      { cause }
-    );
+    super(ErrorCode.CONFIGURATION_ERROR, message, { invalidFields }, requestId, { cause });
   }
 }
 
@@ -265,7 +255,7 @@ export class TimeoutError extends AppError {
       requestId,
       {
         retryAfter: options?.retryAfter,
-        cause: options?.cause
+        cause: options?.cause,
       }
     );
   }
@@ -290,7 +280,7 @@ export class DependencyError extends AppError {
       {
         dependency,
         reason,
-        ...(options?.alternatives && { alternatives: options.alternatives })
+        ...(options?.alternatives && { alternatives: options.alternatives }),
       },
       requestId,
       { cause: options?.cause }
@@ -302,12 +292,7 @@ export class DependencyError extends AppError {
  * Cache operation error
  */
 export class CacheError extends AppError {
-  constructor(
-    operation: string,
-    message: string,
-    requestId?: string,
-    cause?: Error
-  ) {
+  constructor(operation: string, message: string, requestId?: string, cause?: Error) {
     super(
       ErrorCode.CACHE_ERROR,
       `Cache ${operation} failed: ${message}`,
@@ -338,7 +323,7 @@ export class ExternalServiceError extends AppError {
       requestId,
       {
         retryAfter: options?.retryAfter,
-        cause: options?.cause
+        cause: options?.cause,
       }
     );
   }
@@ -369,7 +354,7 @@ export function logError(error: Error | AppError, context?: Record<string, any>)
     ...(appError?.requestContext && { requestContext: appError.requestContext }),
     ...(appError?.cause && { errorChain: appError.getErrorChain() }),
     ...(context && { context }),
-    stack: error.stack
+    stack: error.stack,
   };
 
   // Use appropriate log level based on error type
@@ -399,7 +384,7 @@ export function errorHandler(
     logError(err, {
       method: req.method,
       path: req.path,
-      ip: req.ip
+      ip: req.ip,
     });
 
     res.status(err.statusCode).json(err.toJSON());
@@ -413,13 +398,13 @@ export function errorHandler(
       'Validation failed',
       zodError.errors?.map((e: any) => ({
         field: e.path?.join('.') || 'unknown',
-        message: e.message
+        message: e.message,
       })) || []
     );
 
     logError(validationError, {
       method: req.method,
-      path: req.path
+      path: req.path,
     });
 
     res.status(validationError.statusCode).json(validationError.toJSON());
@@ -429,15 +414,13 @@ export function errorHandler(
   // Handle unknown errors
   const unknownError = new AppError(
     ErrorCode.UNKNOWN_ERROR,
-    process.env.NODE_ENV === 'production'
-      ? 'An unexpected error occurred'
-      : err.message
+    process.env.NODE_ENV === 'production' ? 'An unexpected error occurred' : err.message
   );
 
   logError(err, {
     method: req.method,
     path: req.path,
-    originalError: err.message
+    originalError: err.message,
   });
 
   res.status(500).json(unknownError.toJSON());

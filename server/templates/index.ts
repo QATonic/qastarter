@@ -21,7 +21,10 @@ export class ProjectTemplateGenerator {
       const opts = args.pop();
       return args.some(Boolean);
     });
-    handlebars.registerHelper('includes', (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val));
+    handlebars.registerHelper(
+      'includes',
+      (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val)
+    );
   }
 
   public async generateProject(config: ProjectConfig): Promise<TemplateFile[]> {
@@ -34,13 +37,15 @@ export class ProjectTemplateGenerator {
         language: config.language,
         framework: config.framework,
         testRunner: config.testRunner,
-        buildTool: config.buildTool
+        buildTool: config.buildTool,
       });
       // Use strict mode by default
       return await this.templatePackEngine.generateProject(config, { strict: true });
     } else {
       console.error('Template pack not found for configuration:', config);
-      throw new Error(`No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}. Please verify your selection.`);
+      throw new Error(
+        `No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}. Please verify your selection.`
+      );
     }
   }
 
@@ -49,7 +54,9 @@ export class ProjectTemplateGenerator {
     if (hasTemplatePack) {
       yield* this.templatePackEngine.generateProjectStream(config, { strict: true });
     } else {
-      throw new Error(`No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}.`);
+      throw new Error(
+        `No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}.`
+      );
     }
   }
 
@@ -125,14 +132,14 @@ export class ProjectTemplateGenerator {
     files.push({
       path: 'README.md',
       content: this.getReadmeTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     // .gitignore
     files.push({
       path: '.gitignore',
       content: this.getGitignoreTemplate(config),
-      isTemplate: true
+      isTemplate: true,
     });
 
     return files;
@@ -170,13 +177,13 @@ export class ProjectTemplateGenerator {
       files.push({
         path: 'pom.xml',
         content: this.getMavenPomTemplate(),
-        isTemplate: true
+        isTemplate: true,
       });
     } else if (config.buildTool === 'gradle') {
       files.push({
         path: 'build.gradle',
         content: this.getGradleBuildTemplate(),
-        isTemplate: true
+        isTemplate: true,
       });
     }
 
@@ -184,7 +191,7 @@ export class ProjectTemplateGenerator {
     files.push({
       path: 'src/test/java/{{packageName}}/tests/SampleTest.java',
       content: this.getJavaTestTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     // Base page class for POM
@@ -192,7 +199,7 @@ export class ProjectTemplateGenerator {
       files.push({
         path: 'src/main/java/{{packageName}}/pages/BasePage.java',
         content: this.getJavaBasePageTemplate(),
-        isTemplate: true
+        isTemplate: true,
       });
     }
 
@@ -200,7 +207,7 @@ export class ProjectTemplateGenerator {
     files.push({
       path: 'src/main/java/{{packageName}}/config/TestConfig.java',
       content: this.getJavaConfigTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     return files;
@@ -212,27 +219,27 @@ export class ProjectTemplateGenerator {
     files.push({
       path: 'requirements.txt',
       content: this.getPythonRequirementsTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     files.push({
       path: 'tests/test_sample.py',
       content: this.getPythonTestTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     if (config.testingPattern === 'page-object-model') {
       files.push({
         path: 'pages/base_page.py',
         content: this.getPythonBasePageTemplate(),
-        isTemplate: true
+        isTemplate: true,
       });
     }
 
     files.push({
       path: 'config/test_config.py',
       content: this.getPythonConfigTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     return files;
@@ -244,20 +251,20 @@ export class ProjectTemplateGenerator {
     files.push({
       path: 'package.json',
       content: this.getPackageJsonTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     files.push({
       path: 'tests/sample.test.js',
       content: this.getJavaScriptTestTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     if (config.testingPattern === 'page-object-model') {
       files.push({
         path: 'pages/BasePage.js',
         content: this.getJavaScriptBasePageTemplate(),
-        isTemplate: true
+        isTemplate: true,
       });
     }
 
@@ -270,13 +277,13 @@ export class ProjectTemplateGenerator {
     files.push({
       path: `{{projectName}}.csproj`,
       content: this.getCSharpProjectTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     files.push({
       path: 'Tests/SampleTest.cs',
       content: this.getCSharpTestTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     return files;
@@ -294,21 +301,21 @@ export class ProjectTemplateGenerator {
         files.push({
           path: '.github/workflows/test.yml',
           content: this.getGitHubActionsTemplate(),
-          isTemplate: true
+          isTemplate: true,
         });
         break;
       case 'azure-devops':
         files.push({
           path: 'azure-pipelines.yml',
           content: this.getAzurePipelinesTemplate(),
-          isTemplate: true
+          isTemplate: true,
         });
         break;
       case 'jenkins':
         files.push({
           path: 'Jenkinsfile',
           content: this.getJenkinsfileTemplate(),
-          isTemplate: true
+          isTemplate: true,
         });
         break;
     }
@@ -322,13 +329,13 @@ export class ProjectTemplateGenerator {
     files.push({
       path: 'Package.swift',
       content: this.getSwiftPackageTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     files.push({
       path: 'Tests/{{projectName}}Tests/SampleTests.swift',
       content: this.getSwiftTestTemplate(),
-      isTemplate: true
+      isTemplate: true,
     });
 
     return files;
@@ -338,15 +345,16 @@ export class ProjectTemplateGenerator {
     const files: TemplateFile[] = [
       ...this.getBaseFiles(config),
       ...this.getLanguageSpecificFiles(config),
-      ...this.getCICDFiles(config)
+      ...this.getCICDFiles(config),
     ];
 
     // Process templates
-    return files.map(file => {
+    return files.map((file) => {
       if (file.isTemplate) {
         try {
           // For CI/CD workflow files, mask GitHub Actions expressions before Handlebars compilation
-          const isWorkflowFile = file.path.includes('.github/workflows/') || file.path.includes('azure-pipelines.yml');
+          const isWorkflowFile =
+            file.path.includes('.github/workflows/') || file.path.includes('azure-pipelines.yml');
           let content = file.content;
 
           if (isWorkflowFile) {
@@ -357,8 +365,14 @@ export class ProjectTemplateGenerator {
 
             // Replace GitHub Actions and Azure DevOps expressions (with optional backslash before $)
             content = content
-              .replace(/(?:\\)?\$\{\{([\s\S]*?)\}\}/g, (_, inner) => `${GHA_OPEN}${inner}${GHA_CLOSE}`)
-              .replace(/(?:\\)?\$\(([\s\S]*?)\)/g, (_, inner) => `${AZURE_VAR}${inner}%%END_AZURE%%`);
+              .replace(
+                /(?:\\)?\$\{\{([\s\S]*?)\}\}/g,
+                (_, inner) => `${GHA_OPEN}${inner}${GHA_CLOSE}`
+              )
+              .replace(
+                /(?:\\)?\$\(([\s\S]*?)\)/g,
+                (_, inner) => `${AZURE_VAR}${inner}%%END_AZURE%%`
+              );
           }
 
           // Helper function to sanitize paths and prevent traversal attacks
@@ -373,28 +387,42 @@ export class ProjectTemplateGenerator {
           let processedContent = template({
             ...config,
             groupId: sanitizePath(config.groupId || 'com.example'),
-            artifactId: sanitizePath(config.artifactId || config.projectName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')),
-            packageName: sanitizePath(config.groupId ? config.groupId.replace(/\./g, '/') : 'com/example'),
-            packagePath: sanitizePath(config.groupId ? config.groupId.replace(/\./g, '/') : 'com/example')
+            artifactId: sanitizePath(
+              config.artifactId || config.projectName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-')
+            ),
+            packageName: sanitizePath(
+              config.groupId ? config.groupId.replace(/\./g, '/') : 'com/example'
+            ),
+            packagePath: sanitizePath(
+              config.groupId ? config.groupId.replace(/\./g, '/') : 'com/example'
+            ),
           });
 
           // Unmask GitHub Actions and Azure DevOps expressions after rendering
           if (isWorkflowFile) {
-            processedContent = processedContent.replaceAll('%%GHA_OPEN%%', '${{').replaceAll('%%GHA_CLOSE%%', '}}');
-            processedContent = processedContent.replaceAll('%%AZURE_VAR%%', '$(').replaceAll('%%END_AZURE%%', ')');
+            processedContent = processedContent
+              .replaceAll('%%GHA_OPEN%%', '${{')
+              .replaceAll('%%GHA_CLOSE%%', '}}');
+            processedContent = processedContent
+              .replaceAll('%%AZURE_VAR%%', '$(')
+              .replaceAll('%%END_AZURE%%', ')');
           }
 
           // Process path template
           const pathTemplate = handlebars.compile(file.path);
-          const processedPath = sanitizePath(pathTemplate({
-            ...config,
-            groupId: sanitizePath(config.groupId ? config.groupId.replace(/\./g, '/') : 'com/example')
-          }));
+          const processedPath = sanitizePath(
+            pathTemplate({
+              ...config,
+              groupId: sanitizePath(
+                config.groupId ? config.groupId.replace(/\./g, '/') : 'com/example'
+              ),
+            })
+          );
 
           return {
             ...file,
             path: processedPath,
-            content: processedContent
+            content: processedContent,
           };
         } catch (error) {
           console.error(`Template compilation failed for file: ${file.path}`, error);

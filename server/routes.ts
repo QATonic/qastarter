@@ -1,6 +1,6 @@
 /**
  * Main Routes Configuration
- * 
+ *
  * Routes are organized into modular files for better maintainability:
  * - healthRoutes: Health check endpoints
  * - analyticsRoutes: Usage analytics endpoints
@@ -8,19 +8,14 @@
  * - projectRoutes: Project generation endpoints
  */
 
-import type { Express } from "express";
-import { createServer, type Server } from "http";
-import rateLimit from "express-rate-limit";
-import { rateLimitConfig } from "./config";
-import { ErrorCode } from "./errors";
+import type { Express } from 'express';
+import { createServer, type Server } from 'http';
+import rateLimit from 'express-rate-limit';
+import { rateLimitConfig } from './config';
+import { ErrorCode } from './errors';
 
 // Import route modules
-import {
-  healthRoutes,
-  analyticsRoutes,
-  configRoutes,
-  projectRoutes
-} from "./routes/index";
+import { healthRoutes, analyticsRoutes, configRoutes, projectRoutes } from './routes/index';
 
 // Rate limiting configuration (using centralized config)
 const apiLimiter = rateLimit({
@@ -30,9 +25,9 @@ const apiLimiter = rateLimit({
     success: false,
     error: {
       code: ErrorCode.RATE_LIMIT_EXCEEDED,
-      message: "Too many requests from this IP, please try again later.",
-      timestamp: new Date().toISOString()
-    }
+      message: 'Too many requests from this IP, please try again later.',
+      timestamp: new Date().toISOString(),
+    },
   },
   standardHeaders: true,
   legacyHeaders: false,

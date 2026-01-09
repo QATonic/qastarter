@@ -1,35 +1,35 @@
-import { Linkedin, Twitter, Youtube, Instagram, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import QAStarterLogo from "./QAStarterLogo";
+import { Linkedin, Twitter, Youtube, Instagram, Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import QAStarterLogo from './QAStarterLogo';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   const socialLinks = [
     {
-      name: "LinkedIn",
-      testId: "button-linkedin",
+      name: 'LinkedIn',
+      testId: 'button-linkedin',
       icon: Linkedin,
-      url: "https://linkedin.com/in/SantoshKarad"
+      url: 'https://linkedin.com/in/SantoshKarad',
     },
     {
-      name: "Twitter/X",
-      testId: "button-twitter-x",
+      name: 'Twitter/X',
+      testId: 'button-twitter-x',
       icon: Twitter,
-      url: "https://twitter.com/SantoshKarad"
+      url: 'https://twitter.com/SantoshKarad',
     },
     {
-      name: "YouTube",
-      testId: "button-youtube",
+      name: 'YouTube',
+      testId: 'button-youtube',
       icon: Youtube,
-      url: "https://youtube.com/@SantoshKarad"
+      url: 'https://youtube.com/@SantoshKarad',
     },
     {
-      name: "Instagram",
-      testId: "button-instagram",
+      name: 'Instagram',
+      testId: 'button-instagram',
       icon: Instagram,
-      url: "https://instagram.com/SantoshKarad"
-    }
+      url: 'https://instagram.com/SantoshKarad',
+    },
   ];
 
   return (

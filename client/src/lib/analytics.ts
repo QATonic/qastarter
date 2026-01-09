@@ -3,7 +3,7 @@
 
 export function initializeAnalytics() {
   const trackingId = import.meta.env.VITE_GA_TRACKING_ID;
-  
+
   if (!trackingId) {
     console.log('Google Analytics: Tracking ID not configured');
     return;
@@ -34,7 +34,7 @@ export function initializeAnalytics() {
 // Track page views (for SPA navigation)
 export function trackPageView(path: string) {
   const trackingId = import.meta.env.VITE_GA_TRACKING_ID;
-  
+
   if (!trackingId || typeof window === 'undefined' || !(window as any).gtag) {
     return;
   }
@@ -47,7 +47,7 @@ export function trackPageView(path: string) {
 // Track custom events
 export function trackEvent(eventName: string, eventParams?: Record<string, any>) {
   const trackingId = import.meta.env.VITE_GA_TRACKING_ID;
-  
+
   if (!trackingId || typeof window === 'undefined' || !(window as any).gtag) {
     return;
   }

@@ -2,15 +2,25 @@
  * Framework Step - Select the testing framework
  */
 
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { AlertCircle, CheckCircle2, Globe, Layers, Smartphone, Server, MonitorSmartphone } from "lucide-react";
-import WizardStep from "../../WizardStep";
-import HelpTooltip from "../../HelpTooltip";
-import { getHelpContent } from "@/lib/helpContent";
-import { validationLabels } from "../../../../../shared/validationMatrix";
-import { useWizard } from "../WizardContext";
+import React from 'react';
+
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import {
+  AlertCircle,
+  CheckCircle2,
+  Globe,
+  Layers,
+  Smartphone,
+  Server,
+  MonitorSmartphone,
+} from 'lucide-react';
+import WizardStep from '../../WizardStep';
+import HelpTooltip from '../../HelpTooltip';
+import { getHelpContent } from '@/lib/helpContent';
+import { validationLabels } from '../../../../../shared/validationMatrix';
+import { useWizard } from '../WizardContext';
 
 const frameworkIcons: Record<string, React.ElementType> = {
   selenium: Globe,
@@ -31,7 +41,15 @@ const frameworkIcons: Record<string, React.ElementType> = {
 };
 
 export default function FrameworkStep() {
-  const { config, updateConfig, handleNext, handlePrevious, currentStep, steps, getFilteredOptions } = useWizard();
+  const {
+    config,
+    updateConfig,
+    handleNext,
+    handlePrevious,
+    currentStep,
+    steps,
+    getFilteredOptions,
+  } = useWizard();
   const availableFrameworks = getFilteredOptions('framework');
 
   return (
@@ -55,7 +73,7 @@ export default function FrameworkStep() {
 
         <RadioGroup
           value={config.framework}
-          onValueChange={(value) => updateConfig("framework", value)}
+          onValueChange={(value) => updateConfig('framework', value)}
           disabled={!config.testingType}
           className="grid gap-3"
         >
@@ -67,18 +85,21 @@ export default function FrameworkStep() {
                 key={framework}
                 className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-                  ${isSelected
-                    ? 'bg-primary/5 border-primary/30 shadow-sm'
-                    : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
+                  ${
+                    isSelected
+                      ? 'bg-primary/5 border-primary/30 shadow-sm'
+                      : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
                   }
                   ${!config.testingType ? 'opacity-50 pointer-events-none' : ''}
                 `}
-                onClick={() => config.testingType && updateConfig("framework", framework)}
+                onClick={() => config.testingType && updateConfig('framework', framework)}
               >
-                <div className={`
+                <div
+                  className={`
                   flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0
                   ${isSelected ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}
-                `}>
+                `}
+                >
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -90,14 +111,16 @@ export default function FrameworkStep() {
                       className="sr-only"
                     />
                     <Label htmlFor={framework} className="text-sm font-medium cursor-pointer">
-                      {validationLabels.frameworks[framework as keyof typeof validationLabels.frameworks]}
+                      {
+                        validationLabels.frameworks[
+                          framework as keyof typeof validationLabels.frameworks
+                        ]
+                      }
                     </Label>
                     <HelpTooltip content={getHelpContent(framework)} />
                   </div>
                 </div>
-                {isSelected && (
-                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />
-                )}
+                {isSelected && <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0" />}
               </div>
             );
           })}
@@ -110,7 +133,7 @@ export default function FrameworkStep() {
               <span className="text-sm font-medium">Available Languages:</span>
             </div>
             <div className="flex flex-wrap gap-1">
-              {getFilteredOptions('language').map(language => (
+              {getFilteredOptions('language').map((language) => (
                 <Badge key={language} variant="secondary" className="text-xs">
                   {validationLabels.languages[language as keyof typeof validationLabels.languages]}
                 </Badge>

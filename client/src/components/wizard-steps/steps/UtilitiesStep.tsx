@@ -2,12 +2,14 @@
  * Utilities Step - Select utility modules to include
  */
 
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Settings, FileJson, Camera, FileText, Database, Container, Boxes } from "lucide-react";
-import WizardStep from "../../WizardStep";
-import HelpTooltip from "../../HelpTooltip";
-import { useWizard } from "../WizardContext";
+import React from 'react';
+
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Settings, FileJson, Camera, FileText, Database, Container, Boxes } from 'lucide-react';
+import WizardStep from '../../WizardStep';
+import HelpTooltip from '../../HelpTooltip';
+import { useWizard } from '../WizardContext';
 
 interface UtilityItem {
   key: keyof typeof defaultUtilities;
@@ -36,31 +38,31 @@ const utilityItems: UtilityItem[] = [
     key: 'configReader',
     label: 'Config Reader',
     description: 'Read configuration from properties/yaml files',
-    icon: Settings
+    icon: Settings,
   },
   {
     key: 'jsonReader',
     label: 'JSON Reader',
     description: 'Parse and read JSON test data files',
-    icon: FileJson
+    icon: FileJson,
   },
   {
     key: 'screenshotUtility',
     label: 'Screenshot Utility',
     description: 'Capture screenshots on test failure',
-    icon: Camera
+    icon: Camera,
   },
   {
     key: 'logger',
     label: 'Logger',
     description: 'Structured logging for test execution',
-    icon: FileText
+    icon: FileText,
   },
   {
     key: 'dataProvider',
     label: 'Data Provider',
     description: 'Data-driven testing utilities',
-    icon: Database
+    icon: Database,
   },
 ];
 
@@ -69,13 +71,13 @@ const dockerItems: DockerItem[] = [
     key: 'includeDocker',
     label: 'Dockerfile',
     description: 'Run tests in isolated Docker containers',
-    icon: Container
+    icon: Container,
   },
   {
     key: 'includeDockerCompose',
     label: 'Docker Compose',
     description: 'Selenium Grid with multiple browsers (Chrome, Firefox, Edge)',
-    icon: Boxes
+    icon: Boxes,
   },
 ];
 
@@ -83,16 +85,16 @@ export default function UtilitiesStep() {
   const { config, updateConfig, handleNext, handlePrevious, currentStep, steps } = useWizard();
 
   const toggleUtility = (key: keyof typeof defaultUtilities) => {
-    updateConfig("utilities", {
+    updateConfig('utilities', {
       ...config.utilities,
-      [key]: !config.utilities[key]
+      [key]: !config.utilities[key],
     });
   };
 
   const toggleDocker = (key: 'includeDocker' | 'includeDockerCompose') => {
-    updateConfig("utilities", {
+    updateConfig('utilities', {
       ...config.utilities,
-      [key]: !config.utilities[key]
+      [key]: !config.utilities[key],
     });
   };
 
@@ -100,8 +102,8 @@ export default function UtilitiesStep() {
     .filter(([key]) => !key.startsWith('include'))
     .filter(([, value]) => value).length;
 
-  const dockerCount = (config.utilities.includeDocker ? 1 : 0) +
-    (config.utilities.includeDockerCompose ? 1 : 0);
+  const dockerCount =
+    (config.utilities.includeDocker ? 1 : 0) + (config.utilities.includeDockerCompose ? 1 : 0);
 
   return (
     <WizardStep
@@ -115,10 +117,12 @@ export default function UtilitiesStep() {
       <div className="space-y-6">
         {/* Utility Modules Section */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Helper Utilities</h3>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Helper Utilities
+          </h3>
           {utilityItems
             // Filter out screenshot utility for API testing (UI-less)
-            .filter(item => !(config.testingType === 'api' && item.key === 'screenshotUtility'))
+            .filter((item) => !(config.testingType === 'api' && item.key === 'screenshotUtility'))
             .map((item) => {
               const Icon = item.icon;
               const isEnabled = config.utilities[item.key];
@@ -128,17 +132,16 @@ export default function UtilitiesStep() {
                   key={item.key}
                   className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-                  ${isEnabled
-                      ? 'bg-primary/5 border-primary/30'
-                      : 'bg-card hover:bg-muted/30'
-                    }
+                  ${isEnabled ? 'bg-primary/5 border-primary/30' : 'bg-card hover:bg-muted/30'}
                 `}
                   onClick={() => toggleUtility(item.key)}
                 >
-                  <div className={`
+                  <div
+                    className={`
                   flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0
                   ${isEnabled ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}
-                `}>
+                `}
+                  >
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -160,10 +163,14 @@ export default function UtilitiesStep() {
 
         {/* Docker Support Section */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Docker Support (Optional)</h3>
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Docker Support (Optional)
+          </h3>
           {dockerItems
             // Filter out Docker Compose (Selenium Grid) for non-Web testing types
-            .filter(item => !(config.testingType !== 'web' && item.key === 'includeDockerCompose'))
+            .filter(
+              (item) => !(config.testingType !== 'web' && item.key === 'includeDockerCompose')
+            )
             .map((item) => {
               const Icon = item.icon;
               const isEnabled = config.utilities[item.key];
@@ -173,17 +180,16 @@ export default function UtilitiesStep() {
                   key={item.key}
                   className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-                  ${isEnabled
-                      ? 'bg-blue-500/5 border-blue-500/30'
-                      : 'bg-card hover:bg-muted/30'
-                    }
+                  ${isEnabled ? 'bg-blue-500/5 border-blue-500/30' : 'bg-card hover:bg-muted/30'}
                 `}
                   onClick={() => toggleDocker(item.key)}
                 >
-                  <div className={`
+                  <div
+                    className={`
                   flex items-center justify-center w-10 h-10 rounded-lg flex-shrink-0
                   ${isEnabled ? 'bg-blue-500/10 text-blue-600' : 'bg-muted text-muted-foreground'}
-                `}>
+                `}
+                  >
                     <Icon className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -210,7 +216,8 @@ export default function UtilitiesStep() {
           </p>
           {dockerCount > 0 && (
             <p className="text-sm text-blue-600">
-              <span className="font-medium">{dockerCount}</span> Docker {dockerCount === 1 ? 'file' : 'files'}
+              <span className="font-medium">{dockerCount}</span> Docker{' '}
+              {dockerCount === 1 ? 'file' : 'files'}
             </p>
           )}
         </div>

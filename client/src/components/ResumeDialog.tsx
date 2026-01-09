@@ -7,8 +7,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Clock, Trash2 } from "lucide-react";
+} from '@/components/ui/alert-dialog';
+import { Clock, Trash2 } from 'lucide-react';
 
 interface ResumeDialogProps {
   open: boolean;
@@ -30,7 +30,7 @@ export function ResumeDialog({ open, onResume, onStartFresh, timestamp }: Resume
     if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
     if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
     if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    
+
     return date.toLocaleDateString();
   };
 
@@ -46,13 +46,11 @@ export function ResumeDialog({ open, onResume, onStartFresh, timestamp }: Resume
             <p>
               We found a saved configuration from <strong>{formatDate(timestamp)}</strong>.
             </p>
-            <p>
-              Would you like to resume where you left off, or start with a fresh configuration?
-            </p>
+            <p>Would you like to resume where you left off, or start with a fresh configuration?</p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel 
+          <AlertDialogCancel
             onClick={onStartFresh}
             data-testid="button-start-fresh"
             className="gap-2"
@@ -60,10 +58,7 @@ export function ResumeDialog({ open, onResume, onStartFresh, timestamp }: Resume
             <Trash2 className="w-4 h-4" />
             Start Fresh
           </AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={onResume}
-            data-testid="button-resume"
-          >
+          <AlertDialogAction onClick={onResume} data-testid="button-resume">
             Resume
           </AlertDialogAction>
         </AlertDialogFooter>

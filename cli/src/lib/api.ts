@@ -84,12 +84,12 @@ export function getApiUrl(): string {
 
 function transformMetadata(raw: RawMetadataResponse): MetadataResponse {
   const testingTypeMap = new Map<string, string[]>();
-  raw.data.testingTypes.forEach(tt => {
+  raw.data.testingTypes.forEach((tt) => {
     testingTypeMap.set(tt.id, tt.frameworks);
   });
 
   const frameworks: Record<string, { languages: string[]; testingTypes: string[] }> = {};
-  raw.data.frameworks.forEach(f => {
+  raw.data.frameworks.forEach((f) => {
     const testingTypes: string[] = [];
     testingTypeMap.forEach((fws, ttId) => {
       if (fws.includes(f.id)) {
@@ -98,27 +98,27 @@ function transformMetadata(raw: RawMetadataResponse): MetadataResponse {
     });
     frameworks[f.id] = {
       languages: f.languages,
-      testingTypes
+      testingTypes,
     };
   });
 
   const testRunners: Record<string, string[]> = {};
   const buildTools: Record<string, string[]> = {};
-  raw.data.languages.forEach(l => {
+  raw.data.languages.forEach((l) => {
     testRunners[l.id] = l.testRunners;
     buildTools[l.id] = l.buildTools;
   });
 
   return {
-    testingTypes: raw.data.testingTypes.map(t => t.id),
+    testingTypes: raw.data.testingTypes.map((t) => t.id),
     frameworks,
-    languages: raw.data.languages.map(l => l.id),
+    languages: raw.data.languages.map((l) => l.id),
     testRunners,
     buildTools,
-    testingPatterns: raw.data.testingPatterns.map(p => p.id),
-    cicdTools: raw.data.cicdTools.map(c => c.id),
-    reportingTools: raw.data.reportingTools.map(r => r.id),
-    utilities: raw.data.utilities.map(u => u.id)
+    testingPatterns: raw.data.testingPatterns.map((p) => p.id),
+    cicdTools: raw.data.cicdTools.map((c) => c.id),
+    reportingTools: raw.data.reportingTools.map((r) => r.id),
+    utilities: raw.data.utilities.map((u) => u.id),
   };
 }
 
@@ -136,12 +136,12 @@ export async function generateProject(
   outputPath: string
 ): Promise<string> {
   const params = new URLSearchParams();
-  
+
   params.set('projectName', options.projectName);
   params.set('testingType', options.testingType);
   params.set('framework', options.framework);
   params.set('language', options.language);
-  
+
   if (options.testRunner) params.set('testRunner', options.testRunner);
   if (options.buildTool) params.set('buildTool', options.buildTool);
   if (options.testingPattern) params.set('testingPattern', options.testingPattern);
@@ -171,7 +171,7 @@ export async function generateProject(
 
   const buffer = await response.arrayBuffer();
   const outputFile = path.join(outputPath, filename);
-  
+
   fs.mkdirSync(outputPath, { recursive: true });
   fs.writeFileSync(outputFile, Buffer.from(buffer));
 

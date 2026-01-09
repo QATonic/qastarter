@@ -14,20 +14,22 @@ export function sanitizeProjectName(name: string): string {
     return 'my-project';
   }
 
-  return name
-    // Remove path traversal attempts
-    .replace(/\.\./g, '')
-    .replace(/[\/\\]/g, '')
-    // Replace invalid characters with hyphens
-    .replace(/[^a-zA-Z0-9_-]/g, '-')
-    // Collapse multiple hyphens
-    .replace(/-+/g, '-')
-    // Remove leading/trailing hyphens
-    .replace(/^-+|-+$/g, '')
-    // Limit length
-    .substring(0, 100)
+  return (
+    name
+      // Remove path traversal attempts
+      .replace(/\.\./g, '')
+      .replace(/[/\\]/g, '')
+      // Replace invalid characters with hyphens
+      .replace(/[^a-zA-Z0-9_-]/g, '-')
+      // Collapse multiple hyphens
+      .replace(/-+/g, '-')
+      // Remove leading/trailing hyphens
+      .replace(/^-+|-+$/g, '')
+      // Limit length
+      .substring(0, 100) ||
     // Ensure not empty after sanitization
-    || 'my-project';
+    'my-project'
+  );
 }
 
 /**
@@ -45,7 +47,7 @@ export function sanitizeGroupId(groupId: string): string {
   const segments = groupId
     .toLowerCase()
     .split('.')
-    .map(segment => {
+    .map((segment) => {
       // Remove invalid characters
       let clean = segment.replace(/[^a-z0-9]/g, '');
       // Ensure starts with letter
@@ -54,7 +56,7 @@ export function sanitizeGroupId(groupId: string): string {
       }
       return clean;
     })
-    .filter(segment => segment.length > 0);
+    .filter((segment) => segment.length > 0);
 
   return segments.length > 0 ? segments.join('.') : 'com.example';
 }
@@ -99,20 +101,22 @@ export function sanitizeFilePath(path: string): string {
     return '';
   }
 
-  return path
-    // Normalize slashes to forward slash
-    .replace(/\\/g, '/')
-    // Remove path traversal attempts
-    .replace(/\.\./g, '')
-    // Remove absolute path indicators
-    .replace(/^[a-zA-Z]:/, '')
-    .replace(/^\/+/, '')
-    // Remove null bytes
-    .replace(/\0/g, '')
-    // Collapse multiple slashes
-    .replace(/\/+/g, '/')
-    // Remove leading/trailing slashes
-    .replace(/^\/+|\/+$/g, '');
+  return (
+    path
+      // Normalize slashes to forward slash
+      .replace(/\\/g, '/')
+      // Remove path traversal attempts
+      .replace(/\.\./g, '')
+      // Remove absolute path indicators
+      .replace(/^[a-zA-Z]:/, '')
+      .replace(/^\/+/, '')
+      // Remove null bytes
+      .replace(/\0/g, '')
+      // Collapse multiple slashes
+      .replace(/\/+/g, '/')
+      // Remove leading/trailing slashes
+      .replace(/^\/+|\/+$/g, '')
+  );
 }
 
 /**
@@ -133,15 +137,17 @@ export function sanitizeTemplateValue(value: string): string {
     return '';
   }
 
-  return value
-    // Remove control characters
-    .replace(/[\x00-\x1F\x7F]/g, '')
-    // Escape HTML entities for safety in generated files
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;');
+  return (
+    value
+      // Remove control characters
+      .replace(/[\x00-\x1F\x7F]/g, '') // eslint-disable-line no-control-regex
+      // Escape HTML entities for safety in generated files
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;')
+  );
 }
 
 /**
@@ -152,15 +158,17 @@ export function sanitizeXmlValue(value: string): string {
     return '';
   }
 
-  return value
-    // Remove control characters except newline and tab
-    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
-    // Escape XML entities
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
+  return (
+    value
+      // Remove control characters except newline and tab
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '') // eslint-disable-line no-control-regex
+      // Escape XML entities
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+  );
 }
 
 /**
@@ -171,14 +179,15 @@ export function sanitizeJsonValue(value: string): string {
     return '';
   }
 
-  return value
-    // Remove control characters
-    .replace(/[\x00-\x1F\x7F]/g, '')
-    // Escape backslashes and quotes
-    .replace(/\\/g, '\\\\')
-    .replace(/"/g, '\\"');
+  return (
+    value
+      // Remove control characters
+      .replace(/[\x00-\x1F\x7F]/g, '') // eslint-disable-line no-control-regex
+      // Escape backslashes and quotes
+      .replace(/\\/g, '\\\\')
+      .replace(/"/g, '\\"')
+  );
 }
-
 
 /**
  * Sanitize filename for use in HTTP Content-Disposition header
@@ -190,20 +199,21 @@ export function sanitizeFilename(filename: string): string {
     return 'download';
   }
 
-  return filename
-    // Remove path traversal attempts
-    .replace(/\.\./g, '')
-    // Remove path separators
-    .replace(/[\/\\]/g, '')
-    // Remove characters that could cause header injection
-    .replace(/[\r\n\t]/g, '')
-    // Remove quotes and semicolons (header delimiters)
-    .replace(/[";]/g, '')
-    // Remove other potentially dangerous characters
-    .replace(/[<>:|?*]/g, '')
-    // Limit length
-    .substring(0, 200)
-    || 'download';
+  return (
+    filename
+      // Remove path traversal attempts
+      .replace(/\.\./g, '')
+      // Remove path separators
+      .replace(/[/\\]/g, '')
+      // Remove characters that could cause header injection
+      .replace(/[\r\n\t]/g, '')
+      // Remove quotes and semicolons (header delimiters)
+      .replace(/[";]/g, '')
+      // Remove other potentially dangerous characters
+      .replace(/[<>:|?*]/g, '')
+      // Limit length
+      .substring(0, 200) || 'download'
+  );
 }
 
 /**

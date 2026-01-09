@@ -7,11 +7,11 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       type: 'list',
       name: 'testingType',
       message: 'What type of testing do you want to set up?',
-      choices: metadata.testingTypes.map(t => ({
+      choices: metadata.testingTypes.map((t) => ({
         name: t.charAt(0).toUpperCase() + t.slice(1) + ' Testing',
-        value: t
-      }))
-    }
+        value: t,
+      })),
+    },
   ]);
 
   const availableFrameworks = Object.entries(metadata.frameworks)
@@ -23,11 +23,11 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       type: 'list',
       name: 'framework',
       message: 'Select a testing framework:',
-      choices: availableFrameworks.map(f => ({
+      choices: availableFrameworks.map((f) => ({
         name: f.charAt(0).toUpperCase() + f.slice(1),
-        value: f
-      }))
-    }
+        value: f,
+      })),
+    },
   ]);
 
   const frameworkInfo = metadata.frameworks[framework];
@@ -36,11 +36,11 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       type: 'list',
       name: 'language',
       message: 'Select a programming language:',
-      choices: frameworkInfo.languages.map(l => ({
+      choices: frameworkInfo.languages.map((l) => ({
         name: l.charAt(0).toUpperCase() + l.slice(1),
-        value: l
-      }))
-    }
+        value: l,
+      })),
+    },
   ]);
 
   const testRunnerChoices = metadata.testRunners[language] || [];
@@ -52,15 +52,15 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       name: 'testRunner',
       message: 'Select a test runner:',
       choices: testRunnerChoices,
-      when: testRunnerChoices.length > 1
+      when: testRunnerChoices.length > 1,
     },
     {
       type: 'list',
       name: 'buildTool',
       message: 'Select a build tool:',
       choices: buildToolChoices,
-      when: buildToolChoices.length > 1
-    }
+      when: buildToolChoices.length > 1,
+    },
   ]);
 
   const { testingPattern } = await inquirer.prompt([
@@ -68,11 +68,14 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       type: 'list',
       name: 'testingPattern',
       message: 'Select a testing pattern:',
-      choices: metadata.testingPatterns.map(p => ({
-        name: p.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-        value: p
-      }))
-    }
+      choices: metadata.testingPatterns.map((p) => ({
+        name: p
+          .split('-')
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' '),
+        value: p,
+      })),
+    },
   ]);
 
   const { cicdTool } = await inquirer.prompt([
@@ -82,12 +85,15 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       message: 'Select a CI/CD platform (optional):',
       choices: [
         { name: 'None', value: '' },
-        ...metadata.cicdTools.map(c => ({
-          name: c.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-          value: c
-        }))
-      ]
-    }
+        ...metadata.cicdTools.map((c) => ({
+          name: c
+            .split('-')
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' '),
+          value: c,
+        })),
+      ],
+    },
   ]);
 
   const { reportingTool } = await inquirer.prompt([
@@ -97,12 +103,15 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       message: 'Select a reporting tool (optional):',
       choices: [
         { name: 'None', value: '' },
-        ...metadata.reportingTools.map(r => ({
-          name: r.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-          value: r
-        }))
-      ]
-    }
+        ...metadata.reportingTools.map((r) => ({
+          name: r
+            .split('-')
+            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+            .join(' '),
+          value: r,
+        })),
+      ],
+    },
   ]);
 
   const { utilities } = await inquirer.prompt([
@@ -112,15 +121,15 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       message: 'Select utilities to include:',
       choices: metadata.utilities
         // Filter: No Screenshot Utility for API
-        .filter(u => !(testingType === 'api' && u === 'screenshotUtility'))
+        .filter((u) => !(testingType === 'api' && u === 'screenshotUtility'))
         // Filter: No Selenium Grid (Docker Compose) for non-Web
-        .filter(u => !(testingType !== 'web' && u === 'includeDockerCompose'))
-        .map(u => ({
+        .filter((u) => !(testingType !== 'web' && u === 'includeDockerCompose'))
+        .map((u) => ({
           name: u.split(/(?=[A-Z])/).join(' '),
           value: u,
-          checked: !u.startsWith('include') // Default true for utils, false for docker
-        }))
-    }
+          checked: !u.startsWith('include'), // Default true for utils, false for docker
+        })),
+    },
   ]);
 
   const { includeSampleTests } = await inquirer.prompt([
@@ -128,8 +137,8 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
       type: 'confirm',
       name: 'includeSampleTests',
       message: 'Include sample tests?',
-      default: true
-    }
+      default: true,
+    },
   ]);
 
   const { projectName } = await inquirer.prompt([
@@ -144,8 +153,8 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
           return 'Project name can only contain letters, numbers, hyphens, and underscores';
         }
         return true;
-      }
-    }
+      },
+    },
   ]);
 
   return {
@@ -159,6 +168,6 @@ export async function promptForOptions(metadata: MetadataResponse): Promise<Gene
     cicdTool: cicdTool || undefined,
     reportingTool: reportingTool || undefined,
     utilities,
-    includeSampleTests
+    includeSampleTests,
   };
 }

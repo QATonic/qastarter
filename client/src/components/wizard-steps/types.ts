@@ -2,6 +2,8 @@
  * Type definitions for the QAStarter Wizard
  */
 
+import React from 'react';
+
 export interface WizardConfig {
   testingType: string;
   framework: string;
@@ -34,32 +36,32 @@ export interface WizardStepProps {
 }
 
 export const WIZARD_STEPS = [
-  "Testing Type",
-  "Framework",
-  "Language",
-  "Testing Pattern",
-  "Test Runner",
-  "Build Tool",
-  "Project Metadata",
-  "CI/CD",
-  "Reporting",
-  "Utilities",
-  "Dependencies",
-  "Summary"
+  'Testing Type',
+  'Framework',
+  'Language',
+  'Testing Pattern',
+  'Test Runner',
+  'Build Tool',
+  'Project Metadata',
+  'CI/CD',
+  'Reporting',
+  'Utilities',
+  'Dependencies',
+  'Summary',
 ] as const;
 
 export const DEFAULT_CONFIG: WizardConfig = {
-  testingType: "",
-  framework: "",
-  language: "",
-  testingPattern: "",
-  testRunner: "",
-  buildTool: "",
-  projectName: "",
-  groupId: "",
-  artifactId: "",
-  cicdTool: "",
-  reportingTool: "",
+  testingType: '',
+  framework: '',
+  language: '',
+  testingPattern: '',
+  testRunner: '',
+  buildTool: '',
+  projectName: '',
+  groupId: '',
+  artifactId: '',
+  cicdTool: '',
+  reportingTool: '',
   utilities: {
     configReader: true,
     jsonReader: false,

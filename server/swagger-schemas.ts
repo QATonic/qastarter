@@ -41,7 +41,7 @@
  *         reportingTool:
  *           type: string
  *           description: Optional reporting tool
- *     
+ *
  *     ValidationMatrix:
  *       type: object
  *       properties:
@@ -53,7 +53,7 @@
  *           type: object
  *         languages:
  *           type: object
- *     
+ *
  *     ApiResponse:
  *       type: object
  *       properties:
@@ -68,7 +68,7 @@
  *               type: string
  *             message:
  *               type: string
- *     
+ *
  *     HealthResponse:
  *       type: object
  *       properties:
@@ -84,4 +84,4 @@
  *           type: number
  */
 
-export { };
+export {};

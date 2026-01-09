@@ -3,7 +3,7 @@ import {
   validationMatrix,
   WizardValidator,
   validationLabels,
-  ValidationMatrix
+  ValidationMatrix,
 } from './validationMatrix';
 
 describe('ValidationMatrix', () => {
@@ -16,14 +16,14 @@ describe('ValidationMatrix', () => {
     });
 
     it('should have frameworks for each testing type', () => {
-      validationMatrix.testingTypes.forEach(type => {
+      validationMatrix.testingTypes.forEach((type) => {
         expect(validationMatrix.frameworks[type]).toBeDefined();
         expect(validationMatrix.frameworks[type].length).toBeGreaterThan(0);
       });
     });
 
     it('should have languages for each framework', () => {
-      Object.keys(validationMatrix.languages).forEach(framework => {
+      Object.keys(validationMatrix.languages).forEach((framework) => {
         expect(validationMatrix.languages[framework].length).toBeGreaterThan(0);
       });
     });
@@ -63,7 +63,6 @@ describe('ValidationMatrix', () => {
       expect(cypressLanguages).not.toContain('java');
     });
   });
-
 
   describe('Mobile Frameworks', () => {
     it('should have correct mobile frameworks', () => {
@@ -197,7 +196,6 @@ describe('WizardValidator', () => {
     });
   });
 
-
   describe('getAvailableTestRunnersForFramework', () => {
     it('should return TestNG and JUnit5 for Selenium + Java', () => {
       const runners = WizardValidator.getAvailableTestRunnersForFramework('selenium', 'java');
@@ -216,7 +214,10 @@ describe('WizardValidator', () => {
     });
 
     it('should return mocha for WebdriverIO + JavaScript', () => {
-      const runners = WizardValidator.getAvailableTestRunnersForFramework('webdriverio', 'javascript');
+      const runners = WizardValidator.getAvailableTestRunnersForFramework(
+        'webdriverio',
+        'javascript'
+      );
       expect(runners).toContain('mocha');
     });
 
@@ -317,7 +318,6 @@ describe('WizardValidator', () => {
     });
   });
 
-
   describe('getAvailableTestingPatterns', () => {
     it('should return POM and BDD for Selenium', () => {
       const patterns = WizardValidator.getAvailableTestingPatterns('selenium');
@@ -346,13 +346,19 @@ describe('WizardValidator', () => {
     });
 
     it('should return fluent and BDD for RestAssured + Java', () => {
-      const patterns = WizardValidator.getAvailableTestingPatternsForFramework('restassured', 'java');
+      const patterns = WizardValidator.getAvailableTestingPatternsForFramework(
+        'restassured',
+        'java'
+      );
       expect(patterns).toContain('fluent');
       expect(patterns).toContain('bdd');
     });
 
     it('should return functional-patterns and BDD for PyAutoGUI + Python', () => {
-      const patterns = WizardValidator.getAvailableTestingPatternsForFramework('pyautogui', 'python');
+      const patterns = WizardValidator.getAvailableTestingPatternsForFramework(
+        'pyautogui',
+        'python'
+      );
       expect(patterns).toContain('functional-patterns');
       expect(patterns).toContain('bdd');
     });
@@ -387,40 +393,67 @@ describe('WizardValidator', () => {
 
   describe('hasMatchingTemplate', () => {
     it('should return true for valid complete configuration', () => {
-      expect(WizardValidator.hasMatchingTemplate('web', 'selenium', 'java', 'testng', 'maven')).toBe(true);
-      expect(WizardValidator.hasMatchingTemplate('web', 'playwright', 'python', 'pytest', 'pip')).toBe(true);
-      expect(WizardValidator.hasMatchingTemplate('web', 'cypress', 'javascript', 'cypress', 'npm')).toBe(true);
+      expect(
+        WizardValidator.hasMatchingTemplate('web', 'selenium', 'java', 'testng', 'maven')
+      ).toBe(true);
+      expect(
+        WizardValidator.hasMatchingTemplate('web', 'playwright', 'python', 'pytest', 'pip')
+      ).toBe(true);
+      expect(
+        WizardValidator.hasMatchingTemplate('web', 'cypress', 'javascript', 'cypress', 'npm')
+      ).toBe(true);
     });
 
     it('should return false for invalid test runner', () => {
-      expect(WizardValidator.hasMatchingTemplate('web', 'selenium', 'java', 'pytest', 'maven')).toBe(false);
-      expect(WizardValidator.hasMatchingTemplate('web', 'cypress', 'javascript', 'testng', 'npm')).toBe(false);
+      expect(
+        WizardValidator.hasMatchingTemplate('web', 'selenium', 'java', 'pytest', 'maven')
+      ).toBe(false);
+      expect(
+        WizardValidator.hasMatchingTemplate('web', 'cypress', 'javascript', 'testng', 'npm')
+      ).toBe(false);
     });
 
     it('should return false for invalid build tool', () => {
-      expect(WizardValidator.hasMatchingTemplate('web', 'selenium', 'java', 'testng', 'npm')).toBe(false);
-      expect(WizardValidator.hasMatchingTemplate('web', 'cypress', 'javascript', 'cypress', 'maven')).toBe(false);
+      expect(WizardValidator.hasMatchingTemplate('web', 'selenium', 'java', 'testng', 'npm')).toBe(
+        false
+      );
+      expect(
+        WizardValidator.hasMatchingTemplate('web', 'cypress', 'javascript', 'cypress', 'maven')
+      ).toBe(false);
     });
 
     it('should return false for incompatible framework + language', () => {
-      expect(WizardValidator.hasMatchingTemplate('web', 'cypress', 'java', 'testng', 'maven')).toBe(false);
+      expect(WizardValidator.hasMatchingTemplate('web', 'cypress', 'java', 'testng', 'maven')).toBe(
+        false
+      );
     });
   });
 
   describe('getTemplatePackName', () => {
     it('should generate correct template pack name', () => {
-      const name = WizardValidator.getTemplatePackName('web', 'selenium', 'java', 'testng', 'maven');
+      const name = WizardValidator.getTemplatePackName(
+        'web',
+        'selenium',
+        'java',
+        'testng',
+        'maven'
+      );
       // Format: testingType-language-framework-testRunner-buildTool
       expect(name).toBe('web-java-selenium-testng-maven');
     });
 
     it('should generate correct template pack name for Playwright', () => {
-      const name = WizardValidator.getTemplatePackName('web', 'playwright', 'typescript', 'jest', 'npm');
+      const name = WizardValidator.getTemplatePackName(
+        'web',
+        'playwright',
+        'typescript',
+        'jest',
+        'npm'
+      );
       // Format: testingType-language-framework-testRunner-buildTool
       expect(name).toBe('web-typescript-playwright-jest-npm');
     });
   });
-
 
   describe('getFilteredOptions', () => {
     it('should return frameworks for framework step', () => {
@@ -443,7 +476,7 @@ describe('WizardValidator', () => {
     it('should return test runners for testRunner step', () => {
       const options = WizardValidator.getFilteredOptions('testRunner', {
         framework: 'selenium',
-        language: 'java'
+        language: 'java',
       });
       expect(options).toContain('testng');
       expect(options).toContain('junit5');
@@ -452,7 +485,7 @@ describe('WizardValidator', () => {
     it('should return build tools for buildTool step', () => {
       const options = WizardValidator.getFilteredOptions('buildTool', {
         framework: 'selenium',
-        language: 'java'
+        language: 'java',
       });
       expect(options).toContain('maven');
       expect(options).toContain('gradle');
@@ -467,7 +500,7 @@ describe('WizardValidator', () => {
     it('should return reporting tools for reportingTool step', () => {
       const options = WizardValidator.getFilteredOptions('reportingTool', {
         framework: 'selenium',
-        language: 'java'
+        language: 'java',
       });
       expect(options).toContain('allure');
       expect(options).toContain('extent-reports');
@@ -476,7 +509,7 @@ describe('WizardValidator', () => {
     it('should return testing patterns for testingPattern step', () => {
       const options = WizardValidator.getFilteredOptions('testingPattern', {
         framework: 'selenium',
-        language: 'java'
+        language: 'java',
       });
       expect(options).toContain('page-object-model');
       expect(options).toContain('bdd');
@@ -495,7 +528,7 @@ describe('WizardValidator', () => {
         framework: 'selenium', // Invalid for API
         language: 'java',
         testRunner: 'testng',
-        buildTool: 'maven'
+        buildTool: 'maven',
       };
       const result = WizardValidator.resetInvalidSelections(config);
       expect(result.framework).toBe('');
@@ -510,7 +543,7 @@ describe('WizardValidator', () => {
         framework: 'cypress',
         language: 'java', // Invalid for Cypress
         testRunner: 'testng',
-        buildTool: 'maven'
+        buildTool: 'maven',
       };
       const result = WizardValidator.resetInvalidSelections(config);
       expect(result.language).toBe('');
@@ -524,7 +557,7 @@ describe('WizardValidator', () => {
         framework: 'selenium',
         language: 'python',
         testRunner: 'testng', // Invalid for Python
-        buildTool: 'pip'
+        buildTool: 'pip',
       };
       const result = WizardValidator.resetInvalidSelections(config);
       expect(result.testRunner).toBe('');
@@ -536,7 +569,7 @@ describe('WizardValidator', () => {
         framework: 'selenium',
         language: 'python',
         testRunner: 'pytest',
-        buildTool: 'maven' // Invalid for Python
+        buildTool: 'maven', // Invalid for Python
       };
       const result = WizardValidator.resetInvalidSelections(config);
       expect(result.buildTool).toBe('');
@@ -551,7 +584,7 @@ describe('WizardValidator', () => {
         buildTool: 'maven',
         cicdTool: 'jenkins',
         reportingTool: 'allure',
-        testingPattern: 'page-object-model'
+        testingPattern: 'page-object-model',
       };
       const result = WizardValidator.resetInvalidSelections(config);
       expect(result).toEqual(config);
@@ -562,7 +595,7 @@ describe('WizardValidator', () => {
         testingType: 'web',
         framework: 'selenium',
         language: 'java',
-        reportingTool: 'pytest-html' // Invalid for Java
+        reportingTool: 'pytest-html', // Invalid for Java
       };
       const result = WizardValidator.resetInvalidSelections(config);
       expect(result.reportingTool).toBe('');
@@ -573,14 +606,13 @@ describe('WizardValidator', () => {
         testingType: 'api',
         framework: 'restassured',
         language: 'java',
-        testingPattern: 'page-object-model' // Invalid for RestAssured
+        testingPattern: 'page-object-model', // Invalid for RestAssured
       };
       const result = WizardValidator.resetInvalidSelections(config);
       expect(result.testingPattern).toBe('');
     });
   });
 });
-
 
 describe('validationLabels', () => {
   describe('Testing Types Labels', () => {
@@ -731,7 +763,9 @@ describe('Framework + Language Precise Mappings', () => {
       const key = 'pyautogui-python';
       expect(validationMatrix.frameworkLanguageTestRunners[key]).toContain('pytest');
       expect(validationMatrix.frameworkLanguageBuildTools[key]).toContain('pip');
-      expect(validationMatrix.frameworkLanguageTestingPatterns[key]).toContain('functional-patterns');
+      expect(validationMatrix.frameworkLanguageTestingPatterns[key]).toContain(
+        'functional-patterns'
+      );
     });
   });
 

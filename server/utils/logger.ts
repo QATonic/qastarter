@@ -14,9 +14,7 @@ import { getCorrelationContext } from '../middleware/correlationMiddleware';
 // Determine logs directory - handle Docker/Production environment explicitly
 // In Docker (Linux), we want to use /app/logs to match the Dockerfile & permissions
 // In Development (Windows/Mac), we use the local logs directory
-const isProduction = process.env.NODE_ENV === 'production';
-const logsDir =
-  isProduction && process.platform === 'linux' ? '/app/logs' : path.join(process.cwd(), 'logs');
+const logsDir = process.env.LOGS_DIR || path.join(process.cwd(), 'logs');
 
 console.log(`Checking logger configuration... Logs directory: ${logsDir}`);
 

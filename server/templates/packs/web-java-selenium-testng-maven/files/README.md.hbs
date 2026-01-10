@@ -1,6 +1,7 @@
 # {{projectName}}
 
-A production-ready UI automation framework built with Java, Selenium WebDriver, TestNG, and Maven following industry best practices.
+A production-ready UI automation framework built with Java, Selenium WebDriver, TestNG, and Maven following industry
+best practices.
 
 ## Framework Features
 
@@ -62,52 +63,52 @@ A production-ready UI automation framework built with Java, Selenium WebDriver, 
 
 ```
 {{artifactId}}/
-├── pom.xml                             # Maven build configuration
-├── Jenkinsfile                         # Jenkins CI/CD pipeline
-├── README.md                           # This file
-├── .gitignore                          # Git ignore rules
+├── pom.xml # Maven build configuration
+├── Jenkinsfile # Jenkins CI/CD pipeline
+├── README.md # This file
+├── .gitignore # Git ignore rules
 ├── src/
-│   ├── main/
-│   │   ├── java/{{packagePath}}/
-│   │   │   ├── config/                 # Configuration management
-│   │   │   │   ├── ConfigurationReader.java
-│   │   │   │   └── Environment.java
-│   │   │   ├── core/                   # Core framework components
-│   │   │   │   ├── DriverManager.java
-│   │   │   │   ├── BrowserFactory.java
-│   │   │   │   └── BaseTest.java
-│   │   │   ├── pages/                  # Page Object classes
-│   │   │   │   ├── BasePage.java
-│   │   │   │   ├── LoginPage.java
-│   │   │   │   └── HomePage.java
-│   │   │   ├── utils/                  # Utility classes
-│   │   │   │   ├── WaitUtils.java
-│   │   │   │   ├── WebActions.java
-│   │   │   │   ├── ScreenshotUtils.java
-│   │   │   │   ├── TestDataReader.java
-│   │   │   │   ├── ExtentManager.java
-│   │   │   │   └── Log.java
-│   │   │   └── listeners/              # TestNG listeners
-│   │   │       ├── TestListener.java
-│   │   │       └── RetryAnalyzer.java
-│   │   └── resources/
-│   │       ├── config/                 # Environment configurations
-│   │       │   ├── dev.properties
-│   │       │   ├── qa.properties
-│   │       │   └── prod.properties
-│   │       ├── log4j2.xml             # Logging configuration
-│   │       └── extent-config.xml      # ExtentReports configuration
-│   └── test/
-│       ├── java/{{packagePath}}/tests/
-│       │   ├── LoginTests.java        # Login functionality tests
-│       │   └── SmokeSuite.java        # Critical path tests
-│       └── resources/
-│           ├── testng.xml             # TestNG suite configuration
-│           └── testdata/              # Test data files
-│               ├── users.csv
-│               └── sample.json
-├── reports/                           # Generated test reports
-└── logs/                              # Application logs
+│ ├── main/
+│ │ ├── java/{{packagePath}}/
+│ │ │ ├── config/ # Configuration management
+│ │ │ │ ├── ConfigurationReader.java
+│ │ │ │ └── Environment.java
+│ │ │ ├── core/ # Core framework components
+│ │ │ │ ├── DriverManager.java
+│ │ │ │ ├── BrowserFactory.java
+│ │ │ │ └── BaseTest.java
+│ │ │ ├── pages/ # Page Object classes
+│ │ │ │ ├── BasePage.java
+│ │ │ │ ├── LoginPage.java
+│ │ │ │ └── HomePage.java
+│ │ │ ├── utils/ # Utility classes
+│ │ │ │ ├── WaitUtils.java
+│ │ │ │ ├── WebActions.java
+│ │ │ │ ├── ScreenshotUtils.java
+│ │ │ │ ├── TestDataReader.java
+│ │ │ │ ├── ExtentManager.java
+│ │ │ │ └── Log.java
+│ │ │ └── listeners/ # TestNG listeners
+│ │ │ ├── TestListener.java
+│ │ │ └── RetryAnalyzer.java
+│ │ └── resources/
+│ │ ├── config/ # Environment configurations
+│ │ │ ├── dev.properties
+│ │ │ ├── qa.properties
+│ │ │ └── prod.properties
+│ │ ├── log4j2.xml # Logging configuration
+│ │ └── extent-config.xml # ExtentReports configuration
+│ └── test/
+│ ├── java/{{packagePath}}/tests/
+│ │ ├── LoginTests.java # Login functionality tests
+│ │ └── LoginTests.java # Login functionality tests
+│ └── resources/
+│ ├── testng.xml # TestNG suite configuration
+│ └── testdata/ # Test data files
+│ ├── users.csv
+│ └── sample.json
+├── reports/ # Generated test reports
+└── logs/ # Application logs
 ```
 
 ## Quick Start
@@ -121,28 +122,28 @@ A production-ready UI automation framework built with Java, Selenium WebDriver, 
 ### Setup
 
 1. **Clone/Download the project**
-   ```bash
-   cd {{artifactId}}
-   ```
+```bash
+cd {{artifactId}}
+```
 
 2. **Install dependencies**
-   ```bash
-   mvn clean compile
-   ```
+```bash
+mvn clean compile
+```
 
 3. **Update configuration**
-   - Edit `src/main/resources/config/dev.properties`
-   - Update `base.url` to point to your application
-   - Modify other settings as needed
+- Edit `src/main/resources/config/dev.properties`
+- Update `base.url` to point to your application
+- Modify other settings as needed
 
 4. **Run tests**
-   ```bash
-   # Run smoke tests
-   mvn clean test -Denv=dev -Dsuite=smoke
+```bash
+# Run regression tests
+mvn clean test -Denv=qa -Dsuite=regression
 
-   # Run all tests
-   mvn clean test
-   ```
+# Run UI tests
+mvn clean test -Pqa -Dsuite=uition
+```
 
 ## Running Tests
 
@@ -175,7 +176,7 @@ mvn clean test -Pdev
 mvn clean test -Pqa -Dbrowser=chrome -Dheadless=true
 
 # Production environment (with extra precautions)
-mvn clean test -Pprod -Dsuite=smoke
+mvn clean test -Pprod -Dsuite=regression
 ```
 
 ### Parallel Execution
@@ -191,7 +192,6 @@ mvn clean test -Pqa -Dparallel=classes -DthreadCount=2
 ### Test Suite Options
 
 Available test suites in `testng.xml`:
-- **smoke**: Critical path tests
 - **regression**: Comprehensive functional tests
 - **ui**: User interface focused tests
 - **data-driven**: Data-driven test scenarios
@@ -205,7 +205,7 @@ Available test suites in `testng.xml`:
 Environment-specific settings are managed in properties files:
 
 - `config/dev.properties` - Development environment
-- `config/qa.properties` - QA/Testing environment  
+- `config/qa.properties` - QA/Testing environment
 - `config/prod.properties` - Production environment
 
 Key configuration options:
@@ -257,7 +257,7 @@ Usage in tests:
 ```java
 @DataProvider(name = "loginData")
 public Object[][] getLoginTestData() {
-    return TestDataReader.getCSVDataAsArray("testdata/users.csv");
+return TestDataReader.getCSVDataAsArray("testdata/users.csv");
 }
 
 @Test(dataProvider = "loginData")
@@ -265,210 +265,210 @@ public void testLogin(Map<String, String> testData) {
     String username = testData.get("username");
     String password = testData.get("password");
     // ... test implementation
-}
-```
-
-### JSON Test Data
-
-```json
-{
-  "testUsers": [
-    {
-      "username": "admin",
-      "password": "password123",
-      "role": "administrator"
     }
-  ]
-}
-```
+    ```
 
-Usage:
-```java
-JsonNode testData = TestDataReader.readJSON("testdata/sample.json");
-```
+    ### JSON Test Data
 
-## Reporting
+    ```json
+    {
+    "testUsers": [
+    {
+    "username": "admin",
+    "password": "password123",
+    "role": "administrator"
+    }
+    ]
+    }
+    ```
 
-### ExtentReports
+    Usage:
+    ```java
+    JsonNode testData = TestDataReader.readJSON("testdata/sample.json");
+    ```
 
-HTML reports are generated in the `reports/` directory:
-- Rich HTML reports with screenshots
-- Test execution timeline
-- System information and environment details
-- Failed test screenshots automatically attached
+    ## Reporting
 
-### Jenkins Integration
+    ### ExtentReports
 
-The included `Jenkinsfile` provides:
-- Parameterized builds (browser, environment, suite)
-- Parallel execution support
-- Artifact archiving (reports, screenshots, logs)
-- HTML report publishing
-- JUnit test result publishing
+    HTML reports are generated in the `reports/` directory:
+    - Rich HTML reports with screenshots
+    - Test execution timeline
+    - System information and environment details
+    - Failed test screenshots automatically attached
 
-### Viewing Reports
+    ### Jenkins Integration
 
-After test execution:
-1. Open `reports/ExtentReport_[timestamp].html` in a browser
-2. Review test results, screenshots, and execution details
-3. Check `logs/` directory for detailed logging information
+    The included `Jenkinsfile` provides:
+    - Parameterized builds (browser, environment, suite)
+    - Parallel execution support
+    - Artifact archiving (reports, screenshots, logs)
+    - HTML report publishing
+    - JUnit test result publishing
 
-## Adding New Tests
+    ### Viewing Reports
 
-### 1. Create Page Objects
+    After test execution:
+    1. Open `reports/ExtentReport_[timestamp].html` in a browser
+    2. Review test results, screenshots, and execution details
+    3. Check `logs/` directory for detailed logging information
 
-```java
-public class YourPage extends BasePage {
-    
+    ## Adding New Tests
+
+    ### 1. Create Page Objects
+
+    ```java
+    public class YourPage extends BasePage {
+
     private final By elementLocator = By.id("your-element");
-    
+
     @Override
     public boolean isLoaded() {
-        return isElementDisplayed(elementLocator);
+    return isElementDisplayed(elementLocator);
     }
-    
+
     public YourPage performAction() {
-        logPageAction("Performing action");
-        clickElement(elementLocator);
-        return this;
+    logPageAction("Performing action");
+    clickElement(elementLocator);
+    return this;
     }
-}
-```
+    }
+    ```
 
-### 2. Create Test Classes
+    ### 2. Create Test Classes
 
-```java
-public class YourTests extends BaseTest {
-    
+    ```java
+    public class YourTests extends BaseTest {
+
     @Test(groups = {"smoke"})
     public void testYourFunctionality() {
-        YourPage page = new YourPage();
-        Assert.assertTrue(page.isLoaded());
-        
-        // Test implementation
-        page.performAction();
-        
-        // Assertions
-        Assert.assertTrue(page.isActionSuccessful());
+    YourPage page = new YourPage();
+    Assert.assertTrue(page.isLoaded());
+
+    // Test implementation
+    page.performAction();
+
+    // Assertions
+    Assert.assertTrue(page.isActionSuccessful());
     }
-}
-```
+    }
+    ```
 
-### 3. Update TestNG Configuration
+    ### 3. Update TestNG Configuration
 
-Add your test class to `testng.xml`:
+    Add your test class to `testng.xml`:
 
-```xml
-<classes>
-    <class name="{{javaPackage}}.tests.YourTests"/>
-</classes>
-```
+    ```xml
+    <classes>
+        <class name="{{javaPackage}}.tests.YourTests" />
+    </classes>
+    ```
 
-## Best Practices
+    ## Best Practices
 
-### Page Objects
-- Keep page objects focused on actions, not assertions
-- Use method chaining where appropriate
-- Include isLoaded() verification for each page
-- Use descriptive method and variable names
+    ### Page Objects
+    - Keep page objects focused on actions, not assertions
+    - Use method chaining where appropriate
+    - Include isLoaded() verification for each page
+    - Use descriptive method and variable names
 
-### Test Classes
-- Extend BaseTest for setup/teardown
-- Use TestNG groups for test organization
-- Include meaningful test descriptions
-- Use data providers for data-driven tests
+    ### Test Classes
+    - Extend BaseTest for setup/teardown
+    - Use TestNG groups for test organization
+    - Include meaningful test descriptions
+    - Use data providers for data-driven tests
 
-### Logging
-- Log important test steps and actions
-- Use appropriate log levels (INFO, DEBUG, ERROR)
-- Include context in error messages
-- Use Log.step() for major test actions
+    ### Logging
+    - Log important test steps and actions
+    - Use appropriate log levels (INFO, DEBUG, ERROR)
+    - Include context in error messages
+    - Use Log.step() for major test actions
 
-### Screenshots
-- Screenshots are automatically captured on failures
-- Use ScreenshotUtils for manual screenshots
-- Screenshots are linked in ExtentReports
+    ### Screenshots
+    - Screenshots are automatically captured on failures
+    - Use ScreenshotUtils for manual screenshots
+    - Screenshots are linked in ExtentReports
 
-## Troubleshooting
+    ## Troubleshooting
 
-### Common Issues
+    ### Common Issues
 
-**Tests failing with WebDriver errors:**
-- Ensure Chrome/Firefox is installed
-- Selenium 4+ includes Selenium Manager which auto-downloads drivers
-- Verify firewall/antivirus isn't blocking driver downloads
+    **Tests failing with WebDriver errors:**
+    - Ensure Chrome/Firefox is installed
+    - Selenium 4+ includes Selenium Manager which auto-downloads drivers
+    - Verify firewall/antivirus isn't blocking driver downloads
 
-**Tests failing with timeouts:**
-- Increase timeout values in configuration
-- Check application responsiveness
-- Verify network connectivity to test environment
+    **Tests failing with timeouts:**
+    - Increase timeout values in configuration
+    - Check application responsiveness
+    - Verify network connectivity to test environment
 
-**Reports not generating:**
-- Check file permissions in reports/ directory
-- Verify ExtentReports configuration
-- Check for IOException in logs
+    **Reports not generating:**
+    - Check file permissions in reports/ directory
+    - Verify ExtentReports configuration
+    - Check for IOException in logs
 
-**Parallel execution issues:**
-- Ensure tests are thread-safe
-- Check ThreadLocal usage in DriverManager
-- Verify test data isolation
+    **Parallel execution issues:**
+    - Ensure tests are thread-safe
+    - Check ThreadLocal usage in DriverManager
+    - Verify test data isolation
 
-### Debug Mode
+    ### Debug Mode
 
-Enable debug logging:
-```bash
-mvn clean test -Dlog.level=DEBUG
-```
+    Enable debug logging:
+    ```bash
+    mvn clean test -Dlog.level=DEBUG
+    ```
 
-### Logs Location
+    ### Logs Location
 
-- Application logs: `logs/automation.log`
-- Error logs: `logs/errors.log`
-- Test execution logs: `logs/test-execution.log`
+    - Application logs: `logs/automation.log`
+    - Error logs: `logs/errors.log`
+    - Test execution logs: `logs/test-execution.log`
 
-## Jenkins Pipeline
+    ## Jenkins Pipeline
 
-The included Jenkinsfile supports:
+    The included Jenkinsfile supports:
 
-```groovy
-// Example Jenkins build
-pipeline {
+    ```groovy
+    // Example Jenkins build
+    pipeline {
     parameters {
-        choice(name: 'BROWSER', choices: ['chrome', 'firefox'])
-        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'stg'])
-        booleanParam(name: 'HEADLESS', defaultValue: true)
+    choice(name: 'BROWSER', choices: ['chrome', 'firefox'])
+    choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'stg'])
+    booleanParam(name: 'HEADLESS', defaultValue: true)
     }
-}
-```
+    }
+    ```
 
-Build with parameters:
-- Browser selection (Chrome, Firefox, Edge)
-- Environment selection (dev, qa, staging, prod)
-- Headless execution toggle
-- Test suite selection
+    Build with parameters:
+    - Browser selection (Chrome, Firefox, Edge)
+    - Environment selection (dev, qa, staging, prod)
+    - Headless execution toggle
+    - Test suite selection
 
-## Contributing
+    ## Contributing
 
-When adding new functionality:
+    When adding new functionality:
 
-1. Follow existing code patterns and naming conventions
-2. Add appropriate logging and error handling
-3. Include unit tests where applicable
-4. Update documentation for new features
-5. Ensure thread safety for parallel execution
+    1. Follow existing code patterns and naming conventions
+    2. Add appropriate logging and error handling
+    3. Include unit tests where applicable
+    4. Update documentation for new features
+    5. Ensure thread safety for parallel execution
 
-## Support
+    ## Support
 
-For issues and questions:
+    For issues and questions:
 
-1. Check the logs in `logs/` directory
-2. Review ExtentReports for detailed test execution information
-3. Verify configuration settings in properties files
-4. Check WebDriver and browser compatibility
+    1. Check the logs in `logs/` directory
+    2. Review ExtentReports for detailed test execution information
+    3. Verify configuration settings in properties files
+    4. Check WebDriver and browser compatibility
 
----
+    ---
 
-**Framework Version:** 1.0.0  
-**Last Updated:** {{timestamp}}  
-**Java Version:** 11+  
-**Maven Version:** 3.9.0+
+    **Framework Version:** 1.0.0
+    **Last Updated:** {{timestamp}}
+    **Java Version:** 11+
+    **Maven Version:** 3.9.0+

@@ -14,7 +14,7 @@ pipeline {
         )
         choice(
             name: 'SUITE',
-            choices: ['testng.xml', 'smoke.xml', 'regression.xml'],
+            choices: ['testng.xml', 'regression.xml'],
             description: 'Test suite to execute'
         )
         booleanParam(

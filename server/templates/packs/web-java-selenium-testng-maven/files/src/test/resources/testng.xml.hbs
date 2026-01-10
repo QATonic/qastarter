@@ -2,155 +2,130 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="{{projectName}} Test Suite" verbose="1" parallel="methods" thread-count="3">
-    
+
     <!-- Global Test Parameters -->
-    <parameter name="browser" value="chrome"/>
-    <parameter name="headless" value="false"/>
-    <parameter name="environment" value="dev"/>
-    
+    <parameter name="browser" value="chrome" />
+    <parameter name="headless" value="false" />
+    <parameter name="environment" value="dev" />
+
     <!-- Listeners -->
     <listeners>
-        <listener class-name="{{javaPackage}}.listeners.TestListener"/>
+        <listener class-name="{{javaPackage}}.listeners.TestListener" />
         <!-- Add more listeners if needed -->
     </listeners>
-    
-    <!-- Smoke Test Suite -->
-    <test name="Smoke Tests" preserve-order="true">
-        <parameter name="test.suite" value="smoke"/>
-        
-        <groups>
-            <run>
-                <include name="smoke"/>
-                <include name="critical"/>
-            </run>
-        </groups>
-        
-        <classes>
-            <class name="{{javaPackage}}.tests.SmokeSuite">
-                <methods>
-                    <include name="testApplicationLoads"/>
-                    <include name="testUserCanLogin"/>
-                    <include name="testHomePageFunctionality"/>
-                    <include name="testUserCanLogout"/>
-                    <include name="testInvalidLoginBlocked"/>
-                </methods>
-            </class>
-        </classes>
-    </test>
-    
+
     <!-- Regression Test Suite -->
     <test name="Regression Tests" parallel="methods" thread-count="2">
-        <parameter name="test.suite" value="regression"/>
-        
+        <parameter name="test.suite" value="regression" />
+
         <groups>
             <run>
-                <include name="regression"/>
-                <include name="functional"/>
-                <exclude name="performance"/>
+                <include name="regression" />
+                <include name="functional" />
+                <exclude name="performance" />
             </run>
         </groups>
-        
+
         <classes>
             <class name="{{javaPackage}}.tests.LoginTests">
                 <methods>
-                    <include name="testValidLogin"/>
-                    <include name="testInvalidLogin"/>
-                    <include name="testEmptyCredentials"/>
-                    <include name="testRememberMeCheckbox"/>
-                    <include name="testFieldClearing"/>
-                    <include name="testLoginWithMultipleUsers"/>
-                    <include name="testLoginPageValidation"/>
-                    <include name="testLogoutFunctionality"/>
-                    <include name="testNegativeLoginScenarios"/>
+                    <include name="testValidLogin" />
+                    <include name="testInvalidLogin" />
+                    <include name="testEmptyCredentials" />
+                    <include name="testRememberMeCheckbox" />
+                    <include name="testFieldClearing" />
+                    <include name="testLoginWithMultipleUsers" />
+                    <include name="testLoginPageValidation" />
+                    <include name="testLogoutFunctionality" />
+                    <include name="testNegativeLoginScenarios" />
                 </methods>
             </class>
         </classes>
     </test>
-    
+
     <!-- UI Test Suite -->
     <test name="UI Tests" preserve-order="false">
-        <parameter name="test.suite" value="ui"/>
-        
+        <parameter name="test.suite" value="ui" />
+
         <groups>
             <run>
-                <include name="ui"/>
-                <include name="smoke"/>
+                <include name="ui" />
             </run>
         </groups>
-        
+
         <classes>
-            <class name="{{javaPackage}}.tests.SmokeSuite">
+            <class name="{{javaPackage}}.tests.LoginTests">
                 <methods>
-                    <include name="testCriticalUIElements"/>
-                    <include name="testBasicAccessibility"/>
+                    <include name="testCriticalUIElements" />
+                    <include name="testBasicAccessibility" />
                 </methods>
             </class>
         </classes>
     </test>
-    
+
     <!-- Data-Driven Test Suite -->
     <test name="Data-Driven Tests">
-        <parameter name="test.suite" value="data-driven"/>
-        
+        <parameter name="test.suite" value="data-driven" />
+
         <groups>
             <run>
-                <include name="data-driven"/>
+                <include name="data-driven" />
             </run>
         </groups>
-        
+
         <classes>
             <class name="{{javaPackage}}.tests.LoginTests">
                 <methods>
-                    <include name="testLoginWithMultipleUsers"/>
-                    <include name="testNegativeLoginScenarios"/>
+                    <include name="testLoginWithMultipleUsers" />
+                    <include name="testNegativeLoginScenarios" />
                 </methods>
             </class>
         </classes>
     </test>
-    
+
     <!-- Performance Test Suite -->
     <test name="Performance Tests" preserve-order="true">
-        <parameter name="test.suite" value="performance"/>
-        
+        <parameter name="test.suite" value="performance" />
+
         <groups>
             <run>
-                <include name="performance"/>
+                <include name="performance" />
             </run>
         </groups>
-        
+
         <classes>
-            <class name="{{javaPackage}}.tests.SmokeSuite">
+            <class name="{{javaPackage}}.tests.LoginTests">
                 <methods>
-                    <include name="testApplicationPerformance"/>
+                    <include name="testApplicationPerformance" />
                 </methods>
             </class>
         </classes>
     </test>
-    
+
     <!-- Security Test Suite -->
     <test name="Security Tests">
-        <parameter name="test.suite" value="security"/>
-        
+        <parameter name="test.suite" value="security" />
+
         <groups>
             <run>
-                <include name="security"/>
-                <include name="negative"/>
+                <include name="security" />
+                <include name="negative" />
             </run>
         </groups>
-        
+
         <classes>
-            <class name="{{javaPackage}}.tests.SmokeSuite">
+            <class name="{{javaPackage}}.tests.LoginTests">
                 <methods>
-                    <include name="testBasicSecurity"/>
+                    <include name="testBasicSecurity" />
                 </methods>
             </class>
             <class name="{{javaPackage}}.tests.LoginTests">
                 <methods>
-                    <include name="testInvalidLogin"/>
-                    <include name="testNegativeLoginScenarios"/>
+                    <include name="testInvalidLogin" />
+                    <include name="testNegativeLoginScenarios" />
                 </methods>
             </class>
         </classes>
     </test>
-    
+
 </suite>

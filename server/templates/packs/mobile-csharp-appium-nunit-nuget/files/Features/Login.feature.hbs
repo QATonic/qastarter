@@ -1,43 +1,43 @@
-@smoke @login
+@login
 Feature: User Login
-  As a user
-  I want to log in to the application
-  So that I can access my account
+As a user
+I want to log in to the application
+So that I can access my account
 
-  Background:
-    Given I navigate to the login page
+Background:
+Given I navigate to the login page
 
-  @positive
-  Scenario: Successful login with valid credentials
-    When I enter username "testuser@example.com"
-    And I enter password "Test@123"
-    And I click the login button
-    Then I should be redirected to the home page
-    And I should see a welcome message
+@positive
+Scenario: Successful login with valid credentials
+When I enter username "testuser@example.com"
+And I enter password "Test@123"
+And I click the login button
+Then I should be redirected to the home page
+And I should see a welcome message
 
-  @positive
-  Scenario Outline: Login with different valid users
-    When I enter username "<username>"
-    And I enter password "<password>"
+@positive
+Scenario Outline: Login with different valid users
+When I enter username "<username>"
+  And I enter password "<password>"
     And I click the login button
     Then I should be redirected to the home page
     And I should see welcome message "<message>"
 
-    Examples:
-      | username             | password  | message              |
-      | admin@example.com    | Admin@123 | Welcome, Admin!      |
-      | testuser@example.com | Test@123  | Welcome back!        |
+      Examples:
+      | username | password | message |
+      | admin@example.com | Admin@123 | Welcome, Admin! |
+      | testuser@example.com | Test@123 | Welcome back! |
 
-  @negative
-  Scenario: Failed login with invalid credentials
-    When I enter username "invalid@example.com"
-    And I enter password "WrongPass123"
-    And I click the login button
-    Then I should see error message "Invalid username or password"
-    And I should remain on the login page
+      @negative
+      Scenario: Failed login with invalid credentials
+      When I enter username "invalid@example.com"
+      And I enter password "WrongPass123"
+      And I click the login button
+      Then I should see error message "Invalid username or password"
+      And I should remain on the login page
 
-  @negative
-  Scenario: Failed login with empty credentials
-    When I click the login button
-    Then I should see error message "Username is required"
-    And I should remain on the login page
+      @negative
+      Scenario: Failed login with empty credentials
+      When I click the login button
+      Then I should see error message "Username is required"
+      And I should remain on the login page

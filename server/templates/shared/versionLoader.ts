@@ -1,71 +1,73 @@
 /**
  * Shared Version Loader
  *
- * Loads centralized tool versions from shared/versions.json
- * Provides version merging with manifest-specific overrides
+ * Provides centralized tool versions.
+ * Refactored to use static constants instead of runtime JSON reading.
  */
 
-import { promises as fs } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// Centralized tool versions
+export const toolVersions = {
+  // Languages & Runtimes
+  java: '11',
+  python: '3.11',
+  node: '20',
+  npm: '10',
+  dotnet: '8.0',
+  swift: '5.9',
+  kotlin: '1.9.22',
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  // Web Frameworks
+  selenium: '4.16.0',
+  playwright: '1.41.0',
+  cypress: '13.6.3',
+  webdriverio: '8.27.0',
 
-interface SharedVersions {
-  java?: Record<string, string>;
-  node?: Record<string, string>;
-  python?: Record<string, string>;
-  dotnet?: Record<string, string>;
-  swift?: Record<string, string>;
-  kotlin?: Record<string, string>;
-  webTesting?: Record<string, string>;
-  apiTesting?: Record<string, string>;
-  mobileTesting?: Record<string, string>;
-  desktopTesting?: Record<string, string>;
-  testRunners?: Record<string, string>;
-  reporting?: Record<string, string>;
-  utilities?: Record<string, string>;
-}
+  // Mobile Frameworks
+  appium: '9.0.0',
+  espresso: '3.5.1',
+  xcuitest: '15.0',
 
-// Cache for shared versions
-let sharedVersionsCache: Record<string, string> | null = null;
+  // API Frameworks
+  restassured: '5.4.0',
+  requests: '2.31.0',
+  supertest: '6.3.4',
+  restsharp: '110.2.0',
+  pact: '4.6.3',
+
+  // Test Runners
+  junit5: '5.10.1',
+  testng: '7.8.0',
+  pytest: '7.4.4',
+  jest: '29.7.0',
+  mocha: '10.2.0',
+  nunit: '3.14.0',
+  xctest: '15.0',
+  cucumber: '7.15.0',
+  robotframework: '7.0',
+
+  // Reporting
+  allure: '2.25.0',
+  extentreports: '5.1.1',
+  jesthtmlreporter: '3.10.2',
+  mochawesome: '7.1.3',
+
+  // Utilities
+  log4j: '2.22.0',
+  winston: '3.11.0',
+  jackson: '2.16.0',
+  gson: '2.10.1',
+
+  // Maven Plugins (Common)
+  maven_compiler_plugin: '3.11.0',
+  maven_surefire_plugin: '3.1.2',
+};
 
 /**
- * Load and flatten shared versions from versions.json
+ * Load shared versions
+ * Returns the static flattened map of versions
  */
 export async function loadSharedVersions(): Promise<Record<string, string>> {
-  if (sharedVersionsCache) {
-    return sharedVersionsCache;
-  }
-
-  const versionsPath = path.join(__dirname, 'versions.json');
-
-  try {
-    const content = await fs.readFile(versionsPath, 'utf-8');
-    const versions: SharedVersions = JSON.parse(content);
-
-    // Flatten nested structure into a single record
-    const flattened: Record<string, string> = {};
-
-    for (const [category, categoryVersions] of Object.entries(versions)) {
-      // Skip JSON schema and comment fields
-      if (category.startsWith('$')) continue;
-
-      if (typeof categoryVersions === 'object' && categoryVersions !== null) {
-        for (const [tool, version] of Object.entries(categoryVersions)) {
-          if (typeof version === 'string') {
-            flattened[tool] = version;
-          }
-        }
-      }
-    }
-
-    sharedVersionsCache = flattened;
-    return flattened;
-  } catch (error) {
-    console.warn('Failed to load shared versions, using empty defaults:', error);
-    return {};
-  }
+  return toolVersions;
 }
 
 /**
@@ -83,16 +85,13 @@ export function mergeVersions(
 }
 
 /**
- * Clear the versions cache (useful for testing)
- */
-export function clearVersionsCache(): void {
-  sharedVersionsCache = null;
-}
-
-/**
  * Get version for a specific tool
  */
-export async function getToolVersion(tool: string): Promise<string | undefined> {
-  const versions = await loadSharedVersions();
-  return versions[tool];
+export async function getToolVersion(tool: keyof typeof toolVersions): Promise<string | undefined> {
+  // @ts-ignore
+  return toolVersions[tool];
+}
+
+export function clearVersionsCache(): void {
+  // No-op as we don't cache anymore
 }

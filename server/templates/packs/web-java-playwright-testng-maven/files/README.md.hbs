@@ -122,21 +122,21 @@ mvn test -DsuiteXmlFile=testng.xml
 ```
 src/
 ├── main/java/
-│   ├── config/          # Environment and test configuration
-│   └── pages/           # Page Object classes
-│       ├── BasePage.java
-│       ├── LoginPage.java
-│       └── HomePage.java
+│ ├── config/ # Environment and test configuration
+│ └── pages/ # Page Object classes
+│ ├── BasePage.java
+│ ├── LoginPage.java
+│ └── HomePage.java
 └── test/
-    ├── java/
-    │   ├── tests/       # Test classes
-    │   │   ├── BaseTest.java
-    │   │   ├── LoginTest.java
-    │   │   └── SmokeTest.java
-    │   └── utils/       # Helper utilities
-    └── resources/
-        ├── config/      # Environment properties
-        └── testdata/    # Test data files (CSV, JSON)
+├── java/
+│ ├── tests/ # Test classes
+│ │ ├── BaseTest.java
+│ │ ├── LoginTest.java
+│ │ └── LoginTest.java
+│ └── utils/ # Helper utilities
+└── resources/
+├── config/ # Environment properties
+└── testdata/ # Test data files (CSV, JSON)
 ```
 
 ## Docker

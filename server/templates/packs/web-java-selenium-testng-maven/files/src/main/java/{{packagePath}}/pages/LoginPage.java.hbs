@@ -6,277 +6,279 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Login Page Object
- * 
- * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
- * 1. Open your app's login page in a browser
- * 2. Right-click on each element → Inspect → Copy selector
- * 3. Replace the placeholder locators below with your actual locators
- */
+* Login Page Object
+*
+* HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+* 1. Open your app's login page in a browser
+* 2. Right-click on each element → Inspect → Copy selector
+* 3. Replace the placeholder locators below with your actual locators
+*/
 public class LoginPage extends BasePage {
-    
-    // ============================================
-    // UPDATE THESE LOCATORS FOR YOUR APPLICATION
-    // ============================================
-    // Tip: Use browser DevTools (F12) to find correct selectors
-    
-    @FindBy(id = "username")           // Your username/email input field
-    private WebElement usernameField;
-    
-    @FindBy(id = "password")           // Your password input field
-    private WebElement passwordField;
-    
-    @FindBy(id = "login-button")       // Your login/submit button
-    private WebElement loginButton;
-    
-    @FindBy(className = "error-message") // Error message element
-    private WebElement errorMessage;
-    
-    @FindBy(linkText = "Forgot Password?")
-    private WebElement forgotPasswordLink;
-    
-    @FindBy(id = "remember-me")
-    private WebElement rememberMeCheckbox;
-    
-    // Alternative locators using By objects - UPDATE THESE TOO
-    private final By usernameFieldLocator = By.id("username");
-    private final By passwordFieldLocator = By.id("password");
-    private final By loginButtonLocator = By.id("login-button");
-    private final By errorMessageLocator = By.className("error-message");
-    private final By pageHeaderLocator = By.tagName("h1"); // Element visible on login page
-    // ============================================
-    
-    /**
-     * Check if login page is loaded
-     * @return true if login page is loaded
-     */
-    @Override
-    public boolean isLoaded() {
-        try {
-            return isElementDisplayed(pageHeaderLocator) && 
-                   isElementDisplayed(usernameFieldLocator) &&
-                   isElementDisplayed(passwordFieldLocator) &&
-                   isElementDisplayed(loginButtonLocator);
-        } catch (Exception e) {
-            Log.debug("Login page not loaded: " + e.getMessage());
-            return false;
-        }
-    }
-    
-    /**
-     * Enter username
-     * @param username Username to enter
-     * @return Current LoginPage instance for method chaining
-     */
-    public LoginPage enterUsername(String username) {
-        logPageAction("Entering username: " + username);
-        typeText(usernameFieldLocator, username);
-        return this;
-    }
-    
-    /**
-     * Enter password
-     * @param password Password to enter
-     * @return Current LoginPage instance for method chaining
-     */
-    public LoginPage enterPassword(String password) {
-        logPageAction("Entering password");
-        typeText(passwordFieldLocator, password);
-        return this;
-    }
-    
-    /**
-     * Click login button
-     * @return HomePage instance if login successful, or LoginPage if failed
-     */
-    public <T extends BasePage> T clickLoginButton(Class<T> expectedPageClass) {
+
+// ============================================
+// UPDATE THESE LOCATORS FOR YOUR APPLICATION
+// ============================================
+// Tip: Use browser DevTools (F12) to find correct selectors
+
+@FindBy(id = "username") // Your username/email input field
+private WebElement usernameField;
+
+@FindBy(id = "password") // Your password input field
+private WebElement passwordField;
+
+@FindBy(id = "login-button") // Your login/submit button
+private WebElement loginButton;
+
+@FindBy(className = "error-message") // Error message element
+private WebElement errorMessage;
+
+@FindBy(linkText = "Forgot Password?")
+private WebElement forgotPasswordLink;
+
+@FindBy(id = "remember-me")
+private WebElement rememberMeCheckbox;
+
+// Alternative locators using By objects - UPDATE THESE TOO
+private final By usernameFieldLocator = By.id("username");
+private final By passwordFieldLocator = By.id("password");
+private final By loginButtonLocator = By.id("login-button");
+private final By errorMessageLocator = By.className("error-message");
+private final By pageHeaderLocator = By.tagName("h1"); // Element visible on login page
+// ============================================
+
+/**
+* Check if login page is loaded
+* @return true if login page is loaded
+*/
+@Override
+public boolean isLoaded() {
+try {
+return isElementDisplayed(pageHeaderLocator) &&
+isElementDisplayed(usernameFieldLocator) &&
+isElementDisplayed(passwordFieldLocator) &&
+isElementDisplayed(loginButtonLocator);
+} catch (Exception e) {
+Log.debug("Login page not loaded: " + e.getMessage());
+return false;
+}
+}
+
+/**
+* Enter username
+* @param username Username to enter
+* @return Current LoginPage instance for method chaining
+*/
+public LoginPage enterUsername(String username) {
+logPageAction("Entering username: " + username);
+typeText(usernameFieldLocator, username);
+return this;
+}
+
+/**
+* Enter password
+* @param password Password to enter
+* @return Current LoginPage instance for method chaining
+*/
+public LoginPage enterPassword(String password) {
+logPageAction("Entering password");
+typeText(passwordFieldLocator, password);
+return this;
+}
+
+/**
+* Click login button
+* @return HomePage instance if login successful, or LoginPage if failed
+*/
+public <T extends BasePage> T clickLoginButton(Class<T> expectedPageClass) {
         logPageAction("Clicking login button");
         clickElement(loginButtonLocator);
-        
+
         try {
-            T page = expectedPageClass.getDeclaredConstructor().newInstance();
-            if (page.isLoaded()) {
-                Log.info("Login successful, navigated to: " + expectedPageClass.getSimpleName());
-                return page;
-            } else {
-                Log.warn("Login may have failed, staying on login page");
-                return expectedPageClass.cast(this);
-            }
-        } catch (Exception e) {
-            Log.error("Error creating page instance: " + expectedPageClass.getSimpleName(), e);
-            return expectedPageClass.cast(this);
-        }
-    }
-    
-    /**
-     * Perform complete login with username and password
-     * @param username Username
-     * @param password Password
-     * @param expectedPageClass Expected page class after login
-     * @return Expected page instance
-     */
-    public <T extends BasePage> T login(String username, String password, Class<T> expectedPageClass) {
-        logPageAction("Performing login with username: " + username);
-        enterUsername(username);
-        enterPassword(password);
-        return clickLoginButton(expectedPageClass);
-    }
-    
-    /**
-     * Perform login with remember me option
-     * @param username Username
-     * @param password Password
-     * @param rememberMe Remember me checkbox state
-     * @param expectedPageClass Expected page class after login
-     * @return Expected page instance
-     */
-    public <T extends BasePage> T loginWithRememberMe(String username, String password, 
-                                                     boolean rememberMe, Class<T> expectedPageClass) {
-        logPageAction("Performing login with remember me: " + rememberMe);
-        enterUsername(username);
-        enterPassword(password);
-        setRememberMe(rememberMe);
-        return clickLoginButton(expectedPageClass);
-    }
-    
-    /**
-     * Set remember me checkbox
-     * @param check Whether to check the checkbox
-     * @return Current LoginPage instance
-     */
-    public LoginPage setRememberMe(boolean check) {
-        logPageAction("Setting remember me checkbox: " + check);
-        if (check && !isRememberMeChecked()) {
-            clickElement(By.id("remember-me"));
-        } else if (!check && isRememberMeChecked()) {
-            clickElement(By.id("remember-me"));
-        }
-        return this;
-    }
-    
-    /**
-     * Check if remember me checkbox is checked
-     * @return true if checkbox is checked
-     */
-    public boolean isRememberMeChecked() {
-        return rememberMeCheckbox.isSelected();
-    }
-    
-    /**
-     * Click forgot password link
-     * @return ForgotPasswordPage instance (you would create this page class)
-     */
-    public LoginPage clickForgotPassword() {
-        logPageAction("Clicking forgot password link");
-        clickElement(By.linkText("Forgot Password?"));
-        // Return appropriate page object based on your application
-        return new LoginPage();
-    }
-    
-    /**
-     * Get error message text
-     * @return Error message text, or empty string if no error
-     */
-    public String getErrorMessage() {
-        try {
-            if (isElementDisplayed(errorMessageLocator)) {
-                String error = getElementText(errorMessageLocator);
-                Log.info("Error message displayed: " + error);
-                return error;
-            }
-        } catch (Exception e) {
-            Log.debug("No error message displayed");
-        }
-        return "";
-    }
-    
-    /**
-     * Check if error message is displayed
-     * @return true if error message is visible
-     */
-    public boolean isErrorMessageDisplayed() {
-        return isElementDisplayed(errorMessageLocator);
-    }
-    
-    /**
-     * Check if login button is enabled
-     * @return true if login button is enabled
-     */
-    public boolean isLoginButtonEnabled() {
-        return isElementEnabled(loginButtonLocator);
-    }
-    
-    /**
-     * Get username field value
-     * @return Username field value
-     */
-    public String getUsernameValue() {
-        return getElementAttribute(usernameFieldLocator, "value");
-    }
-    
-    /**
-     * Clear username field
-     * @return Current LoginPage instance
-     */
-    public LoginPage clearUsername() {
-        logPageAction("Clearing username field");
-        usernameField.clear();
-        return this;
-    }
-    
-    /**
-     * Clear password field
-     * @return Current LoginPage instance
-     */
-    public LoginPage clearPassword() {
-        logPageAction("Clearing password field");
-        passwordField.clear();
-        return this;
-    }
-    
-    /**
-     * Clear all form fields
-     * @return Current LoginPage instance
-     */
-    public LoginPage clearAllFields() {
-        logPageAction("Clearing all form fields");
-        clearUsername();
-        clearPassword();
-        return this;
-    }
-    
-    /**
-     * Wait for error message to appear
-     * @param timeoutInSeconds Timeout in seconds
-     * @return true if error message appears within timeout
-     */
-    public boolean waitForErrorMessage(int timeoutInSeconds) {
-        try {
-            waitForElement(errorMessageLocator);
-            return true;
-        } catch (Exception e) {
-            Log.debug("Error message did not appear within " + timeoutInSeconds + " seconds");
-            return false;
-        }
-    }
-    
-    /**
-     * Validate login page elements are present
-     * @return true if all required elements are present
-     */
-    public boolean validatePageElements() {
-        logPageAction("Validating login page elements");
-        
-        boolean isValid = isElementDisplayed(usernameFieldLocator) &&
-                         isElementDisplayed(passwordFieldLocator) &&
-                         isElementDisplayed(loginButtonLocator);
-        
-        if (isValid) {
-            Log.info("All login page elements are present and valid");
+        T page = expectedPageClass.getDeclaredConstructor().newInstance();
+        if (page.isLoaded()) {
+        Log.info("Login successful, navigated to: " + expectedPageClass.getSimpleName());
+        return page;
         } else {
-            Log.error("Some login page elements are missing");
+        String message = "Login passed but target page was not loaded: " + expectedPageClass.getSimpleName();
+        Log.error(message);
+        throw new RuntimeException(message);
         }
-        
-        return isValid;
-    }
-}
+        } catch (Exception e) {
+        String message = "Failed to navigate to " + expectedPageClass.getSimpleName() + " after login";
+        Log.error(message, e);
+        throw new RuntimeException(message, e);
+        }
+        }
+
+        /**
+        * Perform complete login with username and password
+        * @param username Username
+        * @param password Password
+        * @param expectedPageClass Expected page class after login
+        * @return Expected page instance
+        */
+        public <T extends BasePage> T login(String username, String password, Class<T> expectedPageClass) {
+                logPageAction("Performing login with username: " + username);
+                enterUsername(username);
+                enterPassword(password);
+                return clickLoginButton(expectedPageClass);
+                }
+
+                /**
+                * Perform login with remember me option
+                * @param username Username
+                * @param password Password
+                * @param rememberMe Remember me checkbox state
+                * @param expectedPageClass Expected page class after login
+                * @return Expected page instance
+                */
+                public <T extends BasePage> T loginWithRememberMe(String username, String password,
+                    boolean rememberMe, Class<T> expectedPageClass) {
+                        logPageAction("Performing login with remember me: " + rememberMe);
+                        enterUsername(username);
+                        enterPassword(password);
+                        setRememberMe(rememberMe);
+                        return clickLoginButton(expectedPageClass);
+                        }
+
+                        /**
+                        * Set remember me checkbox
+                        * @param check Whether to check the checkbox
+                        * @return Current LoginPage instance
+                        */
+                        public LoginPage setRememberMe(boolean check) {
+                        logPageAction("Setting remember me checkbox: " + check);
+                        if (check && !isRememberMeChecked()) {
+                        clickElement(By.id("remember-me"));
+                        } else if (!check && isRememberMeChecked()) {
+                        clickElement(By.id("remember-me"));
+                        }
+                        return this;
+                        }
+
+                        /**
+                        * Check if remember me checkbox is checked
+                        * @return true if checkbox is checked
+                        */
+                        public boolean isRememberMeChecked() {
+                        return rememberMeCheckbox.isSelected();
+                        }
+
+                        /**
+                        * Click forgot password link
+                        * @return ForgotPasswordPage instance (you would create this page class)
+                        */
+                        public LoginPage clickForgotPassword() {
+                        logPageAction("Clicking forgot password link");
+                        clickElement(By.linkText("Forgot Password?"));
+                        // Return appropriate page object based on your application
+                        return new LoginPage();
+                        }
+
+                        /**
+                        * Get error message text
+                        * @return Error message text, or empty string if no error
+                        */
+                        public String getErrorMessage() {
+                        try {
+                        if (isElementDisplayed(errorMessageLocator)) {
+                        String error = getElementText(errorMessageLocator);
+                        Log.info("Error message displayed: " + error);
+                        return error;
+                        }
+                        } catch (Exception e) {
+                        Log.debug("No error message displayed");
+                        }
+                        return "";
+                        }
+
+                        /**
+                        * Check if error message is displayed
+                        * @return true if error message is visible
+                        */
+                        public boolean isErrorMessageDisplayed() {
+                        return isElementDisplayed(errorMessageLocator);
+                        }
+
+                        /**
+                        * Check if login button is enabled
+                        * @return true if login button is enabled
+                        */
+                        public boolean isLoginButtonEnabled() {
+                        return isElementEnabled(loginButtonLocator);
+                        }
+
+                        /**
+                        * Get username field value
+                        * @return Username field value
+                        */
+                        public String getUsernameValue() {
+                        return getElementAttribute(usernameFieldLocator, "value");
+                        }
+
+                        /**
+                        * Clear username field
+                        * @return Current LoginPage instance
+                        */
+                        public LoginPage clearUsername() {
+                        logPageAction("Clearing username field");
+                        usernameField.clear();
+                        return this;
+                        }
+
+                        /**
+                        * Clear password field
+                        * @return Current LoginPage instance
+                        */
+                        public LoginPage clearPassword() {
+                        logPageAction("Clearing password field");
+                        passwordField.clear();
+                        return this;
+                        }
+
+                        /**
+                        * Clear all form fields
+                        * @return Current LoginPage instance
+                        */
+                        public LoginPage clearAllFields() {
+                        logPageAction("Clearing all form fields");
+                        clearUsername();
+                        clearPassword();
+                        return this;
+                        }
+
+                        /**
+                        * Wait for error message to appear
+                        * @param timeoutInSeconds Timeout in seconds
+                        * @return true if error message appears within timeout
+                        */
+                        public boolean waitForErrorMessage(int timeoutInSeconds) {
+                        try {
+                        waitForElement(errorMessageLocator);
+                        return true;
+                        } catch (Exception e) {
+                        Log.debug("Error message did not appear within " + timeoutInSeconds + " seconds");
+                        return false;
+                        }
+                        }
+
+                        /**
+                        * Validate login page elements are present
+                        * @return true if all required elements are present
+                        */
+                        public boolean validatePageElements() {
+                        logPageAction("Validating login page elements");
+
+                        boolean isValid = isElementDisplayed(usernameFieldLocator) &&
+                        isElementDisplayed(passwordFieldLocator) &&
+                        isElementDisplayed(loginButtonLocator);
+
+                        if (isValid) {
+                        Log.info("All login page elements are present and valid");
+                        } else {
+                        Log.error("Some login page elements are missing");
+                        }
+
+                        return isValid;
+                        }
+                        }

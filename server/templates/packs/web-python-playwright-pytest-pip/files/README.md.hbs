@@ -57,9 +57,6 @@ pytest
 # Run tests in headed mode
 HEADLESS=false pytest
 
-# Run smoke tests
-pytest -m smoke
-
 # Run tests in parallel
 pytest -n auto
 
@@ -85,8 +82,8 @@ All page objects extend `BasePage` and are located in the `pages/` directory:
 
 ```
 tests/
-  ├── test_login.py    # Login functionality tests
-  └── test_smoke.py    # Smoke tests
+├── test_login.py # Login functionality tests
+└── test_smoke.py # Smoke tests
 ```
 
 ## Docker

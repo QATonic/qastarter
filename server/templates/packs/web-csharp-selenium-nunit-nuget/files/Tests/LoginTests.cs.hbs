@@ -3,48 +3,52 @@ using {{projectName}}.Pages;
 
 namespace {{projectName}}.Tests
 {
-    // ========== UPDATE THESE VALUES ==========
-    // Replace with your actual test credentials
-    // ==========================================
-    
-    [TestFixture]
-    public class LoginTests : BaseTest
-    {
-        // ========== UPDATE THESE VALUES ==========
-        private const string TestUsername = "YOUR_USERNAME_HERE";
-        private const string TestPassword = "YOUR_PASSWORD_HERE";
-        // ==========================================
-        
-        private LoginPage _loginPage = null!;
+// ========== UPDATE THESE VALUES ==========
+// Replace with your actual test credentials
+// ==========================================
 
-        [SetUp]
-        public new void SetUp()
-        {
-            base.SetUp();
-            _loginPage = new LoginPage(Driver);
-        }
+[TestFixture]
+public class LoginTests : BaseTest
+{
+// ========== UPDATE THESE VALUES ==========
+private const string TestUsername = "YOUR_USERNAME_HERE";
+private const string TestPassword = "YOUR_PASSWORD_HERE";
+// ==========================================
 
-        /// <summary>
-        /// Verify login functionality works correctly.
-        /// 
-        /// BEFORE RUNNING:
-        /// 1. Update TestUsername and TestPassword above with valid credentials
-        /// 2. Ensure your application URL is set in Config/EnvConfig.cs
-        /// 3. Update selectors in Pages/LoginPage.cs to match your app
-        /// </summary>
-        [Test]
-        public void ShouldLoginWithValidCredentials()
-        {
-            // Step 1: Navigate to login page
-            _loginPage.NavigateToLogin();
-            
-            // Step 2: Enter credentials and submit
-            _loginPage.Login(TestUsername, TestPassword);
-            
-            // Step 3: Verify login was successful
-            Assert.That(_loginPage.IsLoginSuccessful(), Is.True);
-            
-            // Test passed! Your {{framework}} framework is working correctly.
-        }
-    }
+private LoginPage _loginPage = null!;
+
+[SetUp]
+public new void SetUp()
+{
+base.SetUp();
+_loginPage = new LoginPage(Driver);
+}
+
+/// <summary>
+    /// Verify login functionality works correctly.
+    ///
+    /// BEFORE RUNNING:
+    /// 1. Update TestUsername and TestPassword above with valid credentials
+    /// 2. Ensure your application URL is set in Config/EnvConfig.cs
+    /// 3. Update selectors in Pages/LoginPage.cs to match your app
+    /// </summary>
+[Test]
+public void ShouldLoginWithValidCredentials()
+{
+// Get credentials from config
+var username = EnvConfig.Instance.GetUsername("validUser");
+var password = EnvConfig.Instance.GetPassword("validUser");
+
+// Step 1: Navigate to login page
+_loginPage.NavigateToLogin();
+
+// Step 2: Enter credentials and submit
+_loginPage.Login(username, password);
+
+// Step 3: Verify login was successful
+Assert.That(_loginPage.IsLoginSuccessful(), Is.True);
+
+// Test passed! Your {{framework}} framework is working correctly.
+}
+}
 }

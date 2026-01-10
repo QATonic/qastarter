@@ -43,8 +43,8 @@ dotnet restore
 npm install -g appium@2
 
 # Install Appium drivers
-appium driver install uiautomator2  # For Android
-appium driver install xcuitest      # For iOS
+appium driver install uiautomator2 # For Android
+appium driver install xcuitest # For iOS
 ```
 
 ## Configuration
@@ -112,9 +112,6 @@ dotnet test
 PLATFORM=Android dotnet test
 PLATFORM=iOS dotnet test
 
-# Run smoke tests only
-dotnet test --filter "FullyQualifiedName~SmokeTests"
-
 # Run with detailed output
 dotnet test --logger "console;verbosity=detailed"
 
@@ -130,27 +127,27 @@ dotnet clean
 ```
 .
 ├── Config/
-│   ├── AppiumServerConfig.cs   # Appium server configuration
-│   ├── CapabilitiesManager.cs  # Device capabilities manager
-│   └── Settings.cs             # Application settings
+│ ├── AppiumServerConfig.cs # Appium server configuration
+│ ├── CapabilitiesManager.cs # Device capabilities manager
+│ └── Settings.cs # Application settings
 ├── Data/
-│   ├── DevData.json            # Development test data
-│   ├── QaData.json             # QA test data
-│   └── TestData.cs             # Test data models
+│ ├── DevData.json # Development test data
+│ ├── QaData.json # QA test data
+│ └── TestData.cs # Test data models
 ├── Tests/
-│   ├── Pages/
-│   │   ├── BasePage.cs         # Base page class
-│   │   ├── LoginPage.cs        # Login page object
-│   │   └── HomePage.cs         # Home page object
-│   ├── Utils/
-│   │   ├── AndroidGestures.cs  # Android gesture utilities
-│   │   ├── IOSGestures.cs      # iOS gesture utilities
-│   │   ├── DriverManager.cs    # WebDriver lifecycle
-│   │   └── ScreenshotHelper.cs # Screenshot capture
-│   ├── BaseTest.cs             # Base test class
-│   ├── LoginTests.cs           # Login tests
-│   └── SmokeTests.cs           # Smoke tests
-└── {{projectName}}.csproj      # Project file
+│ ├── Pages/
+│ │ ├── BasePage.cs # Base page class
+│ │ ├── LoginPage.cs # Login page object
+│ │ └── HomePage.cs # Home page object
+│ ├── Utils/
+│ │ ├── AndroidGestures.cs # Android gesture utilities
+│ │ ├── IOSGestures.cs # iOS gesture utilities
+│ │ ├── DriverManager.cs # WebDriver lifecycle
+│ │ └── ScreenshotHelper.cs # Screenshot capture
+│ ├── BaseTest.cs # Base test class
+│ ├── LoginTests.cs # Login tests
+│ └── SmokeTests.cs # Smoke tests
+└── {{projectName}}.csproj # Project file
 ```
 
 ## Page Objects

@@ -42,10 +42,9 @@ export default function ReportingStep() {
           <div
             className={`
               flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-              ${
-                !config.reportingTool
-                  ? 'bg-primary/5 border-primary/30 shadow-sm'
-                  : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
+              ${!config.reportingTool
+                ? 'bg-primary/5 border-primary/30 shadow-sm'
+                : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
               }
             `}
             onClick={() => updateConfig('reportingTool', '')}
@@ -79,10 +78,9 @@ export default function ReportingStep() {
                 key={tool}
                 className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-                  ${
-                    isSelected
-                      ? 'bg-primary/5 border-primary/30 shadow-sm'
-                      : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
+                  ${isSelected
+                    ? 'bg-primary/5 border-primary/30 shadow-sm'
+                    : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
                   }
                 `}
                 onClick={() => updateConfig('reportingTool', tool)}
@@ -106,7 +104,7 @@ export default function ReportingStep() {
                     <Label htmlFor={tool} className="text-sm font-medium cursor-pointer">
                       {
                         validationLabels.reportingTools[
-                          tool as keyof typeof validationLabels.reportingTools
+                        tool as keyof typeof validationLabels.reportingTools
                         ]
                       }
                     </Label>
@@ -117,6 +115,16 @@ export default function ReportingStep() {
               </div>
             );
           })}
+
+          {availableReportingTools.length === 0 && config.framework && (
+            <div className="p-4 rounded-lg border border-dashed bg-muted/30 text-center">
+              <p className="text-sm text-muted-foreground">
+                No external reporting tools available for this configuration.
+                <br />
+                Standard framework reports will be generated.
+              </p>
+            </div>
+          )}
         </RadioGroup>
       </div>
     </WizardStep>

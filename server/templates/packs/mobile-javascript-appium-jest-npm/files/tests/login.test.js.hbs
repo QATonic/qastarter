@@ -1,43 +1,42 @@
 const LoginPage = require('./pages/LoginPage');
 const HomePage = require('./pages/HomePage');
 
-// ========== UPDATE THESE VALUES ==========
-// Replace with your actual test credentials
-const TEST_USERNAME = 'YOUR_USERNAME_HERE';
-const TEST_PASSWORD = 'YOUR_PASSWORD_HERE';
-// ==========================================
+
 
 describe('Login Tests', () => {
-  let loginPage;
-  let homePage;
+let loginPage;
+let homePage;
 
-  beforeEach(() => {
-    loginPage = new LoginPage(driver);
-    homePage = new HomePage(driver);
-  });
+beforeEach(() => {
+loginPage = new LoginPage(driver);
+homePage = new HomePage(driver);
+});
 
-  /**
-   * Verify login functionality works correctly.
-   * 
-   * BEFORE RUNNING:
-   * 1. Update TEST_USERNAME and TEST_PASSWORD above with valid credentials
-   * 2. Configure device capabilities in config/capabilities.js
-   * 3. Ensure Appium server is running
-   * 4. Update selectors in pages/LoginPage.js to match your app
-   */
-  test('should login with valid credentials', async () => {
-    try {
-      // Step 1: Perform login
-      await loginPage.login(TEST_USERNAME, TEST_PASSWORD);
-      
-      // Step 2: Verify home page is displayed
-      const isHomeDisplayed = await homePage.isHomePageDisplayed();
-      expect(isHomeDisplayed).toBe(true);
-      
-      // Test passed! Your {{framework}} framework is working correctly.
-    } catch (error) {
-      await driver.saveScreenshot('screenshots/FAILED-login-valid-credentials.png');
-      throw error;
-    }
-  });
+/**
+* Verify login functionality works correctly.
+*
+* BEFORE RUNNING:
+* 1. Update test data in data/dev.json
+* 2. Configure device capabilities in config/capabilities.js
+* 3. Ensure Appium server is running
+* 4. Update selectors in pages/LoginPage.js to match your app
+*/
+test('should login with valid credentials', async () => {
+try {
+// Get credentials from loaded test data
+const { username, password } = global.testData.validUser;
+
+// Step 1: Perform login
+await loginPage.login(username, password);
+
+// Step 2: Verify home page is displayed
+const isHomeDisplayed = await homePage.isHomePageDisplayed();
+expect(isHomeDisplayed).toBe(true);
+
+// Test passed! Your {{framework}} framework is working correctly.
+} catch (error) {
+await driver.saveScreenshot(`screenshots/FAILED-${expect.getState().currentTestName}.png`);
+throw error;
+}
+});
 });

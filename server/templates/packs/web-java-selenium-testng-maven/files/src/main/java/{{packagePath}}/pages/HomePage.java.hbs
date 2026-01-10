@@ -39,7 +39,7 @@ public class HomePage extends BasePage {
     private final By welcomeMessageLocator = By.className("welcome-message");
     private final By userMenuLocator = By.id("user-menu");
     private final By logoutButtonLocator = By.id("logout-button");
-    private final By pageHeaderLocator = By.h1("Dashboard");
+    private final By pageHeaderLocator = By.xpath("//h1[contains(text(), 'Dashboard')]");
     private final By profileLinkLocator = By.linkText("Profile");
     private final By settingsLinkLocator = By.linkText("Settings");
     private final By notificationIconLocator = By.className("notification-icon");

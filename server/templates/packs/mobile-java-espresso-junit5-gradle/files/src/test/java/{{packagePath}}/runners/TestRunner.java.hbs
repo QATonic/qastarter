@@ -5,32 +5,32 @@ import io.cucumber.testng.CucumberOptions;
 import org.testng.annotations.DataProvider;
 
 /**
- * Cucumber TestNG Runner
- * Executes feature files and generates reports
- */
+* Cucumber TestNG Runner
+* Executes feature files and generates reports
+*/
 @CucumberOptions(
-    features = "src/test/resources/features",
-    glue = {"{{javaPackage}}.stepdefinitions"},
-    plugin = {
-        "pretty",
-        "html:target/cucumber-reports/cucumber-html-report.html",
-        "json:target/cucumber-reports/cucumber.json",
-        "junit:target/cucumber-reports/cucumber.xml"{{#if (eq reportingTool "allure")}},
-        "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"{{/if}}
-    },
-    monochrome = true,
-    dryRun = false,
-    tags = "@smoke or @regression"
+features = "src/test/resources/features",
+glue = {"{{javaPackage}}.stepdefinitions"},
+plugin = {
+"pretty",
+"html:target/cucumber-reports/cucumber-html-report.html",
+"json:target/cucumber-reports/cucumber.json",
+"junit:target/cucumber-reports/cucumber.xml"{{#if (eq reportingTool "allure")}},
+"io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"{{/if}}
+},
+monochrome = true,
+dryRun = false,
+tags = "@regression"
 )
 public class TestRunner extends AbstractTestNGCucumberTests {
 
-    /**
-     * Run scenarios in parallel
-     * @return Scenarios data provider
-     */
-    @Override
-    @DataProvider(parallel = true)
-    public Object[][] scenarios() {
-        return super.scenarios();
-    }
+/**
+* Run scenarios in parallel
+* @return Scenarios data provider
+*/
+@Override
+@DataProvider(parallel = true)
+public Object[][] scenarios() {
+return super.scenarios();
+}
 }

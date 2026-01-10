@@ -45,26 +45,26 @@ Production-ready Selenium WebDriver automation framework built with Python and P
 ## 🛠️ Setup
 
 1. **Clone the repository**
-   ```bash
-   cd {{projectName}}
-   ```
+```bash
+cd {{projectName}}
+```
 
 2. **Create virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+```bash
+python -m venv venv
+source venv/bin/activate # On Windows: venv\Scripts\activate
+```
 
 3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+pip install -r requirements.txt
+```
 
 4. **Configure environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
 ## 🧪 Running Tests
 
@@ -75,15 +75,14 @@ pytest
 
 ### Run specific test suite
 ```bash
-pytest -m smoke           # Smoke tests
-pytest -m regression      # Regression tests
-pytest tests/test_login.py  # Specific test file
+pytest -m regression # Regression tests
+pytest tests/test_login.py # Specific test file
 ```
 
 ### Run tests in parallel
 ```bash
-pytest -n auto  # Auto-detect CPU cores
-pytest -n 4     # Run on 4 cores
+pytest -n auto # Auto-detect CPU cores
+pytest -n 4 # Run on 4 cores
 ```
 
 ### Generate Allure report
@@ -96,32 +95,32 @@ allure serve allure-results
 
 ```
 {{projectName}}/
-├── config/              # Configuration files
-│   ├── config.py       # Configuration manager
-│   └── settings.py     # Global settings
-├── pages/              # Page Object Model
-│   ├── base_page.py    # Base page class
-│   ├── login_page.py   # Login page
-│   └── home_page.py    # Home page
-├── utils/              # Utility modules
-│   ├── driver_factory.py    # WebDriver factory
-│   ├── wait_helpers.py      # Wait utilities
-│   ├── web_actions.py       # Web action helpers
-│   ├── logger.py           # Logging utility
-│   ├── screenshot_util.py  # Screenshot utility
-│   └── data_reader.py      # Data reader
-├── tests/              # Test cases
-│   ├── conftest.py     # Pytest fixtures
-│   ├── test_login.py   # Login tests
-│   └── test_smoke.py   # Smoke tests
-├── data/               # Test data
-│   ├── dev.json        # Dev environment data
-│   ├── qa.json         # QA environment data
-│   └── users.csv       # User test data
-├── .github/workflows/  # CI/CD
-│   └── tests.yml       # GitHub Actions
-├── requirements.txt    # Dependencies
-└── pytest.ini         # Pytest configuration
+├── config/ # Configuration files
+│ ├── config.py # Configuration manager
+│ └── settings.py # Global settings
+├── pages/ # Page Object Model
+│ ├── base_page.py # Base page class
+│ ├── login_page.py # Login page
+│ └── home_page.py # Home page
+├── utils/ # Utility modules
+│ ├── driver_factory.py # WebDriver factory
+│ ├── wait_helpers.py # Wait utilities
+│ ├── web_actions.py # Web action helpers
+│ ├── logger.py # Logging utility
+│ ├── screenshot_util.py # Screenshot utility
+│ └── data_reader.py # Data reader
+├── tests/ # Test cases
+│ ├── conftest.py # Pytest fixtures
+│ ├── test_login.py # Login tests
+│ └── test_smoke.py # Smoke tests
+├── data/ # Test data
+│ ├── dev.json # Dev environment data
+│ ├── qa.json # QA environment data
+│ └── users.csv # User test data
+├── .github/workflows/ # CI/CD
+│ └── tests.yml # GitHub Actions
+├── requirements.txt # Dependencies
+└── pytest.ini # Pytest configuration
 ```
 
 ## 🔧 Configuration
@@ -129,13 +128,13 @@ allure serve allure-results
 Environment-specific settings are managed in `config/config.py`:
 
 - `DEV` - Development environment
-- `QA` - QA/Testing environment  
+- `QA` - QA/Testing environment
 - `PROD` - Production environment
 
 Set environment via:
 ```bash
-export TEST_ENV=qa  # Linux/Mac
-set TEST_ENV=qa     # Windows
+export TEST_ENV=qa # Linux/Mac
+set TEST_ENV=qa # Windows
 ```
 
 ## 📊 Reporting
@@ -175,12 +174,12 @@ GitHub Actions workflow (`.github/workflows/tests.yml`) automatically:
 import pytest
 from pages.login_page import LoginPage
 
-@pytest.mark.smoke
+@pytest.mark.regression
 def test_valid_login(driver):
-    login_page = LoginPage(driver)
-    login_page.navigate()
-    login_page.login("user@example.com", "password123")
-    assert login_page.is_login_successful()
+login_page = LoginPage(driver)
+login_page.navigate()
+login_page.login("user@example.com", "password123")
+assert login_page.is_login_successful()
 ```
 
 ## 🤝 Contributing

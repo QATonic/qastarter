@@ -59,9 +59,6 @@ HEADLESS=false dotnet test
 
 # Run tests with specific browser
 BROWSER=firefox dotnet test
-
-# Run tests with filter
-dotnet test --filter "TestCategory=Smoke"
 ```
 
 ## Environment Configuration
@@ -82,9 +79,9 @@ All page objects extend `BasePage` and are located in `Pages/`:
 
 ```
 Tests/
-  ├── BaseTest.cs      # Base test class with setup/teardown
-  ├── LoginTests.cs    # Login functionality tests
-  └── SmokeTests.cs    # Smoke tests
+├── BaseTest.cs # Base test class with setup/teardown
+├── LoginTests.cs # Login functionality tests
+
 ```
 
 ## Docker
@@ -97,7 +94,8 @@ docker run {{projectName}}
 ## CI/CD
 
 {{#if (eq cicdTool "github-actions")}}
-GitHub Actions workflow automatically runs tests on push/PR to main or develop branches with matrix strategy for multiple browsers.
+GitHub Actions workflow automatically runs tests on push/PR to main or develop branches with matrix strategy for
+multiple browsers.
 {{else if (eq cicdTool "jenkins")}}
 Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
 {{else if (eq cicdTool "gitlab-ci")}}

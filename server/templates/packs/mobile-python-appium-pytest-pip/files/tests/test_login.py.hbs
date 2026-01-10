@@ -12,27 +12,26 @@ TEST_PASSWORD = "YOUR_PASSWORD_HERE"
 # ==========================================
 
 
-@pytest.mark.smoke
 class TestLogin:
-    """Login functionality tests"""
-    
-    def test_login_with_valid_credentials(self, driver, test_data):
-        """
-        Verify login functionality works correctly.
-        
-        BEFORE RUNNING:
-        1. Update TEST_USERNAME and TEST_PASSWORD above with valid credentials
-        2. Configure device capabilities in config/capabilities.py
-        3. Ensure Appium server is running
-        4. Update selectors in tests/pages/login_page.py to match your app
-        """
-        login_page = LoginPage(driver)
-        home_page = HomePage(driver)
-        
-        # Step 1: Perform login
-        login_page.login(TEST_USERNAME, TEST_PASSWORD)
-        
-        # Step 2: Verify home page is displayed
-        assert home_page.is_home_page_displayed(), "Home page not displayed after login"
-        
-        # Test passed! Your {{framework}} framework is working correctly.
+"""Login functionality tests"""
+
+def test_login_with_valid_credentials(self, driver, test_data):
+"""
+Verify login functionality works correctly.
+
+BEFORE RUNNING:
+1. Update TEST_USERNAME and TEST_PASSWORD above with valid credentials
+2. Configure device capabilities in config/capabilities.py
+3. Ensure Appium server is running
+4. Update selectors in tests/pages/login_page.py to match your app
+"""
+login_page = LoginPage(driver)
+home_page = HomePage(driver)
+
+# Step 1: Perform login
+login_page.login(TEST_USERNAME, TEST_PASSWORD)
+
+# Step 2: Verify home page is displayed
+assert home_page.is_home_page_displayed(), "Home page not displayed after login"
+
+# Test passed! Your {{framework}} framework is working correctly.

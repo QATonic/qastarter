@@ -11,32 +11,31 @@ from pages.login_page import LoginPage
 from config.config import Config
 
 
-@pytest.mark.smoke
 @pytest.mark.login
 class TestLogin:
-    """Login test suite"""
-    
-    def test_valid_login(self, driver):
-        """Verify successful login with valid credentials"""
-        # Get credentials from config file (data/dev.json)
-        credentials = Config.get_credentials('valid_user')
-        
-        login_page = LoginPage(driver)
-        
-        # Step 1: Navigate to login page
-        login_page.navigate()
-        
-        # Step 2: Enter credentials and submit
-        login_page.login(credentials['username'], credentials['password'])
-        
-        # Step 3: Verify login was successful
-        assert login_page.is_login_successful(), \
-            "Login failed. Check credentials in data/dev.json and selectors in pages/login_page.py"
-    
-    def test_login_page_elements(self, driver):
-        """Verify login page elements are visible"""
-        login_page = LoginPage(driver)
-        login_page.navigate()
-        
-        assert login_page.is_displayed(LoginPage.USERNAME_INPUT), "Username field should be visible"
-        assert login_page.is_displayed(LoginPage.PASSWORD_INPUT), "Password field should be visible"
+"""Login test suite"""
+
+def test_valid_login(self, driver):
+"""Verify successful login with valid credentials"""
+# Get credentials from config file (data/dev.json)
+credentials = Config.get_credentials('valid_user')
+
+login_page = LoginPage(driver)
+
+# Step 1: Navigate to login page
+login_page.navigate()
+
+# Step 2: Enter credentials and submit
+login_page.login(credentials['username'], credentials['password'])
+
+# Step 3: Verify login was successful
+assert login_page.is_login_successful(), \
+"Login failed. Check credentials in data/dev.json and selectors in pages/login_page.py"
+
+def test_login_page_elements(self, driver):
+"""Verify login page elements are visible"""
+login_page = LoginPage(driver)
+login_page.navigate()
+
+assert login_page.is_displayed(LoginPage.USERNAME_INPUT), "Username field should be visible"
+assert login_page.is_displayed(LoginPage.PASSWORD_INPUT), "Password field should be visible"

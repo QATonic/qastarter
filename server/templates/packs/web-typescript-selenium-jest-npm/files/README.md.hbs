@@ -37,23 +37,22 @@ npm install
 
 ## Run Tests
 ```bash
-npm test              # Run all tests
-npm run test:smoke    # Smoke tests only
+npm test # Run all tests
 npm run test:parallel # Parallel execution
 {{#if (eq reportingTool "allure")}}
-npm run report        # View Allure report
+npm run report # View Allure report
 {{/if}}
 ```
 
 ## Project Structure
 ```
 {{projectName}}/
-├── pages/          # Page Objects (TypeScript)
-├── tests/          # Test cases
-├── utils/          # Utilities
-├── config/         # Configuration
-├── data/           # Test data
-└── types/          # Type definitions
+├── pages/ # Page Objects (TypeScript)
+├── tests/ # Test cases
+├── utils/ # Utilities
+├── config/ # Configuration
+├── data/ # Test data
+└── types/ # Type definitions
 ```
 
 ## CI/CD

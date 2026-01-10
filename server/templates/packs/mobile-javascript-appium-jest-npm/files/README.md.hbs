@@ -48,8 +48,8 @@ npm install
 npm install -g appium@next
 
 # Install Appium drivers
-appium driver install uiautomator2  # For Android
-appium driver install xcuitest      # For iOS
+appium driver install uiautomator2 # For Android
+appium driver install xcuitest # For iOS
 ```
 
 ## Configuration
@@ -113,9 +113,6 @@ npm test
 npm run test:android
 npm run test:ios
 
-# Run smoke tests only
-npm run test:smoke
-
 # Watch mode (re-run tests on file changes)
 npm run test:watch
 
@@ -128,25 +125,25 @@ npm run clean
 ```
 .
 ├── config/
-│   ├── capabilities.js    # Device capabilities manager
-│   └── settings.js         # Application settings
+│ ├── capabilities.js # Device capabilities manager
+│ └── settings.js # Application settings
 ├── data/
-│   ├── dev.json           # Development test data
-│   └── qa.json            # QA test data
+│ ├── dev.json # Development test data
+│ └── qa.json # QA test data
 ├── tests/
-│   ├── pages/
-│   │   ├── BasePage.js    # Base page class
-│   │   ├── LoginPage.js   # Login page object
-│   │   └── HomePage.js    # Home page object
-│   ├── utils/
-│   │   ├── androidGestures.js  # Android gesture utilities
-│   │   ├── iosGestures.js      # iOS gesture utilities
-│   │   └── helpers.js          # Helper functions
-│   ├── login.test.js      # Login tests
-│   ├── smoke.test.js      # Smoke tests
-│   └── setup.js           # Test setup and teardown
-├── jest.config.js         # Jest configuration
-└── package.json           # npm dependencies
+│ ├── pages/
+│ │ ├── BasePage.js # Base page class
+│ │ ├── LoginPage.js # Login page object
+│ │ └── HomePage.js # Home page object
+│ ├── utils/
+│ │ ├── androidGestures.js # Android gesture utilities
+│ │ ├── iosGestures.js # iOS gesture utilities
+│ │ └── helpers.js # Helper functions
+│ ├── login.test.js # Login tests
+│ ├── smoke.test.js # Smoke tests
+│ └── setup.js # Test setup and teardown
+├── jest.config.js # Jest configuration
+└── package.json # npm dependencies
 ```
 
 ## Page Objects

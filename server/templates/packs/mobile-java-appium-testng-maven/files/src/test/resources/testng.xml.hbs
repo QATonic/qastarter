@@ -2,81 +2,75 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="{{projectName}}_Mobile_Test_Suite" parallel="tests" thread-count="2">
-    
-    <parameter name="environment" value="qa"/>
-    
+
+    <parameter name="environment" value="qa" />
+
     {{#if (eq testingPattern "bdd")}}
     <!-- BDD Test Configuration with Cucumber -->
     <test name="Mobile_BDD_Tests" preserve-order="true">
         <classes>
-            <class name="{{javaPackage}}.bdd.TestRunner"/>
+            <class name="{{javaPackage}}.bdd.TestRunner" />
         </classes>
     </test>
     {{else}}
     <!-- Android Test Configuration -->
     <test name="Android_Tests" preserve-order="true">
-        <parameter name="platform" value="android"/>
-        <parameter name="environment" value="qa"/>
-        
+        <parameter name="platform" value="android" />
+        <parameter name="environment" value="qa" />
+
         <classes>
             <class name="{{javaPackage}}.tests.LoginTests">
                 <methods>
-                    <include name="testValidLogin"/>
-                    <include name="testInvalidLogin"/>
-                    <include name="testEmptyCredentialsLogin"/>
-                    <include name="testForgotPasswordLink"/>
+                    <include name="testValidLogin" />
+                    <include name="testInvalidLogin" />
+                    <include name="testEmptyCredentialsLogin" />
+                    <include name="testForgotPasswordLink" />
                 </methods>
             </class>
-            <class name="{{javaPackage}}.tests.SmokeSuite">
-                <methods>
-                    <include name="testAppLaunch"/>
-                    <include name="testBasicNavigation"/>
-                </methods>
-            </class>
+
         </classes>
-        
+
         <groups>
             <run>
-                <include name="smoke"/>
-                <include name="regression"/>
+                <include name="regression" />
             </run>
         </groups>
     </test>
-    
+
     <!-- iOS Test Configuration -->
     <test name="iOS_Tests" preserve-order="true">
-        <parameter name="platform" value="ios"/>
-        <parameter name="environment" value="qa"/>
-        
+        <parameter name="platform" value="ios" />
+        <parameter name="environment" value="qa" />
+
         <classes>
             <class name="{{javaPackage}}.tests.LoginTests">
                 <methods>
-                    <include name="testValidLogin"/>
-                    <include name="testInvalidLogin"/>
-                    <include name="testEmptyCredentialsLogin"/>
-                    <include name="testForgotPasswordLink"/>
+                    <include name="testValidLogin" />
+                    <include name="testInvalidLogin" />
+                    <include name="testEmptyCredentialsLogin" />
+                    <include name="testForgotPasswordLink" />
                 </methods>
             </class>
             <class name="{{javaPackage}}.tests.SmokeSuite">
                 <methods>
-                    <include name="testAppLaunch"/>
-                    <include name="testBasicNavigation"/>
+                    <include name="testAppLaunch" />
+                    <include name="testBasicNavigation" />
                 </methods>
             </class>
         </classes>
-        
+
         <groups>
             <run>
-                <include name="smoke"/>
-                <include name="regression"/>
+                <include name="smoke" />
+                <include name="regression" />
             </run>
         </groups>
     </test>
     {{/if}}
-    
+
     <listeners>
-        <listener class-name="{{javaPackage}}.listeners.TestListener"/>
-        <listener class-name="{{javaPackage}}.listeners.RetryAnalyzer"/>
+        <listener class-name="{{javaPackage}}.listeners.TestListener" />
+        <listener class-name="{{javaPackage}}.listeners.RetryAnalyzer" />
     </listeners>
-    
+
 </suite>

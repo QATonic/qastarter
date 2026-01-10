@@ -534,11 +534,19 @@ export class TemplatePackEngine {
           continue;
         }
 
-        // Include logging dependencies (always needed)
+        // Include logging dependencies based on language
+        const isJava = config.language.toLowerCase() === 'java';
+        const isJsTs =
+          config.language.toLowerCase() === 'javascript' ||
+          config.language.toLowerCase() === 'typescript';
+        const isPython = config.language.toLowerCase() === 'python';
+        const isCSharp = config.language.toLowerCase() === 'c#' || config.language.toLowerCase() === 'csharp';
+
         if (
-          keyLower.includes('log4j') ||
-          keyLower.includes('logging') ||
-          keyLower.includes('winston')
+          (isJava && (keyLower.includes('log4j') || keyLower.includes('slf4j') || keyLower.includes('logback'))) ||
+          (isJsTs && (keyLower.includes('winston') || keyLower.includes('bunyan'))) ||
+          (isPython && (keyLower.includes('pytest') || keyLower.includes('logging'))) ||
+          (isCSharp && (keyLower.includes('serilog') || keyLower.includes('nlog')))
         ) {
           filteredDependencies[key] = version as string;
           continue;
@@ -562,13 +570,24 @@ export class TemplatePackEngine {
 
       // Add BDD/Cucumber dependency if BDD pattern is selected
       if (config.testingPattern === 'bdd') {
+        const isJava = config.language.toLowerCase() === 'java';
+        const isPython = config.language.toLowerCase() === 'python';
+        const isJsTs =
+          config.language.toLowerCase() === 'javascript' ||
+          config.language.toLowerCase() === 'typescript';
+        const isCSharp = config.language.toLowerCase() === 'c#' || config.language.toLowerCase() === 'csharp';
+
         for (const [key, version] of Object.entries(allDependencies)) {
           const keyLower = key.toLowerCase();
-          if (
-            keyLower.includes('cucumber') ||
-            keyLower.includes('behave') ||
-            keyLower.includes('gherkin')
-          ) {
+
+          if (isJava && (keyLower.includes('cucumber-java') || keyLower.includes('cucumber-testng') || keyLower.includes('cucumber-junit'))) {
+            filteredDependencies[key] = version as string;
+          } else if (isPython && (keyLower.includes('behave') || keyLower.includes('pytest-bdd'))) {
+            filteredDependencies[key] = version as string;
+          } else if (isJsTs && (keyLower.includes('cucumber') && !keyLower.includes('java'))) {
+            // Avoid cucumber-java in JS
+            filteredDependencies[key] = version as string;
+          } else if (isCSharp && (keyLower.includes('specflow') || keyLower.includes('reqnroll'))) {
             filteredDependencies[key] = version as string;
           }
         }
@@ -576,13 +595,26 @@ export class TemplatePackEngine {
 
       // Add mobile-specific dependencies for mobile testing
       if (config.testingType === 'mobile') {
+        const isJava = config.language.toLowerCase() === 'java';
+        const isPython = config.language.toLowerCase() === 'python';
+        const isJsTs =
+          config.language.toLowerCase() === 'javascript' ||
+          config.language.toLowerCase() === 'typescript';
+        const isCSharp = config.language.toLowerCase() === 'c#' || config.language.toLowerCase() === 'csharp';
+        const isSwift = config.language.toLowerCase() === 'swift';
+
         for (const [key, version] of Object.entries(allDependencies)) {
           const keyLower = key.toLowerCase();
-          if (
-            keyLower.includes('appium') ||
-            keyLower.includes('espresso') ||
-            keyLower.includes('xcuitest')
-          ) {
+
+          if (keyLower.includes('appium')) {
+            // Appium client bindings are specific
+            if (isJava && keyLower.includes('java')) filteredDependencies[key] = version as string;
+            else if (isPython && keyLower.includes('python')) filteredDependencies[key] = version as string;
+            else if (isCSharp && keyLower.includes('webdriver')) filteredDependencies[key] = version as string; // Appium.WebDriver
+            else if (isJsTs && (keyLower.includes('webdriverio') || keyLower.includes('appium'))) filteredDependencies[key] = version as string; // JS usually uses webdriverio or blanket appium
+          } else if (isJava && keyLower.includes('espresso')) {
+            filteredDependencies[key] = version as string;
+          } else if (isSwift && keyLower.includes('xcuitest')) {
             filteredDependencies[key] = version as string;
           }
         }
@@ -590,15 +622,20 @@ export class TemplatePackEngine {
 
       // Add API-specific dependencies for API testing
       if (config.testingType === 'api') {
+        const isJava = config.language.toLowerCase() === 'java';
+        const isPython = config.language.toLowerCase() === 'python';
+        const isJsTs =
+          config.language.toLowerCase() === 'javascript' ||
+          config.language.toLowerCase() === 'typescript';
+
         for (const [key, version] of Object.entries(allDependencies)) {
           const keyLower = key.toLowerCase();
-          if (
-            keyLower.includes('rest') ||
-            keyLower.includes('request') ||
-            keyLower.includes('supertest') ||
-            keyLower.includes('jackson') ||
-            keyLower.includes('gson')
-          ) {
+
+          if (isJava && (keyLower.includes('rest-assured') || keyLower.includes('gson') || keyLower.includes('jackson'))) {
+            filteredDependencies[key] = version as string;
+          } else if (isPython && (keyLower.includes('requests'))) {
+            filteredDependencies[key] = version as string;
+          } else if (isJsTs && (keyLower.includes('supertest') || keyLower.includes('axios'))) {
             filteredDependencies[key] = version as string;
           }
         }

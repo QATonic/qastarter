@@ -37,19 +37,18 @@ dotnet build
 
 ## Run Tests
 ```bash
-dotnet test                          # Run all tests
-dotnet test --filter Category=Smoke  # Smoke tests only
-dotnet test --logger "console;verbosity=detailed"  # Verbose output
+dotnet test # Run all tests
+dotnet test --logger "console;verbosity=detailed" # Verbose output
 ```
 
 ## Project Structure
 ```
 {{projectName}}/
-├── Pages/          # Page Objects
-├── Tests/          # Test cases
-├── Utils/          # Utilities
-├── Config/         # Configuration
-└── Data/           # Test data
+├── Pages/ # Page Objects
+├── Tests/ # Test cases
+├── Utils/ # Utilities
+├── Config/ # Configuration
+└── Data/ # Test data
 ```
 
 ## CI/CD

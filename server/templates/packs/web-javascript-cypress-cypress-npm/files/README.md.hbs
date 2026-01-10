@@ -85,19 +85,18 @@ All page objects extend `BasePage` and are located in `cypress/pages/`:
 
 ```
 cypress/
-  ├── e2e/
-  │   ├── login.cy.js     # Login functionality tests
-  │   └── smoke.cy.js     # Smoke tests
-  ├── pages/
-  │   ├── BasePage.js     # Base page class
-  │   ├── LoginPage.js    # Login page object
-  │   └── HomePage.js     # Home page object
-  ├── fixtures/
-  │   ├── config.json     # Environment config
-  │   └── users.json      # Test user data
-  └── support/
-      ├── e2e.js          # Global setup
-      └── commands.js     # Custom commands
+├── e2e/
+│ └── login.cy.js # Login functionality tests
+├── pages/
+│ ├── BasePage.js # Base page class
+│ ├── LoginPage.js # Login page object
+│ └── HomePage.js # Home page object
+├── fixtures/
+│ ├── config.json # Environment config
+│ └── users.json # Test user data
+└── support/
+├── e2e.js # Global setup
+└── commands.js # Custom commands
 ```
 
 ## Custom Commands

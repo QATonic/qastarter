@@ -6,26 +6,25 @@ python_functions = test_*
 
 # Markers
 markers =
-    smoke: Smoke test suite
-    regression: Regression test suite
-    login: Login related tests
-    slow: Tests that take a long time to run
+regression: Regression test suite
+login: Login related tests
+slow: Tests that take a long time to run
 
 # Output options
-addopts = 
-    -v
-    --tb=short
-    --strict-markers
+addopts =
+-v
+--tb=short
+--strict-markers
 {{#if (eq reportingTool "pytest-html")}}
-    --html=reports/report.html
-    --self-contained-html
+--html=reports/report.html
+--self-contained-html
 {{/if}}
 {{#if (eq reportingTool "allure")}}
-    --alluredir=allure-results
+--alluredir=allure-results
 {{/if}}
 {{#if (eq reportingTool "pytest-json")}}
-    --json-report
-    --json-report-file=reports/report.json
+--json-report
+--json-report-file=reports/report.json
 {{/if}}
 
 # Test paths

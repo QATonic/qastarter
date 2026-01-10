@@ -5,6 +5,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle2 } from 'lucide-react';
 import WizardStep from '../../WizardStep';
 import ProjectPreview from '../../ProjectPreview';
 import { validationLabels } from '../../../../../shared/validationMatrix';
@@ -80,6 +81,22 @@ export default function SummaryStep() {
           isGenerating={isGenerating}
           hideDownloadButton={true}
         />
+
+        {/* Zero-Config Verified Banner */}
+        <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 rounded-lg shadow-sm">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/40 flex-shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-green-800 dark:text-green-300">
+              Zero-Config Verified
+            </h4>
+            <p className="text-xs text-green-700 dark:text-green-400 mt-0.5">
+              This template includes Production-Ready Page Object Model, CI/CD workflows, and
+              externalized data configuration.
+            </p>
+          </div>
+        </div>
 
         {/* Configuration Summary - Compact List Style */}
         <Card className="border-0 shadow-sm">

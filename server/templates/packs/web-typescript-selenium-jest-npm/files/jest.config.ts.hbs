@@ -1,19 +1,19 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  testMatch: ['**/tests/**/*.test.ts'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+preset: 'ts-jest',
+testEnvironment: 'node',
+testMatch: ['**/tests/**/*.test.ts'],
+setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testTimeout: 60000,
   verbose: true,
   collectCoverage: false,
   reporters: [
-    'default',
-    ['jest-allure', {
-      resultsDir: 'allure-results'
-    }]
+  'default'{{#if (eq reportingTool "allure")}},
+  ['jest-allure', {
+  resultsDir: 'allure-results'
+  }]{{/if}}
   ]
-};
+  };
 
-export default config;
+  export default config;

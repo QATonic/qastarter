@@ -2,60 +2,40 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="{{projectName}}_Android_Test_Suite" parallel="tests" thread-count="1">
-    
-    <parameter name="platform" value="android"/>
-    <parameter name="environment" value="qa"/>
-    
+
+    <parameter name="platform" value="android" />
+    <parameter name="environment" value="qa" />
+
     <!-- Android-specific Test Configuration -->
     <test name="Android_Login_Tests" preserve-order="true">
-        <parameter name="platform" value="android"/>
-        <parameter name="environment" value="qa"/>
-        
+        <parameter name="platform" value="android" />
+        <parameter name="environment" value="qa" />
+
         <classes>
             <class name="{{packageName}}.tests.LoginTests">
                 <methods>
-                    <include name="testValidLogin"/>
-                    <include name="testInvalidLogin"/>
-                    <include name="testEmptyCredentialsLogin"/>
-                    <include name="testCrossPlatformLogin"/>
+                    <include name="testValidLogin" />
+                    <include name="testInvalidLogin" />
+                    <include name="testEmptyCredentialsLogin" />
+                    <include name="testCrossPlatformLogin" />
                 </methods>
             </class>
         </classes>
-        
+
         <groups>
             <run>
-                <include name="android"/>
-                <include name="mobile"/>
-                <include name="regression"/>
+                <include name="android" />
+                <include name="mobile" />
+                <include name="regression" />
             </run>
         </groups>
     </test>
-    
-    <test name="Android_Smoke_Tests" preserve-order="true">
-        <parameter name="platform" value="android"/>
-        <parameter name="environment" value="qa"/>
-        
-        <classes>
-            <class name="{{packageName}}.tests.SmokeSuite">
-                <methods>
-                    <include name="testAppLaunch"/>
-                    <include name="testBasicNavigation"/>
-                    <include name="testAndroidSpecificFeatures"/>
-                </methods>
-            </class>
-        </classes>
-        
-        <groups>
-            <run>
-                <include name="smoke"/>
-                <include name="android"/>
-            </run>
-        </groups>
-    </test>
-    
+
+
+
     <listeners>
-        <listener class-name="{{packageName}}.listeners.TestListener"/>
-        <listener class-name="{{packageName}}.listeners.RetryAnalyzer"/>
+        <listener class-name="{{packageName}}.listeners.TestListener" />
+        <listener class-name="{{packageName}}.listeners.RetryAnalyzer" />
     </listeners>
-    
+
 </suite>

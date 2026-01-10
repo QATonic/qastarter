@@ -49,8 +49,8 @@ pip install -r requirements.txt
 npm install -g appium@next
 
 # Install Appium drivers
-appium driver install uiautomator2  # For Android
-appium driver install xcuitest      # For iOS
+appium driver install uiautomator2 # For Android
+appium driver install xcuitest # For iOS
 ```
 
 ## Configuration
@@ -114,7 +114,6 @@ pytest -v
 pytest -v -n auto
 
 # Run specific test markers
-pytest -v -m smoke
 pytest -v -m regression
 pytest -v -m android
 pytest -v -m ios
@@ -136,25 +135,25 @@ allure serve allure-results
 ```
 .
 ├── config/
-│   ├── capabilities.py    # Device capabilities manager
-│   └── settings.py         # Application settings
+│ ├── capabilities.py # Device capabilities manager
+│ └── settings.py # Application settings
 ├── data/
-│   ├── dev.json           # Development test data
-│   └── qa.json            # QA test data
+│ ├── dev.json # Development test data
+│ └── qa.json # QA test data
 ├── tests/
-│   ├── pages/
-│   │   ├── base_page.py   # Base page class
-│   │   ├── login_page.py  # Login page object
-│   │   └── home_page.py   # Home page object
-│   ├── utils/
-│   │   ├── android_gestures.py  # Android gesture utilities
-│   │   ├── ios_gestures.py      # iOS gesture utilities
-│   │   └── helpers.py           # Helper functions
-│   ├── test_login.py      # Login tests
-│   └── test_smoke.py      # Smoke tests
-├── conftest.py            # Pytest fixtures
-├── pytest.ini             # Pytest configuration
-└── requirements.txt       # Python dependencies
+│ ├── pages/
+│ │ ├── base_page.py # Base page class
+│ │ ├── login_page.py # Login page object
+│ │ └── home_page.py # Home page object
+│ ├── utils/
+│ │ ├── android_gestures.py # Android gesture utilities
+│ │ ├── ios_gestures.py # iOS gesture utilities
+│ │ └── helpers.py # Helper functions
+│ ├── test_login.py # Login tests
+│ └── test_smoke.py # Smoke tests
+├── conftest.py # Pytest fixtures
+├── pytest.ini # Pytest configuration
+└── requirements.txt # Python dependencies
 ```
 
 ## Page Objects

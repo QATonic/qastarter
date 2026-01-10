@@ -29,56 +29,56 @@ This is a robust, production-ready test automation framework built with:
 ```
 {{artifactId}}/
 ├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── {{packagePath}}/
-│   │   │       ├── core/           # Core framework components
-│   │   │       │   ├── BaseTest.java
-│   │   │       │   ├── BrowserManager.java
-│   │   │       │   └── PlaywrightFactory.java
-│   │   │       ├── pages/          # Page Object classes
-│   │   │       │   ├── BasePage.java
-│   │   │       │   ├── LoginPage.java
-│   │   │       │   └── HomePage.java
-│   │   │       ├── utils/          # Utility classes
-│   │   │       │   ├── PlaywrightActions.java
-│   │   │       │   ├── WaitUtils.java
-│   │   │       │   ├── ScreenshotUtils.java
-│   │   │       │   ├── TestDataReader.java
+│ ├── main/
+│ │ ├── java/
+│ │ │ └── {{packagePath}}/
+│ │ │ ├── core/ # Core framework components
+│ │ │ │ ├── BaseTest.java
+│ │ │ │ ├── BrowserManager.java
+│ │ │ │ └── PlaywrightFactory.java
+│ │ │ ├── pages/ # Page Object classes
+│ │ │ │ ├── BasePage.java
+│ │ │ │ ├── LoginPage.java
+│ │ │ │ └── HomePage.java
+│ │ │ ├── utils/ # Utility classes
+│ │ │ │ ├── PlaywrightActions.java
+│ │ │ │ ├── WaitUtils.java
+│ │ │ │ ├── ScreenshotUtils.java
+│ │ │ │ ├── TestDataReader.java
 {{#if (eq reportingTool "allure")}}
-│   │   │       │   ├── AllureManager.java
+│ │ │ │ ├── AllureManager.java
 {{/if}}
 {{#if (eq reportingTool "extent-reports")}}
-│   │   │       │   ├── ExtentManager.java
+│ │ │ │ ├── ExtentManager.java
 {{/if}}
-│   │   │       │   └── Log.java
-│   │   │       ├── config/         # Configuration utilities
-│   │   │       │   ├── ConfigurationReader.java
-│   │   │       │   └── Environment.java
-│   │   │       └── listeners/      # Test listeners
-│   │   │           └── TestWatcher.java
-│   │   └── resources/
-│   │       ├── config/             # Environment configs
-│   │       │   ├── dev.properties
-│   │       │   ├── qa.properties
-│   │       │   └── prod.properties
-│   │       ├── testdata/           # Test data files
-│   │       │   ├── users.csv
-│   │       │   └── sample.json
+│ │ │ │ └── Log.java
+│ │ │ ├── config/ # Configuration utilities
+│ │ │ │ ├── ConfigurationReader.java
+│ │ │ │ └── Environment.java
+│ │ │ └── listeners/ # Test listeners
+│ │ │ └── TestWatcher.java
+│ │ └── resources/
+│ │ ├── config/ # Environment configs
+│ │ │ ├── dev.properties
+│ │ │ ├── qa.properties
+│ │ │ └── prod.properties
+│ │ ├── testdata/ # Test data files
+│ │ │ ├── users.csv
+│ │ │ └── sample.json
 {{#if (eq reportingTool "extent-reports")}}
-│   │       ├── extent-config.xml
+│ │ ├── extent-config.xml
 {{/if}}
 {{#if (eq reportingTool "allure")}}
-│   │       ├── allure.properties
+│ │ ├── allure.properties
 {{/if}}
-│   │       ├── log4j2.xml
-│   │       └── junit-platform.properties
-│   └── test/
-│       └── java/
-│           └── {{packagePath}}/
-│               └── tests/          # Test classes
-│                   ├── LoginTests.java
-│                   └── SmokeSuite.java
+│ │ ├── log4j2.xml
+│ │ └── junit-platform.properties
+│ └── test/
+│ └── java/
+│ └── {{packagePath}}/
+│ └── tests/ # Test classes
+│ ├── LoginTests.java
+│ └── LoginTests.java
 ├── pom.xml
 └── .gitignore
 ```
@@ -159,10 +159,8 @@ mvn clean test -Dgroups=regression
 mvn clean test -Dgroups="smoke & login"
 ```
 
-### Run Smoke Suite
-
-```bash
-mvn clean test -Dtest=SmokeSuite
+# Run login tests
+mvn clean test -Dtest=LoginTests
 ```
 
 ### Run with Parallel Execution
@@ -248,7 +246,7 @@ Generate trace files for debugging (when enabled).
 
 Set browser in `config/*.properties`:
 ```properties
-browser=chromium  # or firefox, webkit
+browser=chromium # or firefox, webkit
 headless=false
 ```
 
@@ -261,8 +259,8 @@ mvn test -Dbrowser=firefox -Dheadless=true
 
 Configure timeouts in properties files:
 ```properties
-default.timeout=30000        # 30 seconds
-navigation.timeout=60000     # 60 seconds
+default.timeout=30000 # 30 seconds
+navigation.timeout=60000 # 60 seconds
 ```
 
 ### Parallel Execution
@@ -283,24 +281,24 @@ import {{javaPackage}}.core.BasePage;
 import com.microsoft.playwright.Page;
 
 public class MyPage extends BasePage {
-    
-    // Locators
-    private String myButton = "button#submit";
-    private String myInput = "input[name='username']";
-    
-    public MyPage() {
-        super();
-    }
-    
-    public void clickButton() {
-        page.click(myButton);
-        Log.info("Clicked submit button");
-    }
-    
-    public void enterText(String text) {
-        page.fill(myInput, text);
-        Log.info("Entered text: " + text);
-    }
+
+// Locators
+private String myButton = "button#submit";
+private String myInput = "input[name='username']";
+
+public MyPage() {
+super();
+}
+
+public void clickButton() {
+page.click(myButton);
+Log.info("Clicked submit button");
+}
+
+public void enterText(String text) {
+page.fill(myInput, text);
+Log.info("Entered text: " + text);
+}
 }
 ```
 
@@ -315,15 +313,15 @@ import org.junit.jupiter.api.*;
 
 @DisplayName("My Tests")
 public class MyTests extends BaseTest {
-    
-    @Test
-    @Tag("smoke")
-    @DisplayName("Test something")
-    public void testSomething() {
-        MyPage myPage = new MyPage();
-        myPage.clickButton();
-        // Add assertions
-    }
+
+@Test
+@Tag("smoke")
+@DisplayName("Test something")
+public void testSomething() {
+MyPage myPage = new MyPage();
+myPage.clickButton();
+// Add assertions
+}
 }
 ```
 

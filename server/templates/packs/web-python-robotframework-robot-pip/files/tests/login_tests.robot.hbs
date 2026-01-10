@@ -16,7 +16,7 @@ ${VALID_PASSWORD} testpass123
 *** Test Cases ***
 Valid Login Should Succeed
 [Documentation] Verify user can login with valid credentials
-[Tags] smoke regression
+[Tags] regression
 Navigate To Login Page
 Login With Credentials ${VALID_USERNAME} ${VALID_PASSWORD}
 Verify Successful Login
@@ -52,7 +52,7 @@ Verify Login Error Message Password is required
 
 User Can Logout After Login
 [Documentation] Verify user can logout after successful login
-[Tags] smoke regression
+[Tags] regression
 Navigate To Login Page
 Login With Credentials ${VALID_USERNAME} ${VALID_PASSWORD}
 Verify Successful Login

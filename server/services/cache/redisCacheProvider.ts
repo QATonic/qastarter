@@ -209,4 +209,8 @@ export class RedisCacheProvider implements CacheProvider {
       logger.info('Redis cache provider closed');
     }
   }
+
+  getClient(): RedisClientType {
+    return this.client;
+  }
 }

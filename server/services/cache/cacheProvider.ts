@@ -30,6 +30,9 @@ export interface CacheProvider {
 
   /** Close the cache connection */
   close(): Promise<void>;
+
+  /** Get the underlying client (if any) */
+  getClient(): any;
 }
 
 /**

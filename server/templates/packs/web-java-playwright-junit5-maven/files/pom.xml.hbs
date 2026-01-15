@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -18,37 +17,37 @@
         <java.version>{{toolVersions.java}}</java.version>
         <maven.compiler.source>{{toolVersions.java}}</maven.compiler.source>
         <maven.compiler.target>{{toolVersions.java}}</maven.compiler.target>
-        
+
         <!-- Playwright Configuration -->
         <playwright.version>{{toolVersions.playwright}}</playwright.version>
-        
+
         <!-- JUnit 5 Configuration -->
         <junit.jupiter.version>5.10.1</junit.jupiter.version>
         <junit.platform.version>1.10.1</junit.platform.version>
-        
+
         <!-- Logging -->
         <log4j.version>2.22.0</log4j.version>
-        
-{{#if (eq reportingTool "allure")}}
+
+        {{#if (eq reportingTool "allure")}}
         <!-- Allure Reporting -->
         <allure.version>2.25.0</allure.version>
         <aspectj.version>1.9.21</aspectj.version>
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
         <!-- ExtentReports -->
         <extentreports.version>5.1.1</extentreports.version>
-{{/if}}
-        
+        {{/if}}
+
         <!-- Utilities -->
         <jackson.version>2.16.0</jackson.version>
         <commons-csv.version>1.10.0</commons-csv.version>
-        
+
         <!-- Maven Plugins -->
         <maven.surefire.plugin.version>3.2.3</maven.surefire.plugin.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-{{#if (eq reportingTool "allure")}}
+        {{#if (eq reportingTool "allure")}}
         <allure.maven.version>2.12.0</allure.maven.version>
-{{/if}}
+        {{/if}}
     </properties>
 
     <dependencies>
@@ -93,22 +92,22 @@
             <version>${log4j.version}</version>
         </dependency>
 
-{{#if (eq reportingTool "allure")}}
+        {{#if (eq reportingTool "allure")}}
         <!-- Allure JUnit 5 Integration -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-junit5</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
         <!-- ExtentReports -->
         <dependency>
             <groupId>com.aventstack</groupId>
             <artifactId>extentreports</artifactId>
             <version>${extentreports.version}</version>
         </dependency>
-{{/if}}
+        {{/if}}
 
         <!-- Jackson for JSON Processing -->
         <dependency>
@@ -123,6 +122,27 @@
             <artifactId>commons-csv</artifactId>
             <version>${commons-csv.version}</version>
         </dependency>
+
+        {{#if (eq testingPattern "bdd")}}
+        <!-- Cucumber BDD -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>7.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <version>7.15.0</version>
+        </dependency>
+        {{#if (eq reportingTool "allure")}}
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-cucumber7-jvm</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+        {{/if}}
+        {{/if}}
     </dependencies>
 
     <build>
@@ -144,18 +164,18 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.plugin.version}</version>
                 <configuration>
-{{#if (eq reportingTool "allure")}}
+                    {{#if (eq reportingTool "allure")}}
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>
-{{/if}}
+                    {{/if}}
                     <systemPropertyVariables>
                         <browser>${browser}</browser>
                         <env>${env}</env>
                         <headless>${headless}</headless>
-{{#if (eq reportingTool "allure")}}
+                        {{#if (eq reportingTool "allure")}}
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
-{{/if}}
+                        {{/if}}
                     </systemPropertyVariables>
                     <includes>
                         <include>**/*Test*.java</include>
@@ -171,7 +191,7 @@
                         </configurationParameters>
                     </properties>
                 </configuration>
-{{#if (eq reportingTool "allure")}}
+                {{#if (eq reportingTool "allure")}}
                 <dependencies>
                     <dependency>
                         <groupId>org.aspectj</groupId>
@@ -179,10 +199,10 @@
                         <version>${aspectj.version}</version>
                     </dependency>
                 </dependencies>
-{{/if}}
+                {{/if}}
             </plugin>
 
-{{#if (eq reportingTool "allure")}}
+            {{#if (eq reportingTool "allure")}}
             <!-- Allure Maven Plugin -->
             <plugin>
                 <groupId>io.qameta.allure</groupId>
@@ -193,7 +213,7 @@
                     <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
                 </configuration>
             </plugin>
-{{/if}}
+            {{/if}}
         </plugins>
     </build>
 

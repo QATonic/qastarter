@@ -1,112 +1,73 @@
 """
-Login Step Definitions for BDD Tests
+Login Step Definitions - BDD steps for login feature.
+
+Uses pytest-bdd for Gherkin step matching.
 """
 import pytest
 from pytest_bdd import scenarios, given, when, then, parsers
 from pages.login_page import LoginPage
-from pages.home_page import HomePage
-from utils.logger import Logger
+from utils.driver_manager import DriverManager
+from utils.logger import log
+from config.config_reader import config
 
-# Load all scenarios from the feature file
-scenarios('../features/login.feature')
-
-logger = Logger(__name__).get_logger()
+# Load feature file
+scenarios("../features/login.feature")
 
 
-# Fixtures
 @pytest.fixture
 def login_page(driver):
-    """Initialize LoginPage"""
-    return LoginPage(driver)
+    """Provide LoginPage instance."""
+    return LoginPage()
 
 
-@pytest.fixture
-def home_page(driver):
-    """Initialize HomePage"""
-    return HomePage(driver)
-
-
-# Given Steps
-@given('I navigate to the login page')
-def navigate_to_login_page(driver, config, login_page):
-    """Navigate to the login page"""
-    logger.info("Navigating to login page")
+@given("I am on the login page")
+def navigate_to_login(driver):
+    """Navigate to login page."""
+    log.step("Navigating to login page")
     driver.get(config.base_url)
-    login_page.wait_for_page_load()
 
 
-# When Steps
-@when(parsers.parse('I enter username "{username}"'))
-def enter_username(login_page, username):
-    """Enter username in the login form"""
-    logger.info(f"Entering username: {username}")
+@when("I enter valid username")
+def enter_valid_username(login_page):
+    """Enter valid username."""
+    username = config.get("username")
     login_page.enter_username(username)
 
 
-@when(parsers.parse('I enter password "{password}"'))
-def enter_password(login_page, password):
-    """Enter password in the login form"""
-    logger.info("Entering password")
+@when("I enter valid password")
+def enter_valid_password(login_page):
+    """Enter valid password."""
+    password = config.get("password")
     login_page.enter_password(password)
 
 
-@when('I click the login button')
-def click_login_button(login_page):
-    """Click the login button"""
-    logger.info("Clicking login button")
+@when("I enter invalid username")
+def enter_invalid_username(login_page):
+    """Enter invalid username."""
+    login_page.enter_username("invalid_user")
+
+
+@when("I enter invalid password")
+def enter_invalid_password(login_page):
+    """Enter invalid password."""
+    login_page.enter_password("wrong_password")
+
+
+@when("I click the login button")
+def click_login(login_page):
+    """Click login button."""
     login_page.click_login()
 
 
-# Then Steps
-@then('I should be redirected to the home page')
-def verify_home_page_redirect(driver, config, home_page):
-    """Verify user is redirected to home page"""
-    logger.info("Verifying redirect to home page")
-    home_page.wait_for_page_load()
-    assert config.base_url in driver.current_url, "Not redirected to home page"
+@then("I should be redirected to the inventory page")
+def verify_inventory_page(login_page):
+    """Verify redirect to inventory."""
+    assert login_page.is_login_successful(), "Should be on inventory page"
+    log.info("Successfully logged in")
 
 
-@then(parsers.parse('I should see welcome message "{message}"'))
-def verify_welcome_message(home_page, message):
-    """Verify welcome message is displayed"""
-    logger.info(f"Verifying welcome message: {message}")
-    assert home_page.is_welcome_message_displayed(), "Welcome message not displayed"
-    # Note: In a real implementation, you would verify the actual message text
-
-
-@then(parsers.parse('I should see error message "{error_message}"'))
-def verify_error_message(login_page, error_message):
-    """Verify error message is displayed"""
-    logger.info(f"Verifying error message: {error_message}")
-    assert login_page.is_error_displayed(), "Error message not displayed"
-    # Note: In a real implementation, you would verify the actual error text
-
-
-@then('I should remain on the login page')
-def verify_on_login_page(driver, config, login_page):
-    """Verify user remains on login page"""
-    logger.info("Verifying still on login page")
-    login_page.wait_for_page_load()
-    assert "login" in driver.current_url.lower(), "Not on login page"
-
-
-{{#if (eq reportingTool "allure")}}
-# Allure reporting hooks
-import allure
-from pytest_bdd import when as bdd_when, then as bdd_then, given as bdd_given
-
-
-def pytest_bdd_step_error(request, feature, scenario, step, step_func, step_func_args, exception):
-    """Attach screenshot on step failure"""
-    if hasattr(request, 'driver'):
-        allure.attach(
-            request.driver.get_screenshot_as_png(),
-            name=f"failure_{step.name}",
-            attachment_type=allure.attachment_type.PNG
-        )
-
-
-def pytest_bdd_after_step(request, feature, scenario, step, step_func, step_func_args):
-    """Attach step information to Allure report"""
-    allure.dynamic.description(f"{step.keyword} {step.name}")
-{{/if}}
+@then("I should see an error message")
+def verify_error_message(login_page):
+    """Verify error message displayed."""
+    assert login_page.is_error_displayed(), "Error message should be displayed"
+    log.info("Error message displayed as expected")

@@ -1,49 +1,37 @@
-class BasePage {
-  visit(url: string): void {
-    cy.log(`Navigating to: ${url}`);
-    cy.visit(url);
+/**
+ * Base Page - Parent class for Cypress page objects.
+ */
+export class BasePage {
+  visit(path: string = "/"): this {
+    cy.visit(path);
+    return this;
   }
 
-  click(selector: string): void {
-    cy.log(`Clicking element: ${selector}`);
+  click(selector: string): this {
     cy.get(selector).click();
+    return this;
   }
 
-  type(selector: string, text: string): void {
-    cy.log(`Typing '${text}' into element: ${selector}`);
+  type(selector: string, text: string): this {
     cy.get(selector).clear().type(text);
+    return this;
   }
 
   getText(selector: string): Cypress.Chainable<string> {
-    cy.log(`Getting text from element: ${selector}`);
-    return cy.get(selector).invoke('text');
+    return cy.get(selector).invoke("text");
   }
 
-  isVisible(selector: string): void {
-    cy.log(`Checking visibility of element: ${selector}`);
-    cy.get(selector).should('be.visible');
+  shouldBeVisible(selector: string): this {
+    cy.get(selector).should("be.visible");
+    return this;
   }
 
-  waitForElement(selector: string, timeout: number = 10000): void {
-    cy.log(`Waiting for selector: ${selector}`);
-    cy.get(selector, { timeout }).should('be.visible');
+  shouldNotExist(selector: string): this {
+    cy.get(selector).should("not.exist");
+    return this;
   }
 
-  getTitle(): Cypress.Chainable<string> {
-    return cy.title();
-  }
-
-  getCurrentUrl(): Cypress.Chainable<string> {
+  getUrl(): Cypress.Chainable<string> {
     return cy.url();
   }
-
-  assertUrlContains(text: string): void {
-    cy.url().should('include', text);
-  }
-
-  assertTitleContains(text: string): void {
-    cy.title().should('include', text);
-  }
 }
-
-export default BasePage;

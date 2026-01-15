@@ -1,167 +1,183 @@
 # {{projectName}}
 
-Playwright test automation framework with Java, TestNG, and Maven.
+A production-ready **{{#if (eq framework "selenium")}}Selenium WebDriver{{else}}Playwright{{/if}}** test automation framework using **{{#if (eq testRunner "testng")}}TestNG{{else}}JUnit5{{/if}}** and **{{#if (eq buildTool "maven")}}Maven{{else}}Gradle{{/if}}**.
 
-## 🚀 Quick Start (3 Steps)
-
-### Step 1: Install Dependencies
-```bash
-mvn clean install
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"
-```
-
-### Step 2: Configure for Your Application
-Update these files with your application details:
-
-| File | What to Update |
-|------|----------------|
-| `src/test/resources/config/dev.properties` | Your app URL and test credentials |
-| `src/main/java/pages/LoginPage.java` | CSS selectors matching your login form |
-| `src/test/java/tests/LoginTest.java` | Test credentials (or use config file) |
-
-### Step 3: Run Tests
-```bash
-mvn test
-```
-
----
-
-## ⚙️ Configuration Guide
-
-### Environment Configuration (`src/test/resources/config/dev.properties`)
-
-```properties
-# UPDATE THESE VALUES for your application:
-base.url=https://your-app-url.com
-validUser.username=your-test-user@email.com
-validUser.password=YourPassword123
-adminUser.username=your-admin@email.com
-adminUser.password=AdminPassword123
-timeout=30000
-```
-
-### Page Object Locators (`src/main/java/pages/LoginPage.java`)
-
-Update CSS selectors to match your application's HTML elements:
-
-```java
-// Find these in your browser DevTools (F12 → Elements → right-click → Copy selector)
-private final String USERNAME_INPUT = "#your-username-field";
-private final String PASSWORD_INPUT = "#your-password-field";
-private final String LOGIN_BUTTON = "#your-login-button";
-private final String ERROR_MESSAGE = ".your-error-class";
-private final String SUCCESS_INDICATOR = ".your-dashboard-class";
-```
-
-**Tip:** Use browser DevTools to find the correct selectors for your application.
-
----
-
-## Features
-
-- **Playwright**: Modern browser automation with multi-browser support
-- **Java {{toolVersions.java}}**: Latest LTS version with modern language features
-- **TestNG**: Powerful test framework with parallel execution
-- **Maven**: Dependency management and build automation
-- **Page Object Model**: Maintainable test structure
-{{#if cicdTool}}
-{{#if (eq cicdTool "github-actions")}}
-- **GitHub Actions**: CI/CD workflow included
-{{else if (eq cicdTool "jenkins")}}
-- **Jenkins**: CI/CD pipeline included
-{{else if (eq cicdTool "gitlab-ci")}}
-- **GitLab CI**: CI/CD pipeline included
-{{else if (eq cicdTool "azure-devops")}}
-- **Azure DevOps**: CI/CD pipeline included
-{{else if (eq cicdTool "circleci")}}
-- **CircleCI**: CI/CD workflow included
-{{/if}}
-{{/if}}
-- **Docker Support**: Containerized test execution
-- **Log4j2**: Comprehensive logging
-{{#if (eq reportingTool "allure")}}
-- **Allure Reports**: Rich test reporting with history
-{{else if (eq reportingTool "extent-reports")}}
-- **ExtentReports**: Detailed HTML test reports
-{{/if}}
-{{#if (eq testingPattern "bdd")}}
-- **Cucumber BDD**: Gherkin feature files support
-{{/if}}
-
-## Prerequisites
-
-- Java 17+
-- Maven 3.9+
-
-## Running Tests
+## 🚀 Quick Start
 
 ```bash
 # Run all tests
-mvn test
+{{#if (eq buildTool "maven")}}
+mvn clean test
+{{else}}
+gradle clean test
+{{/if}}
 
-# Run tests with specific environment
+# Run with specific browser
+{{#if (eq buildTool "maven")}}
+mvn test -Dbrowser=firefox
+{{else}}
+gradle test -Dbrowser=firefox
+{{/if}}
+
+# Run headless
+{{#if (eq buildTool "maven")}}
+mvn test -Dheadless=true
+{{else}}
+gradle test -Dheadless=true
+{{/if}}
+
+# Run specific environment
+{{#if (eq buildTool "maven")}}
 mvn test -Denv=qa
-
-# Run tests in headed mode (see browser)
-mvn test -Dheadless=false
-
-# Run specific test suite
-mvn test -DsuiteXmlFile=testng.xml
+{{else}}
+gradle test -Denv=qa
+{{/if}}
 ```
 
-## Environment Files
-
-| Environment | File | Usage |
-|-------------|------|-------|
-| Development | `src/test/resources/config/dev.properties` | Default |
-| QA | `src/test/resources/config/qa.properties` | `-Denv=qa` |
-| Production | `src/test/resources/config/prod.properties` | `-Denv=prod` |
-
-## Project Structure
+## 📁 Project Structure
 
 ```
 src/
-├── main/java/
-│ ├── config/ # Environment and test configuration
-│ └── pages/ # Page Object classes
-│ ├── BasePage.java
-│ ├── LoginPage.java
-│ └── HomePage.java
+├── main/java/{{javaPackage}}/
+│   ├── config/           # Configuration management
+│   ├── core/             # BaseTest, {{#if (eq framework "selenium")}}DriverManager{{else}}PlaywrightManager{{/if}}
+│   ├── pages/            # Page Objects (LoginPage, etc.)
+{{#if (eq testRunner "testng")}}
+│   ├── listeners/        # TestNG listeners
+{{/if}}
+│   └── utils/            # Log, Screenshot, {{#if (eq reportingTool "extent-reports")}}ExtentManager{{/if}}{{#if (eq reportingTool "allure")}}AllureManager{{/if}}
+├── main/resources/
+│   └── config/           # dev.properties, qa.properties
 └── test/
-├── java/
-│ ├── tests/ # Test classes
-│ │ ├── BaseTest.java
-│ │ ├── LoginTest.java
-│ │ └── LoginTest.java
-│ └── utils/ # Helper utilities
-└── resources/
-├── config/ # Environment properties
-└── testdata/ # Test data files (CSV, JSON)
+    ├── java/{{javaPackage}}/
+{{#if (eq testingPattern "bdd")}}
+    │   ├── runners/      # Cucumber TestRunner
+    │   └── stepdefinitions/
+{{else}}
+    │   └── tests/        # Test classes
+{{/if}}
+    └── resources/
+{{#if (eq testingPattern "bdd")}}
+        └── features/     # Gherkin feature files
+{{else}}
+{{#if (eq testRunner "testng")}}
+        └── testng.xml    # TestNG suite configuration
+{{/if}}
+{{/if}}
 ```
 
-## Docker
+## ⚙️ Configuration
 
+Edit `src/main/resources/config/dev.properties`:
+
+```properties
+base.url=https://www.saucedemo.com/
+browser={{#if (eq framework "selenium")}}chrome{{else}}chromium{{/if}}
+headless=false
+username=standard_user
+password=secret_sauce
+timeout.default=30
+```
+
+## 🧪 Writing Tests
+
+{{#if (eq testingPattern "bdd")}}
+### Feature File (Gherkin)
+```gherkin
+@login
+Feature: Login Functionality
+
+  @smoke
+  Scenario: Successful login
+    Given I am on the login page
+    When I login with valid credentials
+    Then login should be successful
+```
+
+### Step Definitions
+```java
+@Given("I am on the login page")
+public void iAmOnTheLoginPage() {
+    // Implementation
+}
+```
+{{else}}
+### Page Object
+```java
+public class LoginPage extends BasePage {
+    public void login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
+    }
+}
+```
+
+### Test Class
+```java
+public class LoginTests extends BaseTest {
+    @Test
+    public void testValidLogin() {
+        LoginPage loginPage = new LoginPage();
+        loginPage.login("standard_user", "secret_sauce");
+        Assert.assertTrue(loginPage.isLoginSuccessful());
+    }
+}
+```
+{{/if}}
+
+## 📊 Reports
+
+{{#if (eq reportingTool "extent-reports")}}
+### ExtentReports
+Reports generated in: `reports/ExtentReport_{timestamp}.html`
+
+Open the HTML file in a browser after test execution.
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+### Allure Reports
 ```bash
-docker build -t {{projectName}} .
-docker run {{projectName}}
+# Generate and open report
+{{#if (eq buildTool "maven")}}
+mvn allure:serve
+{{else}}
+gradle allureServe
+{{/if}}
 ```
+Results in: `target/allure-results`
+{{/if}}
+{{#if (eq reportingTool "testng-reports")}}
+### TestNG Reports
+Reports generated in: `target/surefire-reports/`
+{{/if}}
 
-## CI/CD
+## 🖥️ Browsers
 
-GitHub Actions workflow automatically runs tests on push/PR to main or develop branches.
+| Browser | Config Value |
+|---------|--------------|
+{{#if (eq framework "selenium")}}
+| Chrome | `chrome` |
+| Firefox | `firefox` |
+| Edge | `edge` |
+{{else}}
+| Chromium | `chromium` |
+| Firefox | `firefox` |
+| WebKit | `webkit` |
+{{/if}}
 
-## Utilities
+## 📸 Screenshots
 
-- **ScreenshotHelper**: Auto-capture on failure
-- **WaitHelpers**: Custom wait utilities
-- **DataReader**: Test data file reader (CSV, JSON)
-- **Log**: Logging wrapper for consistent output
+Screenshots are automatically captured on test failure:
+- Location: `screenshots/`
+- Format: `FAILED_{TestName}_{timestamp}.png`
 
-## Troubleshooting
+## 🔧 System Requirements
 
-| Issue | Solution |
-|-------|----------|
-| Browser not found | Run `mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"` |
-| Element not found | Check your CSS selectors in page objects match your app |
-| Login fails | Verify credentials in config file and selectors in LoginPage |
-| Timeout errors | Increase `timeout` value in properties file |
+- Java 17+
+- {{#if (eq buildTool "maven")}}Maven 3.9+{{else}}Gradle 8+{{/if}}
+{{#if (eq framework "playwright")}}
+- Playwright browsers (auto-installed on first run)
+{{/if}}
+
+---
+Generated by [QAStarter](https://github.com/qatonic/qastarter)

@@ -1,147 +1,69 @@
 package {{javaPackage}}.config;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Configuration reader for environment-specific properties.
- * Reads properties based on the environment specified via -Denv system property.
- * Default environment is 'dev' if not specified.
+ * Configuration Reader - Loads environment-specific properties.
+ * 
+ * Usage:
+ *   -Denv=qa (defaults to "dev")
+ *   -Dbrowser=firefox (defaults to value in properties)
+ *   -Dheadless=true
+ * 
+ * Config files: src/main/resources/config/{env}.properties
  */
 public class ConfigurationReader {
-    private static Properties properties;
-    private static final String DEFAULT_ENV = "dev";
-    
+
+    private static final Properties properties = new Properties();
+    private static String currentEnvironment;
+
     static {
-        loadProperties();
+        String env = System.getProperty("env", "dev");
+        currentEnvironment = (env == null || env.isEmpty()) ? "dev" : env;
+        loadConfig();
     }
-    
-    private static void loadProperties() {
-        String environment = System.getProperty("env", DEFAULT_ENV);
-        String configFile = "config/" + environment + ".properties";
-        
-        properties = new Properties();
-        
-        try (InputStream inputStream = ConfigurationReader.class
-                .getClassLoader()
-                .getResourceAsStream(configFile)) {
-            
-            if (inputStream != null) {
-                properties.load(inputStream);
-                System.out.println("✅ Loaded configuration from: " + configFile);
+
+    private static void loadConfig() {
+        String configFile = "config/" + currentEnvironment + ".properties";
+        try (InputStream input = ConfigurationReader.class.getClassLoader().getResourceAsStream(configFile)) {
+            if (input != null) {
+                properties.load(input);
+                System.out.println("[CONFIG] Loaded: " + configFile);
             } else {
-                throw new RuntimeException("❌ Configuration file not found: " + configFile);
+                System.err.println("[CONFIG] File not found: " + configFile);
             }
-            
-        } catch (IOException e) {
-            throw new RuntimeException("❌ Error loading configuration file: " + configFile, e);
+        } catch (Exception e) {
+            System.err.println("[CONFIG] Error loading: " + e.getMessage());
         }
     }
-    
-    /**
-     * Get string property value
-     * @param key Property key
-     * @return Property value or null if not found
-     */
+
     public static String getProperty(String key) {
-        return properties.getProperty(key);
+        return System.getProperty(key, properties.getProperty(key));
     }
-    
-    /**
-     * Get string property with default value
-     * @param key Property key
-     * @param defaultValue Default value if property not found
-     * @return Property value or default value
-     */
+
     public static String getProperty(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
+        String value = getProperty(key);
+        return value != null ? value : defaultValue;
     }
-    
-    /**
-     * Get integer property value
-     * @param key Property key
-     * @return Integer value or 0 if not found/invalid
-     */
-    public static int getIntProperty(String key) {
-        try {
-            return Integer.parseInt(getProperty(key, "0"));
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-    
-    /**
-     * Get integer property with default value
-     * @param key Property key
-     * @param defaultValue Default value
-     * @return Integer value or default value
-     */
-    public static int getIntProperty(String key, int defaultValue) {
-        try {
-            return Integer.parseInt(getProperty(key, String.valueOf(defaultValue)));
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
-    }
-    
-    /**
-     * Get boolean property value
-     * @param key Property key
-     * @return Boolean value or false if not found
-     */
-    public static boolean getBooleanProperty(String key) {
-        return Boolean.parseBoolean(getProperty(key, "false"));
-    }
-    
-    /**
-     * Get boolean property with default value
-     * @param key Property key
-     * @param defaultValue Default value
-     * @return Boolean value or default value
-     */
-    public static boolean getBooleanProperty(String key, boolean defaultValue) {
-        return Boolean.parseBoolean(getProperty(key, String.valueOf(defaultValue)));
-    }
-    
-    // Commonly used configuration getters
+
     public static String getBaseUrl() {
         return getProperty("base.url");
     }
-    
+
     public static String getBrowser() {
         return getProperty("browser", "chrome");
     }
-    
+
     public static boolean isHeadless() {
-        return getBooleanProperty("headless", false);
+        return Boolean.parseBoolean(getProperty("headless", "false"));
     }
-    
-    public static int getImplicitWait() {
-        return getIntProperty("implicit.wait", 10);
+
+    public static int getTimeout() {
+        return Integer.parseInt(getProperty("timeout.default", "30"));
     }
-    
-    public static int getExplicitWait() {
-        return getIntProperty("explicit.wait", 20);
-    }
-    
-    public static int getPageLoadTimeout() {
-        return getIntProperty("page.load.timeout", 30);
-    }
-    
-    public static String getGridUrl() {
-        return getProperty("grid.url");
-    }
-    
-    public static boolean isRemoteExecution() {
-        return getBooleanProperty("remote.execution", false);
-    }
-    
-    public static int getRetryCount() {
-        return getIntProperty("retry.count", 1);
-    }
-    
+
     public static String getCurrentEnvironment() {
-        return System.getProperty("env", DEFAULT_ENV);
+        return currentEnvironment;
     }
 }

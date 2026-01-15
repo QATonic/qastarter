@@ -3,144 +3,69 @@ package {{javaPackage}}.stepdefinitions;
 import {{javaPackage}}.core.DriverManager;
 import {{javaPackage}}.utils.Log;
 import {{javaPackage}}.utils.ScreenshotUtils;
-{{#if (eq reportingTool "allure")}}
-import {{javaPackage}}.utils.AllureManager;
-{{/if}}
 {{#if (eq reportingTool "extent-reports")}}
 import {{javaPackage}}.utils.ExtentManager;
+import com.aventstack.extentreports.Status;
+import java.io.File;
+import java.util.Base64;
+import java.nio.file.Files;
 {{/if}}
 import io.cucumber.java.After;
-import io.cucumber.java.AfterStep;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
-import org.openqa.selenium.WebDriver;
 
 /**
- * Cucumber Hooks for setup and teardown
- * Manages WebDriver lifecycle and reporting
+ * Cucumber Hooks - Setup and teardown for BDD scenarios.
  */
 public class Hooks {
 
-    private WebDriver driver;
-
-    /**
-     * Before each scenario
-     * Initialize WebDriver and reporting
-     * @param scenario Cucumber scenario
-     */
     @Before
     public void setUp(Scenario scenario) {
-        Log.info("===== Starting Scenario: " + scenario.getName() + " =====");
-        Log.info("Tags: " + scenario.getSourceTagNames());
-        
-        // Initialize WebDriver
+        Log.info("================================================================================");
+        Log.info("SCENARIO: " + scenario.getName());
+        Log.info("================================================================================");
+{{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.getInstance();
+        ExtentManager.createTest(scenario.getName(), String.join(", ", scenario.getSourceTagNames()));
+{{/if}}
         DriverManager.initializeDriver();
-        driver = DriverManager.getDriver();
-        Log.info("WebDriver initialized successfully");
-{{#if (eq reportingTool "extent-reports")}}
-        
-        // Initialize ExtentReports test
-        ExtentManager.createTest(scenario.getName(), "BDD Scenario");
-        ExtentManager.logInfo("Scenario started: " + scenario.getName());
-        for (String tag : scenario.getSourceTagNames()) {
-            ExtentManager.addCategory(tag);
-        }
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        
-        // Add Allure labels
-        AllureManager.addCategory(scenario.getName());
-        for (String tag : scenario.getSourceTagNames()) {
-            AllureManager.addFeature(tag);
-        }
-{{/if}}
+        Log.info("Browser initialized for scenario");
     }
 
-    /**
-     * After each step
-     * Capture screenshot on failure
-     * @param scenario Cucumber scenario
-     */
-    @AfterStep
-    public void afterStep(Scenario scenario) {
-        // Take screenshot if step failed
-        if (scenario.isFailed()) {
-            Log.error("Step failed: " + scenario.getName());
-            
-            try {
-                String screenshotPath = ScreenshotUtils.captureScreenshot(
-                    driver, 
-                    "Failed_Step_" + System.currentTimeMillis()
-                );
-                Log.info("Screenshot captured: " + screenshotPath);
-{{#if (eq reportingTool "extent-reports")}}
-                
-                ExtentManager.attachScreenshotFile(screenshotPath, "Failed Step Screenshot");
-                ExtentManager.logFail("Step failed - Screenshot captured");
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-                
-                AllureManager.attachScreenshot(driver, "Failed Step Screenshot");
-{{/if}}
-                
-                // Embed screenshot in Cucumber report
-                byte[] screenshot = ScreenshotUtils.getScreenshotAsBytes(driver);
-                scenario.attach(screenshot, "image/png", "Failed Step Screenshot");
-            } catch (Exception e) {
-                Log.error("Failed to capture screenshot", e);
-            }
-        }
-    }
-
-    /**
-     * After each scenario
-     * Quit WebDriver and finalize reporting
-     * @param scenario Cucumber scenario
-     */
     @After
     public void tearDown(Scenario scenario) {
         try {
-            // Take final screenshot if scenario failed
             if (scenario.isFailed()) {
-                Log.error("Scenario failed: " + scenario.getName());
-                
-                try {
-                    String screenshotPath = ScreenshotUtils.captureScreenshot(
-                        driver,
-                        "Failed_Scenario_" + scenario.getName() + "_" + System.currentTimeMillis()
-                    );
-                    Log.info("Final screenshot captured: " + screenshotPath);
+                Log.error("Scenario FAILED: " + scenario.getName());
+
+                if (DriverManager.isDriverInitialized()) {
+                    byte[] screenshot = ScreenshotUtils.captureAsBytes();
+                    if (screenshot != null) {
+                        scenario.attach(screenshot, "image/png", "Screenshot on Failure");
 {{#if (eq reportingTool "extent-reports")}}
-                    
-                    ExtentManager.attachScreenshotFile(screenshotPath, "Scenario Failure Screenshot");
-                    ExtentManager.logFail("Scenario failed: " + scenario.getName());
+                        if (ExtentManager.getTest() != null) {
+                            String base64 = Base64.getEncoder().encodeToString(screenshot);
+                            ExtentManager.getTest().log(Status.FAIL, "Scenario failed");
+                            ExtentManager.getTest().addScreenCaptureFromBase64String(base64, "Screenshot");
+                        }
 {{/if}}
-{{#if (eq reportingTool "allure")}}
-                    
-                    AllureManager.attachScreenshot(driver, "Scenario Failure Screenshot");
-{{/if}}
-                    
-                    // Embed in Cucumber report
-                    byte[] screenshot = ScreenshotUtils.getScreenshotAsBytes(driver);
-                    scenario.attach(screenshot, "image/png", "Scenario Failure Screenshot");
-                } catch (Exception e) {
-                    Log.error("Failed to capture final screenshot", e);
+                    }
+                    ScreenshotUtils.capture("FAILED_" + scenario.getName().replaceAll(" ", "_"));
                 }
             } else {
-                Log.info("Scenario passed: " + scenario.getName());
+                Log.info("Scenario PASSED: " + scenario.getName());
 {{#if (eq reportingTool "extent-reports")}}
-                ExtentManager.logPass("Scenario passed: " + scenario.getName());
+                if (ExtentManager.getTest() != null) {
+                    ExtentManager.getTest().log(Status.PASS, "Scenario passed");
+                }
 {{/if}}
             }
-{{#if (eq reportingTool "extent-reports")}}
-            
-            // Remove test from ThreadLocal
-            ExtentManager.removeTest();
-{{/if}}
         } finally {
-            // Quit WebDriver
             DriverManager.quitDriver();
-            Log.info("===== Finished Scenario: " + scenario.getName() + " =====\n");
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentManager.flush();
+{{/if}}
+            Log.info("Browser closed");
         }
     }
 }

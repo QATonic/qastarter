@@ -1,79 +1,40 @@
 using System;
+using System.IO;
 
-namespace {{projectName}}.Utils
+namespace {{projectNamespace}}.Utils
 {
     /// <summary>
-    /// Logger utility for test execution.
+    /// Logger with timestamp-based log files.
+    /// Logs saved to: logs/test_{timestamp}.log
     /// </summary>
-    public static class Logger
+    public class Logger
     {
-        private const string Separator = "========================================";
-        private const string StepPrefix = "  → ";
+        private static readonly Lazy<Logger> _instance = new(() => new Logger());
+        private readonly string _logFile;
+        private static readonly object _lock = new();
 
-        public static void Info(string message)
+        public static Logger Instance => _instance.Value;
+
+        private Logger()
         {
-            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ℹ️  INFO: {message}");
+            var logDir = "logs";
+            if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
+            
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            _logFile = Path.Combine(logDir, $"test_{timestamp}.log");
         }
 
-        public static void Debug(string message)
+        private void Log(string level, string message)
         {
-            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] 🔍 DEBUG: {message}");
+            var logLine = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | {level,-8} | {message}";
+            Console.WriteLine(logLine);
+            lock (_lock) { File.AppendAllText(_logFile, logLine + Environment.NewLine); }
         }
 
-        public static void Warn(string message)
-        {
-            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ⚠️  WARN: {message}");
-        }
-
-        public static void Error(string message)
-        {
-            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ❌ ERROR: {message}");
-        }
-
-        public static void Error(string message, Exception ex)
-        {
-            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ❌ ERROR: {message}");
-            Console.WriteLine($"Exception: {ex.Message}");
-            Console.WriteLine($"StackTrace: {ex.StackTrace}");
-        }
-
-        public static void Step(string message)
-        {
-            Console.WriteLine($"{StepPrefix}{message}");
-        }
-
-        public static void StartSection(string sectionName)
-        {
-            Console.WriteLine(Separator);
-            Console.WriteLine(sectionName);
-            Console.WriteLine(Separator);
-        }
-
-        public static void EndSection()
-        {
-            Console.WriteLine(Separator);
-        }
-
-        public static void TestStart(string testName)
-        {
-            StartSection($"🧪 TEST START: {testName}");
-        }
-
-        public static void TestEnd(string testName, bool passed)
-        {
-            var result = passed ? "✅ PASSED" : "❌ FAILED";
-            Console.WriteLine($"TEST {result}: {testName}");
-            EndSection();
-        }
-
-        public static void Assertion(string description)
-        {
-            Console.WriteLine($"  ✓ ASSERT: {description}");
-        }
-
-        public static void Data(string key, object value)
-        {
-            Console.WriteLine($"  📊 DATA: {key} = {value}");
-        }
+        public void Info(string message) => Log("INFO", message);
+        public void Error(string message) => Log("ERROR", message);
+        public void Step(string message) => Log("STEP", message);
+        public void TestStart(string testName) => Log("INFO", $"TEST START: {testName}");
+        public void TestEnd(string testName, string status) => Log("INFO", $"TEST END: {testName} - {status}");
     }
 }

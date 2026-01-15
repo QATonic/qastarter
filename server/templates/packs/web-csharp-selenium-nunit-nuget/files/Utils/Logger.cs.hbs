@@ -1,40 +1,40 @@
-namespace {{projectName}}.Utils
+using System;
+using System.IO;
+
+namespace {{projectNamespace}}.Utils
 {
-    public static class Logger
+    /// <summary>
+    /// Logger with timestamp-based log files.
+    /// Logs saved to: logs/test_{timestamp}.log
+    /// </summary>
+    public class Logger
     {
-        private static readonly string LogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
-        private static readonly string LogFile = Path.Combine(LogPath, $"test_{DateTime.Now:yyyyMMdd}.log");
+        private static readonly Lazy<Logger> _instance = new(() => new Logger());
+        private readonly string _logFile;
+        private static readonly object _lock = new();
 
-        static Logger()
+        public static Logger Instance => _instance.Value;
+
+        private Logger()
         {
-            if (!Directory.Exists(LogPath))
-            {
-                Directory.CreateDirectory(LogPath);
-            }
+            var logDir = "logs";
+            if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
+            
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            _logFile = Path.Combine(logDir, $"test_{timestamp}.log");
         }
 
-        public static void Info(string message)
+        private void Log(string level, string message)
         {
-            Log("INFO", message);
-            Console.WriteLine($"[INFO] {message}");
+            var logLine = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | {level,-8} | {message}";
+            Console.WriteLine(logLine);
+            lock (_lock) { File.AppendAllText(_logFile, logLine + Environment.NewLine); }
         }
 
-        public static void Error(string message)
-        {
-            Log("ERROR", message);
-            Console.WriteLine($"[ERROR] {message}");
-        }
-
-        public static void Debug(string message)
-        {
-            Log("DEBUG", message);
-            Console.WriteLine($"[DEBUG] {message}");
-        }
-
-        private static void Log(string level, string message)
-        {
-            var logMessage = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{level}] {message}";
-            File.AppendAllText(LogFile, logMessage + Environment.NewLine);
-        }
+        public void Info(string message) => Log("INFO", message);
+        public void Error(string message) => Log("ERROR", message);
+        public void Step(string message) => Log("STEP", message);
+        public void TestStart(string testName) => Log("INFO", $"TEST START: {testName}");
+        public void TestEnd(string testName, string status) => Log("INFO", $"TEST END: {testName} - {status}");
     }
 }

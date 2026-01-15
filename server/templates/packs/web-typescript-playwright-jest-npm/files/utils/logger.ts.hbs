@@ -1,31 +1,28 @@
-import winston, { Logger } from 'winston';
-import * as path from 'path';
+/**
+ * Logger - Consistent logging with timestamps.
+ */
+import * as fs from "fs";
+import * as path from "path";
 
-const logger: Logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.File({
-      filename: path.join('logs', 'error.log'),
-      level: 'error'
-    }),
-    new winston.transports.File({
-      filename: path.join('logs', 'combined.log')
-    }),
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(({ level, message, timestamp }): string => {
-          return `${timestamp} ${level}: ${message}`;
-        })
-      )
-    })
-  ]
-});
+class Logger {
+  private logDir = "logs";
+  private logFile: string;
 
-export default logger;
+  constructor() {
+    if (!fs.existsSync(this.logDir)) fs.mkdirSync(this.logDir, { recursive: true });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    this.logFile = path.join(this.logDir, `test_${timestamp}.log`);
+  }
+
+  private log(level: string, message: string): void {
+    const logLine = `${new Date().toISOString()} | ${level.padEnd(8)} | ${message}`;
+    console.log(logLine);
+    fs.appendFileSync(this.logFile, logLine + "\n");
+  }
+
+  info(message: string): void { this.log("INFO", message); }
+  error(message: string): void { this.log("ERROR", message); }
+  step(message: string): void { this.log("STEP", message); }
+}
+
+export const log = new Logger();

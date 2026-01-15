@@ -1,0 +1,9 @@
+class BasePage {
+  async click(selector) { const el = await $(selector); await el.click(); }
+  async type(selector, text) { const el = await $(selector); await el.setValue(text); }
+  async getText(selector) { const el = await $(selector); return await el.getText(); }
+  async isDisplayed(selector) { try { return await $(selector).isDisplayed(); } catch { return false; } }
+  async open(path = "/") { await browser.url(path); }
+  async getUrl() { return await browser.getUrl(); }
+}
+module.exports = { BasePage };

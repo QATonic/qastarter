@@ -1,61 +1,45 @@
-/// <summary>
-/// Login Page Object
-/// 
-/// HOW TO CUSTOMIZE FOR YOUR APPLICATION:
-/// 1. Open your app's login page in a browser
-/// 2. Right-click on each element → Inspect → Copy selector
-/// 3. Replace the placeholder locators below with your actual locators
-/// </summary>
 using OpenQA.Selenium;
-using {{projectName}}.Config;
 
-namespace {{projectName}}.Pages
+namespace {{projectNamespace}}.Pages
 {
+    /// <summary>
+    /// Login Page - Page object for SauceDemo login.
+    /// </summary>
     public class LoginPage : BasePage
     {
-        private readonly string _url;
-        
-        // ============================================
-        // UPDATE THESE LOCATORS FOR YOUR APPLICATION
-        // ============================================
-        // Tip: Use browser DevTools (F12) to find correct selectors
-        public readonly By UsernameInput = By.Id("username");           // Your username/email input field
-        public readonly By PasswordInput = By.Id("password");           // Your password input field
-        private readonly By _loginButton = By.CssSelector("button[type='submit']"); // Your login/submit button
-        private readonly By _errorMessage = By.CssSelector(".error-message");       // Error message element
-        // ============================================
+        // Locators (SauceDemo)
+        private By UsernameField => By.Id("user-name");
+        private By PasswordField => By.Id("password");
+        private By LoginButton => By.Id("login-button");
+        private By ErrorMessage => By.CssSelector("[data-test='error']");
 
-        public LoginPage(IWebDriver driver) : base(driver)
+        public LoginPage EnterUsername(string username)
         {
-            // UPDATE: Change "/login" to your actual login page path
-            _url = $"{EnvConfig.Instance.GetBaseUrl()}/login";
+            Type(UsernameField, username);
+            return this;
         }
 
-        public void NavigateToLogin()
+        public LoginPage EnterPassword(string password)
         {
-            Navigate(_url);
+            Type(PasswordField, password);
+            return this;
         }
+
+        public void ClickLogin() => Click(LoginButton);
 
         public void Login(string username, string password)
         {
-            Type(UsernameInput, username);
-            Type(PasswordInput, password);
-            Click(_loginButton);
+            EnterUsername(username);
+            EnterPassword(password);
+            ClickLogin();
         }
 
-        public string GetErrorMessage()
-        {
-            return GetText(_errorMessage);
-        }
+        public string GetErrorMessage() => IsErrorDisplayed() ? GetText(ErrorMessage) : "";
 
-        public bool IsErrorDisplayed()
-        {
-            return IsDisplayed(_errorMessage);
-        }
+        public bool IsErrorDisplayed() => IsDisplayed(ErrorMessage);
 
-        public bool IsLoginSuccessful()
-        {
-            return GetCurrentUrl().Contains("/dashboard");
-        }
+        public bool IsLoginSuccessful() => GetCurrentUrl().Contains("inventory");
+
+        public bool IsLoaded() => IsDisplayed(LoginButton);
     }
 }

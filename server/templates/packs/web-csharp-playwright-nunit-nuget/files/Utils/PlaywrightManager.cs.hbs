@@ -1,0 +1,46 @@
+using Microsoft.Playwright;
+using {{projectNamespace}}.Config;
+
+namespace {{projectNamespace}}.Utils
+{
+    public class PlaywrightManager
+    {
+        private static IPlaywright _playwright;
+        private static IBrowser _browser;
+        private static IBrowserContext _context;
+        private static IPage _page;
+
+        public static IPage Page => _page ?? throw new InvalidOperationException("Browser not initialized");
+
+        public static async Task<IPage> InitBrowserAsync(string browser = null, bool? headless = null)
+        {
+            browser ??= ConfigReader.Instance.Browser;
+            headless ??= ConfigReader.Instance.Headless;
+
+            Console.WriteLine($"[Playwright] Initializing: {browser} | Headless: {headless}");
+
+            _playwright = await Playwright.CreateAsync();
+
+            _browser = browser.ToLower() switch
+            {
+                "firefox" => await _playwright.Firefox.LaunchAsync(new() { Headless = headless }),
+                "webkit" => await _playwright.Webkit.LaunchAsync(new() { Headless = headless }),
+                _ => await _playwright.Chromium.LaunchAsync(new() { Headless = headless })
+            };
+
+            _context = await _browser.NewContextAsync(new() { ViewportSize = new() { Width = 1920, Height = 1080 } });
+            _page = await _context.NewPageAsync();
+
+            Console.WriteLine("[Playwright] Browser initialized");
+            return _page;
+        }
+
+        public static async Task CloseBrowserAsync()
+        {
+            if (_context != null) await _context.CloseAsync();
+            if (_browser != null) await _browser.CloseAsync();
+            _playwright?.Dispose();
+            Console.WriteLine("[Playwright] Browser closed");
+        }
+    }
+}

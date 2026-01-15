@@ -1,9 +1,8 @@
 {
   "id": "web-typescript-selenium-jest-npm",
-  "displayName": "TypeScript Selenium WebDriver Jest Framework",
-  "name": "TypeScript Selenium WebDriver Jest Framework",
-  "description": "Production-ready Selenium automation framework with TypeScript, Jest, and Page Object Model",
-  "version": "1.0.0",
+  "displayName": "TypeScript Selenium Jest Framework",
+  "description": "Production-ready Selenium automation framework with TypeScript and Jest",
+  "version": "2.0.0",
   "supportsDynamic": true,
   "supportedCombination": {
     "testingType": "web",
@@ -13,209 +12,39 @@
     "buildTool": "npm"
   },
   "dynamicSupport": {
-    "reportingTools": [
-      "allure",
-      "jest-html-reporter",
-      "mochawesome"
-    ],
-    "cicdTools": [
-      "jenkins",
-      "github-actions",
-      "gitlab-ci",
-      "azure-devops",
-      "circleci"
-    ],
-    "testingPatterns": [
-      "page-object-model",
-      "bdd"
-    ]
+    "reportingTools": ["allure", "jest-html"],
+    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
+    "testingPatterns": ["page-object-model", "bdd"]
   },
   "toolVersions": {
-    "node": "20",
-    "typescript": "5.3.3",
-    "selenium-webdriver": "4.16.0",
+    "node": "18+",
+    "selenium": "4.16.0",
     "jest": "29.7.0",
-    "ts-jest": "29.1.1",
-    "allure-jest": "2.15.1"
+    "typescript": "5.3.0"
   },
   "files": [
-    {
-      "path": "package.json",
-      "isTemplate": true,
-      "description": "NPM package configuration"
-    },
-    {
-      "path": "tsconfig.json",
-      "isTemplate": true,
-      "description": "TypeScript configuration"
-    },
-    {
-      "path": "jest.config.ts",
-      "isTemplate": true,
-      "description": "Jest configuration"
-    },
-    {
-      "path": "README.md",
-      "isTemplate": true,
-      "description": "Setup and usage documentation"
-    },
-    {
-      "path": ".gitignore",
-      "isTemplate": false,
-      "description": "Git ignore rules"
-    },
-    {
-      "path": ".env.example",
-      "isTemplate": false,
-      "description": "Environment variables example"
-    },
-    {
-      "path": ".github/workflows/tests.yml",
-      "isTemplate": true,
-      "description": "GitHub Actions CI/CD",
-      "conditional": {
-        "cicdTool": "github-actions"
-      }
-    },
-    {
-      "path": "Jenkinsfile",
-      "isTemplate": true,
-      "description": "Jenkins CI/CD pipeline",
-      "conditional": {
-        "cicdTool": "jenkins"
-      }
-    },
-    {
-      "path": "azure-pipelines.yml",
-      "isTemplate": true,
-      "description": "Azure DevOps CI/CD pipeline",
-      "conditional": {
-        "cicdTool": "azure-devops"
-      }
-    },
-    {
-      "path": "config/env.config.ts",
-      "isTemplate": true,
-      "description": "Environment configuration"
-    },
-    {
-      "path": "config/browser.config.ts",
-      "isTemplate": true,
-      "description": "Browser configuration"
-    },
-    {
-      "path": "pages/BasePage.ts",
-      "isTemplate": true,
-      "description": "Base page with common methods"
-    },
-    {
-      "path": "pages/LoginPage.ts",
-      "isTemplate": true,
-      "description": "Login page object"
-    },
-    {
-      "path": "pages/HomePage.ts",
-      "isTemplate": true,
-      "description": "Home page object"
-    },
-    {
-      "path": "utils/DriverFactory.ts",
-      "isTemplate": true,
-      "description": "WebDriver factory"
-    },
-    {
-      "path": "utils/Logger.ts",
-      "isTemplate": true,
-      "description": "Winston logger"
-    },
-    {
-      "path": "utils/ScreenshotHelper.ts",
-      "isTemplate": true,
-      "description": "Screenshot utility"
-    },
-    {
-      "path": "utils/WaitHelpers.ts",
-      "isTemplate": true,
-      "description": "Wait utilities"
-    },
-    {
-      "path": "utils/DataReader.ts",
-      "isTemplate": true,
-      "description": "Test data reader"
-    },
-    {
-      "path": "tests/login.test.ts",
-      "isTemplate": true,
-      "description": "Login tests"
-    },
-    {
-      "path": "tests/setup.ts",
-      "isTemplate": true,
-      "description": "Test setup/teardown"
-    },
-    {
-      "path": "data/dev.json",
-      "isTemplate": true,
-      "description": "Dev environment data"
-    },
-    {
-      "path": "data/qa.json",
-      "isTemplate": true,
-      "description": "QA environment data"
-    },
-    {
-      "path": "data/users.json",
-      "isTemplate": true,
-      "description": "User test data"
-    },
-    {
-      "path": "types/index.d.ts",
-      "isTemplate": true,
-      "description": "TypeScript type definitions"
-    },
-    {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration",
-      "conditional": {
-        "utilities.includeDocker": true
-      }
-    },
-    {
-      "path": ".dockerignore",
-      "isTemplate": false,
-      "description": "Docker ignore"
-    },
-    {
-      "path": "features/login.feature",
-      "isTemplate": true,
-      "description": "Sample login feature",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "step-definitions/loginSteps.ts",
-      "isTemplate": true,
-      "description": "Cucumber-js step definitions",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose for Selenium Grid",
-      "conditional": {
-        "utilities.includeDockerCompose": true
-      }
-    }
+    {"path": "package.json", "isTemplate": true},
+    {"path": "tsconfig.json", "isTemplate": true},
+    {"path": "jest.config.ts", "isTemplate": true},
+    {"path": "README.md", "isTemplate": true},
+    {"path": ".gitignore", "isTemplate": false},
+    {"path": ".env.example", "isTemplate": false},
+    {"path": "Jenkinsfile", "isTemplate": true, "conditional": {"cicdTool": "jenkins"}},
+    {"path": ".github/workflows/tests.yml", "isTemplate": true, "conditional": {"cicdTool": "github-actions"}},
+    {"path": ".gitlab-ci.yml", "isTemplate": true, "conditional": {"cicdTool": "gitlab-ci"}},
+    {"path": "azure-pipelines.yml", "isTemplate": true, "conditional": {"cicdTool": "azure-devops"}},
+    {"path": ".circleci/config.yml", "isTemplate": true, "conditional": {"cicdTool": "circleci"}},
+    {"path": "Dockerfile", "isTemplate": true},
+    {"path": "docker-compose.yml", "isTemplate": true},
+    {"path": "config/ConfigReader.ts", "isTemplate": true},
+    {"path": "config/dev.json", "isTemplate": false},
+    {"path": "config/qa.json", "isTemplate": false},
+    {"path": "pages/BasePage.ts", "isTemplate": true},
+    {"path": "pages/LoginPage.ts", "isTemplate": true},
+    {"path": "utils/DriverManager.ts", "isTemplate": true},
+    {"path": "tests/login.spec.ts", "isTemplate": true},
+    {"path": "features/login.feature", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
+    {"path": "step-definitions/loginSteps.ts", "isTemplate": true, "conditional": {"testingPattern": "bdd"}}
   ],
-  "directories": [
-    "test-results",
-    "logs",
-    "screenshots",
-    "allure-results",
-    "types"
-  ]
+  "directories": ["logs", "screenshots", "reports"]
 }

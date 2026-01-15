@@ -1,21 +1,5 @@
-# JUnit5 Platform Configuration
-
-# Parallel execution settings
-junit.jupiter.execution.parallel.enabled = true
-junit.jupiter.execution.parallel.mode.default = same_thread
-junit.jupiter.execution.parallel.mode.classes.default = concurrent
-junit.jupiter.execution.parallel.config.strategy = dynamic
-junit.jupiter.execution.parallel.config.dynamic.factor = 1.0
-
-# Test instance lifecycle
-junit.jupiter.testinstance.lifecycle.default = per_method
-
-# Display name generation
-junit.jupiter.displayname.generator.default = org.junit.jupiter.api.DisplayNameGenerator$ReplaceUnderscores
-
-# Extension auto-detection
-junit.jupiter.extensions.autodetection.enabled = true
-
-# Execution timeout (optional - 5 minutes per test)
-junit.jupiter.execution.timeout.default = 5m
-junit.jupiter.execution.timeout.mode = disabled_on_debug
+# JUnit Platform Configuration
+cucumber.execution.parallel.enabled=false
+cucumber.glue={{javaPackage}}.stepdefinitions
+cucumber.features=classpath:features
+cucumber.plugin=pretty, html:target/cucumber-reports/cucumber.html

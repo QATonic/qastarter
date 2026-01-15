@@ -1,26 +1,37 @@
-FROM mcr.microsoft.com/playwright/java:v{{toolVersions.playwright}}-jammy
+FROM eclipse-temurin:17-jdk-alpine
+
+# Install browsers for headless testing
+RUN apk add --no-cache \
+    chromium \
+    chromium-chromedriver \
+    firefox \
+    font-noto \
+    font-noto-cjk
+
+# Set environment variables
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_DRIVER=/usr/bin/chromedriver \
+    JAVA_OPTS="-Xmx512m"
 
 WORKDIR /app
 
-# Copy Gradle wrapper and build files
-COPY gradlew .
+# Copy project files
+COPY pom.xml ./
+{{#if (eq buildTool "maven")}}
+COPY mvnw ./
+COPY .mvn .mvn
+RUN chmod +x mvnw && ./mvnw dependency:resolve
+{{else}}
+COPY gradlew ./
 COPY gradle gradle
-COPY build.gradle .
-COPY settings.gradle .
-COPY gradle.properties .
+RUN chmod +x gradlew && ./gradlew dependencies
+{{/if}}
 
-# Make gradlew executable
-RUN chmod +x gradlew
+COPY src ./src
 
-# Copy source code
-COPY src src
-COPY testng.xml .
-
-# Download dependencies
-RUN ./gradlew dependencies --no-daemon
-
-# Install Playwright browsers
-RUN ./gradlew installPlaywrightBrowsers --no-daemon
-
-# Default command to run tests
-CMD ["./gradlew", "test", "-Pheadless=true", "--no-daemon"]
+# Run tests
+{{#if (eq buildTool "maven")}}
+CMD ["./mvnw", "clean", "test", "-Dheadless=true"]
+{{else}}
+CMD ["./gradlew", "clean", "test", "-Dheadless=true"]
+{{/if}}

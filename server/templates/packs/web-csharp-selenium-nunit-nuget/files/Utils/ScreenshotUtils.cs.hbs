@@ -1,0 +1,40 @@
+using System;
+using System.IO;
+using OpenQA.Selenium;
+
+namespace {{projectNamespace}}.Utils
+{
+    /// <summary>
+    /// Screenshot Utilities with timestamp.
+    /// Screenshots saved to: screenshots/
+    /// </summary>
+    public class ScreenshotUtils
+    {
+        private const string ScreenshotDir = "screenshots";
+
+        public static string Capture(string name)
+        {
+            try
+            {
+                var driver = DriverManager.Driver;
+                if (!Directory.Exists(ScreenshotDir)) Directory.CreateDirectory(ScreenshotDir);
+
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                var sanitizedName = System.Text.RegularExpressions.Regex.Replace(name, "[^a-zA-Z0-9_-]", "_");
+                var filename = $"{sanitizedName}_{timestamp}.png";
+                var filepath = Path.Combine(ScreenshotDir, filename);
+
+                var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
+                screenshot.SaveAsFile(filepath);
+                
+                Logger.Instance.Info($"Screenshot saved: {filepath}");
+                return filepath;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error($"Failed to capture screenshot: {ex.Message}");
+                return null;
+            }
+        }
+    }
+}

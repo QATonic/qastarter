@@ -1,301 +1,9 @@
 {
   "id": "web-java-playwright-testng-gradle",
   "displayName": "Java Playwright TestNG Gradle Framework",
+  "description": "Production-ready Playwright automation framework with TestNG and Gradle",
+  "version": "2.0.0",
   "supportsDynamic": true,
-  "name": "Java Playwright TestNG Gradle Framework",
-  "description": "Production-ready Playwright test automation framework with Java, TestNG, and Gradle for web testing",
-  "version": "1.0.0",
-  "tags": [
-    "web",
-    "playwright",
-    "java",
-    "testng",
-    "gradle",
-    "pom"
-  ],
-  "toolVersions": {
-    "java": "17",
-    "playwright": "1.41.0",
-    "testng": "7.8.0",
-    "gradle": "8.5",
-    "log4j": "2.22.0",
-    "extentreports": "5.1.1",
-    "allure": "2.25.0",
-    "cucumber": "7.15.0"
-  },
-  "files": [
-    {
-      "path": "build.gradle",
-      "isTemplate": true,
-      "description": "Gradle build configuration with Playwright and TestNG dependencies"
-    },
-    {
-      "path": "settings.gradle",
-      "isTemplate": true,
-      "description": "Gradle settings file"
-    },
-    {
-      "path": "gradle.properties",
-      "isTemplate": true,
-      "description": "Gradle properties configuration"
-    },
-    {
-      "path": "gradlew",
-      "isTemplate": false,
-      "description": "Gradle wrapper script (Unix)"
-    },
-    {
-      "path": "gradlew.bat",
-      "isTemplate": false,
-      "description": "Gradle wrapper script (Windows)"
-    },
-    {
-      "path": "gradle/wrapper/gradle-wrapper.properties",
-      "isTemplate": false,
-      "description": "Gradle wrapper properties"
-    },
-    {
-      "path": "testng.xml",
-      "isTemplate": true,
-      "description": "TestNG suite configuration"
-    },
-    {
-      "path": "README.md",
-      "isTemplate": true,
-      "description": "Project documentation and setup guide"
-    },
-    {
-      "path": ".gitignore",
-      "isTemplate": false,
-      "description": "Git ignore patterns"
-    },
-    {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration for containerized testing",
-      "conditional": {
-        "utilities.includeDocker": true
-      }
-    },
-    {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose for Playwright testing",
-      "conditional": {
-        "utilities.includeDockerCompose": true
-      }
-    },
-    {
-      "path": "Jenkinsfile",
-      "isTemplate": true,
-      "description": "Jenkins declarative pipeline for CI/CD",
-      "conditional": {
-        "cicdTool": "jenkins"
-      }
-    },
-    {
-      "path": ".github/workflows/tests.yml",
-      "isTemplate": true,
-      "description": "GitHub Actions CI/CD workflow",
-      "conditional": {
-        "cicdTool": "github-actions"
-      }
-    },
-    {
-      "path": ".gitlab-ci.yml",
-      "isTemplate": true,
-      "description": "GitLab CI pipeline configuration",
-      "conditional": {
-        "cicdTool": "gitlab-ci"
-      }
-    },
-    {
-      "path": "azure-pipelines.yml",
-      "isTemplate": true,
-      "description": "Azure DevOps pipeline configuration",
-      "conditional": {
-        "cicdTool": "azure-devops"
-      }
-    },
-    {
-      "path": ".circleci/config.yml",
-      "isTemplate": true,
-      "description": "CircleCI pipeline configuration",
-      "conditional": {
-        "cicdTool": "circleci"
-      }
-    },
-    {
-      "path": "src/main/java/config/EnvConfig.java",
-      "isTemplate": true,
-      "description": "Environment configuration manager"
-    },
-    {
-      "path": "src/main/java/config/TestConfig.java",
-      "isTemplate": true,
-      "description": "Test configuration and settings"
-    },
-    {
-      "path": "src/main/java/pages/BasePage.java",
-      "isTemplate": true,
-      "description": "Base page class with common functionality"
-    },
-    {
-      "path": "src/main/java/pages/LoginPage.java",
-      "isTemplate": true,
-      "description": "Login page object"
-    },
-    {
-      "path": "src/main/java/pages/HomePage.java",
-      "isTemplate": true,
-      "description": "Home page object"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/Log.java",
-      "isTemplate": true,
-      "description": "Logger wrapper for consistent logging"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/AllureManager.java",
-      "isTemplate": true,
-      "description": "Allure Reports configuration and management",
-      "conditional": {
-        "reportingTool": "allure"
-      }
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
-      "isTemplate": true,
-      "description": "ExtentReports configuration and management",
-      "conditional": {
-        "reportingTool": "extent-reports"
-      }
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
-      "isTemplate": true,
-      "description": "TestNG listener for reporting and screenshots"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java",
-      "isTemplate": true,
-      "description": "TestNG retry analyzer for flaky test handling"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/listeners/RetryTransformer.java",
-      "isTemplate": true,
-      "description": "TestNG annotation transformer for automatic retry application"
-    },
-    {
-      "path": "src/test/java/utils/ScreenshotHelper.java",
-      "isTemplate": true,
-      "description": "Screenshot capture utility"
-    },
-    {
-      "path": "src/test/java/utils/WaitHelpers.java",
-      "isTemplate": true,
-      "description": "Custom wait utilities"
-    },
-    {
-      "path": "src/test/java/utils/DataReader.java",
-      "isTemplate": true,
-      "description": "Test data file reader"
-    },
-    {
-      "path": "src/test/java/tests/BaseTest.java",
-      "isTemplate": true,
-      "description": "Base test class with setup and teardown"
-    },
-    {
-      "path": "src/test/java/tests/LoginTest.java",
-      "isTemplate": true,
-      "description": "Login test suite"
-    },
-    {
-      "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
-      "isTemplate": true,
-      "description": "Cucumber TestNG runner",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java",
-      "isTemplate": true,
-      "description": "Step definitions for login scenarios",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "src/test/java/{{packagePath}}/stepdefinitions/Hooks.java",
-      "isTemplate": true,
-      "description": "Cucumber hooks for setup and teardown",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "src/test/resources/features/Login.feature",
-      "isTemplate": true,
-      "description": "Sample login feature with Gherkin scenarios",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "src/test/resources/config/dev.properties",
-      "isTemplate": true,
-      "description": "Development environment configuration"
-    },
-    {
-      "path": "src/test/resources/config/qa.properties",
-      "isTemplate": true,
-      "description": "QA environment configuration"
-    },
-    {
-      "path": "src/test/resources/config/prod.properties",
-      "isTemplate": true,
-      "description": "Production environment configuration"
-    },
-    {
-      "path": "src/test/resources/log4j2.xml",
-      "isTemplate": true,
-      "description": "Log4j2 logging configuration"
-    },
-    {
-      "path": "src/main/resources/allure.properties",
-      "isTemplate": true,
-      "description": "Allure Reports configuration",
-      "conditional": {
-        "reportingTool": "allure"
-      }
-    },
-    {
-      "path": "src/main/resources/extent-config.xml",
-      "isTemplate": true,
-      "description": "ExtentReports configuration",
-      "conditional": {
-        "reportingTool": "extent-reports"
-      }
-    },
-    {
-      "path": "src/test/resources/testdata/users.csv",
-      "isTemplate": true,
-      "description": "Sample CSV test data file"
-    },
-    {
-      "path": "src/test/resources/testdata/sample.json",
-      "isTemplate": true,
-      "description": "Sample JSON test data file"
-    }
-  ],
-  "directories": [
-    "reports",
-    "logs",
-    "screenshots",
-    "gradle/wrapper"
-  ],
   "supportedCombination": {
     "testingType": "web",
     "framework": "playwright",
@@ -304,22 +12,54 @@
     "buildTool": "gradle"
   },
   "dynamicSupport": {
-    "reportingTools": [
-      "allure",
-      "extent-reports",
-      "testng-reports",
-      "junit-reports"
-    ],
-    "cicdTools": [
-      "jenkins",
-      "github-actions",
-      "gitlab-ci",
-      "azure-devops",
-      "circleci"
-    ],
-    "testingPatterns": [
-      "page-object-model",
-      "bdd"
-    ]
-  }
+    "reportingTools": ["allure", "extent-reports", "testng-reports"],
+    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
+    "testingPatterns": ["page-object-model", "bdd"]
+  },
+  "toolVersions": {
+    "java": "17",
+    "gradle": "8.5",
+    "playwright": "1.41.0",
+    "testng": "7.8.0",
+    "cucumber": "7.15.0"
+  },
+  "files": [
+    {"path": "build.gradle", "isTemplate": true},
+    {"path": "settings.gradle", "isTemplate": true},
+    {"path": "gradle.properties", "isTemplate": true},
+    {"path": "README.md", "isTemplate": true},
+    {"path": ".gitignore", "isTemplate": false},
+    {"path": "Jenkinsfile", "isTemplate": true, "conditional": {"cicdTool": "jenkins"}},
+    {"path": ".github/workflows/tests.yml", "isTemplate": true, "conditional": {"cicdTool": "github-actions"}},
+    {"path": ".gitlab-ci.yml", "isTemplate": true, "conditional": {"cicdTool": "gitlab-ci"}},
+    {"path": "azure-pipelines.yml", "isTemplate": true, "conditional": {"cicdTool": "azure-devops"}},
+    {"path": ".circleci/config.yml", "isTemplate": true, "conditional": {"cicdTool": "circleci"}},
+    {"path": "Dockerfile", "isTemplate": true, "conditional": {"utilities.includeDocker": true}},
+    {"path": "docker-compose.yml", "isTemplate": true, "conditional": {"utilities.includeDockerCompose": true}},
+    {"path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/core/PlaywrightManager.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/core/BaseTest.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/pages/BasePage.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/pages/LoginPage.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/listeners/TestListener.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/utils/Log.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/utils/TestDataReader.java", "isTemplate": true},
+    {"path": "src/main/java/{{packagePath}}/utils/ExtentManager.java", "isTemplate": true, "conditional": {"reportingTool": "extent-reports"}},
+    {"path": "src/main/java/{{packagePath}}/utils/AllureManager.java", "isTemplate": true, "conditional": {"reportingTool": "allure"}},
+    {"path": "src/test/java/{{packagePath}}/tests/LoginTests.java", "isTemplate": true},
+    {"path": "src/test/java/{{packagePath}}/runners/TestRunner.java", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
+    {"path": "src/test/java/{{packagePath}}/stepdefinitions/Hooks.java", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
+    {"path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
+    {"path": "src/test/resources/features/Login.feature", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
+    {"path": "src/test/resources/testng.xml", "isTemplate": true},
+    {"path": "src/main/resources/config/dev.properties", "isTemplate": true},
+    {"path": "src/main/resources/config/qa.properties", "isTemplate": true},
+    {"path": "src/main/resources/config/prod.properties", "isTemplate": true},
+    {"path": "src/main/resources/log4j2.xml", "isTemplate": true},
+    {"path": "src/main/resources/extent-config.xml", "isTemplate": true, "conditional": {"reportingTool": "extent-reports"}},
+    {"path": "src/main/resources/allure.properties", "isTemplate": true, "conditional": {"reportingTool": "allure"}}
+  ],
+  "directories": ["logs", "screenshots", "reports"]
 }

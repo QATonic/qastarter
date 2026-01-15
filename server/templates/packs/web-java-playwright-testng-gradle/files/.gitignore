@@ -1,11 +1,41 @@
+# Build
 target/
+build/
+out/
 *.class
-*.log
-logs/
-screenshots/
-test-results/
+
+# IDE
 .idea/
 *.iml
-.settings/
-.classpath
+.vscode/
 .project
+.classpath
+.settings/
+*.swp
+*~
+
+# Test outputs
+screenshots/
+logs/
+reports/
+allure-results/
+test-output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+*.log
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Environment
+.env

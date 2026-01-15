@@ -1,79 +1,32 @@
-# {{projectName}} - Docker Compose for Selenium Grid
-# Provides scalable browser infrastructure for parallel testing
-
 version: '3.8'
 
 services:
-  # Selenium Hub
+  tests:
+    build: .
+    environment:
+      - HEADLESS=true
+      - BROWSER=chrome
+    volumes:
+      - ./screenshots:/app/screenshots
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+
+{{#if (eq framework "selenium")}}
+  # Selenium Grid (optional)
   selenium-hub:
-    image: selenium/hub:4.16.0
+    image: selenium/hub:4
     container_name: selenium-hub
     ports:
       - "4442:4442"
       - "4443:4443"
       - "4444:4444"
-    environment:
-      - GRID_MAX_SESSION=10
-      - GRID_BROWSER_TIMEOUT=300
-    networks:
-      - selenium-grid
 
-  # Chrome Node
   chrome:
-    image: selenium/node-chrome:4.16.0
-    shm_size: 2gb
+    image: selenium/node-chrome:4
     depends_on:
       - selenium-hub
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_MAX_SESSIONS=4
-    networks:
-      - selenium-grid
-    deploy:
-      replicas: 2
-
-  # Firefox Node
-  firefox:
-    image: selenium/node-firefox:4.16.0
-    shm_size: 2gb
-    depends_on:
-      - selenium-hub
-    environment:
-      - SE_EVENT_BUS_HOST=selenium-hub
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-    networks:
-      - selenium-grid
-    deploy:
-      replicas: 1
-
-  # Test Runner
-  tests:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - selenium-hub
-      - chrome
-    environment:
-      - SELENIUM_HUB_URL=http://selenium-hub:4444/wd/hub
-      - BROWSER=chrome
-      - HEADLESS=true
-      - TEST_ENV=qa
-    volumes:
-      - ./target:/app/target
-    networks:
-      - selenium-grid
-    profiles:
-      - test
-
-networks:
-  selenium-grid:
-    driver: bridge
-
-# Usage:
-# Start Grid: docker-compose up -d selenium-hub chrome firefox
-# Run tests: docker-compose --profile test up tests
-# Scale nodes: docker-compose up -d --scale chrome=4
+{{/if}}

@@ -2,207 +2,66 @@ package {{javaPackage}}.pages;
 
 import {{javaPackage}}.core.DriverManager;
 import {{javaPackage}}.utils.Log;
-import {{javaPackage}}.utils.WaitUtils;
-import {{javaPackage}}.utils.WebActions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 
 /**
- * Base page class containing common page functionality.
- * All page objects should extend this class.
+ * Base Page - Extend this in all your page objects.
  */
 public abstract class BasePage {
+
     protected WebDriver driver;
-    
+    protected WebDriverWait wait;
+
     public BasePage() {
         this.driver = DriverManager.getDriver();
-        PageFactory.initElements(driver, this);
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
-    
-    /**
-     * Get page title
-     * @return Page title
-     */
+
+    protected void click(By locator) {
+        Log.action("Click: " + locator);
+        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+    }
+
+    protected void type(By locator, String text) {
+        Log.action("Type into: " + locator);
+        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        element.clear();
+        element.sendKeys(text);
+    }
+
+    protected String getText(By locator) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
+    }
+
+    protected boolean isDisplayed(By locator) {
+        try {
+            return driver.findElement(locator).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected void waitForElement(By locator) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
     public String getPageTitle() {
-        String title = driver.getTitle();
-        Log.debug("Page title: " + title);
-        return title;
+        return driver.getTitle();
     }
-    
-    /**
-     * Get current URL
-     * @return Current URL
-     */
+
     public String getCurrentUrl() {
-        String url = driver.getCurrentUrl();
-        Log.debug("Current URL: " + url);
-        return url;
+        return driver.getCurrentUrl();
     }
-    
-    /**
-     * Check if page is loaded by verifying page title
-     * @param expectedTitle Expected page title
-     * @return true if page is loaded
-     */
-    public boolean isPageLoaded(String expectedTitle) {
-        return WaitUtils.waitForTitle(expectedTitle);
+
+    protected void logAction(String action) {
+        Log.step("[" + getClass().getSimpleName() + "] " + action);
     }
-    
-    /**
-     * Check if page is loaded by verifying URL contains text
-     * @param urlPart Expected URL part
-     * @return true if page is loaded
-     */
-    public boolean isPageLoadedByUrl(String urlPart) {
-        return WaitUtils.waitForUrlContains(urlPart);
-    }
-    
-    /**
-     * Check if element is displayed
-     * @param locator Element locator
-     * @return true if element is displayed
-     */
-    protected boolean isElementDisplayed(By locator) {
-        return WebActions.isDisplayed(locator);
-    }
-    
-    /**
-     * Check if element is enabled
-     * @param locator Element locator
-     * @return true if element is enabled
-     */
-    protected boolean isElementEnabled(By locator) {
-        return WebActions.isEnabled(locator);
-    }
-    
-    /**
-     * Wait for element to be visible
-     * @param locator Element locator
-     * @return WebElement when visible
-     */
-    protected WebElement waitForElement(By locator) {
-        return WaitUtils.waitForVisibility(locator);
-    }
-    
-    /**
-     * Wait for element to be clickable
-     * @param locator Element locator
-     * @return WebElement when clickable
-     */
-    protected WebElement waitForClickableElement(By locator) {
-        return WaitUtils.waitForClickability(locator);
-    }
-    
-    /**
-     * Click element
-     * @param locator Element locator
-     */
-    protected void clickElement(By locator) {
-        WebActions.click(locator);
-    }
-    
-    /**
-     * Type text into element
-     * @param locator Element locator
-     * @param text Text to type
-     */
-    protected void typeText(By locator, String text) {
-        WebActions.type(locator, text);
-    }
-    
-    /**
-     * Get text from element
-     * @param locator Element locator
-     * @return Element text
-     */
-    protected String getElementText(By locator) {
-        return WebActions.getText(locator);
-    }
-    
-    /**
-     * Get attribute value from element
-     * @param locator Element locator
-     * @param attributeName Attribute name
-     * @return Attribute value
-     */
-    protected String getElementAttribute(By locator, String attributeName) {
-        return WebActions.getAttribute(locator, attributeName);
-    }
-    
-    /**
-     * Select dropdown option by text
-     * @param locator Dropdown locator
-     * @param optionText Option text
-     */
-    protected void selectDropdownByText(By locator, String optionText) {
-        WebActions.selectByText(locator, optionText);
-    }
-    
-    /**
-     * Scroll to element
-     * @param locator Element locator
-     */
-    protected void scrollToElement(By locator) {
-        WebActions.scrollToElement(locator);
-    }
-    
-    /**
-     * Hover over element
-     * @param locator Element locator
-     */
-    protected void hoverOverElement(By locator) {
-        WebActions.hover(locator);
-    }
-    
-    /**
-     * Refresh current page
-     */
-    public void refreshPage() {
-        Log.step("Refreshing page: " + getClass().getSimpleName());
-        driver.navigate().refresh();
-    }
-    
-    /**
-     * Navigate back
-     */
-    public void navigateBack() {
-        Log.step("Navigating back from: " + getClass().getSimpleName());
-        driver.navigate().back();
-    }
-    
-    /**
-     * Wait for page to load completely
-     * @param timeoutInSeconds Timeout in seconds
-     */
-    protected void waitForPageToLoad(int timeoutInSeconds) {
-        Log.debug("Waiting for page to load completely");
-        WaitUtils.hardWait(1000); // Give a moment for page to start loading
-        
-        // You can add more sophisticated page load checks here
-        // For example, wait for specific elements or JavaScript to complete
-    }
-    
-    /**
-     * Abstract method that each page should implement to verify page is loaded
-     * @return true if page is loaded correctly
-     */
+
     public abstract boolean isLoaded();
-    
-    /**
-     * Get page name for logging
-     * @return Page name
-     */
-    protected String getPageName() {
-        return getClass().getSimpleName();
-    }
-    
-    /**
-     * Log page action
-     * @param action Action description
-     */
-    protected void logPageAction(String action) {
-        Log.step("[" + getPageName() + "] " + action);
-    }
 }

@@ -1,147 +1,183 @@
 # {{projectName}}
 
-A production-ready Playwright test automation framework using Java, TestNG, and Gradle.
+A production-ready **{{#if (eq framework "selenium")}}Selenium WebDriver{{else}}Playwright{{/if}}** test automation framework using **{{#if (eq testRunner "testng")}}TestNG{{else}}JUnit5{{/if}}** and **{{#if (eq buildTool "maven")}}Maven{{else}}Gradle{{/if}}**.
 
-## 🚀 Features
+## 🚀 Quick Start
 
-- **Playwright** for modern web automation
-- **TestNG** for test execution and reporting
-- **Gradle** for build management
-- **Page Object Model** design pattern
-{{#if (eq testingPattern "bdd")}}
-- **Cucumber BDD** for behavior-driven development
+```bash
+# Run all tests
+{{#if (eq buildTool "maven")}}
+mvn clean test
+{{else}}
+gradle clean test
 {{/if}}
-{{#if (eq reportingTool "allure")}}
-- **Allure Reports** for beautiful test reports
+
+# Run with specific browser
+{{#if (eq buildTool "maven")}}
+mvn test -Dbrowser=firefox
+{{else}}
+gradle test -Dbrowser=firefox
 {{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-- **ExtentReports** for detailed HTML reports
+
+# Run headless
+{{#if (eq buildTool "maven")}}
+mvn test -Dheadless=true
+{{else}}
+gradle test -Dheadless=true
 {{/if}}
-- **Log4j2** for logging
-- **Multi-browser support** (Chromium, Firefox, WebKit)
-- **Parallel execution** support
-- **Docker** support for containerized testing
 
-## 📋 Prerequisites
-
-- Java 17 or higher
-- Gradle 8.4 or higher (or use the included wrapper)
-
-## 🛠️ Setup
-
-1. Clone the repository
-2. Install Playwright browsers:
-   ```bash
-   ./gradlew installPlaywrightBrowsers
-   ```
-
-## 🏃 Running Tests
-
-### Run all tests
-```bash
-./gradlew test
-```
-
-### Run with specific browser
-```bash
-./gradlew test -Pbrowser=chromium
-./gradlew test -Pbrowser=firefox
-./gradlew test -Pbrowser=webkit
-```
-
-### Run in headless mode
-```bash
-./gradlew test -Pheadless=true
-```
-
-### Run with specific environment
-```bash
-./gradlew test -Penv=dev
-./gradlew test -Penv=qa
-./gradlew test -Penv=prod
-```
-
-### Run smoke tests
-```bash
-./gradlew smokeTest
-```
-
-### Run regression tests with parallel execution
-```bash
-./gradlew regressionTest -Pparallel=true -PthreadCount=3
+# Run specific environment
+{{#if (eq buildTool "maven")}}
+mvn test -Denv=qa
+{{else}}
+gradle test -Denv=qa
+{{/if}}
 ```
 
 ## 📁 Project Structure
 
 ```
-{{projectName}}/
-├── build.gradle              # Gradle build configuration
-├── settings.gradle           # Gradle settings
-├── gradle.properties         # Gradle properties
-├── testng.xml               # TestNG suite configuration
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   ├── config/      # Configuration classes
-│   │   │   ├── pages/       # Page objects
-│   │   │   └── utils/       # Utility classes
-│   │   └── resources/       # Main resources
-│   └── test/
-│       ├── java/
-│       │   ├── tests/       # Test classes
-│       │   └── utils/       # Test utilities
-│       └── resources/
-│           ├── config/      # Environment configs
-│           ├── testdata/    # Test data files
-{{#if (eq testingPattern "bdd")}}
-│           └── features/    # Cucumber feature files
+src/
+├── main/java/{{javaPackage}}/
+│   ├── config/           # Configuration management
+│   ├── core/             # BaseTest, {{#if (eq framework "selenium")}}DriverManager{{else}}PlaywrightManager{{/if}}
+│   ├── pages/            # Page Objects (LoginPage, etc.)
+{{#if (eq testRunner "testng")}}
+│   ├── listeners/        # TestNG listeners
 {{/if}}
-│           └── log4j2.xml   # Logging configuration
-├── reports/                 # Generated reports
-├── logs/                    # Log files
-└── screenshots/             # Failure screenshots
+│   └── utils/            # Log, Screenshot, {{#if (eq reportingTool "extent-reports")}}ExtentManager{{/if}}{{#if (eq reportingTool "allure")}}AllureManager{{/if}}
+├── main/resources/
+│   └── config/           # dev.properties, qa.properties
+└── test/
+    ├── java/{{javaPackage}}/
+{{#if (eq testingPattern "bdd")}}
+    │   ├── runners/      # Cucumber TestRunner
+    │   └── stepdefinitions/
+{{else}}
+    │   └── tests/        # Test classes
+{{/if}}
+    └── resources/
+{{#if (eq testingPattern "bdd")}}
+        └── features/     # Gherkin feature files
+{{else}}
+{{#if (eq testRunner "testng")}}
+        └── testng.xml    # TestNG suite configuration
+{{/if}}
+{{/if}}
 ```
 
-## 🔧 Configuration
+## ⚙️ Configuration
 
-### Environment Configuration
-Edit files in `src/test/resources/config/`:
-- `dev.properties` - Development environment
-- `qa.properties` - QA environment
-- `prod.properties` - Production environment
+Edit `src/main/resources/config/dev.properties`:
 
-### Browser Configuration
-Set browser via command line or `gradle.properties`:
-- `chromium` (default)
-- `firefox`
-- `webkit`
+```properties
+base.url=https://www.saucedemo.com/
+browser={{#if (eq framework "selenium")}}chrome{{else}}chromium{{/if}}
+headless=false
+username=standard_user
+password=secret_sauce
+timeout.default=30
+```
+
+## 🧪 Writing Tests
+
+{{#if (eq testingPattern "bdd")}}
+### Feature File (Gherkin)
+```gherkin
+@login
+Feature: Login Functionality
+
+  @smoke
+  Scenario: Successful login
+    Given I am on the login page
+    When I login with valid credentials
+    Then login should be successful
+```
+
+### Step Definitions
+```java
+@Given("I am on the login page")
+public void iAmOnTheLoginPage() {
+    // Implementation
+}
+```
+{{else}}
+### Page Object
+```java
+public class LoginPage extends BasePage {
+    public void login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
+    }
+}
+```
+
+### Test Class
+```java
+public class LoginTests extends BaseTest {
+    @Test
+    public void testValidLogin() {
+        LoginPage loginPage = new LoginPage();
+        loginPage.login("standard_user", "secret_sauce");
+        Assert.assertTrue(loginPage.isLoginSuccessful());
+    }
+}
+```
+{{/if}}
 
 ## 📊 Reports
-{{#if (eq reportingTool "allure")}}
 
-### Allure Reports
-Generate and view Allure reports:
-```bash
-./gradlew allureReport
-./gradlew allureServe
-```
-{{/if}}
 {{#if (eq reportingTool "extent-reports")}}
-
 ### ExtentReports
-Reports are generated in `reports/extent-report.html` after test execution.
+Reports generated in: `reports/ExtentReport_{timestamp}.html`
+
+Open the HTML file in a browser after test execution.
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+### Allure Reports
+```bash
+# Generate and open report
+{{#if (eq buildTool "maven")}}
+mvn allure:serve
+{{else}}
+gradle allureServe
+{{/if}}
+```
+Results in: `target/allure-results`
+{{/if}}
+{{#if (eq reportingTool "testng-reports")}}
+### TestNG Reports
+Reports generated in: `target/surefire-reports/`
 {{/if}}
 
-### TestNG Reports
-Default TestNG reports are generated in `build/reports/tests/test/index.html`.
+## 🖥️ Browsers
 
-## 🐳 Docker
+| Browser | Config Value |
+|---------|--------------|
+{{#if (eq framework "selenium")}}
+| Chrome | `chrome` |
+| Firefox | `firefox` |
+| Edge | `edge` |
+{{else}}
+| Chromium | `chromium` |
+| Firefox | `firefox` |
+| WebKit | `webkit` |
+{{/if}}
 
-### Build and run tests in Docker
-```bash
-docker-compose up --build
-```
+## 📸 Screenshots
 
-## 📝 License
+Screenshots are automatically captured on test failure:
+- Location: `screenshots/`
+- Format: `FAILED_{TestName}_{timestamp}.png`
 
-This project is licensed under the MIT License.
+## 🔧 System Requirements
+
+- Java 17+
+- {{#if (eq buildTool "maven")}}Maven 3.9+{{else}}Gradle 8+{{/if}}
+{{#if (eq framework "playwright")}}
+- Playwright browsers (auto-installed on first run)
+{{/if}}
+
+---
+Generated by [QAStarter](https://github.com/qatonic/qastarter)

@@ -1,0 +1,80 @@
+/**
+ * Configuration Reader - Load environment-specific settings.
+ * 
+ * @example
+ * import { config } from "./config/ConfigReader";
+ * const baseUrl = config.get("BASE_URL");
+ */
+import * as dotenv from "dotenv";
+import * as fs from "fs";
+import * as path from "path";
+
+dotenv.config();
+
+class ConfigurationReader {
+  private config: Record<string, string> = {};
+
+  constructor() {
+    this.loadConfig();
+  }
+
+  private loadConfig(): void {
+    const env = process.env.ENV || "dev";
+    const configPath = path.join(__dirname, `${env}.json`);
+
+    if (fs.existsSync(configPath)) {
+      const content = fs.readFileSync(configPath, "utf-8");
+      this.config = JSON.parse(content);
+      console.log(`[Config] Loaded: ${configPath}`);
+    } else {
+      console.log(`[Config] Using environment variables only`);
+    }
+  }
+
+  get(key: string, defaultValue?: string): string {
+    // Environment variable takes precedence
+    const envValue = process.env[key];
+    if (envValue) return envValue;
+
+    // Then config file
+    return this.config[key] || defaultValue || "";
+  }
+
+  getNumber(key: string, defaultValue: number = 0): number {
+    const value = this.get(key);
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? defaultValue : parsed;
+  }
+
+  getBoolean(key: string, defaultValue: boolean = false): boolean {
+    const value = this.get(key);
+    if (!value) return defaultValue;
+    return ["true", "1", "yes"].includes(value.toLowerCase());
+  }
+
+  get baseUrl(): string {
+    return this.get("BASE_URL", "https://www.saucedemo.com/");
+  }
+
+  get browser(): string {
+    return this.get("BROWSER", "chrome");
+  }
+
+  get headless(): boolean {
+    return this.getBoolean("HEADLESS", false);
+  }
+
+  get timeout(): number {
+    return this.getNumber("TIMEOUT", 30000);
+  }
+
+  get username(): string {
+    return this.get("USERNAME", "standard_user");
+  }
+
+  get password(): string {
+    return this.get("PASSWORD", "secret_sauce");
+  }
+}
+
+export const config = new ConfigurationReader();

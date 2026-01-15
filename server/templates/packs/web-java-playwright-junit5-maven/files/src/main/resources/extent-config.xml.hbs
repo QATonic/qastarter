@@ -1,85 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extentreports>
     <configuration>
-        <!-- report theme -->
-        <!-- standard, dark -->
+        <!-- Report theme - standard or dark -->
         <theme>standard</theme>
         
-        <!-- document encoding -->  
-        <!-- defaults to UTF-8 -->
+        <!-- Document encoding -->
         <encoding>UTF-8</encoding>
         
-        <!-- protocol for script and stylesheets -->   
-        <!-- defaults to https -->
+        <!-- Protocol for report resources (http or https) -->
         <protocol>https</protocol>
         
-        <!-- title of the document -->
-        <documentTitle>{{projectName}} - Automation Test Results</documentTitle>
+        <!-- Report title -->
+        <documentTitle>{{projectName}} - Test Report</documentTitle>
         
-        <!-- report name - displayed at top-nav -->
-        <reportName>UI Automation Test Execution Report</reportName>
+        <!-- Report name -->
+        <reportName>{{projectName}} Playwright Automation Report</reportName>
         
-        <!-- global date format override -->  
-        <!-- defaults to yyyy-MM-dd -->
-        <dateFormat>yyyy-MM-dd</dateFormat>
+        <!-- Report headline -->
+        <reportHeadline>Automated Test Execution Results</reportHeadline>
         
-        <!-- global time format override -->   
-        <!-- defaults to HH:mm:ss -->
-        <timeFormat>HH:mm:ss</timeFormat>
+        <!-- Chart location - top or bottom -->
+        <chartLocation>top</chartLocation>
         
-        <!-- custom javascript -->
-        <scripts>
-            <![CDATA[
-                $(document).ready(function() {
-                    // Custom JavaScript can be added here
-                    console.log('ExtentReports loaded for {{projectName}}');
-                });
-            ]]>
-        </scripts>
+        <!-- Enable/disable timeline -->
+        <enableTimeline>true</enableTimeline>
         
-        <!-- custom styles -->
-        <styles>
-            <![CDATA[
-                .r-img {
-                    width: 100%;
-                }
-                
-                .test-content {
-                    padding: 10px;
-                }
-                
-                .step-details {
-                    margin: 5px 0;
-                }
-                
-                /* Custom styling for pass/fail status */
-                .badge-success {
-                    background-color: #28a745;
-                }
-                
-                .badge-danger {
-                    background-color: #dc3545;
-                }
-                
-                .badge-warning {
-                    background-color: #ffc107;
-                    color: #212529;
-                }
-                
-                /* Screenshot styling */
-                .screenshot-container {
-                    text-align: center;
-                    margin: 10px 0;
-                }
-                
-                .screenshot-container img {
-                    max-width: 100%;
-                    height: auto;
-                    border: 1px solid #ddd;
-                    border-radius: 4px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                }
-            ]]>
-        </styles>
+        <!-- Date/time format -->
+        <timeStampFormat>MMM dd, yyyy HH:mm:ss</timeStampFormat>
+        
+        <!-- Custom CSS (optional) -->
+        <css></css>
+        
+        <!-- Custom JavaScript (optional) -->
+        <scripts></scripts>
     </configuration>
 </extentreports>

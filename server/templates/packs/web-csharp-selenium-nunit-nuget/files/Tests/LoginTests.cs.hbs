@@ -1,54 +1,53 @@
 using NUnit.Framework;
-using {{projectName}}.Pages;
+using {{projectNamespace}}.Pages;
+using {{projectNamespace}}.Utils;
+using {{projectNamespace}}.Config;
+{{#if (eq reportingTool "allure")}}
+using Allure.Net.Commons;
+{{/if}}
 
-namespace {{projectName}}.Tests
+namespace {{projectNamespace}}.Tests
 {
-// ========== UPDATE THESE VALUES ==========
-// Replace with your actual test credentials
-// ==========================================
+    [TestFixture]
+    public class LoginTests
+    {
+        private LoginPage _loginPage;
 
-[TestFixture]
-public class LoginTests : BaseTest
-{
-// ========== UPDATE THESE VALUES ==========
-private const string TestUsername = "YOUR_USERNAME_HERE";
-private const string TestPassword = "YOUR_PASSWORD_HERE";
-// ==========================================
+        [SetUp]
+        public void Setup()
+        {
+            DriverManager.InitDriver();
+            DriverManager.Driver.Navigate().GoToUrl(ConfigReader.Instance.BaseUrl);
+            _loginPage = new LoginPage();
+        }
 
-private LoginPage _loginPage = null!;
+        [TearDown]
+        public void TearDown()
+        {
+            DriverManager.QuitDriver();
+        }
 
-[SetUp]
-public new void SetUp()
-{
-base.SetUp();
-_loginPage = new LoginPage(Driver);
-}
+        [Test]
+        [Category("Smoke")]
+        public void ValidLogin_ShouldRedirectToInventory()
+        {
+            _loginPage.Login(
+                ConfigReader.Instance.Username,
+                ConfigReader.Instance.Password
+            );
 
-/// <summary>
-    /// Verify login functionality works correctly.
-    ///
-    /// BEFORE RUNNING:
-    /// 1. Update TestUsername and TestPassword above with valid credentials
-    /// 2. Ensure your application URL is set in Config/EnvConfig.cs
-    /// 3. Update selectors in Pages/LoginPage.cs to match your app
-    /// </summary>
-[Test]
-public void ShouldLoginWithValidCredentials()
-{
-// Get credentials from config
-var username = EnvConfig.Instance.GetUsername("validUser");
-var password = EnvConfig.Instance.GetPassword("validUser");
+            Assert.That(_loginPage.IsLoginSuccessful(), Is.True,
+                "User should be redirected to inventory page");
+        }
 
-// Step 1: Navigate to login page
-_loginPage.NavigateToLogin();
+        [Test]
+        [Category("Regression")]
+        public void InvalidLogin_ShouldShowError()
+        {
+            _loginPage.Login("invalid_user", "wrong_password");
 
-// Step 2: Enter credentials and submit
-_loginPage.Login(username, password);
-
-// Step 3: Verify login was successful
-Assert.That(_loginPage.IsLoginSuccessful(), Is.True);
-
-// Test passed! Your {{framework}} framework is working correctly.
-}
-}
+            Assert.That(_loginPage.IsErrorDisplayed(), Is.True,
+                "Error message should be displayed");
+        }
+    }
 }

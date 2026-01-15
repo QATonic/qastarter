@@ -1,70 +1,63 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using {{projectName}}.Utils;
+using System;
+using {{projectNamespace}}.Utils;
+using {{projectNamespace}}.Config;
 
-namespace {{projectName}}.Pages
+namespace {{projectNamespace}}.Pages
 {
-    public class BasePage
+    /// <summary>
+    /// Base Page - Parent class for all page objects.
+    /// </summary>
+    public abstract class BasePage
     {
-        protected readonly IWebDriver Driver;
-        protected readonly WebDriverWait Wait;
+        protected IWebDriver Driver => DriverManager.Driver;
+        protected WebDriverWait Wait { get; }
+        protected int Timeout => ConfigReader.Instance.Timeout;
 
-        public BasePage(IWebDriver driver)
+        protected BasePage()
         {
-            Driver = driver;
-            Wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(Timeout));
         }
 
-        public void Navigate(string url)
+        protected void Click(By locator)
         {
-            Logger.Info($"Navigating to: {url}");
-            Driver.Navigate().GoToUrl(url);
+            Wait.Until(d => d.FindElement(locator).Displayed);
+            Driver.FindElement(locator).Click();
         }
 
-        public IWebElement FindElement(By locator)
+        protected void Type(By locator, string text)
         {
-            Wait.Until(d => d.FindElement(locator));
-            return Driver.FindElement(locator);
-        }
-
-        public void Click(By locator)
-        {
-            FindElement(locator).Click();
-            Logger.Info($"Clicked: {locator}");
-        }
-
-        public void Type(By locator, string text)
-        {
-            var element = FindElement(locator);
+            var element = Wait.Until(d => d.FindElement(locator));
             element.Clear();
             element.SendKeys(text);
-            Logger.Info($"Typed '{text}' into: {locator}");
         }
 
-        public string GetText(By locator)
+        protected string GetText(By locator)
         {
-            return FindElement(locator).Text;
+            return Wait.Until(d => d.FindElement(locator)).Text;
         }
 
-        public bool IsDisplayed(By locator)
+        protected bool IsDisplayed(By locator)
         {
             try
             {
-                return FindElement(locator).Displayed;
+                return Driver.FindElement(locator).Displayed;
             }
-            catch (NoSuchElementException)
+            catch
             {
                 return false;
             }
         }
 
-        public string GetPageTitle() => Driver.Title;
+        protected IWebElement WaitForElement(By locator)
+        {
+            return Wait.Until(d => d.FindElement(locator));
+        }
 
+        public string GetTitle() => Driver.Title;
         public string GetCurrentUrl() => Driver.Url;
 
-        public void TakeScreenshot(string name)
-        {
-            new ScreenshotHelper(Driver).Capture(name);
-        }
+        public void NavigateTo(string url) => Driver.Navigate().GoToUrl(url);
     }
 }

@@ -1,0 +1,63 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.ScreenshotUtils;
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+import com.aventstack.extentreports.Status;
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+import {{javaPackage}}.utils.AllureManager;
+{{/if}}
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+import java.util.Optional;
+
+/**
+ * JUnit5 TestWatcher - Handles test lifecycle events.
+ */
+public class TestWatcher implements org.junit.jupiter.api.extension.TestWatcher {
+
+    @Override
+    public void testSuccessful(ExtensionContext context) {
+        Log.testEnd(context.getDisplayName(), "PASSED");
+{{#if (eq reportingTool "extent-reports")}}
+        if (ExtentManager.getTest() != null) {
+            ExtentManager.getTest().log(Status.PASS, "Test passed");
+        }
+{{/if}}
+    }
+
+    @Override
+    public void testFailed(ExtensionContext context, Throwable cause) {
+        Log.error("TEST FAILED: " + context.getDisplayName());
+        Log.error("Reason: " + cause.getMessage());
+
+        String screenshotPath = ScreenshotUtils.capture("FAILED_" + context.getDisplayName());
+
+{{#if (eq reportingTool "extent-reports")}}
+        if (ExtentManager.getTest() != null) {
+            ExtentManager.getTest().log(Status.FAIL, cause.getMessage());
+            if (screenshotPath != null) {
+                ExtentManager.getTest().addScreenCaptureFromPath(screenshotPath);
+            }
+        }
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+        byte[] screenshot = ScreenshotUtils.captureAsBytes();
+        if (screenshot != null) {
+            AllureManager.attachScreenshot("Screenshot on Failure", screenshot);
+        }
+{{/if}}
+    }
+
+    @Override
+    public void testAborted(ExtensionContext context, Throwable cause) {
+        Log.warn("TEST ABORTED: " + context.getDisplayName());
+    }
+
+    @Override
+    public void testDisabled(ExtensionContext context, Optional<String> reason) {
+        Log.warn("TEST DISABLED: " + context.getDisplayName() + " - " + reason.orElse("No reason"));
+    }
+}

@@ -1,207 +1,57 @@
 package {{javaPackage}}.stepdefinitions;
 
+import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.core.DriverManager;
-import {{javaPackage}}.pages.HomePage;
 import {{javaPackage}}.pages.LoginPage;
 import {{javaPackage}}.utils.Log;
-{{#if (eq reportingTool "extent-reports")}}
-import {{javaPackage}}.utils.ExtentManager;
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-import {{javaPackage}}.utils.AllureManager;
-{{/if}}
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.openqa.selenium.WebDriver;
-import org.testng.Assert;
+import io.cucumber.java.en.Then;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Step Definitions for Login scenarios
- * Contains Gherkin step implementations
+ * Step Definitions for Login Feature (BDD Style)
  */
 public class LoginSteps {
 
     private LoginPage loginPage;
-    private HomePage homePage;
-
-    /**
-     * Get LoginPage instance (lazy initialization)
-     */
-    private LoginPage getLoginPage() {
-        if (loginPage == null) {
-            loginPage = new LoginPage(DriverManager.getDriver());
-        }
-        return loginPage;
-    }
-
-    /**
-     * Get HomePage instance (lazy initialization)
-     */
-    private HomePage getHomePage() {
-        if (homePage == null) {
-            homePage = new HomePage(DriverManager.getDriver());
-        }
-        return homePage;
-    }
 
     @Given("I am on the login page")
     public void iAmOnTheLoginPage() {
-        Log.info("Step: I am on the login page");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logStep("Navigate to login page");
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Navigate to login page");
-{{/if}}
-        
-        getLoginPage().navigateToLoginPage();
-        Assert.assertTrue(getLoginPage().isLoginPageDisplayed(), "Login page should be displayed");
-        
-        Log.info("Successfully navigated to login page");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logPass("Login page displayed successfully");
-{{/if}}
+        Log.step("Opening login page");
+        String baseUrl = ConfigurationReader.getBaseUrl();
+        DriverManager.getDriver().get(baseUrl);
+        loginPage = new LoginPage();
+        assertTrue(loginPage.isLoaded(), "Login page should be loaded");
+        Log.info("Login page loaded successfully");
     }
 
-    @When("I enter username {string}")
-    public void iEnterUsername(String username) {
-        Log.info("Step: I enter username: " + username);
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logStep("Enter username: " + username);
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Enter username", "Username: " + username);
-{{/if}}
-        
-        getLoginPage().enterUsername(username);
-        Log.info("Username entered successfully");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logPass("Username entered: " + username);
-{{/if}}
+    @When("I login with valid credentials")
+    public void iLoginWithValidCredentials() {
+        Log.step("Logging in with valid credentials from config");
+        String username = ConfigurationReader.getProperty("username");
+        String password = ConfigurationReader.getProperty("password");
+        loginPage.login(username, password);
     }
 
-    @And("I enter password {string}")
-    public void iEnterPassword(String password) {
-        Log.info("Step: I enter password: ****");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logStep("Enter password");
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Enter password");
-{{/if}}
-        
-        getLoginPage().enterPassword(password);
-        Log.info("Password entered successfully");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logPass("Password entered successfully");
-{{/if}}
+    @When("I login with username {string} and password {string}")
+    public void iLoginWithUsernameAndPassword(String username, String password) {
+        Log.step("Logging in with username: " + username);
+        loginPage.login(username, password);
     }
 
-    @And("I click on the login button")
-    public void iClickOnTheLoginButton() {
-        Log.info("Step: I click on the login button");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logStep("Click login button");
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Click login button");
-{{/if}}
-        
-        getLoginPage().clickLoginButton();
-        Log.info("Login button clicked");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logPass("Login button clicked successfully");
-{{/if}}
+    @Then("login should be successful")
+    public void loginShouldBeSuccessful() {
+        Log.step("Verifying login success");
+        assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
+        Log.info("Login verified successfully");
     }
 
-    @Then("I should be redirected to the home page")
-    public void iShouldBeRedirectedToTheHomePage() {
-        Log.info("Step: I should be redirected to the home page");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logStep("Verify redirect to home page");
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Verify redirect to home page");
-{{/if}}
-        
-        boolean isHomePageDisplayed = getHomePage().isHomePageDisplayed();
-        Assert.assertTrue(isHomePageDisplayed, "User should be redirected to home page after successful login");
-        
-        Log.info("Successfully redirected to home page");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logAssertion("User redirected to home page");
-{{/if}}
-    }
-
-    @And("I should see a welcome message")
-    public void iShouldSeeAWelcomeMessage() {
-        Log.info("Step: I should see a welcome message");
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logStep("Verify welcome message");
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Verify welcome message");
-{{/if}}
-        
-        String welcomeMessage = getHomePage().getWelcomeMessage();
-        Assert.assertNotNull(welcomeMessage, "Welcome message should be displayed");
-        Assert.assertTrue(welcomeMessage.contains("Welcome"), 
-            "Welcome message should contain 'Welcome' text");
-        
-        Log.info("Welcome message verified: " + welcomeMessage);
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logAssertion("Welcome message displayed: " + welcomeMessage);
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Welcome message verified", "Message: " + welcomeMessage);
-{{/if}}
-    }
-
-    @Then("I should see an error message {string}")
-    public void iShouldSeeAnErrorMessage(String expectedError) {
-        Log.info("Step: I should see an error message: " + expectedError);
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logStep("Verify error message: " + expectedError);
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Verify error message", "Expected: " + expectedError);
-{{/if}}
-        
-        String actualError = getLoginPage().getErrorMessage();
-        Assert.assertNotNull(actualError, "Error message should be displayed");
-        Assert.assertTrue(actualError.contains(expectedError), 
-            "Error message should contain: " + expectedError + " but was: " + actualError);
-        
-        Log.info("Error message verified: " + actualError);
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logAssertion("Error message displayed: " + actualError);
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Error message verified", "Actual: " + actualError);
-{{/if}}
-    }
-
-    @Given("I am logged in with username {string} and password {string}")
-    public void iAmLoggedInWithUsernameAndPassword(String username, String password) {
-        Log.info("Step: I am logged in with username: " + username);
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logStep("Login with username: " + username);
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Login with credentials", "Username: " + username);
-{{/if}}
-        
-        iAmOnTheLoginPage();
-        iEnterUsername(username);
-        iEnterPassword(password);
-        iClickOnTheLoginButton();
-        iShouldBeRedirectedToTheHomePage();
-        
-        Log.info("Successfully logged in with username: " + username);
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logPass("Login successful");
-{{/if}}
+    @Then("I should see an error message")
+    public void iShouldSeeAnErrorMessage() {
+        Log.step("Verifying error message is displayed");
+        assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
+        Log.info("Error message verified: " + loginPage.getErrorMessage());
     }
 }

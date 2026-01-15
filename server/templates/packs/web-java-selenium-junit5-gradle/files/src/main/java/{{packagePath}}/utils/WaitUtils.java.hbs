@@ -3,263 +3,65 @@ package {{javaPackage}}.utils;
 import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.core.DriverManager;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.List;
 
 /**
- * Utility class for explicit waits and element interaction conditions.
- * Provides methods for waiting for various element states.
+ * Wait Utilities - Explicit wait helpers.
+ * 
+ * Timeout configured in: src/main/resources/config/{env}.properties
  */
 public class WaitUtils {
-    private static final int DEFAULT_TIMEOUT = ConfigurationReader.getExplicitWait();
-    
-    /**
-     * Get WebDriverWait instance with default timeout
-     * @return WebDriverWait instance
-     */
+
+    private WaitUtils() {
+        // Private constructor
+    }
+
     private static WebDriverWait getWait() {
-        return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(DEFAULT_TIMEOUT));
+        int timeout = ConfigurationReader.getTimeout();
+        return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeout));
     }
-    
-    /**
-     * Get WebDriverWait instance with custom timeout
-     * @param timeoutInSeconds Timeout in seconds
-     * @return WebDriverWait instance
-     */
-    private static WebDriverWait getWait(int timeoutInSeconds) {
-        return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeoutInSeconds));
-    }
-    
-    /**
-     * Wait for element to be present in DOM
-     * @param locator Element locator
-     * @return WebElement when present
-     */
-    public static WebElement waitForPresence(By locator) {
-        Log.debug("Waiting for element presence: " + locator);
-        return getWait().until(ExpectedConditions.presenceOfElementLocated(locator));
-    }
-    
-    /**
-     * Wait for element to be present in DOM with custom timeout
-     * @param locator Element locator
-     * @param timeoutInSeconds Timeout in seconds
-     * @return WebElement when present
-     */
-    public static WebElement waitForPresence(By locator, int timeoutInSeconds) {
-        Log.debug("Waiting for element presence: " + locator + " (timeout: " + timeoutInSeconds + "s)");
-        return getWait(timeoutInSeconds).until(ExpectedConditions.presenceOfElementLocated(locator));
-    }
-    
+
     /**
      * Wait for element to be visible
-     * @param locator Element locator
-     * @return WebElement when visible
      */
     public static WebElement waitForVisibility(By locator) {
-        Log.debug("Waiting for element visibility: " + locator);
+        Log.logWait("Waiting for visibility: " + locator);
         return getWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
-    
-    /**
-     * Wait for element to be visible with custom timeout
-     * @param locator Element locator
-     * @param timeoutInSeconds Timeout in seconds
-     * @return WebElement when visible
-     */
-    public static WebElement waitForVisibility(By locator, int timeoutInSeconds) {
-        Log.debug("Waiting for element visibility: " + locator + " (timeout: " + timeoutInSeconds + "s)");
-        return getWait(timeoutInSeconds).until(ExpectedConditions.visibilityOfElementLocated(locator));
-    }
-    
-    /**
-     * Wait for element to be visible
-     * @param element WebElement
-     * @return WebElement when visible
-     */
-    public static WebElement waitForVisibility(WebElement element) {
-        Log.debug("Waiting for element visibility");
-        return getWait().until(ExpectedConditions.visibilityOf(element));
-    }
-    
+
     /**
      * Wait for element to be clickable
-     * @param locator Element locator
-     * @return WebElement when clickable
      */
     public static WebElement waitForClickability(By locator) {
-        Log.debug("Waiting for element clickability: " + locator);
+        Log.logWait("Waiting for clickability: " + locator);
         return getWait().until(ExpectedConditions.elementToBeClickable(locator));
     }
-    
+
     /**
-     * Wait for element to be clickable with custom timeout
-     * @param locator Element locator
-     * @param timeoutInSeconds Timeout in seconds
-     * @return WebElement when clickable
+     * Wait for element to be present in DOM
      */
-    public static WebElement waitForClickability(By locator, int timeoutInSeconds) {
-        Log.debug("Waiting for element clickability: " + locator + " (timeout: " + timeoutInSeconds + "s)");
-        return getWait(timeoutInSeconds).until(ExpectedConditions.elementToBeClickable(locator));
+    public static WebElement waitForPresence(By locator) {
+        Log.logWait("Waiting for presence: " + locator);
+        return getWait().until(ExpectedConditions.presenceOfElementLocated(locator));
     }
-    
+
     /**
-     * Wait for element to be clickable
-     * @param element WebElement
-     * @return WebElement when clickable
-     */
-    public static WebElement waitForClickability(WebElement element) {
-        Log.debug("Waiting for element clickability");
-        return getWait().until(ExpectedConditions.elementToBeClickable(element));
-    }
-    
-    /**
-     * Wait for element to be invisible
-     * @param locator Element locator
-     * @return true when invisible
+     * Wait for element to disappear
      */
     public static boolean waitForInvisibility(By locator) {
-        Log.debug("Waiting for element invisibility: " + locator);
+        Log.logWait("Waiting for invisibility: " + locator);
         return getWait().until(ExpectedConditions.invisibilityOfElementLocated(locator));
     }
-    
+
     /**
-     * Wait for element to contain specific text
-     * @param locator Element locator
-     * @param text Expected text
-     * @return true when text is present
+     * Wait for text to be present in element
      */
-    public static boolean waitForTextToBePresent(By locator, String text) {
-        Log.debug("Waiting for text '" + text + "' in element: " + locator);
+    public static boolean waitForTextPresent(By locator, String text) {
+        Log.logWait("Waiting for text '" + text + "' in: " + locator);
         return getWait().until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
-    }
-    
-    /**
-     * Wait for element's value attribute to contain text
-     * @param locator Element locator
-     * @param text Expected text in value
-     * @return true when text is present in value
-     */
-    public static boolean waitForTextInValue(By locator, String text) {
-        Log.debug("Waiting for text '" + text + "' in element value: " + locator);
-        return getWait().until(ExpectedConditions.textToBePresentInElementValue(locator, text));
-    }
-    
-    /**
-     * Wait for specific number of elements to be present
-     * @param locator Element locator
-     * @param count Expected number of elements
-     * @return List of WebElements when count matches
-     */
-    public static List<WebElement> waitForNumberOfElements(By locator, int count) {
-        Log.debug("Waiting for " + count + " elements: " + locator);
-        return getWait().until(ExpectedConditions.numberOfElementsToBe(locator, count));
-    }
-    
-    /**
-     * Wait for at least specified number of elements to be present
-     * @param locator Element locator
-     * @param minCount Minimum expected number of elements
-     * @return List of WebElements when minimum count is reached
-     */
-    public static List<WebElement> waitForMinimumNumberOfElements(By locator, int minCount) {
-        Log.debug("Waiting for at least " + minCount + " elements: " + locator);
-        return getWait().until(ExpectedConditions.numberOfElementsToBeMoreThan(locator, minCount - 1));
-    }
-    
-    /**
-     * Wait for page title to be exact match
-     * @param title Expected title
-     * @return true when title matches
-     */
-    public static boolean waitForTitle(String title) {
-        Log.debug("Waiting for page title: " + title);
-        return getWait().until(ExpectedConditions.titleIs(title));
-    }
-    
-    /**
-     * Wait for page title to contain text
-     * @param titlePart Expected title part
-     * @return true when title contains text
-     */
-    public static boolean waitForTitleContains(String titlePart) {
-        Log.debug("Waiting for page title to contain: " + titlePart);
-        return getWait().until(ExpectedConditions.titleContains(titlePart));
-    }
-    
-    /**
-     * Wait for URL to be exact match
-     * @param url Expected URL
-     * @return true when URL matches
-     */
-    public static boolean waitForUrl(String url) {
-        Log.debug("Waiting for URL: " + url);
-        return getWait().until(ExpectedConditions.urlToBe(url));
-    }
-    
-    /**
-     * Wait for URL to contain text
-     * @param urlPart Expected URL part
-     * @return true when URL contains text
-     */
-    public static boolean waitForUrlContains(String urlPart) {
-        Log.debug("Waiting for URL to contain: " + urlPart);
-        return getWait().until(ExpectedConditions.urlContains(urlPart));
-    }
-    
-    /**
-     * Wait for alert to be present
-     * @return Alert when present
-     */
-    public static org.openqa.selenium.Alert waitForAlert() {
-        Log.debug("Waiting for alert to be present");
-        return getWait().until(ExpectedConditions.alertIsPresent());
-    }
-    
-    /**
-     * Hard wait - use sparingly and only when necessary
-     * @param milliseconds Time to wait in milliseconds
-     */
-    public static void hardWait(long milliseconds) {
-        try {
-            Log.debug("Hard wait for " + milliseconds + " milliseconds");
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            Log.error("Hard wait interrupted", e);
-        }
-    }
-    
-    /**
-     * Check if element is present without waiting
-     * @param locator Element locator
-     * @return true if element is present
-     */
-    public static boolean isElementPresent(By locator) {
-        try {
-            DriverManager.getDriver().findElement(locator);
-            return true;
-        } catch (org.openqa.selenium.NoSuchElementException e) {
-            return false;
-        }
-    }
-    
-    /**
-     * Check if element is visible without waiting
-     * @param locator Element locator
-     * @return true if element is visible
-     */
-    public static boolean isElementVisible(By locator) {
-        try {
-            WebElement element = DriverManager.getDriver().findElement(locator);
-            return element.isDisplayed();
-        } catch (org.openqa.selenium.NoSuchElementException e) {
-            return false;
-        }
     }
 }

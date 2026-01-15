@@ -1,75 +1,60 @@
 """
-Login Page Object
+Login Page - Page object for SauceDemo login page.
 
-HOW TO CUSTOMIZE FOR YOUR APPLICATION:
-1. Open your app's login page in a browser
-2. Right-click on each element → Inspect → Copy selector
-3. Replace the placeholder locators below with your actual locators
-4. Update the login URL path in __init__() method
+URL: https://www.saucedemo.com/
+
+HOW TO CUSTOMIZE:
+  1. Update locators below for your app
+  2. Update credentials in: config/dev.ini
 """
 from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
-from config.config import Config
+
 
 class LoginPage(BasePage):
-    """Login page object"""
+    """Login page object for SauceDemo."""
     
-    # ============================================
-    # UPDATE THESE LOCATORS FOR YOUR APPLICATION
-    # ============================================
-    # Tip: Use browser DevTools (F12) to find correct selectors
-    USERNAME_INPUT = (By.ID, "username")                    # Your username/email input field
-    PASSWORD_INPUT = (By.ID, "password")                    # Your password input field
-    LOGIN_BUTTON = (By.CSS_SELECTOR, "button[type='submit']") # Your login/submit button
-    ERROR_MESSAGE = (By.CSS_SELECTOR, ".error-message")     # Error message element
-    REMEMBER_ME_CHECKBOX = (By.ID, "remember-me")
-    FORGOT_PASSWORD_LINK = (By.LINK_TEXT, "Forgot Password?")
-    # ============================================
+    # Locators (SauceDemo)
+    USERNAME_FIELD = (By.ID, "user-name")
+    PASSWORD_FIELD = (By.ID, "password")
+    LOGIN_BUTTON = (By.ID, "login-button")
+    ERROR_MESSAGE = (By.CSS_SELECTOR, "[data-test='error']")
     
-    def __init__(self, driver):
-        super().__init__(driver)
-        # UPDATE: Change '/login' to your actual login page path
-        self.url = f"{Config.get_base_url()}/login"
+    def enter_username(self, username: str) -> "LoginPage":
+        """Enter username."""
+        self.log_action(f"Entering username: {username}")
+        self.type_text(self.USERNAME_FIELD, username)
+        return self
     
-    def navigate(self) -> None:
-        """Navigate to login page"""
-        self.navigate_to(self.url)
+    def enter_password(self, password: str) -> "LoginPage":
+        """Enter password."""
+        self.log_action("Entering password")
+        self.type_text(self.PASSWORD_FIELD, password)
+        return self
     
-    def enter_username(self, username: str) -> None:
-        """Enter username"""
-        self.type(self.USERNAME_INPUT, username)
-    
-    def enter_password(self, password: str) -> None:
-        """Enter password"""
-        self.type(self.PASSWORD_INPUT, password)
-    
-    def click_login(self) -> None:
-        """Click login button"""
+    def click_login(self):
+        """Click login button."""
+        self.log_action("Clicking login button")
         self.click(self.LOGIN_BUTTON)
     
-    def login(self, username: str, password: str) -> None:
-        """Perform login"""
-        self.logger.info(f"Logging in with username: {username}")
+    def login(self, username: str, password: str):
+        """Perform complete login."""
         self.enter_username(username)
         self.enter_password(password)
         self.click_login()
     
+    def get_error_message(self) -> str:
+        """Get error message text."""
+        return self.get_text(self.ERROR_MESSAGE) if self.is_error_displayed() else ""
+    
     def is_error_displayed(self) -> bool:
-        """Check if error message is displayed"""
+        """Check if error message is displayed."""
         return self.is_displayed(self.ERROR_MESSAGE)
     
-    def get_error_message(self) -> str:
-        """Get error message text"""
-        return self.get_text(self.ERROR_MESSAGE)
-    
     def is_login_successful(self) -> bool:
-        """Verify login success"""
-        return "/dashboard" in self.get_current_url() or "Dashboard" in self.get_page_title()
+        """Check if login was successful (redirected to inventory)."""
+        return "inventory" in self.get_current_url()
     
-    def check_remember_me(self) -> None:
-        """Check remember me checkbox"""
-        self.click(self.REMEMBER_ME_CHECKBOX)
-    
-    def click_forgot_password(self) -> None:
-        """Click forgot password link"""
-        self.click(self.FORGOT_PASSWORD_LINK)
+    def is_loaded(self) -> bool:
+        """Check if login page is loaded."""
+        return self.is_displayed(self.LOGIN_BUTTON)

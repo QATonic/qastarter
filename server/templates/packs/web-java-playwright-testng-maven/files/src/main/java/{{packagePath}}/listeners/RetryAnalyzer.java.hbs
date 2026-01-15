@@ -5,37 +5,20 @@ import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
 /**
- * TestNG retry analyzer for handling flaky tests.
- * Automatically retries failed tests up to a configurable limit.
+ * Retry Analyzer - Automatically retries failed tests.
  */
 public class RetryAnalyzer implements IRetryAnalyzer {
-    
-    private static final int MAX_RETRY_COUNT = 2;
+
     private int retryCount = 0;
-    
+    private static final int MAX_RETRY = 2;
+
     @Override
     public boolean retry(ITestResult result) {
-        if (retryCount < MAX_RETRY_COUNT) {
+        if (retryCount < MAX_RETRY) {
             retryCount++;
-            Log.warn("Retrying test '" + result.getName() + "' - Attempt " + retryCount + " of " + MAX_RETRY_COUNT);
+            Log.warn("Retrying test: " + result.getName() + " (" + retryCount + "/" + MAX_RETRY + ")");
             return true;
         }
         return false;
-    }
-    
-    /**
-     * Get the current retry count
-     * @return Current retry count
-     */
-    public int getRetryCount() {
-        return retryCount;
-    }
-    
-    /**
-     * Get the maximum retry count
-     * @return Maximum retry count
-     */
-    public static int getMaxRetryCount() {
-        return MAX_RETRY_COUNT;
     }
 }

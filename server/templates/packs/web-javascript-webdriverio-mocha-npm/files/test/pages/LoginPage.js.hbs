@@ -1,0 +1,12 @@
+const { BasePage } = require("./BasePage");
+
+class LoginPage extends BasePage {
+  async login(username, password) {
+    await this.type("#user-name", username);
+    await this.type("#password", password);
+    await this.click("#login-button");
+  }
+  async isErrorDisplayed() { return await this.isDisplayed("[data-test='error']"); }
+  async isLoginSuccessful() { return (await this.getUrl()).includes("inventory"); }
+}
+module.exports = { LoginPage };

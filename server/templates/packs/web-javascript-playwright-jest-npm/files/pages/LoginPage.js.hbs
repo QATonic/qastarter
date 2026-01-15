@@ -1,64 +1,19 @@
-/**
- * Login Page Object
- * 
- * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
- * 1. Open your app's login page in a browser
- * 2. Right-click on each element → Inspect → Copy selector
- * 3. Replace the placeholder selectors below with your actual selectors
- * 4. Update the login URL path in constructor
- */
-const BasePage = require('./BasePage');
-const envConfig = require('../config/env.config');
+const { BasePage } = require("./BasePage");
 
 class LoginPage extends BasePage {
-  constructor(page) {
-    super(page);
-    // UPDATE: Change '/login' to your actual login page path
-    this.url = `${envConfig.getBaseUrl()}/login`;
-    
-    // ============================================
-    // UPDATE THESE SELECTORS FOR YOUR APPLICATION
-    // ============================================
-    // Tip: Use browser DevTools (F12) to find correct selectors
-    this.selectors = {
-      usernameInput: '#username',           // Your username/email input field
-      passwordInput: '#password',           // Your password input field
-      loginButton: 'button[type="submit"]', // Your login/submit button
-      errorMessage: '.error-message'        // Error message element
-    };
-    // ============================================
-  }
-
-  async navigateToLogin() {
-    await this.navigate(this.url);
-  }
+  usernameField = "#user-name";
+  passwordField = "#password";
+  loginButton = "#login-button";
+  errorMessage = "[data-test='error']";
 
   async login(username, password) {
-    await this.fill(this.selectors.usernameInput, username);
-    await this.fill(this.selectors.passwordInput, password);
-    await this.click(this.selectors.loginButton);
+    await this.type(this.usernameField, username);
+    await this.type(this.passwordField, password);
+    await this.click(this.loginButton);
   }
 
-  async getErrorMessage() {
-    return await this.getText(this.selectors.errorMessage);
-  }
-
-  async isErrorDisplayed() {
-    return await this.isVisible(this.selectors.errorMessage);
-  }
-
-  async isLoginSuccessful() {
-    const url = await this.getCurrentUrl();
-    return url.includes('/dashboard');
-  }
-
-  async isUsernameVisible() {
-    return await this.isVisible(this.selectors.usernameInput);
-  }
-
-  async isPasswordVisible() {
-    return await this.isVisible(this.selectors.passwordInput);
-  }
+  async isErrorDisplayed() { return await this.isDisplayed(this.errorMessage); }
+  async isLoginSuccessful() { return (await this.getCurrentUrl()).includes("inventory"); }
 }
 
-module.exports = LoginPage;
+module.exports = { LoginPage };

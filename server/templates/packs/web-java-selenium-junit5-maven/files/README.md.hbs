@@ -1,594 +1,183 @@
 # {{projectName}}
 
-A production-ready UI automation framework built with Java, Selenium WebDriver, JUnit5, and Maven following industry
-best practices.
+A production-ready **{{#if (eq framework "selenium")}}Selenium WebDriver{{else}}Playwright{{/if}}** test automation framework using **{{#if (eq testRunner "testng")}}TestNG{{else}}JUnit5{{/if}}** and **{{#if (eq buildTool "maven")}}Maven{{else}}Gradle{{/if}}**.
 
-## Framework Features
+## 🚀 Quick Start
 
-- **{{#if (eq testingPattern "bdd")}}BDD (Cucumber){{else}}Page Object Model (POM){{/if}}** design pattern for
-maintainable test code
-- **Cross-browser support** (Chrome, Firefox, Edge) with local and remote execution
-- **Parallel test execution** for faster feedback
-{{#if (eq reportingTool "extent-reports")}}
-- **ExtentReports** with screenshots and detailed test reporting
-{{else if (eq reportingTool "allure")}}
-- **Allure Reports** with rich test analytics and historical trends
-{{else if (eq reportingTool "junit-reports")}}
-- **JUnit HTML Reports** with test execution summaries
-{{else}}
-- **JUnit Platform Reports** with built-in test reporting
-{{/if}}
-- **Log4j2** structured logging with multiple appenders
-- **Data-driven testing** support with CSV and JSON test data
-{{#if (eq cicdPlatform "jenkins")}}
-- **Jenkins CI/CD integration** with pipeline configuration
-{{else if (eq cicdPlatform "github-actions")}}
-- **GitHub Actions** CI/CD integration
-{{else if (eq cicdPlatform "gitlab-ci")}}
-- **GitLab CI** integration
-{{else if (eq cicdPlatform "azure-devops")}}
-- **Azure DevOps Pipelines** integration
-{{else if (eq cicdPlatform "circleci")}}
-- **CircleCI** integration
-{{/if}}
-- **Configurable environments** (dev, qa, staging, production)
-- **Thread-safe WebDriver management** for parallel execution
-
-## Technology Stack
-
-| Component | Technology | Version |
-|-----------|------------|---------|
-| Language | Java | {{toolVersions.java}} |
-| Build Tool | Apache Maven | 3.9.0 |
-| Test Framework | JUnit5 | {{toolVersions.junit5}} |
-| Web Automation | Selenium WebDriver | {{toolVersions.selenium}} |
-{{#if (eq testingPattern "bdd")}}
-| BDD Framework | Cucumber | {{toolVersions.cucumber}} |
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-| Reporting | ExtentReports | {{toolVersions.extentreports}} |
-{{else if (eq reportingTool "allure")}}
-| Reporting | Allure | {{toolVersions.allure}} |
-{{/if}}
-| Logging | Log4j2 | {{toolVersions.log4j}} |
-| Data Processing | Jackson (JSON) | 2.15.2 |
-| Data Processing | Commons CSV | 1.10.0 |
-
-## Project Structure
-
-```
-{{artifactId}}/
-├── pom.xml # Maven build configuration
-{{#if (eq cicdPlatform "github-actions")}}
-├── .github/workflows/tests.yml # GitHub Actions CI/CD
-{{else if (eq cicdPlatform "gitlab-ci")}}
-├── .gitlab-ci.yml # GitLab CI configuration
-{{else if (eq cicdPlatform "azure-devops")}}
-├── azure-pipelines.yml # Azure DevOps pipeline
-{{else if (eq cicdPlatform "circleci")}}
-├── .circleci/config.yml # CircleCI configuration
-{{else if (eq cicdPlatform "jenkins")}}
-├── Jenkinsfile # Jenkins CI/CD pipeline
-{{/if}}
-├── README.md # This file
-├── .gitignore # Git ignore rules
-├── src/
-│ ├── main/
-│ │ ├── java/{{packagePath}}/
-│ │ │ ├── config/ # Configuration management
-│ │ │ │ ├── ConfigurationReader.java
-│ │ │ │ └── Environment.java
-│ │ │ ├── core/ # Core framework components
-│ │ │ │ ├── DriverManager.java
-│ │ │ │ ├── BrowserFactory.java
-│ │ │ │ └── BaseTest.java
-│ │ │ ├── pages/ # Page Object classes
-│ │ │ │ ├── BasePage.java
-│ │ │ │ ├── LoginPage.java
-│ │ │ │ └── HomePage.java
-│ │ │ ├── utils/ # Utility classes
-│ │ │ │ ├── WaitUtils.java
-│ │ │ │ ├── WebActions.java
-│ │ │ │ ├── ScreenshotUtils.java
-│ │ │ │ ├── TestDataReader.java
-{{#if (eq reportingTool "extent-reports")}}
-│ │ │ │ ├── ExtentManager.java
-{{/if}}
-│ │ │ │ └── Log.java
-{{#if (eq testingPattern "bdd")}}
-│ │ │ └── stepdefinitions/ # Cucumber step definitions
-│ │ │ ├── Hooks.java
-│ │ │ └── LoginSteps.java
-{{else}}
-│ │ │ └── listeners/ # JUnit5 extensions
-│ │ │ └── TestWatcher.java
-{{/if}}
-│ │ └── resources/
-│ │ ├── config/ # Environment configurations
-│ │ │ ├── dev.properties
-│ │ │ ├── qa.properties
-│ │ │ └── prod.properties
-│ │ ├── log4j2.xml # Logging configuration
-{{#if (eq reportingTool "extent-reports")}}
-│ │ └── extent-config.xml # ExtentReports configuration
-{{/if}}
-│ └── test/
-│ ├── java/{{packagePath}}/
-{{#if (eq testingPattern "bdd")}}
-│ │ └── runners/
-│ │ └── TestRunner.java # Cucumber test runner
-│ └── resources/
-│ ├── features/ # Cucumber feature files
-│ │ └── login.feature
-│ ├── junit-platform.properties # JUnit5 configuration
-{{else}}
-│ │ └── tests/
-│ │ └── LoginTests.java # Login functionality tests
-│ └── resources/
-│ ├── junit-platform.properties # JUnit5 configuration
-{{/if}}
-│ └── testdata/ # Test data files
-│ ├── users.csv
-│ └── sample.json
-├── reports/ # Generated test reports
-└── logs/ # Application logs
-```
-
-## Quick Start
-
-### Prerequisites
-
-- Java {{toolVersions.java}} or higher
-- Maven 3.6 or higher
-- Chrome browser (for default configuration)
-
-### Setup
-
-1. **Clone/Download the project**
 ```bash
-cd {{artifactId}}
-```
-
-2. **Install dependencies**
-```bash
-mvn clean compile
-```
-
-3. **Update configuration**
-- Edit `src/main/resources/config/dev.properties`
-- Update `base.url` to point to your application
-- Update test credentials and element locators in page objects
-- Modify other settings as needed
-
-4. **Run tests**
-```bash
-# Run regression tests
-mvn clean test -Dgroups=regression
-
 # Run all tests
+{{#if (eq buildTool "maven")}}
 mvn clean test
-```
-
-## Running Tests
-
-### Basic Execution
-
-```bash
-# Default execution (dev environment, Chrome)
-mvn clean test
-
-# Specific environment
-mvn clean test -Denv=qa
-
-# Specific browser
-mvn clean test -Dbrowser=firefox
-
-# Headless mode
-mvn clean test -Dheadless=true
-
-# Run tests by tag
-mvn clean test -Dgroups=smoke
-mvn clean test -Dgroups="smoke | regression"
-mvn clean test -Dgroups="!slow"
-```
-
-### Environment Profiles
-
-```bash
-# Development environment
-mvn clean test -Pdev
-
-# QA environment
-mvn clean test -Pqa -Dbrowser=chrome -Dheadless=true
-
-# Production environment (with extra precautions)
-mvn clean test -Pprod -Dgroups=regression
-```
-
-### Parallel Execution
-
-JUnit5 parallel execution is configured in `junit-platform.properties`:
-
-```bash
-# Run tests in parallel (configured in junit-platform.properties)
-mvn clean test
-
-# Override parallel settings
-mvn clean test -Djunit.jupiter.execution.parallel.enabled=true
-```
-
-### Test Tags
-
-Available test tags:
-- **smoke**: Critical path tests
-- **regression**: Comprehensive functional tests
-- **functional**: Functional test scenarios
-- **negative**: Negative test scenarios
-{{#if (eq testingPattern "bdd")}}
-- **bdd**: BDD/Cucumber tests
-{{/if}}
-- **login**: Login-related tests
-- **data-driven**: Data-driven test scenarios
-
-## Configuration
-
-### Environment Configuration
-
-Configuration files are located in `src/main/resources/config/`:
-- `dev.properties` - Development environment
-- `qa.properties` - QA/Testing environment
-- `prod.properties` - Production environment
-
-Example configuration (update with your values):
-```properties
-# Application URL (REQUIRED - Update this!)
-base.url=https://your-app-url.example.com
-
-# Test user credentials (REQUIRED - Update with your test users!)
-test.username=testuser@example.com
-test.password=Test@123
-
-# Browser settings
-default.browser=chrome
-implicit.wait=10
-explicit.wait=20
-page.load.timeout=30
-
-# Screenshot settings
-screenshot.on.failure=true
-screenshot.on.pass=false
-```
-
-### Browser Configuration
-
-Supported browsers: Chrome, Firefox, Edge
-
-```bash
-# Chrome (default)
-mvn clean test -Dbrowser=chrome
-
-# Firefox
-mvn clean test -Dbrowser=firefox
-
-# Edge
-mvn clean test -Dbrowser=edge
-
-# Headless mode
-mvn clean test -Dbrowser=chrome -Dheadless=true
-```
-
-### Logging
-
-Logging is configured in `src/main/resources/log4j2.xml`. Logs are written to:
-- Console (INFO level and above)
-- `logs/automation.log` (DEBUG level and above)
-- `logs/error.log` (ERROR level only)
-
-## Reporting
-
-{{#if (eq reportingTool "allure")}}
-### Allure Reports
-
-Generate and view Allure reports:
-
-```bash
-# Run tests
-mvn clean test
-
-# Generate Allure report
-mvn allure:report
-
-# Serve report (opens in browser)
-mvn allure:serve
-```
-
-Allure report features:
-- Test execution trends and history
-- Test duration statistics
-- Failure analysis with screenshots
-- Test categorization and tagging
-- Environment information
-
-Report location: `target/site/allure-maven-plugin/index.html`
-{{else if (eq reportingTool "extent-reports")}}
-### ExtentReports
-
-ExtentReports are automatically generated after test execution.
-
-Report location: `reports/extent-report.html`
-
-Features:
-- Rich HTML dashboard with charts
-- Test execution timeline
-- Failure screenshots
-- System information
-- Exception stack traces
-{{else if (eq reportingTool "junit-reports")}}
-### JUnit HTML Reports
-
-JUnit HTML reports are generated in the Surefire reports directory.
-
-Report location: `target/surefire-reports/`
-
-Features:
-- Test execution summary
-- Individual test results
-- Failure details and stack traces
 {{else}}
-### JUnit Platform Reports
-
-Standard JUnit test reports are generated by Maven Surefire.
-
-Report location: `target/surefire-reports/`
+gradle clean test
 {{/if}}
 
-## CI/CD Integration
-
-{{#if (eq cicdPlatform "github-actions")}}
-### GitHub Actions
-
-Workflow file: `.github/workflows/tests.yml`
-
-Features:
-- Runs on push to main/develop branches
-- Pull request validation
-- Multi-browser matrix testing
-- Automatic report uploads
-
-Trigger manually:
-- Go to Actions tab in GitHub
-- Select "Selenium Tests" workflow
-- Click "Run workflow"
-{{else if (eq cicdPlatform "gitlab-ci")}}
-### GitLab CI
-
-Configuration file: `.gitlab-ci.yml`
-
-Features:
-- Runs on push to main/develop branches
-- Merge request validation
-- Multi-browser testing
-- Artifact storage for reports
-
-View pipeline:
-- Go to CI/CD > Pipelines in GitLab
-- Select a pipeline to view results
-{{else if (eq cicdPlatform "azure-devops")}}
-### Azure DevOps
-
-Pipeline file: `azure-pipelines.yml`
-
-Features:
-- Trigger on push to main/develop
-- PR validation
-- Matrix strategy for browsers
-- Test result publishing
-
-Configure:
-- Create new pipeline in Azure DevOps
-- Select existing YAML file
-- Point to azure-pipelines.yml
-{{else if (eq cicdPlatform "circleci")}}
-### CircleCI
-
-Configuration file: `.circleci/config.yml`
-
-Features:
-- Automatic builds on commit
-- Multi-browser workflows
-- Artifact storage
-- Test result reporting
-
-Setup:
-- Connect repository to CircleCI
-- Configuration is auto-detected
-- View results in CircleCI dashboard
-{{else if (eq cicdPlatform "jenkins")}}
-### Jenkins
-
-Pipeline file: `Jenkinsfile`
-
-Features:
-- Parameterized builds (browser, environment)
-- Multi-stage pipeline
-- HTML report publishing
-{{#if (eq reportingTool "allure")}}
-- Allure report integration
+# Run with specific browser
+{{#if (eq buildTool "maven")}}
+mvn test -Dbrowser=firefox
+{{else}}
+gradle test -Dbrowser=firefox
 {{/if}}
-- Artifact archiving
 
-Setup:
-1. Create new Pipeline job in Jenkins
-2. Configure SCM (Git repository)
-3. Point to Jenkinsfile
-4. Add parameters: BROWSER, ENVIRONMENT
+# Run headless
+{{#if (eq buildTool "maven")}}
+mvn test -Dheadless=true
+{{else}}
+gradle test -Dheadless=true
 {{/if}}
+
+# Run specific environment
+{{#if (eq buildTool "maven")}}
+mvn test -Denv=qa
+{{else}}
+gradle test -Denv=qa
+{{/if}}
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── main/java/{{javaPackage}}/
+│   ├── config/           # Configuration management
+│   ├── core/             # BaseTest, {{#if (eq framework "selenium")}}DriverManager{{else}}PlaywrightManager{{/if}}
+│   ├── pages/            # Page Objects (LoginPage, etc.)
+{{#if (eq testRunner "testng")}}
+│   ├── listeners/        # TestNG listeners
+{{/if}}
+│   └── utils/            # Log, Screenshot, {{#if (eq reportingTool "extent-reports")}}ExtentManager{{/if}}{{#if (eq reportingTool "allure")}}AllureManager{{/if}}
+├── main/resources/
+│   └── config/           # dev.properties, qa.properties
+└── test/
+    ├── java/{{javaPackage}}/
+{{#if (eq testingPattern "bdd")}}
+    │   ├── runners/      # Cucumber TestRunner
+    │   └── stepdefinitions/
+{{else}}
+    │   └── tests/        # Test classes
+{{/if}}
+    └── resources/
+{{#if (eq testingPattern "bdd")}}
+        └── features/     # Gherkin feature files
+{{else}}
+{{#if (eq testRunner "testng")}}
+        └── testng.xml    # TestNG suite configuration
+{{/if}}
+{{/if}}
+```
+
+## ⚙️ Configuration
+
+Edit `src/main/resources/config/dev.properties`:
+
+```properties
+base.url=https://www.saucedemo.com/
+browser={{#if (eq framework "selenium")}}chrome{{else}}chromium{{/if}}
+headless=false
+username=standard_user
+password=secret_sauce
+timeout.default=30
+```
+
+## 🧪 Writing Tests
 
 {{#if (eq testingPattern "bdd")}}
-## BDD with Cucumber
-
-### Feature Files
-
-Feature files are located in `src/test/resources/features/`
-
-Example:
+### Feature File (Gherkin)
 ```gherkin
-@smoke @login
+@login
 Feature: Login Functionality
 
-Scenario: Successful login with valid credentials
-Given user navigates to login page
-When user logs in with username "admin" and password "password123"
-Then user should see home page
-And user should be logged in
+  @smoke
+  Scenario: Successful login
+    Given I am on the login page
+    When I login with valid credentials
+    Then login should be successful
 ```
 
 ### Step Definitions
+```java
+@Given("I am on the login page")
+public void iAmOnTheLoginPage() {
+    // Implementation
+}
+```
+{{else}}
+### Page Object
+```java
+public class LoginPage extends BasePage {
+    public void login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
+    }
+}
+```
 
-Step definitions are in `src/main/java/{{packagePath}}/stepdefinitions/`
-
-### Running Cucumber Tests
-
-```bash
-# Run all features
-mvn clean test
-
-# Run specific feature file
-mvn clean test -Dcucumber.features="src/test/resources/features/login.feature"
-
-# Run by tag
-mvn clean test -Dcucumber.filter.tags="@smoke"
+### Test Class
+```java
+public class LoginTests extends BaseTest {
+    @Test
+    public void testValidLogin() {
+        LoginPage loginPage = new LoginPage();
+        loginPage.login("standard_user", "secret_sauce");
+        Assert.assertTrue(loginPage.isLoginSuccessful());
+    }
+}
 ```
 {{/if}}
 
-## Data-Driven Testing
+## 📊 Reports
 
-### CSV Data Files
+{{#if (eq reportingTool "extent-reports")}}
+### ExtentReports
+Reports generated in: `reports/ExtentReport_{timestamp}.html`
 
-Place CSV files in `src/test/resources/testdata/`
-
-Example `users.csv`:
-```csv
-username,password,expectedResult
-admin,password123,success
-testuser,testpass,success
-invaliduser,wrongpass,failure
+Open the HTML file in a browser after test execution.
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+### Allure Reports
+```bash
+# Generate and open report
+{{#if (eq buildTool "maven")}}
+mvn allure:serve
+{{else}}
+gradle allureServe
+{{/if}}
 ```
+Results in: `target/allure-results`
+{{/if}}
+{{#if (eq reportingTool "testng-reports")}}
+### TestNG Reports
+Reports generated in: `target/surefire-reports/`
+{{/if}}
 
-### Using in Tests
+## 🖥️ Browsers
 
-{{#if (eq testingPattern "bdd")}}
-```gherkin
-Scenario Outline: Login with multiple users
-Given user navigates to login page
-When user logs in with username "<username>" and password "<password>"
-      Then login result should be "<expectedResult>"
+| Browser | Config Value |
+|---------|--------------|
+{{#if (eq framework "selenium")}}
+| Chrome | `chrome` |
+| Firefox | `firefox` |
+| Edge | `edge` |
+{{else}}
+| Chromium | `chromium` |
+| Firefox | `firefox` |
+| WebKit | `webkit` |
+{{/if}}
 
-         Examples:
-         | username | password | expectedResult |
-         | admin | password123 | success |
-         | invaliduser | wrongpass | failure |
-         ```
-         {{else}}
-         ```java
-         @ParameterizedTest
-         @CsvFileSource(resources = "/testdata/users.csv", numLinesToSkip = 1)
-         @Tag("data-driven")
-         void testLoginWithMultipleUsers(String username, String password, String expectedResult) {
-         // Test implementation
-         }
-         ```
-         {{/if}}
+## 📸 Screenshots
 
-         ## Best Practices
+Screenshots are automatically captured on test failure:
+- Location: `screenshots/`
+- Format: `FAILED_{TestName}_{timestamp}.png`
 
-         1. **Page Objects**: Keep page objects focused and cohesive
-         2. **Waits**: Use explicit waits instead of Thread.sleep()
-         3. **Locators**: Prefer ID and CSS selectors for stability
-         4. **Assertions**: Use meaningful assertion messages
-         5. **Test Data**: Externalize test data to CSV/JSON files
-         6. **Logging**: Add appropriate log statements for debugging
-         7. **Screenshots**: Capture screenshots on test failures
-         8. **Clean Up**: Always quit WebDriver in @AfterEach methods
+## 🔧 System Requirements
 
-         ## Troubleshooting
+- Java 17+
+- {{#if (eq buildTool "maven")}}Maven 3.9+{{else}}Gradle 8+{{/if}}
+{{#if (eq framework "playwright")}}
+- Playwright browsers (auto-installed on first run)
+{{/if}}
 
-         ### Common Issues
-
-         **Issue**: WebDriver executable not found
-         ```bash
-         Solution: Selenium 4+ includes Selenium Manager which auto-downloads drivers. Ensure internet connectivity.
-         ```
-
-         **Issue**: Tests failing with StaleElementReferenceException
-         ```bash
-         Solution: Use WaitUtils methods to ensure element stability before interaction.
-         ```
-
-         **Issue**: Parallel execution conflicts
-         ```bash
-         Solution: Ensure thread-safe WebDriver management using ThreadLocal in DriverManager.
-         ```
-
-         **Issue**: Configuration not loading
-         ```bash
-         Solution: Verify environment property files exist in src/main/resources/config/
-         ```
-
-         ## Customization Guide
-
-         ### Adding New Tests
-
-         {{#if (eq testingPattern "bdd")}}
-         1. Create feature file in `src/test/resources/features/`
-         2. Implement step definitions in `src/main/java/{{packagePath}}/stepdefinitions/`
-         3. Add page objects as needed
-         4. Run: `mvn clean test`
-         {{else}}
-         1. Create test class extending BaseTest
-         2. Add @ExtendWith(TestWatcher.class) annotation
-         3. Add @Test methods with appropriate @Tag annotations
-         4. Run: `mvn clean test -Dgroups=your-tag`
-         {{/if}}
-
-         ### Adding New Page Objects
-
-         1. Create class extending BasePage
-         2. Define locators as private variables
-         3. Implement page-specific methods
-         4. Use in test classes
-
-         ### Adding New Utilities
-
-         1. Create utility class in `utils` package
-         2. Add static helper methods
-         3. Use Log class for logging
-         4. Import and use in tests
-
-         ## Getting Help
-
-         - Check logs in `logs/` directory
-         - Review screenshots in `reports/screenshots/`
-         {{#if (eq reportingTool "allure")}}
-         - Open Allure report: `mvn allure:serve`
-         {{else if (eq reportingTool "extent-reports")}}
-         - Open ExtentReport: `reports/extent-report.html`
-         {{/if}}
-         - Review test execution output in console
-
-         ## License
-
-         This test automation framework is generated by QAStarter and is free to use and modify.
-
-         ## Next Steps
-
-         1. ✅ Update `base.url` in configuration files
-         2. ✅ Update test credentials in config files
-         3. ✅ Update element locators in page objects
-         4. ✅ Review and customize test data files
-         5. ✅ Run smoke tests to verify setup
-         6. ⏳ Customize tests for your application
-         7. ⏳ Configure CI/CD pipeline for your repository
-         8. ⏳ Add more page objects and tests as needed
-
-         Happy Testing! 🚀
+---
+Generated by [QAStarter](https://github.com/qatonic/qastarter)

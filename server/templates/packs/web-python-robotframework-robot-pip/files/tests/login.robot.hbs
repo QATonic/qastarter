@@ -1,0 +1,18 @@
+*** Settings ***
+Documentation     Login Test Cases for SauceDemo
+Resource          ../resources/common.resource
+Test Setup        Open Browser To Login Page
+Test Teardown     Close Browser Session
+
+*** Test Cases ***
+Valid Login Should Redirect To Inventory
+    [Documentation]    Verify successful login with valid credentials
+    [Tags]    smoke    login
+    Login With Credentials    ${USERNAME}    ${PASSWORD}
+    Verify Login Success
+
+Invalid Login Should Show Error
+    [Documentation]    Verify error message with invalid credentials
+    [Tags]    regression    login
+    Login With Credentials    invalid_user    wrong_password
+    Verify Error Message Displayed

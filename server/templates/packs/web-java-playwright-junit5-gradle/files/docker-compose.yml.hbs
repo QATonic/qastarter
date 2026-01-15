@@ -1,17 +1,32 @@
 version: '3.8'
 
 services:
-  playwright-tests:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: {{projectName}}-tests
+  tests:
+    build: .
     environment:
-      - BROWSER=${BROWSER:-chromium}
-      - HEADLESS=${HEADLESS:-true}
-      - ENV=${ENV:-dev}
+      - HEADLESS=true
+      - BROWSER=chrome
     volumes:
-      - ./reports:/app/build/reports
       - ./screenshots:/app/screenshots
+      - ./reports:/app/reports
       - ./logs:/app/logs
-    command: ./gradlew test -Pbrowser=${BROWSER:-chromium} -Pheadless=${HEADLESS:-true} -Penv=${ENV:-dev} --no-daemon
+
+{{#if (eq framework "selenium")}}
+  # Selenium Grid (optional)
+  selenium-hub:
+    image: selenium/hub:4.16
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+
+  chrome:
+    image: selenium/node-chrome:4.16
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+{{/if}}

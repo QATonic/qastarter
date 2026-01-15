@@ -1,25 +1,21 @@
 package {{javaPackage}}.runners;
 
-import org.junit.platform.suite.api.*;
+import org.junit.platform.suite.api.ConfigurationParameter;
+import org.junit.platform.suite.api.IncludeEngines;
+import org.junit.platform.suite.api.SelectClasspathResource;
+import org.junit.platform.suite.api.Suite;
+
+import static io.cucumber.junit.platform.engine.Constants.*;
 
 /**
- * JUnit5 Cucumber Test Runner.
- * Executes all feature files with configured options.
+ * Cucumber JUnit5 Runner - Executes BDD feature files.
+ * 
+ * Run: mvn clean test -Dtest=TestRunner
  */
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
-@ConfigurationParameter(key = "cucumber.plugin", 
-    value = "pretty, " +
-            "html:target/cucumber-reports/cucumber.html, " +
-            "json:target/cucumber-reports/cucumber.json, " +
-            "junit:target/cucumber-reports/cucumber.xml{{#if (eq reportingTool "allure")}}, " +
-            "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm{{/if}}")
-@ConfigurationParameter(key = "cucumber.glue", value = "{{javaPackage}}.stepdefinitions")
-@ConfigurationParameter(key = "cucumber.filter.tags", value = "not @skip and not @wip")
-@ConfigurationParameter(key = "cucumber.execution.parallel.enabled", value = "false")
-@ConfigurationParameter(key = "cucumber.execution.parallel.config.strategy", value = "dynamic")
-@ConfigurationParameter(key = "cucumber.publish.quiet", value = "true")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "{{javaPackage}}.stepdefinitions")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty, html:target/cucumber-reports/cucumber.html, json:target/cucumber-reports/cucumber.json")
 public class TestRunner {
-    // This class will be empty - JUnit5 Platform uses annotations to configure
 }

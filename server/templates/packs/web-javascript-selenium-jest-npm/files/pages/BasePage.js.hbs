@@ -1,64 +1,49 @@
-const { By, until } = require('selenium-webdriver');
-const logger = require('../utils/logger');
+/**
+ * Base Page - Parent class for all page objects.
+ */
+const { By, until } = require("selenium-webdriver");
+const { DriverManager } = require("../utils/DriverManager");
+const { config } = require("../config/ConfigReader");
 
 class BasePage {
-  constructor(driver) {
-    this.driver = driver;
-  }
-
-  async navigate(url) {
-    logger.info(`Navigating to: ${url}`);
-    await this.driver.get(url);
-  }
-
-  async findElement(locator) {
-    return await this.driver.wait(until.elementLocated(locator), 10000);
+  async getDriver() {
+    return await DriverManager.getDriver();
   }
 
   async click(locator) {
-    const element = await this.findElement(locator);
+    const driver = await this.getDriver();
+    const element = await driver.wait(until.elementLocated(locator), config.timeout);
+    await driver.wait(until.elementIsEnabled(element), config.timeout);
     await element.click();
-    logger.info(`Clicked: ${locator}`);
   }
 
   async type(locator, text) {
-    const element = await this.findElement(locator);
+    const driver = await this.getDriver();
+    const element = await driver.wait(until.elementLocated(locator), config.timeout);
     await element.clear();
     await element.sendKeys(text);
-    logger.info(`Typed "${text}" into: ${locator}`);
   }
 
   async getText(locator) {
-    const element = await this.findElement(locator);
+    const driver = await this.getDriver();
+    const element = await driver.wait(until.elementLocated(locator), config.timeout);
     return await element.getText();
   }
 
   async isDisplayed(locator) {
     try {
-      const element = await this.findElement(locator);
+      const driver = await this.getDriver();
+      const element = await driver.findElement(locator);
       return await element.isDisplayed();
-    } catch (error) {
+    } catch {
       return false;
     }
   }
 
-  async waitForElement(locator, timeout = 10000) {
-    await this.driver.wait(until.elementLocated(locator), timeout);
-  }
-
-  async getPageTitle() {
-    return await this.driver.getTitle();
-  }
-
   async getCurrentUrl() {
-    return await this.driver.getCurrentUrl();
-  }
-
-  async takeScreenshot(name) {
-    const screenshot = await this.driver.takeScreenshot();
-    require('fs').writeFileSync(`screenshots/${name}.png`, screenshot, 'base64');
-    logger.info(`Screenshot saved: ${name}.png`);
+    const driver = await this.getDriver();
+    return await driver.getCurrentUrl();
   }
 }
 
-module.exports = BasePage;
+module.exports = { BasePage };

@@ -1,552 +1,183 @@
 # {{projectName}}
 
-A production-ready UI automation framework built with Java, Selenium WebDriver, TestNG, and Gradle following industry
-best practices.
+A production-ready **{{#if (eq framework "selenium")}}Selenium WebDriver{{else}}Playwright{{/if}}** test automation framework using **{{#if (eq testRunner "testng")}}TestNG{{else}}JUnit5{{/if}}** and **{{#if (eq buildTool "maven")}}Maven{{else}}Gradle{{/if}}**.
 
-## Framework Features
+## 🚀 Quick Start
 
-- **{{#if (eq testingPattern "bdd")}}BDD (Cucumber){{else}}Page Object Model (POM){{/if}}** design pattern for
-maintainable test code
-- **Cross-browser support** (Chrome, Firefox, Edge) with local and remote execution
-- **Parallel test execution** for faster feedback
-{{#if (eq reportingTool "extent-reports")}}
-- **ExtentReports** with screenshots and detailed test reporting
-{{else if (eq reportingTool "allure")}}
-- **Allure Reports** with rich test analytics and historical trends
-{{else if (eq reportingTool "testng-reports")}}
-- **TestNG Reports** with built-in test reporting
-{{else}}
-- **Test Reporting** with screenshots and detailed execution logs
-{{/if}}
-- **Log4j2** structured logging with multiple appenders
-- **Data-driven testing** support with CSV and JSON test data
-{{#if cicdTool}}
-{{#if (eq cicdTool "jenkins")}}
-- **Jenkins CI/CD integration** with pipeline configuration
-{{else if (eq cicdTool "github-actions")}}
-- **GitHub Actions CI/CD integration** with workflow configuration
-{{else if (eq cicdTool "gitlab-ci")}}
-- **GitLab CI/CD integration** with pipeline configuration
-{{else if (eq cicdTool "azure-devops")}}
-- **Azure DevOps CI/CD integration** with pipeline configuration
-{{else if (eq cicdTool "circleci")}}
-- **CircleCI CI/CD integration** with workflow configuration
-{{/if}}
-{{/if}}
-- **Configurable environments** (dev, qa, staging, production)
-- **Retry mechanism** for handling flaky tests
-- **Thread-safe WebDriver management** for parallel execution
-{{#if (eq testingPattern "bdd")}}
-- **BDD/Cucumber support** with Gherkin feature files
-{{/if}}
-
-## Technology Stack
-
-| Component | Technology | Version |
-|-----------|------------|---------|
-| Language | Java | {{toolVersions.java}} |
-| Build Tool | Gradle | {{toolVersions.gradle}} |
-| Test Runner | TestNG | {{toolVersions.testng}} |
-| Web Automation | Selenium WebDriver | {{toolVersions.selenium}} |
-{{#if (eq reportingTool "extent-reports")}}
-| Reporting | ExtentReports | {{toolVersions.extentreports}} |
-{{else if (eq reportingTool "allure")}}
-| Reporting | Allure Reports | {{toolVersions.allure}} |
-{{else}}
-| Reporting | TestNG Reports | Built-in |
-{{/if}}
-| Logging | Log4j2 | {{toolVersions.log4j}} |
-{{#if (eq testingPattern "bdd")}}
-| BDD Framework | Cucumber | {{toolVersions.cucumber}} |
-{{/if}}
-
-## Project Structure
-
-```
-{{artifactId}}/
-├── build.gradle # Gradle build configuration
-├── gradle.properties # Gradle properties
-├── settings.gradle # Gradle settings
-{{#if (eq cicdTool "jenkins")}}
-├── Jenkinsfile # Jenkins CI/CD pipeline
-{{else if (eq cicdTool "github-actions")}}
-├── .github/workflows/tests.yml # GitHub Actions CI/CD
-{{else if (eq cicdTool "gitlab-ci")}}
-├── .gitlab-ci.yml # GitLab CI configuration
-{{else if (eq cicdTool "azure-devops")}}
-├── azure-pipelines.yml # Azure DevOps pipeline
-{{else if (eq cicdTool "circleci")}}
-├── .circleci/config.yml # CircleCI configuration
-{{/if}}
-├── README.md # This file
-├── .gitignore # Git ignore rules
-├── src/
-│ ├── main/
-│ │ ├── java/{{packagePath}}/
-│ │ │ ├── config/ # Configuration management
-│ │ │ │ ├── ConfigurationReader.java
-│ │ │ │ └── Environment.java
-│ │ │ ├── core/ # Core framework components
-│ │ │ │ ├── DriverManager.java
-│ │ │ │ ├── BrowserFactory.java
-│ │ │ │ └── BaseTest.java
-│ │ │ ├── pages/ # Page Object classes
-│ │ │ │ ├── BasePage.java
-│ │ │ │ ├── LoginPage.java
-│ │ │ │ └── HomePage.java
-│ │ │ ├── utils/ # Utility classes
-│ │ │ │ ├── WaitUtils.java
-│ │ │ │ ├── WebActions.java
-│ │ │ │ ├── ScreenshotUtils.java
-│ │ │ │ ├── TestDataReader.java
-{{#if (eq reportingTool "extent-reports")}}
-│ │ │ │ ├── ExtentManager.java
-{{else if (eq reportingTool "allure")}}
-│ │ │ │ ├── AllureManager.java
-{{/if}}
-│ │ │ │ └── Log.java
-│ │ │ └── listeners/ # TestNG listeners
-│ │ │ ├── TestListener.java
-│ │ │ └── RetryAnalyzer.java
-│ │ └── resources/
-│ │ ├── config/ # Environment configurations
-│ │ │ ├── dev.properties
-│ │ │ ├── qa.properties
-│ │ │ └── prod.properties
-│ │ ├── log4j2.xml # Logging configuration
-{{#if (eq reportingTool "extent-reports")}}
-│ │ └── extent-config.xml # ExtentReports configuration
-{{else if (eq reportingTool "allure")}}
-│ │ └── allure.properties # Allure configuration
-{{/if}}
-│ └── test/
-│ ├── java/{{packagePath}}/tests/
-│ │ ├── LoginTests.java # Login functionality tests
-│ └── resources/
-│ ├── testng.xml # TestNG suite configuration
-│ └── testdata/ # Test data files
-│ ├── users.csv
-│ └── sample.json
-├── reports/ # Generated test reports
-└── logs/ # Application logs
-```
-
-## Quick Start
-
-### Prerequisites
-
-- Java 11 or higher (Gradle wrapper included)
-- Chrome browser (for default configuration)
-
-### Setup
-
-1. **Clone/Download the project**
 ```bash
-cd {{artifactId}}
-```
-
-2. **Install dependencies**
-```bash
-./gradlew compileJava
-```
-
-3. **Update configuration**
-- Edit `src/main/resources/config/dev.properties`
-- Update `base.url` to point to your application
-- Modify other settings as needed
-
-4. **Run tests**
-```bash
-# Run regression tests
-./gradlew test -Pgroups=regression
-
 # Run all tests
-./gradlew test
+{{#if (eq buildTool "maven")}}
+mvn clean test
+{{else}}
+gradle clean test
+{{/if}}
+
+# Run with specific browser
+{{#if (eq buildTool "maven")}}
+mvn test -Dbrowser=firefox
+{{else}}
+gradle test -Dbrowser=firefox
+{{/if}}
+
+# Run headless
+{{#if (eq buildTool "maven")}}
+mvn test -Dheadless=true
+{{else}}
+gradle test -Dheadless=true
+{{/if}}
+
+# Run specific environment
+{{#if (eq buildTool "maven")}}
+mvn test -Denv=qa
+{{else}}
+gradle test -Denv=qa
+{{/if}}
 ```
 
-## Running Tests
+## 📁 Project Structure
 
-### Basic Execution
-
-```bash
-# Default execution (dev environment, Chrome)
-./gradlew test
-
-# Specific environment
-./gradlew test -Penv=qa
-
-# Specific browser
-./gradlew test -Pbrowser=firefox
-
-# Headless mode
-./gradlew test -Pheadless=true
-
-# Specific test suite
-./gradlew smokeTest
+```
+src/
+├── main/java/{{javaPackage}}/
+│   ├── config/           # Configuration management
+│   ├── core/             # BaseTest, {{#if (eq framework "selenium")}}DriverManager{{else}}PlaywrightManager{{/if}}
+│   ├── pages/            # Page Objects (LoginPage, etc.)
+{{#if (eq testRunner "testng")}}
+│   ├── listeners/        # TestNG listeners
+{{/if}}
+│   └── utils/            # Log, Screenshot, {{#if (eq reportingTool "extent-reports")}}ExtentManager{{/if}}{{#if (eq reportingTool "allure")}}AllureManager{{/if}}
+├── main/resources/
+│   └── config/           # dev.properties, qa.properties
+└── test/
+    ├── java/{{javaPackage}}/
+{{#if (eq testingPattern "bdd")}}
+    │   ├── runners/      # Cucumber TestRunner
+    │   └── stepdefinitions/
+{{else}}
+    │   └── tests/        # Test classes
+{{/if}}
+    └── resources/
+{{#if (eq testingPattern "bdd")}}
+        └── features/     # Gherkin feature files
+{{else}}
+{{#if (eq testRunner "testng")}}
+        └── testng.xml    # TestNG suite configuration
+{{/if}}
+{{/if}}
 ```
 
-### Environment Profiles
+## ⚙️ Configuration
 
-```bash
-# Development environment
-./gradlew test -Penv=dev
-
-# QA environment
-./gradlew test -Penv=qa -Pbrowser=chrome -Pheadless=true
-
-# Production environment (with extra precautions)
-./gradlew test -Penv=prod -Pgroups=regression
-```
-
-### Parallel Execution
-
-```bash
-# Parallel execution with 3 threads
-./gradlew test -Pparallel=true -PthreadCount=3
-
-# Using QA environment with parallel execution
-./gradlew test -Penv=qa -Pparallel=true -PthreadCount=2
-```
-
-### Test Suite Options
-
-Available test suites in `testng.xml`:
-- **regression**: Comprehensive functional tests
-- **ui**: User interface focused tests
-- **data-driven**: Data-driven test scenarios
-- **performance**: Performance and load tests
-- **security**: Security and negative tests
-
-## Configuration
-
-### Environment Configuration
-
-Environment-specific settings are managed in properties files:
-
-- `config/dev.properties` - Development environment
-- `config/qa.properties` - QA/Testing environment
-- `config/prod.properties` - Production environment
-
-Key configuration options:
+Edit `src/main/resources/config/dev.properties`:
 
 ```properties
-# Application URL
-base.url=https://your-app.com
-
-# Browser settings
-browser=chrome
+base.url=https://www.saucedemo.com/
+browser={{#if (eq framework "selenium")}}chrome{{else}}chromium{{/if}}
 headless=false
-
-# Selenium Grid (for remote execution)
-remote.execution=false
-grid.url=http://selenium-grid:4444/wd/hub
-
-# Timeouts (seconds)
-implicit.wait=10
-explicit.wait=20
-page.load.timeout=30
-
-# Retry configuration
-retry.count=2
+username=standard_user
+password=secret_sauce
+timeout.default=30
 ```
 
-### Logging Configuration
+## 🧪 Writing Tests
 
-Logging is configured in `log4j2.xml` with multiple appenders:
+{{#if (eq testingPattern "bdd")}}
+### Feature File (Gherkin)
+```gherkin
+@login
+Feature: Login Functionality
 
-- **Console**: INFO level and above
-- **File**: All logs to `logs/automation.log`
-- **Error File**: Error logs only to `logs/errors.log`
-- **Test Execution**: Test-specific logs to `logs/test-execution.log`
-
-## Test Data Management
-
-### CSV Test Data
-
-Place CSV files in `src/test/resources/testdata/`:
-
-```csv
-username,password,expectedResult
-admin,password123,success
-testuser,testpass123,success
-invaliduser,wrongpass,failure
+  @smoke
+  Scenario: Successful login
+    Given I am on the login page
+    When I login with valid credentials
+    Then login should be successful
 ```
 
-Usage in tests:
+### Step Definitions
 ```java
-@DataProvider(name = "loginData")
-public Object[][] getLoginTestData() {
-return TestDataReader.getCSVDataAsArray("testdata/users.csv");
+@Given("I am on the login page")
+public void iAmOnTheLoginPage() {
+    // Implementation
 }
-
-@Test(dataProvider = "loginData")
-public void testLogin(Map<String, String> testData) {
-    String username = testData.get("username");
-    String password = testData.get("password");
-    // ... test implementation
+```
+{{else}}
+### Page Object
+```java
+public class LoginPage extends BasePage {
+    public void login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
     }
-    ```
+}
+```
 
-    ### JSON Test Data
-
-    ```json
-    {
-    "testUsers": [
-    {
-    "username": "admin",
-    "password": "password123",
-    "role": "administrator"
+### Test Class
+```java
+public class LoginTests extends BaseTest {
+    @Test
+    public void testValidLogin() {
+        LoginPage loginPage = new LoginPage();
+        loginPage.login("standard_user", "secret_sauce");
+        Assert.assertTrue(loginPage.isLoginSuccessful());
     }
-    ]
-    }
-    ```
+}
+```
+{{/if}}
 
-    Usage:
-    ```java
-    JsonNode testData = TestDataReader.readJSON("testdata/sample.json");
-    ```
+## 📊 Reports
 
-    ## Reporting
+{{#if (eq reportingTool "extent-reports")}}
+### ExtentReports
+Reports generated in: `reports/ExtentReport_{timestamp}.html`
 
-    {{#if (eq reportingTool "allure")}}
-    ### Allure Reports
+Open the HTML file in a browser after test execution.
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+### Allure Reports
+```bash
+# Generate and open report
+{{#if (eq buildTool "maven")}}
+mvn allure:serve
+{{else}}
+gradle allureServe
+{{/if}}
+```
+Results in: `target/allure-results`
+{{/if}}
+{{#if (eq reportingTool "testng-reports")}}
+### TestNG Reports
+Reports generated in: `target/surefire-reports/`
+{{/if}}
 
-    Generate and view Allure reports:
+## 🖥️ Browsers
 
-    ```bash
-    # Run tests
-    ./gradlew test
+| Browser | Config Value |
+|---------|--------------|
+{{#if (eq framework "selenium")}}
+| Chrome | `chrome` |
+| Firefox | `firefox` |
+| Edge | `edge` |
+{{else}}
+| Chromium | `chromium` |
+| Firefox | `firefox` |
+| WebKit | `webkit` |
+{{/if}}
 
-    # Generate Allure report
-    ./gradlew allureReport
+## 📸 Screenshots
 
-    # Serve report (opens in browser)
-    ./gradlew allureServe
-    ```
+Screenshots are automatically captured on test failure:
+- Location: `screenshots/`
+- Format: `FAILED_{TestName}_{timestamp}.png`
 
-    Allure report features:
-    - Test execution trends and history
-    - Test duration statistics
-    - Failure analysis with screenshots
-    - Test categorization and tagging
-    - Environment information
+## 🔧 System Requirements
 
-    Report location: `build/reports/allure-report/index.html`
-    {{else if (eq reportingTool "extent-reports")}}
-    ### ExtentReports
+- Java 17+
+- {{#if (eq buildTool "maven")}}Maven 3.9+{{else}}Gradle 8+{{/if}}
+{{#if (eq framework "playwright")}}
+- Playwright browsers (auto-installed on first run)
+{{/if}}
 
-    HTML reports are generated in the `reports/` directory:
-    - Rich HTML reports with screenshots
-    - Test execution timeline
-    - System information and environment details
-    - Failed test screenshots automatically attached
-    {{else}}
-    ### TestNG Reports
-
-    Default TestNG reports are generated in `build/reports/tests/test/index.html`.
-    {{/if}}
-
-    {{#if cicdTool}}
-    ### CI/CD Integration
-
-    {{#if (eq cicdTool "jenkins")}}
-    The included `Jenkinsfile` provides:
-    - Parameterized builds (browser, environment, suite)
-    - Parallel execution support
-    - Artifact archiving (reports, screenshots, logs)
-    - HTML report publishing
-    - JUnit test result publishing
-    {{else if (eq cicdTool "github-actions")}}
-    GitHub Actions workflow (`.github/workflows/tests.yml`) provides:
-    - Automatic test execution on push/PR
-    - Multi-browser matrix testing
-    - Artifact upload for reports
-    - Test result publishing
-    {{else if (eq cicdTool "gitlab-ci")}}
-    GitLab CI (`.gitlab-ci.yml`) provides:
-    - Pipeline stages for build and test
-    - Artifact storage for reports
-    - Multi-browser testing support
-    {{else if (eq cicdTool "azure-devops")}}
-    Azure DevOps (`azure-pipelines.yml`) provides:
-    - Pipeline with build and test stages
-    - Test result publishing
-    - Artifact storage
-    {{else if (eq cicdTool "circleci")}}
-    CircleCI (`.circleci/config.yml`) provides:
-    - Workflow with test jobs
-    - Artifact storage for reports
-    - Multi-browser testing support
-    {{/if}}
-    {{/if}}
-
-    ### Viewing Reports
-
-    After test execution:
-    1. Open `reports/ExtentReport_[timestamp].html` in a browser
-    2. Review test results, screenshots, and execution details
-    3. Check `logs/` directory for detailed logging information
-
-    ## Adding New Tests
-
-    ### 1. Create Page Objects
-
-    ```java
-    public class YourPage extends BasePage {
-
-    private final By elementLocator = By.id("your-element");
-
-    @Override
-    public boolean isLoaded() {
-    return isElementDisplayed(elementLocator);
-    }
-
-    public YourPage performAction() {
-    logPageAction("Performing action");
-    clickElement(elementLocator);
-    return this;
-    }
-    }
-    ```
-
-    ### 2. Create Test Classes
-
-    ```java
-    public class YourTests extends BaseTest {
-
-    @Test(groups = {"smoke"})
-    public void testYourFunctionality() {
-    YourPage page = new YourPage();
-    Assert.assertTrue(page.isLoaded());
-
-    // Test implementation
-    page.performAction();
-
-    // Assertions
-    Assert.assertTrue(page.isActionSuccessful());
-    }
-    }
-    ```
-
-    ### 3. Update TestNG Configuration
-
-    Add your test class to `testng.xml`:
-
-    ```xml
-    <classes>
-        <class name="{{javaPackage}}.tests.YourTests" />
-    </classes>
-    ```
-
-    ## Best Practices
-
-    ### Page Objects
-    - Keep page objects focused on actions, not assertions
-    - Use method chaining where appropriate
-    - Include isLoaded() verification for each page
-    - Use descriptive method and variable names
-
-    ### Test Classes
-    - Extend BaseTest for setup/teardown
-    - Use TestNG groups for test organization
-    - Include meaningful test descriptions
-    - Use data providers for data-driven tests
-
-    ### Logging
-    - Log important test steps and actions
-    - Use appropriate log levels (INFO, DEBUG, ERROR)
-    - Include context in error messages
-    - Use Log.step() for major test actions
-
-    ### Screenshots
-    - Screenshots are automatically captured on failures
-    - Use ScreenshotUtils for manual screenshots
-    - Screenshots are linked in ExtentReports
-
-    ## Troubleshooting
-
-    ### Common Issues
-
-    **Tests failing with WebDriver errors:**
-    - Ensure Chrome/Firefox is installed
-    - Selenium 4+ includes Selenium Manager which auto-downloads drivers
-    - Verify firewall/antivirus isn't blocking driver downloads
-
-    **Tests failing with timeouts:**
-    - Increase timeout values in configuration
-    - Check application responsiveness
-    - Verify network connectivity to test environment
-
-    **Reports not generating:**
-    - Check file permissions in reports/ directory
-    - Verify ExtentReports configuration
-    - Check for IOException in logs
-
-    **Parallel execution issues:**
-    - Ensure tests are thread-safe
-    - Check ThreadLocal usage in DriverManager
-    - Verify test data isolation
-
-    ### Debug Mode
-
-    Enable debug logging:
-    ```bash
-    ./gradlew test -Dlog.level=DEBUG
-    ```
-
-    ### Logs Location
-
-    - Application logs: `logs/automation.log`
-    - Error logs: `logs/errors.log`
-    - Test execution logs: `logs/test-execution.log`
-
-    ## Jenkins Pipeline
-
-    {{#if (eq cicdTool "jenkins")}}
-    The included Jenkinsfile supports:
-
-    ```groovy
-    // Example Jenkins build
-    pipeline {
-    parameters {
-    choice(name: 'BROWSER', choices: ['chrome', 'firefox'])
-    choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'stg'])
-    booleanParam(name: 'HEADLESS', defaultValue: true)
-    }
-    }
-    ```
-
-    Build with parameters:
-    - Browser selection (Chrome, Firefox, Edge)
-    - Environment selection (dev, qa, staging, prod)
-    - Headless execution toggle
-    - Test suite selection
-    {{else}}
-    CI/CD pipeline is configured for {{cicdTool}}. See the pipeline configuration file for details.
-    {{/if}}
-
-    ## Contributing
-
-    When adding new functionality:
-
-    1. Follow existing code patterns and naming conventions
-    2. Add appropriate logging and error handling
-    3. Include unit tests where applicable
-    4. Update documentation for new features
-    5. Ensure thread safety for parallel execution
-
-    ## Support
-
-    For issues and questions:
-
-    1. Check the logs in `logs/` directory
-    2. Review ExtentReports for detailed test execution information
-    3. Verify configuration settings in properties files
-    4. Check WebDriver and browser compatibility
-
-    ---
-
-    **Framework Version:** 1.0.0
-    **Last Updated:** {{timestamp}}
-    **Java Version:** {{toolVersions.java}}+
-    **Gradle Version:** {{toolVersions.gradle}} (included)
+---
+Generated by [QAStarter](https://github.com/qatonic/qastarter)

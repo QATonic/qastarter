@@ -1,0 +1,60 @@
+/**
+ * Playwright Manager - Browser lifecycle management.
+ */
+import { chromium, firefox, webkit, Browser, BrowserContext, Page } from "playwright";
+import { config } from "../config/ConfigReader";
+
+class PlaywrightManager {
+  private static browser: Browser | null = null;
+  private static context: BrowserContext | null = null;
+  private static page: Page | null = null;
+
+  static async getPage(): Promise<Page> {
+    if (!this.page) {
+      throw new Error("Browser not initialized. Call initBrowser() first.");
+    }
+    return this.page;
+  }
+
+  static async initBrowser(browser?: string, headless?: boolean): Promise<Page> {
+    browser = browser || config.browser;
+    headless = headless !== undefined ? headless : config.headless;
+
+    console.log(`[Playwright] Initializing: ${browser} | Headless: ${headless}`);
+
+    switch (browser.toLowerCase()) {
+      case "firefox":
+        this.browser = await firefox.launch({ headless });
+        break;
+      case "webkit":
+      case "safari":
+        this.browser = await webkit.launch({ headless });
+        break;
+      default:
+        this.browser = await chromium.launch({ headless });
+    }
+
+    this.context = await this.browser.newContext({
+      viewport: { width: 1920, height: 1080 },
+    });
+    this.page = await this.context.newPage();
+
+    console.log("[Playwright] Browser initialized");
+    return this.page;
+  }
+
+  static async closeBrowser(): Promise<void> {
+    if (this.context) await this.context.close();
+    if (this.browser) await this.browser.close();
+    this.page = null;
+    this.context = null;
+    this.browser = null;
+    console.log("[Playwright] Browser closed");
+  }
+
+  static isInitialized(): boolean {
+    return this.page !== null;
+  }
+}
+
+export { PlaywrightManager };

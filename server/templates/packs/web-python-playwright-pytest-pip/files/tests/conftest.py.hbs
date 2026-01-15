@@ -1,0 +1,55 @@
+"""
+Pytest Fixtures for Playwright.
+"""
+import pytest
+from utils.playwright_manager import PlaywrightManager
+from utils.logger import log
+from utils.screenshot_utils import ScreenshotUtils
+from config.config_reader import config
+{{#if (eq reportingTool "allure")}}
+import allure
+{{/if}}
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_session():
+    """Run once before all tests."""
+    log.info("=" * 60)
+    log.info(" PLAYWRIGHT TEST SESSION STARTED")
+    log.info("=" * 60)
+    yield
+    log.info(" TEST SESSION COMPLETED")
+
+
+@pytest.fixture(scope="function")
+def page():
+    """Provides Playwright Page for each test."""
+    log.info("--- Test Setup ---")
+    PlaywrightManager.init_browser()
+    page = PlaywrightManager.get_page()
+    
+    # Navigate to base URL
+    base_url = config.base_url
+    if base_url:
+        page.goto(base_url)
+        log.info(f"Navigated to: {base_url}")
+    
+    yield page
+    
+    log.info("--- Test Teardown ---")
+    PlaywrightManager.quit_browser()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Capture screenshot on test failure."""
+    outcome = yield
+    report = outcome.get_result()
+    
+    if report.when == "call" and report.failed:
+        log.error(f"TEST FAILED: {item.name}")
+        
+        if PlaywrightManager.is_initialized():
+            screenshot_path = ScreenshotUtils.capture(f"FAILED_{item.name}")
+            if screenshot_path:
+                log.info(f"Screenshot saved: {screenshot_path}")

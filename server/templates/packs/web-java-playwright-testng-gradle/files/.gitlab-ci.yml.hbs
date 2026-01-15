@@ -1,55 +1,57 @@
-image: mcr.microsoft.com/playwright/java:v{{toolVersions.playwright}}-jammy
-
-variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  BROWSER: "chromium"
-  HEADLESS: "true"
-  ENV: "qa"
+image: eclipse-temurin:17-jdk
 
 stages:
-  - build
   - test
   - report
 
-cache:
-  key: gradle-cache
-  paths:
-    - .gradle/
-    - build/
+variables:
+  HEADLESS: "true"
 
+{{#if (eq framework "playwright")}}
 before_script:
-  - chmod +x gradlew
-  - ./gradlew installPlaywrightBrowsers --no-daemon
-
-build:
-  stage: build
-  script:
-    - ./gradlew clean build -x test --no-daemon
-  artifacts:
-    paths:
-      - build/
+  - apt-get update && apt-get install -y libglib2.0-0 libnss3 libx11-6 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6
+{{#if (eq buildTool "maven")}}
+  - mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+{{else}}
+  - ./gradlew playwright install
+{{/if}}
+{{/if}}
 
 test:
   stage: test
   script:
-    - ./gradlew test -Pbrowser=$BROWSER -Pheadless=$HEADLESS -Penv=$ENV --no-daemon
+{{#if (eq buildTool "maven")}}
+    - mvn clean test -Dheadless=$HEADLESS
+{{else}}
+    - ./gradlew clean test -Dheadless=$HEADLESS
+{{/if}}
   artifacts:
     when: always
     paths:
+{{#if (eq buildTool "maven")}}
+      - target/surefire-reports/
+{{else}}
       - build/reports/
+{{/if}}
       - screenshots/
-    reports:
-      junit: build/test-results/test/*.xml
+      - reports/
+    expire_in: 7 days
+{{#if (eq reportingTool "allure")}}
 
-pages:
+allure-report:
   stage: report
-  dependencies:
-    - test
   script:
-    - mkdir -p public
-    - cp -r build/reports/tests/test/* public/
+{{#if (eq buildTool "maven")}}
+    - mvn allure:report
+{{else}}
+    - ./gradlew allureReport
+{{/if}}
   artifacts:
     paths:
-      - public
-  only:
-    - main
+{{#if (eq buildTool "maven")}}
+      - target/site/allure-maven-plugin/
+{{else}}
+      - build/allure-report/
+{{/if}}
+    expire_in: 7 days
+{{/if}}

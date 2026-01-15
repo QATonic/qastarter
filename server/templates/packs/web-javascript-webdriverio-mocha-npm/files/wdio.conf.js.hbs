@@ -1,3 +1,13 @@
-import { config } from './config/wdio.config.js';
-
-export { config };
+exports.config = {
+  runner: "local",
+  specs: ["./test/specs/**/*.spec.js"],
+  maxInstances: 5,
+  capabilities: [{ browserName: "chrome" }],
+  logLevel: "info",
+  bail: 0,
+  baseUrl: "https://www.saucedemo.com/",
+  waitforTimeout: 30000,
+  framework: "mocha",
+  reporters: ["spec"],
+  mochaOpts: { ui: "bdd", timeout: 60000 },
+};

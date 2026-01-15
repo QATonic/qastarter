@@ -49,10 +49,10 @@ dependencies {
 implementation "com.microsoft.playwright:playwright:${playwrightVersion}"
 
 // JUnit 5
-testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+implementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+implementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
 testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-testImplementation "org.junit.platform:junit-platform-suite:1.10.0"
+implementation "org.junit.platform:junit-platform-suite:1.10.0"
 {{#if (eq reportingTool "extent-reports")}}
 
 // ExtentReports

@@ -1,46 +1,29 @@
 {
-  "name": "{{projectName}}",
+  "name": "{{artifactId}}",
   "version": "1.0.0",
-  "description": "Cypress test automation framework with TypeScript",
+  "description": "{{projectName}} - Cypress TypeScript Automation Framework",
   "scripts": {
     "test": "cypress run",
+    "test:open": "cypress open",
     "test:headed": "cypress run --headed",
-    "test:chrome": "cypress run --browser chrome",
-    "test:firefox": "cypress run --browser firefox",
-    "open": "cypress open",
 {{#if (eq reportingTool "allure")}}
-    "report": "allure generate allure-results --clean && allure open",
-    "report:generate": "allure generate allure-results --clean",
-{{else if (eq reportingTool "mochawesome")}}
-    "report": "marge cypress/results/*.json --reportDir cypress/reports && open cypress/reports/mochawesome.html || xdg-open cypress/reports/mochawesome.html",
-    "report:merge": "mochawesome-merge cypress/results/*.json > cypress/reports/merged.json",
-{{else}}
-    "report": "open cypress/reports/index.html || xdg-open cypress/reports/index.html || start cypress/reports/index.html",
+    "allure:generate": "allure generate allure-results -o allure-report --clean",
+    "allure:open": "allure open allure-report",
 {{/if}}
-    "clean": "rm -rf cypress/screenshots cypress/videos cypress/results",
-    "type-check": "tsc --noEmit"
+    "lint": "eslint cypress/**/*.ts"
   },
-  "keywords": ["cypress", "testing", "automation", "e2e", "typescript"],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "cypress": "^13.6.0",
     "typescript": "^5.3.0",
-    "@types/node": "^20.10.0",
+{{#if (eq reportingTool "allure")}}
+    "@shelex/cypress-allure-plugin": "^2.40.0",
+    "allure-commandline": "^2.24.0",
+{{/if}}
 {{#if (eq reportingTool "mochawesome")}}
-    "mochawesome": "^7.1.3",
+    "mochawesome": "^7.1.0",
     "mochawesome-merge": "^4.3.0",
     "mochawesome-report-generator": "^6.2.0",
 {{/if}}
-{{#if (eq reportingTool "allure")}}
-    "@shelex/cypress-allure-plugin": "^2.40.2",
-    "allure-commandline": "^2.25.0",
-{{/if}}
-{{#if (eq testingPattern "bdd")}}
-    "@badeball/cypress-cucumber-preprocessor": "^20.0.0",
-    "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
-    "esbuild": "^0.19.0",
-{{/if}}
-    "dotenv": "^16.3.1"
+    "@types/node": "^20.10.0"
   }
 }

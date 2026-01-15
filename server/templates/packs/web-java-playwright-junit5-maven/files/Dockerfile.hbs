@@ -1,39 +1,37 @@
-# {{projectName}} - Playwright Test Automation with JUnit5
-# Multi-stage Dockerfile for running Playwright tests
+FROM eclipse-temurin:17-jdk-alpine
 
-FROM maven:3.9-eclipse-temurin-17 AS build
-WORKDIR /app
-
-# Copy pom.xml and download dependencies
-COPY pom.xml ./
-RUN mvn dependency:go-offline -B
-
-# Copy source code
-COPY src ./src
-
-# Build the project
-RUN mvn compile -DskipTests
-
-# Test stage
-FROM mcr.microsoft.com/playwright/java:v1.40.0-jammy AS test
-WORKDIR /app
-
-# Copy Maven
-COPY --from=maven:3.9-eclipse-temurin-17 /usr/share/maven /usr/share/maven
-ENV PATH="/usr/share/maven/bin:${PATH}"
-
-# Copy built application
-COPY --from=build /app ./
-COPY --from=build /root/.m2 /root/.m2
+# Install browsers for headless testing
+RUN apk add --no-cache \
+    chromium \
+    chromium-chromedriver \
+    firefox \
+    font-noto \
+    font-noto-cjk
 
 # Set environment variables
-ENV BROWSER=chromium
-ENV HEADLESS=true
-ENV TEST_ENV=qa
+ENV CHROME_BIN=/usr/bin/chromium-browser \
+    CHROME_DRIVER=/usr/bin/chromedriver \
+    JAVA_OPTS="-Xmx512m"
 
-# Create directories for test results
-RUN mkdir -p /app/target/surefire-reports /app/target/screenshots
+WORKDIR /app
 
-# Default command runs all tests
-ENTRYPOINT ["mvn", "test"]
-CMD ["-Dheadless=true", "-Dbrowser=chromium"]
+# Copy project files
+COPY pom.xml ./
+{{#if (eq buildTool "maven")}}
+COPY mvnw ./
+COPY .mvn .mvn
+RUN chmod +x mvnw && ./mvnw dependency:resolve
+{{else}}
+COPY gradlew ./
+COPY gradle gradle
+RUN chmod +x gradlew && ./gradlew dependencies
+{{/if}}
+
+COPY src ./src
+
+# Run tests
+{{#if (eq buildTool "maven")}}
+CMD ["./mvnw", "clean", "test", "-Dheadless=true"]
+{{else}}
+CMD ["./gradlew", "clean", "test", "-Dheadless=true"]
+{{/if}}

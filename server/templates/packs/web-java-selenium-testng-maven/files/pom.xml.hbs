@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>{{groupId}}</groupId>
@@ -13,11 +12,11 @@
     <description>UI Automation Framework using Selenium WebDriver, TestNG, and Maven</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        
+
         <!-- Dependency Versions -->
         <selenium.version>{{toolVersions.selenium}}</selenium.version>
         <testng.version>{{toolVersions.testng}}</testng.version>
@@ -34,12 +33,12 @@
         {{/if}}
         <jackson.version>2.15.2</jackson.version>
         <commons-csv.version>1.10.0</commons-csv.version>
-        
+
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
-        
+
         <!-- Test Configuration -->
         <suite>testng.xml</suite>
         <browser>chrome</browser>
@@ -61,7 +60,7 @@
             <artifactId>testng</artifactId>
             <version>${testng.version}</version>
         </dependency>
-{{#if (eq testingPattern "bdd")}}
+        {{#if (eq testingPattern "bdd")}}
 
         <!-- Cucumber -->
         <dependency>
@@ -74,8 +73,8 @@
             <artifactId>cucumber-testng</artifactId>
             <version>${cucumber.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
 
         <!-- ExtentReports -->
         <dependency>
@@ -83,8 +82,8 @@
             <artifactId>extentreports</artifactId>
             <version>${extentreports.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "allure")}}
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
 
         <!-- Allure -->
         <dependency>
@@ -92,14 +91,14 @@
             <artifactId>allure-testng</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{#if (eq testingPattern "bdd")}}
+        {{#if (eq testingPattern "bdd")}}
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber7-jvm</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{/if}}
-{{/if}}
+        {{/if}}
+        {{/if}}
 
 
         <!-- Log4j2 -->
@@ -157,9 +156,11 @@
                         <env>${env}</env>
                     </systemPropertyVariables>
                     <useSystemClassLoader>false</useSystemClassLoader>
-                    <argLine>-Dfile.encoding=UTF-8{{#if (eq reportingTool "allure")}} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}</argLine>
+                    <argLine>-Dfile.encoding=UTF-8{{#if (eq reportingTool "allure")}}
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}
+                    </argLine>
                 </configuration>
-{{#if (eq reportingTool "allure")}}
+                {{#if (eq reportingTool "allure")}}
                 <dependencies>
                     <dependency>
                         <groupId>org.aspectj</groupId>
@@ -167,9 +168,9 @@
                         <version>${aspectj.version}</version>
                     </dependency>
                 </dependencies>
-{{/if}}
+                {{/if}}
             </plugin>
-{{#if (eq reportingTool "allure")}}
+            {{#if (eq reportingTool "allure")}}
 
             <!-- Allure Maven Plugin -->
             <plugin>
@@ -181,7 +182,7 @@
                     <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
                 </configuration>
             </plugin>
-{{/if}}
+            {{/if}}
         </plugins>
     </build>
 

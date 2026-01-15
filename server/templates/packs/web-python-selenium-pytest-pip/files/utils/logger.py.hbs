@@ -1,58 +1,93 @@
 """
-Logging utility with file and console handlers
+Logger - Consistent logging across the framework.
+
+Usage:
+    from utils.logger import log
+    
+    log.info("Message")
+    log.step("Test step description")
+    log.error("Error occurred")
 """
 import logging
-import sys
-from pathlib import Path
+import os
 from datetime import datetime
-from config.config import Config
+from pathlib import Path
+
 
 class Logger:
-    """Logger utility class"""
+    """Custom logger with test-focused methods."""
     
-    _loggers = {}
+    _instance = None
+    _logger = None
     
-    @classmethod
-    def get_logger(cls, name: str) -> logging.Logger:
-        """
-        Get or create logger instance
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._setup_logger()
+        return cls._instance
+    
+    def _setup_logger(self):
+        """Configure logger with file and console handlers."""
+        self._logger = logging.getLogger("TestFramework")
+        self._logger.setLevel(logging.DEBUG)
         
-        Args:
-            name: Logger name
-            
-        Returns:
-            Logger instance
-        """
-        if name in cls._loggers:
-            return cls._loggers[name]
+        # Clear existing handlers
+        self._logger.handlers.clear()
         
-        logger = logging.getLogger(name)
-        logger.setLevel(getattr(logging, Config.LOG_LEVEL))
-        
-        # Create logs directory if it doesn't exist
-        Config.LOG_DIR.mkdir(exist_ok=True)
+        # Create logs directory
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
         
         # File handler
-        log_file = Config.LOG_DIR / f'test_{datetime.now().strftime("%Y%m%d")}.log'
-        file_handler = logging.FileHandler(log_file)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_handler = logging.FileHandler(logs_dir / f"test_{timestamp}.log")
         file_handler.setLevel(logging.DEBUG)
-        file_formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
-        file_handler.setFormatter(file_formatter)
+        file_handler.setFormatter(logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | %(message)s"
+        ))
         
         # Console handler
-        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.INFO)
-        console_formatter = logging.Formatter(
-            '%(levelname)s - %(name)s - %(message)s'
-        )
-        console_handler.setFormatter(console_formatter)
+        console_handler.setFormatter(logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | %(message)s",
+            datefmt="%H:%M:%S"
+        ))
         
-        # Add handlers
-        logger.addHandler(file_handler)
-        logger.addHandler(console_handler)
-        
-        cls._loggers[name] = logger
-        return logger
+        self._logger.addHandler(file_handler)
+        self._logger.addHandler(console_handler)
+    
+    def info(self, message: str):
+        self._logger.info(message)
+    
+    def debug(self, message: str):
+        self._logger.debug(message)
+    
+    def warning(self, message: str):
+        self._logger.warning(message)
+    
+    def error(self, message: str):
+        self._logger.error(message)
+    
+    def step(self, message: str):
+        """Log a test step."""
+        self._logger.info(f"STEP: {message}")
+    
+    def action(self, message: str):
+        """Log an action (click, type, etc.)."""
+        self._logger.info(f"ACTION: {message}")
+    
+    def test_start(self, test_name: str):
+        """Log test start."""
+        self._logger.info("=" * 60)
+        self._logger.info(f"TEST START: {test_name}")
+        self._logger.info("=" * 60)
+    
+    def test_end(self, test_name: str, status: str):
+        """Log test end."""
+        self._logger.info(f"TEST END: {test_name} - {status}")
+        self._logger.info("=" * 60)
+
+
+# Singleton instance
+log = Logger()

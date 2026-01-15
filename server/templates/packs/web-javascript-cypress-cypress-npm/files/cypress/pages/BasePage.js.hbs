@@ -1,49 +1,7 @@
 class BasePage {
-  visit(url) {
-    cy.log(`Navigating to: ${url}`);
-    cy.visit(url);
-  }
-
-  click(selector) {
-    cy.log(`Clicking element: ${selector}`);
-    cy.get(selector).click();
-  }
-
-  type(selector, text) {
-    cy.log(`Typing '${text}' into element: ${selector}`);
-    cy.get(selector).clear().type(text);
-  }
-
-  getText(selector) {
-    cy.log(`Getting text from element: ${selector}`);
-    return cy.get(selector).invoke('text');
-  }
-
-  isVisible(selector) {
-    cy.log(`Checking visibility of element: ${selector}`);
-    return cy.get(selector).should('be.visible');
-  }
-
-  waitForElement(selector, timeout = 10000) {
-    cy.log(`Waiting for selector: ${selector}`);
-    cy.get(selector, { timeout }).should('be.visible');
-  }
-
-  getTitle() {
-    return cy.title();
-  }
-
-  getCurrentUrl() {
-    return cy.url();
-  }
-
-  assertUrlContains(text) {
-    cy.url().should('include', text);
-  }
-
-  assertTitleContains(text) {
-    cy.title().should('include', text);
-  }
+  visit(path = "/") { cy.visit(path); return this; }
+  click(selector) { cy.get(selector).click(); return this; }
+  type(selector, text) { cy.get(selector).clear().type(text); return this; }
+  shouldBeVisible(selector) { cy.get(selector).should("be.visible"); return this; }
 }
-
-export default BasePage;
+module.exports = { BasePage };

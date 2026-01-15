@@ -1,20 +1,17 @@
-{{{{raw}}}}
 pipeline {
     agent any
     
     tools {
-        gradle 'Gradle 8.4'
-        jdk 'JDK 17'
+        jdk 'JDK17'
+{{#if (eq buildTool "maven")}}
+        maven 'Maven3'
+{{else}}
+        gradle 'Gradle8'
+{{/if}}
     }
     
     environment {
-        PLAYWRIGHT_BROWSERS_PATH = '0'
-    }
-    
-    parameters {
-        choice(name: 'BROWSER', choices: ['chromium', 'firefox', 'webkit'], description: 'Browser to run tests')
-        booleanParam(name: 'HEADLESS', defaultValue: true, description: 'Run in headless mode')
-        string(name: 'ENVIRONMENT', defaultValue: 'qa', description: 'Test environment')
+        HEADLESS = 'true'
     }
     
     stages {
@@ -24,61 +21,62 @@ pipeline {
             }
         }
         
-        stage('Install Playwright Browsers') {
+        stage('Build') {
             steps {
-                sh './gradlew installPlaywrightBrowsers --no-daemon'
+{{#if (eq buildTool "maven")}}
+                sh 'mvn clean compile'
+{{else}}
+                sh './gradlew clean classes'
+{{/if}}
             }
         }
+{{#if (eq framework "playwright")}}
         
-        stage('Run Tests') {
+        stage('Install Browsers') {
             steps {
-                sh """
-                    ./gradlew test \
-                        -Pbrowser=${params.BROWSER} \
-                        -Pheadless=${params.HEADLESS} \
-                        -Penv=${params.ENVIRONMENT} \
-                        --no-daemon
-                """
+{{#if (eq buildTool "maven")}}
+                sh 'mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"'
+{{else}}
+                sh './gradlew playwright install'
+{{/if}}
             }
         }
+{{/if}}
         
-        stage('Generate Reports') {
+        stage('Test') {
             steps {
-                script {
-                    // TestNG Reports
-                    testNG testResultsPattern: 'build/test-results/test/*.xml'
+{{#if (eq buildTool "maven")}}
+                sh 'mvn test -Dheadless=${HEADLESS}'
+{{else}}
+                sh './gradlew test -Dheadless=${HEADLESS}'
+{{/if}}
+            }
+            post {
+                always {
+{{#if (eq testRunner "testng")}}
+                    testResultsPublisher(testResultsPattern: '**/target/surefire-reports/*.xml')
+{{else}}
+                    junit '**/target/surefire-reports/*.xml'
+{{/if}}
                 }
             }
         }
+{{#if (eq reportingTool "allure")}}
+        
+        stage('Allure Report') {
+            steps {
+                allure includeProperties: false, jdk: '', results: [[path: 'target/allure-results']]
+            }
+        }
+{{/if}}
     }
     
     post {
-        always {
-            // Archive test results
-            archiveArtifacts artifacts: 'build/reports/**/*', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'screenshots/**/*', allowEmptyArchive: true
-            
-            // Publish TestNG results
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'build/reports/tests/test',
-                reportFiles: 'index.html',
-                reportName: 'TestNG Report'
-            ])
-            
-            // Clean workspace
-            cleanWs()
-        }
-        
         failure {
-            echo 'Tests failed! Check the reports for details.'
+            archiveArtifacts artifacts: 'screenshots/**', allowEmptyArchive: true
         }
-        
-        success {
-            echo 'All tests passed successfully!'
+        always {
+            cleanWs()
         }
     }
 }
-{{{{/raw}}}}

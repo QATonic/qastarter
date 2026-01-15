@@ -1,37 +1,24 @@
 /**
- * Login Test Suite
- * 
- * BEFORE RUNNING:
- * 1. Update baseUrl in wdio.conf.ts
- * 2. Update selectors in test/pageobjects/login.page.ts
- * 3. Run: npm test
+ * Login Tests using WebdriverIO.
  */
-import { expect } from '@wdio/globals';
-import LoginPage from '../pageobjects/login.page';
+import { LoginPage } from "../pages/LoginPage";
 
-// ============================================
-// UPDATE THESE VALUES FOR YOUR APPLICATION
-// ============================================
-const TEST_USERNAME = 'your-test-user@email.com';
-const TEST_PASSWORD = 'YourTestPassword123';
-// ============================================
+describe("Login Tests", () => {
+  const loginPage = new LoginPage();
+  const username = "standard_user";
+  const password = "secret_sauce";
 
-describe('Login Functionality', () => {
-  
-  it('should login with valid credentials', async () => {
-    // Step 1: Perform login
-    await LoginPage.login(TEST_USERNAME, TEST_PASSWORD);
-    
-    // Step 2: Verify login was successful
-    // UPDATE: Change this assertion to match your app's success indicator
-    await expect(LoginPage.flashMessage).toBeDisplayed();
-    const message = await LoginPage.getFlashMessage();
-    expect(message).toContain('success'); // Update expected message
+  beforeEach(async () => {
+    await loginPage.open("/");
   });
-  
-  it('should display login page elements', async () => {
-    await LoginPage.open('/login');
-    await expect(LoginPage.usernameInput).toBeDisplayed();
-    await expect(LoginPage.passwordInput).toBeDisplayed();
+
+  it("should login successfully with valid credentials", async () => {
+    await loginPage.login(username, password);
+    expect(await loginPage.isLoginSuccessful()).toBe(true);
+  });
+
+  it("should show error with invalid credentials", async () => {
+    await loginPage.login("invalid_user", "wrong_password");
+    expect(await loginPage.isErrorDisplayed()).toBe(true);
   });
 });

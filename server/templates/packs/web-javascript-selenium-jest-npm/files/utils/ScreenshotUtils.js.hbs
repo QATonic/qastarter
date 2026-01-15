@@ -1,0 +1,32 @@
+/**
+ * Screenshot Utilities.
+ */
+const fs = require("fs");
+const path = require("path");
+const { DriverManager } = require("./DriverManager");
+const { log } = require("./Logger");
+
+class ScreenshotUtils {
+  static screenshotDir = "screenshots";
+
+  static async capture(name) {
+    try {
+      const driver = await DriverManager.getDriver();
+      if (!fs.existsSync(this.screenshotDir)) fs.mkdirSync(this.screenshotDir, { recursive: true });
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const filename = `${name.replace(/[^a-zA-Z0-9_-]/g, "_")}_${timestamp}.png`;
+      const filepath = path.join(this.screenshotDir, filename);
+
+      const screenshot = await driver.takeScreenshot();
+      fs.writeFileSync(filepath, screenshot, "base64");
+      log.info(`Screenshot saved: ${filepath}`);
+      return filepath;
+    } catch (error) {
+      log.error(`Failed to capture screenshot: ${error}`);
+      return null;
+    }
+  }
+}
+
+module.exports = { ScreenshotUtils };

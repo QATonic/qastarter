@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>{{groupId}}</groupId>
@@ -15,30 +14,30 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
+
         <!-- Core Dependencies -->
         <playwright.version>{{toolVersions.playwright}}</playwright.version>
         <testng.version>{{toolVersions.testng}}</testng.version>
         <log4j.version>{{toolVersions.log4j}}</log4j.version>
-        
-{{#if (eq reportingTool "allure")}}
+
+        {{#if (eq reportingTool "allure")}}
         <!-- Allure Reporting -->
         <allure.version>{{toolVersions.allure}}</allure.version>
         <aspectj.version>1.9.20</aspectj.version>
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
         <!-- ExtentReports -->
         <extentreports.version>{{toolVersions.extentreports}}</extentreports.version>
-{{/if}}
-{{#if (eq testingPattern "bdd")}}
+        {{/if}}
+        {{#if (eq testingPattern "bdd")}}
         <!-- Cucumber BDD -->
         <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
-{{/if}}
-        
+        {{/if}}
+
         <!-- Utilities -->
         <gson.version>2.10.1</gson.version>
         <jackson.version>2.15.2</jackson.version>
-        
+
         <!-- Plugin Versions -->
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -51,7 +50,7 @@
             <artifactId>playwright</artifactId>
             <version>${playwright.version}</version>
         </dependency>
-        
+
         <!-- TestNG -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -59,7 +58,7 @@
             <version>${testng.version}</version>
         </dependency>
 
-{{#if (eq testingPattern "bdd")}}
+        {{#if (eq testingPattern "bdd")}}
         <!-- Cucumber -->
         <dependency>
             <groupId>io.cucumber</groupId>
@@ -71,8 +70,8 @@
             <artifactId>cucumber-testng</artifactId>
             <version>${cucumber.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
 
         <!-- ExtentReports -->
         <dependency>
@@ -80,8 +79,8 @@
             <artifactId>extentreports</artifactId>
             <version>${extentreports.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "allure")}}
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
 
         <!-- Allure -->
         <dependency>
@@ -89,14 +88,14 @@
             <artifactId>allure-testng</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{#if (eq testingPattern "bdd")}}
+        {{#if (eq testingPattern "bdd")}}
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber7-jvm</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{/if}}
-{{/if}}
+        {{/if}}
+        {{/if}}
 
         <!-- Log4j2 -->
         <dependency>
@@ -142,26 +141,28 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-{{#if (eq testingPattern "bdd")}}
+                    {{#if (eq testingPattern "bdd")}}
                     <includes>
                         <include>**/runners/*TestRunner.java</include>
                     </includes>
-{{else}}
+                    {{else}}
                     <suiteXmlFiles>
-                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-{{/if}}
+                    {{/if}}
                     <systemPropertyVariables>
                         <browser>${browser}</browser>
                         <headless>${headless}</headless>
                         <env>${env}</env>
-{{#if (eq reportingTool "allure")}}
+                        {{#if (eq reportingTool "allure")}}
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
-{{/if}}
+                        {{/if}}
                     </systemPropertyVariables>
-                    <argLine>-Dfile.encoding=UTF-8{{#if (eq reportingTool "allure")}} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}</argLine>
+                    <argLine>-Dfile.encoding=UTF-8{{#if (eq reportingTool "allure")}}
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}
+                    </argLine>
                 </configuration>
-{{#if (eq reportingTool "allure")}}
+                {{#if (eq reportingTool "allure")}}
                 <dependencies>
                     <dependency>
                         <groupId>org.aspectj</groupId>
@@ -169,9 +170,9 @@
                         <version>${aspectj.version}</version>
                     </dependency>
                 </dependencies>
-{{/if}}
+                {{/if}}
             </plugin>
-{{#if (eq reportingTool "allure")}}
+            {{#if (eq reportingTool "allure")}}
 
             <!-- Allure Maven Plugin -->
             <plugin>
@@ -183,7 +184,7 @@
                     <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
                 </configuration>
             </plugin>
-{{/if}}
+            {{/if}}
         </plugins>
     </build>
 

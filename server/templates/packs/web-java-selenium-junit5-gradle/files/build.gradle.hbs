@@ -21,7 +21,7 @@ mavenCentral()
 
 ext {
 // Dependency versions
-seleniumVersion = '4.16.0'
+seleniumVersion = '4.27.0'
 junitVersion = '5.10.0'
 log4jVersion = '2.20.0'
 {{#if (eq reportingTool "extent-reports")}}
@@ -48,11 +48,11 @@ dependencies {
 // Selenium WebDriver
 implementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
 
-// JUnit 5
-testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
-testImplementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
+// JUnit 5 (in implementation because BaseTest is in src/main)
+implementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+implementation "org.junit.jupiter:junit-jupiter-params:${junitVersion}"
 testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
-testImplementation "org.junit.platform:junit-platform-suite:1.10.0"
+implementation "org.junit.platform:junit-platform-suite:1.10.0"
 {{#if (eq reportingTool "extent-reports")}}
 
 // ExtentReports

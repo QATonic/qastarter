@@ -1,414 +1,183 @@
 # {{projectName}}
 
-Web UI Test Automation Framework using Java, Playwright, JUnit5, and Maven.
+A production-ready **{{#if (eq framework "selenium")}}Selenium WebDriver{{else}}Playwright{{/if}}** test automation framework using **{{#if (eq testRunner "testng")}}TestNG{{else}}JUnit5{{/if}}** and **{{#if (eq buildTool "maven")}}Maven{{else}}Gradle{{/if}}**.
 
-## Overview
-
-This is a robust, production-ready test automation framework built with:
-- **Playwright** - Modern browser automation with auto-waiting and powerful selectors
-- **JUnit 5** - Modern testing framework with annotations and extensions
-- **Maven** - Build and dependency management
-- **Page Object Model** - Maintainable test structure
-{{#if (eq reportingTool "allure")}}
-- **Allure Reports** - Beautiful, interactive test reports
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-- **ExtentReports** - Rich HTML test reports
-{{/if}}
-- **Log4j2** - Comprehensive logging
-- **Data-driven testing** - Support for CSV and JSON test data
-
-## Prerequisites
-
-- **Java {{toolVersions.java}}** or higher
-- **Maven 3.6+**
-- **Node.js** (Playwright requires Node.js for browser installation)
-
-## Project Structure
-
-```
-{{artifactId}}/
-├── src/
-│ ├── main/
-│ │ ├── java/
-│ │ │ └── {{packagePath}}/
-│ │ │ ├── core/ # Core framework components
-│ │ │ │ ├── BaseTest.java
-│ │ │ │ ├── BrowserManager.java
-│ │ │ │ └── PlaywrightFactory.java
-│ │ │ ├── pages/ # Page Object classes
-│ │ │ │ ├── BasePage.java
-│ │ │ │ ├── LoginPage.java
-│ │ │ │ └── HomePage.java
-│ │ │ ├── utils/ # Utility classes
-│ │ │ │ ├── PlaywrightActions.java
-│ │ │ │ ├── WaitUtils.java
-│ │ │ │ ├── ScreenshotUtils.java
-│ │ │ │ ├── TestDataReader.java
-{{#if (eq reportingTool "allure")}}
-│ │ │ │ ├── AllureManager.java
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-│ │ │ │ ├── ExtentManager.java
-{{/if}}
-│ │ │ │ └── Log.java
-│ │ │ ├── config/ # Configuration utilities
-│ │ │ │ ├── ConfigurationReader.java
-│ │ │ │ └── Environment.java
-│ │ │ └── listeners/ # Test listeners
-│ │ │ └── TestWatcher.java
-│ │ └── resources/
-│ │ ├── config/ # Environment configs
-│ │ │ ├── dev.properties
-│ │ │ ├── qa.properties
-│ │ │ └── prod.properties
-│ │ ├── testdata/ # Test data files
-│ │ │ ├── users.csv
-│ │ │ └── sample.json
-{{#if (eq reportingTool "extent-reports")}}
-│ │ ├── extent-config.xml
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-│ │ ├── allure.properties
-{{/if}}
-│ │ ├── log4j2.xml
-│ │ └── junit-platform.properties
-│ └── test/
-│ └── java/
-│ └── {{packagePath}}/
-│ └── tests/ # Test classes
-│ ├── LoginTests.java
-│ └── LoginTests.java
-├── pom.xml
-└── .gitignore
-```
-
-## Setup Instructions
-
-### 1. Install Playwright Browsers
-
-After cloning the project, install Playwright browsers:
+## 🚀 Quick Start
 
 ```bash
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"
-```
-
-Or install specific browsers:
-
-```bash
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install chromium"
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install firefox"
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install webkit"
-```
-
-### 2. Configure Test Environment
-
-Edit the configuration files in `src/main/resources/config/`:
-- `dev.properties` - Development environment
-- `qa.properties` - QA environment
-- `prod.properties` - Production environment
-
-Update the `base.url` and other settings as needed.
-
-## Running Tests
-
-### Run All Tests
-
-```bash
+# Run all tests
+{{#if (eq buildTool "maven")}}
 mvn clean test
-```
-
-### Run with Specific Browser
-
-```bash
-mvn clean test -Dbrowser=chromium
-mvn clean test -Dbrowser=firefox
-mvn clean test -Dbrowser=webkit
-```
-
-### Run with Specific Environment
-
-```bash
-mvn clean test -Denv=qa
-mvn clean test -Denv=prod
-```
-
-### Run in Headless Mode
-
-```bash
-mvn clean test -Dheadless=true
-```
-
-### Run Specific Test Class
-
-```bash
-mvn clean test -Dtest=LoginTests
-```
-
-### Run Specific Test Method
-
-```bash
-mvn clean test -Dtest=LoginTests#testValidLogin
-```
-
-### Run Tests by Tag
-
-```bash
-mvn clean test -Dgroups=smoke
-mvn clean test -Dgroups=regression
-mvn clean test -Dgroups="smoke & login"
-```
-
-# Run login tests
-mvn clean test -Dtest=LoginTests
-```
-
-### Run with Parallel Execution
-
-```bash
-mvn clean test -Dparallel.execution=true -Dthread.count=4
-```
-
-## Test Reports
-
-{{#if (eq reportingTool "allure")}}
-### Allure Reports
-
-Generate and view Allure reports:
-
-```bash
-mvn clean test
-mvn allure:serve
-```
-
-Generate Allure report without opening:
-
-```bash
-mvn allure:report
-```
-
-Report will be available at `target/site/allure-maven-plugin/index.html`
+{{else}}
+gradle clean test
 {{/if}}
+
+# Run with specific browser
+{{#if (eq buildTool "maven")}}
+mvn test -Dbrowser=firefox
+{{else}}
+gradle test -Dbrowser=firefox
+{{/if}}
+
+# Run headless
+{{#if (eq buildTool "maven")}}
+mvn test -Dheadless=true
+{{else}}
+gradle test -Dheadless=true
+{{/if}}
+
+# Run specific environment
+{{#if (eq buildTool "maven")}}
+mvn test -Denv=qa
+{{else}}
+gradle test -Denv=qa
+{{/if}}
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── main/java/{{javaPackage}}/
+│   ├── config/           # Configuration management
+│   ├── core/             # BaseTest, {{#if (eq framework "selenium")}}DriverManager{{else}}PlaywrightManager{{/if}}
+│   ├── pages/            # Page Objects (LoginPage, etc.)
+{{#if (eq testRunner "testng")}}
+│   ├── listeners/        # TestNG listeners
+{{/if}}
+│   └── utils/            # Log, Screenshot, {{#if (eq reportingTool "extent-reports")}}ExtentManager{{/if}}{{#if (eq reportingTool "allure")}}AllureManager{{/if}}
+├── main/resources/
+│   └── config/           # dev.properties, qa.properties
+└── test/
+    ├── java/{{javaPackage}}/
+{{#if (eq testingPattern "bdd")}}
+    │   ├── runners/      # Cucumber TestRunner
+    │   └── stepdefinitions/
+{{else}}
+    │   └── tests/        # Test classes
+{{/if}}
+    └── resources/
+{{#if (eq testingPattern "bdd")}}
+        └── features/     # Gherkin feature files
+{{else}}
+{{#if (eq testRunner "testng")}}
+        └── testng.xml    # TestNG suite configuration
+{{/if}}
+{{/if}}
+```
+
+## ⚙️ Configuration
+
+Edit `src/main/resources/config/dev.properties`:
+
+```properties
+base.url=https://www.saucedemo.com/
+browser={{#if (eq framework "selenium")}}chrome{{else}}chromium{{/if}}
+headless=false
+username=standard_user
+password=secret_sauce
+timeout.default=30
+```
+
+## 🧪 Writing Tests
+
+{{#if (eq testingPattern "bdd")}}
+### Feature File (Gherkin)
+```gherkin
+@login
+Feature: Login Functionality
+
+  @smoke
+  Scenario: Successful login
+    Given I am on the login page
+    When I login with valid credentials
+    Then login should be successful
+```
+
+### Step Definitions
+```java
+@Given("I am on the login page")
+public void iAmOnTheLoginPage() {
+    // Implementation
+}
+```
+{{else}}
+### Page Object
+```java
+public class LoginPage extends BasePage {
+    public void login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
+    }
+}
+```
+
+### Test Class
+```java
+public class LoginTests extends BaseTest {
+    @Test
+    public void testValidLogin() {
+        LoginPage loginPage = new LoginPage();
+        loginPage.login("standard_user", "secret_sauce");
+        Assert.assertTrue(loginPage.isLoginSuccessful());
+    }
+}
+```
+{{/if}}
+
+## 📊 Reports
+
 {{#if (eq reportingTool "extent-reports")}}
 ### ExtentReports
+Reports generated in: `reports/ExtentReport_{timestamp}.html`
 
-After test execution, find the ExtentReports HTML report at:
-```
-reports/extent-report.html
-```
-
-Open this file in a browser to view detailed test results.
+Open the HTML file in a browser after test execution.
 {{/if}}
-{{#if (eq reportingTool "junit-reports")}}
-### JUnit Reports
-
-JUnit XML reports are generated in:
-```
-target/surefire-reports/
-```
-{{/if}}
-
-### Logs
-
-Logs are generated in the `logs/` directory:
-- `automation.log` - All logs
-- `errors.log` - Error logs only
-- `test-execution.log` - Test execution logs
-- `debug.log` - Debug logs
-
-## Playwright Features
-
-This framework leverages Playwright's powerful features:
-
-### Auto-waiting
-Playwright automatically waits for elements to be ready before performing actions.
-
-### Multiple Browser Support
-- **Chromium** (Chrome, Edge)
-- **Firefox**
-- **WebKit** (Safari)
-
-### Mobile Emulation
-Configure device emulation in PlaywrightFactory for mobile testing.
-
-### Network Interception
-Intercept and modify network requests/responses.
-
-### Screenshots and Videos
-Automatic screenshot capture on test failure.
-
-### Trace Files
-Generate trace files for debugging (when enabled).
-
-## Configuration
-
-### Browser Configuration
-
-Set browser in `config/*.properties`:
-```properties
-browser=chromium # or firefox, webkit
-headless=false
-```
-
-Or override via command line:
-```bash
-mvn test -Dbrowser=firefox -Dheadless=true
-```
-
-### Timeout Configuration
-
-Configure timeouts in properties files:
-```properties
-default.timeout=30000 # 30 seconds
-navigation.timeout=60000 # 60 seconds
-```
-
-### Parallel Execution
-
-Enable parallel execution in `junit-platform.properties` or via command line:
-```bash
-mvn test -Dparallel.execution=true -Dthread.count=4
-```
-
-## Writing Tests
-
-### Create a Page Object
-
-```java
-package {{javaPackage}}.pages;
-
-import {{javaPackage}}.core.BasePage;
-import com.microsoft.playwright.Page;
-
-public class MyPage extends BasePage {
-
-// Locators
-private String myButton = "button#submit";
-private String myInput = "input[name='username']";
-
-public MyPage() {
-super();
-}
-
-public void clickButton() {
-page.click(myButton);
-Log.info("Clicked submit button");
-}
-
-public void enterText(String text) {
-page.fill(myInput, text);
-Log.info("Entered text: " + text);
-}
-}
-```
-
-### Create a Test
-
-```java
-package {{javaPackage}}.tests;
-
-import {{javaPackage}}.core.BaseTest;
-import {{javaPackage}}.pages.MyPage;
-import org.junit.jupiter.api.*;
-
-@DisplayName("My Tests")
-public class MyTests extends BaseTest {
-
-@Test
-@Tag("smoke")
-@DisplayName("Test something")
-public void testSomething() {
-MyPage myPage = new MyPage();
-myPage.clickButton();
-// Add assertions
-}
-}
-```
-
-## CI/CD Integration
-
-{{#if (eq cicdTool "jenkins")}}
-### Jenkins
-
-The `Jenkinsfile` is included for Jenkins pipeline integration.
-
-```bash
-# Configure in Jenkins
-# Point to the Jenkinsfile in your repository
-```
-{{/if}}
-{{#if (eq cicdTool "github-actions")}}
-### GitHub Actions
-
-The `.github/workflows/tests.yml` workflow is included.
-
-Tests will run automatically on push and pull requests.
-{{/if}}
-{{#if (eq cicdTool "gitlab-ci")}}
-### GitLab CI
-
-The `.gitlab-ci.yml` configuration is included.
-
-Tests will run automatically in GitLab CI/CD pipelines.
-{{/if}}
-{{#if (eq cicdTool "azure-devops")}}
-### Azure DevOps
-
-The `azure-pipelines.yml` configuration is included.
-
-Import the pipeline in Azure DevOps.
-{{/if}}
-{{#if (eq cicdTool "circleci")}}
-### CircleCI
-
-The `.circleci/config.yml` configuration is included.
-
-Tests will run automatically in CircleCI.
-{{/if}}
-
-## Best Practices
-
-1. **Use Page Object Model** - Keep test code separate from page logic
-2. **Use meaningful locators** - Prefer data-testid or semantic selectors
-3. **Add proper waits** - Leverage Playwright's auto-waiting
-4. **Log important actions** - Use Log utility for better debugging
-5. **Use tags** - Organize tests with @Tag annotations
-6. **Data-driven testing** - Use @ParameterizedTest for multiple data sets
-7. **Clean test data** - Clean up after tests when possible
-8. **Independent tests** - Each test should be able to run independently
-
-## Troubleshooting
-
-### Browsers not installed
-```bash
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"
-```
-
-### Tests timing out
-Increase timeout values in properties files or use explicit waits.
-
-### Screenshots not captured
-Check `capture.screenshots.on.failure=true` in properties.
-
-### Parallel execution issues
-Ensure thread-safe implementation of BrowserManager and proper test isolation.
-
-## Resources
-
-- [Playwright Java Documentation](https://playwright.dev/java/)
-- [JUnit 5 Documentation](https://junit.org/junit5/docs/current/user-guide/)
 {{#if (eq reportingTool "allure")}}
-- [Allure Documentation](https://docs.qameta.io/allure/)
+### Allure Reports
+```bash
+# Generate and open report
+{{#if (eq buildTool "maven")}}
+mvn allure:serve
+{{else}}
+gradle allureServe
 {{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-- [ExtentReports Documentation](https://www.extentreports.com/)
+```
+Results in: `target/allure-results`
 {{/if}}
-- [Maven Documentation](https://maven.apache.org/)
+{{#if (eq reportingTool "testng-reports")}}
+### TestNG Reports
+Reports generated in: `target/surefire-reports/`
+{{/if}}
 
-## License
+## 🖥️ Browsers
 
-This project is licensed under the MIT License.
+| Browser | Config Value |
+|---------|--------------|
+{{#if (eq framework "selenium")}}
+| Chrome | `chrome` |
+| Firefox | `firefox` |
+| Edge | `edge` |
+{{else}}
+| Chromium | `chromium` |
+| Firefox | `firefox` |
+| WebKit | `webkit` |
+{{/if}}
 
-## Support
+## 📸 Screenshots
 
-For issues or questions, please open an issue in the repository.
+Screenshots are automatically captured on test failure:
+- Location: `screenshots/`
+- Format: `FAILED_{TestName}_{timestamp}.png`
+
+## 🔧 System Requirements
+
+- Java 17+
+- {{#if (eq buildTool "maven")}}Maven 3.9+{{else}}Gradle 8+{{/if}}
+{{#if (eq framework "playwright")}}
+- Playwright browsers (auto-installed on first run)
+{{/if}}
+
+---
+Generated by [QAStarter](https://github.com/qatonic/qastarter)

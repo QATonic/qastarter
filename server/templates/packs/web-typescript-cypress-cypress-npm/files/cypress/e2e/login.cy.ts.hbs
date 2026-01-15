@@ -1,45 +1,24 @@
 /**
- * Login Test Suite
- * 
- * BEFORE RUNNING:
- * 1. Update baseUrl in cypress.config.ts
- * 2. Update credentials in cypress/fixtures/users.json
- * 3. Update selectors in cypress/pages/LoginPage.ts
- * 4. Run: npx cypress open
+ * Login Tests using Cypress.
  */
-import LoginPage from '../pages/LoginPage';
+import { LoginPage } from "../pages/LoginPage";
 
-interface UserCredentials {
-  username: string;
-  password: string;
-}
-
-interface UsersFixture {
-  validUser: UserCredentials;
-  adminUser: UserCredentials;
-  invalidUser: UserCredentials;
-}
-
-describe('Login Tests', () => {
+describe("Login Tests", () => {
   const loginPage = new LoginPage();
+  const username = Cypress.env("username");
+  const password = Cypress.env("password");
 
   beforeEach(() => {
-    loginPage.visitLoginPage(Cypress.config('baseUrl') as string);
+    loginPage.visit("/");
   });
 
-  it('should login with valid credentials', () => {
-    // Load credentials from fixtures (cypress/fixtures/users.json)
-    cy.fixture('users').then((users: UsersFixture) => {
-      // Step 1: Enter credentials and submit
-      loginPage.login(users.validUser.username, users.validUser.password);
-      
-      // Step 2: Verify login was successful
-      loginPage.verifyLoginSuccess();
-    });
+  it("should login successfully with valid credentials", () => {
+    loginPage.login(username, password);
+    loginPage.verifyLoginSuccess();
   });
 
-  it('should display login page elements', () => {
-    loginPage.verifyUsernameVisible();
-    loginPage.verifyPasswordVisible();
+  it("should show error with invalid credentials", () => {
+    loginPage.login("invalid_user", "wrong_password");
+    loginPage.verifyErrorDisplayed();
   });
 });

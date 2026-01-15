@@ -1,50 +1,35 @@
-const logger = require('../utils/logger');
+const { PlaywrightManager } = require("../utils/PlaywrightManager");
+const { config } = require("../config/ConfigReader");
 
 class BasePage {
-  constructor(page) {
-    this.page = page;
-  }
-
-  async navigate(url) {
-    logger.info(`Navigating to: ${url}`);
-    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
-  }
+  async getPage() { return await PlaywrightManager.getPage(); }
 
   async click(selector) {
-    await this.page.click(selector);
-    logger.info(`Clicked: ${selector}`);
+    const page = await this.getPage();
+    await page.click(selector, { timeout: config.timeout });
   }
 
-  async fill(selector, text) {
-    await this.page.fill(selector, text);
-    logger.info(`Filled "${text}" into: ${selector}`);
+  async type(selector, text) {
+    const page = await this.getPage();
+    await page.fill(selector, text, { timeout: config.timeout });
   }
 
   async getText(selector) {
-    return await this.page.textContent(selector);
+    const page = await this.getPage();
+    return (await page.textContent(selector)) || "";
   }
 
-  async isVisible(selector) {
+  async isDisplayed(selector) {
     try {
-      return await this.page.isVisible(selector);
-    } catch {
-      return false;
-    }
-  }
-
-  async getPageTitle() {
-    return await this.page.title();
+      const page = await this.getPage();
+      return await page.isVisible(selector, { timeout: 5000 });
+    } catch { return false; }
   }
 
   async getCurrentUrl() {
-    return this.page.url();
-  }
-
-  async takeScreenshot(name) {
-    const path = `screenshots/${name}.png`;
-    await this.page.screenshot({ path, fullPage: true });
-    logger.info(`Screenshot saved: ${name}.png`);
+    const page = await this.getPage();
+    return page.url();
   }
 }
 
-module.exports = BasePage;
+module.exports = { BasePage };

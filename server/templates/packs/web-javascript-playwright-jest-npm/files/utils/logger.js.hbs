@@ -1,27 +1,28 @@
-const winston = require('winston');
-const path = require('path');
+/**
+ * Logger - Consistent logging with timestamps.
+ */
+const fs = require("fs");
+const path = require("path");
 
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.File({
-      filename: path.join('logs', 'test.log'),
-      maxsize: 5242880,
-      maxFiles: 5
-    }),
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      )
-    })
-  ]
-});
+class Logger {
+  constructor() {
+    this.logDir = "logs";
+    if (!fs.existsSync(this.logDir)) fs.mkdirSync(this.logDir, { recursive: true });
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    this.logFile = path.join(this.logDir, `test_${timestamp}.log`);
+  }
 
-module.exports = logger;
+  log(level, message) {
+    const logLine = `${new Date().toISOString()} | ${level.padEnd(8)} | ${message}`;
+    console.log(logLine);
+    fs.appendFileSync(this.logFile, logLine + "\n");
+  }
+
+  info(message) { this.log("INFO", message); }
+  error(message) { this.log("ERROR", message); }
+  step(message) { this.log("STEP", message); }
+}
+
+const log = new Logger();
+module.exports = { log };

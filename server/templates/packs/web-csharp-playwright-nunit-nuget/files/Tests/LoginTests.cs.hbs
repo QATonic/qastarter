@@ -1,44 +1,38 @@
 using NUnit.Framework;
-using {{projectName}}.Pages;
+using {{projectNamespace}}.Pages;
+using {{projectNamespace}}.Utils;
+using {{projectNamespace}}.Config;
 
-namespace {{projectName}}.Tests;
-
-// ========== UPDATE THESE VALUES ==========
-// Replace with your actual test credentials
-// ==========================================
-
-[TestFixture]
-public class LoginTests : BaseTest
+namespace {{projectNamespace}}.Tests
 {
+    [TestFixture]
+    public class LoginTests
+    {
+        private LoginPage _loginPage;
 
+        [SetUp]
+        public async Task Setup()
+        {
+            await PlaywrightManager.InitBrowserAsync();
+            await PlaywrightManager.Page.GotoAsync(ConfigReader.Instance.BaseUrl);
+            _loginPage = new LoginPage();
+        }
 
-/// <summary>
-    /// Verify login functionality works correctly.
-    ///
-    /// BEFORE RUNNING:
-    /// 1. Update TestUsername and TestPassword above with valid credentials
-    /// 2. Ensure your application URL is set in Config/EnvConfig.cs
-    /// 3. Update selectors in Pages/LoginPage.cs to match your app
-    /// </summary>
-[Test, Order(1)]
-[Description("Login with valid credentials")]
-public async Task TestLoginWithValidCredentials()
-{
-// Get credentials from config
-var username = EnvConfig.Instance.GetUsername("validUser");
-var password = EnvConfig.Instance.GetPassword("validUser");
+        [TearDown]
+        public async Task TearDown() => await PlaywrightManager.CloseBrowserAsync();
 
-var loginPage = new LoginPage(Page!);
+        [Test, Category("Smoke")]
+        public async Task ValidLogin_ShouldRedirectToInventory()
+        {
+            await _loginPage.LoginAsync(ConfigReader.Instance.Username, ConfigReader.Instance.Password);
+            Assert.That(_loginPage.IsLoginSuccessful(), Is.True);
+        }
 
-// Step 1: Navigate to login page
-await loginPage.NavigateToLoginAsync();
-
-// Step 2: Enter credentials and submit
-await loginPage.LoginAsync(username, password);
-
-// Step 3: Verify login was successful
-Assert.IsTrue(await loginPage.IsLoginSuccessfulAsync(), "Login was not successful");
-
-// Test passed! Your {{framework}} framework is working correctly.
-}
+        [Test, Category("Regression")]
+        public async Task InvalidLogin_ShouldShowError()
+        {
+            await _loginPage.LoginAsync("invalid", "wrong");
+            Assert.That(await _loginPage.IsErrorDisplayedAsync(), Is.True);
+        }
+    }
 }

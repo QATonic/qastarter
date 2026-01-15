@@ -2,122 +2,46 @@ package {{javaPackage}}.utils;
 
 import io.qameta.allure.Allure;
 import io.qameta.allure.Attachment;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 
 import java.io.ByteArrayInputStream;
 
 /**
- * Allure Reports utility for attaching screenshots and information to test reports
+ * Allure Manager - Allure reporting integration.
+ * 
+ * Results saved to: build/allure-results (Gradle) or target/allure-results (Maven)
+ * 
+ * To view report:
+ *   Gradle: gradle allureServe
+ *   Maven: mvn allure:serve
  */
 public class AllureManager {
 
-    /**
-     * Attach screenshot to Allure report
-     * @param driver WebDriver instance
-     * @param screenshotName Name of the screenshot
-     */
-    @Attachment(value = "{screenshotName}", type = "image/png")
-    public static byte[] attachScreenshot(WebDriver driver, String screenshotName) {
-        return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+    private AllureManager() {}
+
+    @Attachment(value = "{0}", type = "image/png")
+    public static byte[] attachScreenshot(String name, byte[] screenshot) {
+        Log.info("[Allure] Attaching screenshot: " + name);
+        return screenshot;
     }
 
-    /**
-     * Attach text to Allure report
-     * @param name Attachment name
-     * @param text Text content
-     */
-    @Attachment(value = "{name}", type = "text/plain")
+    @Attachment(value = "{0}", type = "text/plain")
     public static String attachText(String name, String text) {
         return text;
     }
 
-    /**
-     * Attach JSON to Allure report
-     * @param name Attachment name
-     * @param json JSON content
-     */
-    @Attachment(value = "{name}", type = "application/json")
-    public static String attachJson(String name, String json) {
-        return json;
+    public static void attachScreenshotToReport(String name, byte[] screenshot) {
+        Allure.addAttachment(name, new ByteArrayInputStream(screenshot));
     }
 
-    /**
-     * Attach HTML to Allure report
-     * @param name Attachment name
-     * @param html HTML content
-     */
-    @Attachment(value = "{name}", type = "text/html")
-    public static String attachHtml(String name, String html) {
-        return html;
-    }
-
-    /**
-     * Add environment information to Allure report
-     * @param key Property key
-     * @param value Property value
-     */
-    public static void addEnvironmentInfo(String key, String value) {
-        Allure.addAttachment("Environment - " + key, value);
-    }
-
-    /**
-     * Add step to Allure report
-     * @param stepName Step name
-     */
     public static void step(String stepName) {
         Allure.step(stepName);
     }
 
-    /**
-     * Add step with description to Allure report
-     * @param stepName Step name
-     * @param description Step description
-     */
-    public static void step(String stepName, String description) {
-        Allure.step(stepName, () -> {
-            Allure.addAttachment("Description", description);
-        });
-    }
-
-    /**
-     * Set test description
-     * @param description Test description
-     */
-    public static void setDescription(String description) {
+    public static void addDescription(String description) {
         Allure.description(description);
     }
 
-    /**
-     * Set test severity
-     * @param severity Severity level (e.g., CRITICAL, NORMAL, MINOR)
-     */
-    public static void setSeverity(String severity) {
-        Allure.label("severity", severity);
-    }
-
-    /**
-     * Add category to test
-     * @param category Category name (e.g., Login, Checkout, API)
-     */
-    public static void addCategory(String category) {
-        Allure.label("epic", category);
-    }
-
-    /**
-     * Add feature to test
-     * @param feature Feature name
-     */
-    public static void addFeature(String feature) {
-        Allure.label("feature", feature);
-    }
-
-    /**
-     * Add story to test
-     * @param story Story name
-     */
-    public static void addStory(String story) {
-        Allure.label("story", story);
+    public static void addLink(String name, String url) {
+        Allure.link(name, url);
     }
 }

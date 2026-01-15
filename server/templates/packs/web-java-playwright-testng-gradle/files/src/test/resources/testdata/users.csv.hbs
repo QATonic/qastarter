@@ -1,7 +1,5 @@
-username,password,role,expected_result
-admin,Admin@123,admin,success
-user1,User@123,standard,success
-user2,User@456,standard,success
-invalid_user,wrong_password,none,failure
-locked_user,Locked@123,locked,account_locked
-expired_user,Expired@123,expired,password_expired
+username,password,expected
+standard_user,secret_sauce,success
+locked_out_user,secret_sauce,error
+problem_user,secret_sauce,success
+invalid_user,wrong_password,error

@@ -2,147 +2,46 @@ package {{javaPackage}}.utils;
 
 import io.qameta.allure.Allure;
 import io.qameta.allure.Attachment;
-import io.qameta.allure.Step;
 
 import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
- * Allure Reports utility for enhanced test reporting.
- * Provides methods to add attachments, steps, and custom information to reports.
+ * Allure Manager - Allure reporting integration.
+ * 
+ * Results saved to: build/allure-results (Gradle) or target/allure-results (Maven)
+ * 
+ * To view report:
+ *   Gradle: gradle allureServe
+ *   Maven: mvn allure:serve
  */
 public class AllureManager {
-    
-    /**
-     * Add a step to the Allure report
-     * @param stepDescription Step description
-     */
-    @Step("{0}")
-    public static void step(String stepDescription) {
-        Log.step(stepDescription);
-    }
-    
-    /**
-     * Attach text to the Allure report
-     * @param name Attachment name
-     * @param content Text content
-     */
-    @Attachment(value = "{0}", type = "text/plain")
-    public static String attachText(String name, String content) {
-        return content;
-    }
-    
-    /**
-     * Attach HTML to the Allure report
-     * @param name Attachment name
-     * @param html HTML content
-     */
-    @Attachment(value = "{0}", type = "text/html")
-    public static String attachHtml(String name, String html) {
-        return html;
-    }
-    
-    /**
-     * Attach JSON to the Allure report
-     * @param name Attachment name
-     * @param json JSON content
-     */
-    @Attachment(value = "{0}", type = "application/json")
-    public static String attachJson(String name, String json) {
-        return json;
-    }
-    
-    /**
-     * Attach screenshot bytes to the Allure report
-     * @param name Attachment name
-     * @param screenshot Screenshot bytes
-     */
+
+    private AllureManager() {}
+
     @Attachment(value = "{0}", type = "image/png")
     public static byte[] attachScreenshot(String name, byte[] screenshot) {
+        Log.info("[Allure] Attaching screenshot: " + name);
         return screenshot;
     }
-    
-    /**
-     * Add description to current test
-     * @param description Description text
-     */
+
+    @Attachment(value = "{0}", type = "text/plain")
+    public static String attachText(String name, String text) {
+        return text;
+    }
+
+    public static void attachScreenshotToReport(String name, byte[] screenshot) {
+        Allure.addAttachment(name, new ByteArrayInputStream(screenshot));
+    }
+
+    public static void step(String stepName) {
+        Allure.step(stepName);
+    }
+
     public static void addDescription(String description) {
         Allure.description(description);
     }
-    
-    /**
-     * Add description as HTML to current test
-     * @param html HTML description
-     */
-    public static void addDescriptionHtml(String html) {
-        Allure.descriptionHtml(html);
-    }
-    
-    /**
-     * Add link to current test
-     * @param name Link name
-     * @param url Link URL
-     */
+
     public static void addLink(String name, String url) {
         Allure.link(name, url);
-    }
-    
-    /**
-     * Add issue link to current test
-     * @param issueId Issue ID
-     */
-    public static void addIssue(String issueId) {
-        Allure.issue(issueId, issueId);
-    }
-    
-    /**
-     * Add TMS link to current test
-     * @param testCaseId Test case ID
-     */
-    public static void addTestCase(String testCaseId) {
-        Allure.tms(testCaseId, testCaseId);
-    }
-    
-    /**
-     * Add parameter to current test
-     * @param name Parameter name
-     * @param value Parameter value
-     */
-    public static void addParameter(String name, String value) {
-        Allure.parameter(name, value);
-    }
-    
-    /**
-     * Add attachment from input stream
-     * @param name Attachment name
-     * @param content Content as string
-     * @param type MIME type
-     */
-    public static void addAttachment(String name, String content, String type) {
-        Allure.addAttachment(name, type, 
-            new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), 
-            getFileExtension(type));
-    }
-    
-    /**
-     * Get file extension from MIME type
-     * @param mimeType MIME type
-     * @return File extension
-     */
-    private static String getFileExtension(String mimeType) {
-        switch (mimeType) {
-            case "text/plain":
-                return ".txt";
-            case "text/html":
-                return ".html";
-            case "application/json":
-                return ".json";
-            case "image/png":
-                return ".png";
-            case "application/xml":
-                return ".xml";
-            default:
-                return "";
-        }
     }
 }

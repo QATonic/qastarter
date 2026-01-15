@@ -1,41 +1,51 @@
 """
-Login Test Suite
+Login Tests - Example test class for SauceDemo.
 
-BEFORE RUNNING:
-1. Update credentials in: data/dev.json
-2. Update selectors in: pages/login_page.py
-3. Run: pytest
+Run with: pytest tests/test_login.py -v
 """
 import pytest
 from pages.login_page import LoginPage
-from config.config import Config
+from utils.logger import log
+from config.config_reader import config
+{{#if (eq reportingTool "allure")}}
+import allure
 
 
-@pytest.mark.login
+@allure.feature("Login")
+@allure.story("Authentication")
+{{/if}}
 class TestLogin:
-"""Login test suite"""
-
-def test_valid_login(self, driver):
-"""Verify successful login with valid credentials"""
-# Get credentials from config file (data/dev.json)
-credentials = Config.get_credentials('valid_user')
-
-login_page = LoginPage(driver)
-
-# Step 1: Navigate to login page
-login_page.navigate()
-
-# Step 2: Enter credentials and submit
-login_page.login(credentials['username'], credentials['password'])
-
-# Step 3: Verify login was successful
-assert login_page.is_login_successful(), \
-"Login failed. Check credentials in data/dev.json and selectors in pages/login_page.py"
-
-def test_login_page_elements(self, driver):
-"""Verify login page elements are visible"""
-login_page = LoginPage(driver)
-login_page.navigate()
-
-assert login_page.is_displayed(LoginPage.USERNAME_INPUT), "Username field should be visible"
-assert login_page.is_displayed(LoginPage.PASSWORD_INPUT), "Password field should be visible"
+    """Login test cases."""
+    
+{{#if (eq reportingTool "allure")}}
+    @allure.title("Valid Login Test")
+    @allure.severity(allure.severity_level.CRITICAL)
+{{/if}}
+    @pytest.mark.smoke
+    def test_valid_login(self, driver):
+        """Verify successful login with valid credentials."""
+        log.step("Testing valid login")
+        
+        login_page = LoginPage()
+        username = config.get("username")
+        password = config.get("password")
+        
+        login_page.login(username, password)
+        
+        assert login_page.is_login_successful(), "Login should be successful"
+        log.info("Valid login test passed")
+    
+{{#if (eq reportingTool "allure")}}
+    @allure.title("Invalid Login Test")
+    @allure.severity(allure.severity_level.NORMAL)
+{{/if}}
+    @pytest.mark.regression
+    def test_invalid_login(self, driver):
+        """Verify error message with invalid credentials."""
+        log.step("Testing invalid login")
+        
+        login_page = LoginPage()
+        login_page.login("invalid_user", "wrong_password")
+        
+        assert login_page.is_error_displayed(), "Error message should be displayed"
+        log.info("Invalid login test passed - error displayed as expected")

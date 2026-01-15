@@ -1,125 +1,41 @@
-# Compiled class files
+# Build
+target/
+build/
+out/
 *.class
 
-# Log files
-*.log
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+*.swp
+*~
+
+# Test outputs
+screenshots/
 logs/
+reports/
+allure-results/
+test-output/
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Maven
-target/
+*.log
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
-pom.xml.next
 release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
 
-# IntelliJ IDEA
-.idea/
-*.iws
-*.iml
-*.ipr
-out/
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
 
-# Eclipse
-.classpath
-.project
-.settings/
-bin/
-
-# NetBeans
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-# VS Code
-.vscode/
-*.code-workspace
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Test Reports
-reports/
-test-output/
-{{#if (eq reportingTool "allure")}}
-allure-results/
-allure-report/
-.allure/
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-extent-report.html
-ExtentReports/
-{{/if}}
-
-# Screenshots
-screenshots/
-**/screenshots/
-
-# Videos
-videos/
-**/videos/
-
-# Playwright specific
-playwright-report/
-trace.zip
-*.trace
-test-results/
-
-# Temporary files
-*.tmp
-*.temp
-*.swp
-*.swo
-*~
-
-# Package Files
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# Build artifacts
-build/
-
-# Node modules (if using npm for Playwright installation)
-node_modules/
-package-lock.json
-package.json
-
-# Environment files
+# Environment
 .env
-.env.local
-.env.*.local
-
-# Backup files
-*.bak
-*.backup
-
-# Coverage reports
-coverage/
-.coverage
-
-# JUnit
-junit*.properties
-
-# Debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*

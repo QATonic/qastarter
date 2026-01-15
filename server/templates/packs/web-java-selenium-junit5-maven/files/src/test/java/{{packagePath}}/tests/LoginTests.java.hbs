@@ -1,46 +1,49 @@
 package {{javaPackage}}.tests;
 
+import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.core.BaseTest;
-import {{javaPackage}}.pages.HomePage;
 import {{javaPackage}}.pages.LoginPage;
-import org.junit.jupiter.api.*;
+import {{javaPackage}}.utils.Log;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Sample Login Test
- * 
- * HOW TO USE THIS TEMPLATE:
- * 1. Update the username and password below with your test credentials
- * 2. Update LoginPage locators to match your website's login form
- * 3. Run: mvn clean test
- * 
- * This is a simple positive login test to verify your framework setup.
- * Add more test cases as needed for your project.
+ * Login Tests - Example test class for SauceDemo.
  */
-@DisplayName("Login Tests")
-public class LoginTests extends BaseTest {
-    
-    // ========== UPDATE THESE VALUES ==========
-    private static final String TEST_USERNAME = "YOUR_USERNAME_HERE";
-    private static final String TEST_PASSWORD = "YOUR_PASSWORD_HERE";
-    // ==========================================
-    
+class LoginTests extends BaseTest {
+
     @Test
+    @Order(1)
     @Tag("smoke")
-    @Tag("login")
     @DisplayName("Verify successful login with valid credentials")
-    public void testValidLogin() {
-        // Step 1: Navigate to login page
+    void testValidLogin() {
+        Log.step("Testing valid login");
         LoginPage loginPage = new LoginPage();
-        assertTrue(loginPage.isLoaded(), "Login page should be loaded");
-        
-        // Step 2: Enter credentials and login
-        HomePage homePage = loginPage.login(TEST_USERNAME, TEST_PASSWORD, HomePage.class);
-        
-        // Step 3: Verify successful login
-        assertTrue(homePage.isLoaded(), "Home page should be loaded after login");
-        
-        // Test passed! Your framework is working correctly.
+
+        String username = ConfigurationReader.getProperty("username");
+        String password = ConfigurationReader.getProperty("password");
+
+        loginPage.login(username, password);
+
+        assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
+        Log.info("Valid login test passed");
+    }
+
+    @Test
+    @Order(2)
+    @Tag("regression")
+    @DisplayName("Verify error message with invalid credentials")
+    void testInvalidLogin() {
+        Log.step("Testing invalid login");
+        LoginPage loginPage = new LoginPage();
+
+        loginPage.login("invalid_user", "wrong_password");
+
+        assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
+        Log.info("Invalid login test passed - error displayed as expected");
     }
 }

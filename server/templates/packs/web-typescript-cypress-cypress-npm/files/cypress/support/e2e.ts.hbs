@@ -1,32 +1,22 @@
-// Import commands.ts using ES2015 syntax:
-import './commands';
+/**
+ * Cypress E2E Support File.
+ */
+{{#if (eq reportingTool "allure")}}
+import "@shelex/cypress-allure-plugin";
+{{/if}}
 
-// Global before hook
-before(() => {
-  cy.log('Starting test suite');
+// Add custom commands here
+Cypress.Commands.add("login", (username: string, password: string) => {
+  cy.get("#user-name").type(username);
+  cy.get("#password").type(password);
+  cy.get("#login-button").click();
 });
 
-// Global after hook
-after(() => {
-  cy.log('Test suite completed');
-});
-
-// Global beforeEach hook
-beforeEach(() => {
-  // Load fixtures or perform setup before each test
-  cy.fixture('config').as('config');
-});
-
-// Global afterEach hook for screenshots on failure
-afterEach(function() {
-  if (this.currentTest && this.currentTest.state === 'failed') {
-    cy.screenshot(`FAILED-${this.currentTest.title}`);
+// Declare custom commands
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      login(username: string, password: string): Chainable<void>;
+    }
   }
-});
-
-// Uncaught exception handler
-Cypress.on('uncaught:exception', (err) => {
-  // returning false here prevents Cypress from failing the test
-  console.log('Uncaught exception:', err.message);
-  return false;
-});
+}

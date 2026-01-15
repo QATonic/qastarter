@@ -1,8 +1,7 @@
 {
   "id": "web-python-selenium-pytest-pip",
-  "displayName": "Python Selenium WebDriver Pytest Framework",
-  "name": "Python Selenium WebDriver Pytest Framework",
-  "description": "Production-ready UI automation framework with dynamic reporting, CI/CD, and testing pattern support",
+  "displayName": "Python Selenium pytest Framework",
+  "description": "Production-ready Selenium automation framework with Python and pytest",
   "version": "2.0.0",
   "supportsDynamic": true,
   "supportedCombination": {
@@ -13,259 +12,45 @@
     "buildTool": "pip"
   },
   "dynamicSupport": {
-    "reportingTools": [
-      "pytest-html",
-      "allure",
-      "pytest-json"
-    ],
-    "cicdTools": [
-      "github-actions",
-      "gitlab-ci",
-      "azure-devops",
-      "circleci",
-      "jenkins"
-    ],
-    "testingPatterns": [
-      "page-object-model",
-      "bdd"
-    ]
+    "reportingTools": ["allure", "pytest-html"],
+    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
+    "testingPatterns": ["page-object-model", "bdd"]
   },
   "toolVersions": {
-    "python": "3.11",
+    "python": "3.10+",
     "selenium": "4.16.0",
-    "pytest": "8.0.0",
-    "allurePytest": "2.13.2",
-    "pytestHtml": "4.1.1",
-    "pytestJson": "1.11.0",
-    "pytestBdd": "7.0.1",
-    "pytestXdist": "3.5.0"
+    "pytest": "7.4.0"
   },
   "files": [
-    {
-      "path": "requirements.txt",
-      "isTemplate": true,
-      "description": "Python dependencies with pinned versions"
-    },
-    {
-      "path": "README.md",
-      "isTemplate": true,
-      "description": "Complete setup and usage documentation"
-    },
-    {
-      "path": ".gitignore",
-      "isTemplate": false,
-      "description": "Git ignore rules for Python projects"
-    },
-    {
-      "path": ".env.example",
-      "isTemplate": false,
-      "description": "Example environment variables file"
-    },
-    {
-      "path": ".dockerignore",
-      "isTemplate": false,
-      "description": "Docker ignore rules"
-    },
-    {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker container configuration",
-      "conditional": {
-        "utilities.includeDocker": true
-      }
-    },
-    {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose configuration with Selenium Grid",
-      "conditional": {
-        "utilities.includeDockerCompose": true
-      }
-    },
-    {
-      "path": "setup.py",
-      "isTemplate": true,
-      "description": "Python package setup configuration"
-    },
-    {
-      "path": "pytest.ini",
-      "isTemplate": true,
-      "description": "Pytest configuration with markers and options"
-    },
-    {
-      "path": ".github/workflows/tests.yml",
-      "isTemplate": true,
-      "description": "GitHub Actions CI/CD workflow",
-      "conditional": {
-        "cicdTool": "github-actions"
-      }
-    },
-    {
-      "path": ".gitlab-ci.yml",
-      "isTemplate": true,
-      "description": "GitLab CI/CD workflow",
-      "conditional": {
-        "cicdTool": "gitlab-ci"
-      }
-    },
-    {
-      "path": "azure-pipelines.yml",
-      "isTemplate": true,
-      "description": "Azure DevOps pipeline configuration",
-      "conditional": {
-        "cicdTool": "azure-devops"
-      }
-    },
-    {
-      "path": ".circleci/config.yml",
-      "isTemplate": true,
-      "description": "CircleCI workflow configuration",
-      "conditional": {
-        "cicdTool": "circleci"
-      }
-    },
-    {
-      "path": "Jenkinsfile",
-      "isTemplate": true,
-      "description": "Jenkins pipeline configuration",
-      "conditional": {
-        "cicdTool": "jenkins"
-      }
-    },
-    {
-      "path": "config/__init__.py",
-      "isTemplate": false,
-      "description": "Config package initialization"
-    },
-    {
-      "path": "config/config.py",
-      "isTemplate": true,
-      "description": "Configuration management with environment support"
-    },
-    {
-      "path": "config/settings.py",
-      "isTemplate": true,
-      "description": "Global settings and constants"
-    },
-    {
-      "path": "pages/__init__.py",
-      "isTemplate": false,
-      "description": "Pages package initialization"
-    },
-    {
-      "path": "pages/base_page.py",
-      "isTemplate": true,
-      "description": "Base page class with common page functionality"
-    },
-    {
-      "path": "pages/login_page.py",
-      "isTemplate": true,
-      "description": "Sample login page with POM implementation"
-    },
-    {
-      "path": "pages/home_page.py",
-      "isTemplate": true,
-      "description": "Sample home page with POM implementation"
-    },
-    {
-      "path": "utils/__init__.py",
-      "isTemplate": false,
-      "description": "Utils package initialization"
-    },
-    {
-      "path": "utils/driver_factory.py",
-      "isTemplate": true,
-      "description": "WebDriver factory with automatic driver management"
-    },
-    {
-      "path": "utils/wait_helpers.py",
-      "isTemplate": true,
-      "description": "Explicit wait utilities for reliable element interactions"
-    },
-    {
-      "path": "utils/web_actions.py",
-      "isTemplate": true,
-      "description": "Reusable web interaction methods with built-in waits"
-    },
-    {
-      "path": "utils/logger.py",
-      "isTemplate": true,
-      "description": "Logging utility with file and console handlers"
-    },
-    {
-      "path": "utils/screenshot_util.py",
-      "isTemplate": true,
-      "description": "Screenshot capture utility for test reporting"
-    },
-    {
-      "path": "utils/data_reader.py",
-      "isTemplate": true,
-      "description": "CSV and JSON test data reader utility"
-    },
-    {
-      "path": "tests/__init__.py",
-      "isTemplate": false,
-      "description": "Tests package initialization"
-    },
-    {
-      "path": "tests/conftest.py",
-      "isTemplate": true,
-      "description": "Pytest fixtures for setup/teardown and driver management"
-    },
-    {
-      "path": "tests/test_login.py",
-      "isTemplate": true,
-      "description": "Sample login tests with parametrization"
-    },
-    {
-      "path": "features/login.feature",
-      "isTemplate": true,
-      "description": "Sample login feature file for BDD",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "step_defs/__init__.py",
-      "isTemplate": false,
-      "description": "Step definitions package initialization",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "step_defs/test_login_steps.py",
-      "isTemplate": true,
-      "description": "Login step definitions for BDD",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "data/dev.json",
-      "isTemplate": true,
-      "description": "Development environment test data"
-    },
-    {
-      "path": "data/qa.json",
-      "isTemplate": true,
-      "description": "QA environment test data"
-    },
-    {
-      "path": "data/prod.json",
-      "isTemplate": true,
-      "description": "Production environment test data"
-    },
-    {
-      "path": "data/users.csv",
-      "isTemplate": true,
-      "description": "Sample CSV test data file"
-    }
+    {"path": "requirements.txt", "isTemplate": true},
+    {"path": "pytest.ini", "isTemplate": true},
+    {"path": "README.md", "isTemplate": true},
+    {"path": ".gitignore", "isTemplate": false},
+    {"path": ".env.example", "isTemplate": false},
+    {"path": "Jenkinsfile", "isTemplate": true, "conditional": {"cicdTool": "jenkins"}},
+    {"path": ".github/workflows/tests.yml", "isTemplate": true, "conditional": {"cicdTool": "github-actions"}},
+    {"path": ".gitlab-ci.yml", "isTemplate": true, "conditional": {"cicdTool": "gitlab-ci"}},
+    {"path": "azure-pipelines.yml", "isTemplate": true, "conditional": {"cicdTool": "azure-devops"}},
+    {"path": ".circleci/config.yml", "isTemplate": true, "conditional": {"cicdTool": "circleci"}},
+    {"path": "Dockerfile", "isTemplate": true},
+    {"path": "docker-compose.yml", "isTemplate": true},
+    {"path": "config/__init__.py", "isTemplate": false},
+    {"path": "config/config_reader.py", "isTemplate": true},
+    {"path": "config/dev.ini", "isTemplate": false},
+    {"path": "config/qa.ini", "isTemplate": false},
+    {"path": "pages/__init__.py", "isTemplate": false},
+    {"path": "pages/base_page.py", "isTemplate": true},
+    {"path": "pages/login_page.py", "isTemplate": true},
+    {"path": "utils/__init__.py", "isTemplate": false},
+    {"path": "utils/driver_manager.py", "isTemplate": true},
+    {"path": "utils/logger.py", "isTemplate": true},
+    {"path": "utils/screenshot_utils.py", "isTemplate": true},
+    {"path": "tests/__init__.py", "isTemplate": false},
+    {"path": "tests/conftest.py", "isTemplate": true},
+    {"path": "tests/test_login.py", "isTemplate": true},
+    {"path": "features/login.feature", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
+    {"path": "step_defs/__init__.py", "isTemplate": false, "conditional": {"testingPattern": "bdd"}},
+    {"path": "step_defs/test_login_steps.py", "isTemplate": true, "conditional": {"testingPattern": "bdd"}}
   ],
-  "directories": [
-    "reports",
-    "logs",
-    "screenshots",
-    "allure-results"
-  ]
+  "directories": ["logs", "screenshots", "reports"]
 }

@@ -1,73 +1,30 @@
 package {{javaPackage}}.config;
 
 /**
- * Enumeration representing different test environments.
- * Used for environment-specific configurations and validations.
+ * Environment enumeration for configuration.
  */
 public enum Environment {
-    DEV("dev", "Development"),
-    QA("qa", "Quality Assurance"),
-    STG("stg", "Staging"),
-    PROD("prod", "Production");
-    
-    private final String key;
-    private final String displayName;
-    
-    Environment(String key, String displayName) {
-        this.key = key;
-        this.displayName = displayName;
+    DEV("dev"),
+    QA("qa"),
+    STG("stg"),
+    PROD("prod");
+
+    private final String name;
+
+    Environment(String name) {
+        this.name = name;
     }
-    
-    public String getKey() {
-        return key;
+
+    public String getName() {
+        return name;
     }
-    
-    public String getDisplayName() {
-        return displayName;
-    }
-    
-    /**
-     * Get Environment enum from string key
-     * @param key Environment key (dev, qa, stg, prod)
-     * @return Environment enum or DEV if not found
-     */
-    public static Environment fromKey(String key) {
-        for (Environment env : Environment.values()) {
-            if (env.getKey().equalsIgnoreCase(key)) {
-                return env;
+
+    public static Environment fromString(String env) {
+        for (Environment e : values()) {
+            if (e.name.equalsIgnoreCase(env)) {
+                return e;
             }
         }
-        return DEV; // Default fallback
-    }
-    
-    /**
-     * Get current environment from system property
-     * @return Current Environment
-     */
-    public static Environment getCurrent() {
-        String envKey = System.getProperty("env", "dev");
-        return fromKey(envKey);
-    }
-    
-    /**
-     * Check if current environment is production
-     * @return true if production environment
-     */
-    public static boolean isProduction() {
-        return getCurrent() == PROD;
-    }
-    
-    /**
-     * Check if current environment allows debug features
-     * @return true if dev or qa environment
-     */
-    public static boolean isDebugAllowed() {
-        Environment current = getCurrent();
-        return current == DEV || current == QA;
-    }
-    
-    @Override
-    public String toString() {
-        return displayName + " (" + key + ")";
+        return DEV;
     }
 }

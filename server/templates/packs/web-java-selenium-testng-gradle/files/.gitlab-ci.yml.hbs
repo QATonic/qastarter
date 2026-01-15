@@ -1,76 +1,57 @@
-image: gradle:{{toolVersions.gradle}}-jdk{{toolVersions.java}}
-
-variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-  ENVIRONMENT: "qa"
-
-cache:
-  paths:
-    - .gradle/
+image: eclipse-temurin:17-jdk
 
 stages:
   - test
   - report
 
-test:chrome:
+variables:
+  HEADLESS: "true"
+
+{{#if (eq framework "playwright")}}
+before_script:
+  - apt-get update && apt-get install -y libglib2.0-0 libnss3 libx11-6 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6
+{{#if (eq buildTool "maven")}}
+  - mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+{{else}}
+  - ./gradlew playwright install
+{{/if}}
+{{/if}}
+
+test:
   stage: test
   script:
-    - apt-get update && apt-get install -y wget gnupg2
-    - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-    - echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
-    - apt-get update && apt-get install -y google-chrome-stable
-    - chmod +x gradlew
-    - ./gradlew test -Dbrowser=chrome
+{{#if (eq buildTool "maven")}}
+    - mvn clean test -Dheadless=$HEADLESS
+{{else}}
+    - ./gradlew clean test -Dheadless=$HEADLESS
+{{/if}}
   artifacts:
     when: always
     paths:
-      {{#if (eq reportingTool "allure")}}
-      - build/allure-results
-      {{/if}}
-      {{#if (eq reportingTool "extent-reports")}}
-      - reports/extent-report.html
-      {{/if}}
-      {{#if (eq reportingTool "testng-reports")}}
-      - build/reports/tests/test
-      {{/if}}
-      - reports/screenshots
-      - logs
+{{#if (eq buildTool "maven")}}
+      - target/surefire-reports/
+{{else}}
+      - build/reports/
+{{/if}}
+      - screenshots/
+      - reports/
     expire_in: 7 days
-
-test:firefox:
-  stage: test
-  script:
-    - apt-get update && apt-get install -y firefox-esr
-    - chmod +x gradlew
-    - ./gradlew test -Dbrowser=firefox
-  artifacts:
-    when: always
-    paths:
-      {{#if (eq reportingTool "allure")}}
-      - build/allure-results
-      {{/if}}
-      {{#if (eq reportingTool "extent-reports")}}
-      - reports/extent-report.html
-      {{/if}}
-      {{#if (eq reportingTool "testng-reports")}}
-      - build/reports/tests/test
-      {{/if}}
-      - reports/screenshots
-      - logs
-    expire_in: 7 days
-
 {{#if (eq reportingTool "allure")}}
-allure:report:
+
+allure-report:
   stage: report
   script:
-    - chmod +x gradlew
+{{#if (eq buildTool "maven")}}
+    - mvn allure:report
+{{else}}
     - ./gradlew allureReport
-  dependencies:
-    - test:chrome
-    - test:firefox
+{{/if}}
   artifacts:
     paths:
-      - build/reports/allure-report
-    expire_in: 30 days
-  when: always
+{{#if (eq buildTool "maven")}}
+      - target/site/allure-maven-plugin/
+{{else}}
+      - build/allure-report/
+{{/if}}
+    expire_in: 7 days
 {{/if}}

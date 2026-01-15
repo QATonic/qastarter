@@ -1,172 +1,25 @@
 {
   "id": "web-javascript-cypress-cypress-npm",
-  "displayName": "Web Automation Framework",
+  "displayName": "JavaScript Cypress Framework",
+  "description": "Production-ready Cypress automation framework with JavaScript",
+  "version": "2.0.0",
   "supportsDynamic": true,
-  "name": "Web Automation Framework",
-  "description": "Cypress test automation framework with JavaScript and npm for web testing",
-  "tags": [
-    "web",
-    "cypress",
-    "javascript",
-    "npm",
-    "pom"
-  ],
-  "toolVersions": {
-    "node": "18.x",
-    "cypress": "13.6.0",
-    "npm": "9.x"
-  },
-  "files": [
-    {
-      "path": "package.json",
-      "isTemplate": true,
-      "description": "npm configuration with Cypress dependencies"
-    },
-    {
-      "path": "cypress.config.js",
-      "isTemplate": true,
-      "description": "Cypress configuration file"
-    },
-    {
-      "path": ".github/workflows/tests.yml",
-      "isTemplate": true,
-      "description": "GitHub Actions CI/CD workflow",
-      "conditional": {
-        "cicdTool": "github-actions"
-      }
-    },
-    {
-      "path": "Jenkinsfile",
-      "isTemplate": true,
-      "description": "Jenkins CI/CD pipeline",
-      "conditional": {
-        "cicdTool": "jenkins"
-      }
-    },
-    {
-      "path": "azure-pipelines.yml",
-      "isTemplate": true,
-      "description": "Azure DevOps CI/CD pipeline",
-      "conditional": {
-        "cicdTool": "azure-devops"
-      }
-    },
-    {
-      "path": "Dockerfile",
-      "isTemplate": true,
-      "description": "Docker configuration for containerized testing",
-      "conditional": {
-        "utilities.includeDocker": true
-      }
-    },
-    {
-      "path": ".gitignore",
-      "isTemplate": false,
-      "description": "Git ignore patterns"
-    },
-    {
-      "path": "README.md",
-      "isTemplate": true,
-      "description": "Project documentation and setup guide"
-    },
-    {
-      "path": "cypress/support/e2e.js",
-      "isTemplate": true,
-      "description": "Cypress support file for global setup"
-    },
-    {
-      "path": "cypress/support/commands.js",
-      "isTemplate": true,
-      "description": "Custom Cypress commands"
-    },
-    {
-      "path": "cypress/pages/BasePage.js",
-      "isTemplate": true,
-      "description": "Base page class with common functionality"
-    },
-    {
-      "path": "cypress/pages/LoginPage.js",
-      "isTemplate": true,
-      "description": "Login page object"
-    },
-    {
-      "path": "cypress/pages/HomePage.js",
-      "isTemplate": true,
-      "description": "Home page object"
-    },
-    {
-      "path": "cypress/e2e/login.cy.js",
-      "isTemplate": true,
-      "description": "Login test suite"
-    },
-    {
-      "path": "cypress/fixtures/users.json",
-      "isTemplate": true,
-      "description": "User test data"
-    },
-    {
-      "path": "cypress/fixtures/config.json",
-      "isTemplate": true,
-      "description": "Environment configuration data"
-    },
-    {
-      "path": "cypress/fixtures/environments.json",
-      "isTemplate": true,
-      "description": "Multi-environment configuration"
-    },
-    {
-      "path": "cypress/support/utils.js",
-      "isTemplate": true,
-      "description": "Common utility functions"
-    },
-    {
-      "path": "docker-compose.yml",
-      "isTemplate": true,
-      "description": "Docker Compose for parallel testing",
-      "conditional": {
-        "utilities.includeDockerCompose": true
-      }
-    },
-    {
-      "path": "cypress/e2e/features/login.feature",
-      "isTemplate": true,
-      "description": "Sample login feature",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "cypress/support/step_definitions/loginSteps.js",
-      "isTemplate": true,
-      "description": "Cypress Cucumber step definitions",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    }
-  ],
-  "supportedCombination": {
-    "testingType": "web",
-    "framework": "cypress",
-    "language": "javascript",
-    "testRunner": "cypress",
-    "buildTool": "npm"
-  },
+  "supportedCombination": {"testingType": "web", "framework": "cypress", "language": "javascript", "testRunner": "cypress", "buildTool": "npm"},
   "dynamicSupport": {
-    "reportingTools": [
-      "allure",
-      "jest-html-reporter",
-      "mochawesome"
-    ],
-    "cicdTools": [
-      "jenkins",
-      "github-actions",
-      "gitlab-ci",
-      "azure-devops",
-      "circleci"
-    ],
-    "testingPatterns": [
-      "page-object-model",
-      "bdd"
-    ]
-  }
+    "reportingTools": ["mochawesome"],
+    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
+    "testingPatterns": ["page-object-model", "bdd"]
+  },
+  "toolVersions": {"node": "18+", "cypress": "13.6.0"},
+  "files": [
+    {"path": "package.json", "isTemplate": true},
+    {"path": "cypress.config.js", "isTemplate": true},
+    {"path": "README.md", "isTemplate": true},
+    {"path": ".gitignore", "isTemplate": false},
+    {"path": "cypress/pages/BasePage.js", "isTemplate": true},
+    {"path": "cypress/pages/LoginPage.js", "isTemplate": true},
+    {"path": "cypress/e2e/login.cy.js", "isTemplate": true},
+    {"path": "cypress/support/e2e.js", "isTemplate": true}
+  ],
+  "directories": ["cypress/screenshots", "cypress/videos", "reports"]
 }

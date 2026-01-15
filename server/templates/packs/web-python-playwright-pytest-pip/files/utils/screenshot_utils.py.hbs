@@ -1,0 +1,51 @@
+"""
+Screenshot Utilities for Playwright.
+"""
+from datetime import datetime
+from pathlib import Path
+from utils.playwright_manager import PlaywrightManager
+from utils.logger import log
+
+
+class ScreenshotUtils:
+    """Screenshot capture utilities for Playwright."""
+    
+    SCREENSHOT_DIR = "screenshots"
+    
+    @classmethod
+    def capture(cls, name: str) -> str:
+        """Capture screenshot and save to file."""
+        try:
+            page = PlaywrightManager.get_page()
+            if page is None:
+                log.error("Cannot capture screenshot - page is None")
+                return None
+            
+            screenshots_dir = Path(cls.SCREENSHOT_DIR)
+            screenshots_dir.mkdir(exist_ok=True)
+            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            sanitized_name = "".join(c if c.isalnum() or c in "_-" else "_" for c in name)
+            filename = f"{sanitized_name}_{timestamp}.png"
+            filepath = screenshots_dir / filename
+            
+            page.screenshot(path=str(filepath))
+            log.info(f"Screenshot saved: {filepath}")
+            
+            return str(filepath)
+            
+        except Exception as e:
+            log.error(f"Failed to capture screenshot: {e}")
+            return None
+    
+    @classmethod
+    def capture_as_bytes(cls) -> bytes:
+        """Capture screenshot as bytes."""
+        try:
+            page = PlaywrightManager.get_page()
+            if page is None:
+                return None
+            return page.screenshot()
+        except Exception as e:
+            log.error(f"Failed to capture screenshot bytes: {e}")
+            return None

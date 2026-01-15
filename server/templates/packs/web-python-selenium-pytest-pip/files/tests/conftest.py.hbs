@@ -1,50 +1,68 @@
 """
-Pytest fixtures for setup/teardown and driver management
+Pytest Fixtures - Setup and teardown for all tests.
+
+This file is automatically discovered by pytest.
 """
 import pytest
-from selenium.webdriver.remote.webdriver import WebDriver
-from utils.driver_factory import DriverFactory
-from utils.screenshot_util import ScreenshotUtil
-from utils.logger import Logger
-from config.config import Config
+from utils.driver_manager import DriverManager
+from utils.logger import log
+from utils.screenshot_utils import ScreenshotUtils
+from config.config_reader import config
+{{#if (eq reportingTool "allure")}}
+import allure
+{{/if}}
 
-logger = Logger.get_logger(__name__)
-
-@pytest.fixture(scope="function")
-def driver(request) -> WebDriver:
-    """
-    WebDriver fixture with automatic cleanup
-    
-    Usage:
-        def test_example(driver):
-            driver.get("https://example.com")
-    """
-    logger.info("Setting up WebDriver")
-    driver_instance = DriverFactory.create_driver()
-    driver_instance.implicitly_wait(Config.IMPLICIT_WAIT)
-    
-    yield driver_instance
-    
-    # Capture screenshot on failure
-    if request.node.rep_call.failed and Config.SCREENSHOT_ON_FAILURE:
-        screenshot_util = ScreenshotUtil(driver_instance)
-        test_name = request.node.name
-        screenshot_path = screenshot_util.capture_screenshot(f"failed_{test_name}")
-        logger.error(f"Test failed. Screenshot saved: {screenshot_path}")
-    
-    logger.info("Tearing down WebDriver")
-    driver_instance.quit()
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_directories():
-    """Create necessary directories"""
-    Config.SCREENSHOT_DIR.mkdir(exist_ok=True)
-    Config.LOG_DIR.mkdir(exist_ok=True)
-    Config.REPORT_DIR.mkdir(exist_ok=True)
+def setup_session():
+    """Run once before all tests."""
+    log.info("=" * 60)
+    log.info(" TEST SESSION STARTED")
+    log.info("=" * 60)
+    log.info(f"Environment: {config.get('ENV', 'dev')}")
+    log.info(f"Browser: {config.browser}")
+    log.info(f"Base URL: {config.base_url}")
+    
+    yield
+    
+    log.info("=" * 60)
+    log.info(" TEST SESSION COMPLETED")
+    log.info("=" * 60)
 
-@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+
+@pytest.fixture(scope="function")
+def driver():
+    """Provides WebDriver for each test."""
+    log.info("--- Test Setup ---")
+    DriverManager.init_driver()
+    driver = DriverManager.get_driver()
+    
+    # Navigate to base URL
+    base_url = config.base_url
+    if base_url:
+        driver.get(base_url)
+        log.info(f"Navigated to: {base_url}")
+    
+    yield driver
+    
+    log.info("--- Test Teardown ---")
+    DriverManager.quit_driver()
+
+
+@pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    """Hook to capture test result for screenshot on failure"""
+    """Capture screenshot on test failure."""
     outcome = yield
-    rep = outcome.get_result()
-    setattr(item, f"rep_{rep.when}", rep)
+    report = outcome.get_result()
+    
+    if report.when == "call" and report.failed:
+        log.error(f"TEST FAILED: {item.name}")
+        
+        if DriverManager.is_initialized():
+            screenshot_path = ScreenshotUtils.capture(f"FAILED_{item.name}")
+            if screenshot_path:
+                log.info(f"Screenshot saved: {screenshot_path}")
+{{#if (eq reportingTool "allure")}}
+                with open(screenshot_path, "rb") as f:
+                    allure.attach(f.read(), name="Screenshot", attachment_type=allure.attachment_type.PNG)
+{{/if}}

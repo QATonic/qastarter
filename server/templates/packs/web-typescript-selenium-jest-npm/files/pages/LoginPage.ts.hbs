@@ -1,46 +1,41 @@
 /**
- * Login Page Object
- * 
- * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
- * 1. Open your app's login page in a browser
- * 2. Right-click on each element → Inspect → Copy selector
- * 3. Replace the placeholder locators below with your actual locators
+ * Login Page - Page object for SauceDemo login.
  */
-import { By, WebDriver } from 'selenium-webdriver';
-import BasePage from './BasePage';
-import envConfig from '../config/env.config';
+import { By } from "selenium-webdriver";
+import { BasePage } from "./BasePage";
 
-export default class LoginPage extends BasePage {
-  private url: string;
-  
-  // ============================================
-  // UPDATE THESE LOCATORS FOR YOUR APPLICATION
-  // ============================================
-  // Tip: Use browser DevTools (F12) to find correct selectors
-  public readonly usernameInput = By.id('username');           // Your username/email input field
-  public readonly passwordInput = By.id('password');           // Your password input field
-  private loginButton = By.css('button[type="submit"]');       // Your login/submit button
-  private errorMessage = By.css('.error-message');             // Error message element
-  // ============================================
+export class LoginPage extends BasePage {
+  // Locators (SauceDemo)
+  private usernameField = By.id("user-name");
+  private passwordField = By.id("password");
+  private loginButton = By.id("login-button");
+  private errorMessage = By.css("[data-test='error']");
 
-  constructor(driver: WebDriver) {
-    super(driver);
-    // UPDATE: Change '/login' to your actual login page path
-    this.url = `${envConfig.getBaseUrl()}/login`;
+  async enterUsername(username: string): Promise<LoginPage> {
+    await this.type(this.usernameField, username);
+    return this;
   }
 
-  async navigateToLogin(): Promise<void> {
-    await this.navigate(this.url);
+  async enterPassword(password: string): Promise<LoginPage> {
+    await this.type(this.passwordField, password);
+    return this;
   }
 
-  async login(username: string, password: string): Promise<void> {
-    await this.type(this.usernameInput, username);
-    await this.type(this.passwordInput, password);
+  async clickLogin(): Promise<void> {
     await this.click(this.loginButton);
   }
 
+  async login(username: string, password: string): Promise<void> {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLogin();
+  }
+
   async getErrorMessage(): Promise<string> {
-    return await this.getText(this.errorMessage);
+    if (await this.isErrorDisplayed()) {
+      return await this.getText(this.errorMessage);
+    }
+    return "";
   }
 
   async isErrorDisplayed(): Promise<boolean> {
@@ -49,6 +44,10 @@ export default class LoginPage extends BasePage {
 
   async isLoginSuccessful(): Promise<boolean> {
     const url = await this.getCurrentUrl();
-    return url.includes('/dashboard');
+    return url.includes("inventory");
+  }
+
+  async isLoaded(): Promise<boolean> {
+    return await this.isDisplayed(this.loginButton);
   }
 }

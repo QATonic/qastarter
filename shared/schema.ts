@@ -64,6 +64,8 @@ export const projectConfigSchema = z.object({
       screenshotUtility: z.boolean().optional(),
       logger: z.boolean().optional(),
       dataProvider: z.boolean().optional(),
+      includeDocker: z.boolean().optional(),
+      includeDockerCompose: z.boolean().optional(),
     })
     .optional(),
 });

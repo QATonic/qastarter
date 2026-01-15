@@ -1,0 +1,56 @@
+using System;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+
+namespace {{projectNamespace}}.Config
+{
+    /// <summary>
+    /// Configuration Reader - Load environment-specific settings.
+    /// Uses appsettings.json and environment variables.
+    /// </summary>
+    public class ConfigReader
+    {
+        private static readonly Lazy<ConfigReader> _instance = new(() => new ConfigReader());
+        private readonly IConfiguration _configuration;
+
+        public static ConfigReader Instance => _instance.Value;
+
+        private ConfigReader()
+        {
+            var env = Environment.GetEnvironmentVariable("ENV") ?? "dev";
+            
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddJsonFile($"appsettings.{env}.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+        }
+
+        public string Get(string key, string defaultValue = "")
+        {
+            return Environment.GetEnvironmentVariable(key) ?? _configuration[key] ?? defaultValue;
+        }
+
+        public int GetInt(string key, int defaultValue = 0)
+        {
+            var value = Get(key);
+            return int.TryParse(value, out int result) ? result : defaultValue;
+        }
+
+        public bool GetBool(string key, bool defaultValue = false)
+        {
+            var value = Get(key);
+            if (string.IsNullOrEmpty(value)) return defaultValue;
+            return value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                   value.Equals("1", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public string BaseUrl => Get("BaseUrl", "https://www.saucedemo.com/");
+        public string Browser => Get("Browser", "chrome");
+        public bool Headless => GetBool("Headless", false);
+        public int Timeout => GetInt("Timeout", 30);
+        public string Username => Get("Username", "standard_user");
+        public string Password => Get("Password", "secret_sauce");
+    }
+}

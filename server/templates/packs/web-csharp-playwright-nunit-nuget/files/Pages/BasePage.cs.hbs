@@ -1,65 +1,23 @@
 using Microsoft.Playwright;
+using {{projectNamespace}}.Utils;
+using {{projectNamespace}}.Config;
 
-namespace {{projectName}}.Pages;
-
-public class BasePage
+namespace {{projectNamespace}}.Pages
 {
-    protected readonly IPage Page;
-
-    public BasePage(IPage page)
+    public abstract class BasePage
     {
-        Page = page;
-    }
+        protected IPage Page => PlaywrightManager.Page;
+        protected int Timeout => ConfigReader.Instance.Timeout * 1000;
 
-    public async Task NavigateAsync(string url)
-    {
-        Console.WriteLine($"Navigating to: {url}");
-        await Page.GotoAsync(url);
-    }
-
-    public async Task ClickAsync(string selector)
-    {
-        Console.WriteLine($"Clicking element: {selector}");
-        await Page.ClickAsync(selector);
-    }
-
-    public async Task TypeAsync(string selector, string text)
-    {
-        Console.WriteLine($"Typing '{text}' into element: {selector}");
-        await Page.FillAsync(selector, text);
-    }
-
-    public async Task<string?> GetTextAsync(string selector)
-    {
-        var text = await Page.TextContentAsync(selector);
-        Console.WriteLine($"Getting text from element: {selector} = '{text}'");
-        return text;
-    }
-
-    public async Task<bool> IsVisibleAsync(string selector)
-    {
-        var visible = await Page.IsVisibleAsync(selector);
-        Console.WriteLine($"Checking visibility of element: {selector} = {visible}");
-        return visible;
-    }
-
-    public async Task WaitForSelectorAsync(string selector, float timeout = 30000)
-    {
-        Console.WriteLine($"Waiting for selector: {selector}");
-        await Page.WaitForSelectorAsync(selector, new() { Timeout = timeout });
-    }
-
-    public async Task<string> GetPageTitleAsync()
-    {
-        var title = await Page.TitleAsync();
-        Console.WriteLine($"Page title: {title}");
-        return title;
-    }
-
-    public string GetCurrentUrl()
-    {
-        var url = Page.Url;
-        Console.WriteLine($"Current URL: {url}");
-        return url;
+        protected async Task ClickAsync(string selector) => await Page.ClickAsync(selector, new() { Timeout = Timeout });
+        protected async Task TypeAsync(string selector, string text) => await Page.FillAsync(selector, text, new() { Timeout = Timeout });
+        protected async Task<string> GetTextAsync(string selector) => await Page.TextContentAsync(selector) ?? "";
+        protected async Task<bool> IsDisplayedAsync(string selector)
+        {
+            try { return await Page.IsVisibleAsync(selector, new() { Timeout = 5000 }); }
+            catch { return false; }
+        }
+        public string CurrentUrl => Page.Url;
+        public async Task NavigateToAsync(string url) => await Page.GotoAsync(url);
     }
 }

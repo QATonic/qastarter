@@ -1,130 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="{{projectName}} Test Suite" parallel="methods" thread-count="2">
 
-<suite name="{{projectName}} Test Suite" verbose="1" parallel="methods" thread-count="3">
-
-    <!-- Global Test Parameters -->
-    <parameter name="browser" value="chrome" />
-    <parameter name="headless" value="false" />
-    <parameter name="environment" value="dev" />
-
-    <!-- Listeners -->
     <listeners>
         <listener class-name="{{javaPackage}}.listeners.TestListener" />
-        <!-- Add more listeners if needed -->
     </listeners>
 
-    <!-- Regression Test Suite -->
-    <test name="Regression Tests" parallel="methods" thread-count="2">
-        <parameter name="test.suite" value="regression" />
-
-        <groups>
-            <run>
-                <include name="regression" />
-                <include name="functional" />
-                <exclude name="performance" />
-            </run>
-        </groups>
-
+    <test name="Login Tests">
         <classes>
-            <class name="{{javaPackage}}.tests.LoginTests">
-                <methods>
-                    <include name="testValidLogin" />
-                    <include name="testInvalidLogin" />
-                    <include name="testEmptyCredentials" />
-                    <include name="testRememberMeCheckbox" />
-                    <include name="testFieldClearing" />
-                    <include name="testLoginWithMultipleUsers" />
-                    <include name="testLoginPageValidation" />
-                    <include name="testLogoutFunctionality" />
-                    <include name="testNegativeLoginScenarios" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-
-    <!-- UI Test Suite -->
-    <test name="UI Tests" preserve-order="false">
-        <parameter name="test.suite" value="ui" />
-
-        <groups>
-            <run>
-                <include name="ui" />
-            </run>
-        </groups>
-
-        <classes>
-            <class name="{{javaPackage}}.tests.LoginTests">
-                <methods>
-                    <include name="testCriticalUIElements" />
-                    <include name="testBasicAccessibility" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-
-    <!-- Data-Driven Test Suite -->
-    <test name="Data-Driven Tests">
-        <parameter name="test.suite" value="data-driven" />
-
-        <groups>
-            <run>
-                <include name="data-driven" />
-            </run>
-        </groups>
-
-        <classes>
-            <class name="{{javaPackage}}.tests.LoginTests">
-                <methods>
-                    <include name="testLoginWithMultipleUsers" />
-                    <include name="testNegativeLoginScenarios" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-
-    <!-- Performance Test Suite -->
-    <test name="Performance Tests" preserve-order="true">
-        <parameter name="test.suite" value="performance" />
-
-        <groups>
-            <run>
-                <include name="performance" />
-            </run>
-        </groups>
-
-        <classes>
-            <class name="{{javaPackage}}.tests.LoginTests">
-                <methods>
-                    <include name="testApplicationPerformance" />
-                </methods>
-            </class>
-        </classes>
-    </test>
-
-    <!-- Security Test Suite -->
-    <test name="Security Tests">
-        <parameter name="test.suite" value="security" />
-
-        <groups>
-            <run>
-                <include name="security" />
-                <include name="negative" />
-            </run>
-        </groups>
-
-        <classes>
-            <class name="{{javaPackage}}.tests.LoginTests">
-                <methods>
-                    <include name="testBasicSecurity" />
-                </methods>
-            </class>
-            <class name="{{javaPackage}}.tests.LoginTests">
-                <methods>
-                    <include name="testInvalidLogin" />
-                    <include name="testNegativeLoginScenarios" />
-                </methods>
-            </class>
+            <class name="{{javaPackage}}.tests.LoginTests" />
         </classes>
     </test>
 

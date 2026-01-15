@@ -1,27 +1,51 @@
-import * as winston from 'winston';
-import * as path from 'path';
+/**
+ * Logger - Consistent logging with timestamps.
+ * 
+ * Logs saved to: logs/test_{timestamp}.log
+ */
+import * as fs from "fs";
+import * as path from "path";
 
-const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.File({
-      filename: path.join('logs', 'test.log'),
-      maxsize: 5242880,
-      maxFiles: 5
-    }),
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      )
-    })
-  ]
-});
+class Logger {
+  private logDir = "logs";
+  private logFile: string;
 
-export default logger;
+  constructor() {
+    // Create logs directory
+    if (!fs.existsSync(this.logDir)) {
+      fs.mkdirSync(this.logDir, { recursive: true });
+    }
+
+    // Create log file with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    this.logFile = path.join(this.logDir, `test_${timestamp}.log`);
+  }
+
+  private log(level: string, message: string): void {
+    const timestamp = new Date().toISOString();
+    const logLine = `${timestamp} | ${level.padEnd(8)} | ${message}`;
+    
+    console.log(logLine);
+    fs.appendFileSync(this.logFile, logLine + "\n");
+  }
+
+  info(message: string): void { this.log("INFO", message); }
+  debug(message: string): void { this.log("DEBUG", message); }
+  warn(message: string): void { this.log("WARN", message); }
+  error(message: string): void { this.log("ERROR", message); }
+  step(message: string): void { this.log("STEP", message); }
+  action(message: string): void { this.log("ACTION", message); }
+
+  testStart(testName: string): void {
+    this.log("INFO", "=".repeat(60));
+    this.log("INFO", `TEST START: ${testName}`);
+    this.log("INFO", "=".repeat(60));
+  }
+
+  testEnd(testName: string, status: string): void {
+    this.log("INFO", `TEST END: ${testName} - ${status}`);
+    this.log("INFO", "=".repeat(60));
+  }
+}
+
+export const log = new Logger();

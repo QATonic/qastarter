@@ -189,7 +189,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
             </p>
 
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground text-balance">
-              41 Production-Ready Templates
+              43 Production-Ready Templates
             </h2>
 
             <p className="text-base md:text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">

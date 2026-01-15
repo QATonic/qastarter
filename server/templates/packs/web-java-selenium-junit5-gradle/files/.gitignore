@@ -1,82 +1,41 @@
-# Compiled class files
-*.class
-
-# Log files
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# Virtual machine crash logs
-hs_err_pid*
-
-# Maven
+# Build
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+build/
+out/
+*.class
 
 # IDE
 .idea/
-*.iws
 *.iml
-*.ipr
 .vscode/
-.classpath
 .project
+.classpath
 .settings/
-bin/
+*.swp
+*~
 
-# Test reports
-reports/
-test-results/
-surefire-reports/
-failsafe-reports/
-
-# Logs
+# Test outputs
+screenshots/
 logs/
-*.log
+reports/
+allure-results/
+test-output/
 
-# OS generated files
+# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Screenshots
-screenshots/
-*.png
-*.jpg
-*.jpeg
+# Maven
+*.log
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
 
-# Temporary files
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
 
-# ExtentReports
-extent-reports/
-ExtentReports/
+# Environment
+.env

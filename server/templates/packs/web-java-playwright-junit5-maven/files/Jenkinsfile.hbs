@@ -2,17 +2,16 @@ pipeline {
     agent any
     
     tools {
-        maven 'Maven 3.9'
-        jdk 'JDK {{toolVersions.java}}'
-    }
-    
-    parameters {
-        choice(name: 'BROWSER', choices: ['chromium', 'firefox', 'webkit'], description: 'Browser to run tests')
-        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'stg', 'prod'], description: 'Environment to test against')
+        jdk 'JDK17'
+{{#if (eq buildTool "maven")}}
+        maven 'Maven3'
+{{else}}
+        gradle 'Gradle8'
+{{/if}}
     }
     
     environment {
-        MAVEN_OPTS = '-Xmx3072m'
+        HEADLESS = 'true'
     }
     
     stages {
@@ -24,168 +23,58 @@ pipeline {
         
         stage('Build') {
             steps {
+{{#if (eq buildTool "maven")}}
                 sh 'mvn clean compile'
+{{else}}
+                sh './gradlew clean classes'
+{{/if}}
             }
         }
+{{#if (eq framework "playwright")}}
         
-        stage('Install Playwright Browsers') {
+        stage('Install Browsers') {
             steps {
-                sh 'mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install"'
+{{#if (eq buildTool "maven")}}
+                sh 'mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"'
+{{else}}
+                sh './gradlew playwright install'
+{{/if}}
             }
         }
+{{/if}}
         
-        stage('Test - Chromium') {
-            when {
-                expression { params.BROWSER == 'chromium' || params.BROWSER == null }
-            }
+        stage('Test') {
             steps {
-                sh """
-                    mvn test -Dbrowser=chromium -Denv=${params.ENVIRONMENT}
-                """
+{{#if (eq buildTool "maven")}}
+                sh 'mvn test -Dheadless=${HEADLESS}'
+{{else}}
+                sh './gradlew test -Dheadless=${HEADLESS}'
+{{/if}}
             }
             post {
                 always {
-                    junit testResults: '**/target/surefire-reports/TEST-*.xml', allowEmptyResults: true
-{{#if (eq reportingTool "allure")}}
-                    script {
-                        allure([
-                            includeProperties: false,
-                            jdk: '',
-                            properties: [],
-                            reportBuildPolicy: 'ALWAYS',
-                            results: [[path: 'target/allure-results']]
-                        ])
-                    }
+{{#if (eq testRunner "testng")}}
+                    testResultsPublisher(testResultsPattern: '**/target/surefire-reports/*.xml')
+{{else}}
+                    junit '**/target/surefire-reports/*.xml'
 {{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'reports',
-                        reportFiles: 'extent-report.html',
-                        reportName: 'ExtentReports - Chromium',
-                        reportTitles: ''
-                    ])
-{{/if}}
-{{#if (eq reportingTool "junit-reports")}}
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'target/surefire-reports',
-                        reportFiles: '*.html',
-                        reportName: 'JUnit Reports - Chromium',
-                        reportTitles: ''
-                    ])
-{{/if}}
-                    archiveArtifacts artifacts: 'reports/screenshots/**, logs/**', allowEmptyArchive: true
                 }
             }
         }
+{{#if (eq reportingTool "allure")}}
         
-        stage('Test - Firefox') {
-            when {
-                expression { params.BROWSER == 'firefox' }
-            }
+        stage('Allure Report') {
             steps {
-                sh """
-                    mvn test -Dbrowser=firefox -Denv=${params.ENVIRONMENT}
-                """
-            }
-            post {
-                always {
-                    junit testResults: '**/target/surefire-reports/TEST-*.xml', allowEmptyResults: true
-{{#if (eq reportingTool "allure")}}
-                    script {
-                        allure([
-                            includeProperties: false,
-                            jdk: '',
-                            properties: [],
-                            reportBuildPolicy: 'ALWAYS',
-                            results: [[path: 'target/allure-results']]
-                        ])
-                    }
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'reports',
-                        reportFiles: 'extent-report.html',
-                        reportName: 'ExtentReports - Firefox',
-                        reportTitles: ''
-                    ])
-{{/if}}
-{{#if (eq reportingTool "junit-reports")}}
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'target/surefire-reports',
-                        reportFiles: '*.html',
-                        reportName: 'JUnit Reports - Firefox',
-                        reportTitles: ''
-                    ])
-{{/if}}
-                    archiveArtifacts artifacts: 'reports/screenshots/**, logs/**', allowEmptyArchive: true
-                }
+                allure includeProperties: false, jdk: '', results: [[path: 'target/allure-results']]
             }
         }
-        
-        stage('Test - WebKit') {
-            when {
-                expression { params.BROWSER == 'webkit' }
-            }
-            steps {
-                sh """
-                    mvn test -Dbrowser=webkit -Denv=${params.ENVIRONMENT}
-                """
-            }
-            post {
-                always {
-                    junit testResults: '**/target/surefire-reports/TEST-*.xml', allowEmptyResults: true
-{{#if (eq reportingTool "allure")}}
-                    script {
-                        allure([
-                            includeProperties: false,
-                            jdk: '',
-                            properties: [],
-                            reportBuildPolicy: 'ALWAYS',
-                            results: [[path: 'target/allure-results']]
-                        ])
-                    }
 {{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'reports',
-                        reportFiles: 'extent-report.html',
-                        reportName: 'ExtentReports - WebKit',
-                        reportTitles: ''
-                    ])
-{{/if}}
-{{#if (eq reportingTool "junit-reports")}}
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'target/surefire-reports',
-                        reportFiles: '*.html',
-                        reportName: 'JUnit Reports - WebKit',
-                        reportTitles: ''
-                    ])
-{{/if}}
-                    archiveArtifacts artifacts: 'reports/screenshots/**, logs/**', allowEmptyArchive: true
-                }
-            }
-        }
     }
     
     post {
+        failure {
+            archiveArtifacts artifacts: 'screenshots/**', allowEmptyArchive: true
+        }
         always {
             cleanWs()
         }

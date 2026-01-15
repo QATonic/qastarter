@@ -1,258 +1,104 @@
 package {{javaPackage}}.listeners;
 
 import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.ScreenshotUtils;
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.MediaEntityBuilder;
+{{/if}}
 {{#if (eq reportingTool "allure")}}
 import {{javaPackage}}.utils.AllureManager;
 {{/if}}
-{{#if (eq reportingTool "extent-reports")}}
-import {{javaPackage}}.utils.ExtentManager;
-{{/if}}
-import org.testng.*;
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
 
+import java.io.File;
+import java.util.Base64;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
- * TestNG listener for test lifecycle events, logging, and reporting.
- * Handles test start, success, failure, and skip events.
- * Integrates with reporting tools (Allure/ExtentReports) when configured.
+ * TestNG Listener - Handles test events, logging, and reporting.
  */
-public class TestListener implements ITestListener, ISuiteListener, IConfigurationListener {
-    
+public class TestListener implements ITestListener {
+
     @Override
-    public void onStart(ISuite suite) {
-        Log.startSection("TEST SUITE: " + suite.getName());
-        Log.info("Suite started: " + suite.getName());
-        
-        // Create output directories
-        try {
-            Files.createDirectories(Paths.get("screenshots"));
-            Files.createDirectories(Paths.get("reports"));
-            Files.createDirectories(Paths.get("logs"));
-        } catch (Exception e) {
-            Log.warn("Could not create output directories: " + e.getMessage());
-        }
-        
+    public void onStart(ITestContext context) {
+        Log.info("TEST SUITE: " + context.getName());
 {{#if (eq reportingTool "extent-reports")}}
-        // Initialize ExtentReports
-        ExtentManager.createInstance();
+        ExtentManager.getInstance();
 {{/if}}
     }
-    
+
     @Override
-    public void onFinish(ISuite suite) {
-        Log.info("Suite finished: " + suite.getName());
-        Log.endSection();
-        
+    public void onFinish(ITestContext context) {
+        Log.info("Suite finished: " + context.getName());
 {{#if (eq reportingTool "extent-reports")}}
-        // Flush ExtentReports
         ExtentManager.flush();
 {{/if}}
     }
-    
+
     @Override
     public void onTestStart(ITestResult result) {
-        String testName = getTestName(result);
-        Log.testStart(testName);
-        
-        // Log test parameters if any
-        logTestParameters(result);
-        
+        Log.testStart(getTestName(result));
 {{#if (eq reportingTool "extent-reports")}}
-        // Create test in ExtentReports
-        String description = result.getMethod().getDescription();
-        ExtentManager.createTest(testName, description != null ? description : "");
-        
-        // Set categories from groups
-        String[] groups = result.getMethod().getGroups();
-        if (groups != null && groups.length > 0) {
-            ExtentManager.setTestCategory(groups);
-        }
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        // Add test info to Allure
-        AllureManager.addParameter("Class", result.getTestClass().getName());
-        AllureManager.addParameter("Method", result.getMethod().getMethodName());
+        ExtentManager.createTest(getTestName(result), result.getMethod().getDescription());
 {{/if}}
     }
-    
+
     @Override
     public void onTestSuccess(ITestResult result) {
-        String testName = getTestName(result);
-        long duration = result.getEndMillis() - result.getStartMillis();
-        
-        Log.testEnd(testName, "PASSED");
-        Log.info("Test duration: " + duration + "ms");
-        
+        Log.testEnd(getTestName(result), "PASSED");
 {{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logPass("Test passed in " + duration + "ms");
-        ExtentManager.removeTest();
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.step("Test completed successfully in " + duration + "ms");
+        if (ExtentManager.getTest() != null) {
+            ExtentManager.getTest().log(Status.PASS, "Test passed");
+        }
 {{/if}}
     }
-    
+
     @Override
     public void onTestFailure(ITestResult result) {
-        String testName = getTestName(result);
-        Throwable throwable = result.getThrowable();
-        
-        Log.testEnd(testName, "FAILED");
-        Log.error("Test failed: " + testName, throwable);
-        
+        Log.error("TEST FAILED: " + getTestName(result));
+        Log.error("Reason: " + result.getThrowable().getMessage());
+
+        String screenshotPath = ScreenshotUtils.capture("FAILED_" + getTestName(result));
+
 {{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logFail("Test failed: " + (throwable != null ? throwable.getMessage() : "Unknown error"));
-        if (throwable != null) {
-            ExtentManager.logException(throwable);
-        }
-        
-        // Capture screenshot on failure
-        captureScreenshotForReport(result);
-        ExtentManager.removeTest();
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        if (throwable != null) {
-            AllureManager.attachText("Error Details", throwable.getMessage());
-        }
-        
-        // Capture screenshot on failure
-        captureScreenshotForReport(result);
-{{/if}}
-    }
-    
-    @Override
-    public void onTestSkipped(ITestResult result) {
-        String testName = getTestName(result);
-        Throwable throwable = result.getThrowable();
-        
-        Log.testEnd(testName, "SKIPPED");
-        
-        String skipReason = throwable != null ? throwable.getMessage() : "Test was skipped";
-        Log.warn("Skip reason: " + skipReason);
-        
-{{#if (eq reportingTool "extent-reports")}}
-        // Create test entry for skipped test
-        String description = result.getMethod().getDescription();
-        ExtentManager.createTest(testName, description != null ? description : "");
-        ExtentManager.logSkip("Test skipped: " + skipReason);
-        ExtentManager.removeTest();
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-        AllureManager.attachText("Skip Reason", skipReason);
-{{/if}}
-    }
-    
-    @Override
-    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-        String testName = getTestName(result);
-        Log.warn("Test failed but within success percentage: " + testName);
-        
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.logWarning("Test failed but within success percentage");
-        ExtentManager.removeTest();
-{{/if}}
-    }
-    
-    /**
-     * Get formatted test name
-     * @param result Test result
-     * @return Formatted test name
-     */
-    private String getTestName(ITestResult result) {
-        String className = result.getTestClass().getName();
-        String methodName = result.getMethod().getMethodName();
-        
-        // Extract simple class name
-        String simpleClassName = className.substring(className.lastIndexOf('.') + 1);
-        
-        return simpleClassName + "." + methodName;
-    }
-    
-    /**
-     * Log test parameters if present
-     * @param result Test result
-     */
-    private void logTestParameters(ITestResult result) {
-        Object[] parameters = result.getParameters();
-        if (parameters != null && parameters.length > 0) {
-            StringBuilder paramLog = new StringBuilder("Test parameters: ");
-            for (int i = 0; i < parameters.length; i++) {
-                if (i > 0) paramLog.append(", ");
-                String paramValue = parameters[i] != null ? parameters[i].toString() : "null";
-                paramLog.append("param").append(i + 1).append("=").append(paramValue);
-                
-{{#if (eq reportingTool "allure")}}
-                AllureManager.addParameter("param" + (i + 1), paramValue);
-{{/if}}
-            }
-            Log.info(paramLog.toString());
-        }
-    }
-    
-    /**
-     * Capture screenshot for reporting
-     * @param result Test result
-     */
-    private void captureScreenshotForReport(ITestResult result) {
-        try {
-            // Get page from BaseTest if available
-            Object testInstance = result.getInstance();
-            if (testInstance != null) {
-                java.lang.reflect.Method getPageMethod = testInstance.getClass().getMethod("getPage");
-                Object page = getPageMethod.invoke(null);
-                
-                if (page != null && page instanceof com.microsoft.playwright.Page) {
-                    com.microsoft.playwright.Page playwrightPage = (com.microsoft.playwright.Page) page;
-                    String screenshotName = getTestName(result).replaceAll("[^a-zA-Z0-9]", "_");
-                    String screenshotPath = "screenshots/" + screenshotName + "_" + System.currentTimeMillis() + ".png";
-                    
-                    byte[] screenshot = playwrightPage.screenshot(
-                        new com.microsoft.playwright.Page.ScreenshotOptions()
-                            .setPath(java.nio.file.Paths.get(screenshotPath))
-                            .setFullPage(true)
-                    );
-                    
-{{#if (eq reportingTool "extent-reports")}}
-                    ExtentManager.addScreenshot(screenshotPath, "Failure Screenshot");
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-                    AllureManager.attachScreenshot("Failure Screenshot", screenshot);
-{{/if}}
-                    
-                    Log.info("Screenshot captured: " + screenshotPath);
+        if (ExtentManager.getTest() != null) {
+            ExtentManager.getTest().log(Status.FAIL, result.getThrowable().getMessage());
+            
+            // Attach screenshot as Base64 for reliable embedding
+            if (screenshotPath != null) {
+                try {
+                    byte[] fileContent = Files.readAllBytes(new File(screenshotPath).toPath());
+                    String base64 = Base64.getEncoder().encodeToString(fileContent);
+                    ExtentManager.getTest().addScreenCaptureFromBase64String(base64, "Screenshot on Failure");
+                } catch (Exception e) {
+                    Log.error("Failed to attach screenshot to report: " + e.getMessage());
                 }
             }
-        } catch (Exception e) {
-            Log.warn("Could not capture screenshot for report: " + e.getMessage());
         }
-    }
-    
-    @Override
-    public void onConfigurationFailure(ITestResult result) {
-        String configName = result.getMethod().getMethodName();
-        Throwable throwable = result.getThrowable();
-        Log.error("Configuration method failed: " + configName, throwable);
-        
-{{#if (eq reportingTool "extent-reports")}}
-        ExtentManager.createTest("Configuration: " + configName, "Configuration method");
-        ExtentManager.logFail("Configuration failed: " + (throwable != null ? throwable.getMessage() : "Unknown error"));
-        if (throwable != null) {
-            ExtentManager.logException(throwable);
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+        byte[] screenshot = ScreenshotUtils.captureAsBytes();
+        if (screenshot != null) {
+            AllureManager.attachScreenshot("Screenshot on Failure", screenshot);
         }
-        ExtentManager.removeTest();
 {{/if}}
     }
-    
+
     @Override
-    public void onConfigurationSuccess(ITestResult result) {
-        String configName = result.getMethod().getMethodName();
-        Log.debug("Configuration method passed: " + configName);
+    public void onTestSkipped(ITestResult result) {
+        Log.warn("TEST SKIPPED: " + getTestName(result));
+{{#if (eq reportingTool "extent-reports")}}
+        if (ExtentManager.getTest() != null) {
+            ExtentManager.getTest().log(Status.SKIP, "Test skipped");
+        }
+{{/if}}
     }
-    
-    @Override
-    public void onConfigurationSkip(ITestResult result) {
-        String configName = result.getMethod().getMethodName();
-        Log.warn("Configuration method skipped: " + configName);
+
+    private String getTestName(ITestResult result) {
+        return result.getTestClass().getRealClass().getSimpleName() + "." + result.getMethod().getMethodName();
     }
 }

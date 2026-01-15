@@ -1,59 +1,17 @@
-@smoke @regression @login
-Feature: User Login Functionality
-  As a registered user
-  I want to be able to log in to the application
-  So that I can access my account
+@login
+Feature: Login Functionality
+  As a user
+  I want to login to SauceDemo
+  So that I can access the products page
 
-  Background:
-    Given I am on the login page
-
-  @positive @critical
+  @smoke
   Scenario: Successful login with valid credentials
-    When I enter username "testuser@example.com"
-    And I enter password "Test@123"
-    And I click on the login button
-    Then I should be redirected to the home page
-    And I should see a welcome message
+    Given I am on the login page
+    When I login with valid credentials
+    Then login should be successful
 
-  @negative
-  Scenario: Login with invalid username
-    When I enter username "invalid@example.com"
-    And I enter password "Test@123"
-    And I click on the login button
-    Then I should see an error message "Invalid credentials"
-
-  @negative
-  Scenario: Login with invalid password
-    When I enter username "testuser@example.com"
-    And I enter password "WrongPassword"
-    And I click on the login button
-    Then I should see an error message "Invalid credentials"
-
-  @negative
-  Scenario: Login with empty username
-    When I enter username ""
-    And I enter password "Test@123"
-    And I click on the login button
-    Then I should see an error message "Username is required"
-
-  @negative
-  Scenario: Login with empty password
-    When I enter username "testuser@example.com"
-    And I enter password ""
-    And I click on the login button
-    Then I should see an error message "Password is required"
-
-  @data-driven
-  Scenario Outline: Login with multiple invalid credentials
-    When I enter username "<username>"
-    And I enter password "<password>"
-    And I click on the login button
-    Then I should see an error message "<error>"
-
-    Examples:
-      | username              | password        | error                  |
-      | invalid@example.com   | Test@123        | Invalid credentials    |
-      | testuser@example.com  | WrongPass       | Invalid credentials    |
-      |                       | Test@123        | Username is required   |
-      | testuser@example.com  |                 | Password is required   |
-      | notanemail            | Test@123        | Invalid email format   |
+  @regression
+  Scenario: Failed login with invalid credentials
+    Given I am on the login page
+    When I login with username "invalid_user" and password "wrong_password"
+    Then I should see an error message

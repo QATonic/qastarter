@@ -1,337 +1,9 @@
 {
   "id": "web-java-selenium-testng-gradle",
-  "displayName": "Java + Selenium + TestNG + Gradle",
-  "name": "web-java-selenium-testng-gradle",
-  "description": "Professional QA automation framework with Java, Selenium WebDriver, TestNG, and Gradle for web application testing",
-  "version": "1.0.0",
+  "displayName": "Java Selenium TestNG Gradle Framework",
+  "description": "Production-ready Selenium automation framework with TestNG and Gradle",
+  "version": "2.0.0",
   "supportsDynamic": true,
-  "category": "web-testing",
-  "tags": [
-    "web",
-    "java",
-    "selenium",
-    "testng",
-    "gradle",
-    "automation"
-  ],
-  "toolVersions": {
-    "java": "11+",
-    "gradle": "8.5",
-    "selenium": "4.16.0",
-    "testng": "7.8.0"
-  },
-  "files": [
-    {
-      "path": "build.gradle",
-      "template": "build.gradle.hbs",
-      "isTemplate": true,
-      "description": "Gradle build configuration with all dependencies and tasks"
-    },
-    {
-      "path": "gradle.properties",
-      "template": "gradle.properties.hbs",
-      "isTemplate": true,
-      "description": "Gradle project properties and configuration"
-    },
-    {
-      "path": "settings.gradle",
-      "template": "settings.gradle.hbs",
-      "isTemplate": true,
-      "description": "Gradle settings configuration"
-    },
-    {
-      "path": "gradle/wrapper/gradle-wrapper.properties",
-      "template": "gradle/wrapper/gradle-wrapper.properties.hbs",
-      "isTemplate": true,
-      "description": "Gradle wrapper properties"
-    },
-    {
-      "path": "README.md",
-      "template": "README.md.hbs",
-      "isTemplate": true,
-      "description": "Complete setup and usage documentation"
-    },
-    {
-      "path": ".gitignore",
-      "template": ".gitignore",
-      "isTemplate": false,
-      "description": "Git ignore rules for Java/Gradle projects"
-    },
-    {
-      "path": "Jenkinsfile",
-      "template": "Jenkinsfile.hbs",
-      "isTemplate": true,
-      "description": "Jenkins declarative pipeline for CI/CD",
-      "conditional": {
-        "cicdTool": "jenkins"
-      }
-    },
-    {
-      "path": "azure-pipelines.yml",
-      "template": "azure-pipelines.yml.hbs",
-      "isTemplate": true,
-      "description": "Azure DevOps CI/CD pipeline",
-      "conditional": {
-        "cicdTool": "azure-devops"
-      }
-    },
-    {
-      "path": ".github/workflows/tests.yml",
-      "template": ".github/workflows/tests.yml.hbs",
-      "isTemplate": true,
-      "description": "GitHub Actions CI/CD workflow",
-      "conditional": {
-        "cicdTool": "github-actions"
-      }
-    },
-    {
-      "path": ".gitlab-ci.yml",
-      "template": ".gitlab-ci.yml.hbs",
-      "isTemplate": true,
-      "description": "GitLab CI/CD pipeline",
-      "conditional": {
-        "cicdTool": "gitlab-ci"
-      }
-    },
-    {
-      "path": ".circleci/config.yml",
-      "template": ".circleci/config.yml.hbs",
-      "isTemplate": true,
-      "description": "CircleCI pipeline configuration",
-      "conditional": {
-        "cicdTool": "circleci"
-      }
-    },
-    {
-      "path": "gradlew",
-      "template": "gradlew",
-      "isTemplate": false,
-      "description": "Gradle wrapper executable script (Unix)"
-    },
-    {
-      "path": "gradlew.bat",
-      "template": "gradlew.bat",
-      "isTemplate": false,
-      "description": "Gradle wrapper executable script (Windows)"
-    },
-    {
-      "path": "gradle/wrapper/gradle-wrapper.jar",
-      "template": "gradle/wrapper/gradle-wrapper.jar",
-      "isTemplate": false,
-      "description": "Gradle wrapper JAR file"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
-      "template": "src/main/java/{{packagePath}}/config/ConfigurationReader.java.hbs",
-      "isTemplate": true,
-      "description": "Type-safe configuration reader for environment properties"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/config/Environment.java",
-      "template": "src/main/java/{{packagePath}}/config/Environment.java.hbs",
-      "isTemplate": true,
-      "description": "Environment enumeration for dev/qa/prod"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/core/DriverManager.java",
-      "template": "src/main/java/{{packagePath}}/core/DriverManager.java.hbs",
-      "isTemplate": true,
-      "description": "Thread-safe WebDriver lifecycle management"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/core/BrowserFactory.java",
-      "template": "src/main/java/{{packagePath}}/core/BrowserFactory.java.hbs",
-      "isTemplate": true,
-      "description": "Browser instantiation with local/remote and headless support"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
-      "template": "src/main/java/{{packagePath}}/core/BaseTest.java.hbs",
-      "isTemplate": true,
-      "description": "Base test class with setup/teardown and common test functionality"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/pages/BasePage.java",
-      "template": "src/main/java/{{packagePath}}/pages/BasePage.java.hbs",
-      "isTemplate": true,
-      "description": "Base page class with common page functionality"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/pages/LoginPage.java",
-      "template": "src/main/java/{{packagePath}}/pages/LoginPage.java.hbs",
-      "isTemplate": true,
-      "description": "Sample login page with POM implementation"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/pages/HomePage.java",
-      "template": "src/main/java/{{packagePath}}/pages/HomePage.java.hbs",
-      "isTemplate": true,
-      "description": "Sample home page with POM implementation"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/WaitUtils.java",
-      "template": "src/main/java/{{packagePath}}/utils/WaitUtils.java.hbs",
-      "isTemplate": true,
-      "description": "Explicit wait utilities for reliable element interactions"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/WebActions.java",
-      "template": "src/main/java/{{packagePath}}/utils/WebActions.java.hbs",
-      "isTemplate": true,
-      "description": "Reusable web interaction methods with built-in waits"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java",
-      "template": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java.hbs",
-      "isTemplate": true,
-      "description": "Screenshot capture utility for test reporting"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
-      "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
-      "isTemplate": true,
-      "description": "CSV and JSON test data reader utility"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
-      "template": "src/main/java/{{packagePath}}/utils/ExtentManager.java.hbs",
-      "isTemplate": true,
-      "description": "ExtentReports configuration and management",
-      "conditional": {
-        "reportingTool": "extent-reports"
-      }
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/Log.java",
-      "template": "src/main/java/{{packagePath}}/utils/Log.java.hbs",
-      "isTemplate": true,
-      "description": "Logger wrapper for consistent logging across the framework"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
-      "template": "src/main/java/{{packagePath}}/listeners/TestListener.java.hbs",
-      "isTemplate": true,
-      "description": "TestNG listener for reporting and screenshot on failure"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java",
-      "template": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java.hbs",
-      "isTemplate": true,
-      "description": "TestNG retry analyzer for handling flaky tests"
-    },
-    {
-      "path": "src/test/java/{{packagePath}}/tests/LoginTests.java",
-      "template": "src/test/java/{{packagePath}}/tests/LoginTests.java.hbs",
-      "isTemplate": true,
-      "description": "Sample login tests with data-driven approach using TestNG"
-    },
-    {
-      "path": "src/main/resources/config/dev.properties",
-      "template": "src/main/resources/config/dev.properties.hbs",
-      "isTemplate": true,
-      "description": "Development environment configuration"
-    },
-    {
-      "path": "src/main/resources/config/qa.properties",
-      "template": "src/main/resources/config/qa.properties.hbs",
-      "isTemplate": true,
-      "description": "QA environment configuration"
-    },
-    {
-      "path": "src/main/resources/config/prod.properties",
-      "template": "src/main/resources/config/prod.properties.hbs",
-      "isTemplate": true,
-      "description": "Production environment configuration"
-    },
-    {
-      "path": "src/main/resources/log4j2.xml",
-      "template": "src/main/resources/log4j2.xml.hbs",
-      "isTemplate": true,
-      "description": "Log4j2 configuration with rolling file appender"
-    },
-    {
-      "path": "src/main/resources/extent-config.xml",
-      "template": "src/main/resources/extent-config.xml.hbs",
-      "isTemplate": true,
-      "description": "ExtentReports configuration",
-      "conditional": {
-        "reportingTool": "extent-reports"
-      }
-    },
-    {
-      "path": "src/main/resources/allure.properties",
-      "template": "src/main/resources/allure.properties.hbs",
-      "isTemplate": true,
-      "description": "Allure Reports configuration",
-      "conditional": {
-        "reportingTool": "allure"
-      }
-    },
-    {
-      "path": "src/test/resources/testng.xml",
-      "template": "src/test/resources/testng.xml.hbs",
-      "isTemplate": true,
-      "description": "TestNG suite configuration"
-    },
-    {
-      "path": "src/test/resources/regression.xml",
-      "template": "src/test/resources/regression.xml.hbs",
-      "isTemplate": true,
-      "description": "TestNG regression test suite configuration"
-    },
-    {
-      "path": "src/test/resources/testdata/users.csv",
-      "template": "src/test/resources/testdata/users.csv.hbs",
-      "isTemplate": true,
-      "description": "Sample CSV test data file"
-    },
-    {
-      "path": "src/test/resources/testdata/sample.json",
-      "template": "src/test/resources/testdata/sample.json.hbs",
-      "isTemplate": true,
-      "description": "Sample JSON test data file"
-    },
-    {
-      "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
-      "isTemplate": true,
-      "description": "Cucumber TestNG runner",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java",
-      "isTemplate": true,
-      "description": "Step definitions for login scenarios",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "src/test/resources/features/Login.feature",
-      "isTemplate": true,
-      "description": "Sample login feature with Gherkin scenarios",
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "Dockerfile",
-      "template": "Dockerfile.hbs",
-      "isTemplate": true,
-      "description": "Docker configuration for containerized testing"
-    },
-    {
-      "path": "docker-compose.yml",
-      "template": "docker-compose.yml.hbs",
-      "isTemplate": true,
-      "description": "Docker Compose for Selenium Grid"
-    }
-  ],
-  "directories": [
-    "reports",
-    "logs"
-  ],
   "supportedCombination": {
     "testingType": "web",
     "framework": "selenium",
@@ -343,8 +15,7 @@
     "reportingTools": [
       "allure",
       "extent-reports",
-      "testng-reports",
-      "junit-reports"
+      "testng-reports"
     ],
     "cicdTools": [
       "jenkins",
@@ -357,5 +28,216 @@
       "page-object-model",
       "bdd"
     ]
-  }
+  },
+  "toolVersions": {
+    "java": "17",
+    "gradle": "8.5",
+    "selenium": "4.27.0",
+    "testng": "7.8.0",
+    "cucumber": "7.15.0"
+  },
+  "files": [
+    {
+      "path": "build.gradle",
+      "isTemplate": true
+    },
+    {
+      "path": "settings.gradle",
+      "isTemplate": true
+    },
+    {
+      "path": "gradle.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/DriverManager.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BrowserFactory.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/BasePage.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/LoginPage.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/Log.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/WaitUtils.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/AllureManager.java",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/LoginTests.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/stepdefinitions/Hooks.java",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/features/Login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/testng.xml",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/dev.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/qa.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/prod.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
+    },
+    {
+      "path": "src/main/resources/allure.properties",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      }
+    }
+  ],
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
 }

@@ -1,144 +1,69 @@
 package {{javaPackage}}.stepdefinitions;
 
-import com.microsoft.playwright.*;
+import {{javaPackage}}.core.PlaywrightManager;
 import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.ScreenshotUtils;
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+import com.aventstack.extentreports.Status;
+import java.util.Base64;
+{{/if}}
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 
-import java.nio.file.Paths;
-
 /**
- * Cucumber hooks for Playwright browser lifecycle management.
- * Handles setup and teardown for BDD scenarios.
+ * Cucumber Hooks - Setup and teardown for BDD scenarios.
  */
 public class Hooks {
-    
-    private static Playwright playwright;
-    private static Browser browser;
-    private BrowserContext context;
-    private Page page;
-    
-    // ThreadLocal for parallel execution
-    private static ThreadLocal<Page> threadLocalPage = new ThreadLocal<>();
-    private static ThreadLocal<BrowserContext> threadLocalContext = new ThreadLocal<>();
-    
-    /**
-     * Get the current page instance
-     * @return Current Page instance
-     */
-    public static Page getPage() {
-        return threadLocalPage.get();
+
+    @Before
+    public void setUp(Scenario scenario) {
+        Log.info("================================================================================");
+        Log.info("SCENARIO: " + scenario.getName());
+        Log.info("================================================================================");
+{{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.getInstance();
+        ExtentManager.createTest(scenario.getName(), String.join(", ", scenario.getSourceTagNames()));
+{{/if}}
+        PlaywrightManager.initializeBrowser();
+        Log.info("Browser initialized for scenario");
     }
-    
-    /**
-     * Setup browser before each scenario
-     * @param scenario Cucumber scenario
-     */
-    @Before(order = 0)
-    public void setupBrowser(Scenario scenario) {
-        Log.info("Setting up browser for scenario: " + scenario.getName());
-        
-        // Initialize Playwright and browser if not already done
-        if (playwright == null) {
-            playwright = Playwright.create();
-        }
-        
-        if (browser == null || !browser.isConnected()) {
-            String browserName = System.getProperty("browser", "chromium");
-            boolean headless = Boolean.parseBoolean(System.getProperty("headless", "true"));
-            
-            BrowserType.LaunchOptions options = new BrowserType.LaunchOptions()
-                    .setHeadless(headless);
-            
-            switch (browserName.toLowerCase()) {
-                case "firefox":
-                    browser = playwright.firefox().launch(options);
-                    break;
-                case "webkit":
-                    browser = playwright.webkit().launch(options);
-                    break;
-                default:
-                    browser = playwright.chromium().launch(options);
+
+    @After
+    public void tearDown(Scenario scenario) {
+        try {
+            if (scenario.isFailed()) {
+                Log.error("Scenario FAILED: " + scenario.getName());
+
+                if (PlaywrightManager.isInitialized()) {
+                    byte[] screenshot = ScreenshotUtils.captureAsBytes();
+                    if (screenshot != null) {
+                        scenario.attach(screenshot, "image/png", "Screenshot on Failure");
+{{#if (eq reportingTool "extent-reports")}}
+                        if (ExtentManager.getTest() != null) {
+                            String base64 = Base64.getEncoder().encodeToString(screenshot);
+                            ExtentManager.getTest().log(Status.FAIL, "Scenario failed");
+                            ExtentManager.getTest().addScreenCaptureFromBase64String(base64, "Screenshot");
+                        }
+{{/if}}
+                    }
+                    ScreenshotUtils.capture("FAILED_" + scenario.getName().replaceAll(" ", "_"));
+                }
+            } else {
+                Log.info("Scenario PASSED: " + scenario.getName());
+{{#if (eq reportingTool "extent-reports")}}
+                if (ExtentManager.getTest() != null) {
+                    ExtentManager.getTest().log(Status.PASS, "Scenario passed");
+                }
+{{/if}}
             }
-            
-            Log.info("Browser launched: " + browserName + " (headless: " + headless + ")");
+        } finally {
+            PlaywrightManager.closeBrowser();
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentManager.flush();
+{{/if}}
+            Log.info("Browser closed");
         }
-        
-        // Create new context and page for each scenario
-        Browser.NewContextOptions contextOptions = new Browser.NewContextOptions()
-                .setViewportSize(1920, 1080)
-                .setIgnoreHTTPSErrors(true);
-        
-        context = browser.newContext(contextOptions);
-        page = context.newPage();
-        
-        threadLocalContext.set(context);
-        threadLocalPage.set(page);
-        
-        Log.info("Browser context and page created for scenario");
-    }
-    
-    /**
-     * Capture screenshot on failure
-     * @param scenario Cucumber scenario
-     */
-    @After(order = 1)
-    public void captureScreenshotOnFailure(Scenario scenario) {
-        if (scenario.isFailed()) {
-            Page currentPage = threadLocalPage.get();
-            if (currentPage != null) {
-                String screenshotName = scenario.getName().replaceAll("[^a-zA-Z0-9]", "_");
-                String screenshotPath = "screenshots/" + screenshotName + "_" + System.currentTimeMillis() + ".png";
-                
-                currentPage.screenshot(new Page.ScreenshotOptions()
-                        .setPath(Paths.get(screenshotPath))
-                        .setFullPage(true));
-                
-                Log.info("Screenshot captured: " + screenshotPath);
-                
-                // Attach screenshot to Cucumber report
-                byte[] screenshot = currentPage.screenshot(new Page.ScreenshotOptions().setFullPage(true));
-                scenario.attach(screenshot, "image/png", screenshotName);
-            }
-        }
-    }
-    
-    /**
-     * Teardown browser after each scenario
-     * @param scenario Cucumber scenario
-     */
-    @After(order = 0)
-    public void teardownBrowser(Scenario scenario) {
-        Log.info("Tearing down browser for scenario: " + scenario.getName() + " - Status: " + scenario.getStatus());
-        
-        // Close page and context
-        Page currentPage = threadLocalPage.get();
-        BrowserContext currentContext = threadLocalContext.get();
-        
-        if (currentPage != null) {
-            currentPage.close();
-            threadLocalPage.remove();
-        }
-        
-        if (currentContext != null) {
-            currentContext.close();
-            threadLocalContext.remove();
-        }
-    }
-    
-    /**
-     * Cleanup resources after all tests
-     */
-    public static void cleanup() {
-        if (browser != null) {
-            browser.close();
-            browser = null;
-        }
-        if (playwright != null) {
-            playwright.close();
-            playwright = null;
-        }
-        Log.info("Browser resources cleaned up");
     }
 }

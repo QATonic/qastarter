@@ -1,55 +1,44 @@
 /**
- * Login Page Object
- * 
- * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
- * 1. Open your app's login page in a browser
- * 2. Right-click on each element → Inspect → Copy selector
- * 3. Replace the placeholder selectors below with your actual selectors
+ * Login Page - Page object for SauceDemo.
  */
-import BasePage from './BasePage';
+import { BasePage } from "./BasePage";
 
-class LoginPage extends BasePage {
-  // ============================================
-  // UPDATE THESE SELECTORS FOR YOUR APPLICATION
-  // ============================================
-  // Tip: Use browser DevTools (F12) to find correct selectors
-  private readonly usernameInput = '#username';           // Your username/email input field
-  private readonly passwordInput = '#password';           // Your password input field
-  private readonly loginButton = 'button[type="submit"]'; // Your login/submit button
-  private readonly errorMessage = '.error-message';       // Error message element
-  private readonly successIndicator = '.dashboard, .home'; // Element visible after successful login
-  // ============================================
+export class LoginPage extends BasePage {
+  // Selectors
+  private usernameField = "#user-name";
+  private passwordField = "#password";
+  private loginButton = "#login-button";
+  private errorMessage = "[data-test='error']";
 
-  visitLoginPage(baseUrl: string): void {
-    // UPDATE: Change '/login' to your actual login page path
-    this.visit(`${baseUrl}/login`);
+  enterUsername(username: string): this {
+    this.type(this.usernameField, username);
+    return this;
   }
 
-  login(username: string, password: string): void {
-    this.type(this.usernameInput, username);
-    this.type(this.passwordInput, password);
+  enterPassword(password: string): this {
+    this.type(this.passwordField, password);
+    return this;
+  }
+
+  clickLogin(): this {
     this.click(this.loginButton);
+    return this;
   }
 
-  verifyLoginSuccess(): void {
-    cy.get(this.successIndicator, { timeout: 10000 }).should('be.visible');
+  login(username: string, password: string): this {
+    this.enterUsername(username);
+    this.enterPassword(password);
+    this.clickLogin();
+    return this;
   }
 
-  verifyErrorDisplayed(): void {
-    cy.get(this.errorMessage).should('be.visible');
+  verifyErrorDisplayed(): this {
+    this.shouldBeVisible(this.errorMessage);
+    return this;
   }
 
-  getErrorMessage(): Cypress.Chainable<string> {
-    return this.getText(this.errorMessage);
-  }
-
-  verifyUsernameVisible(): void {
-    cy.get(this.usernameInput).should('be.visible');
-  }
-
-  verifyPasswordVisible(): void {
-    cy.get(this.passwordInput).should('be.visible');
+  verifyLoginSuccess(): this {
+    cy.url().should("include", "inventory");
+    return this;
   }
 }
-
-export default LoginPage;

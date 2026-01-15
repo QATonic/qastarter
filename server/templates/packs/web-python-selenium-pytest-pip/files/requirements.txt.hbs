@@ -1,33 +1,29 @@
-# Core Testing Dependencies
-selenium=={{toolVersions.selenium}}
-pytest=={{toolVersions.pytest}}
-pytest-xdist=={{toolVersions.pytestXdist}}
+# ==================================================
+# {{projectName}} - Requirements
+# ==================================================
 
-# Reporting Tools (conditional)
+# Core
+selenium>=4.16.0
+pytest>=7.4.0
+pytest-xdist>=3.5.0
+
+# Reporting
 {{#if (eq reportingTool "pytest-html")}}
-pytest-html=={{toolVersions.pytestHtml}}
+pytest-html>=4.1.0
 {{/if}}
 {{#if (eq reportingTool "allure")}}
-allure-pytest=={{toolVersions.allurePytest}}
-{{/if}}
-{{#if (eq reportingTool "pytest-json")}}
-pytest-json-report=={{toolVersions.pytestJson}}
+allure-pytest>=2.13.0
 {{/if}}
 
-# BDD Testing (conditional)
+# BDD
 {{#if (eq testingPattern "bdd")}}
-pytest-bdd=={{toolVersions.pytestBdd}}
+pytest-bdd>=7.0.0
 {{/if}}
 
 # Utilities
-python-dotenv==1.0.0
-Pillow==10.1.0
-openpyxl==3.1.2
-requests==2.31.0
+python-dotenv>=1.0.0
+Pillow>=10.1.0
+PyYAML>=6.0.1
 
 # Logging
-colorlog==6.8.0
-
-# Data Handling
-pandas==2.1.4
-PyYAML==6.0.1
+colorlog>=6.8.0

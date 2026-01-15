@@ -144,7 +144,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </p>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center p-3 bg-background/50 rounded-lg">
-                <div className="text-2xl font-bold text-primary">39+</div>
+                <div className="text-2xl font-bold text-primary">43+</div>
                 <div className="text-xs text-muted-foreground">Templates</div>
               </div>
               <div className="text-center p-3 bg-background/50 rounded-lg">

@@ -1,45 +1,32 @@
-# {{projectName}} - Docker Compose for Playwright Testing
-# Provides containerized browser testing environment
-
 version: '3.8'
 
 services:
-  # Playwright Test Runner
-  playwright-tests:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      - BROWSER=chromium
-      - HEADLESS=true
-      - TEST_ENV=qa
-      - BASE_URL={{#if baseUrl}}{{baseUrl}}{{else}}https://example.com{{/if}}
-    volumes:
-      - ./target:/app/target
-    networks:
-      - playwright-network
-
-  # Run tests with all browsers
-  playwright-all-browsers:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  tests:
+    build: .
     environment:
       - HEADLESS=true
-      - TEST_ENV=qa
-    command: mvn test -Dbrowser=all
+      - BROWSER=chrome
     volumes:
-      - ./target:/app/target
-    networks:
-      - playwright-network
-    profiles:
-      - all-browsers
+      - ./screenshots:/app/screenshots
+      - ./reports:/app/reports
+      - ./logs:/app/logs
 
-networks:
-  playwright-network:
-    driver: bridge
+{{#if (eq framework "selenium")}}
+  # Selenium Grid (optional)
+  selenium-hub:
+    image: selenium/hub:4.16
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
 
-# Usage:
-# Build and run tests: docker-compose up --build playwright-tests
-# Run with specific browser: docker-compose run -e BROWSER=firefox playwright-tests
-# Run all browsers: docker-compose --profile all-browsers up playwright-all-browsers
+  chrome:
+    image: selenium/node-chrome:4.16
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+{{/if}}

@@ -1,1 +1,1 @@
-# Step definitions package
+# Package init

@@ -134,7 +134,7 @@ If you find QAStarter helpful, please consider:
 
 - ⭐ **Starring** the repository
 - 🍴 **Forking** to contribute
-- ☕ **Supporting** on [Ko-fi](https://ko-fi.com/SantoshKarad)
+- ☕ **Supporting** on [Buy Me a Coffee](https://buymeacoffee.com/santoshkarad)
 
 ---
 

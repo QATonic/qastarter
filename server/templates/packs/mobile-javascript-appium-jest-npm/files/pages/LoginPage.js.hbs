@@ -1,0 +1,14 @@
+const { BasePage } = require("./BasePage");
+const { log } = require("../utils/Logger");
+
+class LoginPage extends BasePage {
+  async login(username, password) {
+    log.step(`Login with: ${username}`);
+    await this.type("~test-Username", username);
+    await this.type("~test-Password", password);
+    await this.tap("~test-LOGIN");
+  }
+  async isLoginSuccessful() { return await this.isDisplayed('//android.widget.TextView[@text="PRODUCTS"]'); }
+}
+
+module.exports = { LoginPage };

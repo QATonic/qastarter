@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,10 +13,10 @@
     <description>API Test Automation Framework using REST Assured, TestNG, and Maven</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
+
         <!-- Dependency Versions -->
         <rest-assured.version>5.4.0</rest-assured.version>
         <testng.version>7.8.0</testng.version>
@@ -42,14 +41,14 @@
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
         </dependency>
-        
+
         <!-- REST Assured JSON Path -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>json-path</artifactId>
             <version>${rest-assured.version}</version>
         </dependency>
-        
+
         <!-- REST Assured JSON Schema Validation -->
         <dependency>
             <groupId>io.rest-assured</groupId>
@@ -70,13 +69,13 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -113,7 +112,7 @@
             <artifactId>allure-testng</artifactId>
             <version>${allure.version}</version>
         </dependency>
-        
+
         <!-- Allure REST Assured -->
         <dependency>
             <groupId>io.qameta.allure</groupId>
@@ -129,7 +128,7 @@
             <artifactId>cucumber-java</artifactId>
             <version>${cucumber.version}</version>
         </dependency>
-        
+
         <!-- Cucumber TestNG -->
         <dependency>
             <groupId>io.cucumber</groupId>
@@ -145,7 +144,7 @@
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
@@ -169,8 +168,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler.version}</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>17</source>
+                    <target>17</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

@@ -1,49 +1,31 @@
-using FluentAssertions;
 using NUnit.Framework;
-using {{projectName}}.Core;
-using {{projectName}}.Pages;
+using {{projectNamespace}}.Core;
+using {{projectNamespace}}.Pages;
+using {{projectNamespace}}.Utils;
 
-namespace {{projectName}}.Tests;
-
-// ========== UPDATE THESE VALUES ==========
-// Calculator is used as an example. Replace with your application
-// ==========================================
-
-[TestFixture]
-[Category("Smoke")]
-public class CalculatorTests : BaseTest
+namespace {{projectNamespace}}.Tests
 {
-    // ========== UPDATE THESE VALUES ==========
-    private const string AppPath = "YOUR_APPLICATION_PATH_HERE";
-    // ==========================================
-    
-    private CalculatorPage _calculatorPage = null!;
-
-    [SetUp]
-    public void SetUp()
+    [TestFixture]
+    public class CalculatorTests
     {
-        Driver = DriverFactory.CreateCalculatorDriver();
-        _calculatorPage = new CalculatorPage(Driver);
-    }
+        private CalculatorPage _calc;
 
-    /// <summary>
-    /// Verify basic calculator functionality works correctly.
-    /// 
-    /// BEFORE RUNNING:
-    /// 1. Ensure WinAppDriver is running (default: http://127.0.0.1:4723)
-    /// 2. Configure your app path in Config/WinAppDriverConfig.cs
-    /// 3. Update selectors in Pages/CalculatorPage.cs to match your app
-    /// </summary>
-    [Test]
-    public void Addition_ShouldCalculateCorrectly()
-    {
-        // Step 1: Perform addition: 5 + 3
-        _calculatorPage.Add(5, 3);
-        
-        // Step 2: Get and verify result
-        var result = _calculatorPage.GetResult();
-        result.Should().Contain("8");
-        
-        // Test passed! Your {{framework}} framework is working correctly.
+        [SetUp]
+        public void Setup()
+        {
+            WinAppDriverManager.InitDriver();
+            _calc = new CalculatorPage();
+        }
+
+        [TearDown]
+        public void TearDown() => WinAppDriverManager.QuitDriver();
+
+        [Test, Category("Smoke")]
+        public void TestAddition()
+        {
+            Log.Instance.Step("Test: 2 + 3 = 5");
+            _calc.Add(2, 3);
+            Assert.That(_calc.GetResult(), Does.Contain("5"));
+        }
     }
 }

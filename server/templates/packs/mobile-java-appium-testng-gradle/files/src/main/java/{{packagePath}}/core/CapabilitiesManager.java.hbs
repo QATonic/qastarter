@@ -1,184 +1,122 @@
 package {{packageName}}.core;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import {{packageName}}.config.ConfigurationReader;
 {{#if utilities.logger}}
 import {{packageName}}.utils.Log;
 {{/if}}
 
-import java.io.InputStream;
-import java.util.Iterator;
-import java.util.Map;
+import java.time.Duration;
 
 /**
- * Mobile capabilities management for Android and iOS platforms
- * Loads capabilities from JSON files and environment-specific configurations
- */
+* Mobile capabilities management for Android and iOS platforms
+* Updated for Appium Java Client 9.x - Uses UiAutomator2Options/XCUITestOptions
+*/
 public class CapabilitiesManager {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+/**
+* Get Android options using UiAutomator2Options (Appium 9.x)
+*
+* @return UiAutomator2Options for Android
+*/
+public static UiAutomator2Options getAndroidOptions() {
+UiAutomator2Options options = new UiAutomator2Options();
 
-    /**
-     * Get desired capabilities for the specified platform
-     * 
-     * @param platform The target platform (android/ios)
-     * @return DesiredCapabilities for the platform
-     */
-    public static DesiredCapabilities getCapabilities(String platform) {
-        try {
-            DesiredCapabilities capabilities = new DesiredCapabilities();
-            
-            // Load platform-specific capabilities from JSON
-            loadCapabilitiesFromJson(capabilities, platform);
-            
-            // Override with environment-specific properties
-            overrideFromProperties(capabilities, platform);
-            
-            {{#if utilities.logger}}
-            Log.info("Generated capabilities for " + platform + ": " + capabilities.toString());
-            {{/if}}
-            
-            return capabilities;
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Failed to generate capabilities for platform: " + platform, e);
-            {{/if}}
-            throw new RuntimeException("Failed to create capabilities for platform: " + platform, e);
-        }
-    }
+// Device settings
+String deviceName = ConfigurationReader.getProperty("mobile.android.deviceName", "Android Emulator");
+options.setDeviceName(deviceName);
 
-    /**
-     * Load capabilities from platform-specific JSON file
-     * 
-     * @param capabilities DesiredCapabilities to populate
-     * @param platform The target platform
-     */
-    private static void loadCapabilitiesFromJson(DesiredCapabilities capabilities, String platform) {
-        try {
-            String capabilitiesFile = "/capabilities/" + platform.toLowerCase() + ".json";
-            InputStream inputStream = CapabilitiesManager.class.getResourceAsStream(capabilitiesFile);
-            
-            if (inputStream == null) {
-                {{#if utilities.logger}}
-                Log.warn("Capabilities file not found: " + capabilitiesFile + ". Using default capabilities.");
-                {{/if}}
-                setDefaultCapabilities(capabilities, platform);
-                return;
-            }
+// Platform version (optional)
+String platformVersion = ConfigurationReader.getProperty("mobile.android.platformVersion");
+if (platformVersion != null && !platformVersion.isEmpty()) {
+options.setPlatformVersion(platformVersion);
+}
 
-            JsonNode jsonNode = objectMapper.readTree(inputStream);
-            
-            // Convert JSON to capabilities
-            Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
-            while (fields.hasNext()) {
-                Map.Entry<String, JsonNode> field = fields.next();
-                String key = field.getKey();
-                JsonNode value = field.getValue();
-                
-                if (value.isTextual()) {
-                    capabilities.setCapability(key, value.asText());
-                } else if (value.isBoolean()) {
-                    capabilities.setCapability(key, value.asBoolean());
-                } else if (value.isNumber()) {
-                    capabilities.setCapability(key, value.asInt());
-                }
-            }
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Error loading capabilities from JSON for platform: " + platform, e);
-            {{/if}}
-            setDefaultCapabilities(capabilities, platform);
-        }
-    }
+// UDID (optional for device identification)
+String udid = ConfigurationReader.getProperty("mobile.android.udid");
+if (udid != null && !udid.isEmpty()) {
+options.setUdid(udid);
+}
 
-    /**
-     * Override capabilities with environment-specific properties
-     * 
-     * @param capabilities DesiredCapabilities to modify
-     * @param platform The target platform
-     */
-    private static void overrideFromProperties(DesiredCapabilities capabilities, String platform) {
-        String prefix = "mobile." + platform.toLowerCase() + ".";
-        
-        // Common mobile capabilities that can be overridden
-        String[] overrideKeys = {
-            "platformName", "platformVersion", "deviceName", "udid",
-            "app", "appPackage", "appActivity", "bundleId",
-            "automationName", "newCommandTimeout", "noReset", "fullReset"
-        };
-        
-        for (String key : overrideKeys) {
-            String propertyKey = prefix + key;
-            String value = ConfigurationReader.getProperty(propertyKey);
-            
-            if (value != null && !value.isEmpty()) {
-                // Convert string values to appropriate types
-                Object capability = parseCapabilityValue(value);
-                capabilities.setCapability(key, capability);
-                {{#if utilities.logger}}
-                Log.debug("Overriding capability " + key + " with value: " + value);
-                {{/if}}
-            }
-        }
-    }
+// App settings
+String app = ConfigurationReader.getProperty("mobile.android.app");
+if (app != null && !app.isEmpty()) {
+options.setApp(app);
+}
 
-    /**
-     * Set default capabilities when JSON file is not available
-     * 
-     * @param capabilities DesiredCapabilities to populate
-     * @param platform The target platform
-     */
-    private static void setDefaultCapabilities(DesiredCapabilities capabilities, String platform) {
-        switch (platform.toLowerCase()) {
-            case "android":
-                capabilities.setCapability("platformName", "Android");
-                capabilities.setCapability("automationName", "UiAutomator2");
-                capabilities.setCapability("deviceName", "Android Emulator");
-                capabilities.setCapability("newCommandTimeout", 300);
-                capabilities.setCapability("noReset", true);
-                break;
-                
-            case "ios":
-                capabilities.setCapability("platformName", "iOS");
-                capabilities.setCapability("automationName", "XCUITest");
-                capabilities.setCapability("deviceName", "iPhone Simulator");
-                capabilities.setCapability("newCommandTimeout", 300);
-                capabilities.setCapability("noReset", true);
-                break;
-                
-            default:
-                throw new IllegalArgumentException("Unsupported platform: " + platform);
-        }
-        
-        {{#if utilities.logger}}
-        Log.info("Using default capabilities for platform: " + platform);
-        {{/if}}
-    }
+String appPackage = ConfigurationReader.getProperty("mobile.android.appPackage");
+if (appPackage != null && !appPackage.isEmpty()) {
+options.setAppPackage(appPackage);
+}
 
-    /**
-     * Parse capability value to appropriate type
-     * 
-     * @param value String value to parse
-     * @return Parsed value as appropriate type
-     */
-    private static Object parseCapabilityValue(String value) {
-        // Boolean values
-        if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
-            return Boolean.parseBoolean(value);
-        }
-        
-        // Integer values
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException ignored) {
-            // Not an integer, continue
-        }
-        
-        // Return as string
-        return value;
-    }
+String appActivity = ConfigurationReader.getProperty("mobile.android.appActivity");
+if (appActivity != null && !appActivity.isEmpty()) {
+options.setAppActivity(appActivity);
+}
+
+// Reset behavior
+boolean noReset = Boolean.parseBoolean(ConfigurationReader.getProperty("mobile.android.noReset", "true"));
+options.setNoReset(noReset);
+
+// Timeouts
+int commandTimeout = Integer.parseInt(ConfigurationReader.getProperty("mobile.android.newCommandTimeout", "300"));
+options.setNewCommandTimeout(Duration.ofSeconds(commandTimeout));
+
+{{#if utilities.logger}}
+Log.info("Android options configured for device: " + deviceName);
+{{/if}}
+
+return options;
+}
+
+/**
+* Get iOS options using XCUITestOptions (Appium 9.x)
+*
+* @return XCUITestOptions for iOS
+*/
+public static XCUITestOptions getIOSOptions() {
+XCUITestOptions options = new XCUITestOptions();
+
+// Device settings
+String deviceName = ConfigurationReader.getProperty("mobile.ios.deviceName", "iPhone Simulator");
+options.setDeviceName(deviceName);
+
+// Platform version
+String platformVersion = ConfigurationReader.getProperty("mobile.ios.platformVersion");
+if (platformVersion != null && !platformVersion.isEmpty()) {
+options.setPlatformVersion(platformVersion);
+}
+
+// UDID
+String udid = ConfigurationReader.getProperty("mobile.ios.udid");
+if (udid != null && !udid.isEmpty()) {
+options.setUdid(udid);
+}
+
+// App settings
+String app = ConfigurationReader.getProperty("mobile.ios.app");
+if (app != null && !app.isEmpty()) {
+options.setApp(app);
+}
+
+String bundleId = ConfigurationReader.getProperty("mobile.ios.bundleId");
+if (bundleId != null && !bundleId.isEmpty()) {
+options.setBundleId(bundleId);
+}
+
+// Reset behavior
+boolean noReset = Boolean.parseBoolean(ConfigurationReader.getProperty("mobile.ios.noReset", "true"));
+options.setNoReset(noReset);
+
+// Timeouts
+int commandTimeout = Integer.parseInt(ConfigurationReader.getProperty("mobile.ios.newCommandTimeout", "300"));
+options.setNewCommandTimeout(Duration.ofSeconds(commandTimeout));
+
+{{#if utilities.logger}}
+Log.info("iOS options configured for device: " + deviceName);
+{{/if}}
+
+return options;
+}
 }

@@ -1,39 +1,49 @@
+"""
+Logger - Consistent logging with timestamps.
+Logs saved to: logs/api_test_{timestamp}.log
+"""
 import logging
-import sys
+import os
+from datetime import datetime
 from pathlib import Path
-from config.settings import settings
 
 
-def setup_logger(name: str = "api_tests") -> logging.Logger:
-    """Configure and return logger instance."""
-    logger = logging.getLogger(name)
-    logger.setLevel(getattr(logging, settings.LOG_LEVEL))
+class Logger:
+    _instance = None
+    _logger = None
     
-    # Remove existing handlers
-    logger.handlers.clear()
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._setup_logger()
+        return cls._instance
     
-    # Console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.INFO)
-    console_format = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    console_handler.setFormatter(console_format)
-    logger.addHandler(console_handler)
+    def _setup_logger(self):
+        self._logger = logging.getLogger("APITest")
+        self._logger.setLevel(logging.DEBUG)
+        self._logger.handlers.clear()
+        
+        # Create logs directory
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
+        
+        # File handler with timestamp
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_handler = logging.FileHandler(logs_dir / f"api_test_{timestamp}.log")
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s"))
+        
+        # Console handler
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+        
+        self._logger.addHandler(file_handler)
+        self._logger.addHandler(console_handler)
     
-    # File handler
-    log_file = Path(settings.LOG_FILE)
-    log_file.parent.mkdir(parents=True, exist_ok=True)
-    
-    file_handler = logging.FileHandler(log_file)
-    file_handler.setLevel(logging.DEBUG)
-    file_format = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
-    )
-    file_handler.setFormatter(file_format)
-    logger.addHandler(file_handler)
-    
-    return logger
+    def info(self, message: str): self._logger.info(message)
+    def error(self, message: str): self._logger.error(message)
+    def step(self, message: str): self._logger.info(f"STEP: {message}")
 
 
-logger = setup_logger()
+log = Logger()

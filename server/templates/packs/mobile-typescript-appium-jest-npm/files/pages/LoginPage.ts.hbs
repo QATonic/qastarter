@@ -1,0 +1,20 @@
+import { BasePage } from "./BasePage";
+import { log } from "../utils/Logger";
+
+export class LoginPage extends BasePage {
+  private usernameField = '~test-Username';
+  private passwordField = '~test-Password';
+  private loginButton = '~test-LOGIN';
+  private productsTitle = '//android.widget.TextView[@text="PRODUCTS"]';
+
+  async login(username: string, password: string): Promise<void> {
+    log.step(`Login with: ${username}`);
+    await this.type(this.usernameField, username);
+    await this.type(this.passwordField, password);
+    await this.tap(this.loginButton);
+  }
+
+  async isLoginSuccessful(): Promise<boolean> {
+    return await this.isDisplayed(this.productsTitle);
+  }
+}

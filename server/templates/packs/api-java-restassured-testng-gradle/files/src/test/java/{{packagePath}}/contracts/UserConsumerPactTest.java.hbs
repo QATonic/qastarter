@@ -1,0 +1,140 @@
+package {{groupId}}.contracts;
+
+import au.com.dius.pact.consumer.MockServer;
+import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
+import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
+import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.V4Pact;
+import au.com.dius.pact.core.model.annotations.Pact;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonBody;
+import static au.com.dius.pact.consumer.dsl.LambdaDsl.newJsonArray;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+* Pact Consumer Contract Tests - User Service
+*
+* Contract tests for the User API from the consumer perspective.
+* These tests define the expected interactions with the provider.
+*/
+@ExtendWith(PactConsumerTestExt.class)
+@PactTestFor(providerName = "UserService")
+public class UserConsumerPactTest {
+
+@Pact(consumer = "{{projectName}}Consumer")
+public V4Pact getAllUsersPact(PactDslWithProvider builder) {
+return builder
+.given("users exist")
+.uponReceiving("a request for all users")
+.path("/users")
+.method("GET")
+.headers("Accept", "application/json")
+.willRespondWith()
+.status(200)
+.headers(java.util.Map.of("Content-Type", "application/json"))
+.body(newJsonArray(array -> {
+array.object(user -> {
+user.integerType("id", 1);
+user.stringType("name", "John Doe");
+user.stringMatcher("email", "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", "john@example.com");
+user.stringType("createdAt", "2024-01-01T00:00:00Z");
+});
+}).build())
+.toPact(V4Pact.class);
+}
+
+@Pact(consumer = "{{projectName}}Consumer")
+public V4Pact getUserByIdPact(PactDslWithProvider builder) {
+return builder
+.given("user with ID 1 exists")
+.uponReceiving("a request for user 1")
+.path("/users/1")
+.method("GET")
+.headers("Accept", "application/json")
+.willRespondWith()
+.status(200)
+.headers(java.util.Map.of("Content-Type", "application/json"))
+.body(newJsonBody(user -> {
+user.integerType("id", 1);
+user.stringType("name", "John Doe");
+user.stringMatcher("email", "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$", "john@example.com");
+user.stringType("createdAt", "2024-01-01T00:00:00Z");
+}).build())
+.toPact(V4Pact.class);
+}
+
+@Pact(consumer = "{{projectName}}Consumer")
+public V4Pact userNotFoundPact(PactDslWithProvider builder) {
+return builder
+.given("user with ID 999 does not exist")
+.uponReceiving("a request for non-existent user")
+.path("/users/999")
+.method("GET")
+.headers("Accept", "application/json")
+.willRespondWith()
+.status(404)
+.headers(java.util.Map.of("Content-Type", "application/json"))
+.body(newJsonBody(error -> {
+error.stringType("error", "User not found");
+error.stringType("code", "NOT_FOUND");
+}).build())
+.toPact(V4Pact.class);
+}
+
+@Test
+@PactTestFor(pactMethod = "getAllUsersPact")
+void testGetAllUsers(MockServer mockServer) {
+Response response = RestAssured
+.given()
+.baseUri(mockServer.getUrl())
+.header("Accept", "application/json")
+.when()
+.get("/users")
+.then()
+.statusCode(200)
+.body("$", hasSize(greaterThan(0)))
+.body("[0].id", notNullValue())
+.body("[0].name", notNullValue())
+.body("[0].email", notNullValue())
+.extract()
+.response();
+
+assertNotNull(response);
+}
+
+@Test
+@PactTestFor(pactMethod = "getUserByIdPact")
+void testGetUserById(MockServer mockServer) {
+RestAssured
+.given()
+.baseUri(mockServer.getUrl())
+.header("Accept", "application/json")
+.when()
+.get("/users/1")
+.then()
+.statusCode(200)
+.body("id", equalTo(1))
+.body("name", notNullValue())
+.body("email", matchesPattern("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$"));
+}
+
+@Test
+@PactTestFor(pactMethod = "userNotFoundPact")
+void testUserNotFound(MockServer mockServer) {
+RestAssured
+.given()
+.baseUri(mockServer.getUrl())
+.header("Accept", "application/json")
+.when()
+.get("/users/999")
+.then()
+.statusCode(404)
+.body("error", equalTo("User not found"))
+.body("code", equalTo("NOT_FOUND"));
+}
+}

@@ -1,143 +1,46 @@
-package {{packageName}}.utils;
+package {{javaPackage}}.utils;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
- * Logger wrapper for consistent logging across API automation framework
- * Provides convenient methods for different log levels
+ * Logger - Consistent logging with timestamps.
+ * Logs saved to: logs/api_test_{timestamp}.log
  */
 public class Log {
 
-    private static final Logger logger = LogManager.getLogger(Log.class);
+    private static final String LOG_DIR = "logs";
+    private static PrintWriter logWriter;
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    /**
-     * Log info message
-     * 
-     * @param message Info message
-     */
-    public static void info(String message) {
-        logger.info(message);
+    static {
+        try {
+            new File(LOG_DIR).mkdirs();
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+            String logFile = LOG_DIR + "/api_test_" + timestamp + ".log";
+            logWriter = new PrintWriter(new FileWriter(logFile, true));
+            System.out.println("[Log] File: " + logFile);
+        } catch (Exception e) {
+            System.err.println("[Log] Failed to create log file: " + e.getMessage());
+        }
     }
 
-    /**
-     * Log debug message
-     * 
-     * @param message Debug message
-     */
-    public static void debug(String message) {
-        logger.debug(message);
+    private static void log(String level, String message) {
+        String timestamp = dateFormat.format(new Date());
+        String logLine = String.format("%s | %-8s | %s", timestamp, level, message);
+        System.out.println(logLine);
+        if (logWriter != null) {
+            logWriter.println(logLine);
+            logWriter.flush();
+        }
     }
 
-    /**
-     * Log warning message
-     * 
-     * @param message Warning message
-     */
-    public static void warn(String message) {
-        logger.warn(message);
-    }
-
-    /**
-     * Log error message
-     * 
-     * @param message Error message
-     */
-    public static void error(String message) {
-        logger.error(message);
-    }
-
-    /**
-     * Log error message with exception
-     * 
-     * @param message Error message
-     * @param throwable Exception details
-     */
-    public static void error(String message, Throwable throwable) {
-        logger.error(message, throwable);
-    }
-
-    /**
-     * Log fatal message
-     * 
-     * @param message Fatal message
-     */
-    public static void fatal(String message) {
-        logger.fatal(message);
-    }
-
-    /**
-     * Log fatal message with exception
-     * 
-     * @param message Fatal message
-     * @param throwable Exception details
-     */
-    public static void fatal(String message, Throwable throwable) {
-        logger.fatal(message, throwable);
-    }
-
-    /**
-     * Start test logging
-     * 
-     * @param testName Name of the test starting
-     */
-    public static void startTest(String testName) {
-        info("========== STARTING API TEST: " + testName + " ==========");
-    }
-
-    /**
-     * End test logging
-     * 
-     * @param testName Name of the test ending
-     */
-    public static void endTest(String testName) {
-        info("========== ENDING API TEST: " + testName + " ==========");
-    }
-
-    /**
-     * Log step information
-     * 
-     * @param stepDescription Description of the test step
-     */
-    public static void step(String stepDescription) {
-        info("STEP: " + stepDescription);
-    }
-
-    /**
-     * Log action information
-     * 
-     * @param action Description of the action being performed
-     */
-    public static void action(String action) {
-        info("ACTION: " + action);
-    }
-
-    /**
-     * Log verification information
-     * 
-     * @param verification Description of the verification being performed
-     */
-    public static void verification(String verification) {
-        info("VERIFICATION: " + verification);
-    }
-
-    /**
-     * Log API request details
-     * 
-     * @param method HTTP method
-     * @param endpoint API endpoint
-     */
-    public static void request(String method, String endpoint) {
-        info("API REQUEST: " + method + " " + endpoint);
-    }
-
-    /**
-     * Log API response details
-     * 
-     * @param statusCode Response status code
-     * @param responseTime Response time in milliseconds
-     */
-    public static void response(int statusCode, long responseTime) {
-        info("API RESPONSE: Status " + statusCode + " in " + responseTime + "ms");
-    }
+    public static void info(String message) { log("INFO", message); }
+    public static void debug(String message) { log("DEBUG", message); }
+    public static void warn(String message) { log("WARN", message); }
+    public static void error(String message) { log("ERROR", message); }
+    public static void step(String message) { log("STEP", message); }
 }

@@ -1,148 +1,27 @@
-package {{packageName}}.core;
+package {{javaPackage}}.core;
 
-import org.testng.annotations.*;
-import {{packageName}}.config.ConfigurationReader;
-{{#if utilities.logger}}
-import {{packageName}}.utils.Log;
-{{/if}}
-{{#if utilities.screenshotUtility}}
-import {{packageName}}.utils.ScreenshotUtils;
-{{/if}}
-{{#if (includes reporting "extent-reports")}}
-import {{packageName}}.utils.ExtentManager;
-{{/if}}
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import {{javaPackage}}.utils.Log;
 
 /**
- * Base test class for mobile automation
- * Provides setup/teardown functionality and common test utilities
+ * Base Test - Common setup for all mobile tests.
  */
 public class BaseTest {
 
-    protected static String platform;
-    protected static String environment;
-
-    @BeforeMethod(alwaysRun = true)
-    @Parameters({"platform", "environment"})
-    public void setUp(@Optional("android") String testPlatform, 
-                      @Optional("qa") String testEnvironment) {
-        try {
-            platform = testPlatform;
-            environment = testEnvironment;
-            
-            {{#if utilities.logger}}
-            Log.info("Starting test setup for platform: " + platform + ", environment: " + environment);
-            {{/if}}
-            
-            // Set environment system property for configuration reader
-            System.setProperty("test.environment", environment);
-            
-            // Initialize mobile driver
-            DriverManager.initializeDriver(platform);
-            
-            {{#if utilities.logger}}
-            Log.info("Test setup completed successfully");
-            {{/if}}
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Failed to setup test", e);
-            {{/if}}
-            throw new RuntimeException("Test setup failed", e);
-        }
+    @BeforeMethod
+    public void setup() {
+        Log.info("========================================");
+        Log.info("Mobile Test Started");
+        Log.info("========================================");
+        AppiumManager.initDriver();
     }
 
-    @AfterMethod(alwaysRun = true)
-    public void tearDown() {
-        try {
-            {{#if utilities.logger}}
-            Log.info("Starting test teardown");
-            {{/if}}
-            
-            // Terminate driver
-            DriverManager.terminateDriver();
-            
-            {{#if utilities.logger}}
-            Log.info("Test teardown completed successfully");
-            {{/if}}
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Error during test teardown", e);
-            {{/if}}
-        }
+    @AfterMethod
+    public void teardown() {
+        AppiumManager.quitDriver();
+        Log.info("========================================");
+        Log.info("Mobile Test Completed");
+        Log.info("========================================");
     }
-
-    {{#if (includes reporting "extent-reports")}}
-    @BeforeSuite(alwaysRun = true)
-    public void beforeSuite() {
-        ExtentManager.initializeExtentReports();
-        {{#if utilities.logger}}
-        Log.info("ExtentReports initialized for test suite");
-        {{/if}}
-    }
-
-    @AfterSuite(alwaysRun = true)
-    public void afterSuite() {
-        ExtentManager.flushReports();
-        {{#if utilities.logger}}
-        Log.info("ExtentReports flushed and reports generated");
-        {{/if}}
-    }
-    {{/if}}
-
-    /**
-     * Get the current test platform
-     * 
-     * @return platform name (android/ios)
-     */
-    protected String getPlatform() {
-        return platform;
-    }
-
-    /**
-     * Get the current test environment
-     * 
-     * @return environment name (dev/qa/prod)
-     */
-    protected String getEnvironment() {
-        return environment;
-    }
-
-    /**
-     * Check if running on Android platform
-     * 
-     * @return true if running on Android, false otherwise
-     */
-    protected boolean isAndroid() {
-        return "android".equalsIgnoreCase(platform);
-    }
-
-    /**
-     * Check if running on iOS platform
-     * 
-     * @return true if running on iOS, false otherwise
-     */
-    protected boolean isIOS() {
-        return "ios".equalsIgnoreCase(platform);
-    }
-
-    {{#if utilities.screenshotUtility}}
-    /**
-     * Take screenshot with default naming
-     * 
-     * @param testName Name of the test
-     */
-    protected void takeScreenshot(String testName) {
-        ScreenshotUtils.takeScreenshot(testName);
-    }
-
-    /**
-     * Take screenshot on test failure
-     * 
-     * @param testName Name of the failed test
-     */
-    protected void takeScreenshotOnFailure(String testName) {
-        ScreenshotUtils.takeScreenshot(testName + "_FAILED");
-    }
-    {{/if}}
 }

@@ -1,39 +1,30 @@
+"""
+User Model - Data class for JSONPlaceholder /users endpoint.
+"""
 from dataclasses import dataclass
 from typing import Optional
 
 
 @dataclass
 class User:
-    """User data model."""
-    
+    """User model for /users endpoint."""
+    name: str
+    username: str
+    email: str
     id: Optional[int] = None
-    name: Optional[str] = None
-    username: Optional[str] = None
-    email: Optional[str] = None
     phone: Optional[str] = None
     website: Optional[str] = None
     
+    def to_dict(self) -> dict:
+        return {k: v for k, v in self.__dict__.items() if v is not None}
+    
     @classmethod
     def from_dict(cls, data: dict) -> "User":
-        """Create User from dictionary."""
         return cls(
             id=data.get("id"),
-            name=data.get("name"),
-            username=data.get("username"),
-            email=data.get("email"),
+            name=data.get("name", ""),
+            username=data.get("username", ""),
+            email=data.get("email", ""),
             phone=data.get("phone"),
             website=data.get("website")
         )
-    
-    def to_dict(self) -> dict:
-        """Convert User to dictionary."""
-        return {
-            k: v for k, v in {
-                "id": self.id,
-                "name": self.name,
-                "username": self.username,
-                "email": self.email,
-                "phone": self.phone,
-                "website": self.website
-            }.items() if v is not None
-        }

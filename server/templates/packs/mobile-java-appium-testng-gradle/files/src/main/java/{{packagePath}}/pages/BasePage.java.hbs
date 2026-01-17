@@ -1,251 +1,54 @@
-package {{packageName}}.pages;
+package {{javaPackage}}.pages;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.PageFactory;
-import {{packageName}}.core.DriverManager;
-import {{packageName}}.utils.MobileWaitUtils;
-import {{packageName}}.utils.MobileActions;
-{{#if utilities.logger}}
-import {{packageName}}.utils.Log;
-{{/if}}
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import {{javaPackage}}.core.AppiumManager;
+import {{javaPackage}}.config.ConfigReader;
+import {{javaPackage}}.utils.Log;
 
 import java.time.Duration;
 
 /**
- * Base page class for mobile Page Object Model
- * Provides common functionality for all mobile page objects
+ * Base Page - Common mobile actions for all pages.
  */
-public abstract class BasePage {
+public class BasePage {
 
     protected AppiumDriver driver;
+    protected WebDriverWait wait;
 
-    /**
-     * Constructor - initializes page elements using PageFactory
-     */
     public BasePage() {
-        this.driver = DriverManager.getDriver();
-        PageFactory.initElements(new AppiumFieldDecorator(driver, Duration.ofSeconds(10)), this);
+        this.driver = AppiumManager.getDriver();
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getImplicitWait()));
     }
 
-    /**
-     * Wait for element to be visible and return it
-     * 
-     * @param locator Element locator
-     * @return Visible WebElement
-     */
-    protected WebElement waitForElement(By locator) {
-        return MobileWaitUtils.waitForElementToBeVisible(locator);
+    protected void tap(By locator) {
+        Log.info("Tap: " + locator);
+        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
-    /**
-     * Wait for element to be clickable and return it
-     * 
-     * @param locator Element locator
-     * @return Clickable WebElement
-     */
-    protected WebElement waitForClickableElement(By locator) {
-        return MobileWaitUtils.waitForElementToBeClickable(locator);
+    protected void type(By locator, String text) {
+        Log.info("Type: " + text + " into " + locator);
+        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        element.clear();
+        element.sendKeys(text);
     }
 
-    /**
-     * Safe click on element with wait
-     * 
-     * @param locator Element locator
-     */
-    protected void clickElement(By locator) {
+    protected String getText(By locator) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
+    }
+
+    protected boolean isDisplayed(By locator) {
         try {
-            WebElement element = waitForClickableElement(locator);
-            element.click();
-            {{#if utilities.logger}}
-            Log.info("Clicked on element: " + locator.toString());
-            {{/if}}
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).isDisplayed();
         } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Failed to click on element: " + locator.toString(), e);
-            {{/if}}
-            throw new RuntimeException("Click failed on element: " + locator.toString(), e);
-        }
-    }
-
-    /**
-     * Safe click on WebElement
-     * 
-     * @param element WebElement to click
-     */
-    protected void clickElement(WebElement element) {
-        try {
-            element.click();
-            {{#if utilities.logger}}
-            Log.info("Clicked on element: " + element.toString());
-            {{/if}}
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Failed to click on element: " + element.toString(), e);
-            {{/if}}
-            throw new RuntimeException("Click failed on element", e);
-        }
-    }
-
-    /**
-     * Send text to element with wait
-     * 
-     * @param locator Element locator
-     * @param text Text to send
-     */
-    protected void sendTextToElement(By locator, String text) {
-        try {
-            WebElement element = waitForElement(locator);
-            element.clear();
-            element.sendKeys(text);
-            {{#if utilities.logger}}
-            Log.info("Sent text '" + text + "' to element: " + locator.toString());
-            {{/if}}
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Failed to send text to element: " + locator.toString(), e);
-            {{/if}}
-            throw new RuntimeException("Send text failed: " + locator.toString(), e);
-        }
-    }
-
-    /**
-     * Send text to WebElement
-     * 
-     * @param element WebElement
-     * @param text Text to send
-     */
-    protected void sendTextToElement(WebElement element, String text) {
-        try {
-            element.clear();
-            element.sendKeys(text);
-            {{#if utilities.logger}}
-            Log.info("Sent text '" + text + "' to element");
-            {{/if}}
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Failed to send text to element", e);
-            {{/if}}
-            throw new RuntimeException("Send text failed", e);
-        }
-    }
-
-    /**
-     * Get text from element
-     * 
-     * @param locator Element locator
-     * @return Element text
-     */
-    protected String getElementText(By locator) {
-        try {
-            WebElement element = waitForElement(locator);
-            String text = element.getText();
-            {{#if utilities.logger}}
-            Log.info("Got text '" + text + "' from element: " + locator.toString());
-            {{/if}}
-            return text;
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Failed to get text from element: " + locator.toString(), e);
-            {{/if}}
-            throw new RuntimeException("Get text failed: " + locator.toString(), e);
-        }
-    }
-
-    /**
-     * Check if element is displayed
-     * 
-     * @param locator Element locator
-     * @return true if element is displayed, false otherwise
-     */
-    protected boolean isElementDisplayed(By locator) {
-        try {
-            WebElement element = driver.findElement(locator);
-            boolean isDisplayed = element.isDisplayed();
-            {{#if utilities.logger}}
-            Log.debug("Element display status: " + isDisplayed + " for: " + locator.toString());
-            {{/if}}
-            return isDisplayed;
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.debug("Element not found or not displayed: " + locator.toString());
-            {{/if}}
             return false;
         }
     }
 
-    /**
-     * Check if element is enabled
-     * 
-     * @param locator Element locator
-     * @return true if element is enabled, false otherwise
-     */
-    protected boolean isElementEnabled(By locator) {
-        try {
-            WebElement element = waitForElement(locator);
-            boolean isEnabled = element.isEnabled();
-            {{#if utilities.logger}}
-            Log.debug("Element enabled status: " + isEnabled + " for: " + locator.toString());
-            {{/if}}
-            return isEnabled;
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.debug("Element not found or not enabled: " + locator.toString());
-            {{/if}}
-            return false;
-        }
+    protected void waitForElement(By locator) {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
-
-    /**
-     * Perform swipe up gesture
-     */
-    protected void swipeUp() {
-        MobileActions.swipeUp();
-    }
-
-    /**
-     * Perform swipe down gesture
-     */
-    protected void swipeDown() {
-        MobileActions.swipeDown();
-    }
-
-    /**
-     * Perform swipe left gesture
-     */
-    protected void swipeLeft() {
-        MobileActions.swipeLeft();
-    }
-
-    /**
-     * Perform swipe right gesture
-     */
-    protected void swipeRight() {
-        MobileActions.swipeRight();
-    }
-
-    /**
-     * Hide mobile keyboard
-     */
-    protected void hideKeyboard() {
-        MobileActions.hideKeyboard();
-    }
-
-    /**
-     * Abstract method to verify page is loaded
-     * Must be implemented by each page class
-     * 
-     * @return true if page is loaded, false otherwise
-     */
-    public abstract boolean isPageLoaded();
-
-    /**
-     * Get page title or identifying text
-     * Must be implemented by each page class
-     * 
-     * @return Page title or identifying text
-     */
-    public abstract String getPageTitle();
 }

@@ -1,309 +1,49 @@
-package {{packageName}}.core;
+package {{javaPackage}}.core;
 
 import io.restassured.response.Response;
-import org.hamcrest.Matchers;
-import org.testng.Assert;
-import {{packageName}}.utils.JSONUtils;
-{{#if utilities.logger}}
-import {{packageName}}.utils.Log;
-{{/if}}
-
-import java.util.List;
-import java.util.Map;
-
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static org.hamcrest.Matchers.*;
+import {{javaPackage}}.utils.Log;
+import static org.testng.Assert.*;
 
 /**
- * Response validator for REST API responses
- * Provides comprehensive validation methods for API responses
+ * Response Validator - Common assertions for API responses.
+ * 
+ * Usage:
+ *   ResponseValidator.assertStatus(response, 200);
+ *   ResponseValidator.assertBodyContains(response, "id");
  */
 public class ResponseValidator {
 
-    /**
-     * Validate response status code
-     * 
-     * @param response API response
-     * @param expectedStatusCode Expected HTTP status code
-     */
-    public void validateStatusCode(Response response, int expectedStatusCode) {
-        int actualStatusCode = response.getStatusCode();
-        
-        {{#if utilities.logger}}
-        Log.info("Validating status code. Expected: " + expectedStatusCode + ", Actual: " + actualStatusCode);
-        {{/if}}
-        
-        Assert.assertEquals(actualStatusCode, expectedStatusCode, 
-                          "Status code validation failed. Expected: " + expectedStatusCode + 
-                          ", but got: " + actualStatusCode);
+    public static void assertStatus(Response response, int expectedStatus) {
+        int actualStatus = response.getStatusCode();
+        Log.info("Asserting status: expected=" + expectedStatus + ", actual=" + actualStatus);
+        assertEquals(actualStatus, expectedStatus, "Status code mismatch");
     }
 
-    /**
-     * Validate response status code is in success range (200-299)
-     * 
-     * @param response API response
-     */
-    public void validateSuccessStatusCode(Response response) {
-        int statusCode = response.getStatusCode();
-        
-        {{#if utilities.logger}}
-        Log.info("Validating success status code: " + statusCode);
-        {{/if}}
-        
-        Assert.assertTrue(statusCode >= 200 && statusCode < 300, 
-                         "Expected success status code (200-299), but got: " + statusCode);
+    public static void assertBodyContains(Response response, String key) {
+        String body = response.getBody().asString();
+        Log.info("Asserting body contains key: " + key);
+        assertTrue(body.contains(key), "Response body should contain: " + key);
     }
 
-    /**
-     * Validate response header
-     * 
-     * @param response API response
-     * @param headerName Header name
-     * @param expectedValue Expected header value
-     */
-    public void validateHeader(Response response, String headerName, String expectedValue) {
-        String actualValue = response.getHeader(headerName);
-        
-        {{#if utilities.logger}}
-        Log.info("Validating header '" + headerName + "'. Expected: " + expectedValue + ", Actual: " + actualValue);
-        {{/if}}
-        
-        Assert.assertEquals(actualValue, expectedValue, 
-                          "Header validation failed for '" + headerName + "'. Expected: " + expectedValue + 
-                          ", but got: " + actualValue);
+    public static void assertBodyNotEmpty(Response response) {
+        String body = response.getBody().asString();
+        Log.info("Asserting body is not empty");
+        assertFalse(body.isEmpty(), "Response body should not be empty");
     }
 
-    /**
-     * Validate response header exists
-     * 
-     * @param response API response
-     * @param headerName Header name
-     */
-    public void validateHeaderExists(Response response, String headerName) {
-        String headerValue = response.getHeader(headerName);
-        
-        {{#if utilities.logger}}
-        Log.info("Validating header '" + headerName + "' exists: " + (headerValue != null));
-        {{/if}}
-        
-        Assert.assertNotNull(headerValue, "Header '" + headerName + "' should exist in response");
+    public static <T> T extractAs(Response response, Class<T> clazz) {
+        return response.as(clazz);
     }
 
-    /**
-     * Validate response content type
-     * 
-     * @param response API response
-     * @param expectedContentType Expected content type
-     */
-    public void validateContentType(Response response, String expectedContentType) {
-        String actualContentType = response.getContentType();
-        
-        {{#if utilities.logger}}
-        Log.info("Validating content type. Expected: " + expectedContentType + ", Actual: " + actualContentType);
-        {{/if}}
-        
-        Assert.assertTrue(actualContentType.contains(expectedContentType), 
-                         "Content type validation failed. Expected to contain: " + expectedContentType + 
-                         ", but got: " + actualContentType);
+    public static <T> T[] extractAsArray(Response response, Class<T[]> clazz) {
+        return response.as(clazz);
     }
 
-    /**
-     * Validate JSON response field value
-     * 
-     * @param response API response
-     * @param jsonPath JSON path expression
-     * @param expectedValue Expected field value
-     */
-    public void validateJsonField(Response response, String jsonPath, Object expectedValue) {
-        Object actualValue = response.jsonPath().get(jsonPath);
-        
-        {{#if utilities.logger}}
-        Log.info("Validating JSON field '" + jsonPath + "'. Expected: " + expectedValue + ", Actual: " + actualValue);
-        {{/if}}
-        
-        Assert.assertEquals(actualValue, expectedValue, 
-                          "JSON field validation failed for '" + jsonPath + "'. Expected: " + expectedValue + 
-                          ", but got: " + actualValue);
+    public static String extractValue(Response response, String jsonPath) {
+        return response.jsonPath().getString(jsonPath);
     }
 
-    /**
-     * Validate JSON response field exists
-     * 
-     * @param response API response
-     * @param jsonPath JSON path expression
-     */
-    public void validateJsonFieldExists(Response response, String jsonPath) {
-        Object value = response.jsonPath().get(jsonPath);
-        
-        {{#if utilities.logger}}
-        Log.info("Validating JSON field '" + jsonPath + "' exists: " + (value != null));
-        {{/if}}
-        
-        Assert.assertNotNull(value, "JSON field '" + jsonPath + "' should exist in response");
-    }
-
-    /**
-     * Validate JSON response field is not empty
-     * 
-     * @param response API response
-     * @param jsonPath JSON path expression
-     */
-    public void validateJsonFieldNotEmpty(Response response, String jsonPath) {
-        Object value = response.jsonPath().get(jsonPath);
-        
-        {{#if utilities.logger}}
-        Log.info("Validating JSON field '" + jsonPath + "' is not empty: " + value);
-        {{/if}}
-        
-        Assert.assertNotNull(value, "JSON field '" + jsonPath + "' should not be null");
-        
-        if (value instanceof String) {
-            Assert.assertFalse(((String) value).isEmpty(), "JSON field '" + jsonPath + "' should not be empty");
-        } else if (value instanceof List) {
-            Assert.assertFalse(((List<?>) value).isEmpty(), "JSON array '" + jsonPath + "' should not be empty");
-        } else if (value instanceof Map) {
-            Assert.assertFalse(((Map<?, ?>) value).isEmpty(), "JSON object '" + jsonPath + "' should not be empty");
-        }
-    }
-
-    /**
-     * Validate JSON array size
-     * 
-     * @param response API response
-     * @param jsonPath JSON path to array
-     * @param expectedSize Expected array size
-     */
-    public void validateJsonArraySize(Response response, String jsonPath, int expectedSize) {
-        List<?> array = response.jsonPath().getList(jsonPath);
-        int actualSize = array != null ? array.size() : 0;
-        
-        {{#if utilities.logger}}
-        Log.info("Validating JSON array '" + jsonPath + "' size. Expected: " + expectedSize + ", Actual: " + actualSize);
-        {{/if}}
-        
-        Assert.assertEquals(actualSize, expectedSize, 
-                          "JSON array size validation failed for '" + jsonPath + "'. Expected: " + expectedSize + 
-                          ", but got: " + actualSize);
-    }
-
-    /**
-     * Validate JSON response against schema
-     * 
-     * @param response API response
-     * @param schemaPath Path to JSON schema file in resources
-     */
-    public void validateJsonSchema(Response response, String schemaPath) {
-        {{#if utilities.logger}}
-        Log.info("Validating JSON response against schema: " + schemaPath);
-        {{/if}}
-        
-        try {
-            response.then().assertThat().body(matchesJsonSchemaInClasspath(schemaPath));
-            
-            {{#if utilities.logger}}
-            Log.info("JSON schema validation passed for: " + schemaPath);
-            {{/if}}
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("JSON schema validation failed for: " + schemaPath, e);
-            {{/if}}
-            Assert.fail("JSON schema validation failed: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Validate response time is within limit
-     * 
-     * @param response API response
-     * @param maxResponseTime Maximum acceptable response time in milliseconds
-     */
-    public void validateResponseTime(Response response, long maxResponseTime) {
-        long actualResponseTime = response.getTime();
-        
-        {{#if utilities.logger}}
-        Log.info("Validating response time. Expected: <" + maxResponseTime + "ms, Actual: " + actualResponseTime + "ms");
-        {{/if}}
-        
-        Assert.assertTrue(actualResponseTime <= maxResponseTime, 
-                         "Response time validation failed. Expected: <" + maxResponseTime + 
-                         "ms, but got: " + actualResponseTime + "ms");
-    }
-
-    /**
-     * Validate response body contains specific text
-     * 
-     * @param response API response
-     * @param expectedText Expected text in response body
-     */
-    public void validateResponseContains(Response response, String expectedText) {
-        String responseBody = response.getBody().asString();
-        
-        {{#if utilities.logger}}
-        Log.info("Validating response contains text: " + expectedText);
-        {{/if}}
-        
-        Assert.assertTrue(responseBody.contains(expectedText), 
-                         "Response body should contain: " + expectedText);
-    }
-
-    /**
-     * Validate response body does not contain specific text
-     * 
-     * @param response API response
-     * @param unexpectedText Text that should not be in response body
-     */
-    public void validateResponseDoesNotContain(Response response, String unexpectedText) {
-        String responseBody = response.getBody().asString();
-        
-        {{#if utilities.logger}}
-        Log.info("Validating response does not contain text: " + unexpectedText);
-        {{/if}}
-        
-        Assert.assertFalse(responseBody.contains(unexpectedText), 
-                          "Response body should not contain: " + unexpectedText);
-    }
-
-    /**
-     * Validate response is valid JSON
-     * 
-     * @param response API response
-     */
-    public void validateValidJson(Response response) {
-        {{#if utilities.logger}}
-        Log.info("Validating response is valid JSON");
-        {{/if}}
-        
-        try {
-            response.then().assertThat().contentType(containsString("application/json"));
-            // Try to parse as JSON to validate structure
-            JSONUtils.jsonToObject(response.getBody().asString(), Map.class);
-            
-            {{#if utilities.logger}}
-            Log.info("Response is valid JSON");
-            {{/if}}
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Response is not valid JSON", e);
-            {{/if}}
-            Assert.fail("Response is not valid JSON: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Validate multiple JSON fields at once
-     * 
-     * @param response API response
-     * @param expectedValues Map of JSON paths to expected values
-     */
-    public void validateMultipleJsonFields(Response response, Map<String, Object> expectedValues) {
-        {{#if utilities.logger}}
-        Log.info("Validating multiple JSON fields: " + expectedValues.keySet());
-        {{/if}}
-        
-        for (Map.Entry<String, Object> entry : expectedValues.entrySet()) {
-            validateJsonField(response, entry.getKey(), entry.getValue());
-        }
+    public static int extractIntValue(Response response, String jsonPath) {
+        return response.jsonPath().getInt(jsonPath);
     }
 }

@@ -1,0 +1,5 @@
+{
+  "baseUrl": "https://jsonplaceholder.typicode.com",
+  "timeout": 30,
+  "contentType": "application/json"
+}

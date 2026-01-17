@@ -1,0 +1,33 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using {{projectNamespace}}.Core;
+using {{projectNamespace}}.Utils;
+
+namespace {{projectNamespace}}.Pages
+{
+    public class BasePage
+    {
+        protected IWebDriver Driver => AppiumManager.Driver;
+        protected WebDriverWait Wait => new(Driver, TimeSpan.FromSeconds(10));
+
+        protected void Tap(By locator)
+        {
+            Log.Instance.Info($"Tap: {locator}");
+            Wait.Until(d => d.FindElement(locator)).Click();
+        }
+
+        protected void Type(By locator, string text)
+        {
+            Log.Instance.Info($"Type: {text}");
+            var element = Wait.Until(d => d.FindElement(locator));
+            element.Clear();
+            element.SendKeys(text);
+        }
+
+        protected bool IsDisplayed(By locator)
+        {
+            try { return Wait.Until(d => d.FindElement(locator)).Displayed; }
+            catch { return false; }
+        }
+    }
+}

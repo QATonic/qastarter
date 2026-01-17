@@ -1,0 +1,27 @@
+"""
+Login Page - SauceDemo Mobile app login screen.
+"""
+from appium.webdriver.common.appiumby import AppiumBy
+from pages.base_page import BasePage
+from utils.logger import log
+
+
+class LoginPage(BasePage):
+    # Android locators
+    USERNAME_FIELD = (AppiumBy.ACCESSIBILITY_ID, "test-Username")
+    PASSWORD_FIELD = (AppiumBy.ACCESSIBILITY_ID, "test-Password")
+    LOGIN_BUTTON = (AppiumBy.ACCESSIBILITY_ID, "test-LOGIN")
+    ERROR_MESSAGE = (AppiumBy.XPATH, "//android.widget.TextView[contains(@text, 'Username')]")
+    PRODUCTS_TITLE = (AppiumBy.XPATH, "//android.widget.TextView[@text='PRODUCTS']")
+    
+    def login(self, username: str, password: str):
+        log.step(f"Login with: {username}")
+        self.type_text(self.USERNAME_FIELD, username)
+        self.type_text(self.PASSWORD_FIELD, password)
+        self.tap(self.LOGIN_BUTTON)
+    
+    def is_error_displayed(self) -> bool:
+        return self.is_displayed(self.ERROR_MESSAGE)
+    
+    def is_login_successful(self) -> bool:
+        return self.is_displayed(self.PRODUCTS_TITLE)

@@ -1,0 +1,28 @@
+const { remote } = require("webdriverio");
+const { config } = require("../config/ConfigReader");
+const { log } = require("../utils/Logger");
+
+class AppiumManager {
+  static driver = null;
+
+  static async getDriver() { return this.driver; }
+
+  static async initDriver() {
+    log.info(`Initializing Appium driver for: ${config.platform}`);
+    const capabilities = {
+      platformName: config.platform,
+      "appium:deviceName": config.deviceName,
+      "appium:app": config.appPath,
+      "appium:automationName": config.platform === "ios" ? "XCUITest" : "UiAutomator2",
+    };
+    this.driver = await remote({ hostname: "127.0.0.1", port: 4723, capabilities });
+    log.info("Appium driver initialized");
+    return this.driver;
+  }
+
+  static async quitDriver() {
+    if (this.driver) { await this.driver.deleteSession(); this.driver = null; }
+  }
+}
+
+module.exports = { AppiumManager };

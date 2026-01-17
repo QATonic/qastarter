@@ -1,88 +1,27 @@
-package {{groupId}}.tests
+package {{packageName}}.tests
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import {{groupId}}.MainActivity
-import {{groupId}}.screens.LoginScreen
-import {{groupId}}.screens.HomeScreen
+import {{packageName}}.MainActivity
+import {{packageName}}.pages.LoginPage
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
 
-/**
-* Login test suite.
-* Tests various login scenarios.
-*/
 @RunWith(AndroidJUnit4::class)
-@LargeTest
 class LoginTests {
 
-@get:Rule
-val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    @get:Rule
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
 
-companion object {
-private const val VALID_USERNAME = "testuser"
-private const val VALID_PASSWORD = "password123"
-private const val INVALID_USERNAME = "wronguser"
-private const val INVALID_PASSWORD = "wrongpassword"
-}
-
-@Test
-fun loginScreen_shouldBeDisplayed() {
-LoginScreen()
-.verifyScreenDisplayed()
-}
-
-@Test
-fun loginWithValidCredentials_shouldSucceed() {
-LoginScreen()
-.loginWith(VALID_USERNAME, VALID_PASSWORD)
-
-HomeScreen()
-.verifyUserLoggedIn()
-}
-
-@Test
-fun loginWithInvalidUsername_shouldShowError() {
-LoginScreen()
-.loginWith(INVALID_USERNAME, VALID_PASSWORD)
-.verifyErrorMessage("Invalid credentials")
-}
-
-@Test
-fun loginWithInvalidPassword_shouldShowError() {
-LoginScreen()
-.loginWith(VALID_USERNAME, INVALID_PASSWORD)
-.verifyErrorMessage("Invalid credentials")
-}
-
-@Test
-fun loginWithEmptyUsername_shouldShowError() {
-LoginScreen()
-.enterPassword(VALID_PASSWORD)
-.clickLogin()
-.verifyErrorMessage("Username is required")
-}
-
-@Test
-fun loginWithEmptyPassword_shouldShowError() {
-LoginScreen()
-.enterUsername(VALID_USERNAME)
-.clickLogin()
-.verifyErrorMessage("Password is required")
-}
-
-@Test
-fun logoutAfterLogin_shouldReturnToLoginScreen() {
-LoginScreen()
-.loginWith(VALID_USERNAME, VALID_PASSWORD)
-
-HomeScreen()
-.verifyUserLoggedIn()
-.clickLogout()
-
-LoginScreen()
-.verifyScreenDisplayed()
-}
+    @Test
+    fun validLogin_showsProducts() {
+        val loginPage = LoginPage()
+        loginPage.login("standard_user", "secret_sauce")
+        
+        onView(withText("PRODUCTS")).check(matches(isDisplayed()))
+    }
 }

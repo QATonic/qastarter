@@ -1,0 +1,34 @@
+using Microsoft.Extensions.Configuration;
+
+namespace {{projectNamespace}}.Config
+{
+    /// <summary>
+    /// Configuration Reader - Load API environment settings.
+    /// </summary>
+    public class ConfigReader
+    {
+        private static readonly Lazy<ConfigReader> _instance = new(() => new ConfigReader());
+        private readonly IConfiguration _config;
+
+        public static ConfigReader Instance => _instance.Value;
+
+        public string BaseUrl => Get("BaseUrl", "https://jsonplaceholder.typicode.com");
+        public int Timeout => GetInt("Timeout", 30);
+        public string ContentType => Get("ContentType", "application/json");
+
+        private ConfigReader()
+        {
+            var env = Environment.GetEnvironmentVariable("ENV") ?? "dev";
+            _config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile($"appsettings.{env}.json", optional: true)
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+            Console.WriteLine($"[Config] Environment: {env}, Base URL: {BaseUrl}");
+        }
+
+        private string Get(string key, string defaultValue) => _config[key] ?? defaultValue;
+        private int GetInt(string key, int defaultValue) => int.TryParse(_config[key], out var v) ? v : defaultValue;
+    }
+}

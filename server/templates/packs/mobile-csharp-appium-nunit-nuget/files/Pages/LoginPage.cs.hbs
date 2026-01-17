@@ -1,0 +1,24 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
+using {{projectNamespace}}.Utils;
+
+namespace {{projectNamespace}}.Pages
+{
+    public class LoginPage : BasePage
+    {
+        private By UsernameField = MobileBy.AccessibilityId("test-Username");
+        private By PasswordField = MobileBy.AccessibilityId("test-Password");
+        private By LoginButton = MobileBy.AccessibilityId("test-LOGIN");
+        private By ProductsTitle = By.XPath("//android.widget.TextView[@text='PRODUCTS']");
+
+        public void Login(string username, string password)
+        {
+            Log.Instance.Step($"Login with: {username}");
+            Type(UsernameField, username);
+            Type(PasswordField, password);
+            Tap(LoginButton);
+        }
+
+        public bool IsLoginSuccessful() => IsDisplayed(ProductsTitle);
+    }
+}

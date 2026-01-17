@@ -1,0 +1,51 @@
+"""
+Config Reader - Load API environment settings.
+
+Usage:
+    from config.config_reader import config
+    base_url = config.base_url
+"""
+import os
+from configparser import ConfigParser
+from pathlib import Path
+
+
+class ConfigReader:
+    """Configuration reader for API tests."""
+    
+    def __init__(self):
+        self.env = os.getenv("ENV", "dev")
+        self._config = ConfigParser()
+        self._load_config()
+    
+    def _load_config(self):
+        config_file = Path(__file__).parent / f"{self.env}.ini"
+        if config_file.exists():
+            self._config.read(config_file)
+            print(f"[Config] Loaded: {config_file}")
+        else:
+            print(f"[Config] Using defaults - {config_file} not found")
+    
+    def get(self, key: str, default: str = "") -> str:
+        env_value = os.getenv(key.upper().replace(".", "_"))
+        if env_value:
+            return env_value
+        try:
+            return self._config.get("api", key)
+        except:
+            return default
+    
+    @property
+    def base_url(self) -> str:
+        return self.get("base_url", "https://jsonplaceholder.typicode.com")
+    
+    @property
+    def timeout(self) -> int:
+        return int(self.get("timeout", "30"))
+    
+    @property
+    def content_type(self) -> str:
+        return self.get("content_type", "application/json")
+
+
+config = ConfigReader()

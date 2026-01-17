@@ -1,0 +1,21 @@
+const fs = require("fs");
+const path = require("path");
+
+class Logger {
+  constructor() {
+    this.logDir = "logs";
+    if (!fs.existsSync(this.logDir)) fs.mkdirSync(this.logDir, { recursive: true });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    this.logFile = path.join(this.logDir, `mobile_test_${timestamp}.log`);
+  }
+  write(level, message) {
+    const logLine = `${new Date().toISOString()} | ${level.padEnd(8)} | ${message}`;
+    console.log(logLine);
+    fs.appendFileSync(this.logFile, logLine + "\n");
+  }
+  info(message) { this.write("INFO", message); }
+  step(message) { this.write("STEP", message); }
+}
+
+const log = new Logger();
+module.exports = { log };

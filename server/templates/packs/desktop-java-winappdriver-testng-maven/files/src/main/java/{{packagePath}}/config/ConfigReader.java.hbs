@@ -1,0 +1,49 @@
+package {{javaPackage}}.config;
+
+import java.io.InputStream;
+import java.util.Properties;
+
+/**
+ * Configuration Reader - Load WinAppDriver settings.
+ */
+public class ConfigReader {
+
+    private static Properties properties;
+    private static final String ENV = System.getProperty("env", "dev");
+
+    static {
+        loadProperties();
+    }
+
+    private static void loadProperties() {
+        properties = new Properties();
+        String configFile = "config/" + ENV + ".properties";
+        
+        try (InputStream input = ConfigReader.class.getClassLoader().getResourceAsStream(configFile)) {
+            if (input != null) {
+                properties.load(input);
+                System.out.println("[Config] Loaded: " + configFile);
+            }
+        } catch (Exception e) {
+            System.err.println("[Config] Error: " + e.getMessage());
+        }
+    }
+
+    public static String get(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    // WinAppDriver Server
+    public static String getWinAppDriverUrl() {
+        return get("winappdriver.url", "http://127.0.0.1:4723");
+    }
+
+    // App
+    public static String getAppPath() {
+        return get("app.path", "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App");
+    }
+
+    public static int getImplicitWait() {
+        return Integer.parseInt(get("implicit.wait", "10"));
+    }
+}

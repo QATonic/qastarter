@@ -1,0 +1,42 @@
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Android;
+using OpenQA.Selenium.Appium.iOS;
+using {{projectNamespace}}.Config;
+using {{projectNamespace}}.Utils;
+
+namespace {{projectNamespace}}.Core
+{
+    public class AppiumManager
+    {
+        private static AppiumDriver _driver;
+
+        public static AppiumDriver Driver => _driver ?? throw new InvalidOperationException("Driver not initialized");
+
+        public static void InitDriver()
+        {
+            var config = ConfigReader.Instance;
+            Log.Instance.Info($"Initializing Appium driver for: {config.Platform}");
+
+            var options = new AppiumOptions();
+            options.PlatformName = config.Platform;
+            options.DeviceName = config.DeviceName;
+            options.App = config.AppPath;
+            options.AutomationName = config.Platform.ToLower() == "ios" ? "XCUITest" : "UiAutomator2";
+
+            var serverUri = new Uri("http://127.0.0.1:4723");
+            
+            _driver = config.Platform.ToLower() == "ios" 
+                ? new IOSDriver(serverUri, options)
+                : new AndroidDriver(serverUri, options);
+
+            Log.Instance.Info("Appium driver initialized");
+        }
+
+        public static void QuitDriver()
+        {
+            _driver?.Quit();
+            _driver = null;
+            Log.Instance.Info("Appium driver closed");
+        }
+    }
+}

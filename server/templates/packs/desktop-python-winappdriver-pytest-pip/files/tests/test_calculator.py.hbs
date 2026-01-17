@@ -1,33 +1,18 @@
-"""
-Sample Windows desktop test with single positive test case
-"""
 import pytest
 from pages.calculator_page import CalculatorPage
+from utils.logger import log
 
-# ========== UPDATE THESE VALUES ==========
-# Calculator is used as an example. Replace with your application
-APP_PATH = "YOUR_APPLICATION_PATH_HERE"
-# ==========================================
-
-
-@pytest.mark.smoke
 class TestCalculator:
-    def test_addition(self, calculator_driver):
-        """
-        Verify basic calculator functionality works correctly.
-        
-        BEFORE RUNNING:
-        1. Ensure WinAppDriver is running (default: http://127.0.0.1:4723)
-        2. Configure your app path in config/winappdriver_config.py
-        3. Update selectors in pages/calculator_page.py to match your app
-        """
-        calculator = CalculatorPage(calculator_driver)
-        
-        # Step 1: Perform addition: 5 + 3
-        calculator.add(5, 3)
-        
-        # Step 2: Get and verify result
-        result = calculator.get_result()
-        assert "8" in result
-        
-        # Test passed! Your {{framework}} framework is working correctly.
+    @pytest.mark.smoke
+    def test_addition(self, driver):
+        log.step("Test addition: 2 + 3 = 5")
+        calc = CalculatorPage()
+        calc.add(2, 3)
+        result = calc.get_result()
+        assert "5" in result
+
+$requirements = @'
+Appium-Python-Client>=3.1.0
+selenium>=4.16.0
+pytest>=7.4.0
+python-dotenv>=1.0.0

@@ -1,0 +1,21 @@
+# GraphQL API Testing - Dockerfile
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+RUN npm ci
+
+# Copy application
+COPY . .
+
+# Build TypeScript
+RUN npm run build 2>/dev/null || true
+
+# Environment variables
+ENV NODE_ENV=test
+ENV TEST_ENV=qa
+
+# Run tests
+CMD ["npm", "test"]

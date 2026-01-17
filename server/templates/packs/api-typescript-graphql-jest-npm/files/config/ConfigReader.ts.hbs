@@ -1,0 +1,12 @@
+/**
+ * Config Reader for GraphQL API.
+ */
+import * as dotenv from "dotenv";
+dotenv.config();
+
+export const apiConfig = {
+  baseUrl: process.env.GRAPHQL_URL || "https://spacex-production.up.railway.app/",
+  timeout: parseInt(process.env.TIMEOUT || "30") * 1000,
+};
+
+console.log(`[Config] GraphQL Endpoint: ${apiConfig.baseUrl}`);

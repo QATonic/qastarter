@@ -1,13 +1,15 @@
 # {{projectName}} - Desktop Automation Framework
 
-A comprehensive Windows desktop application testing framework built with **WinAppDriver + Java + TestNG + Maven**. This framework provides robust automation capabilities for Windows desktop applications with built-in reporting, screenshot capture, and comprehensive utilities.
+A comprehensive Windows desktop application testing framework built with **WinAppDriver + Java + TestNG + Maven**. This
+framework provides robust automation capabilities for Windows desktop applications with built-in reporting, screenshot
+capture, and comprehensive utilities.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 - **Windows 10/11** (WinAppDriver requirement)
-- **Java 11+** installed and configured
+- **Java 17+** installed and configured
 - **Maven 3.6+** installed
 - **WinAppDriver** installed and running
 - **Visual Studio Code** or **IntelliJ IDEA** (recommended)
@@ -17,12 +19,12 @@ A comprehensive Windows desktop application testing framework built with **WinAp
 1. **Download WinAppDriver** from [Microsoft GitHub Repository](https://github.com/Microsoft/WinAppDriver/releases)
 2. **Install WinAppDriver** with administrator privileges
 3. **Enable Developer Mode** on Windows:
-   - Go to Settings → Update & Security → For developers
-   - Select "Developer mode"
+- Go to Settings → Update & Security → For developers
+- Select "Developer mode"
 4. **Start WinAppDriver** before running tests:
-   ```cmd
-   WinAppDriver.exe
-   ```
+```cmd
+WinAppDriver.exe
+```
 
 ### Running Tests
 
@@ -48,50 +50,50 @@ mvn test -Dsurefire.suiteXmlFiles=src/test/resources/regression-tests.xml
 ```
 {{artifactId}}/
 ├── src/
-│   ├── main/java/{{packagePath}}/
-│   │   ├── core/                    # Core framework components
-│   │   │   ├── DriverManager.java   # WinAppDriver lifecycle management
-│   │   │   ├── DesktopDriverFactory.java # Driver factory for applications
-│   │   │   ├── BaseTest.java        # Base test class with setup/teardown
-│   │   │   └── CapabilitiesManager.java # Desktop capabilities configuration
-│   │   ├── pages/                   # Page Object Model classes
-│   │   │   ├── BasePage.java        # Base page with common functionality
-│   │   │   ├── CalculatorPage.java  # Calculator application POM
-│   │   │   └── NotepadPage.java     # Notepad application POM
-│   │   ├── utils/                   # Utility classes
-│   │   │   ├── WindowsUtils.java    # Windows-specific operations
-│   │   │   ├── ElementWaitUtils.java # Desktop element waiting
-│   │   │   ├── DesktopActions.java  # Desktop interactions & shortcuts
-│   │   │   ├── ScreenshotUtils.java # Screenshot capture utilities
-│   │   │   ├── Log.java             # Logging wrapper
-│   │   │   └── ExtentManager.java   # ExtentReports management
-│   │   ├── config/                  # Configuration management
-│   │   │   ├── ConfigurationReader.java # Properties file reader
-│   │   │   └── Environment.java     # Environment enumeration
-│   │   └── listeners/               # TestNG listeners
-│   │       ├── TestListener.java    # Test lifecycle listener
-│   │       └── RetryAnalyzer.java   # Automatic retry for flaky tests
-│   ├── main/resources/
-│   │   ├── config/                  # Environment configurations
-│   │   │   ├── dev.properties       # Development environment
-│   │   │   ├── qa.properties        # QA environment
-│   │   │   └── prod.properties      # Production environment
-│   │   ├── log4j2.xml              # Logging configuration
-│   │   └── extent-config.xml       # ExtentReports styling
-│   ├── test/java/{{packagePath}}/
-│   │   └── tests/                   # Test classes
-│   │       ├── CalculatorTests.java # Calculator application tests
-│   │       ├── NotepadTests.java    # Notepad application tests
-│   │       └── WindowsIntegrationTests.java # System integration tests
-│   └── test/resources/
-│       ├── testng.xml              # Default test suite
-│       ├── desktop-tests.xml       # Full desktop test suite
-│       └── regression-tests.xml    # Regression test suite
-├── screenshots/                     # Test screenshots (auto-generated)
-├── reports/                        # ExtentReports (auto-generated)
-├── logs/                           # Application logs (auto-generated)
-├── Jenkinsfile                     # CI/CD pipeline configuration
-└── README.md                       # This file
+│ ├── main/java/{{packagePath}}/
+│ │ ├── core/ # Core framework components
+│ │ │ ├── DriverManager.java # WinAppDriver lifecycle management
+│ │ │ ├── DesktopDriverFactory.java # Driver factory for applications
+│ │ │ ├── BaseTest.java # Base test class with setup/teardown
+│ │ │ └── CapabilitiesManager.java # Desktop capabilities configuration
+│ │ ├── pages/ # Page Object Model classes
+│ │ │ ├── BasePage.java # Base page with common functionality
+│ │ │ ├── CalculatorPage.java # Calculator application POM
+│ │ │ └── NotepadPage.java # Notepad application POM
+│ │ ├── utils/ # Utility classes
+│ │ │ ├── WindowsUtils.java # Windows-specific operations
+│ │ │ ├── ElementWaitUtils.java # Desktop element waiting
+│ │ │ ├── DesktopActions.java # Desktop interactions & shortcuts
+│ │ │ ├── ScreenshotUtils.java # Screenshot capture utilities
+│ │ │ ├── Log.java # Logging wrapper
+│ │ │ └── ExtentManager.java # ExtentReports management
+│ │ ├── config/ # Configuration management
+│ │ │ ├── ConfigurationReader.java # Properties file reader
+│ │ │ └── Environment.java # Environment enumeration
+│ │ └── listeners/ # TestNG listeners
+│ │ ├── TestListener.java # Test lifecycle listener
+│ │ └── RetryAnalyzer.java # Automatic retry for flaky tests
+│ ├── main/resources/
+│ │ ├── config/ # Environment configurations
+│ │ │ ├── dev.properties # Development environment
+│ │ │ ├── qa.properties # QA environment
+│ │ │ └── prod.properties # Production environment
+│ │ ├── log4j2.xml # Logging configuration
+│ │ └── extent-config.xml # ExtentReports styling
+│ ├── test/java/{{packagePath}}/
+│ │ └── tests/ # Test classes
+│ │ ├── CalculatorTests.java # Calculator application tests
+│ │ ├── NotepadTests.java # Notepad application tests
+│ │ └── WindowsIntegrationTests.java # System integration tests
+│ └── test/resources/
+│ ├── testng.xml # Default test suite
+│ ├── desktop-tests.xml # Full desktop test suite
+│ └── regression-tests.xml # Regression test suite
+├── screenshots/ # Test screenshots (auto-generated)
+├── reports/ # ExtentReports (auto-generated)
+├── logs/ # Application logs (auto-generated)
+├── Jenkinsfile # CI/CD pipeline configuration
+└── README.md # This file
 ```
 
 ## 🧪 Test Examples
@@ -100,10 +102,10 @@ mvn test -Dsurefire.suiteXmlFiles=src/test/resources/regression-tests.xml
 ```java
 @Test(description = "Verify basic addition calculation")
 public void testBasicAddition() {
-    // Perform calculation: 5 + 3 = 8
-    String result = calculatorPage.performCalculation(5, "+", 3);
-    Assert.assertTrue(calculatorPage.verifyResult("8"), 
-                     "Addition result should be 8");
+// Perform calculation: 5 + 3 = 8
+String result = calculatorPage.performCalculation(5, "+", 3);
+Assert.assertTrue(calculatorPage.verifyResult("8"),
+"Addition result should be 8");
 }
 ```
 
@@ -111,11 +113,11 @@ public void testBasicAddition() {
 ```java
 @Test(description = "Verify basic text typing functionality")
 public void testBasicTextTyping() {
-    // Type and verify text
-    Assert.assertTrue(notepadPage.typeText("Sample text"), 
-                     "Should type sample text successfully");
-    Assert.assertTrue(notepadPage.verifyTextContains("Sample text"), 
-                     "Notepad should contain the typed text");
+// Type and verify text
+Assert.assertTrue(notepadPage.typeText("Sample text"),
+"Should type sample text successfully");
+Assert.assertTrue(notepadPage.verifyTextContains("Sample text"),
+"Notepad should contain the typed text");
 }
 ```
 
@@ -123,10 +125,10 @@ public void testBasicTextTyping() {
 ```java
 @Test(description = "Verify Windows process management utilities")
 public void testProcessManagement() {
-    // Check running processes
-    boolean calcRunning = WindowsUtils.isProcessRunning("Calculator.exe");
-    var processes = WindowsUtils.getRunningProcesses();
-    Assert.assertFalse(processes.isEmpty(), "Should retrieve running processes");
+// Check running processes
+boolean calcRunning = WindowsUtils.isProcessRunning("Calculator.exe");
+var processes = WindowsUtils.getRunningProcesses();
+Assert.assertFalse(processes.isEmpty(), "Should retrieve running processes");
 }
 ```
 
@@ -161,7 +163,7 @@ Customize test execution in TestNG XML files:
 <suite name="Desktop Tests" parallel="false" thread-count="1">
     <test name="Calculator Tests">
         <classes>
-            <class name="{{groupId}}.tests.CalculatorTests"/>
+            <class name="{{groupId}}.tests.CalculatorTests" />
         </classes>
     </test>
 </suite>
@@ -192,15 +194,15 @@ Customize test execution in TestNG XML files:
 ### Page Object Model (POM)
 ```java
 public class CalculatorPage extends BasePage {
-    private final By buttonAdd = By.name("Plus");
-    
-    public boolean clickAdd() {
-        return clickElement(buttonAdd);
-    }
-    
-    public String performCalculation(int first, String op, int second) {
-        // Implementation with proper error handling
-    }
+private final By buttonAdd = By.name("Plus");
+
+public boolean clickAdd() {
+return clickElement(buttonAdd);
+}
+
+public String performCalculation(int first, String op, int second) {
+// Implementation with proper error handling
+}
 }
 ```
 
@@ -214,8 +216,8 @@ boolean textAppeared = ElementWaitUtils.waitForElementText(locator, "Expected", 
 
 // Custom wait conditions
 Result result = ElementWaitUtils.waitForCustomCondition(driver -> {
-    // Custom logic
-    return someCondition() ? result : null;
+// Custom logic
+return someCondition() ? result : null;
 }, 20);
 ```
 
@@ -272,28 +274,28 @@ GENERATE_REPORTS=true
 ### Common Issues
 
 1. **WinAppDriver Not Running**
-   ```
-   Error: Unable to connect to WinAppDriver
-   Solution: Start WinAppDriver.exe before running tests
-   ```
+```
+Error: Unable to connect to WinAppDriver
+Solution: Start WinAppDriver.exe before running tests
+```
 
 2. **Element Not Found**
-   ```
-   Error: NoSuchElementException
-   Solution: Check element locators and wait conditions
-   ```
+```
+Error: NoSuchElementException
+Solution: Check element locators and wait conditions
+```
 
 3. **Permission Issues**
-   ```
-   Error: Access denied
-   Solution: Run as Administrator or check Windows permissions
-   ```
+```
+Error: Access denied
+Solution: Run as Administrator or check Windows permissions
+```
 
 4. **Application Launch Failed**
-   ```
-   Error: Application not found
-   Solution: Verify application paths in configuration
-   ```
+```
+Error: Application not found
+Solution: Verify application paths in configuration
+```
 
 ### Debug Mode
 Enable debug logging:

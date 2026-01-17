@@ -1,0 +1,29 @@
+# Robot Framework Web Testing - Dockerfile
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install Chrome and dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    gnupg \
+    curl \
+    chromium \
+    chromium-driver \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy Robot Framework tests
+COPY . .
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1
+ENV TEST_ENV=qa
+ENV BROWSER=chrome
+ENV HEADLESS=true
+
+# Run Robot Framework tests
+CMD ["robot", "--outputdir", "results", "tests/"]

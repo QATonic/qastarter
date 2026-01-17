@@ -1,0 +1,184 @@
+/**
+* gRPC API Tests - Sample tests for gRPC service testing.
+*
+* This template uses grpc-js for Node.js gRPC client implementation.
+* Modify the proto files and service details for your specific API.
+*
+* Run: npm test
+*/
+import { log } from "../utils/Logger";
+import { config } from "../config/ConfigReader";
+
+describe("gRPC API Tests", () => {
+
+beforeAll(() => {
+log.info("Initializing gRPC test suite");
+});
+
+describe("Connection Tests", () => {
+test("gRPC client configuration is valid", () => {
+log.step("Verify gRPC client configuration");
+
+const grpcHost = config.grpc?.host || "localhost";
+const grpcPort = config.grpc?.port || 50051;
+
+expect(grpcHost).toBeDefined();
+expect(grpcPort).toBeGreaterThan(0);
+expect(grpcPort).toBeLessThan(65536);
+
+log.info(`gRPC config: ${grpcHost}:${grpcPort}`);
+});
+
+test("Proto files are available", () => {
+log.step("Check proto file availability");
+
+const fs = require("fs");
+const path = require("path");
+
+const protosDir = path.join(__dirname, "../protos");
+const protoExists = fs.existsSync(protosDir);
+
+expect(protoExists).toBe(true);
+log.info("Proto files directory exists");
+});
+});
+
+describe("Service Definition Tests", () => {
+test("User service proto is parseable", () => {
+log.step("Parse user.proto");
+
+const protoLoader = require("@grpc/proto-loader");
+const path = require("path");
+
+const protoPath = path.join(__dirname, "../protos/user.proto");
+
+// This will throw if proto is invalid
+const packageDefinition = protoLoader.loadSync(protoPath, {
+keepCase: true,
+longs: String,
+enums: String,
+defaults: true,
+oneofs: true
+});
+
+expect(packageDefinition).toBeDefined();
+log.info("User proto parsed successfully");
+});
+
+test("Common proto is parseable", () => {
+log.step("Parse common.proto");
+
+const protoLoader = require("@grpc/proto-loader");
+const path = require("path");
+
+const protoPath = path.join(__dirname, "../protos/common.proto");
+
+const packageDefinition = protoLoader.loadSync(protoPath, {
+keepCase: true,
+longs: String,
+enums: String,
+defaults: true,
+oneofs: true
+});
+
+expect(packageDefinition).toBeDefined();
+log.info("Common proto parsed successfully");
+});
+});
+
+describe("Mock Service Tests", () => {
+test("Create gRPC request object", () => {
+log.step("Create sample gRPC request");
+
+const getUserRequest = {
+user_id: "test-123",
+include_details: true
+};
+
+expect(getUserRequest.user_id).toBe("test-123");
+expect(getUserRequest.include_details).toBe(true);
+
+log.info(`Request: ${JSON.stringify(getUserRequest)}`);
+});
+
+test("Create gRPC metadata", () => {
+log.step("Create gRPC metadata");
+
+const grpc = require("@grpc/grpc-js");
+const metadata = new grpc.Metadata();
+
+metadata.set("authorization", "Bearer test-token");
+metadata.set("x-request-id", "req-123");
+
+const authHeader = metadata.get("authorization");
+expect(authHeader).toContain("Bearer test-token");
+
+log.info("Metadata created successfully");
+});
+
+test("Simulate unary call response", () => {
+log.step("Simulate unary call response");
+
+// Mock response from a GetUser RPC
+const mockResponse = {
+user: {
+id: "user-123",
+name: "John Doe",
+email: "john@example.com",
+roles: ["admin", "user"]
+},
+status: "SUCCESS"
+};
+
+expect(mockResponse.user).toBeDefined();
+expect(mockResponse.user.id).toBe("user-123");
+expect(mockResponse.user.roles).toContain("admin");
+
+log.info(`User: ${mockResponse.user.name}`);
+});
+});
+
+describe("Error Handling Tests", () => {
+test("Handle gRPC status codes", () => {
+log.step("Test gRPC status code handling");
+
+const grpc = require("@grpc/grpc-js");
+
+// Verify standard status codes are available
+expect(grpc.status.OK).toBe(0);
+expect(grpc.status.CANCELLED).toBe(1);
+expect(grpc.status.UNKNOWN).toBe(2);
+expect(grpc.status.INVALID_ARGUMENT).toBe(3);
+expect(grpc.status.NOT_FOUND).toBe(5);
+expect(grpc.status.UNAUTHENTICATED).toBe(16);
+
+log.info("gRPC status codes verified");
+});
+
+test("Create gRPC error object", () => {
+log.step("Create gRPC error");
+
+const grpc = require("@grpc/grpc-js");
+
+const error = {
+code: grpc.status.NOT_FOUND,
+message: "User not found",
+details: "User with ID 'test-123' does not exist"
+};
+
+expect(error.code).toBe(5);
+expect(error.message).toContain("not found");
+
+log.info(`Error code: ${error.code}, message: ${error.message}`);
+});
+});
+
+describe("Framework Initialization", () => {
+test("Framework initialization is complete", () => {
+log.step("Verify gRPC framework setup");
+
+expect(true).toBe(true);
+log.info("gRPC TypeScript framework is ready for testing!");
+});
+});
+});

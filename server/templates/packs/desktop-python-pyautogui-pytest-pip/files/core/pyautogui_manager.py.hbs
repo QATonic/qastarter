@@ -1,0 +1,54 @@
+"""
+PyAutoGUI Manager - Python-based desktop automation.
+
+Sample App: Windows Notepad
+"""
+import pyautogui
+import subprocess
+import time
+from utils.logger import log
+
+
+class PyAutoGUIManager:
+    _process = None
+
+    @classmethod
+    def launch_app(cls, app_path: str = "notepad.exe"):
+        log.info(f"Launching: {app_path}")
+        cls._process = subprocess.Popen(app_path)
+        time.sleep(1)  # Wait for app to load
+        log.info("App launched")
+
+    @classmethod
+    def close_app(cls):
+        if cls._process:
+            cls._process.terminate()
+            cls._process = None
+            log.info("App closed")
+
+    @staticmethod
+    def click(x: int, y: int):
+        log.info(f"Click: ({x}, {y})")
+        pyautogui.click(x, y)
+
+    @staticmethod
+    def type_text(text: str):
+        log.info(f"Type: {text}")
+        pyautogui.typewrite(text, interval=0.05)
+
+    @staticmethod
+    def press_key(key: str):
+        log.info(f"Press: {key}")
+        pyautogui.press(key)
+
+    @staticmethod
+    def hotkey(*keys):
+        log.info(f"Hotkey: {keys}")
+        pyautogui.hotkey(*keys)
+
+    @staticmethod
+    def screenshot(filename: str = None):
+        if filename:
+            pyautogui.screenshot(filename)
+            log.info(f"Screenshot saved: {filename}")
+        return pyautogui.screenshot()

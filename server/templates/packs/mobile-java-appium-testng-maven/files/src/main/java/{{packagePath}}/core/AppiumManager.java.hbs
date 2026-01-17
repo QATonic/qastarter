@@ -1,0 +1,68 @@
+package {{javaPackage}}.core;
+
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
+import {{javaPackage}}.config.ConfigReader;
+import {{javaPackage}}.utils.Log;
+
+import java.net.URL;
+import java.time.Duration;
+
+/**
+ * Appium Manager - Mobile driver lifecycle management.
+ * 
+ * Sample App: SauceDemo Mobile (https://github.com/saucelabs/sample-app-mobile)
+ */
+public class AppiumManager {
+
+    private static ThreadLocal<AppiumDriver> driver = new ThreadLocal<>();
+
+    public static AppiumDriver getDriver() {
+        return driver.get();
+    }
+
+    public static void initDriver() {
+        String platform = ConfigReader.getPlatform().toLowerCase();
+        Log.info("Initializing Appium driver for: " + platform);
+
+        try {
+            URL appiumUrl = new URL(ConfigReader.getAppiumUrl());
+
+            if ("ios".equals(platform)) {
+                XCUITestOptions options = new XCUITestOptions()
+                    .setDeviceName(ConfigReader.getDeviceName())
+                    .setApp(ConfigReader.getAppPath())
+                    .setAutomationName("XCUITest");
+                driver.set(new IOSDriver(appiumUrl, options));
+            } else {
+                UiAutomator2Options options = new UiAutomator2Options()
+                    .setDeviceName(ConfigReader.getDeviceName())
+                    .setApp(ConfigReader.getAppPath())
+                    .setAutomationName("UiAutomator2")
+                    .setAppPackage("com.saucelabs.mydemoapp.android")
+                    .setAppActivity(".MainActivity");
+                driver.set(new AndroidDriver(appiumUrl, options));
+            }
+
+            driver.get().manage().timeouts().implicitlyWait(
+                Duration.ofSeconds(ConfigReader.getImplicitWait())
+            );
+
+            Log.info("Appium driver initialized successfully");
+        } catch (Exception e) {
+            Log.error("Failed to initialize driver: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void quitDriver() {
+        if (driver.get() != null) {
+            driver.get().quit();
+            driver.remove();
+            Log.info("Appium driver closed");
+        }
+    }
+}

@@ -1,0 +1,9 @@
+import pytest
+from core.appium_manager import AppiumManager
+
+
+@pytest.fixture(scope="function")
+def driver():
+    AppiumManager.init_driver()
+    yield AppiumManager.get_driver()
+    AppiumManager.quit_driver()

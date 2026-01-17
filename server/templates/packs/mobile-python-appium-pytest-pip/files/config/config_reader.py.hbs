@@ -1,0 +1,44 @@
+"""
+Config Reader - Load Appium and device settings.
+"""
+import os
+from configparser import ConfigParser
+from pathlib import Path
+
+
+class ConfigReader:
+    def __init__(self):
+        self.env = os.getenv("ENV", "dev")
+        self._config = ConfigParser()
+        self._load_config()
+    
+    def _load_config(self):
+        config_file = Path(__file__).parent / f"{self.env}.ini"
+        if config_file.exists():
+            self._config.read(config_file)
+            print(f"[Config] Loaded: {config_file}")
+    
+    def get(self, key: str, default: str = "") -> str:
+        try:
+            return self._config.get("appium", key)
+        except:
+            return default
+    
+    @property
+    def appium_url(self) -> str:
+        return self.get("appium_url", "http://127.0.0.1:4723")
+    
+    @property
+    def platform(self) -> str:
+        return self.get("platform", "android")
+    
+    @property
+    def device_name(self) -> str:
+        return self.get("device_name", "emulator-5554")
+    
+    @property
+    def app_path(self) -> str:
+        return self.get("app_path", "./apps/saucedemo.apk")
+
+
+config = ConfigReader()

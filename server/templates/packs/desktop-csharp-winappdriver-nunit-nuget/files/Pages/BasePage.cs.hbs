@@ -1,46 +1,21 @@
 using OpenQA.Selenium;
-using OpenQA.Selenium.Appium.Windows;
-using {{projectName}}.Core;
+using OpenQA.Selenium.Support.UI;
+using {{projectNamespace}}.Core;
+using {{projectNamespace}}.Utils;
 
-namespace {{projectName}}.Pages;
-
-public abstract class BasePage
+namespace {{projectNamespace}}.Pages
 {
-    protected WindowsDriver<WindowsElement> Driver;
-
-    protected BasePage(WindowsDriver<WindowsElement> driver)
+    public class BasePage
     {
-        Driver = driver;
-    }
+        protected IWebDriver Driver => WinAppDriverManager.Driver;
+        protected WebDriverWait Wait => new(Driver, TimeSpan.FromSeconds(10));
 
-    protected WindowsElement FindElement(By locator)
-    {
-        return Driver.FindElement(locator) as WindowsElement 
-            ?? throw new NoSuchElementException($"Element not found: {locator}");
-    }
+        protected void Click(By locator)
+        {
+            Log.Instance.Info($"Click: {locator}");
+            Wait.Until(d => d.FindElement(locator)).Click();
+        }
 
-    protected WindowsElement WaitForElement(By locator, int timeoutSeconds = -1)
-    {
-        return WaitHelpers.WaitForElement(Driver, locator, timeoutSeconds);
-    }
-
-    protected void Click(WindowsElement element, string elementName = "Element")
-    {
-        ElementActions.Click(element, elementName);
-    }
-
-    protected void SendKeys(WindowsElement element, string text, string elementName = "Element")
-    {
-        ElementActions.SendKeys(element, text, elementName);
-    }
-
-    protected string GetText(WindowsElement element, string elementName = "Element")
-    {
-        return ElementActions.GetText(element, elementName);
-    }
-
-    protected string GetAttribute(WindowsElement element, string attributeName, string elementName = "Element")
-    {
-        return ElementActions.GetAttribute(element, attributeName, elementName);
+        protected string GetText(By locator) => Wait.Until(d => d.FindElement(locator)).Text;
     }
 }

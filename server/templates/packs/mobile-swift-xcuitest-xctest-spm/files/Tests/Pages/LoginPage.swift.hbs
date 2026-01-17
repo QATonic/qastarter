@@ -1,0 +1,39 @@
+import XCTest
+
+class LoginPage {
+    let app: XCUIApplication
+    
+    init(app: XCUIApplication) {
+        self.app = app
+    }
+    
+    var usernameField: XCUIElement {
+        app.textFields["test-Username"]
+    }
+    
+    var passwordField: XCUIElement {
+        app.secureTextFields["test-Password"]
+    }
+    
+    var loginButton: XCUIElement {
+        app.buttons["test-LOGIN"]
+    }
+    
+    var productsTitle: XCUIElement {
+        app.staticTexts["PRODUCTS"]
+    }
+    
+    func login(username: String, password: String) {
+        usernameField.tap()
+        usernameField.typeText(username)
+        
+        passwordField.tap()
+        passwordField.typeText(password)
+        
+        loginButton.tap()
+    }
+    
+    func isLoginSuccessful() -> Bool {
+        return productsTitle.waitForExistence(timeout: 5)
+    }
+}

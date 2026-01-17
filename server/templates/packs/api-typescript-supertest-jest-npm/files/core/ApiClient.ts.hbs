@@ -1,85 +1,55 @@
-import request, { Response } from 'supertest';
-import { config } from '../config/settings';
-import { logger } from '../utils/logger';
-
 /**
- * Base API client using Supertest
- * Provides reusable methods for API testing
+ * API Client - HTTP client for REST API testing.
+ * 
+ * Sample API: JSONPlaceholder (https://jsonplaceholder.typicode.com)
  */
+import request from "supertest";
+import { apiConfig } from "../config/ConfigReader";
+import { log } from "../utils/Logger";
+
 export class ApiClient {
   private baseUrl: string;
-  private defaultHeaders: Record<string, string>;
 
-  constructor(baseUrl: string = config.baseUrl) {
-    this.baseUrl = baseUrl;
-    this.defaultHeaders = config.headers;
+  constructor() {
+    this.baseUrl = apiConfig.baseUrl;
+    log.info(`API Client initialized: ${this.baseUrl}`);
   }
 
-  /**
-   * GET request
-   */
-  async get(endpoint: string, headers: Record<string, string> = {}): Promise<Response> {
-    logger.info(`GET ${endpoint}`);
-    return request(this.baseUrl)
+  async get(endpoint: string): Promise<request.Response> {
+    log.info(`GET ${endpoint}`);
+    const response = await request(this.baseUrl)
       .get(endpoint)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
+      .set("Content-Type", apiConfig.contentType);
+    log.info(`Response: ${response.status}`);
+    return response;
   }
 
-  /**
-   * POST request
-   */
-  async post(endpoint: string, body: any, headers: Record<string, string> = {}): Promise<Response> {
-    logger.info(`POST ${endpoint}`, { body });
-    return request(this.baseUrl)
+  async post(endpoint: string, body: object): Promise<request.Response> {
+    log.info(`POST ${endpoint}`);
+    const response = await request(this.baseUrl)
       .post(endpoint)
-      .send(body)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
+      .set("Content-Type", apiConfig.contentType)
+      .send(body);
+    log.info(`Response: ${response.status}`);
+    return response;
   }
 
-  /**
-   * PUT request
-   */
-  async put(endpoint: string, body: any, headers: Record<string, string> = {}): Promise<Response> {
-    logger.info(`PUT ${endpoint}`, { body });
-    return request(this.baseUrl)
+  async put(endpoint: string, body: object): Promise<request.Response> {
+    log.info(`PUT ${endpoint}`);
+    const response = await request(this.baseUrl)
       .put(endpoint)
-      .send(body)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
+      .set("Content-Type", apiConfig.contentType)
+      .send(body);
+    log.info(`Response: ${response.status}`);
+    return response;
   }
 
-  /**
-   * PATCH request
-   */
-  async patch(endpoint: string, body: any, headers: Record<string, string> = {}): Promise<Response> {
-    logger.info(`PATCH ${endpoint}`, { body });
-    return request(this.baseUrl)
-      .patch(endpoint)
-      .send(body)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
-  }
-
-  /**
-   * DELETE request
-   */
-  async delete(endpoint: string, headers: Record<string, string> = {}): Promise<Response> {
-    logger.info(`DELETE ${endpoint}`);
-    return request(this.baseUrl)
+  async delete(endpoint: string): Promise<request.Response> {
+    log.info(`DELETE ${endpoint}`);
+    const response = await request(this.baseUrl)
       .delete(endpoint)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
-  }
-
-  /**
-   * Add authentication token to headers
-   */
-  withAuth(token: string): this {
-    this.defaultHeaders['Authorization'] = `Bearer ${token}`;
-    return this;
+      .set("Content-Type", apiConfig.contentType);
+    log.info(`Response: ${response.status}`);
+    return response;
   }
 }
-
-export const apiClient = new ApiClient();

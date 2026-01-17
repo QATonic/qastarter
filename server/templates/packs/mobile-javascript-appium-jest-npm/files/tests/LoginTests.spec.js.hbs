@@ -1,0 +1,16 @@
+const { AppiumManager } = require("../core/AppiumManager");
+const { LoginPage } = require("../pages/LoginPage");
+const { log } = require("../utils/Logger");
+
+describe("Mobile Login Tests", () => {
+  let loginPage;
+
+  beforeAll(async () => { await AppiumManager.initDriver(); loginPage = new LoginPage(); });
+  afterAll(async () => { await AppiumManager.quitDriver(); });
+
+  test("valid login shows Products", async () => {
+    log.step("Valid login test");
+    await loginPage.login("standard_user", "secret_sauce");
+    expect(await loginPage.isLoginSuccessful()).toBe(true);
+  });
+});

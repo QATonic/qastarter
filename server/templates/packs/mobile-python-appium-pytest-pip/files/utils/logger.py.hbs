@@ -1,0 +1,39 @@
+import logging
+import os
+from datetime import datetime
+from pathlib import Path
+
+
+class Logger:
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._setup_logger()
+        return cls._instance
+    
+    def _setup_logger(self):
+        self._logger = logging.getLogger("MobileTest")
+        self._logger.setLevel(logging.DEBUG)
+        self._logger.handlers.clear()
+        
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_handler = logging.FileHandler(logs_dir / f"mobile_test_{timestamp}.log")
+        file_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s"))
+        
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+        
+        self._logger.addHandler(file_handler)
+        self._logger.addHandler(console_handler)
+    
+    def info(self, message): self._logger.info(message)
+    def error(self, message): self._logger.error(message)
+    def step(self, message): self._logger.info(f"STEP: {message}")
+
+
+log = Logger()

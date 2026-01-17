@@ -1,141 +1,18 @@
 {
-    "id": "api-typescript-graphql-jest-npm",
-    "displayName": "GraphQL API Testing",
-    "name": "GraphQL API Testing Framework",
-    "description": "GraphQL API testing framework with TypeScript, Jest, and Apollo Client",
-    "version": "1.0.0",
-    "supportsDynamic": true,
-    "supportedCombination": {
-        "testingType": "api",
-        "framework": "graphql",
-        "language": "typescript",
-        "testRunner": "jest",
-        "buildTool": "npm"
-    },
-    "dynamicSupport": {
-        "reportingTools": [
-            "jest-html-reporter",
-            "allure"
-        ],
-        "cicdTools": [
-            "github-actions",
-            "gitlab-ci",
-            "jenkins",
-            "azure-devops",
-            "circleci"
-        ],
-        "testingPatterns": [
-            "contract-testing",
-            "schema-validation"
-        ]
-    },
-    "toolVersions": {
-        "node": "18+",
-        "typescript": "5.3.0",
-        "jest": "29.7.0",
-        "graphql": "16.8.1",
-        "apollo-client": "3.8.8"
-    },
-    "files": [
-        {
-            "path": "package.json",
-            "isTemplate": true,
-            "description": "NPM package configuration"
-        },
-        {
-            "path": "tsconfig.json",
-            "isTemplate": true,
-            "description": "TypeScript configuration"
-        },
-        {
-            "path": "jest.config.ts",
-            "isTemplate": true,
-            "description": "Jest configuration"
-        },
-        {
-            "path": ".gitignore",
-            "isTemplate": false,
-            "description": "Git ignore patterns"
-        },
-        {
-            "path": "README.md",
-            "isTemplate": true,
-            "description": "Project documentation"
-        },
-        {
-            "path": ".github/workflows/tests.yml",
-            "isTemplate": true,
-            "description": "GitHub Actions CI/CD",
-            "conditional": {
-                "cicdTool": "github-actions"
-            }
-        },
-        {
-            "path": "Jenkinsfile",
-            "isTemplate": true,
-            "description": "Jenkins CI/CD pipeline",
-            "conditional": {
-                "cicdTool": "jenkins"
-            }
-        },
-        {
-            "path": "src/client/graphql-client.ts",
-            "isTemplate": true,
-            "description": "GraphQL client configuration"
-        },
-        {
-            "path": "src/queries/user.queries.ts",
-            "isTemplate": true,
-            "description": "User GraphQL queries"
-        },
-        {
-            "path": "src/mutations/user.mutations.ts",
-            "isTemplate": true,
-            "description": "User GraphQL mutations"
-        },
-        {
-            "path": "src/fragments/user.fragments.ts",
-            "isTemplate": true,
-            "description": "User GraphQL fragments"
-        },
-        {
-            "path": "src/types/graphql.types.ts",
-            "isTemplate": true,
-            "description": "GraphQL type definitions"
-        },
-        {
-            "path": "src/utils/test-helpers.ts",
-            "isTemplate": true,
-            "description": "Test helper utilities"
-        },
-        {
-            "path": "src/config/environments.ts",
-            "isTemplate": true,
-            "description": "Environment configuration"
-        },
-        {
-            "path": "tests/queries/user.queries.test.ts",
-            "isTemplate": true,
-            "description": "User query tests"
-        },
-        {
-            "path": "tests/mutations/user.mutations.test.ts",
-            "isTemplate": true,
-            "description": "User mutation tests"
-        },
-        {
-            "path": "tests/schema/schema.validation.test.ts",
-            "isTemplate": true,
-            "description": "Schema validation tests"
-        },
-        {
-            "path": "tests/integration/auth.integration.test.ts",
-            "isTemplate": true,
-            "description": "Authentication integration tests"
-        }
-    ],
-    "directories": [
-        "reports",
-        "coverage"
-    ]
+  "id": "api-typescript-graphql-jest-npm",
+  "displayName": "TypeScript GraphQL API Framework",
+  "version": "2.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {"testingType": "api", "framework": "graphql", "language": "typescript", "testRunner": "jest", "buildTool": "npm"},
+  "toolVersions": {"node": "18+", "graphql-request": "6.1.0", "jest": "29.7.0"},
+  "files": [
+    {"path": "package.json", "isTemplate": true},
+    {"path": "tsconfig.json", "isTemplate": true},
+    {"path": "config/ConfigReader.ts", "isTemplate": true},
+    {"path": "core/GraphQLClient.ts", "isTemplate": true},
+    {"path": "queries/SpaceXQueries.ts", "isTemplate": true},
+    {"path": "utils/Logger.ts", "isTemplate": true},
+    {"path": "tests/GraphQLTests.spec.ts", "isTemplate": true}
+  ],
+  "directories": ["logs", "reports"]
 }

@@ -1,52 +1,8 @@
 import pytest
-from core.driver_factory import DriverFactory
-from config.winappdriver_config import WinAppDriverConfig
-from utils.logger import Logger
-from utils.screenshot_helper import ScreenshotHelper
-
-@pytest.fixture(scope="session", autouse=True)
-def test_session_setup():
-    Logger.info("=" * 80)
-    Logger.info("Starting test session")
-    Logger.info("WinAppDriver must be running at http://127.0.0.1:4723")
-    Logger.info("=" * 80)
-    yield
-    Logger.info("=" * 80)
-    Logger.info("Test session completed")
-    Logger.info("=" * 80)
+from core.winappdriver_manager import WinAppDriverManager
 
 @pytest.fixture(scope="function")
-def calculator_driver(request):
-    Logger.info(f"Starting test: {request.node.name}")
-    options = WinAppDriverConfig.get_calculator_options()
-    driver = DriverFactory.create_driver(options)
-    yield driver
-    
-    if request.node.rep_call.failed:
-        Logger.error(f"Test FAILED: {request.node.name}")
-        ScreenshotHelper.take_screenshot(driver, request.node.name)
-    else:
-        Logger.info(f"Test PASSED: {request.node.name}")
-    
-    DriverFactory.quit_driver(driver)
-
-@pytest.fixture(scope="function")
-def notepad_driver(request):
-    Logger.info(f"Starting test: {request.node.name}")
-    options = WinAppDriverConfig.get_notepad_options()
-    driver = DriverFactory.create_driver(options)
-    yield driver
-    
-    if request.node.rep_call.failed:
-        Logger.error(f"Test FAILED: {request.node.name}")
-        ScreenshotHelper.take_screenshot(driver, request.node.name)
-    else:
-        Logger.info(f"Test PASSED: {request.node.name}")
-    
-    DriverFactory.quit_driver(driver)
-
-@pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
-    outcome = yield
-    rep = outcome.get_result()
-    setattr(item, f"rep_{rep.when}", rep)
+def driver():
+    WinAppDriverManager.init_driver()
+    yield WinAppDriverManager.get_driver()
+    WinAppDriverManager.quit_driver()

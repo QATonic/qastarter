@@ -1,0 +1,27 @@
+using Microsoft.Extensions.Configuration;
+
+namespace {{projectNamespace}}.Config
+{
+    public class ConfigReader
+    {
+        private static readonly Lazy<ConfigReader> _instance = new(() => new ConfigReader());
+        private readonly IConfiguration _config;
+
+        public static ConfigReader Instance => _instance.Value;
+
+        public string Platform => Get("Platform", "android");
+        public string DeviceName => Get("DeviceName", "emulator-5554");
+        public string AppPath => Get("AppPath", "./apps/saucedemo.apk");
+
+        private ConfigReader()
+        {
+            _config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+        }
+
+        private string Get(string key, string defaultValue) => _config[key] ?? defaultValue;
+    }
+}

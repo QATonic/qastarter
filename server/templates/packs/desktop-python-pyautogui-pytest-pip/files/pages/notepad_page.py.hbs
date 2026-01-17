@@ -1,0 +1,33 @@
+"""
+Notepad Page - Windows Notepad automation with PyAutoGUI.
+"""
+import pyautogui
+from core.pyautogui_manager import PyAutoGUIManager
+from utils.logger import log
+
+
+class NotepadPage:
+    def __init__(self):
+        PyAutoGUIManager.launch_app("notepad.exe")
+
+    def type_text(self, text: str):
+        log.step(f"Type text: {text}")
+        pyautogui.typewrite(text, interval=0.02)
+        return self
+
+    def new_file(self):
+        pyautogui.hotkey("ctrl", "n")
+        return self
+
+    def save_file(self, filename: str):
+        log.step(f"Save file: {filename}")
+        pyautogui.hotkey("ctrl", "s")
+        pyautogui.sleep(0.5)
+        pyautogui.typewrite(filename)
+        pyautogui.press("enter")
+        return self
+
+    def close(self):
+        pyautogui.hotkey("alt", "F4")
+        pyautogui.sleep(0.5)
+        pyautogui.press("n")  # Don't save

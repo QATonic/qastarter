@@ -1,44 +1,40 @@
-package {{packageName}}.tests;
+package {{javaPackage}}.tests;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import {{packageName}}.core.BaseTest;
-import {{packageName}}.pages.LoginPage;
-import {{packageName}}.pages.HomePage;
+import {{javaPackage}}.core.BaseTest;
+import {{javaPackage}}.pages.LoginPage;
+import {{javaPackage}}.utils.Log;
 
 /**
- * Sample Mobile Login Test
+ * Login Tests - SauceDemo Mobile app.
  * 
- * HOW TO USE THIS TEMPLATE:
- * 1. Update the username and password below with your test credentials
- * 2. Update LoginPage locators to match your mobile app's login screen
- * 3. Update capabilities in capabilities/android.json or capabilities/ios.json
- * 4. Run: mvn clean test
- * 
- * This is a simple positive login test to verify your framework setup.
- * Add more test cases as needed for your project.
+ * Run: mvn clean test
  */
 public class LoginTests extends BaseTest {
 
-    // ========== UPDATE THESE VALUES ==========
-    private static final String TEST_USERNAME = "YOUR_USERNAME_HERE";
-    private static final String TEST_PASSWORD = "YOUR_PASSWORD_HERE";
-    // ==========================================
+    private static final String VALID_USER = "standard_user";
+    private static final String VALID_PASS = "secret_sauce";
 
-    @Test(groups = {"smoke", "login"}, 
-          description = "Verify successful login with valid credentials")
+    @Test(groups = {"smoke", "mobile"}, description = "Valid login shows Products screen")
     public void testValidLogin() {
-        // Step 1: Verify login page is loaded
+        Log.step("Valid login test");
+        
         LoginPage loginPage = new LoginPage();
-        Assert.assertTrue(loginPage.isPageLoaded(), "Login page should be loaded");
+        loginPage.login(VALID_USER, VALID_PASS);
         
-        // Step 2: Enter credentials and login
-        loginPage.performLogin(TEST_USERNAME, TEST_PASSWORD);
+        Assert.assertTrue(loginPage.isLoginSuccessful(), "Should navigate to Products");
+        Log.info("Valid login test passed");
+    }
+
+    @Test(groups = {"regression", "mobile"}, description = "Invalid login shows error")
+    public void testInvalidLogin() {
+        Log.step("Invalid login test");
         
-        // Step 3: Verify successful login
-        HomePage homePage = new HomePage();
-        Assert.assertTrue(homePage.isPageLoaded(), "Home page should be loaded after login");
+        LoginPage loginPage = new LoginPage();
+        loginPage.login("invalid_user", "wrong_password");
         
-        // Test passed! Your framework is working correctly.
+        Assert.assertTrue(loginPage.isErrorDisplayed(), "Should show error message");
+        Log.info("Invalid login test passed");
     }
 }

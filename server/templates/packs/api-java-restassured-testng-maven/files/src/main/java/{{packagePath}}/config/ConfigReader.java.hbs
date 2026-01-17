@@ -1,0 +1,68 @@
+package {{javaPackage}}.config;
+
+import java.io.InputStream;
+import java.util.Properties;
+
+/**
+ * Configuration Reader - Load API environment settings.
+ * 
+ * Usage:
+ *   String baseUrl = ConfigReader.getBaseUrl();
+ *   int timeout = ConfigReader.getTimeout();
+ */
+public class ConfigReader {
+
+    private static Properties properties;
+    private static final String ENV = System.getProperty("env", "dev");
+
+    static {
+        loadProperties();
+    }
+
+    private static void loadProperties() {
+        properties = new Properties();
+        String configFile = "config/" + ENV + ".properties";
+        
+        try (InputStream input = ConfigReader.class.getClassLoader().getResourceAsStream(configFile)) {
+            if (input != null) {
+                properties.load(input);
+                System.out.println("[Config] Loaded: " + configFile);
+            } else {
+                System.out.println("[Config] Using defaults - " + configFile + " not found");
+            }
+        } catch (Exception e) {
+            System.err.println("[Config] Error loading config: " + e.getMessage());
+        }
+    }
+
+    public static String get(String key) {
+        String envValue = System.getProperty(key);
+        return envValue != null ? envValue : properties.getProperty(key, "");
+    }
+
+    public static String get(String key, String defaultValue) {
+        String value = get(key);
+        return value.isEmpty() ? defaultValue : value;
+    }
+
+    public static int getInt(String key, int defaultValue) {
+        try {
+            return Integer.parseInt(get(key));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    // Convenience methods
+    public static String getBaseUrl() {
+        return get("base.url", "https://jsonplaceholder.typicode.com");
+    }
+
+    public static int getTimeout() {
+        return getInt("timeout", 30);
+    }
+
+    public static String getContentType() {
+        return get("content.type", "application/json");
+    }
+}

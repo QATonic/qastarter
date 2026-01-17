@@ -1,49 +1,31 @@
 using NUnit.Framework;
-using {{projectName}}.Tests.Pages;
+using {{projectNamespace}}.Core;
+using {{projectNamespace}}.Pages;
+using {{projectNamespace}}.Utils;
 
-namespace {{projectName}}.Tests;
-
-// ========== UPDATE THESE VALUES ==========
-// Replace with your actual test credentials
-// ==========================================
-
-[TestFixture]
-public class LoginTests : BaseTest
+namespace {{projectNamespace}}.Tests
 {
+    [TestFixture]
+    public class LoginTests
+    {
+        private LoginPage _loginPage;
 
-private LoginPage _loginPage = null!;
-private HomePage _homePage = null!;
+        [SetUp]
+        public void Setup()
+        {
+            AppiumManager.InitDriver();
+            _loginPage = new LoginPage();
+        }
 
-[SetUp]
-public void SetUpPages()
-{
-_loginPage = new LoginPage(Driver);
-_homePage = new HomePage(Driver);
-}
+        [TearDown]
+        public void TearDown() => AppiumManager.QuitDriver();
 
-/// <summary>
-    /// Verify login functionality works correctly.
-    ///
-    /// BEFORE RUNNING:
-    /// 1. Update TestUsername and TestPassword above with valid credentials
-    /// 2. Configure device capabilities in Config/CapabilitiesConfig.cs
-    /// 3. Ensure Appium server is running
-    /// 4. Update selectors in Tests/Pages/LoginPage.cs to match your app
-    /// </summary>
-[Test]
-public void ShouldLoginWithValidCredentials()
-{
-// Get credentials from config
-var username = EnvConfig.Instance.GetUsername("validUser");
-var password = EnvConfig.Instance.GetPassword("validUser");
-
-// Step 1: Perform login
-_loginPage.Login(username, password);
-
-// Step 2: Verify home page is displayed
-var isHomeDisplayed = _homePage.IsHomePageDisplayed();
-Assert.That(isHomeDisplayed, Is.True, "Home page should be displayed after login");
-
-// Test passed! Your {{framework}} framework is working correctly.
-}
+        [Test, Category("Smoke")]
+        public void ValidLogin_ShowsProducts()
+        {
+            Log.Instance.Step("Valid login test");
+            _loginPage.Login("standard_user", "secret_sauce");
+            Assert.That(_loginPage.IsLoginSuccessful(), Is.True);
+        }
+    }
 }

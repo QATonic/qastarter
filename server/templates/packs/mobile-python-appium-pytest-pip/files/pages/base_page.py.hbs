@@ -1,0 +1,33 @@
+"""
+Base Page - Common mobile actions for all pages.
+"""
+from appium.webdriver.common.appiumby import AppiumBy
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from core.appium_manager import AppiumManager
+from utils.logger import log
+
+
+class BasePage:
+    def __init__(self):
+        self.driver = AppiumManager.get_driver()
+        self.wait = WebDriverWait(self.driver, 10)
+    
+    def tap(self, locator):
+        log.info(f"Tap: {locator}")
+        self.wait.until(EC.element_to_be_clickable(locator)).click()
+    
+    def type_text(self, locator, text):
+        log.info(f"Type: {text}")
+        element = self.wait.until(EC.visibility_of_element_located(locator))
+        element.clear()
+        element.send_keys(text)
+    
+    def get_text(self, locator):
+        return self.wait.until(EC.visibility_of_element_located(locator)).text
+    
+    def is_displayed(self, locator):
+        try:
+            return self.wait.until(EC.visibility_of_element_located(locator)).is_displayed()
+        except:
+            return False

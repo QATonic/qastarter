@@ -1,151 +1,43 @@
 plugins {
-id 'java'
-id 'jacoco'
+    id 'java'
 {{#if (eq reportingTool "allure")}}
-id 'io.qameta.allure' version '2.11.2'
+    id 'io.qameta.allure' version '2.11.2'
 {{/if}}
 }
 
 group = '{{groupId}}'
 version = '1.0.0'
-description = '{{projectName}} - API Automation Framework'
-
-java {
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
-}
+sourceCompatibility = '17'
 
 repositories {
-mavenCentral()
-}
-
-ext {
-restAssuredVersion = '5.4.0'
-testngVersion = '7.8.0'
-log4jVersion = '2.20.0'
-jacksonVersion = '2.15.2'
-{{#if (eq reportingTool "extent-reports")}}
-extentReportsVersion = '5.0.9'
-{{/if}}
-{{#if (eq reportingTool "allure")}}
-allureVersion = '2.24.0'
-{{/if}}
-{{#if (eq testingPattern "bdd")}}
-cucumberVersion = '7.14.0'
-{{/if}}
-
-// Test configuration
-baseUrl = project.hasProperty('baseUrl') ? project.property('baseUrl') : 'https://api.example.com'
-env = project.hasProperty('env') ? project.property('env') : 'dev'
-suite = project.hasProperty('suite') ? project.property('suite') : 'testng.xml'
-parallel = project.hasProperty('parallel') ? project.property('parallel') : 'false'
-threadCount = project.hasProperty('threadCount') ? project.property('threadCount') : '1'
+    mavenCentral()
 }
 
 dependencies {
-// RestAssured
-testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
-testImplementation "io.rest-assured:json-schema-validator:${restAssuredVersion}"
-testImplementation "io.rest-assured:json-path:${restAssuredVersion}"
-
-// TestNG
-testImplementation "org.testng:testng:${testngVersion}"
-{{#if (eq reportingTool "extent-reports")}}
-
-// ExtentReports
-implementation "com.aventstack:extentreports:${extentReportsVersion}"
-{{/if}}
+    // RestAssured
+    implementation 'io.rest-assured:rest-assured:5.4.0'
+    implementation 'io.rest-assured:json-path:5.4.0'
+    implementation 'io.rest-assured:json-schema-validator:5.4.0'
+    
+    // TestNG
+    implementation 'org.testng:testng:7.9.0'
+    
+    // JSON
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    
 {{#if (eq reportingTool "allure")}}
-
-// Allure
-testImplementation "io.qameta.allure:allure-testng:${allureVersion}"
-testImplementation "io.qameta.allure:allure-rest-assured:${allureVersion}"
-{{#if (eq testingPattern "bdd")}}
-testImplementation "io.qameta.allure:allure-cucumber7-jvm:${allureVersion}"
-{{/if}}
-{{/if}}
-{{#if (eq testingPattern "bdd")}}
-
-// Cucumber BDD
-testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
-testImplementation "io.cucumber:cucumber-testng:${cucumberVersion}"
+    // Allure
+    implementation 'io.qameta.allure:allure-testng:2.24.0'
 {{/if}}
 
-// Log4j2
-implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
-implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
-implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
-
-// Jackson for JSON processing
-implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
-implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+    // Logging
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
 }
 
 test {
-useTestNG() {
-suites "src/test/resources/${suite}"
-
-if ((project.findProperty('parallel') ?: 'false') == 'true') {
-parallel = 'methods'
-threadCount = Integer.parseInt(project.findProperty('threadCount') ?: '1')
+    useTestNG()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
-
-systemProperty 'baseUrl', baseUrl
-systemProperty 'env', env
-}
-
-testLogging {
-events "passed", "skipped", "failed"
-exceptionFormat "full"
-}
-
-reports {
-html.required = true
-junitXml.required = true
-}
-
-ignoreFailures = false
-jvmArgs = ['-Xmx1024m']
-}
-
-task smokeTest(type: Test) {
-useTestNG() {
-suites "src/test/resources/smoke.xml"
-systemProperty 'baseUrl', baseUrl
-systemProperty 'env', env
-}
-}
-
-jacoco {
-toolVersion = "0.8.8"
-}
-
-jacocoTestReport {
-dependsOn test
-reports {
-xml.required = true
-html.required = true
-}
-}
-
-clean {
-delete "logs"
-delete "reports"
-delete "test-output"
-}
-
-wrapper {
-gradleVersion = '8.5'
-distributionType = Wrapper.DistributionType.BIN
-}
-{{#if (eq reportingTool "allure")}}
-
-allure {
-version = '2.24.0'
-autoconfigure = true
-aspectjweaver = true
-useTestNG {
-version = '2.24.0'
-}
-}
-{{/if}}

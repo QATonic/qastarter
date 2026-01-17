@@ -1,0 +1,48 @@
+/**
+ * Appium Manager - Mobile driver lifecycle management.
+ */
+import { remote, RemoteOptions } from "webdriverio";
+import { config } from "../config/ConfigReader";
+import { log } from "../utils/Logger";
+
+export class AppiumManager {
+  private static driver: WebdriverIO.Browser | null = null;
+
+  static async getDriver(): Promise<WebdriverIO.Browser> {
+    if (!this.driver) throw new Error("Driver not initialized");
+    return this.driver;
+  }
+
+  static async initDriver(): Promise<WebdriverIO.Browser> {
+    log.info(`Initializing Appium driver for: ${config.platform}`);
+
+    const capabilities: any = {
+      platformName: config.platform,
+      "appium:deviceName": config.deviceName,
+      "appium:app": config.appPath,
+      "appium:automationName": config.platform === "ios" ? "XCUITest" : "UiAutomator2",
+    };
+
+    if (config.platform === "android") {
+      capabilities["appium:appPackage"] = "com.saucelabs.mydemoapp.android";
+      capabilities["appium:appActivity"] = ".MainActivity";
+    }
+
+    this.driver = await remote({
+      hostname: "127.0.0.1",
+      port: 4723,
+      capabilities,
+    });
+
+    log.info("Appium driver initialized");
+    return this.driver;
+  }
+
+  static async quitDriver(): Promise<void> {
+    if (this.driver) {
+      await this.driver.deleteSession();
+      this.driver = null;
+      log.info("Appium driver closed");
+    }
+  }
+}

@@ -1,45 +1,66 @@
-using System.Net;
-using FluentAssertions;
 using NUnit.Framework;
-using {{projectName}}.Core;
-using {{projectName}}.Models;
+using RestSharp;
+using System.Net;
+using System.Text.Json;
+using {{projectNamespace}}.Core;
+using {{projectNamespace}}.Models;
+using {{projectNamespace}}.Utils;
 
-namespace {{projectName}}.Tests;
-
-// ========== UPDATE THESE VALUES ==========
-// Replace with your actual API endpoint
-// ==========================================
-
-[TestFixture]
-[Category("Smoke")]
-public class UserTests : BaseTest
+namespace {{projectNamespace}}.Tests
 {
-    // ========== UPDATE THESE VALUES ==========
-    // Replace with your actual API base URL and a valid user ID
-    private const string ApiBaseUrl = "YOUR_API_BASE_URL_HERE";
-    private const string UserId = "YOUR_USER_ID_HERE";
-    // ==========================================
-
-    /// <summary>
-    /// Verify API connection and basic GET request works correctly.
-    /// 
-    /// BEFORE RUNNING:
-    /// 1. Update ApiBaseUrl in Config/Settings.cs
-    /// 2. Update UserId above with a valid user ID from your API
-    /// 3. Update Models/User.cs to match your API response structure
-    /// </summary>
-    [Test]
-    public async Task GetUserById_ShouldReturnUser()
+    [TestFixture]
+    public class UserTests
     {
-        // Step 1: Make GET request to users endpoint
-        var response = await Client.GetAsync<User>($"/users/{UserId}");
+        private ApiClient _api;
+        private const string UsersEndpoint = "/users";
 
-        // Step 2: Validate response
-        var validator = new ResponseValidator<User>(response);
-        validator.AssertStatusCode(HttpStatusCode.OK)
-                 .AssertSuccess();
+        [SetUp]
+        public void Setup() => _api = new ApiClient();
 
-        // Step 3: Verify user data exists
-        response.Data.Should().NotBeNull("Test passed! Your {{framework}} framework is working correctly.");
+        [Test, Category("Smoke")]
+        public void GetAllUsers_ReturnsSuccess()
+        {
+            Log.Instance.Step("GET all users");
+            var response = _api.Get(UsersEndpoint);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var users = JsonSerializer.Deserialize<User[]>(response.Content!);
+            Assert.That(users?.Length, Is.GreaterThan(0));
+        }
+
+        [Test, Category("Smoke")]
+        public void GetSingleUser_ReturnsUserData()
+        {
+            Log.Instance.Step("GET single user by ID");
+            var response = _api.Get($"{UsersEndpoint}/1");
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var user = JsonSerializer.Deserialize<User>(response.Content!);
+            Assert.That(user?.Email, Is.Not.Null);
+        }
+
+        [Test, Category("Regression")]
+        public void CreateUser_ReturnsCreated()
+        {
+            Log.Instance.Step("POST create new user");
+            var newUser = new User { Name = "John Doe", Username = "johndoe", Email = "john@example.com" };
+            var response = _api.Post(UsersEndpoint, newUser);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        }
+
+        [Test, Category("Regression")]
+        public void UpdateUser_ReturnsSuccess()
+        {
+            Log.Instance.Step("PUT update existing user");
+            var updatedUser = new User { Name = "Jane Doe", Username = "janedoe", Email = "jane@example.com" };
+            var response = _api.Put($"{UsersEndpoint}/1", updatedUser);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test, Category("Regression")]
+        public void DeleteUser_ReturnsSuccess()
+        {
+            Log.Instance.Step("DELETE user by ID");
+            var response = _api.Delete($"{UsersEndpoint}/1");
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
     }
 }

@@ -1,0 +1,28 @@
+import { AppiumManager } from "../core/AppiumManager";
+import { log } from "../utils/Logger";
+
+export class BasePage {
+  protected async getDriver() { return await AppiumManager.getDriver(); }
+
+  async tap(selector: string): Promise<void> {
+    log.info(`Tap: ${selector}`);
+    const driver = await this.getDriver();
+    const element = await driver.$(selector);
+    await element.click();
+  }
+
+  async type(selector: string, text: string): Promise<void> {
+    log.info(`Type: ${text}`);
+    const driver = await this.getDriver();
+    const element = await driver.$(selector);
+    await element.setValue(text);
+  }
+
+  async isDisplayed(selector: string): Promise<boolean> {
+    try {
+      const driver = await this.getDriver();
+      const element = await driver.$(selector);
+      return await element.isDisplayed();
+    } catch { return false; }
+  }
+}

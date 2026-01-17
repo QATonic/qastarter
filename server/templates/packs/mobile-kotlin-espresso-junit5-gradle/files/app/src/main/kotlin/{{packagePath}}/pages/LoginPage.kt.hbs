@@ -1,0 +1,29 @@
+package {{packageName}}.pages
+
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.matcher.ViewMatchers.*
+
+class LoginPage {
+    fun enterUsername(username: String) {
+        onView(withContentDescription("test-Username"))
+            .perform(clearText(), typeText(username))
+    }
+
+    fun enterPassword(password: String) {
+        onView(withContentDescription("test-Password"))
+            .perform(clearText(), typeText(password))
+    }
+
+    fun tapLogin() {
+        onView(withContentDescription("test-LOGIN")).perform(click())
+    }
+
+    fun login(username: String, password: String) {
+        enterUsername(username)
+        closeSoftKeyboard()
+        enterPassword(password)
+        closeSoftKeyboard()
+        tapLogin()
+    }
+}

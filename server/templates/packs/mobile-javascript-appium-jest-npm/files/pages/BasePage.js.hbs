@@ -1,0 +1,10 @@
+const { AppiumManager } = require("../core/AppiumManager");
+const { log } = require("../utils/Logger");
+
+class BasePage {
+  async tap(selector) { log.info(`Tap: ${selector}`); const el = await (await AppiumManager.getDriver()).$(selector); await el.click(); }
+  async type(selector, text) { log.info(`Type: ${text}`); const el = await (await AppiumManager.getDriver()).$(selector); await el.setValue(text); }
+  async isDisplayed(selector) { try { const el = await (await AppiumManager.getDriver()).$(selector); return await el.isDisplayed(); } catch { return false; } }
+}
+
+module.exports = { BasePage };

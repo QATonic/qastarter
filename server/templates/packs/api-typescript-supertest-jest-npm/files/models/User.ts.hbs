@@ -1,84 +1,15 @@
 /**
- * User model and JSON schema
+ * User Model - Interface for JSONPlaceholder /users endpoint.
  */
-
-export interface UserAddress {
-  street: string;
-  city: string;
-  zipcode: string;
-}
-
-export interface UserCompany {
+export interface User {
+  id?: number;
   name: string;
-  catchPhrase: string;
-}
-
-export interface UserData {
-  id: number;
-  name: string;
+  username: string;
   email: string;
-  username?: string;
   phone?: string;
   website?: string;
-  address?: UserAddress;
-  company?: UserCompany;
 }
 
-export const userSchema = {
-  type: 'object',
-  required: ['id', 'name', 'email'],
-  properties: {
-    id: { type: 'number' },
-    name: { type: 'string' },
-    email: { type: 'string', format: 'email' },
-    username: { type: 'string' },
-    phone: { type: 'string' },
-    website: { type: 'string' },
-    address: {
-      type: 'object',
-      properties: {
-        street: { type: 'string' },
-        city: { type: 'string' },
-        zipcode: { type: 'string' }
-      }
-    },
-    company: {
-      type: 'object',
-      properties: {
-        name: { type: 'string' },
-        catchPhrase: { type: 'string' }
-      }
-    }
-  }
-};
-
-export const usersArraySchema = {
-  type: 'array',
-  items: userSchema
-};
-
-export class User {
-  id: number;
-  name: string;
-  email: string;
-  username?: string;
-  phone?: string;
-  website?: string;
-  address?: UserAddress;
-  company?: UserCompany;
-
-  constructor(data: UserData) {
-    this.id = data.id;
-    this.name = data.name;
-    this.email = data.email;
-    this.username = data.username;
-    this.phone = data.phone;
-    this.website = data.website;
-    this.address = data.address;
-    this.company = data.company;
-  }
-
-  static create(data: UserData): User {
-    return new User(data);
-  }
+export function createUser(name: string, username: string, email: string): User {
+  return { name, username, email };
 }

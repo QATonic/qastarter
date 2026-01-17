@@ -1,25 +1,28 @@
-import winston from 'winston';
-import { config } from '../config/settings';
+/**
+ * Logger - Consistent logging with timestamps.
+ */
+import * as fs from "fs";
+import * as path from "path";
 
-export const logger = winston.createLogger({
-  level: config.logLevel,
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      )
-    }),
-    new winston.transports.File({ 
-      filename: 'logs/error.log', 
-      level: 'error' 
-    }),
-    new winston.transports.File({ 
-      filename: 'logs/combined.log' 
-    })
-  ]
-});
+class Logger {
+  private logDir = "logs";
+  private logFile: string;
+
+  constructor() {
+    if (!fs.existsSync(this.logDir)) fs.mkdirSync(this.logDir, { recursive: true });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    this.logFile = path.join(this.logDir, `api_test_${timestamp}.log`);
+  }
+
+  private write(level: string, message: string): void {
+    const logLine = `${new Date().toISOString()} | ${level.padEnd(8)} | ${message}`;
+    console.log(logLine);
+    fs.appendFileSync(this.logFile, logLine + "\n");
+  }
+
+  info(message: string): void { this.write("INFO", message); }
+  error(message: string): void { this.write("ERROR", message); }
+  step(message: string): void { this.write("STEP", message); }
+}
+
+export const log = new Logger();

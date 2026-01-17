@@ -1,0 +1,7 @@
+require("dotenv").config();
+const config = {
+  platform: process.env.PLATFORM || "android",
+  deviceName: process.env.DEVICE_NAME || "emulator-5554",
+  appPath: process.env.APP_PATH || "./apps/saucedemo.apk",
+};
+module.exports = { config };

@@ -2,8 +2,9 @@ package {{packageName}}.core;
 
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.ios.IOSDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import io.appium.java_client.ios.options.XCUITestOptions;
 import {{packageName}}.config.ConfigurationReader;
 {{#if utilities.logger}}
 import {{packageName}}.utils.Log;
@@ -14,132 +15,136 @@ import java.net.URL;
 import java.time.Duration;
 
 /**
- * Thread-safe Appium driver management for mobile automation
- * Supports both Android and iOS platforms with local and remote execution
- */
+* Thread-safe Appium driver management for mobile automation
+* Supports both Android and iOS platforms with local and remote execution
+*
+* Updated for Appium Java Client 9.x - Uses UiAutomator2Options/XCUITestOptions
+*/
 public class DriverManager {
 
-    private static final ThreadLocal<AppiumDriver> driverThreadLocal = new ThreadLocal<>();
-    private static final String APPIUM_SERVER_URL = ConfigurationReader.getProperty("appium.server.url");
+private static final ThreadLocal<AppiumDriver> driverThreadLocal = new ThreadLocal<>();
+        private static final String APPIUM_SERVER_URL = ConfigurationReader.getProperty("appium.server.url");
 
-    /**
-     * Initialize Appium driver based on platform
-     * 
-     * @param platform The target platform (android/ios)
-     */
-    public static void initializeDriver(String platform) {
+        /**
+        * Initialize Appium driver based on platform
+        *
+        * @param platform The target platform (android/ios)
+        */
+        public static void initializeDriver(String platform) {
         if (driverThreadLocal.get() != null) {
-            {{#if utilities.logger}}
-            Log.warn("Driver already initialized for current thread. Terminating existing driver.");
-            {{/if}}
-            terminateDriver();
+        {{#if utilities.logger}}
+        Log.warn("Driver already initialized for current thread. Terminating existing driver.");
+        {{/if}}
+        terminateDriver();
         }
 
         try {
-            AppiumDriver driver = createDriver(platform);
-            driverThreadLocal.set(driver);
-            
-            // Configure implicit wait
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(
-                Integer.parseInt(ConfigurationReader.getProperty("mobile.implicit.wait", "10"))
-            ));
-            
-            {{#if utilities.logger}}
-            Log.info("Successfully initialized " + platform + " driver for thread: " + Thread.currentThread().getId());
-            {{/if}}
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Failed to initialize driver for platform: " + platform, e);
-            {{/if}}
-            throw new RuntimeException("Failed to initialize mobile driver", e);
-        }
-    }
+        AppiumDriver driver = createDriver(platform);
+        driverThreadLocal.set(driver);
 
-    /**
-     * Get the current thread's Appium driver instance
-     * 
-     * @return AppiumDriver instance
-     */
-    public static AppiumDriver getDriver() {
+        // Configure implicit wait
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(
+        Integer.parseInt(ConfigurationReader.getProperty("mobile.implicit.wait", "10"))
+        ));
+
+        {{#if utilities.logger}}
+        Log.info("Successfully initialized " + platform + " driver for thread: " + Thread.currentThread().getId());
+        {{/if}}
+
+        } catch (Exception e) {
+        {{#if utilities.logger}}
+        Log.error("Failed to initialize driver for platform: " + platform, e);
+        {{/if}}
+        throw new RuntimeException("Failed to initialize mobile driver", e);
+        }
+        }
+
+        /**
+        * Get the current thread's Appium driver instance
+        *
+        * @return AppiumDriver instance
+        */
+        public static AppiumDriver getDriver() {
         AppiumDriver driver = driverThreadLocal.get();
         if (driver == null) {
-            throw new IllegalStateException("Driver not initialized. Call initializeDriver() first.");
+        throw new IllegalStateException("Driver not initialized. Call initializeDriver() first.");
         }
         return driver;
-    }
+        }
 
-    /**
-     * Check if driver is initialized for current thread
-     * 
-     * @return true if driver is initialized, false otherwise
-     */
-    public static boolean isDriverInitialized() {
+        /**
+        * Check if driver is initialized for current thread
+        *
+        * @return true if driver is initialized, false otherwise
+        */
+        public static boolean isDriverInitialized() {
         return driverThreadLocal.get() != null;
-    }
+        }
 
-    /**
-     * Terminate the current thread's driver and clean up resources
-     */
-    public static void terminateDriver() {
+        /**
+        * Terminate the current thread's driver and clean up resources
+        */
+        public static void terminateDriver() {
         AppiumDriver driver = driverThreadLocal.get();
         if (driver != null) {
-            try {
-                driver.quit();
-                {{#if utilities.logger}}
-                Log.info("Successfully terminated driver for thread: " + Thread.currentThread().getId());
-                {{/if}}
-            } catch (Exception e) {
-                {{#if utilities.logger}}
-                Log.error("Error occurred while terminating driver", e);
-                {{/if}}
-            } finally {
-                driverThreadLocal.remove();
-            }
+        try {
+        driver.quit();
+        {{#if utilities.logger}}
+        Log.info("Successfully terminated driver for thread: " + Thread.currentThread().getId());
+        {{/if}}
+        } catch (Exception e) {
+        {{#if utilities.logger}}
+        Log.error("Error occurred while terminating driver", e);
+        {{/if}}
+        } finally {
+        driverThreadLocal.remove();
         }
-    }
+        }
+        }
 
-    /**
-     * Create AppiumDriver instance based on platform
-     * 
-     * @param platform The target platform (android/ios)
-     * @return AppiumDriver instance
-     */
-    private static AppiumDriver createDriver(String platform) throws MalformedURLException {
-        DesiredCapabilities capabilities = CapabilitiesManager.getCapabilities(platform);
+        /**
+        * Create AppiumDriver instance based on platform
+        * Uses Appium 9.x Options classes (UiAutomator2Options, XCUITestOptions)
+        *
+        * @param platform The target platform (android/ios)
+        * @return AppiumDriver instance
+        */
+        private static AppiumDriver createDriver(String platform) throws MalformedURLException {
         URL appiumUrl = new URL(APPIUM_SERVER_URL);
 
         switch (platform.toLowerCase()) {
-            case "android":
-                {{#if utilities.logger}}
-                Log.info("Creating AndroidDriver with capabilities: " + capabilities.toString());
-                {{/if}}
-                return new AndroidDriver(appiumUrl, capabilities);
-                
-            case "ios":
-                {{#if utilities.logger}}
-                Log.info("Creating IOSDriver with capabilities: " + capabilities.toString());
-                {{/if}}
-                return new IOSDriver(appiumUrl, capabilities);
-                
-            default:
-                throw new IllegalArgumentException("Unsupported platform: " + platform + ". Supported platforms: android, ios");
-        }
-    }
+        case "android":
+        UiAutomator2Options androidOptions = CapabilitiesManager.getAndroidOptions();
+        {{#if utilities.logger}}
+        Log.info("Creating AndroidDriver with UiAutomator2Options");
+        {{/if}}
+        return new AndroidDriver(appiumUrl, androidOptions);
 
-    /**
-     * Get the current platform of the driver
-     * 
-     * @return platform name (android/ios)
-     */
-    public static String getCurrentPlatform() {
+        case "ios":
+        XCUITestOptions iosOptions = CapabilitiesManager.getIOSOptions();
+        {{#if utilities.logger}}
+        Log.info("Creating IOSDriver with XCUITestOptions");
+        {{/if}}
+        return new IOSDriver(appiumUrl, iosOptions);
+
+        default:
+        throw new IllegalArgumentException("Unsupported platform: " + platform + ". Supported platforms: android, ios");
+        }
+        }
+
+        /**
+        * Get the current platform of the driver
+        *
+        * @return platform name (android/ios)
+        */
+        public static String getCurrentPlatform() {
         AppiumDriver driver = getDriver();
         if (driver instanceof AndroidDriver) {
-            return "android";
+        return "android";
         } else if (driver instanceof IOSDriver) {
-            return "ios";
+        return "ios";
         } else {
-            return "unknown";
+        return "unknown";
         }
-    }
-}
+        }
+        }

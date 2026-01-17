@@ -1,198 +1,199 @@
 package {{groupId}}.core;
 
 import io.appium.java_client.windows.WindowsDriver;
+import io.appium.java_client.windows.options.WindowsOptions;
 import {{groupId}}.config.ConfigurationReader;
 import {{groupId}}.utils.Log;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 
 /**
- * Thread-safe driver manager for WinAppDriver lifecycle management
- * Handles driver creation, initialization, and cleanup
- */
+* Thread-safe driver manager for WinAppDriver lifecycle management
+* Handles driver creation, initialization, and cleanup
+*
+* Updated for Appium Java Client 9.x - Uses WindowsOptions instead of DesiredCapabilities
+*/
 public class DriverManager {
 
-    private static final ThreadLocal<WindowsDriver> driver = new ThreadLocal<>();
-    
-    /**
-     * Get the current thread's driver instance
-     * @return WindowsDriver instance for current thread
-     */
-    public static WindowsDriver getDriver() {
+private static final ThreadLocal<WindowsDriver> driver = new ThreadLocal<>();
+
+        /**
+        * Get the current thread's driver instance
+        * @return WindowsDriver instance for current thread
+        */
+        public static WindowsDriver getDriver() {
         return driver.get();
-    }
-
-    /**
-     * Initialize driver with specified application
-     * @param appPath Path to the application executable or app ID
-     */
-    public static void initializeDriver(String appPath) {
-        if (driver.get() == null) {
-            try {
-                DesiredCapabilities capabilities = CapabilitiesManager.getDesktopCapabilities(appPath);
-                String winAppDriverUrl = ConfigurationReader.getWinAppDriverUrl();
-                URL serverUrl = new URL(winAppDriverUrl);
-                
-                WindowsDriver windowsDriver = new WindowsDriver(serverUrl, capabilities);
-                
-                // Set implicit wait
-                int implicitWait = ConfigurationReader.getImplicitWait();
-                windowsDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
-                
-                driver.set(windowsDriver);
-                Log.info("Desktop driver initialized successfully for application: " + appPath);
-                
-            } catch (MalformedURLException e) {
-                String winAppDriverUrl = ConfigurationReader.getWinAppDriverUrl();
-                Log.error("Invalid WinAppDriver URL: " + winAppDriverUrl);
-                throw new RuntimeException("Failed to initialize desktop driver: Invalid URL", e);
-            } catch (Exception e) {
-                Log.error("Failed to initialize desktop driver for application: " + appPath);
-                throw new RuntimeException("Failed to initialize desktop driver", e);
-            }
         }
-    }
 
-    /**
-     * Initialize driver for Windows Root (desktop session)
-     */
-    public static void initializeRootDriver() {
+        /**
+        * Initialize driver with specified application
+        * @param appPath Path to the application executable or app ID
+        */
+        public static void initializeDriver(String appPath) {
         if (driver.get() == null) {
-            try {
-                DesiredCapabilities capabilities = CapabilitiesManager.getRootCapabilities();
-                String winAppDriverUrl = ConfigurationReader.getWinAppDriverUrl();
-                URL serverUrl = new URL(winAppDriverUrl);
-                
-                WindowsDriver windowsDriver = new WindowsDriver(serverUrl, capabilities);
-                
-                // Set implicit wait
-                int implicitWait = ConfigurationReader.getImplicitWait();
-                windowsDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
-                
-                driver.set(windowsDriver);
-                Log.info("Desktop root driver initialized successfully");
-                
-            } catch (MalformedURLException e) {
-                String winAppDriverUrl = ConfigurationReader.getWinAppDriverUrl();
-                Log.error("Invalid WinAppDriver URL: " + winAppDriverUrl);
-                throw new RuntimeException("Failed to initialize desktop root driver: Invalid URL", e);
-            } catch (Exception e) {
-                Log.error("Failed to initialize desktop root driver");
-                throw new RuntimeException("Failed to initialize desktop root driver", e);
-            }
-        }
-    }
+        try {
+        WindowsOptions options = CapabilitiesManager.getDesktopOptions(appPath);
+        String winAppDriverUrl = ConfigurationReader.getWinAppDriverUrl();
+        URL serverUrl = new URL(winAppDriverUrl);
 
-    /**
-     * Quit the current driver and remove from thread local
-     */
-    public static void quitDriver() {
+        WindowsDriver windowsDriver = new WindowsDriver(serverUrl, options);
+
+        // Set implicit wait
+        int implicitWait = ConfigurationReader.getImplicitWait();
+        windowsDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
+
+        driver.set(windowsDriver);
+        Log.info("Desktop driver initialized successfully for application: " + appPath);
+
+        } catch (MalformedURLException e) {
+        String winAppDriverUrl = ConfigurationReader.getWinAppDriverUrl();
+        Log.error("Invalid WinAppDriver URL: " + winAppDriverUrl);
+        throw new RuntimeException("Failed to initialize desktop driver: Invalid URL", e);
+        } catch (Exception e) {
+        Log.error("Failed to initialize desktop driver for application: " + appPath);
+        throw new RuntimeException("Failed to initialize desktop driver", e);
+        }
+        }
+        }
+
+        /**
+        * Initialize driver for Windows Root (desktop session)
+        */
+        public static void initializeRootDriver() {
+        if (driver.get() == null) {
+        try {
+        WindowsOptions options = CapabilitiesManager.getRootOptions();
+        String winAppDriverUrl = ConfigurationReader.getWinAppDriverUrl();
+        URL serverUrl = new URL(winAppDriverUrl);
+
+        WindowsDriver windowsDriver = new WindowsDriver(serverUrl, options);
+
+        // Set implicit wait
+        int implicitWait = ConfigurationReader.getImplicitWait();
+        windowsDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(implicitWait));
+
+        driver.set(windowsDriver);
+        Log.info("Desktop root driver initialized successfully");
+
+        } catch (MalformedURLException e) {
+        String winAppDriverUrl = ConfigurationReader.getWinAppDriverUrl();
+        Log.error("Invalid WinAppDriver URL: " + winAppDriverUrl);
+        throw new RuntimeException("Failed to initialize desktop root driver: Invalid URL", e);
+        } catch (Exception e) {
+        Log.error("Failed to initialize desktop root driver");
+        throw new RuntimeException("Failed to initialize desktop root driver", e);
+        }
+        }
+        }
+
+        /**
+        * Quit the current driver and remove from thread local
+        */
+        public static void quitDriver() {
         WindowsDriver currentDriver = driver.get();
         if (currentDriver != null) {
-            try {
-                currentDriver.quit();
-                Log.info("Desktop driver quit successfully");
-            } catch (Exception e) {
-                Log.error("Error quitting desktop driver: " + e.getMessage());
-            } finally {
-                driver.remove();
-            }
+        try {
+        currentDriver.quit();
+        Log.info("Desktop driver quit successfully");
+        } catch (Exception e) {
+        Log.error("Error quitting desktop driver: " + e.getMessage());
+        } finally {
+        driver.remove();
         }
-    }
+        }
+        }
 
-    /**
-     * Check if driver is currently initialized
-     * @return true if driver exists and is active
-     */
-    public static boolean isDriverInitialized() {
+        /**
+        * Check if driver is currently initialized
+        * @return true if driver exists and is active
+        */
+        public static boolean isDriverInitialized() {
         WindowsDriver currentDriver = driver.get();
         if (currentDriver == null) {
-            return false;
+        return false;
         }
-        
+
         try {
-            // Try to get the window handle to verify driver is active
-            currentDriver.getWindowHandle();
-            return true;
+        currentDriver.getWindowHandle();
+        return true;
         } catch (Exception e) {
-            return false;
+        return false;
         }
-    }
+        }
 
-    /**
-     * Close current window (but keep driver active)
-     */
-    public static void closeWindow() {
+        /**
+        * Close current window (but keep driver active)
+        */
+        public static void closeWindow() {
         WindowsDriver currentDriver = driver.get();
         if (currentDriver != null) {
-            try {
-                currentDriver.close();
-                Log.info("Current desktop window closed successfully");
-            } catch (Exception e) {
-                Log.error("Error closing desktop window: " + e.getMessage());
-            }
+        try {
+        currentDriver.close();
+        Log.info("Current desktop window closed successfully");
+        } catch (Exception e) {
+        Log.error("Error closing desktop window: " + e.getMessage());
         }
-    }
+        }
+        }
 
-    /**
-     * Switch to window by title
-     * @param windowTitle Title of the window to switch to
-     * @return true if successfully switched to window
-     */
-    public static boolean switchToWindow(String windowTitle) {
+        /**
+        * Switch to window by title
+        * @param windowTitle Title of the window to switch to
+        * @return true if successfully switched to window
+        */
+        public static boolean switchToWindow(String windowTitle) {
         WindowsDriver currentDriver = driver.get();
         if (currentDriver != null) {
-            try {
-                for (String windowHandle : currentDriver.getWindowHandles()) {
-                    currentDriver.switchTo().window(windowHandle);
-                    String title = currentDriver.getTitle();
-                    if (title != null && title.contains(windowTitle)) {
-                        Log.info("Successfully switched to window: " + windowTitle);
-                        return true;
-                    }
-                }
-                Log.warn("Window not found: " + windowTitle);
-                return false;
-            } catch (Exception e) {
-                Log.error("Error switching to window '" + windowTitle + "': " + e.getMessage());
-                return false;
-            }
+        try {
+        for (String windowHandle : currentDriver.getWindowHandles()) {
+        currentDriver.switchTo().window(windowHandle);
+        String title = currentDriver.getTitle();
+        if (title != null && title.contains(windowTitle)) {
+        Log.info("Successfully switched to window: " + windowTitle);
+        return true;
+        }
+        }
+        Log.warn("Window not found: " + windowTitle);
+        return false;
+        } catch (Exception e) {
+        Log.error("Error switching to window '" + windowTitle + "': " + e.getMessage());
+        return false;
+        }
         }
         return false;
-    }
+        }
 
-    /**
-     * Get current window title
-     * @return Current window title or null if error
-     */
-    public static String getCurrentWindowTitle() {
+        /**
+        * Get current window title
+        * @return Current window title or null if error
+        */
+        public static String getCurrentWindowTitle() {
         WindowsDriver currentDriver = driver.get();
         if (currentDriver != null) {
-            try {
-                return currentDriver.getTitle();
-            } catch (Exception e) {
-                Log.error("Error getting current window title: " + e.getMessage());
-                return null;
-            }
+        try {
+        return currentDriver.getTitle();
+        } catch (Exception e) {
+        Log.error("Error getting current window title: " + e.getMessage());
+        return null;
+        }
         }
         return null;
-    }
+        }
 
-    /**
-     * Maximize current window
-     */
-    public static void maximizeWindow() {
+        /**
+        * Maximize current window
+        */
+        public static void maximizeWindow() {
         WindowsDriver currentDriver = driver.get();
         if (currentDriver != null) {
-            try {
-                currentDriver.manage().window().maximize();
-                Log.info("Desktop window maximized successfully");
-            } catch (Exception e) {
-                Log.error("Error maximizing desktop window: " + e.getMessage());
-            }
+        try {
+        currentDriver.manage().window().maximize();
+        Log.info("Desktop window maximized successfully");
+        } catch (Exception e) {
+        Log.error("Error maximizing desktop window: " + e.getMessage());
         }
-    }
-}
+        }
+        }
+        }

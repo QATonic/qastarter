@@ -1,0 +1,44 @@
+"""
+Appium Manager - Mobile driver lifecycle management.
+
+Sample App: SauceDemo Mobile
+"""
+from appium import webdriver
+from appium.options.android import UiAutomator2Options
+from appium.options.ios import XCUITestOptions
+from config.config_reader import config
+from utils.logger import log
+
+
+class AppiumManager:
+    _driver = None
+
+    @classmethod
+    def get_driver(cls):
+        return cls._driver
+
+    @classmethod
+    def init_driver(cls):
+        log.info(f"Initializing Appium driver for: {config.platform}")
+        
+        if config.platform.lower() == "ios":
+            options = XCUITestOptions()
+            options.device_name = config.device_name
+            options.app = config.app_path
+        else:
+            options = UiAutomator2Options()
+            options.device_name = config.device_name
+            options.app = config.app_path
+            options.app_package = "com.saucelabs.mydemoapp.android"
+            options.app_activity = ".MainActivity"
+        
+        cls._driver = webdriver.Remote(config.appium_url, options=options)
+        log.info("Appium driver initialized")
+        return cls._driver
+
+    @classmethod
+    def quit_driver(cls):
+        if cls._driver:
+            cls._driver.quit()
+            cls._driver = None
+            log.info("Appium driver closed")

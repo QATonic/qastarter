@@ -1,0 +1,33 @@
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Windows;
+using {{projectNamespace}}.Config;
+using {{projectNamespace}}.Utils;
+
+namespace {{projectNamespace}}.Core
+{
+    public class WinAppDriverManager
+    {
+        private static WindowsDriver _driver;
+
+        public static WindowsDriver Driver => _driver ?? throw new InvalidOperationException("Driver not initialized");
+
+        public static void InitDriver()
+        {
+            Log.Instance.Info("Initializing WinAppDriver");
+
+            var options = new AppiumOptions();
+            options.App = ConfigReader.Instance.AppPath;
+            options.DeviceName = "WindowsPC";
+
+            _driver = new WindowsDriver(new Uri(ConfigReader.Instance.WinAppDriverUrl), options);
+            Log.Instance.Info("WinAppDriver initialized");
+        }
+
+        public static void QuitDriver()
+        {
+            _driver?.Quit();
+            _driver = null;
+            Log.Instance.Info("WinAppDriver closed");
+        }
+    }
+}

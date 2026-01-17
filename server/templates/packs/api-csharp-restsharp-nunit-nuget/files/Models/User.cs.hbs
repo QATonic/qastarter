@@ -1,24 +1,15 @@
-using Newtonsoft.Json;
-
-namespace {{projectName}}.Models;
-
-public class User
+namespace {{projectNamespace}}.Models
 {
-    [JsonProperty("id")]
-    public int? Id { get; set; }
-
-    [JsonProperty("name")]
-    public string? Name { get; set; }
-
-    [JsonProperty("username")]
-    public string? Username { get; set; }
-
-    [JsonProperty("email")]
-    public string? Email { get; set; }
-
-    [JsonProperty("phone")]
-    public string? Phone { get; set; }
-
-    [JsonProperty("website")]
-    public string? Website { get; set; }
+    /// <summary>
+    /// User Model - POCO for JSONPlaceholder /users endpoint.
+    /// </summary>
+    public class User
+    {
+        public int? Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Username { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string? Phone { get; set; }
+        public string? Website { get; set; }
+    }
 }

@@ -1,41 +1,76 @@
 """
-Sample API test with single positive test case
+User API Tests - CRUD operations for /users endpoint.
+
+Sample API: JSONPlaceholder (https://jsonplaceholder.typicode.com)
+
+Run: pytest tests/ -v
 """
 import pytest
-from core.api_client import APIClient
-from core.response_validator import ResponseValidator
-
-# ========== UPDATE THESE VALUES ==========
-# Replace with your actual API endpoint
-API_BASE_URL = "YOUR_API_BASE_URL_HERE"
-USER_ID = 1  # Replace with a valid user ID from your API
-# ==========================================
+from models.user import User
+from utils.logger import log
 
 
-@pytest.mark.users
-@pytest.mark.smoke
+USERS_ENDPOINT = "/users"
+
+
 class TestUserAPI:
-    """User API test suite."""
+    """User API test cases."""
     
-    def test_get_user_by_id(self, api_client: APIClient):
-        """
-        Verify API connection and basic GET request works correctly.
+    @pytest.mark.smoke
+    def test_get_all_users(self, api):
+        """GET all users returns 200."""
+        log.step("GET all users")
         
-        BEFORE RUNNING:
-        1. Update API_BASE_URL in config/settings.py
-        2. Update USER_ID above with a valid user ID from your API
-        3. Update response validation to match your API response structure
-        """
-        # Step 1: Make GET request to users endpoint
-        response = api_client.get(f"/users/{USER_ID}")
+        response = api.get(USERS_ENDPOINT)
         
-        # Step 2: Validate response
-        validator = ResponseValidator(response)
-        validator.assert_status_code(200)
-        validator.assert_json_contains("id")
+        assert response.status_code == 200
+        users = response.json()
+        assert len(users) > 0
+        log.info(f"Total users: {len(users)}")
+    
+    @pytest.mark.smoke
+    def test_get_single_user(self, api):
+        """GET single user returns user data."""
+        log.step("GET single user by ID")
         
-        # Step 3: Verify user ID matches
+        response = api.get(f"{USERS_ENDPOINT}/1")
+        
+        assert response.status_code == 200
         user_data = response.json()
-        assert user_data["id"] == USER_ID
+        user = User.from_dict(user_data)
+        assert user.email is not None
+        log.info(f"User: {user.name}")
+    
+    @pytest.mark.regression
+    def test_create_user(self, api):
+        """POST creates new user."""
+        log.step("POST create new user")
         
-        # Test passed! Your {{framework}} framework is working correctly.
+        new_user = User(name="John Doe", username="johndoe", email="john@example.com")
+        response = api.post(USERS_ENDPOINT, new_user.to_dict())
+        
+        assert response.status_code == 201
+        created = response.json()
+        assert "id" in created
+        log.info(f"Created user ID: {created['id']}")
+    
+    @pytest.mark.regression
+    def test_update_user(self, api):
+        """PUT updates existing user."""
+        log.step("PUT update existing user")
+        
+        updated_user = User(name="Jane Doe", username="janedoe", email="jane@example.com")
+        response = api.put(f"{USERS_ENDPOINT}/1", updated_user.to_dict())
+        
+        assert response.status_code == 200
+        assert response.json()["username"] == "janedoe"
+    
+    @pytest.mark.regression
+    def test_delete_user(self, api):
+        """DELETE removes user."""
+        log.step("DELETE user by ID")
+        
+        response = api.delete(f"{USERS_ENDPOINT}/1")
+        
+        assert response.status_code == 200
+        log.info("User deleted successfully")

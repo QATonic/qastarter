@@ -1,82 +1,43 @@
-import request from 'supertest';
-import { config } from '../config/settings.js';
-import { logger } from '../utils/logger.js';
-
 /**
- * Base API client using Supertest
- * Provides reusable methods for API testing
+ * API Client - HTTP client for REST API testing.
  */
-export class ApiClient {
-  constructor(baseUrl = config.baseUrl) {
-    this.baseUrl = baseUrl;
-    this.defaultHeaders = config.headers;
+const request = require("supertest");
+const { apiConfig } = require("../config/ConfigReader");
+const { log } = require("../utils/Logger");
+
+class ApiClient {
+  constructor() {
+    this.baseUrl = apiConfig.baseUrl;
+    log.info(`API Client initialized: ${this.baseUrl}`);
   }
 
-  /**
-   * GET request
-   */
-  async get(endpoint, headers = {}) {
-    logger.info(`GET ${endpoint}`);
-    return request(this.baseUrl)
-      .get(endpoint)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
+  async get(endpoint) {
+    log.info(`GET ${endpoint}`);
+    const response = await request(this.baseUrl).get(endpoint).set("Content-Type", apiConfig.contentType);
+    log.info(`Response: ${response.status}`);
+    return response;
   }
 
-  /**
-   * POST request
-   */
-  async post(endpoint, body, headers = {}) {
-    logger.info(`POST ${endpoint}`, { body });
-    return request(this.baseUrl)
-      .post(endpoint)
-      .send(body)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
+  async post(endpoint, body) {
+    log.info(`POST ${endpoint}`);
+    const response = await request(this.baseUrl).post(endpoint).set("Content-Type", apiConfig.contentType).send(body);
+    log.info(`Response: ${response.status}`);
+    return response;
   }
 
-  /**
-   * PUT request
-   */
-  async put(endpoint, body, headers = {}) {
-    logger.info(`PUT ${endpoint}`, { body });
-    return request(this.baseUrl)
-      .put(endpoint)
-      .send(body)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
+  async put(endpoint, body) {
+    log.info(`PUT ${endpoint}`);
+    const response = await request(this.baseUrl).put(endpoint).set("Content-Type", apiConfig.contentType).send(body);
+    log.info(`Response: ${response.status}`);
+    return response;
   }
 
-  /**
-   * PATCH request
-   */
-  async patch(endpoint, body, headers = {}) {
-    logger.info(`PATCH ${endpoint}`, { body });
-    return request(this.baseUrl)
-      .patch(endpoint)
-      .send(body)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
-  }
-
-  /**
-   * DELETE request
-   */
-  async delete(endpoint, headers = {}) {
-    logger.info(`DELETE ${endpoint}`);
-    return request(this.baseUrl)
-      .delete(endpoint)
-      .set({ ...this.defaultHeaders, ...headers })
-      .timeout(config.timeout);
-  }
-
-  /**
-   * Add authentication token to headers
-   */
-  withAuth(token) {
-    this.defaultHeaders['Authorization'] = `Bearer ${token}`;
-    return this;
+  async delete(endpoint) {
+    log.info(`DELETE ${endpoint}`);
+    const response = await request(this.baseUrl).delete(endpoint).set("Content-Type", apiConfig.contentType);
+    log.info(`Response: ${response.status}`);
+    return response;
   }
 }
 
-export const apiClient = new ApiClient();
+module.exports = { ApiClient };

@@ -1,25 +1,12 @@
-# Core Testing Dependencies
-requests==2.31.0
-pytest==8.0.0
-pytest-xdist==3.5.0
-jsonschema==4.21.0
+# Core
+requests>=2.31.0
+pytest>=7.4.0
+pytest-html>=4.1.0
 
-# Reporting Tools (conditional)
-{{#if (eq reportingTool "pytest-html")}}
-pytest-html==4.1.1
-{{/if}}
 {{#if (eq reportingTool "allure")}}
-allure-pytest==2.13.2
-{{/if}}
-{{#if (eq reportingTool "pytest-json")}}
-pytest-json-report==1.5.0
-{{/if}}
-
-# BDD Testing (conditional)
-{{#if (eq testingPattern "bdd")}}
-pytest-bdd==7.0.1
+# Allure Reporting
+allure-pytest>=2.13.0
 {{/if}}
 
 # Utilities
-python-dotenv==1.0.0
-faker==20.1.0
+python-dotenv>=1.0.0

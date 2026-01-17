@@ -1,0 +1,34 @@
+package {{packageName}}.pages;
+
+import androidx.test.espresso.Espresso;
+import androidx.test.espresso.action.ViewActions;
+import androidx.test.espresso.matcher.ViewMatchers;
+
+/**
+ * Login Page - Espresso page object for SauceDemo app.
+ */
+public class LoginPage {
+
+    public void enterUsername(String username) {
+        Espresso.onView(ViewMatchers.withContentDescription("test-Username"))
+            .perform(ViewActions.clearText(), ViewActions.typeText(username));
+    }
+
+    public void enterPassword(String password) {
+        Espresso.onView(ViewMatchers.withContentDescription("test-Password"))
+            .perform(ViewActions.clearText(), ViewActions.typeText(password));
+    }
+
+    public void tapLogin() {
+        Espresso.onView(ViewMatchers.withContentDescription("test-LOGIN"))
+            .perform(ViewActions.click());
+    }
+
+    public void login(String username, String password) {
+        enterUsername(username);
+        Espresso.closeSoftKeyboard();
+        enterPassword(password);
+        Espresso.closeSoftKeyboard();
+        tapLogin();
+    }
+}

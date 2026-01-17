@@ -921,5 +921,44 @@
     "cicdTool": "jenkins",
     "reportingTool": "robot-reports",
     "createdAt": "2026-01-15T16:59:05.430Z"
+  },
+  {
+    "id": 72,
+    "projectName": "Desktop-Java",
+    "testingType": "desktop",
+    "framework": "winappdriver",
+    "language": "java",
+    "testingPattern": "page-object-model",
+    "testRunner": "testng",
+    "buildTool": "maven",
+    "cicdTool": "jenkins",
+    "reportingTool": "extent-reports",
+    "createdAt": "2026-01-17T11:01:32.547Z"
+  },
+  {
+    "id": 73,
+    "projectName": "JavaDesktop",
+    "testingType": "desktop",
+    "framework": "winappdriver",
+    "language": "java",
+    "testingPattern": "page-object-model",
+    "testRunner": "testng",
+    "buildTool": "maven",
+    "cicdTool": "jenkins",
+    "reportingTool": "extent-reports",
+    "createdAt": "2026-01-17T12:51:23.373Z"
+  },
+  {
+    "id": 74,
+    "projectName": "selenium-java-testng-bdd-extent",
+    "testingType": "web",
+    "framework": "selenium",
+    "language": "java",
+    "testingPattern": "bdd",
+    "testRunner": "testng",
+    "buildTool": "maven",
+    "cicdTool": "jenkins",
+    "reportingTool": "extent-reports",
+    "createdAt": "2026-01-17T13:11:52.679Z"
   }
 ]

@@ -1,142 +1,34 @@
 package {{packageName}}.tests;
 
-import {{packageName}}.base.BaseTest;
-import {{packageName}}.screens.HomeScreen;
-import {{packageName}}.screens.LoginScreen;
-import {{packageName}}.utils.Log;
-import {{packageName}}.utils.TestDataReader;
-
-import org.junit.Before;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import {{packageName}}.MainActivity;
+import {{packageName}}.pages.LoginPage;
 
-import java.util.Map;
-
-import static org.junit.Assert.assertTrue;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.*;
 
 /**
- * Login functionality tests.
+ * Login Tests - Espresso UI tests for SauceDemo app.
  * 
- * ========== IMPORTANT: BEFORE RUNNING ==========
- * 1. Update view IDs in LoginScreen.java and HomeScreen.java
- * 2. Update test data in assets/testdata/users.json
- * 3. Update the activity launch in setUp() method
- * ================================================
+ * Run: ./gradlew connectedAndroidTest
  */
-public class LoginTests extends BaseTest {
+@RunWith(AndroidJUnit4.class)
+public class LoginTests {
 
-    private LoginScreen loginScreen;
-    private HomeScreen homeScreen;
+    @Rule
+    public ActivityScenarioRule<MainActivity> activityRule = 
+        new ActivityScenarioRule<>(MainActivity.class);
 
-    @Before
-    public void setUp() {
-        super.baseSetUp();
-        
-        // TODO: Launch your login activity here
-        // Example: launchActivity(LoginActivity.class);
-        
-        loginScreen = new LoginScreen();
-        homeScreen = new HomeScreen();
-        
-        Log.info("Login tests setup complete");
-    }
-
-    /**
-     * Test successful login with valid credentials.
-     * 
-     * Steps:
-     * 1. Enter valid username
-     * 2. Enter valid password
-     * 3. Click login button
-     * 4. Verify home screen is displayed
-     */
     @Test
-    public void testSuccessfulLogin() {
-        Log.testStart("testSuccessfulLogin");
+    public void validLogin_showsProducts() {
+        LoginPage loginPage = new LoginPage();
+        loginPage.login("standard_user", "secret_sauce");
         
-        // Get test data
-        Map<String, String> validUser = TestDataReader.getTestUser("validUser");
-        
-        // Perform login
-        loginScreen.login(
-            validUser.get("username"),
-            validUser.get("password")
-        );
-        
-        // Verify home screen is displayed
-        assertTrue("Home screen should be displayed after successful login",
-                homeScreen.isLoaded());
-        
-        Log.testEnd("testSuccessfulLogin", true);
-    }
-
-    /**
-     * Test login with invalid credentials.
-     * 
-     * Steps:
-     * 1. Enter invalid username
-     * 2. Enter invalid password
-     * 3. Click login button
-     * 4. Verify error message is displayed
-     */
-    @Test
-    public void testInvalidLogin() {
-        Log.testStart("testInvalidLogin");
-        
-        // Get test data
-        Map<String, String> invalidUser = TestDataReader.getTestUser("invalidUser");
-        
-        // Perform login with invalid credentials
-        loginScreen.login(
-            invalidUser.get("username"),
-            invalidUser.get("password")
-        );
-        
-        // Verify error is displayed
-        loginScreen.verifyErrorDisplayed();
-        
-        Log.testEnd("testInvalidLogin", true);
-    }
-
-    /**
-     * Test login with empty credentials.
-     * 
-     * Steps:
-     * 1. Leave username empty
-     * 2. Leave password empty
-     * 3. Click login button
-     * 4. Verify validation error is displayed
-     */
-    @Test
-    public void testEmptyCredentials() {
-        Log.testStart("testEmptyCredentials");
-        
-        // Clear any existing text
-        loginScreen.clearForm();
-        
-        // Try to login with empty fields
-        loginScreen.clickLogin();
-        
-        // Verify error is displayed
-        loginScreen.verifyErrorDisplayed();
-        
-        Log.testEnd("testEmptyCredentials", true);
-    }
-
-    /**
-     * Test login with empty password.
-     */
-    @Test
-    public void testEmptyPassword() {
-        Log.testStart("testEmptyPassword");
-        
-        Map<String, String> validUser = TestDataReader.getTestUser("validUser");
-        
-        loginScreen
-            .enterUsername(validUser.get("username"))
-            .clickLogin();
-        
-        loginScreen.verifyErrorDisplayed();
-        
-        Log.testEnd("testEmptyPassword", true);
+        onView(withText("PRODUCTS")).check(matches(isDisplayed()));
     }
 }

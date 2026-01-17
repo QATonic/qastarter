@@ -1,0 +1,70 @@
+/**
+ * User API Tests - CRUD operations for /users endpoint.
+ * 
+ * Sample API: JSONPlaceholder (https://jsonplaceholder.typicode.com)
+ * 
+ * Run: npm test
+ */
+import { ApiClient } from "../core/ApiClient";
+import { User, createUser } from "../models/User";
+import { log } from "../utils/Logger";
+
+const USERS_ENDPOINT = "/users";
+
+describe("User API Tests", () => {
+  let api: ApiClient;
+
+  beforeAll(() => {
+    api = new ApiClient();
+  });
+
+  test("GET all users returns 200", async () => {
+    log.step("GET all users");
+    
+    const response = await api.get(USERS_ENDPOINT);
+    
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+    log.info(`Total users: ${response.body.length}`);
+  });
+
+  test("GET single user returns user data", async () => {
+    log.step("GET single user by ID");
+    
+    const response = await api.get(`${USERS_ENDPOINT}/1`);
+    
+    expect(response.status).toBe(200);
+    expect(response.body.email).toBeDefined();
+    log.info(`User: ${response.body.name}`);
+  });
+
+  test("POST creates new user", async () => {
+    log.step("POST create new user");
+    
+    const newUser = createUser("John Doe", "johndoe", "john@example.com");
+    const response = await api.post(USERS_ENDPOINT, newUser);
+    
+    expect(response.status).toBe(201);
+    expect(response.body.id).toBeDefined();
+    log.info(`Created user ID: ${response.body.id}`);
+  });
+
+  test("PUT updates existing user", async () => {
+    log.step("PUT update existing user");
+    
+    const updatedUser = createUser("Jane Doe", "janedoe", "jane@example.com");
+    const response = await api.put(`${USERS_ENDPOINT}/1`, updatedUser);
+    
+    expect(response.status).toBe(200);
+    expect(response.body.username).toBe("janedoe");
+  });
+
+  test("DELETE removes user", async () => {
+    log.step("DELETE user by ID");
+    
+    const response = await api.delete(`${USERS_ENDPOINT}/1`);
+    
+    expect(response.status).toBe(200);
+    log.info("User deleted successfully");
+  });
+});

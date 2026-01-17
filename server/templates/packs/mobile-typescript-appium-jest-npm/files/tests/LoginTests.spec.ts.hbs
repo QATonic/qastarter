@@ -1,0 +1,16 @@
+import { AppiumManager } from "../core/AppiumManager";
+import { LoginPage } from "../pages/LoginPage";
+import { log } from "../utils/Logger";
+
+describe("Mobile Login Tests", () => {
+  let loginPage: LoginPage;
+
+  beforeAll(async () => { await AppiumManager.initDriver(); loginPage = new LoginPage(); });
+  afterAll(async () => { await AppiumManager.quitDriver(); });
+
+  test("valid login shows Products", async () => {
+    log.step("Valid login test");
+    await loginPage.login("standard_user", "secret_sauce");
+    expect(await loginPage.isLoginSuccessful()).toBe(true);
+  });
+});

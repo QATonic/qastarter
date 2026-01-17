@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,10 +13,10 @@
     <description>Desktop Test Automation Framework using WinAppDriver, TestNG, and Maven</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
+
         <!-- Dependency Versions -->
         <selenium.version>4.16.0</selenium.version>
         <testng.version>7.8.0</testng.version>
@@ -25,26 +24,26 @@
         <jackson.version>2.15.2</jackson.version>
         <commons.lang3.version>3.13.0</commons.lang3.version>
         <commons.io.version>2.11.0</commons.io.version>
-        
-{{#if (eq reportingTool "allure")}}
+
+        {{#if (eq reportingTool "allure")}}
         <!-- Allure Reporting -->
         <allure.version>{{toolVersions.allure}}</allure.version>
         <aspectj.version>1.9.20</aspectj.version>
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
         <!-- ExtentReports -->
         <extentreports.version>{{toolVersions.extentreports}}</extentreports.version>
-{{/if}}
-{{#if (eq testingPattern "bdd")}}
+        {{/if}}
+        {{#if (eq testingPattern "bdd")}}
         <!-- Cucumber BDD -->
         <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
-{{/if}}
-        
+        {{/if}}
+
         <!-- Plugin Versions -->
         <maven.surefire.version>3.1.2</maven.surefire.version>
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <maven.resources.version>3.3.1</maven.resources.version>
-        
+
         <!-- Test Execution Properties -->
         <environment>dev</environment>
         <winappdriver.url>http://127.0.0.1:4723</winappdriver.url>
@@ -57,9 +56,9 @@
         <dependency>
             <groupId>io.appium</groupId>
             <artifactId>java-client</artifactId>
-            <version>8.6.0</version>
+            <version>9.1.0</version>
         </dependency>
-        
+
         <!-- Selenium WebDriver (used by Appium) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -74,7 +73,7 @@
             <version>${testng.version}</version>
         </dependency>
 
-{{#if (eq testingPattern "bdd")}}
+        {{#if (eq testingPattern "bdd")}}
         <!-- Cucumber -->
         <dependency>
             <groupId>io.cucumber</groupId>
@@ -86,8 +85,8 @@
             <artifactId>cucumber-testng</artifactId>
             <version>${cucumber.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
 
         <!-- ExtentReports -->
         <dependency>
@@ -95,8 +94,8 @@
             <artifactId>extentreports</artifactId>
             <version>${extentreports.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "allure")}}
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
 
         <!-- Allure -->
         <dependency>
@@ -104,14 +103,14 @@
             <artifactId>allure-testng</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{#if (eq testingPattern "bdd")}}
+        {{#if (eq testingPattern "bdd")}}
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber7-jvm</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{/if}}
-{{/if}}
+        {{/if}}
+        {{/if}}
 
         <!-- Log4j2 for logging -->
         <dependency>
@@ -167,8 +166,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.version}</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>17</source>
+                    <target>17</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -189,23 +188,23 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven.surefire.version}</version>
                 <configuration>
-{{#if (eq testingPattern "bdd")}}
+                    {{#if (eq testingPattern "bdd")}}
                     <includes>
                         <include>**/runners/*TestRunner.java</include>
                     </includes>
-{{else}}
+                    {{else}}
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-{{/if}}
+                    {{/if}}
                     <systemPropertyVariables>
                         <environment>${environment}</environment>
                         <winappdriver.url>${winappdriver.url}</winappdriver.url>
                         <parallel.execution.enabled>${parallel.execution.enabled}</parallel.execution.enabled>
                         <parallel.thread.count>${parallel.thread.count}</parallel.thread.count>
-{{#if (eq reportingTool "allure")}}
+                        {{#if (eq reportingTool "allure")}}
                         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
-{{/if}}
+                        {{/if}}
                     </systemPropertyVariables>
                     <properties>
                         <property>
@@ -220,15 +219,15 @@
                     <argLine>
                         -Dfile.encoding=UTF-8
                         -Djava.awt.headless=false
-{{#if (eq reportingTool "allure")}}
+                        {{#if (eq reportingTool "allure")}}
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
-{{/if}}
+                        {{/if}}
                     </argLine>
                     <testFailureIgnore>false</testFailureIgnore>
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
                 </configuration>
-{{#if (eq reportingTool "allure")}}
+                {{#if (eq reportingTool "allure")}}
                 <dependencies>
                     <dependency>
                         <groupId>org.aspectj</groupId>
@@ -236,9 +235,9 @@
                         <version>${aspectj.version}</version>
                     </dependency>
                 </dependencies>
-{{/if}}
+                {{/if}}
             </plugin>
-{{#if (eq reportingTool "allure")}}
+            {{#if (eq reportingTool "allure")}}
 
             <!-- Allure Maven Plugin -->
             <plugin>
@@ -250,7 +249,7 @@
                     <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
                 </configuration>
             </plugin>
-{{/if}}
+            {{/if}}
         </plugins>
     </build>
 

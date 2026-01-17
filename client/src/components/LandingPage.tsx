@@ -189,7 +189,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
             </p>
 
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground text-balance">
-              43 Production-Ready Templates
+              43+ Production-Ready Templates
             </h2>
 
             <p className="text-base md:text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -404,7 +404,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                       <span className="text-sm font-medium">Which frameworks are supported?</span>
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
-                      43 templates: Web (Selenium, Playwright, Cypress, Robot Framework), Mobile
+                      43+ templates: Web (Selenium, Playwright, Cypress, Robot Framework), Mobile
                       (Appium, Espresso with Kotlin), API (RestAssured, Supertest, GraphQL, gRPC),
                       and Desktop (WinAppDriver) with POM, BDD, and Docker support.
                     </AccordionContent>

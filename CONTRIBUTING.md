@@ -63,8 +63,8 @@ Documentation improvements are always welcome! This includes:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/QAStarter.git
-cd QAStarter
+git clone https://github.com/QATonic/qastarter.git
+cd qastarter
 
 # Install dependencies
 npm install

@@ -19,7 +19,7 @@ Please **do not** report security vulnerabilities through public GitHub issues.
 
 ### 2. Report Privately
 
-Send details to: **security@qatonic.com** (or create a private security advisory)
+Send details to: **info@qatonic.com** (or create a private security advisory)
 
 Include:
 - Description of the vulnerability

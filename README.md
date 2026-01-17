@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="client/public/logo.svg" alt="QAStarter Logo" width="80" height="80">
+  <img src="client/public/logo.png" alt="QAStarter Logo" width="80" height="80">
 </p>
 
 <h1 align="center">QAStarter</h1>

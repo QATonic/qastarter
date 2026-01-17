@@ -1,0 +1,71 @@
+name: 📄 New Template Request
+description: Request a new testing framework template
+title: "[Template]: "
+labels: ["template", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for requesting a new template! Help us prioritize by providing details.
+
+  - type: dropdown
+    id: testing-type
+    attributes:
+      label: Testing Type
+      options:
+        - Web
+        - Mobile
+        - API
+        - Desktop
+    validations:
+      required: true
+
+  - type: input
+    id: framework
+    attributes:
+      label: Framework Name
+      description: Which testing framework?
+      placeholder: e.g., Puppeteer, Karate, Robot Framework
+    validations:
+      required: true
+
+  - type: input
+    id: language
+    attributes:
+      label: Programming Language
+      description: Which language should this template use?
+      placeholder: e.g., Java, Python, JavaScript
+    validations:
+      required: true
+
+  - type: input
+    id: test-runner
+    attributes:
+      label: Test Runner (if applicable)
+      placeholder: e.g., JUnit5, pytest, Mocha
+
+  - type: input
+    id: build-tool
+    attributes:
+      label: Build Tool
+      placeholder: e.g., Maven, Gradle, npm
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Why is this template needed? What's the typical use case?
+    validations:
+      required: true
+
+  - type: textarea
+    id: resources
+    attributes:
+      label: Reference Resources
+      description: Links to official docs or example projects
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'm willing to help create this template

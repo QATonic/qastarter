@@ -199,37 +199,49 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
                 <CardDescription>Tools chosen by engineers worldwide</CardDescription>
               </CardHeader>
               <CardContent className="h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={frameworkData}
-                    layout="vertical"
-                    margin={{ left: 20, right: 30, top: 10, bottom: 10 }}
-                  >
-                    <XAxis type="number" hide />
-                    <YAxis
-                      dataKey="name"
-                      type="category"
-                      width={100}
-                      tick={{ fontSize: 13, fill: '#888888', fontWeight: 500 }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      content={<CustomTooltip />}
-                      cursor={{ fill: 'var(--primary)', opacity: 0.05 }}
-                    />
-                    <Bar
-                      dataKey="value"
-                      radius={[0, 6, 6, 0]}
-                      barSize={32}
-                      animationDuration={1500}
+                {frameworkData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={frameworkData}
+                      layout="vertical"
+                      margin={{ left: 20, right: 30, top: 10, bottom: 10 }}
                     >
-                      {frameworkData.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                      <XAxis type="number" hide />
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        width={100}
+                        tick={{ fontSize: 13, fill: '#888888', fontWeight: 500 }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <Tooltip
+                        content={<CustomTooltip />}
+                        cursor={{ fill: 'var(--primary)', opacity: 0.05 }}
+                      />
+                      <Bar
+                        dataKey="value"
+                        radius={[0, 6, 6, 0]}
+                        barSize={32}
+                        animationDuration={1500}
+                      >
+                        {frameworkData.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      <TrendingUp className="w-8 h-8 text-primary/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">No data yet</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">
+                      Generate your first project to see trends!
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -242,45 +254,57 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
                 <CardDescription>Preferred ecosystem breakdown</CardDescription>
               </CardHeader>
               <CardContent className="h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={languageData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={80}
-                      outerRadius={110}
-                      paddingAngle={5}
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {languageData.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend
-                      verticalAlign="bottom"
-                      height={36}
-                      iconType="circle"
-                      content={({ payload }) => (
-                        <div className="flex flex-wrap justify-center gap-4 mt-4">
-                          {payload?.map((entry: any, index: number) => (
-                            <div key={`legend-${index}`} className="flex items-center gap-2">
-                              <div
-                                className="w-2.5 h-2.5 rounded-full"
-                                style={{ backgroundColor: entry.color }}
-                              />
-                              <span className="text-sm font-medium text-muted-foreground capitalize">
-                                {entry.value}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                {languageData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={languageData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={80}
+                        outerRadius={110}
+                        paddingAngle={5}
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {languageData.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend
+                        verticalAlign="bottom"
+                        height={36}
+                        iconType="circle"
+                        content={({ payload }) => (
+                          <div className="flex flex-wrap justify-center gap-4 mt-4">
+                            {payload?.map((entry: any, index: number) => (
+                              <div key={`legend-${index}`} className="flex items-center gap-2">
+                                <div
+                                  className="w-2.5 h-2.5 rounded-full"
+                                  style={{ backgroundColor: entry.color }}
+                                />
+                                <span className="text-sm font-medium text-muted-foreground capitalize">
+                                  {entry.value}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <div className="w-16 h-16 rounded-full bg-violet-500/10 flex items-center justify-center mb-4">
+                      <Code2 className="w-8 h-8 text-violet-500/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">No languages yet</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">
+                      Be the first to generate a project!
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -293,31 +317,43 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
                 <CardDescription>What are teams testing the most?</CardDescription>
               </CardHeader>
               <CardContent className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={typeData} margin={{ top: 20, bottom: 20 }}>
-                    <XAxis
-                      dataKey="name"
-                      tick={{ fontSize: 13, fill: '#888888', fontWeight: 500 }}
-                      axisLine={false}
-                      tickLine={false}
-                      dy={10}
-                    />
-                    <Tooltip
-                      content={<CustomTooltip />}
-                      cursor={{ fill: 'var(--primary)', opacity: 0.05 }}
-                    />
-                    <Bar
-                      dataKey="value"
-                      radius={[8, 8, 0, 0]}
-                      barSize={60}
-                      animationDuration={1500}
-                    >
-                      {typeData.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                {typeData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={typeData} margin={{ top: 20, bottom: 20 }}>
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 13, fill: '#888888', fontWeight: 500 }}
+                        axisLine={false}
+                        tickLine={false}
+                        dy={10}
+                      />
+                      <Tooltip
+                        content={<CustomTooltip />}
+                        cursor={{ fill: 'var(--primary)', opacity: 0.05 }}
+                      />
+                      <Bar
+                        dataKey="value"
+                        radius={[8, 8, 0, 0]}
+                        barSize={60}
+                        animationDuration={1500}
+                      >
+                        {typeData.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center">
+                    <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
+                      <Globe className="w-8 h-8 text-blue-500/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">No testing data yet</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">
+                      Community trends will appear here as projects are generated
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -331,7 +367,7 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-border/50">
         <DialogHeader className="space-y-2 pb-6 border-b border-border/40">
           <DialogTitle className="text-4xl font-black tracking-tighter">
-            <span className="bg-gradient-to-r from-violet-600 via-pink-500 to-amber-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
               Global QA Trends
             </span>
           </DialogTitle>

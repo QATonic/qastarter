@@ -143,7 +143,7 @@ If you find QAStarter helpful, please consider:
 </p>
 
 <p align="center">
-  <a href="https://linkedin.com/in/SantoshKarad">LinkedIn</a> •
-  <a href="https://twitter.com/SantoshKarad">Twitter</a> •
-  <a href="https://youtube.com/@SantoshKarad">YouTube</a>
+  <a href="https://www.linkedin.com/company/qatonic">LinkedIn</a> •
+  <a href="https://x.com/qatonicinnovate">Twitter</a> •
+  <a href="https://www.youtube.com/@qatonicinnovations">YouTube</a>
 </p>

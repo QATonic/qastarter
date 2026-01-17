@@ -22,9 +22,9 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
           <div className="flex items-center space-x-3">
             <QAStarterLogo className="h-16 w-auto" />
             <div>
-              <DialogTitle className="text-2xl font-bold">QAStarter</DialogTitle>
+              <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">QAStarter</DialogTitle>
               <DialogDescription className="text-base">
-                QA Automation Project Initializer
+                Your testing foundation, pre-built Templates
               </DialogDescription>
             </div>
           </div>

@@ -152,8 +152,8 @@ docs(readme): update installation instructions
 
 Feel free to open an issue with the `question` label or reach out:
 
-- Twitter: [@SantoshKarad](https://twitter.com/SantoshKarad)
-- LinkedIn: [SantoshKarad](https://linkedin.com/in/SantoshKarad)
+- Twitter/X: [@qatonicinnovate](https://x.com/qatonicinnovate)
+- LinkedIn: [QATonic](https://www.linkedin.com/company/qatonic)
 
 ---
 

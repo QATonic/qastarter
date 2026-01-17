@@ -10,25 +10,25 @@ export default function Footer() {
       name: 'LinkedIn',
       testId: 'button-linkedin',
       icon: Linkedin,
-      url: 'https://linkedin.com/in/SantoshKarad',
+      url: 'https://www.linkedin.com/company/qatonic',
     },
     {
       name: 'Twitter/X',
       testId: 'button-twitter-x',
       icon: Twitter,
-      url: 'https://twitter.com/SantoshKarad',
+      url: 'https://x.com/qatonicinnovate',
     },
     {
       name: 'YouTube',
       testId: 'button-youtube',
       icon: Youtube,
-      url: 'https://youtube.com/@SantoshKarad',
+      url: 'https://www.youtube.com/@qatonicinnovations',
     },
     {
       name: 'Instagram',
       testId: 'button-instagram',
       icon: Instagram,
-      url: 'https://instagram.com/SantoshKarad',
+      url: 'https://www.instagram.com/qatonic/',
     },
   ];
 

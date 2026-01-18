@@ -33,7 +33,11 @@ export interface TemplatePackFile {
 export interface TemplateContext extends ProjectConfig {
   // Computed fields for templates
   javaPackage: string;
+  packageName: string; // Alias for javaPackage, used by some templates
   packagePath: string;
+  // C# specific - namespace format
+  projectNamespace: string;
+  csharpNamespace: string;
   safeArtifactId: string;
   safeGroupId: string;
   envs: string[];

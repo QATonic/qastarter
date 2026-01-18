@@ -1,68 +1,53 @@
 package {{javaPackage}}.config;
 
-import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Configuration Reader - Load API environment settings.
- * 
- * Usage:
- *   String baseUrl = ConfigReader.getBaseUrl();
- *   int timeout = ConfigReader.getTimeout();
+ * Config Reader - Reads environment-specific properties.
  */
 public class ConfigReader {
 
     private static Properties properties;
-    private static final String ENV = System.getProperty("env", "dev");
+    private static final String CONFIG_DIR = "src/main/resources/config/";
 
     static {
-        loadProperties();
+        loadConfig();
     }
 
-    private static void loadProperties() {
+    private static void loadConfig() {
+        String env = System.getProperty("env", "dev");
+        String configFile = CONFIG_DIR + env + ".properties";
+
         properties = new Properties();
-        String configFile = "config/" + ENV + ".properties";
-        
-        try (InputStream input = ConfigReader.class.getClassLoader().getResourceAsStream(configFile)) {
-            if (input != null) {
-                properties.load(input);
-                System.out.println("[Config] Loaded: " + configFile);
-            } else {
-                System.out.println("[Config] Using defaults - " + configFile + " not found");
-            }
-        } catch (Exception e) {
-            System.err.println("[Config] Error loading config: " + e.getMessage());
+        try (FileInputStream fis = new FileInputStream(configFile)) {
+            properties.load(fis);
+            System.out.println("[Config] Loaded: " + configFile);
+        } catch (IOException e) {
+            System.err.println("[Config] Failed to load: " + configFile);
+            setDefaults();
         }
     }
 
-    public static String get(String key) {
-        String envValue = System.getProperty(key);
-        return envValue != null ? envValue : properties.getProperty(key, "");
+    private static void setDefaults() {
+        properties.setProperty("base.url", "https://jsonplaceholder.typicode.com");
+        properties.setProperty("timeout", "30");
     }
 
-    public static String get(String key, String defaultValue) {
-        String value = get(key);
-        return value.isEmpty() ? defaultValue : value;
-    }
-
-    public static int getInt(String key, int defaultValue) {
-        try {
-            return Integer.parseInt(get(key));
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
-    }
-
-    // Convenience methods
     public static String getBaseUrl() {
-        return get("base.url", "https://jsonplaceholder.typicode.com");
+        return properties.getProperty("base.url", "https://jsonplaceholder.typicode.com");
     }
 
     public static int getTimeout() {
-        return getInt("timeout", 30);
+        return Integer.parseInt(properties.getProperty("timeout", "30"));
     }
 
     public static String getContentType() {
-        return get("content.type", "application/json");
+        return properties.getProperty("content.type", "application/json");
+    }
+
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
     }
 }

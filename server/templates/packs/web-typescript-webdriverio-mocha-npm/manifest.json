@@ -4,22 +4,64 @@
   "description": "Production-ready WebdriverIO automation framework with TypeScript and Mocha",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "web", "framework": "webdriverio", "language": "typescript", "testRunner": "mocha", "buildTool": "npm"},
-  "dynamicSupport": {
-    "reportingTools": ["allure", "spec"],
-    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
-    "testingPatterns": ["page-object-model", "bdd"]
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "webdriverio",
+    "language": "typescript",
+    "testRunner": "mocha",
+    "buildTool": "npm"
   },
-  "toolVersions": {"node": "18+", "webdriverio": "8.27.0", "mocha": "10.0.0"},
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "spec"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "node": "18+",
+    "webdriverio": "8.27.0",
+    "mocha": "10.0.0"
+  },
   "files": [
-    {"path": "package.json", "isTemplate": true},
-    {"path": "tsconfig.json", "isTemplate": true},
-    {"path": "wdio.conf.ts", "isTemplate": true},
-    {"path": "README.md", "isTemplate": true},
-    {"path": ".gitignore", "isTemplate": false},
-    {"path": "test/pages/BasePage.ts", "isTemplate": true},
-    {"path": "test/pages/LoginPage.ts", "isTemplate": true},
-    {"path": "test/specs/login.spec.ts", "isTemplate": true}
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "tsconfig.json",
+      "isTemplate": true
+    },
+    {
+      "path": "wdio.conf.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true
+    },
+    {
+      "path": "test/specs/login.spec.ts",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "screenshots", "reports"]
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
 }

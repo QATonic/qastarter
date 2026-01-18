@@ -134,12 +134,6 @@
       "description": "Driver lifecycle management"
     },
     {
-      "path": "src/main/java/{{packagePath}}/core/WinAppDriverFactory.java",
-      "template": "src/main/java/{{packagePath}}/core/WinAppDriverFactory.java.hbs",
-      "isTemplate": true,
-      "description": "WinAppDriver factory"
-    },
-    {
       "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
       "template": "src/main/java/{{packagePath}}/core/BaseTest.java.hbs",
       "isTemplate": true,
@@ -150,18 +144,6 @@
       "template": "src/main/java/{{packagePath}}/pages/BasePage.java.hbs",
       "isTemplate": true,
       "description": "Base page class"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/pages/MainWindowPage.java",
-      "template": "src/main/java/{{packagePath}}/pages/MainWindowPage.java.hbs",
-      "isTemplate": true,
-      "description": "Sample main window page"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/WaitUtils.java",
-      "template": "src/main/java/{{packagePath}}/utils/WaitUtils.java.hbs",
-      "isTemplate": true,
-      "description": "Wait utilities"
     },
     {
       "path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java",
@@ -180,12 +162,6 @@
       "template": "src/main/java/{{packagePath}}/listeners/TestListener.java.hbs",
       "isTemplate": true,
       "description": "TestNG listener"
-    },
-    {
-      "path": "src/test/java/{{packagePath}}/tests/DesktopTests.java",
-      "template": "src/test/java/{{packagePath}}/tests/DesktopTests.java.hbs",
-      "isTemplate": true,
-      "description": "Sample desktop tests"
     },
     {
       "path": "src/main/resources/config/dev.properties",
@@ -210,15 +186,6 @@
       "template": "src/test/resources/testng.xml.hbs",
       "isTemplate": true,
       "description": "TestNG suite"
-    },
-    {
-      "path": "src/main/resources/allure.properties",
-      "template": "src/main/resources/allure.properties.hbs",
-      "isTemplate": true,
-      "conditional": {
-        "reportingTool": "allure"
-      },
-      "description": "Allure config"
     },
     {
       "path": "src/main/resources/extent-config.xml",

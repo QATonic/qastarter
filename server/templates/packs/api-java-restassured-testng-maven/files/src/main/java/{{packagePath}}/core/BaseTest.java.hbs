@@ -1,28 +1,62 @@
 package {{javaPackage}}.core;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import {{javaPackage}}.config.ConfigReader;
+import {{javaPackage}}.utils.Log;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
-import {{javaPackage}}.utils.Log;
+
+import static io.restassured.RestAssured.given;
 
 /**
- * Base Test - Common setup for all API tests.
+ * Base Test - Setup and teardown for API tests.
  */
 public class BaseTest {
 
-    protected APIClient api;
+    protected static final String USERS_ENDPOINT = "/users";
 
     @BeforeClass
     public void setup() {
-        Log.info("========================================");
-        Log.info("API Test Suite Started");
-        Log.info("========================================");
-        api = new APIClient();
+        RestAssured.baseURI = ConfigReader.getBaseUrl();
+        Log.info("API Base URL: " + RestAssured.baseURI);
     }
 
     @AfterClass
     public void teardown() {
-        Log.info("========================================");
-        Log.info("API Test Suite Completed");
-        Log.info("========================================");
+        Log.info("Test suite completed");
+    }
+
+    protected Response get(String endpoint) {
+        Log.info("GET " + endpoint);
+        return given()
+            .contentType("application/json")
+            .get(endpoint);
+    }
+
+    protected Response get(String endpoint, int id) {
+        return get(endpoint + "/" + id);
+    }
+
+    protected Response post(String endpoint, Object body) {
+        Log.info("POST " + endpoint);
+        return given()
+            .contentType("application/json")
+            .body(body)
+            .post(endpoint);
+    }
+
+    protected Response put(String endpoint, int id, Object body) {
+        Log.info("PUT " + endpoint + "/" + id);
+        return given()
+            .contentType("application/json")
+            .body(body)
+            .put(endpoint + "/" + id);
+    }
+
+    protected Response delete(String endpoint, int id) {
+        Log.info("DELETE " + endpoint + "/" + id);
+        return given()
+            .delete(endpoint + "/" + id);
     }
 }

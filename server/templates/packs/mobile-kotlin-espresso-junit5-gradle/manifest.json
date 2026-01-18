@@ -72,36 +72,12 @@
       "description": "GitHub Actions workflow"
     },
     {
-      "path": ".gitlab-ci.yml",
-      "isTemplate": true,
-      "conditional": {
-        "cicdTool": "gitlab-ci"
-      },
-      "description": "GitLab CI configuration"
-    },
-    {
       "path": "Jenkinsfile",
       "isTemplate": true,
       "conditional": {
         "cicdTool": "jenkins"
       },
       "description": "Jenkins pipeline"
-    },
-    {
-      "path": "azure-pipelines.yml",
-      "isTemplate": true,
-      "conditional": {
-        "cicdTool": "azure-devops"
-      },
-      "description": "Azure DevOps pipeline"
-    },
-    {
-      "path": ".circleci/config.yml",
-      "isTemplate": true,
-      "conditional": {
-        "cicdTool": "circleci"
-      },
-      "description": "CircleCI configuration"
     },
     {
       "path": "app/build.gradle.kts",

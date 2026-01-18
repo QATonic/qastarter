@@ -1,91 +1,60 @@
-package {{packageName}}.listeners;
+package {{javaPackage}}.listeners;
 
 import org.testng.ITestListener;
 import org.testng.ITestResult;
-{{#if (includes reporting "extent-reports")}}
-import {{packageName}}.utils.ExtentManager;
-{{/if}}
-{{#if utilities.logger}}
-import {{packageName}}.utils.Log;
+import {{javaPackage}}.utils.Log;
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentReportManager;
 {{/if}}
 
 /**
- * TestNG listener for API test reporting
- * Handles test lifecycle events and integrates with reporting tools
+ * TestNG Listener - Logs test lifecycle events.
  */
 public class TestListener implements ITestListener {
 
     @Override
     public void onTestStart(ITestResult result) {
         String testName = result.getMethod().getMethodName();
-        String className = result.getTestClass().getName();
-        
-        {{#if utilities.logger}}
-        Log.startTest(testName + " [" + className + "]");
-        {{/if}}
-        
-        {{#if (includes reporting "extent-reports")}}
-        ExtentManager.createTest(testName, result.getMethod().getDescription());
-        ExtentManager.logInfo("API test started: " + testName);
+        Log.startTest(testName);
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.createTest(testName, result.getMethod().getDescription());
         {{/if}}
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
         String testName = result.getMethod().getMethodName();
-        
-        {{#if utilities.logger}}
-        Log.info("API Test PASSED: " + testName);
+        Log.info("PASSED: " + testName);
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.logPass("Test passed: " + testName);
+        {{/if}}
         Log.endTest(testName);
-        {{/if}}
-        
-        {{#if (includes reporting "extent-reports")}}
-        ExtentManager.logPass("API test completed successfully");
-        {{/if}}
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
         String testName = result.getMethod().getMethodName();
-        Throwable throwable = result.getThrowable();
-        
-        {{#if utilities.logger}}
-        Log.error("API Test FAILED: " + testName, throwable);
+        Log.error("FAILED: " + testName, result.getThrowable());
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.logFail("Test failed: " + result.getThrowable().getMessage());
         {{/if}}
-        
-        {{#if (includes reporting "extent-reports")}}
-        ExtentManager.logFail("API test failed: " + testName, throwable);
-        {{/if}}
-        
-        {{#if utilities.logger}}
         Log.endTest(testName);
-        {{/if}}
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
         String testName = result.getMethod().getMethodName();
-        
-        {{#if utilities.logger}}
-        Log.warn("API Test SKIPPED: " + testName);
-        {{/if}}
-        
-        {{#if (includes reporting "extent-reports")}}
-        ExtentManager.createTest(testName, result.getMethod().getDescription());
-        ExtentManager.logSkip("API test was skipped: " + (result.getThrowable() != null ? result.getThrowable().getMessage() : "No reason provided"));
+        Log.warn("SKIPPED: " + testName);
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.logWarning("Test skipped: " + testName);
         {{/if}}
     }
 
     @Override
-    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
-        String testName = result.getMethod().getMethodName();
-        
-        {{#if utilities.logger}}
-        Log.warn("API Test FAILED but within success percentage: " + testName);
-        {{/if}}
-        
-        {{#if (includes reporting "extent-reports")}}
-        ExtentManager.logWarning("API test failed but within success percentage");
+    public void onFinish(org.testng.ITestContext context) {
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.flush();
+        Log.info("Extent Report generated at: target/extent-reports/");
         {{/if}}
     }
 }

@@ -3,18 +3,76 @@
   "displayName": "TypeScript Supertest API Framework",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "api", "framework": "supertest", "language": "typescript", "testRunner": "jest", "buildTool": "npm"},
-  "toolVersions": {"node": "18+", "supertest": "6.3.0", "jest": "29.7.0"},
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "supertest",
+    "language": "typescript",
+    "testRunner": "jest",
+    "buildTool": "npm"
+  },
+  "toolVersions": {
+    "node": "18+",
+    "supertest": "6.3.0",
+    "jest": "29.7.0"
+  },
   "files": [
-    {"path": "package.json", "isTemplate": true},
-    {"path": "tsconfig.json", "isTemplate": true},
-    {"path": "jest.config.ts", "isTemplate": true},
-    {"path": "config/ConfigReader.ts", "isTemplate": true},
-    {"path": "config/dev.json", "isTemplate": false},
-    {"path": "core/ApiClient.ts", "isTemplate": true},
-    {"path": "models/User.ts", "isTemplate": true},
-    {"path": "utils/Logger.ts", "isTemplate": true},
-    {"path": "tests/UserTests.spec.ts", "isTemplate": true}
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "tsconfig.json",
+      "isTemplate": true
+    },
+    {
+      "path": "jest.config.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "config/ConfigReader.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "config/dev.json",
+      "isTemplate": false
+    },
+    {
+      "path": "core/ApiClient.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "models/User.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/Logger.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/UserTests.spec.ts",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "reports"]
+  "directories": [
+    "logs",
+    "reports"
+  ],
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "jest-html-reporter",
+      "mochawesome"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops"
+    ],
+    "testingPatterns": [
+      "data-driven",
+      "bdd",
+      "contract-testing"
+    ]
+  }
 }

@@ -3,15 +3,62 @@
   "displayName": "TypeScript gRPC API Framework",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "api", "framework": "grpc", "language": "typescript", "testRunner": "jest", "buildTool": "npm"},
-  "toolVersions": {"node": "18+", "grpc-js": "1.9.0", "jest": "29.7.0"},
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "grpc",
+    "language": "typescript",
+    "testRunner": "jest",
+    "buildTool": "npm"
+  },
+  "toolVersions": {
+    "node": "18+",
+    "grpc-js": "1.9.0",
+    "jest": "29.7.0"
+  },
   "files": [
-    {"path": "package.json", "isTemplate": true},
-    {"path": "tsconfig.json", "isTemplate": true},
-    {"path": "config/ConfigReader.ts", "isTemplate": true},
-    {"path": "core/GrpcClient.ts", "isTemplate": true},
-    {"path": "utils/Logger.ts", "isTemplate": true},
-    {"path": "tests/GrpcTests.spec.ts", "isTemplate": true}
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "tsconfig.json",
+      "isTemplate": true
+    },
+    {
+      "path": "config/ConfigReader.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "core/GrpcClient.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/Logger.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/GrpcTests.spec.ts",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "reports", "protos"]
+  "directories": [
+    "logs",
+    "reports",
+    "protos"
+  ],
+  "dynamicSupport": {
+    "reportingTools": [
+      "jest-html-reporter",
+      "allure"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops"
+    ],
+    "testingPatterns": [
+      "contract-testing"
+    ]
+  }
 }

@@ -3,16 +3,66 @@
   "displayName": "TypeScript GraphQL API Framework",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "api", "framework": "graphql", "language": "typescript", "testRunner": "jest", "buildTool": "npm"},
-  "toolVersions": {"node": "18+", "graphql-request": "6.1.0", "jest": "29.7.0"},
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "graphql",
+    "language": "typescript",
+    "testRunner": "jest",
+    "buildTool": "npm"
+  },
+  "toolVersions": {
+    "node": "18+",
+    "graphql-request": "6.1.0",
+    "jest": "29.7.0"
+  },
   "files": [
-    {"path": "package.json", "isTemplate": true},
-    {"path": "tsconfig.json", "isTemplate": true},
-    {"path": "config/ConfigReader.ts", "isTemplate": true},
-    {"path": "core/GraphQLClient.ts", "isTemplate": true},
-    {"path": "queries/SpaceXQueries.ts", "isTemplate": true},
-    {"path": "utils/Logger.ts", "isTemplate": true},
-    {"path": "tests/GraphQLTests.spec.ts", "isTemplate": true}
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "tsconfig.json",
+      "isTemplate": true
+    },
+    {
+      "path": "config/ConfigReader.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "core/GraphQLClient.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "queries/SpaceXQueries.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/Logger.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/GraphQLTests.spec.ts",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "reports"]
+  "directories": [
+    "logs",
+    "reports"
+  ],
+  "dynamicSupport": {
+    "reportingTools": [
+      "jest-html-reporter",
+      "allure"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops"
+    ],
+    "testingPatterns": [
+      "contract-testing",
+      "schema-validation"
+    ]
+  }
 }

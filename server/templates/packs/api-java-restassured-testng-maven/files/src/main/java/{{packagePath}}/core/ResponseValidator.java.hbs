@@ -6,36 +6,26 @@ import static org.testng.Assert.*;
 
 /**
  * Response Validator - Common assertions for API responses.
- * 
- * Usage:
- *   ResponseValidator.assertStatus(response, 200);
- *   ResponseValidator.assertBodyContains(response, "id");
  */
 public class ResponseValidator {
 
     public static void assertStatus(Response response, int expectedStatus) {
-        int actualStatus = response.getStatusCode();
-        Log.info("Asserting status: expected=" + expectedStatus + ", actual=" + actualStatus);
-        assertEquals(actualStatus, expectedStatus, "Status code mismatch");
+        int actual = response.getStatusCode();
+        Log.info("Expected: " + expectedStatus + ", Actual: " + actual);
+        assertEquals(actual, expectedStatus, "Status code mismatch");
     }
 
     public static void assertBodyContains(Response response, String key) {
         String body = response.getBody().asString();
-        Log.info("Asserting body contains key: " + key);
-        assertTrue(body.contains(key), "Response body should contain: " + key);
+        assertTrue(body.contains(key), "Response should contain: " + key);
     }
 
     public static void assertBodyNotEmpty(Response response) {
         String body = response.getBody().asString();
-        Log.info("Asserting body is not empty");
         assertFalse(body.isEmpty(), "Response body should not be empty");
     }
 
     public static <T> T extractAs(Response response, Class<T> clazz) {
-        return response.as(clazz);
-    }
-
-    public static <T> T[] extractAsArray(Response response, Class<T[]> clazz) {
         return response.as(clazz);
     }
 

@@ -3,14 +3,63 @@
   "displayName": "JavaScript Supertest API Framework",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "api", "framework": "supertest", "language": "javascript", "testRunner": "jest", "buildTool": "npm"},
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "supertest",
+    "language": "javascript",
+    "testRunner": "jest",
+    "buildTool": "npm"
+  },
+  "toolVersions": {
+    "node": "18+",
+    "supertest": "6.3.0",
+    "jest": "29.7.0"
+  },
   "files": [
-    {"path": "package.json", "isTemplate": true},
-    {"path": "config/ConfigReader.js", "isTemplate": true},
-    {"path": "config/dev.json", "isTemplate": false},
-    {"path": "core/ApiClient.js", "isTemplate": true},
-    {"path": "utils/Logger.js", "isTemplate": true},
-    {"path": "tests/UserTests.spec.js", "isTemplate": true}
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "config/ConfigReader.js",
+      "isTemplate": true
+    },
+    {
+      "path": "config/dev.json",
+      "isTemplate": false
+    },
+    {
+      "path": "core/ApiClient.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/Logger.js",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/UserTests.spec.js",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "reports"]
+  "directories": [
+    "logs",
+    "reports"
+  ],
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "jest-html"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops"
+    ],
+    "testingPatterns": [
+      "data-driven",
+      "bdd",
+      "contract-testing"
+    ]
+  }
 }

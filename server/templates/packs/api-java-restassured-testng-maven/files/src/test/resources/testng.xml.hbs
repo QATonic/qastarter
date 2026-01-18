@@ -1,104 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-
-<suite name="{{projectName}}_API_Test_Suite" parallel="classes" thread-count="3">
-    
-    <parameter name="environment" value="qa"/>
-    
-    <!-- Main API Test Configuration -->
-    <test name="API_Smoke_Tests" preserve-order="true">
-        <parameter name="environment" value="qa"/>
-        
-        <classes>
-            <class name="{{packageName}}.tests.UserAPITests">
-                <methods>
-                    <include name="testCreateUser"/>
-                    <include name="testGetUser"/>
-                    <include name="testGetAllUsers"/>
-                </methods>
-            </class>
-            <class name="{{packageName}}.tests.AuthenticationTests">
-                <methods>
-                    <include name="testValidLogin"/>
-                    <include name="testInvalidLogin"/>
-                </methods>
-            </class>
-        </classes>
-        
-        <groups>
-            <run>
-                <include name="api"/>
-                <include name="smoke"/>
-            </run>
-        </groups>
-    </test>
-    
-    <test name="API_Regression_Tests" preserve-order="true">
-        <parameter name="environment" value="qa"/>
-        
-        <classes>
-            <class name="{{packageName}}.tests.UserAPITests">
-                <methods>
-                    <include name="testCreateUser"/>
-                    <include name="testGetUser"/>
-                    <include name="testUpdateUser"/>
-                    <include name="testDeleteUser"/>
-                    <include name="testGetAllUsers"/>
-                    <include name="testGetNonExistentUser"/>
-                    <include name="testCreateUserWithInvalidData"/>
-                </methods>
-            </class>
-            <class name="{{packageName}}.tests.AuthenticationTests">
-                <methods>
-                    <include name="testValidLogin"/>
-                    <include name="testInvalidLogin"/>
-                    <include name="testLoginWithMissingCredentials"/>
-                    <include name="testAuthenticatedRequest"/>
-                    <include name="testInvalidTokenRequest"/>
-                    <include name="testRequestWithoutToken"/>
-                </methods>
-            </class>
-            <class name="{{packageName}}.tests.DataDrivenTests"/>
-        </classes>
-        
-        <groups>
-            <run>
-                <include name="api"/>
-                <include name="regression"/>
-            </run>
-        </groups>
-    </test>
-    
-    <test name="API_Negative_Tests" preserve-order="false">
-        <parameter name="environment" value="qa"/>
-        
-        <classes>
-            <class name="{{packageName}}.tests.UserAPITests">
-                <methods>
-                    <include name="testGetNonExistentUser"/>
-                    <include name="testCreateUserWithInvalidData"/>
-                </methods>
-            </class>
-            <class name="{{packageName}}.tests.AuthenticationTests">
-                <methods>
-                    <include name="testInvalidLogin"/>
-                    <include name="testLoginWithMissingCredentials"/>
-                    <include name="testInvalidTokenRequest"/>
-                    <include name="testRequestWithoutToken"/>
-                </methods>
-            </class>
-        </classes>
-        
-        <groups>
-            <run>
-                <include name="negative"/>
-            </run>
-        </groups>
-    </test>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="API Test Suite" parallel="methods" thread-count="3">
     
     <listeners>
-        <listener class-name="{{packageName}}.listeners.TestListener"/>
-        <listener class-name="{{packageName}}.listeners.RetryAnalyzer"/>
+        <listener class-name="{{javaPackage}}.listeners.TestListener"/>
     </listeners>
+    
+    <test name="User API Tests">
+        <classes>
+            <class name="{{javaPackage}}.tests.UserTests"/>
+        </classes>
+    </test>
     
 </suite>

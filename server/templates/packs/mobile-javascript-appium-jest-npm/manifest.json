@@ -61,7 +61,7 @@
     },
     {
       "path": ".gitignore",
-      "isTemplate": false,
+      "isTemplate": true,
       "description": "Git ignore patterns"
     },
     {

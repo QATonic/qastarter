@@ -4,22 +4,70 @@
   "description": "Production-ready Cypress automation framework with JavaScript",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "web", "framework": "cypress", "language": "javascript", "testRunner": "cypress", "buildTool": "npm"},
-  "dynamicSupport": {
-    "reportingTools": ["mochawesome"],
-    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
-    "testingPatterns": ["page-object-model", "bdd"]
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "cypress",
+    "language": "javascript",
+    "testRunner": "cypress",
+    "buildTool": "npm"
   },
-  "toolVersions": {"node": "18+", "cypress": "13.6.0"},
+  "dynamicSupport": {
+    "reportingTools": [
+      "mochawesome"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "node": "18+",
+    "cypress": "13.6.0"
+  },
   "files": [
-    {"path": "package.json", "isTemplate": true},
-    {"path": "cypress.config.js", "isTemplate": true},
-    {"path": "README.md", "isTemplate": true},
-    {"path": ".gitignore", "isTemplate": false},
-    {"path": "cypress/pages/BasePage.js", "isTemplate": true},
-    {"path": "cypress/pages/LoginPage.js", "isTemplate": true},
-    {"path": "cypress/e2e/login.cy.js", "isTemplate": true},
-    {"path": "cypress/support/e2e.js", "isTemplate": true}
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/pages/BasePage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/pages/LoginPage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/e2e/login.cy.js",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/support/e2e.js",
+      "isTemplate": true
+    }
   ],
-  "directories": ["cypress/screenshots", "cypress/videos", "reports"]
+  "directories": [
+    "cypress/screenshots",
+    "cypress/videos",
+    "reports"
+  ]
 }

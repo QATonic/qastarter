@@ -1,4 +1,4 @@
-package {{packageName}}.runners;
+package {{javaPackage}}.runners;
 
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
@@ -6,20 +6,16 @@ import org.testng.annotations.DataProvider;
 
 @CucumberOptions(
     features = "src/test/resources/features",
-    glue = {"{{packageName}}.steps"},
-    tags = "@api",
+    glue = {"{{javaPackage}}.steps"},
     plugin = {
         "pretty",
         "html:target/cucumber-reports/cucumber.html",
-        "json:target/cucumber-reports/cucumber.json",
-        "junit:target/cucumber-reports/cucumber.xml"{{#if (eq reportingTool "allure")}},
-        "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"{{/if}}
+        "json:target/cucumber-reports/cucumber.json"
     },
-    monochrome = true,
-    dryRun = false
+    monochrome = true
 )
 public class TestRunner extends AbstractTestNGCucumberTests {
-    
+
     @Override
     @DataProvider(parallel = true)
     public Object[][] scenarios() {

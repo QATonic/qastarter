@@ -1,0 +1,102 @@
+package {{javaPackage}}.steps;
+
+import io.cucumber.datatable.DataTable;
+import io.cucumber.java.en.*;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import {{javaPackage}}.config.ConfigReader;
+import {{javaPackage}}.core.ResponseValidator;
+import {{javaPackage}}.utils.Log;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+import static org.testng.Assert.*;
+
+public class UserSteps {
+
+    private Response response;
+    private Map<String, Object> userData;
+
+    @Given("the API is available")
+    public void the_api_is_available() {
+        RestAssured.baseURI = ConfigReader.getBaseUrl();
+        Log.info("API Base URL: " + RestAssured.baseURI);
+    }
+
+    @Given("I have user data:")
+    public void i_have_user_data(DataTable dataTable) {
+        List<Map<String, String>> rows = dataTable.asMaps();
+        Map<String, String> row = rows.get(0);
+        userData = new HashMap<>();
+        userData.put("name", row.get("name"));
+        userData.put("username", row.get("username"));
+        userData.put("email", row.get("email"));
+        Log.info("User data: " + userData);
+    }
+
+    @Given("I have updated user data:")
+    public void i_have_updated_user_data(DataTable dataTable) {
+        i_have_user_data(dataTable);
+    }
+
+    @When("I send a GET request to {string}")
+    public void i_send_a_get_request_to(String endpoint) {
+        Log.info("GET " + endpoint);
+        response = given().contentType("application/json").get(endpoint);
+        Log.info("Response: " + response.getStatusCode());
+    }
+
+    @When("I send a POST request to {string}")
+    public void i_send_a_post_request_to(String endpoint) {
+        Log.info("POST " + endpoint);
+        response = given().contentType("application/json").body(userData).post(endpoint);
+        Log.info("Response: " + response.getStatusCode());
+    }
+
+    @When("I send a PUT request to {string}")
+    public void i_send_a_put_request_to(String endpoint) {
+        Log.info("PUT " + endpoint);
+        response = given().contentType("application/json").body(userData).put(endpoint);
+        Log.info("Response: " + response.getStatusCode());
+    }
+
+    @When("I send a DELETE request to {string}")
+    public void i_send_a_delete_request_to(String endpoint) {
+        Log.info("DELETE " + endpoint);
+        response = given().delete(endpoint);
+        Log.info("Response: " + response.getStatusCode());
+    }
+
+    @Then("the response status code should be {int}")
+    public void the_response_status_code_should_be(int expectedStatus) {
+        ResponseValidator.assertStatus(response, expectedStatus);
+    }
+
+    @Then("the response should contain a list of users")
+    public void the_response_should_contain_a_list_of_users() {
+        List<?> users = response.jsonPath().getList("$");
+        assertTrue(users.size() > 0, "Should contain users");
+        Log.info("Found " + users.size() + " users");
+    }
+
+    @Then("the response should contain user with id {int}")
+    public void the_response_should_contain_user_with_id(int id) {
+        int actualId = response.jsonPath().getInt("id");
+        assertEquals(actualId, id, "User ID should match");
+    }
+
+    @Then("the response should contain the created user")
+    public void the_response_should_contain_the_created_user() {
+        assertNotNull(response.jsonPath().get("id"), "Should have ID");
+        Log.info("User created with ID: " + response.jsonPath().getInt("id"));
+    }
+
+    @Then("the response should contain the updated data")
+    public void the_response_should_contain_the_updated_data() {
+        String name = response.jsonPath().getString("name");
+        Log.info("Updated user name: " + name);
+    }
+}

@@ -3,16 +3,67 @@
   "displayName": "C# RestSharp NUnit API Framework",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "api", "framework": "restsharp", "language": "csharp", "testRunner": "nunit", "buildTool": "nuget"},
-  "toolVersions": {"dotnet": "8.0", "restsharp": "110.2.0", "nunit": "4.0.1"},
+  "supportedCombination": {
+    "testingType": "api",
+    "framework": "restsharp",
+    "language": "csharp",
+    "testRunner": "nunit",
+    "buildTool": "nuget"
+  },
+  "toolVersions": {
+    "dotnet": "8.0",
+    "restsharp": "110.2.0",
+    "nunit": "4.0.1"
+  },
   "files": [
-    {"path": "{{projectName}}.csproj", "isTemplate": true},
-    {"path": "appsettings.json", "isTemplate": true},
-    {"path": "Config/ConfigReader.cs", "isTemplate": true},
-    {"path": "Core/ApiClient.cs", "isTemplate": true},
-    {"path": "Models/User.cs", "isTemplate": true},
-    {"path": "Utils/Log.cs", "isTemplate": true},
-    {"path": "Tests/UserTests.cs", "isTemplate": true}
+    {
+      "path": "{{projectName}}.csproj",
+      "isTemplate": true
+    },
+    {
+      "path": "appsettings.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Config/ConfigReader.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Core/ApiClient.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Models/User.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/Log.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Tests/UserTests.cs",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "reports"]
+  "directories": [
+    "logs",
+    "reports"
+  ],
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "nunit-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops"
+    ],
+    "testingPatterns": [
+      "data-driven",
+      "bdd"
+    ]
+  }
 }

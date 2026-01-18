@@ -128,22 +128,10 @@
       "description": "Environment enum"
     },
     {
-      "path": "src/main/java/{{packagePath}}/core/BaseApiTest.java",
-      "template": "src/main/java/{{packagePath}}/core/BaseApiTest.java.hbs",
-      "isTemplate": true,
-      "description": "Base API test class"
-    },
-    {
       "path": "src/main/java/{{packagePath}}/core/RequestBuilder.java",
       "template": "src/main/java/{{packagePath}}/core/RequestBuilder.java.hbs",
       "isTemplate": true,
       "description": "Request specification builder"
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/endpoints/Endpoints.java",
-      "template": "src/main/java/{{packagePath}}/endpoints/Endpoints.java.hbs",
-      "isTemplate": true,
-      "description": "API endpoints"
     },
     {
       "path": "src/main/java/{{packagePath}}/models/User.java",
@@ -210,15 +198,6 @@
       "template": "src/test/resources/testdata/users.json.hbs",
       "isTemplate": true,
       "description": "Test data"
-    },
-    {
-      "path": "src/main/resources/allure.properties",
-      "template": "src/main/resources/allure.properties.hbs",
-      "isTemplate": true,
-      "conditional": {
-        "reportingTool": "allure"
-      },
-      "description": "Allure config"
     },
     {
       "path": "src/main/resources/extent-config.xml",

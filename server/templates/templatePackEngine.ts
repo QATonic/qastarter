@@ -158,10 +158,20 @@ export class TemplatePackEngine {
     const artifactId =
       config.artifactId || config.projectName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-');
 
+    // Create C# namespace from project name (e.g., "my-project" -> "MyProject")
+    const projectNamespace = config.projectName
+      .split(/[-_\s]+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join('');
+
     return {
       ...config,
       javaPackage: groupId,
+      packageName: groupId, // Alias for templates using {{packageName}}
       packagePath: sanitizePath(groupId.replace(/\./g, '/')),
+      // C# specific namespaces
+      projectNamespace: projectNamespace,
+      csharpNamespace: projectNamespace, // Alias for templates using {{csharpNamespace}}
       safeArtifactId: sanitizePath(artifactId),
       safeGroupId: sanitizePath(groupId),
       envs: ['dev', 'qa', 'prod'],

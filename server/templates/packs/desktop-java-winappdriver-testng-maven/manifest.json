@@ -227,22 +227,6 @@
       }
     },
     {
-      "path": "src/main/resources/allure.properties",
-      "isTemplate": true,
-      "description": "Allure Reports configuration",
-      "conditional": {
-        "reportingTool": "allure"
-      }
-    },
-    {
-      "path": "src/main/java/{{packagePath}}/utils/AllureManager.java",
-      "isTemplate": true,
-      "description": "Allure Reports configuration and management",
-      "conditional": {
-        "reportingTool": "allure"
-      }
-    },
-    {
       "path": "src/test/resources/testng.xml",
       "template": "src/test/resources/testng.xml.hbs",
       "isTemplate": true,

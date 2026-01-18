@@ -1,30 +1,22 @@
-package {{packageName}}.listeners;
+package {{javaPackage}}.listeners;
 
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
-{{#if utilities.logger}}
-import {{packageName}}.utils.Log;
-{{/if}}
+import {{javaPackage}}.utils.Log;
 
 /**
- * TestNG retry analyzer for handling flaky API tests
- * Automatically retries failed tests up to a specified limit
+ * Retry Analyzer - Retries failed tests.
  */
 public class RetryAnalyzer implements IRetryAnalyzer {
 
     private int retryCount = 0;
-    private static final int MAX_RETRY_COUNT = 2;
+    private static final int MAX_RETRIES = 2;
 
     @Override
     public boolean retry(ITestResult result) {
-        if (retryCount < MAX_RETRY_COUNT) {
+        if (retryCount < MAX_RETRIES) {
             retryCount++;
-            String testName = result.getMethod().getMethodName();
-            
-            {{#if utilities.logger}}
-            Log.warn("Retrying API test: " + testName + " (Attempt " + (retryCount + 1) + "/" + (MAX_RETRY_COUNT + 1) + ")");
-            {{/if}}
-            
+            Log.warn("Retrying: " + result.getName() + " (Attempt " + retryCount + ")");
             return true;
         }
         return false;

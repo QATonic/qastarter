@@ -7,49 +7,47 @@ import {{javaPackage}}.core.ResponseValidator;
 import {{javaPackage}}.models.User;
 import {{javaPackage}}.utils.Log;
 
+import java.util.List;
+
 /**
- * User API Tests - CRUD operations for /users endpoint.
- * 
- * Sample API: JSONPlaceholder (https://jsonplaceholder.typicode.com)
+ * User API Tests - CRUD operations against JSONPlaceholder /users.
  * 
  * Run: mvn clean test
  */
 public class UserTests extends BaseTest {
 
-    private static final String USERS_ENDPOINT = "/users";
-
-    @Test(groups = {"smoke", "api"}, description = "GET all users returns 200")
+    @Test(priority = 1, description = "GET all users")
     public void testGetAllUsers() {
-        Log.step("GET all users");
+        Log.step("GET all users from /users");
         
-        Response response = api.get(USERS_ENDPOINT);
+        Response response = get(USERS_ENDPOINT);
         
         ResponseValidator.assertStatus(response, 200);
         ResponseValidator.assertBodyNotEmpty(response);
         
-        User[] users = ResponseValidator.extractAsArray(response, User[].class);
-        Log.info("Total users: " + users.length);
+        List<?> users = response.jsonPath().getList("$");
+        Log.info("Total users: " + users.size());
     }
 
-    @Test(groups = {"smoke", "api"}, description = "GET single user returns user data")
+    @Test(priority = 2, description = "GET single user by ID")
     public void testGetSingleUser() {
-        Log.step("GET single user by ID");
+        Log.step("GET user with ID 1");
         
-        Response response = api.get(USERS_ENDPOINT, 1);
+        Response response = get(USERS_ENDPOINT, 1);
         
         ResponseValidator.assertStatus(response, 200);
         ResponseValidator.assertBodyContains(response, "email");
         
-        User user = ResponseValidator.extractAs(response, User.class);
-        Log.info("User retrieved: " + user);
+        String name = response.jsonPath().getString("name");
+        Log.info("User name: " + name);
     }
 
-    @Test(groups = {"regression", "api"}, description = "POST creates new user")
+    @Test(priority = 3, description = "POST create new user")
     public void testCreateUser() {
         Log.step("POST create new user");
         
         User newUser = new User("John Doe", "johndoe", "john@example.com");
-        Response response = api.post(USERS_ENDPOINT, newUser);
+        Response response = post(USERS_ENDPOINT, newUser);
         
         ResponseValidator.assertStatus(response, 201);
         
@@ -57,22 +55,22 @@ public class UserTests extends BaseTest {
         Log.info("Created user ID: " + createdId);
     }
 
-    @Test(groups = {"regression", "api"}, description = "PUT updates existing user")
+    @Test(priority = 4, description = "PUT update existing user")
     public void testUpdateUser() {
-        Log.step("PUT update existing user");
+        Log.step("PUT update user with ID 1");
         
         User updatedUser = new User("Jane Doe", "janedoe", "jane@example.com");
-        Response response = api.put(USERS_ENDPOINT, 1, updatedUser);
+        Response response = put(USERS_ENDPOINT, 1, updatedUser);
         
         ResponseValidator.assertStatus(response, 200);
         ResponseValidator.assertBodyContains(response, "janedoe");
     }
 
-    @Test(groups = {"regression", "api"}, description = "DELETE removes user")
+    @Test(priority = 5, description = "DELETE user by ID")
     public void testDeleteUser() {
-        Log.step("DELETE user by ID");
+        Log.step("DELETE user with ID 1");
         
-        Response response = api.delete(USERS_ENDPOINT, 1);
+        Response response = delete(USERS_ENDPOINT, 1);
         
         ResponseValidator.assertStatus(response, 200);
         Log.info("User deleted successfully");

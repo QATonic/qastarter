@@ -26,7 +26,7 @@ interface LandingPageProps {
   onStartGeneration: () => void;
 }
 
-const YOUTUBE_VIDEO_ID = 'YOUR_VIDEO_ID';
+const YOUTUBE_VIDEO_ID = 'YYEBwX9oqas';
 
 export default function LandingPage({ onStartGeneration }: LandingPageProps) {
   const [demoOpen, setDemoOpen] = useState(false);
@@ -44,7 +44,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
               <iframe
                 width="100%"
                 height="100%"
-                src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1`}
+                src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?rel=0`}
                 title="QAStarter Demo Video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

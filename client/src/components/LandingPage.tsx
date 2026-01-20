@@ -44,7 +44,8 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
               <iframe
                 width="100%"
                 height="100%"
-                src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?rel=0`}
+                src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?origin=${window.location.origin}`}
+                referrerPolicy="origin"
                 title="QAStarter Demo Video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

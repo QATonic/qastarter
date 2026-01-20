@@ -40,7 +40,7 @@ if (isDevelopment) {
           fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://fonts.googleapis.com'],
           objectSrc: ["'none'"],
           mediaSrc: ["'self'"],
-          frameSrc: ["'self'", 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
+          frameSrc: ["'none'"],
           frameAncestors: ["'none'"],
           upgradeInsecureRequests: [],
         },

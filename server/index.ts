@@ -102,8 +102,9 @@ app.use((req, res, next) => {
     res.setTimeout(REQUEST_TIMEOUT_MS);
   }
 
-  // Handle timeout
+  // Handle timeout - including streaming responses
   req.on('timeout', () => {
+    log(`Request timeout on ${req.method} ${req.path}`);
     if (!res.headersSent) {
       res.status(408).json({
         success: false,
@@ -113,6 +114,10 @@ app.use((req, res, next) => {
           timestamp: new Date().toISOString(),
         },
       });
+    } else if (!res.writableEnded) {
+      // If streaming, destroy the response to signal client
+      log(`Destroying streaming response due to timeout on ${req.path}`);
+      res.destroy(new Error('Request timeout during streaming'));
     }
   });
 

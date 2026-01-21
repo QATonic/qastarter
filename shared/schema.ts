@@ -26,16 +26,37 @@ export type InsertProjectGeneration = z.infer<typeof insertProjectGenerationSche
 
 // Project configuration schema - Updated to match validation matrix system
 export const projectConfigSchema = z.object({
-  testingType: z.enum(['web', 'mobile', 'api', 'desktop']),
-  framework: z.string().min(1, 'Framework is required'),
-  language: z.string().min(1, 'Language is required'),
-  testingPattern: z.string().min(1, 'Testing pattern is required'),
-  testRunner: z.string().min(1, 'Test runner is required'),
-  buildTool: z.string().min(1, 'Build tool is required'),
+  testingType: z.enum(['web', 'mobile', 'api', 'desktop'], {
+    required_error: 'Testing type is required',
+    invalid_type_error: 'Testing type must be one of: web, mobile, api, desktop',
+  }),
+  framework: z.string({
+    required_error: 'Framework is required',
+    invalid_type_error: 'Framework must be a string',
+  }).min(1, 'Framework cannot be empty'),
+  language: z.string({
+    required_error: 'Language is required',
+    invalid_type_error: 'Language must be a string',
+  }).min(1, 'Language cannot be empty'),
+  testingPattern: z.string({
+    required_error: 'Testing pattern is required',
+    invalid_type_error: 'Testing pattern must be a string',
+  }).min(1, 'Testing pattern cannot be empty'),
+  testRunner: z.string({
+    required_error: 'Test runner is required',
+    invalid_type_error: 'Test runner must be a string',
+  }).min(1, 'Test runner cannot be empty'),
+  buildTool: z.string({
+    required_error: 'Build tool is required',
+    invalid_type_error: 'Build tool must be a string',
+  }).min(1, 'Build tool cannot be empty'),
   projectName: z
-    .string()
-    .min(1)
-    .max(100)
+    .string({
+      required_error: 'Project name is required',
+      invalid_type_error: 'Project name must be a string',
+    })
+    .min(1, 'Project name cannot be empty')
+    .max(100, 'Project name cannot exceed 100 characters')
     .regex(
       /^[a-zA-Z0-9_-]+$/,
       'Project name can only contain letters, numbers, hyphens, and underscores'

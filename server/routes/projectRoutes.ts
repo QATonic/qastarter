@@ -3,7 +3,7 @@
  * Endpoints for generating, previewing, and managing projects
  */
 
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import rateLimit from 'express-rate-limit';
 import { projectConfigSchema, type ProjectConfig } from '@shared/schema';
 import { projectService } from '../services/projectService';
@@ -20,6 +20,24 @@ import { createRequestLogger } from '../utils/logger';
 import { rateLimitConfig } from '../config';
 
 const router = Router();
+
+/**
+ * Reusable validation helper to reduce code duplication (DRY)
+ * Validates request body against projectConfigSchema
+ */
+function validateProjectConfigBody(body: unknown, requestId: string): ProjectConfig {
+  const validationResult = projectConfigSchema.safeParse(body);
+
+  if (!validationResult.success) {
+    const errors = validationResult.error.errors.map((e) => ({
+      field: e.path.join('.'),
+      message: e.message,
+    }));
+    throw new ValidationError('Invalid project configuration', errors, requestId);
+  }
+
+  return validationResult.data;
+}
 
 // Project generation rate limiter
 const generateProjectLimiter = rateLimit({
@@ -318,7 +336,9 @@ router.get(
       ? (testingTypeParam as 'web' | 'mobile' | 'api' | 'desktop')
       : 'web';
 
-    const utilitiesArray = utilitiesParam ? utilitiesParam.split(',').map((u) => u.trim()) : [];
+    const utilitiesArray = utilitiesParam
+      ? utilitiesParam.split(',').map((u) => u.trim()).filter(Boolean)
+      : [];
     const utilities = {
       configReader: utilitiesArray.includes('configReader'),
       jsonReader: utilitiesArray.includes('jsonReader'),

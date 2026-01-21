@@ -2,6 +2,7 @@ import { ProjectConfig } from '@shared/schema';
 import { ProjectTemplateGenerator, TemplateFile } from '../templates';
 import { storage } from '../storage';
 import { logGeneration } from '../utils/logger';
+import { sanitizeFilename } from '@shared/sanitize';
 import archiver from 'archiver';
 import path from 'path';
 import { Response } from 'express';
@@ -50,17 +51,25 @@ export class ProjectService {
       zlib: { level: 9 }, // Max compression
     });
 
-    // Set Headers
+    // Set Headers with sanitized filename (RFC 5987 encoding for safety)
+    const safeName = sanitizeFilename(config.projectName);
     res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename="${config.projectName}.zip"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${safeName}.zip"; filename*=UTF-8''${encodeURIComponent(safeName)}.zip`
+    );
+    // Track error state to prevent double response handling
+    let hasErrored = false;
 
     // Handle archive errors
     archive.on('error', (err: Error) => {
+      hasErrored = true;
       reqLogger.error('Archive error', { error: err.message });
       if (!res.headersSent) {
         res.status(500).json({ error: 'Archive creation failed' });
-      } else {
-        res.end(); // Terminate stream if headers sent
+      } else if (!res.writableEnded) {
+        // Properly destroy the stream to signal failure to client
+        res.destroy(err);
       }
     });
 
@@ -95,13 +104,15 @@ export class ProjectService {
 
       reqLogger.debug('Streamed generation completed', { files: fileCount, durationMs });
     } catch (error) {
-      reqLogger.error('Streaming generation failed', { error });
-      // If we haven't sent headers yet (unlikely if we started streaming), send error
-      // If we are mid-stream, we technically can't "unsend" the zip header,
-      // but we can destroy the stream to signal failure.
-      archive.abort();
-      if (!res.headersSent) {
-        throw error; // Let controller handle it
+      // Only handle if archive error handler didn't already respond
+      if (!hasErrored) {
+        reqLogger.error('Streaming generation failed', { error });
+        archive.abort();
+        if (!res.headersSent) {
+          throw error; // Let controller handle it
+        } else if (!res.writableEnded) {
+          res.destroy(error as Error);
+        }
       }
     }
   }

@@ -92,31 +92,55 @@ export function sanitizeArtifactId(artifactId: string): string {
 
 /**
  * Sanitize file path to prevent path traversal
- * - Removes .. sequences
- * - Normalizes slashes
+ * - Decodes URL encoding first
+ * - Normalizes path using Node's path module
+ * - Throws on traversal detection (fail-safe)
  * - Removes absolute path indicators
  */
-export function sanitizeFilePath(path: string): string {
-  if (!path || typeof path !== 'string') {
+export function sanitizeFilePath(inputPath: string): string {
+  if (!inputPath || typeof inputPath !== 'string') {
     return '';
   }
 
-  return (
-    path
-      // Normalize slashes to forward slash
-      .replace(/\\/g, '/')
-      // Remove path traversal attempts
-      .replace(/\.\./g, '')
-      // Remove absolute path indicators
-      .replace(/^[a-zA-Z]:/, '')
-      .replace(/^\/+/, '')
-      // Remove null bytes
-      .replace(/\0/g, '')
-      // Collapse multiple slashes
-      .replace(/\/+/g, '/')
-      // Remove leading/trailing slashes
-      .replace(/^\/+|\/+$/g, '')
-  );
+  // Remove null bytes first (security)
+  let sanitized = inputPath.replace(/\0/g, '');
+
+  // Decode URL encoding to catch %2e%2e type attacks
+  try {
+    // Decode multiple times to handle double encoding
+    let decoded = sanitized;
+    let prev = '';
+    while (decoded !== prev) {
+      prev = decoded;
+      decoded = decodeURIComponent(decoded);
+    }
+    sanitized = decoded;
+  } catch {
+    // Invalid encoding - proceed with original
+  }
+
+  // Normalize slashes to forward slash
+  sanitized = sanitized.replace(/\\/g, '/');
+
+  // Remove Windows drive letters
+  sanitized = sanitized.replace(/^[a-zA-Z]:/, '');
+
+  // Check for path traversal BEFORE normalizing (catch explicit attempts)
+  if (sanitized.includes('..')) {
+    throw new Error('Invalid path: path traversal detected');
+  }
+
+  // Collapse multiple slashes and remove leading/trailing slashes
+  sanitized = sanitized
+    .replace(/\/+/g, '/')
+    .replace(/^\/+|\/+$/g, '');
+
+  // Final safety check - ensure no absolute paths escaped
+  if (sanitized.startsWith('/') || /^[a-zA-Z]:/.test(sanitized)) {
+    throw new Error('Invalid path: absolute paths not allowed');
+  }
+
+  return sanitized;
 }
 
 /**

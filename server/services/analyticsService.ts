@@ -60,13 +60,22 @@ class AnalyticsStore {
   };
   private combinationCounts: Map<string, number> = new Map();
   private readonly MAX_EVENTS = 10000; // Keep only last 10k events in memory
+  private readonly MAX_MEMORY_MB = 50; // Maximum memory for analytics store
+  private memoryCheckCounter = 0;
 
   addEvent(event: AnalyticsEvent): void {
     this.events.push(event);
 
-    // Trim old events if needed
+    // Trim old events if count exceeded
     if (this.events.length > this.MAX_EVENTS) {
       this.events = this.events.slice(-this.MAX_EVENTS);
+    }
+
+    // Periodically check memory usage (every 500 events)
+    this.memoryCheckCounter++;
+    if (this.memoryCheckCounter >= 500) {
+      this.memoryCheckCounter = 0;
+      this.checkMemoryUsage();
     }
 
     // Update stats for generation events
@@ -80,6 +89,17 @@ class AnalyticsStore {
       sessionId: event.sessionId.substring(0, 8), // Only log partial session ID
       data: event.data,
     });
+  }
+
+  private checkMemoryUsage(): void {
+    const usage = process.memoryUsage();
+    const heapUsedMB = usage.heapUsed / 1024 / 1024;
+
+    if (heapUsedMB > this.MAX_MEMORY_MB) {
+      logger.warn(`Analytics memory usage high (${heapUsedMB.toFixed(1)}MB), trimming events`);
+      // Aggressively trim to half
+      this.events = this.events.slice(-Math.floor(this.MAX_EVENTS / 2));
+    }
   }
 
   private updateGenerationStats(event: AnalyticsEvent): void {
@@ -206,8 +226,8 @@ export function trackProjectGeneration(
 ): void {
   const enabledUtilities = config.utilities
     ? Object.entries(config.utilities)
-        .filter(([_, enabled]) => enabled)
-        .map(([key]) => key)
+      .filter(([_, enabled]) => enabled)
+      .map(([key]) => key)
     : [];
 
   trackEvent(

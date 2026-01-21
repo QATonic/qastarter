@@ -12,22 +12,24 @@ const CACHE_TTL = process.env.NODE_ENV === 'production' ? 3600 : 60; // 1 hour i
 const CHECK_PERIOD = 120; // Check for expired keys every 2 minutes
 
 // Create cache instances
+// Note: useClones=true prevents callers from accidentally mutating cached objects
+// Trade-off: ~10-20% performance overhead but safer for data integrity
 const manifestCache = new NodeCache({
   stdTTL: CACHE_TTL,
   checkperiod: CHECK_PERIOD,
-  useClones: false, // Better performance, but be careful not to mutate cached objects
+  useClones: true, // Safer - prevents mutation of cached objects
 });
 
 const templateCache = new NodeCache({
   stdTTL: CACHE_TTL,
   checkperiod: CHECK_PERIOD,
-  useClones: false,
+  useClones: true,
 });
 
 const metadataCache = new NodeCache({
   stdTTL: CACHE_TTL * 2, // Metadata can be cached longer
   checkperiod: CHECK_PERIOD,
-  useClones: false,
+  useClones: true,
 });
 
 // Cache statistics

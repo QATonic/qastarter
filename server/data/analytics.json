@@ -1155,5 +1155,18 @@
     "cicdTool": null,
     "reportingTool": null,
     "createdAt": "2026-01-19T18:25:52.193Z"
+  },
+  {
+    "id": 90,
+    "projectName": "selenium",
+    "testingType": "web",
+    "framework": "selenium",
+    "language": "java",
+    "testingPattern": "page-object-model",
+    "testRunner": "testng",
+    "buildTool": "maven",
+    "cicdTool": "jenkins",
+    "reportingTool": "extent-reports",
+    "createdAt": "2026-01-21T16:24:16.744Z"
   }
 ]

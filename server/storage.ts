@@ -2,17 +2,57 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 import { desc, count } from 'drizzle-orm';
 import { ProjectConfig, projectGenerations } from '@shared/schema';
+import { Mutex } from 'async-mutex';
 
 const { Pool } = pg;
 
+// Configure SSL for production with proper certificate validation
+// Set DATABASE_CA_CERT env var for custom CA, or DATABASE_SSL_REJECT_UNAUTHORIZED=false to disable (not recommended)
+const getSslConfig = () => {
+  if (process.env.NODE_ENV !== 'production') {
+    return undefined;
+  }
+
+  // Allow explicit opt-out for legacy systems (not recommended)
+  if (process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'false') {
+    console.warn('⚠️ SSL certificate validation is disabled - this is insecure!');
+    return { rejectUnauthorized: false };
+  }
+
+  // Prefer proper SSL with optional custom CA
+  return {
+    rejectUnauthorized: true,
+    ca: process.env.DATABASE_CA_CERT || undefined,
+  };
+};
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+  ssl: getSslConfig(),
 });
+
+// Graceful shutdown handlers
+const gracefulShutdown = async (signal: string) => {
+  console.log(`\n${signal} received. Closing database pool...`);
+  try {
+    await pool.end();
+    console.log('Database pool closed successfully.');
+  } catch (error) {
+    console.error('Error closing database pool:', error);
+  }
+  process.exit(0);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Export pool for testing/manual management if needed
+export { pool };
 
 const db = drizzle(pool);
 import fs from 'fs/promises';
 import path from 'path';
+import { logger } from './utils/logger';
 
 // Storage interface for QAStarter
 export interface IStorage {
@@ -104,6 +144,13 @@ export class FileStorage implements IStorage {
   private filePath: string;
   private memoryCache: any[] = [];
   private initialized = false;
+  private mutex = new Mutex();
+  private idCounter = 0;
+
+  // Pre-computed count caches for O(1) stats retrieval
+  private countByTestingType: Map<string, number> = new Map();
+  private countByFramework: Map<string, number> = new Map();
+  private countByLanguage: Map<string, number> = new Map();
 
   constructor() {
     this.filePath = path.join(process.cwd(), 'server', 'data', 'analytics.json');
@@ -117,45 +164,81 @@ export class FileStorage implements IStorage {
       try {
         const data = await fs.readFile(this.filePath, 'utf-8');
         this.memoryCache = JSON.parse(data);
+        // Initialize idCounter from existing data to ensure unique IDs
+        this.idCounter = this.memoryCache.reduce((max: number, item: any) =>
+          Math.max(max, item.id || 0), 0);
+        // Pre-compute count caches from existing data
+        this.rebuildCountCaches();
       } catch (e) {
         this.memoryCache = [];
+        this.idCounter = 0;
         await this.flush();
       }
       this.initialized = true;
     } catch (error) {
-      console.error('Failed to initialize FileStorage:', error);
+      logger.error('Failed to initialize FileStorage', { error });
     }
+  }
+
+  private rebuildCountCaches(): void {
+    this.countByTestingType.clear();
+    this.countByFramework.clear();
+    this.countByLanguage.clear();
+
+    for (const item of this.memoryCache) {
+      if (item.testingType) {
+        this.countByTestingType.set(item.testingType, (this.countByTestingType.get(item.testingType) || 0) + 1);
+      }
+      if (item.framework) {
+        this.countByFramework.set(item.framework, (this.countByFramework.get(item.framework) || 0) + 1);
+      }
+      if (item.language) {
+        this.countByLanguage.set(item.language, (this.countByLanguage.get(item.language) || 0) + 1);
+      }
+    }
+  }
+
+  private incrementCountCache(config: ProjectConfig): void {
+    this.countByTestingType.set(config.testingType, (this.countByTestingType.get(config.testingType) || 0) + 1);
+    this.countByFramework.set(config.framework, (this.countByFramework.get(config.framework) || 0) + 1);
+    this.countByLanguage.set(config.language, (this.countByLanguage.get(config.language) || 0) + 1);
   }
 
   private async flush() {
     try {
       await fs.writeFile(this.filePath, JSON.stringify(this.memoryCache, null, 2));
     } catch (error) {
-      console.error('Failed to persist analytics:', error);
+      logger.error('Failed to persist analytics', { error });
     }
   }
 
   async saveProjectGeneration(config: ProjectConfig): Promise<string> {
-    if (!this.initialized) await this.init();
+    // Use mutex to prevent race conditions on concurrent writes
+    return this.mutex.runExclusive(async () => {
+      if (!this.initialized) await this.init();
 
-    const record = {
-      id: this.memoryCache.length + 1,
-      projectName: config.projectName,
-      testingType: config.testingType,
-      framework: config.framework,
-      language: config.language,
-      testingPattern: config.testingPattern || 'POM',
-      testRunner: config.testRunner,
-      buildTool: config.buildTool,
-      cicdTool: config.cicdTool || null,
-      reportingTool: config.reportingTool || null,
-      createdAt: new Date().toISOString(),
-    };
+      this.idCounter++;
+      const record = {
+        id: this.idCounter,
+        projectName: config.projectName,
+        testingType: config.testingType,
+        framework: config.framework,
+        language: config.language,
+        testingPattern: config.testingPattern || 'POM',
+        testRunner: config.testRunner,
+        buildTool: config.buildTool,
+        cicdTool: config.cicdTool || null,
+        reportingTool: config.reportingTool || null,
+        createdAt: new Date().toISOString(),
+      };
 
-    this.memoryCache.push(record);
-    await this.flush(); // Simple append-and-save
+      this.memoryCache.push(record);
+      // Update pre-computed count caches (O(1) operation)
+      this.incrementCountCache(config);
+      await this.flush();
 
-    return record.id.toString();
+      return record.id.toString();
+    });
   }
 
   async getProjectGenerationStats(): Promise<{
@@ -167,31 +250,20 @@ export class FileStorage implements IStorage {
   }> {
     if (!this.initialized) await this.init();
 
-    const data = this.memoryCache;
-    const totalGenerated = data.length;
+    const totalGenerated = this.memoryCache.length;
 
-    const countBy = (key: string) => {
-      const counts: { [k: string]: number } = {};
-      data.forEach((item: any) => {
-        const val = item[key];
-        if (val) counts[val] = (counts[val] || 0) + 1;
-      });
-      return Object.entries(counts)
-        .map(([k, v]) => ({ [key]: k, count: v }))
-        .sort((a: any, b: any) => b.count - a.count);
-    };
+    // Use pre-computed caches for O(1) stats retrieval
+    const mapToArray = (map: Map<string, number>, keyName: string) =>
+      Array.from(map.entries())
+        .map(([key, count]) => ({ [keyName]: key, count }))
+        .sort((a, b) => b.count - a.count);
 
-    const byTestingType = countBy('testingType').map((i) => ({
-      testingType: i.testingType,
-      count: i.count,
-    }));
-    const byFramework = countBy('framework').map((i) => ({
-      framework: i.framework,
-      count: i.count,
-    }));
-    const byLanguage = countBy('language').map((i) => ({ language: i.language, count: i.count }));
+    const byTestingType = mapToArray(this.countByTestingType, 'testingType');
+    const byFramework = mapToArray(this.countByFramework, 'framework');
+    const byLanguage = mapToArray(this.countByLanguage, 'language');
 
-    const recentGenerations = [...data]
+    // Only recent generations needs full scan (limited to 10 items)
+    const recentGenerations = [...this.memoryCache]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 10);
 

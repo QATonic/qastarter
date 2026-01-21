@@ -46,10 +46,14 @@ export const logConfig = {
 
 // Project Generation Configuration
 export const generationConfig = {
+  /** Maximum characters allowed in project name (filesystem limit consideration) */
   maxProjectNameLength: 100,
+  /** Default project name when none is specified */
   defaultProjectName: 'my-qa-project',
-  compressionLevel: 9, // ZIP compression (0-9)
-  maxFileSizeKB: 10240, // 10MB max project size
+  /** ZIP compression level (0=none, 9=max). Higher = smaller files but slower generation */
+  compressionLevel: 9,
+  /** Maximum generated project size in KB. Prevents abuse/DoS attacks */
+  maxFileSizeKB: 10240, // 10MB
 };
 
 // Request Timeout Configuration

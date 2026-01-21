@@ -130,6 +130,7 @@
     "@vitejs/plugin-react": "^4.3.2",
     "@vitest/coverage-v8": "^2.1.9",
     "autoprefixer": "^10.4.20",
+    "baseline-browser-mapping": "^2.9.17",
     "cross-env": "^10.1.0",
     "drizzle-kit": "^0.30.4",
     "esbuild": "^0.25.0",

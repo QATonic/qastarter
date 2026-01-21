@@ -1,13 +1,11 @@
 import handlebars from 'handlebars';
 import { ProjectConfig } from '@shared/schema';
 import { TemplatePackEngine } from './templatePackEngine';
+import { logger } from '../utils/logger';
+import type { TemplateFile } from './types';
 
-export interface TemplateFile {
-  path: string;
-  content: string;
-  isTemplate: boolean;
-  mode?: string;
-}
+// Re-export TemplateFile type for backward compatibility
+export type { TemplateFile } from './types';
 
 export class ProjectTemplateGenerator {
   private templatePackEngine: TemplatePackEngine;
@@ -32,7 +30,7 @@ export class ProjectTemplateGenerator {
     const hasTemplatePack = await this.templatePackEngine.hasTemplatePack(config);
 
     if (hasTemplatePack) {
-      console.log('Using sophisticated template pack for:', {
+      logger.debug('Using template pack', {
         testingType: config.testingType,
         language: config.language,
         framework: config.framework,
@@ -42,7 +40,7 @@ export class ProjectTemplateGenerator {
       // Use strict mode by default
       return await this.templatePackEngine.generateProject(config, { strict: true });
     } else {
-      console.error('Template pack not found for configuration:', config);
+      logger.error('Template pack not found', { config });
       throw new Error(
         `No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}. Please verify your selection.`
       );
@@ -67,7 +65,7 @@ export class ProjectTemplateGenerator {
     if (hasTemplatePack) {
       return await this.templatePackEngine.getDependencies(config);
     } else {
-      console.error('Template pack not found for dependencies:', config);
+      logger.warn('Template pack not found for dependencies', { config });
       return {};
     }
   }

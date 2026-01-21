@@ -2,7 +2,7 @@ import handlebars from 'handlebars';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { ProjectConfig } from '@shared/schema';
-import { TemplatePackManifest, TemplateContext, TemplatePackFile } from './types';
+import { TemplatePackManifest, TemplateContext, TemplatePackFile, TemplateFile } from './types';
 import { fileURLToPath } from 'url';
 import {
   getCachedManifest,
@@ -13,15 +13,12 @@ import {
   getCacheStats,
 } from '../services/cacheService';
 import { loadSharedVersions, mergeVersions } from './shared/versionLoader';
+import { logger } from '../utils/logger';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export interface TemplateFile {
-  path: string;
-  content: string;
-  isTemplate: boolean;
-  mode?: string;
-}
+// Re-export TemplateFile type for backward compatibility
+export type { TemplateFile } from './types';
 
 export class TemplatePackEngine {
   private packsDirectory: string;
@@ -464,7 +461,7 @@ export class TemplatePackEngine {
             );
           } catch (error) {
             // If file doesn't exist, skip it (allows for optional files)
-            console.warn(`Template file not found: ${fileConfig.path}, skipping`);
+            logger.warn(`Template file not found: ${fileConfig.path}, skipping`);
             if (options.strict) {
               throw new Error(`Required template file not found: ${fileConfig.path}`);
             }
@@ -483,7 +480,7 @@ export class TemplatePackEngine {
             mode: fileConfig.mode,
           };
         } catch (fileError) {
-          console.error(`Error processing file ${fileConfig.path}:`, fileError);
+          logger.error(`Error processing file ${fileConfig.path}`, { error: fileError });
 
           if (options.strict) {
             throw fileError;
@@ -493,7 +490,7 @@ export class TemplatePackEngine {
         }
       }
     } catch (error) {
-      console.error(`Template pack generation failed for ${packKey}:`, error);
+      logger.error(`Template pack generation failed for ${packKey}`, { error });
       throw error;
     }
   }
@@ -653,7 +650,7 @@ export class TemplatePackEngine {
 
       return filteredDependencies;
     } catch (error) {
-      console.error(`Failed to load dependencies for ${packKey}:`, error);
+      logger.error(`Failed to load dependencies for ${packKey}`, { error });
       return {};
     }
   }

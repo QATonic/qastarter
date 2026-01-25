@@ -8,47 +8,74 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.safari.SafariDriver;
 
 /**
- * Browser Factory - Creates WebDriver instances.
- * 
- * Selenium 4.16+ uses built-in Selenium Manager for automatic driver management.
- * No external driver setup required!
- */
+* Browser Factory - Creates WebDriver instances.
+*
+* Selenium 4.16+ uses built-in Selenium Manager for automatic driver management.
+* No external driver setup required!
+*
+* Supported browsers: chrome, firefox, edge, safari
+*/
 public class BrowserFactory {
 
-    private BrowserFactory() {}
+private BrowserFactory() {}
 
-    public static WebDriver createDriver(String browser, boolean headless) {
-        WebDriver driver;
+public static WebDriver createDriver(String browser, boolean headless) {
+WebDriver driver;
 
-        switch (browser.toLowerCase()) {
-            case "firefox":
-                FirefoxOptions firefoxOptions = new FirefoxOptions();
-                if (headless) firefoxOptions.addArguments("--headless");
-                driver = new FirefoxDriver(firefoxOptions);
-                break;
+switch (browser.toLowerCase()) {
+case "firefox":
+FirefoxOptions firefoxOptions = new FirefoxOptions();
+if (headless) {
+firefoxOptions.addArguments("--headless");
+}
+firefoxOptions.addArguments("--width=1920");
+firefoxOptions.addArguments("--height=1080");
+driver = new FirefoxDriver(firefoxOptions);
+break;
 
-            case "edge":
-                EdgeOptions edgeOptions = new EdgeOptions();
-                if (headless) edgeOptions.addArguments("--headless");
-                driver = new EdgeDriver(edgeOptions);
-                break;
+case "edge":
+EdgeOptions edgeOptions = new EdgeOptions();
+if (headless) {
+edgeOptions.addArguments("--headless=new");
+}
+edgeOptions.addArguments("--window-size=1920,1080");
+edgeOptions.addArguments("--no-sandbox");
+edgeOptions.addArguments("--disable-dev-shm-usage");
+edgeOptions.addArguments("--disable-extensions");
+driver = new EdgeDriver(edgeOptions);
+break;
 
-            case "chrome":
-            default:
-                ChromeOptions chromeOptions = new ChromeOptions();
-                if (headless) {
-                    chromeOptions.addArguments("--headless=new");
-                }
-                chromeOptions.addArguments("--no-sandbox");
-                chromeOptions.addArguments("--disable-dev-shm-usage");
-                chromeOptions.addArguments("--disable-gpu");
-                driver = new ChromeDriver(chromeOptions);
-                break;
-        }
+case "safari":
+// Safari does not support headless mode
+if (headless) {
+Log.warn("Safari does not support headless mode - running in normal mode");
+}
+driver = new SafariDriver();
+break;
 
-        Log.info("Created " + browser + " driver (Selenium Manager)");
-        return driver;
-    }
+case "chrome":
+default:
+ChromeOptions chromeOptions = new ChromeOptions();
+if (headless) {
+chromeOptions.addArguments("--headless=new");
+}
+// Stability options for CI/CD environments
+chromeOptions.addArguments("--window-size=1920,1080");
+chromeOptions.addArguments("--no-sandbox");
+chromeOptions.addArguments("--disable-dev-shm-usage");
+chromeOptions.addArguments("--disable-gpu");
+chromeOptions.addArguments("--disable-extensions");
+chromeOptions.addArguments("--disable-infobars");
+chromeOptions.addArguments("--ignore-certificate-errors");
+chromeOptions.addArguments("--remote-allow-origins=*");
+driver = new ChromeDriver(chromeOptions);
+break;
+}
+
+Log.info("Created " + browser + " driver (Selenium Manager)");
+return driver;
+}
 }

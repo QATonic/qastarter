@@ -1,24 +1,53 @@
 /**
- * Login Tests using WebdriverIO.
- */
+* Login Tests using WebdriverIO with TypeScript.
+* Demonstrates both configuration-based and data-driven testing.
+*/
 import { LoginPage } from "../pages/LoginPage";
+import TestDataReader from "../utils/TestDataReader";
+
+interface UserTestData {
+username: string;
+password: string;
+expected: string;
+}
 
 describe("Login Tests", () => {
-  const loginPage = new LoginPage();
-  const username = "standard_user";
-  const password = "secret_sauce";
+const loginPage = new LoginPage();
+const username = "standard_user";
+const password = "secret_sauce";
 
-  beforeEach(async () => {
-    await loginPage.open("/");
-  });
+beforeEach(async () => {
+await loginPage.open("/");
+});
 
-  it("should login successfully with valid credentials", async () => {
-    await loginPage.login(username, password);
-    expect(await loginPage.isLoginSuccessful()).toBe(true);
-  });
+it("should login successfully with valid credentials", async () => {
+await loginPage.login(username, password);
+expect(await loginPage.isLoginSuccessful()).toBe(true);
+});
 
-  it("should show error with invalid credentials", async () => {
-    await loginPage.login("invalid_user", "wrong_password");
-    expect(await loginPage.isErrorDisplayed()).toBe(true);
-  });
+it("should show error with invalid credentials", async () => {
+await loginPage.login("invalid_user", "wrong_password");
+expect(await loginPage.isErrorDisplayed()).toBe(true);
+});
+
+/**
+* Data-driven tests using CSV test data
+* Reads test data from test/data/users.csv
+*/
+describe("Data-driven login tests", () => {
+const testData = TestDataReader.readCsv("users.csv") as UserTestData[];
+
+testData.forEach((user) => {
+it(`should verify login for user: ${user.username}`, async () => {
+await loginPage.open("/");
+await loginPage.login(user.username, user.password);
+
+if (user.expected === "success") {
+expect(await loginPage.isLoginSuccessful()).toBe(true);
+} else {
+expect(await loginPage.isErrorDisplayed()).toBe(true);
+}
+});
+});
+});
 });

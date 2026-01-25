@@ -1,17 +1,42 @@
+/**
+* Login Tests using WebDriverIO with Mocha.
+* Demonstrates both configuration-based and data-driven testing.
+*/
 const { LoginPage } = require("../pages/LoginPage");
+const TestDataReader = require("../utils/TestDataReader");
 
 describe("Login Tests", () => {
-  const loginPage = new LoginPage();
+const loginPage = new LoginPage();
 
-  beforeEach(async () => { await loginPage.open("/"); });
+beforeEach(async () => { await loginPage.open("/"); });
 
-  it("should login successfully", async () => {
-    await loginPage.login("standard_user", "secret_sauce");
-    expect(await loginPage.isLoginSuccessful()).toBe(true);
-  });
+it("should login successfully", async () => {
+await loginPage.login("standard_user", "secret_sauce");
+expect(await loginPage.isLoginSuccessful()).toBe(true);
+});
 
-  it("should show error with invalid credentials", async () => {
-    await loginPage.login("invalid", "wrong");
-    expect(await loginPage.isErrorDisplayed()).toBe(true);
-  });
+it("should show error with invalid credentials", async () => {
+await loginPage.login("invalid", "wrong");
+expect(await loginPage.isErrorDisplayed()).toBe(true);
+});
+
+/**
+* Data-driven tests using CSV test data
+*/
+describe("Data-driven login tests", () => {
+const testData = TestDataReader.readCsv("users.csv");
+
+testData.forEach((user) => {
+it(`should verify login for user: ${user.username}`, async () => {
+await loginPage.open("/");
+await loginPage.login(user.username, user.password);
+
+if (user.expected === "success") {
+expect(await loginPage.isLoginSuccessful()).toBe(true);
+} else {
+expect(await loginPage.isErrorDisplayed()).toBe(true);
+}
+});
+});
+});
 });

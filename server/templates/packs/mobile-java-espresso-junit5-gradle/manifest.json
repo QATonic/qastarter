@@ -122,6 +122,9 @@
     {
       "path": "app/src/androidTest/java/{{packagePath}}/utils/TestDataReader.java",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "Test data reader utility"
     },
     {

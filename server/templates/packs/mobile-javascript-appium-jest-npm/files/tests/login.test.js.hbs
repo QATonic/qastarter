@@ -1,7 +1,9 @@
 const LoginPage = require('./pages/LoginPage');
 const HomePage = require('./pages/HomePage');
+const TestDataReader = require('./utils/TestDataReader');
 
-
+const TEST_USERNAME = 'standard_user';
+const TEST_PASSWORD = 'secret_sauce';
 
 describe('Login Tests', () => {
 let loginPage;
@@ -12,31 +14,53 @@ loginPage = new LoginPage(driver);
 homePage = new HomePage(driver);
 });
 
-/**
-* Verify login functionality works correctly.
-*
-* BEFORE RUNNING:
-* 1. Update test data in data/dev.json
-* 2. Configure device capabilities in config/capabilities.js
-* 3. Ensure Appium server is running
-* 4. Update selectors in pages/LoginPage.js to match your app
-*/
 test('should login with valid credentials', async () => {
 try {
-// Get credentials from loaded test data
-const { username, password } = global.testData.validUser;
-
-// Step 1: Perform login
-await loginPage.login(username, password);
-
-// Step 2: Verify home page is displayed
+await loginPage.login(TEST_USERNAME, TEST_PASSWORD);
 const isHomeDisplayed = await homePage.isHomePageDisplayed();
 expect(isHomeDisplayed).toBe(true);
-
-// Test passed! Your {{framework}} framework is working correctly.
 } catch (error) {
-await driver.saveScreenshot(`screenshots/FAILED-${expect.getState().currentTestName}.png`);
+await driver.saveScreenshot('screenshots/FAILED-login-valid.png');
 throw error;
 }
+});
+
+test('should show error with invalid credentials', async () => {
+try {
+await loginPage.login('invalid_user', 'wrong_password');
+const isErrorDisplayed = await loginPage.isErrorDisplayed();
+expect(isErrorDisplayed).toBe(true);
+} catch (error) {
+await driver.saveScreenshot('screenshots/FAILED-login-invalid.png');
+throw error;
+}
+});
+
+/**
+* Data-driven tests using test.each
+* Reads test data from data/users.json
+*/
+describe('Data-driven login tests', () => {
+const testData = TestDataReader.readJson('users.json');
+
+test.each(testData)(
+'should verify login for user: $username',
+async ({ username, password, expected }) => {
+try {
+await loginPage.login(username, password);
+
+if (expected === 'success') {
+const isHomeDisplayed = await homePage.isHomePageDisplayed();
+expect(isHomeDisplayed).toBe(true);
+} else {
+const isErrorDisplayed = await loginPage.isErrorDisplayed();
+expect(isErrorDisplayed).toBe(true);
+}
+} catch (error) {
+await driver.saveScreenshot(`screenshots/FAILED-login-${username}.png`);
+throw error;
+}
+}
+);
 });
 });

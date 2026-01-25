@@ -1,6 +1,6 @@
 // Comprehensive validation matrix for QAStarter wizard steps
 // Defines compatibility between testing types, frameworks, languages, and tools
-// Updated: December 27, 2025 - Aligned with actual template inventory (34 templates)
+// Updated: January 2026 - Aligned with actual template inventory (43 templates)
 
 export interface ValidationMatrix {
   testingTypes: string[];
@@ -266,13 +266,13 @@ export const validationMatrix: ValidationMatrix = {
     'xcuitest-swift': [],
 
     // API - RestAssured
-    'restassured-java': ['allure', 'extent-reports', 'testng-reports'],
+    'restassured-java': ['allure', 'extent-reports', 'testng-reports', 'junit-html'],
 
     // API - Requests
-    'requests-python': ['allure', 'pytest-html'],
+    'requests-python': ['allure', 'pytest-html', 'pytest-json'],
 
     // API - Supertest
-    'supertest-javascript': ['allure', 'jest-html'],
+    'supertest-javascript': ['allure', 'jest-html', 'jest-html-reporter', 'mochawesome'],
     'supertest-typescript': ['allure', 'jest-html-reporter', 'mochawesome'],
 
     // API - RestSharp

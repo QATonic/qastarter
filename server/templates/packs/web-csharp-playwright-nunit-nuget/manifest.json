@@ -55,6 +55,123 @@
     {
       "path": "Tests/LoginTests.cs",
       "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "Config/EnvConfig.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Config/TestSettings.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/users.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "Features/Login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "Pages/HomePage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": "StepDefinitions/LoginSteps.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Tests/BaseTest.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/BrowserFactory.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/DataReader.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/Logger.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/RetryHelper.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/ScreenshotHelper.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/ScreenshotUtils.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/WaitHelpers.cs",
+      "isTemplate": true
     }
   ],
   "directories": [

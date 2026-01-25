@@ -11,15 +11,22 @@ roots: ['<rootDir>/tests'],
     coverageReporters: ['text', 'lcov', 'html'],
     verbose: true,
     testTimeout: 30000,
+
+    // Retry failed tests up to 2 times for gRPC API reliability
+    retryTimes: 2,
+
     setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
         reporters: [
-        'default',
+        'default'{{#if (eq reportingTool "jest-html")}},
         ['jest-html-reporter', {
         pageTitle: '{{projectName}} gRPC Test Report',
         outputPath: 'reports/test-report.html',
         includeFailureMsg: true,
         includeSuiteFailure: true
-        }]
+        }]{{/if}}{{#if (eq reportingTool "allure")}},
+        ['jest-allure', {
+        resultsDir: 'allure-results'
+        }]{{/if}}
         ]
         };
 

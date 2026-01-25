@@ -3,13 +3,149 @@
   "displayName": "JavaScript WebdriverIO Mocha Framework",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "web", "framework": "webdriverio", "language": "javascript", "testRunner": "mocha", "buildTool": "npm"},
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "webdriverio",
+    "language": "javascript",
+    "testRunner": "mocha",
+    "buildTool": "npm"
+  },
   "files": [
-    {"path": "package.json", "isTemplate": true},
-    {"path": "wdio.conf.js", "isTemplate": true},
-    {"path": "test/pages/BasePage.js", "isTemplate": true},
-    {"path": "test/pages/LoginPage.js", "isTemplate": true},
-    {"path": "test/specs/login.spec.js", "isTemplate": true}
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "wdio.conf.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pages/BasePage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pages/LoginPage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/specs/login.spec.js",
+      "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "config/environments.js",
+      "isTemplate": true
+    },
+    {
+      "path": "config/wdio.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": "step-definitions/loginSteps.js",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "test/data/users.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pageobjects/base.page.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pageobjects/home.page.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pageobjects/login.page.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/dataReader.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/logger.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshotHelper.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/waitHelpers.js",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "screenshots", "reports"]
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
 }

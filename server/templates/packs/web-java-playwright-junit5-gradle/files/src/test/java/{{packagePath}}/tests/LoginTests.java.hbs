@@ -4,46 +4,75 @@ import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.core.BaseTest;
 import {{javaPackage}}.pages.LoginPage;
 import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.TestDataReader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvFileSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Login Tests - Example test class for SauceDemo.
- */
+* Login Tests - Example test class for SauceDemo.
+* Demonstrates both configuration-based and data-driven testing.
+*/
 class LoginTests extends BaseTest {
 
-    @Test
-    @Order(1)
-    @Tag("smoke")
-    @DisplayName("Verify successful login with valid credentials")
-    void testValidLogin() {
-        Log.step("Testing valid login");
-        LoginPage loginPage = new LoginPage();
+@Test
+@Order(1)
+@Tag("smoke")
+@DisplayName("Verify successful login with valid credentials")
+void testValidLogin() {
+Log.step("Testing valid login");
+LoginPage loginPage = new LoginPage();
 
-        String username = ConfigurationReader.getProperty("username");
-        String password = ConfigurationReader.getProperty("password");
+String username = ConfigurationReader.getProperty("username");
+String password = ConfigurationReader.getProperty("password");
 
-        loginPage.login(username, password);
+loginPage.login(username, password);
 
-        assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
-        Log.info("Valid login test passed");
-    }
+assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
+Log.info("Valid login test passed");
+}
 
-    @Test
-    @Order(2)
-    @Tag("regression")
-    @DisplayName("Verify error message with invalid credentials")
-    void testInvalidLogin() {
-        Log.step("Testing invalid login");
-        LoginPage loginPage = new LoginPage();
+@Test
+@Order(2)
+@Tag("regression")
+@DisplayName("Verify error message with invalid credentials")
+void testInvalidLogin() {
+Log.step("Testing invalid login");
+LoginPage loginPage = new LoginPage();
 
-        loginPage.login("invalid_user", "wrong_password");
+loginPage.login("invalid_user", "wrong_password");
 
-        assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
-        Log.info("Invalid login test passed - error displayed as expected");
-    }
+assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
+Log.info("Invalid login test passed - error displayed as expected");
+}
+
+/**
+* Data-driven test using JUnit 5 ParameterizedTest with CSV file source.
+* Reads test data from src/main/resources/testdata/users.csv
+*/
+@ParameterizedTest(name = "Login test for user: {0}")
+@CsvFileSource(resources = "/testdata/users.csv", numLinesToSkip = 1)
+@Order(3)
+@Tag("regression")
+@DisplayName("Data-driven login test using CSV")
+void testLoginWithTestData(String username, String password, String expectedResult) {
+Log.step("Testing login with data: " + username);
+LoginPage loginPage = new LoginPage();
+
+loginPage.login(username, password);
+
+if ("success".equals(expectedResult)) {
+assertTrue(loginPage.isLoginSuccessful(),
+"Login should be successful for user: " + username);
+} else {
+assertTrue(loginPage.isErrorDisplayed(),
+"Error should be displayed for user: " + username);
+}
+Log.info("Data-driven test passed for: " + username);
+}
 }

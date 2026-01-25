@@ -4,19 +4,131 @@
   "description": "Production-ready Robot Framework automation with SeleniumLibrary",
   "version": "2.0.0",
   "supportsDynamic": true,
-  "supportedCombination": {"testingType": "web", "framework": "robotframework", "language": "python", "testRunner": "robot", "buildTool": "pip"},
-  "dynamicSupport": {
-    "reportingTools": ["allure", "robot-html"],
-    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
-    "testingPatterns": ["keyword-driven", "bdd"]
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "robotframework",
+    "language": "python",
+    "testRunner": "robot",
+    "buildTool": "pip"
   },
-  "toolVersions": {"python": "3.10+", "robotframework": "6.1.0", "seleniumlibrary": "6.1.0"},
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "robot-html"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "keyword-driven",
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "python": "3.10+",
+    "robotframework": "6.1.0",
+    "seleniumlibrary": "6.1.0"
+  },
   "files": [
-    {"path": "requirements.txt", "isTemplate": true},
-    {"path": "README.md", "isTemplate": true},
-    {"path": ".gitignore", "isTemplate": false},
-    {"path": "resources/common.resource", "isTemplate": true},
-    {"path": "tests/login.robot", "isTemplate": true}
+    {
+      "path": "requirements.txt",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "resources/common.resource",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/login.robot",
+      "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "libraries/CustomLibrary.py",
+      "isTemplate": true
+    },
+    {
+      "path": "resources/pages/HomePage.resource",
+      "isTemplate": true
+    },
+    {
+      "path": "resources/pages/LoginPage.resource",
+      "isTemplate": true
+    },
+    {
+      "path": "robot.yaml",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/login_tests.robot",
+      "isTemplate": true
+    },
+    {
+      "path": "variables/dev.yaml",
+      "isTemplate": true
+    },
+    {
+      "path": "variables/qa.yaml",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "screenshots", "reports", "results"]
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports",
+    "results"
+  ]
 }

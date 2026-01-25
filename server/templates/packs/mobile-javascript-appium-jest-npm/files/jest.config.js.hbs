@@ -1,24 +1,31 @@
 module.exports = {
-  testEnvironment: 'node',
-  testMatch: ['**/tests/**/*.test.js'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+testEnvironment: 'node',
+testMatch: ['**/tests/**/*.test.js'],
+setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   testTimeout: 120000,
+
+  // Retry failed tests up to 2 times for flaky mobile tests
+  retryTimes: 2,
+
   reporters: [
-    'default',
-    [
-      'jest-html-reporter',
-      {
-        pageTitle: '{{projectName}} Test Report',
-        outputPath: 'reports/test-report.html',
-        includeFailureMsg: true,
-        includeConsoleLog: true,
-        dateFormat: 'yyyy-mm-dd HH:MM:ss'
-      }
-    ]
+  'default'{{#if (eq reportingTool "jest-html")}},
+  [
+  'jest-html-reporter',
+  {
+  pageTitle: '{{projectName}} Test Report',
+  outputPath: 'reports/test-report.html',
+  includeFailureMsg: true,
+  includeConsoleLog: true,
+  dateFormat: 'yyyy-mm-dd HH:MM:ss'
+  }
+  ]{{/if}}{{#if (eq reportingTool "allure")}},
+  ['jest-allure', {
+  resultsDir: 'allure-results'
+  }]{{/if}}
   ],
   collectCoverageFrom: [
-    'tests/**/*.js',
-    '!tests/**/*.test.js',
-    '!tests/setup.js'
+  'tests/**/*.js',
+  '!tests/**/*.test.js',
+  '!tests/setup.js'
   ]
-};
+  };

@@ -17,7 +17,7 @@
   ],
   "supportsDynamic": true,
   "toolVersions": {
-    "java": "11",
+    "java": "17",
     "gradle": "8.5",
     "appium": "9.0.0",
     "testng": "7.8.0",
@@ -195,7 +195,9 @@
     {
       "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
       "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
-      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "CSV and JSON test data reader utility"
     },
     {

@@ -1,46 +1,78 @@
 /**
- * Login Test Suite
- * 
- * BEFORE RUNNING:
- * 1. Update credentials in: data/dev.json
- * 2. Update selectors in: pages/LoginPage.ts
- * 3. Run: npm test
- */
+* Login Test Suite
+*
+* BEFORE RUNNING:
+* 1. Update credentials in: data/dev.json
+* 2. Update selectors in: pages/LoginPage.ts
+* 3. Run: npm test
+*
+* Demonstrates both configuration-based and data-driven testing.
+*/
 import { WebDriver } from 'selenium-webdriver';
 import DriverFactory from '../utils/DriverFactory';
 import LoginPage from '../pages/LoginPage';
 import ScreenshotHelper from '../utils/ScreenshotHelper';
+import TestDataReader from '../utils/TestDataReader';
 import envConfig from '../config/env.config';
 
 describe('Login Tests', () => {
-  let driver: WebDriver;
-  let loginPage: LoginPage;
-  let screenshot: ScreenshotHelper;
+let driver: WebDriver;
+let loginPage: LoginPage;
+let screenshot: ScreenshotHelper;
 
-  beforeAll(async () => {
-    driver = await DriverFactory.createDriver();
-    loginPage = new LoginPage(driver);
-    screenshot = new ScreenshotHelper(driver);
-  });
+beforeAll(async () => {
+driver = await DriverFactory.createDriver();
+loginPage = new LoginPage(driver);
+screenshot = new ScreenshotHelper(driver);
+});
 
-  afterAll(async () => {
-    if (driver) {
-      await driver.quit();
-    }
-  });
+afterAll(async () => {
+if (driver) {
+await driver.quit();
+}
+});
 
-  test('should login with valid credentials', async () => {
-    // Get credentials from config file (data/dev.json)
-    const credentials = envConfig.getCredentials('validUser');
-    
-    // Step 1: Navigate to login page
-    await loginPage.navigateToLogin();
-    
-    // Step 2: Enter credentials and submit
-    await loginPage.login(credentials.username, credentials.password);
-    
-    // Step 3: Verify login was successful
-    const isLoggedIn = await loginPage.isLoginSuccessful();
-    expect(isLoggedIn).toBe(true);
-  });
+test('should login with valid credentials', async () => {
+// Get credentials from config file (data/dev.json)
+const credentials = envConfig.getCredentials('validUser');
+
+// Step 1: Navigate to login page
+await loginPage.navigateToLogin();
+
+// Step 2: Enter credentials and submit
+await loginPage.login(credentials.username, credentials.password);
+
+// Step 3: Verify login was successful
+const isLoggedIn = await loginPage.isLoginSuccessful();
+expect(isLoggedIn).toBe(true);
+});
+
+/**
+* Data-driven test example using TestDataReader
+* Reads test data from data/users.csv
+*/
+describe('Data-driven login tests', () => {
+// Load CSV test data
+const testData = TestDataReader.readCsv('users.csv');
+
+test.each(testData)(
+'should verify login for user: %s',
+async (username: string, password: string, expected: string) => {
+// Navigate to login page
+await loginPage.navigateToLogin();
+
+// Perform login
+await loginPage.login(username, password);
+
+// Verify result based on expected outcome
+if (expected === 'success') {
+const isLoggedIn = await loginPage.isLoginSuccessful();
+expect(isLoggedIn).toBe(true);
+} else {
+const hasError = await loginPage.isErrorDisplayed();
+expect(hasError).toBe(true);
+}
+}
+);
+});
 });

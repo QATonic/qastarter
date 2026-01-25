@@ -1,19 +1,46 @@
 const { LoginPage } = require("../pages/LoginPage");
 
 describe("Login Tests", () => {
-  const loginPage = new LoginPage();
-  const username = Cypress.env("username");
-  const password = Cypress.env("password");
+const loginPage = new LoginPage();
+const username = Cypress.env("username");
+const password = Cypress.env("password");
 
-  beforeEach(() => { loginPage.visit("/"); });
+beforeEach(() => { loginPage.visit("/"); });
 
-  it("should login successfully with valid credentials", () => {
-    loginPage.login(username, password);
-    loginPage.verifyLoginSuccess();
-  });
+it("should login successfully with valid credentials", () => {
+loginPage.login(username, password);
+loginPage.verifyLoginSuccess();
+});
 
-  it("should show error with invalid credentials", () => {
-    loginPage.login("invalid_user", "wrong_password");
-    loginPage.verifyErrorDisplayed();
-  });
+it("should show error with invalid credentials", () => {
+loginPage.login("invalid_user", "wrong_password");
+loginPage.verifyErrorDisplayed();
+});
+
+/**
+* Data-driven tests using fixtures
+* Test data loaded from cypress/fixtures/users.json
+*/
+context("Data-driven login tests", () => {
+beforeEach(() => {
+cy.fixture("users.json").as("loginData");
+});
+
+it("should verify multiple login scenarios from fixture", function () {
+this.loginData.forEach((user) => {
+loginPage.visit("/");
+loginPage.login(user.username, user.password);
+
+if (user.expected === "success") {
+loginPage.verifyLoginSuccess();
+} else {
+loginPage.verifyErrorDisplayed();
+}
+
+// Clear session for next iteration
+cy.clearCookies();
+cy.clearLocalStorage();
+});
+});
+});
 });

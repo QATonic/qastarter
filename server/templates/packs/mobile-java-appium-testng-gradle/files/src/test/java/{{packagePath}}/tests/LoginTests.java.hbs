@@ -1,40 +1,78 @@
 package {{javaPackage}}.tests;
 
 import org.testng.Assert;
+{{#unless utilities.dataProvider}}
+import org.testng.annotations.DataProvider;
+{{/unless}}
 import org.testng.annotations.Test;
 import {{javaPackage}}.core.BaseTest;
 import {{javaPackage}}.pages.LoginPage;
 import {{javaPackage}}.utils.Log;
+{{#if utilities.dataProvider}}
+import {{javaPackage}}.utils.TestDataReader;
+import org.testng.annotations.DataProvider;
+{{/if}}
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * Login Tests - SauceDemo Mobile app.
- * 
- * Run: mvn clean test
- */
+* Login Tests - SauceDemo Mobile app.
+*
+* Run: mvn clean test -Dtest=LoginTests
+*
+* Demonstrates both configuration-based and data-driven testing.
+*/
 public class LoginTests extends BaseTest {
 
-    private static final String VALID_USER = "standard_user";
-    private static final String VALID_PASS = "secret_sauce";
+private static final String VALID_USER = "standard_user";
+private static final String VALID_PASS = "secret_sauce";
 
-    @Test(groups = {"smoke", "mobile"}, description = "Valid login shows Products screen")
-    public void testValidLogin() {
-        Log.step("Valid login test");
+@Test(groups = {"smoke", "mobile"}, description = "Valid login shows Products screen")
+public void testValidLogin() {
+Log.step("Valid login test");
+
+LoginPage loginPage = new LoginPage();
+loginPage.login(VALID_USER, VALID_PASS);
+
+Assert.assertTrue(loginPage.isLoginSuccessful(), "Should navigate to Products");
+Log.info("Valid login test passed");
+}
+
+@Test(groups = {"regression", "mobile"}, description = "Invalid login shows error")
+public void testInvalidLogin() {
+Log.step("Invalid login test");
+
+LoginPage loginPage = new LoginPage();
+loginPage.login("invalid_user", "wrong_password");
+
+Assert.assertTrue(loginPage.isErrorDisplayed(), "Should show error message");
+Log.info("Invalid login test passed");
+}
+
+{{#if utilities.dataProvider}}
+/**
+* Data-driven test using TestNG DataProvider.
+* Reads test data from src/test/resources/testdata/users.csv
+*/
+@DataProvider(name = "loginTestData")
+public Object[][] getLoginTestData() {
+List<Map<String, String>> data = TestDataReader.readCsv("users.csv");
+    Object[][] testData = new Object[data.size()][3];
+
+    for (int i = 0; i < data.size(); i++) { testData[i][0]=data.get(i).get("username");
+        testData[i][1]=data.get(i).get("password"); testData[i][2]=data.get(i).get("expected"); } return testData; }
+        @Test(groups={"regression", "mobile" , "data-driven" }, dataProvider="loginTestData" ,
+        description="Data-driven login validation" ) public void testLoginWithCsvData(String username, String password,
+        String expected) { Log.step("Data-driven login test for: " + username);
         
         LoginPage loginPage = new LoginPage();
-        loginPage.login(VALID_USER, VALID_PASS);
+        loginPage.login(username, password);
         
-        Assert.assertTrue(loginPage.isLoginSuccessful(), "Should navigate to Products");
-        Log.info("Valid login test passed");
+        if (" success".equalsIgnoreCase(expected)) {
+        Assert.assertTrue(loginPage.isLoginSuccessful(), "Login should succeed for: " + username); } else {
+        Assert.assertTrue(loginPage.isErrorDisplayed(), "Error should display for: " + username); }
+        Log.info("Data-driven test passed for: " + username);
     }
-
-    @Test(groups = {"regression", "mobile"}, description = "Invalid login shows error")
-    public void testInvalidLogin() {
-        Log.step("Invalid login test");
-        
-        LoginPage loginPage = new LoginPage();
-        loginPage.login("invalid_user", "wrong_password");
-        
-        Assert.assertTrue(loginPage.isErrorDisplayed(), "Should show error message");
-        Log.info("Invalid login test passed");
-    }
+    {{/if}}
 }

@@ -7,7 +7,7 @@
   "supportsDynamic": true,
   "author": "QAStarter Generated Framework",
   "toolVersions": {
-    "java": "11+",
+    "java": "17",
     "maven": "3.8+",
     "winappdriver": "1.2.1",
     "testng": "7.8.0",
@@ -68,6 +68,24 @@
       "description": "Azure DevOps CI/CD pipeline",
       "conditional": {
         "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "template": ".gitlab-ci.yml.hbs",
+      "isTemplate": true,
+      "description": "GitLab CI pipeline",
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "template": ".circleci/config.yml.hbs",
+      "isTemplate": true,
+      "description": "CircleCI configuration",
+      "conditional": {
+        "cicdTool": "circleci"
       }
     },
     {
@@ -289,11 +307,13 @@
     ],
     "cicdTools": [
       "jenkins",
-      "github-actions"
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
     ],
     "testingPatterns": [
-      "pom",
-      "hybrid",
+      "page-object-model",
       "data-driven",
       "bdd"
     ]

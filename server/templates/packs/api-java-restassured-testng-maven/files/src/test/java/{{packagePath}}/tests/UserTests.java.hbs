@@ -1,31 +1,37 @@
 package {{javaPackage}}.tests;
 
 import io.restassured.response.Response;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import {{javaPackage}}.core.BaseTest;
 import {{javaPackage}}.core.ResponseValidator;
 import {{javaPackage}}.models.User;
 import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.TestDataReader;
 
 import java.util.List;
+import java.util.Map;
 
 /**
- * User API Tests - CRUD operations against JSONPlaceholder /users.
- * 
- * Run: mvn clean test
- */
+* User API Tests - CRUD operations against JSONPlaceholder /users.
+*
+* Run: mvn clean test
+*
+* Demonstrates both standard and data-driven API testing.
+*/
 public class UserTests extends BaseTest {
 
-    @Test(priority = 1, description = "GET all users")
-    public void testGetAllUsers() {
-        Log.step("GET all users from /users");
-        
-        Response response = get(USERS_ENDPOINT);
-        
-        ResponseValidator.assertStatus(response, 200);
-        ResponseValidator.assertBodyNotEmpty(response);
-        
-        List<?> users = response.jsonPath().getList("$");
+@Test(priority = 1, description = "GET all users")
+public void testGetAllUsers() {
+Log.step("GET all users from /users");
+
+Response response = get(USERS_ENDPOINT);
+
+ResponseValidator.assertStatus(response, 200);
+ResponseValidator.assertBodyNotEmpty(response);
+
+List
+<?> users = response.jsonPath().getList("$");
         Log.info("Total users: " + users.size());
     }
 
@@ -74,5 +80,63 @@ public class UserTests extends BaseTest {
         
         ResponseValidator.assertStatus(response, 200);
         Log.info("User deleted successfully");
+    }
+
+    // ===== DATA-DRIVEN TESTS =====
+
+    /**
+     * DataProvider for data-driven user tests.
+     * Reads from src/test/resources/testdata/users.csv
+     */
+    @DataProvider(name = "userTestData")
+    public Object[][] getUserTestData() {
+        List<Map<String, String>> data = TestDataReader.readCsv("users.csv");
+        Object[][] testData = new Object[data.size()][3];
+        
+        for (int i = 0; i < data.size(); i++) {
+            testData[i][0] = Integer.parseInt(data.get(i).get("id"));
+            testData[i][1] = data.get(i).get("name");
+            testData[i][2] = Integer.parseInt(data.get(i).get("expectedStatus"));
+        }
+        
+        return testData;
+    }
+
+    @Test(priority = 6, dataProvider = "userTestData", 
+          description = "Data-driven GET user by ID")
+    public void testGetUserWithData(int userId, String expectedName, int expectedStatus) {
+        Log.step("Data-driven GET user with ID: " + userId);
+        
+        Response response = get(USERS_ENDPOINT, userId);
+        
+        ResponseValidator.assertStatus(response, expectedStatus);
+        
+        if (expectedStatus == 200) {
+            String actualName = response.jsonPath().getString("name");
+            Log.info("Expected: " + expectedName + ", Actual: " + actualName);
+        }
+    }
+
+    /**
+     * DataProvider for negative test cases.
+     */
+    @DataProvider(name = "invalidUserIds")
+    public Object[][] getInvalidUserIds() {
+        return new Object[][] {
+            {0, 404},
+            {-1, 404},
+            {99999, 404}
+        };
+    }
+
+    @Test(priority = 7, dataProvider = "invalidUserIds",
+          description = "Negative test - invalid user IDs")
+    public void testGetInvalidUser(int userId, int expectedStatus) {
+        Log.step("Testing invalid user ID: " + userId);
+        
+        Response response = get(USERS_ENDPOINT, userId);
+        
+        ResponseValidator.assertStatus(response, expectedStatus);
+        Log.info("Correctly returned " + expectedStatus + " for user ID: " + userId);
     }
 }

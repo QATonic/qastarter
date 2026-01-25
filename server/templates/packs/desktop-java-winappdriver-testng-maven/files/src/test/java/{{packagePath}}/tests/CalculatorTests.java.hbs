@@ -1,38 +1,99 @@
 package {{javaPackage}}.tests;
 
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import {{javaPackage}}.core.BaseTest;
 import {{javaPackage}}.pages.CalculatorPage;
 import {{javaPackage}}.utils.Log;
 
 /**
- * Calculator Tests - Windows Calculator app.
- * 
- * Run: mvn clean test
- */
+* Calculator Tests - Windows Calculator app.
+*
+* Run: mvn clean test
+*
+* Demonstrates both standard and data-driven desktop testing.
+*/
 public class CalculatorTests extends BaseTest {
 
-    @Test(groups = {"smoke", "desktop"}, description = "Addition test")
-    public void testAddition() {
-        Log.step("Test addition: 2 + 3 = 5");
-        
-        CalculatorPage calc = new CalculatorPage();
-        calc.add(2, 3);
-        
-        String result = calc.getResult();
-        Assert.assertTrue(result.contains("5"), "Result should contain 5");
-    }
+@Test(groups = {"smoke", "desktop"}, description = "Addition test")
+public void testAddition() {
+Log.step("Test addition: 2 + 3 = 5");
 
-    @Test(groups = {"regression", "desktop"}, description = "Multiple operations")
-    public void testMultipleOperations() {
-        Log.step("Test: 5 + 3 = 8");
-        
-        CalculatorPage calc = new CalculatorPage();
-        calc.clear();
-        calc.add(5, 3);
-        
-        String result = calc.getResult();
-        Assert.assertTrue(result.contains("8"), "Result should contain 8");
-    }
+CalculatorPage calc = new CalculatorPage();
+calc.add(2, 3);
+
+String result = calc.getResult();
+Assert.assertTrue(result.contains("5"), "Result should contain 5");
+}
+
+@Test(groups = {"regression", "desktop"}, description = "Multiple operations")
+public void testMultipleOperations() {
+Log.step("Test: 5 + 3 = 8");
+
+CalculatorPage calc = new CalculatorPage();
+calc.clear();
+calc.add(5, 3);
+
+String result = calc.getResult();
+Assert.assertTrue(result.contains("8"), "Result should contain 8");
+}
+
+// ===== DATA-DRIVEN TESTS =====
+
+/**
+* DataProvider for addition test cases.
+*/
+@DataProvider(name = "additionData")
+public Object[][] getAdditionData() {
+return new Object[][] {
+{1, 1, 2},
+{5, 5, 10},
+{10, 20, 30},
+{0, 0, 0},
+{99, 1, 100}
+};
+}
+
+@Test(groups = {"regression", "desktop", "data-driven"},
+dataProvider = "additionData",
+description = "Data-driven addition test")
+public void testAdditionWithData(int num1, int num2, int expected) {
+Log.step("Data-driven test: " + num1 + " + " + num2 + " = " + expected);
+
+CalculatorPage calc = new CalculatorPage();
+calc.clear();
+calc.add(num1, num2);
+
+String result = calc.getResult();
+Assert.assertTrue(result.contains(String.valueOf(expected)),
+"Result should contain " + expected);
+}
+
+/**
+* DataProvider for subtraction test cases.
+*/
+@DataProvider(name = "subtractionData")
+public Object[][] getSubtractionData() {
+return new Object[][] {
+{5, 3, 2},
+{10, 5, 5},
+{100, 50, 50}
+};
+}
+
+@Test(groups = {"regression", "desktop", "data-driven"},
+dataProvider = "subtractionData",
+description = "Data-driven subtraction test")
+public void testSubtractionWithData(int num1, int num2, int expected) {
+Log.step("Data-driven test: " + num1 + " - " + num2 + " = " + expected);
+
+CalculatorPage calc = new CalculatorPage();
+calc.clear();
+calc.subtract(num1, num2);
+
+String result = calc.getResult();
+Assert.assertTrue(result.contains(String.valueOf(expected)),
+"Result should contain " + expected);
+}
 }

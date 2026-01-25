@@ -2,26 +2,49 @@
 Login Tests - SauceDemo Mobile app.
 
 Run: pytest tests/ -v
+
+Demonstrates both configuration-based and data-driven testing.
 """
 import pytest
 from pages.login_page import LoginPage
 from utils.logger import log
+from utils.data_reader import DataReader
 
 
 class TestLogin:
-    VALID_USER = "standard_user"
-    VALID_PASS = "secret_sauce"
+VALID_USER = "standard_user"
+VALID_PASS = "secret_sauce"
 
-    @pytest.mark.smoke
-    def test_valid_login(self, driver):
-        log.step("Valid login test")
-        login_page = LoginPage()
-        login_page.login(self.VALID_USER, self.VALID_PASS)
-        assert login_page.is_login_successful(), "Should navigate to Products"
+@pytest.mark.smoke
+def test_valid_login(self, driver):
+"""Verify successful login with valid credentials."""
+log.step("Valid login test")
+login_page = LoginPage()
+login_page.login(self.VALID_USER, self.VALID_PASS)
+assert login_page.is_login_successful(), "Should navigate to Products"
+log.info("Valid login test passed")
 
-    @pytest.mark.regression
-    def test_invalid_login(self, driver):
-        log.step("Invalid login test")
-        login_page = LoginPage()
-        login_page.login("invalid_user", "wrong_password")
-        assert login_page.is_error_displayed(), "Should show error message"
+@pytest.mark.regression
+def test_invalid_login(self, driver):
+"""Verify error message with invalid credentials."""
+log.step("Invalid login test")
+login_page = LoginPage()
+login_page.login("invalid_user", "wrong_password")
+assert login_page.is_error_displayed(), "Should show error message"
+log.info("Invalid login test passed")
+
+@pytest.mark.regression
+@pytest.mark.parametrize("username,password,expected", DataReader.read_csv("users.csv"))
+def test_login_with_csv_data(self, driver, username, password, expected):
+"""Data-driven login test using CSV file."""
+log.step(f"Data-driven login test for: {username}")
+
+login_page = LoginPage()
+login_page.login(username, password)
+
+if expected == "success":
+assert login_page.is_login_successful(), f"Login should succeed for: {username}"
+else:
+assert login_page.is_error_displayed(), f"Error should display for: {username}"
+
+log.info(f"Data-driven test passed for: {username}")

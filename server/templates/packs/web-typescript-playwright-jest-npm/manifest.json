@@ -73,6 +73,141 @@
     {
       "path": "tests/login.spec.ts",
       "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "config/env.config.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "config/test.config.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "cucumber.js",
+      "isTemplate": true
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "jest-playwright.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": "jest.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/HomePage.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "step-definitions/loginSteps.ts",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "support/hooks.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "support/world.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/login.test.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/setup.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "types/global.d.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/dataReader.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/logger.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshotHelper.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/ScreenshotUtils.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/waitHelpers.ts",
+      "isTemplate": true
     }
   ],
   "directories": [

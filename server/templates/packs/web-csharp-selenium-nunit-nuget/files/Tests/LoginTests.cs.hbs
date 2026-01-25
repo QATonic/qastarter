@@ -8,46 +8,78 @@ using Allure.Net.Commons;
 
 namespace {{projectNamespace}}.Tests
 {
-    [TestFixture]
-    public class LoginTests
-    {
-        private LoginPage _loginPage;
+[TestFixture]
+public class LoginTests
+{
+private LoginPage _loginPage;
 
-        [SetUp]
-        public void Setup()
-        {
-            DriverManager.InitDriver();
-            DriverManager.Driver.Navigate().GoToUrl(ConfigReader.Instance.BaseUrl);
-            _loginPage = new LoginPage();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            DriverManager.QuitDriver();
-        }
-
-        [Test]
-        [Category("Smoke")]
-        public void ValidLogin_ShouldRedirectToInventory()
-        {
-            _loginPage.Login(
-                ConfigReader.Instance.Username,
-                ConfigReader.Instance.Password
-            );
-
-            Assert.That(_loginPage.IsLoginSuccessful(), Is.True,
-                "User should be redirected to inventory page");
-        }
-
-        [Test]
-        [Category("Regression")]
-        public void InvalidLogin_ShouldShowError()
-        {
-            _loginPage.Login("invalid_user", "wrong_password");
-
-            Assert.That(_loginPage.IsErrorDisplayed(), Is.True,
-                "Error message should be displayed");
-        }
-    }
+[SetUp]
+public void Setup()
+{
+DriverManager.InitDriver();
+DriverManager.Driver.Navigate().GoToUrl(ConfigReader.Instance.BaseUrl);
+_loginPage = new LoginPage();
 }
+
+[TearDown]
+public void TearDown()
+{
+DriverManager.QuitDriver();
+}
+
+[Test]
+[Category("Smoke")]
+public void ValidLogin_ShouldRedirectToInventory()
+{
+_loginPage.Login(
+ConfigReader.Instance.Username,
+ConfigReader.Instance.Password
+);
+
+Assert.That(_loginPage.IsLoginSuccessful(), Is.True,
+"User should be redirected to inventory page");
+}
+
+[Test]
+[Category("Regression")]
+public void InvalidLogin_ShouldShowError()
+{
+_loginPage.Login("invalid_user", "wrong_password");
+
+Assert.That(_loginPage.IsErrorDisplayed(), Is.True,
+"Error message should be displayed");
+}
+
+/// <summary>
+    /// Data-driven test using TestCaseSource with CSV data.
+    /// Reads test data from testdata/users.csv
+    /// </summary>
+[Test]
+[Category("Regression")]
+[TestCaseSource(nameof(GetLoginTestData))]
+public void DataDrivenLogin_ShouldValidateCredentials(string username, string password, string expected)
+{
+_loginPage.Login(username, password);
+
+if (expected == "success")
+{
+Assert.That(_loginPage.IsLoginSuccessful(), Is.True,
+$"Login should be successful for: {username}");
+}
+else
+{
+Assert.That(_loginPage.IsErrorDisplayed(), Is.True,
+$"Error should be displayed for: {username}");
+}
+}
+
+private static IEnumerable<object[]> GetLoginTestData()
+    {
+    var testData = TestDataReader.ReadCsv("users.csv");
+    foreach (var row in testData)
+    {
+    yield return new object[] { row["username"], row["password"], row["expected"] };
+    }
+    }
+    }
+    }

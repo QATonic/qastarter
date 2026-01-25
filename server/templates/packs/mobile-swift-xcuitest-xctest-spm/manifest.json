@@ -135,7 +135,10 @@
     "buildTool": "spm"
   },
   "dynamicSupport": {
-    "reportingTools": [],
+    "reportingTools": [
+      "xcresult",
+      "allure"
+    ],
     "cicdTools": [
       "jenkins",
       "github-actions",

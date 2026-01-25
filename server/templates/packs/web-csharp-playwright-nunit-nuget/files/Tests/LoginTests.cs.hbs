@@ -5,34 +5,65 @@ using {{projectNamespace}}.Config;
 
 namespace {{projectNamespace}}.Tests
 {
-    [TestFixture]
-    public class LoginTests
-    {
-        private LoginPage _loginPage;
+[TestFixture]
+public class LoginTests
+{
+private LoginPage _loginPage;
 
-        [SetUp]
-        public async Task Setup()
-        {
-            await PlaywrightManager.InitBrowserAsync();
-            await PlaywrightManager.Page.GotoAsync(ConfigReader.Instance.BaseUrl);
-            _loginPage = new LoginPage();
-        }
-
-        [TearDown]
-        public async Task TearDown() => await PlaywrightManager.CloseBrowserAsync();
-
-        [Test, Category("Smoke")]
-        public async Task ValidLogin_ShouldRedirectToInventory()
-        {
-            await _loginPage.LoginAsync(ConfigReader.Instance.Username, ConfigReader.Instance.Password);
-            Assert.That(_loginPage.IsLoginSuccessful(), Is.True);
-        }
-
-        [Test, Category("Regression")]
-        public async Task InvalidLogin_ShouldShowError()
-        {
-            await _loginPage.LoginAsync("invalid", "wrong");
-            Assert.That(await _loginPage.IsErrorDisplayedAsync(), Is.True);
-        }
-    }
+[SetUp]
+public async Task Setup()
+{
+await PlaywrightManager.InitBrowserAsync();
+await PlaywrightManager.Page.GotoAsync(ConfigReader.Instance.BaseUrl);
+_loginPage = new LoginPage();
 }
+
+[TearDown]
+public async Task TearDown() => await PlaywrightManager.CloseBrowserAsync();
+
+[Test, Category("Smoke")]
+public async Task ValidLogin_ShouldRedirectToInventory()
+{
+await _loginPage.LoginAsync(ConfigReader.Instance.Username, ConfigReader.Instance.Password);
+Assert.That(_loginPage.IsLoginSuccessful(), Is.True);
+}
+
+[Test, Category("Regression")]
+public async Task InvalidLogin_ShouldShowError()
+{
+await _loginPage.LoginAsync("invalid", "wrong");
+Assert.That(await _loginPage.IsErrorDisplayedAsync(), Is.True);
+}
+
+/// <summary>
+    /// Data-driven test using TestCaseSource with CSV data.
+    /// Reads test data from testdata/users.csv
+    /// </summary>
+[Test, Category("Regression")]
+[TestCaseSource(nameof(GetLoginTestData))]
+public async Task DataDrivenLogin_ShouldValidateCredentials(string username, string password, string expected)
+{
+await _loginPage.LoginAsync(username, password);
+
+if (expected == "success")
+{
+Assert.That(_loginPage.IsLoginSuccessful(), Is.True,
+$"Login should be successful for: {username}");
+}
+else
+{
+Assert.That(await _loginPage.IsErrorDisplayedAsync(), Is.True,
+$"Error should be displayed for: {username}");
+}
+}
+
+private static IEnumerable<object[]> GetLoginTestData()
+    {
+    var testData = TestDataReader.ReadCsv("users.csv");
+    foreach (var row in testData)
+    {
+    yield return new object[] { row["username"], row["password"], row["expected"] };
+    }
+    }
+    }
+    }

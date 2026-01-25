@@ -2,66 +2,85 @@ package {{javaPackage}}.pages;
 
 import {{javaPackage}}.core.DriverManager;
 import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.WaitUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 /**
- * Base Page - Extend this in all your page objects.
- */
+* Base Page - Extend this in all your page objects.
+*
+* Uses WaitUtils for centralized wait logic.
+*/
 public abstract class BasePage {
 
-    protected WebDriver driver;
-    protected WebDriverWait wait;
+protected WebDriver driver;
 
-    public BasePage() {
-        this.driver = DriverManager.getDriver();
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
-    }
+public BasePage() {
+this.driver = DriverManager.getDriver();
+}
 
-    protected void click(By locator) {
-        Log.action("Click: " + locator);
-        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
-    }
+/**
+* Click on element (uses WaitUtils for waits)
+*/
+protected void click(By locator) {
+Log.action("Click: " + locator);
+WaitUtils.waitForClickability(locator).click();
+}
 
-    protected void type(By locator, String text) {
-        Log.action("Type into: " + locator);
-        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        element.clear();
-        element.sendKeys(text);
-    }
+/**
+* Type text into element (uses WaitUtils for waits)
+*/
+protected void type(By locator, String text) {
+Log.action("Type into: " + locator);
+WebElement element = WaitUtils.waitForVisibility(locator);
+element.clear();
+element.sendKeys(text);
+}
 
-    protected String getText(By locator) {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
-    }
+/**
+* Get text from element
+*/
+protected String getText(By locator) {
+return WaitUtils.waitForVisibility(locator).getText();
+}
 
-    protected boolean isDisplayed(By locator) {
-        try {
-            return driver.findElement(locator).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
+/**
+* Check if element is displayed (no wait)
+*/
+protected boolean isDisplayed(By locator) {
+try {
+return driver.findElement(locator).isDisplayed();
+} catch (Exception e) {
+return false;
+}
+}
 
-    protected void waitForElement(By locator) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-    }
+/**
+* Wait for element to be visible
+*/
+protected void waitForElement(By locator) {
+WaitUtils.waitForVisibility(locator);
+}
 
-    public String getPageTitle() {
-        return driver.getTitle();
-    }
+/**
+* Wait for element to disappear
+*/
+protected void waitForElementToDisappear(By locator) {
+WaitUtils.waitForInvisibility(locator);
+}
 
-    public String getCurrentUrl() {
-        return driver.getCurrentUrl();
-    }
+public String getPageTitle() {
+return driver.getTitle();
+}
 
-    protected void logAction(String action) {
-        Log.step("[" + getClass().getSimpleName() + "] " + action);
-    }
+public String getCurrentUrl() {
+return driver.getCurrentUrl();
+}
 
-    public abstract boolean isLoaded();
+protected void logAction(String action) {
+Log.step("[" + getClass().getSimpleName() + "] " + action);
+}
+
+public abstract boolean isLoaded();
 }

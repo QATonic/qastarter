@@ -50,6 +50,10 @@
       "isTemplate": true
     },
     {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "isTemplate": true
+    },
+    {
       "path": "README.md",
       "isTemplate": true
     },
@@ -148,7 +152,11 @@
     },
     {
       "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
-      "isTemplate": true
+      "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "src/main/java/{{packagePath}}/utils/WaitUtils.java",
@@ -205,6 +213,10 @@
       "isTemplate": true
     },
     {
+      "path": "src/test/resources/regression.xml",
+      "isTemplate": true
+    },
+    {
       "path": "src/main/resources/config/dev.properties",
       "isTemplate": true
     },
@@ -218,6 +230,26 @@
     },
     {
       "path": "src/main/resources/log4j2.xml",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/setup.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/testdata/sample.json",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/testdata/users.csv",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/testdata/sample.json",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/testdata/users.csv",
       "isTemplate": true
     },
     {

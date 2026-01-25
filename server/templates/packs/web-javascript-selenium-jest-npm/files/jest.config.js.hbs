@@ -1,14 +1,19 @@
 module.exports = {
-  testEnvironment: 'node',
-  testMatch: ['**/tests/**/*.test.js'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+testEnvironment: 'node',
+testMatch: ['**/tests/**/*.test.js'],
+setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   testTimeout: 60000,
   verbose: true,
   collectCoverage: false,
+
+  // Retry failed tests up to 2 times
+  // Requires jest-circus (default in Jest 27+)
+  retryTimes: 2,
+
   reporters: [
-    'default',
-    ['jest-allure', {
-      resultsDir: 'allure-results'
-    }]
+  'default'{{#if (eq reportingTool "allure")}},
+  ['jest-allure', {
+  resultsDir: 'allure-results'
+  }]{{/if}}
   ]
-};
+  };

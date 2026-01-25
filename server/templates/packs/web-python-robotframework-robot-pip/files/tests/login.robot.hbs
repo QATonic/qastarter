@@ -1,18 +1,40 @@
 *** Settings ***
-Documentation     Login Test Cases for SauceDemo
-Resource          ../resources/common.resource
-Test Setup        Open Browser To Login Page
-Test Teardown     Close Browser Session
+Documentation Login Test Cases for SauceDemo
+... Demonstrates configuration-based and data-driven testing
+Resource ../resources/common.resource
+Test Setup Open Browser To Login Page
+Test Teardown Close Browser Session
 
 *** Test Cases ***
 Valid Login Should Redirect To Inventory
-    [Documentation]    Verify successful login with valid credentials
-    [Tags]    smoke    login
-    Login With Credentials    ${USERNAME}    ${PASSWORD}
-    Verify Login Success
+[Documentation] Verify successful login with valid credentials
+[Tags] smoke login
+Login With Credentials ${USERNAME} ${PASSWORD}
+Verify Login Success
 
 Invalid Login Should Show Error
-    [Documentation]    Verify error message with invalid credentials
-    [Tags]    regression    login
-    Login With Credentials    invalid_user    wrong_password
-    Verify Error Message Displayed
+[Documentation] Verify error message with invalid credentials
+[Tags] regression login
+Login With Credentials invalid_user wrong_password
+Verify Error Message Displayed
+
+Data-Driven Login Test With CSV
+[Documentation] Data-driven test using CSV test data
+[Tags] regression data-driven
+[Template] Verify Login With Test Data
+FOR ${user} IN @{LOGIN_TEST_DATA}
+${user}[username] ${user}[password] ${user}[expected]
+END
+
+*** Keywords ***
+Verify Login With Test Data
+[Documentation] Reusable keyword for data-driven login testing
+[Arguments] ${username} ${password} ${expected}
+Open Browser To Login Page
+Login With Credentials ${username} ${password}
+IF '${expected}' == 'success'
+Verify Login Success
+ELSE
+Verify Error Message Displayed
+END
+Close Browser Session

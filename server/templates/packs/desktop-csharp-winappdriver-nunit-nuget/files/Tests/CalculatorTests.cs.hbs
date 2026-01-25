@@ -2,30 +2,78 @@ using NUnit.Framework;
 using {{projectNamespace}}.Core;
 using {{projectNamespace}}.Pages;
 using {{projectNamespace}}.Utils;
+using System.Collections.Generic;
 
 namespace {{projectNamespace}}.Tests
 {
-    [TestFixture]
-    public class CalculatorTests
-    {
-        private CalculatorPage _calc;
+[TestFixture]
+public class CalculatorTests
+{
+private CalculatorPage _calc;
 
-        [SetUp]
-        public void Setup()
-        {
-            WinAppDriverManager.InitDriver();
-            _calc = new CalculatorPage();
-        }
-
-        [TearDown]
-        public void TearDown() => WinAppDriverManager.QuitDriver();
-
-        [Test, Category("Smoke")]
-        public void TestAddition()
-        {
-            Log.Instance.Step("Test: 2 + 3 = 5");
-            _calc.Add(2, 3);
-            Assert.That(_calc.GetResult(), Does.Contain("5"));
-        }
-    }
+[SetUp]
+public void Setup()
+{
+WinAppDriverManager.InitDriver();
+_calc = new CalculatorPage();
 }
+
+[TearDown]
+public void TearDown() => WinAppDriverManager.QuitDriver();
+
+[Test, Category("Smoke")]
+public void TestAddition()
+{
+Log.Instance.Step("Test: 2 + 3 = 5");
+_calc.Add(2, 3);
+Assert.That(_calc.GetResult(), Does.Contain("5"));
+}
+
+[Test, Category("Regression")]
+public void TestSubtraction()
+{
+Log.Instance.Step("Test: 5 - 3 = 2");
+_calc.Subtract(5, 3);
+Assert.That(_calc.GetResult(), Does.Contain("2"));
+}
+
+// ===== DATA-DRIVEN TESTS =====
+
+/// <summary>
+    /// Data-driven addition test using TestCaseSource.
+    /// </summary>
+[Test, Category("Regression")]
+[TestCaseSource(nameof(GetAdditionTestData))]
+public void TestAdditionDataDriven(int num1, int num2, int expected)
+{
+Log.Instance.Step($"Data-driven test: {num1} + {num2} = {expected}");
+_calc.Clear();
+_calc.Add(num1, num2);
+Assert.That(_calc.GetResult(), Does.Contain(expected.ToString()));
+}
+
+private static IEnumerable<object[]> GetAdditionTestData()
+    {
+    yield return new object[] { 1, 1, 2 };
+    yield return new object[] { 5, 5, 10 };
+    yield return new object[] { 10, 20, 30 };
+    yield return new object[] { 0, 0, 0 };
+    yield return new object[] { 99, 1, 100 };
+    }
+
+    /// <summary>
+        /// Data-driven subtraction test using TestCase attribute.
+        /// </summary>
+    [Test, Category("Regression")]
+    [TestCase(5, 3, 2)]
+    [TestCase(10, 5, 5)]
+    [TestCase(100, 50, 50)]
+    public void TestSubtractionDataDriven(int num1, int num2, int expected)
+    {
+    Log.Instance.Step($"Data-driven test: {num1} - {num2} = {expected}");
+    _calc.Clear();
+    _calc.Subtract(num1, num2);
+    Assert.That(_calc.GetResult(), Does.Contain(expected.ToString()));
+    }
+    }
+    }

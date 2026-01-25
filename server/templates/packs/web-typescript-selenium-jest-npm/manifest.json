@@ -12,9 +12,21 @@
     "buildTool": "npm"
   },
   "dynamicSupport": {
-    "reportingTools": ["allure", "jest-html"],
-    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
-    "testingPatterns": ["page-object-model", "bdd"]
+    "reportingTools": [
+      "allure",
+      "jest-html"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
   },
   "toolVersions": {
     "node": "18+",
@@ -23,28 +35,171 @@
     "typescript": "5.3.0"
   },
   "files": [
-    {"path": "package.json", "isTemplate": true},
-    {"path": "tsconfig.json", "isTemplate": true},
-    {"path": "jest.config.ts", "isTemplate": true},
-    {"path": "README.md", "isTemplate": true},
-    {"path": ".gitignore", "isTemplate": false},
-    {"path": ".env.example", "isTemplate": false},
-    {"path": "Jenkinsfile", "isTemplate": true, "conditional": {"cicdTool": "jenkins"}},
-    {"path": ".github/workflows/tests.yml", "isTemplate": true, "conditional": {"cicdTool": "github-actions"}},
-    {"path": ".gitlab-ci.yml", "isTemplate": true, "conditional": {"cicdTool": "gitlab-ci"}},
-    {"path": "azure-pipelines.yml", "isTemplate": true, "conditional": {"cicdTool": "azure-devops"}},
-    {"path": ".circleci/config.yml", "isTemplate": true, "conditional": {"cicdTool": "circleci"}},
-    {"path": "Dockerfile", "isTemplate": true},
-    {"path": "docker-compose.yml", "isTemplate": true},
-    {"path": "config/ConfigReader.ts", "isTemplate": true},
-    {"path": "config/dev.json", "isTemplate": false},
-    {"path": "config/qa.json", "isTemplate": false},
-    {"path": "pages/BasePage.ts", "isTemplate": true},
-    {"path": "pages/LoginPage.ts", "isTemplate": true},
-    {"path": "utils/DriverManager.ts", "isTemplate": true},
-    {"path": "tests/login.spec.ts", "isTemplate": true},
-    {"path": "features/login.feature", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
-    {"path": "step-definitions/loginSteps.ts", "isTemplate": true, "conditional": {"testingPattern": "bdd"}}
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "tsconfig.json",
+      "isTemplate": true
+    },
+    {
+      "path": "jest.config.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": ".env.example",
+      "isTemplate": false
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true
+    },
+    {
+      "path": "config/ConfigReader.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "config/browser.config.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "config/env.config.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/users.json",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/BasePage.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/LoginPage.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/HomePage.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "types/index.d.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/DriverManager.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/DriverFactory.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/DataReader.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/Logger.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/ScreenshotHelper.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/ScreenshotUtils.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/WaitHelpers.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/login.spec.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/login.test.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/setup.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step-definitions/loginSteps.ts",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    }
   ],
-  "directories": ["logs", "screenshots", "reports"]
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
 }

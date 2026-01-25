@@ -4,36 +4,97 @@ import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.core.BaseTest;
 import {{javaPackage}}.pages.LoginPage;
 import {{javaPackage}}.utils.Log;
+{{#if utilities.dataProvider}}
+import {{javaPackage}}.utils.TestDataReader;
+import org.testng.annotations.DataProvider;
+import java.util.List;
+import java.util.Map;
+{{/if}}
 import org.testng.Assert;
+{{#unless utilities.dataProvider}}
+import org.testng.annotations.DataProvider;
+{{/unless}}
 import org.testng.annotations.Test;
 
 /**
- * Login Tests - Example test class for SauceDemo.
- */
+* Login Tests - Example test class for SauceDemo.
+*
+* Demonstrates:
+* - Simple tests using ConfigurationReader (properties file)
+* - Data-driven tests using TestDataReader (CSV file)
+*/
 public class LoginTests extends BaseTest {
 
-    @Test(priority = 1, description = "Verify successful login with valid credentials")
-    public void testValidLogin() {
-        Log.step("Testing valid login");
-        LoginPage loginPage = new LoginPage();
+// ===========================================
+// SIMPLE TESTS (using properties file)
+// ===========================================
 
-        String username = ConfigurationReader.getProperty("username");
-        String password = ConfigurationReader.getProperty("password");
+@Test(priority = 1, description = "Verify successful login with valid credentials")
+public void testValidLogin() {
+Log.step("Testing valid login from properties file");
+LoginPage loginPage = new LoginPage();
 
-        loginPage.login(username, password);
+// Get credentials from dev.properties
+String username = ConfigurationReader.getProperty("username");
+String password = ConfigurationReader.getProperty("password");
 
-        Assert.assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
-        Log.info("Valid login test passed");
-    }
+loginPage.login(username, password);
 
-    @Test(priority = 2, description = "Verify error message with invalid credentials")
-    public void testInvalidLogin() {
-        Log.step("Testing invalid login");
-        LoginPage loginPage = new LoginPage();
-
-        loginPage.login("invalid_user", "wrong_password");
-
-        Assert.assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
-        Log.info("Invalid login test passed - error displayed as expected");
-    }
+Assert.assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
+Log.info("Valid login test passed");
 }
+
+@Test(priority = 2, description = "Verify error message with invalid credentials")
+public void testInvalidLogin() {
+Log.step("Testing invalid login");
+LoginPage loginPage = new LoginPage();
+
+loginPage.login("invalid_user", "wrong_password");
+
+Assert.assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
+Log.info("Invalid login test passed - error displayed as expected");
+}
+
+    // ===========================================
+    // DATA-DRIVEN TESTS (using CSV file)
+    // ===========================================
+
+    {{#if utilities.dataProvider}}
+    /**
+     * DataProvider reads test data from: src/main/resources/testdata/users.csv
+     * 
+     * CSV format: username,password,expected
+     */
+    @DataProvider(name = "loginTestData")
+    public Object[][] getLoginTestData() {
+        List<Map<String, String>> data = TestDataReader.readCsv("users.csv");
+        
+        return data.stream()
+            .map(row -> new Object[]{
+                row.get("username"), 
+                row.get("password"),
+                row.get("expected")
+            })
+            .toArray(Object[][]::new);
+    }
+
+    @Test(dataProvider = "loginTestData", priority = 3, 
+          description = "Data-driven login test using CSV data")
+    public void testLoginWithTestData(String username, String password, String expected) {
+        Log.step("Testing login for user: " + username);
+        LoginPage loginPage = new LoginPage();
+        
+        loginPage.login(username, password);
+        
+        if ("success".equals(expected)) {
+            Assert.assertTrue(loginPage.isLoginSuccessful(), 
+                "User " + username + " should login successfully");
+            Log.info("Login successful for: " + username);
+        } else {
+            Assert.assertTrue(loginPage.isErrorDisplayed(), 
+                "User " + username + " should see error message");
+            Log.info("Error displayed as expected for: " + username);
+        }
+    }
+    {{/if}}
+    }

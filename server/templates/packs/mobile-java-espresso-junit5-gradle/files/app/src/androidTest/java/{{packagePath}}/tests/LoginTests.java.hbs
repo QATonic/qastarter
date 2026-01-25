@@ -5,30 +5,81 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import {{packageName}}.MainActivity;
-import {{packageName}}.pages.LoginPage;
+import {{packageName}}.screens.LoginScreen;
+{{#if utilities.dataProvider}}
+import {{packageName}}.utils.TestDataReader;
+{{/if}}
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
 
 /**
- * Login Tests - Espresso UI tests for SauceDemo app.
- * 
- * Run: ./gradlew connectedAndroidTest
- */
+* Login Tests - Espresso UI tests for Android app.
+*
+* Run: ./gradlew connectedAndroidTest
+*
+* Demonstrates both standard and data-driven testing.
+*/
 @RunWith(AndroidJUnit4.class)
 public class LoginTests {
 
-    @Rule
-    public ActivityScenarioRule<MainActivity> activityRule = 
-        new ActivityScenarioRule<>(MainActivity.class);
+@Rule
+public ActivityScenarioRule<MainActivity> activityRule =
+    new ActivityScenarioRule<>(MainActivity.class);
 
-    @Test
-    public void validLogin_showsProducts() {
-        LoginPage loginPage = new LoginPage();
-        loginPage.login("standard_user", "secret_sauce");
-        
+        private static final String VALID_USER = "standard_user";
+        private static final String VALID_PASS = "secret_sauce";
+
+        @Test
+        public void validLogin_showsProducts() {
+        LoginScreen loginScreen = new LoginScreen();
+        loginScreen.login(VALID_USER, VALID_PASS);
+
         onView(withText("PRODUCTS")).check(matches(isDisplayed()));
-    }
-}
+        }
+
+        @Test
+        public void invalidLogin_showsError() {
+        LoginScreen loginScreen = new LoginScreen();
+        loginScreen.login("invalid_user", "wrong_password");
+
+        onView(withId(R.id.error_message)).check(matches(isDisplayed()));
+        }
+
+        {{#if utilities.dataProvider}}
+        /**
+        * Data-driven test example.
+        * For full parameterized testing, use @RunWith(Parameterized.class)
+        * with @Parameters annotation.
+        */
+        @Test
+        public void dataDrivernLogin_fromTestData() {
+        List<Map<String, String>> testData = TestDataReader.readJson("users.json");
+
+            for (Map<String, String> user : testData) {
+                String username = user.get("username");
+                String password = user.get("password");
+                String expected = user.get("expected");
+
+                LoginScreen loginScreen = new LoginScreen();
+                loginScreen.login(username, password);
+
+                if ("success".equals(expected)) {
+                onView(withText("PRODUCTS")).check(matches(isDisplayed()));
+                } else {
+                onView(withId(R.id.error_message)).check(matches(isDisplayed()));
+                }
+
+                // Reset app state for next iteration
+                activityRule.getScenario().recreate();
+                }
+                }
+                {{/if}}
+                }

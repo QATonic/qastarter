@@ -69,6 +69,125 @@
     {
       "path": "tests/login.spec.js",
       "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "config/browser.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": "config/env.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/users.json",
+      "isTemplate": true
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "pages/HomePage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "step-definitions/loginSteps.js",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "tests/login.test.js",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/setup.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/dataReader.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/driverFactory.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/logger.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshotHelper.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/ScreenshotUtils.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/waitHelpers.js",
+      "isTemplate": true
     }
   ],
   "directories": [

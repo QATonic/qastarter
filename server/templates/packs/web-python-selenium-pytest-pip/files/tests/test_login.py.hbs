@@ -2,10 +2,12 @@
 Login Tests - Example test class for SauceDemo.
 
 Run with: pytest tests/test_login.py -v
+Demonstrates both configuration-based and data-driven testing.
 """
 import pytest
 from pages.login_page import LoginPage
 from utils.logger import log
+from utils.data_reader import DataReader
 from config.config_reader import config
 {{#if (eq reportingTool "allure")}}
 import allure
@@ -15,37 +17,57 @@ import allure
 @allure.story("Authentication")
 {{/if}}
 class TestLogin:
-    """Login test cases."""
-    
+"""Login test cases."""
+
 {{#if (eq reportingTool "allure")}}
-    @allure.title("Valid Login Test")
-    @allure.severity(allure.severity_level.CRITICAL)
+@allure.title("Valid Login Test")
+@allure.severity(allure.severity_level.CRITICAL)
 {{/if}}
-    @pytest.mark.smoke
-    def test_valid_login(self, driver):
-        """Verify successful login with valid credentials."""
-        log.step("Testing valid login")
-        
-        login_page = LoginPage()
-        username = config.get("username")
-        password = config.get("password")
-        
-        login_page.login(username, password)
-        
-        assert login_page.is_login_successful(), "Login should be successful"
-        log.info("Valid login test passed")
-    
+@pytest.mark.smoke
+def test_valid_login(self, driver):
+"""Verify successful login with valid credentials."""
+log.step("Testing valid login")
+
+login_page = LoginPage()
+username = config.get("username")
+password = config.get("password")
+
+login_page.login(username, password)
+
+assert login_page.is_login_successful(), "Login should be successful"
+log.info("Valid login test passed")
+
 {{#if (eq reportingTool "allure")}}
-    @allure.title("Invalid Login Test")
-    @allure.severity(allure.severity_level.NORMAL)
+@allure.title("Invalid Login Test")
+@allure.severity(allure.severity_level.NORMAL)
 {{/if}}
-    @pytest.mark.regression
-    def test_invalid_login(self, driver):
-        """Verify error message with invalid credentials."""
-        log.step("Testing invalid login")
-        
-        login_page = LoginPage()
-        login_page.login("invalid_user", "wrong_password")
-        
-        assert login_page.is_error_displayed(), "Error message should be displayed"
-        log.info("Invalid login test passed - error displayed as expected")
+@pytest.mark.regression
+def test_invalid_login(self, driver):
+"""Verify error message with invalid credentials."""
+log.step("Testing invalid login")
+
+login_page = LoginPage()
+login_page.login("invalid_user", "wrong_password")
+
+assert login_page.is_error_displayed(), "Error message should be displayed"
+log.info("Invalid login test passed - error displayed as expected")
+
+{{#if (eq reportingTool "allure")}}
+@allure.title("Data-Driven Login Test")
+@allure.severity(allure.severity_level.NORMAL)
+{{/if}}
+@pytest.mark.regression
+@pytest.mark.parametrize("username,password,expected", DataReader.read_csv("users.csv"))
+def test_login_with_csv_data(self, driver, username, password, expected):
+"""Data-driven login test using CSV file."""
+log.step(f"Testing login with data: {username}")
+
+login_page = LoginPage()
+login_page.login(username, password)
+
+if expected == "success":
+assert login_page.is_login_successful(), f"Login should be successful for: {username}"
+else:
+assert login_page.is_error_displayed(), f"Error should be displayed for: {username}"
+
+log.info(f"Data-driven test passed for: {username}")

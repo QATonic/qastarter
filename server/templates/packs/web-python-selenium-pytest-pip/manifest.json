@@ -12,9 +12,21 @@
     "buildTool": "pip"
   },
   "dynamicSupport": {
-    "reportingTools": ["allure", "pytest-html"],
-    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
-    "testingPatterns": ["page-object-model", "bdd"]
+    "reportingTools": [
+      "allure",
+      "pytest-html"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
   },
   "toolVersions": {
     "python": "3.10+",
@@ -22,35 +34,194 @@
     "pytest": "7.4.0"
   },
   "files": [
-    {"path": "requirements.txt", "isTemplate": true},
-    {"path": "pytest.ini", "isTemplate": true},
-    {"path": "README.md", "isTemplate": true},
-    {"path": ".gitignore", "isTemplate": false},
-    {"path": ".env.example", "isTemplate": false},
-    {"path": "Jenkinsfile", "isTemplate": true, "conditional": {"cicdTool": "jenkins"}},
-    {"path": ".github/workflows/tests.yml", "isTemplate": true, "conditional": {"cicdTool": "github-actions"}},
-    {"path": ".gitlab-ci.yml", "isTemplate": true, "conditional": {"cicdTool": "gitlab-ci"}},
-    {"path": "azure-pipelines.yml", "isTemplate": true, "conditional": {"cicdTool": "azure-devops"}},
-    {"path": ".circleci/config.yml", "isTemplate": true, "conditional": {"cicdTool": "circleci"}},
-    {"path": "Dockerfile", "isTemplate": true},
-    {"path": "docker-compose.yml", "isTemplate": true},
-    {"path": "config/__init__.py", "isTemplate": false},
-    {"path": "config/config_reader.py", "isTemplate": true},
-    {"path": "config/dev.ini", "isTemplate": false},
-    {"path": "config/qa.ini", "isTemplate": false},
-    {"path": "pages/__init__.py", "isTemplate": false},
-    {"path": "pages/base_page.py", "isTemplate": true},
-    {"path": "pages/login_page.py", "isTemplate": true},
-    {"path": "utils/__init__.py", "isTemplate": false},
-    {"path": "utils/driver_manager.py", "isTemplate": true},
-    {"path": "utils/logger.py", "isTemplate": true},
-    {"path": "utils/screenshot_utils.py", "isTemplate": true},
-    {"path": "tests/__init__.py", "isTemplate": false},
-    {"path": "tests/conftest.py", "isTemplate": true},
-    {"path": "tests/test_login.py", "isTemplate": true},
-    {"path": "features/login.feature", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
-    {"path": "step_defs/__init__.py", "isTemplate": false, "conditional": {"testingPattern": "bdd"}},
-    {"path": "step_defs/test_login_steps.py", "isTemplate": true, "conditional": {"testingPattern": "bdd"}}
+    {
+      "path": "requirements.txt",
+      "isTemplate": true
+    },
+    {
+      "path": "pytest.ini",
+      "isTemplate": true
+    },
+    {
+      "path": "setup.py",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": ".env.example",
+      "isTemplate": false
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true
+    },
+    {
+      "path": "config/__init__.py",
+      "isTemplate": false
+    },
+    {
+      "path": "config/config.py",
+      "isTemplate": true
+    },
+    {
+      "path": "config/config_reader.py",
+      "isTemplate": true
+    },
+    {
+      "path": "config/settings.py",
+      "isTemplate": true
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/prod.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/users.csv",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/__init__.py",
+      "isTemplate": false
+    },
+    {
+      "path": "pages/base_page.py",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/login_page.py",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/home_page.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/__init__.py",
+      "isTemplate": false
+    },
+    {
+      "path": "utils/driver_manager.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/driver_factory.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/logger.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshot_util.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshot_utils.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/wait_helpers.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/web_actions.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/data_reader.py",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/__init__.py",
+      "isTemplate": false
+    },
+    {
+      "path": "tests/conftest.py",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/test_login.py",
+      "isTemplate": true
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/__init__.py",
+      "isTemplate": false,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "step_defs/test_login_steps.py",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    }
   ],
-  "directories": ["logs", "screenshots", "reports"]
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
 }

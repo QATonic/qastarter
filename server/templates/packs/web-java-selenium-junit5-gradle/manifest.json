@@ -12,9 +12,22 @@
     "buildTool": "gradle"
   },
   "dynamicSupport": {
-    "reportingTools": ["allure", "extent-reports", "junit-reports"],
-    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
-    "testingPatterns": ["page-object-model", "bdd"]
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "junit-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
   },
   "toolVersions": {
     "java": "17",
@@ -24,43 +37,235 @@
     "cucumber": "7.15.0"
   },
   "files": [
-    {"path": "build.gradle", "isTemplate": true},
-    {"path": "settings.gradle", "isTemplate": true},
-    {"path": "gradle.properties", "isTemplate": true},
-    {"path": "README.md", "isTemplate": true},
-    {"path": ".gitignore", "isTemplate": false},
-    {"path": "Jenkinsfile", "isTemplate": true, "conditional": {"cicdTool": "jenkins"}},
-    {"path": ".github/workflows/tests.yml", "isTemplate": true, "conditional": {"cicdTool": "github-actions"}},
-    {"path": ".gitlab-ci.yml", "isTemplate": true, "conditional": {"cicdTool": "gitlab-ci"}},
-    {"path": "azure-pipelines.yml", "isTemplate": true, "conditional": {"cicdTool": "azure-devops"}},
-    {"path": ".circleci/config.yml", "isTemplate": true, "conditional": {"cicdTool": "circleci"}},
-    {"path": "Dockerfile", "isTemplate": true, "conditional": {"utilities.includeDocker": true}},
-    {"path": "docker-compose.yml", "isTemplate": true, "conditional": {"utilities.includeDockerCompose": true}},
-    {"path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/core/DriverManager.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/core/BrowserFactory.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/core/BaseTest.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/core/TestWatcher.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/pages/BasePage.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/pages/LoginPage.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/utils/Log.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/utils/TestDataReader.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/utils/WaitUtils.java", "isTemplate": true},
-    {"path": "src/main/java/{{packagePath}}/utils/ExtentManager.java", "isTemplate": true, "conditional": {"reportingTool": "extent-reports"}},
-    {"path": "src/main/java/{{packagePath}}/utils/AllureManager.java", "isTemplate": true, "conditional": {"reportingTool": "allure"}},
-    {"path": "src/test/java/{{packagePath}}/tests/LoginTests.java", "isTemplate": true},
-    {"path": "src/test/java/{{packagePath}}/runners/TestRunner.java", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
-    {"path": "src/test/java/{{packagePath}}/stepdefinitions/Hooks.java", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
-    {"path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
-    {"path": "src/test/resources/features/Login.feature", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
-    {"path": "src/test/resources/junit-platform.properties", "isTemplate": true},
-    {"path": "src/main/resources/config/dev.properties", "isTemplate": true},
-    {"path": "src/main/resources/config/qa.properties", "isTemplate": true},
-    {"path": "src/main/resources/config/prod.properties", "isTemplate": true},
-    {"path": "src/main/resources/log4j2.xml", "isTemplate": true},
-    {"path": "src/main/resources/extent-config.xml", "isTemplate": true, "conditional": {"reportingTool": "extent-reports"}},
-    {"path": "src/main/resources/allure.properties", "isTemplate": true, "conditional": {"reportingTool": "allure"}}
+    {
+      "path": "build.gradle",
+      "isTemplate": true
+    },
+    {
+      "path": "settings.gradle",
+      "isTemplate": true
+    },
+    {
+      "path": "gradle.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/DriverManager.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BrowserFactory.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/TestWatcher.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/TestWatcher.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/BasePage.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/LoginPage.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/Log.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
+      "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/WaitUtils.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/AllureManager.java",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/LoginTests.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/stepdefinitions/Hooks.java",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/features/Login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/junit-platform.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/dev.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/qa.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/prod.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/setup.properties",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/testdata/sample.json",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/testdata/users.csv",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/testdata/sample.json",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/testdata/users.csv",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
+    },
+    {
+      "path": "src/main/resources/allure.properties",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      }
+    }
   ],
-  "directories": ["logs", "screenshots", "reports"]
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
 }

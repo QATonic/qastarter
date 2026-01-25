@@ -63,6 +63,93 @@
     {
       "path": "cypress/support/e2e.js",
       "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "cypress/e2e/features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "cypress/fixtures/config.json",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/fixtures/environments.json",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/fixtures/users.json",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/pages/HomePage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/support/commands.js",
+      "isTemplate": true
+    },
+    {
+      "path": "cypress/support/step_definitions/loginSteps.js",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "cypress/support/utils.js",
+      "isTemplate": true
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
     }
   ],
   "directories": [

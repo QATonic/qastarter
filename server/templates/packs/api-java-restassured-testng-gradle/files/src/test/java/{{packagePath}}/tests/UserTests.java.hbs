@@ -1,55 +1,61 @@
 package {{javaPackage}}.tests;
 
 import io.restassured.response.Response;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import {{javaPackage}}.core.BaseTest;
 import {{javaPackage}}.core.ResponseValidator;
 import {{javaPackage}}.models.User;
 import {{javaPackage}}.utils.Log;
+{{#if utilities.dataProvider}}
+import {{javaPackage}}.utils.TestDataReader;
+{{/if}}
+
+import java.util.List;
+import java.util.Map;
 
 /**
- * User API Tests - CRUD operations for /users endpoint.
- * 
- * Sample API: JSONPlaceholder (https://jsonplaceholder.typicode.com)
- * 
- * Run: mvn clean test
- */
+* User API Tests - CRUD operations against JSONPlaceholder /users.
+*
+* Run: mvn clean test
+*
+* Demonstrates both standard and data-driven API testing.
+*/
 public class UserTests extends BaseTest {
 
-    private static final String USERS_ENDPOINT = "/users";
+@Test(priority = 1, description = "GET all users")
+public void testGetAllUsers() {
+Log.step("GET all users from /users");
 
-    @Test(groups = {"smoke", "api"}, description = "GET all users returns 200")
-    public void testGetAllUsers() {
-        Log.step("GET all users");
-        
-        Response response = api.get(USERS_ENDPOINT);
-        
-        ResponseValidator.assertStatus(response, 200);
-        ResponseValidator.assertBodyNotEmpty(response);
-        
-        User[] users = ResponseValidator.extractAsArray(response, User[].class);
-        Log.info("Total users: " + users.length);
+Response response = get(USERS_ENDPOINT);
+
+ResponseValidator.assertStatus(response, 200);
+ResponseValidator.assertBodyNotEmpty(response);
+
+List
+<?> users = response.jsonPath().getList("$");
+        Log.info("Total users: " + users.size());
     }
 
-    @Test(groups = {"smoke", "api"}, description = "GET single user returns user data")
+    @Test(priority = 2, description = "GET single user by ID")
     public void testGetSingleUser() {
-        Log.step("GET single user by ID");
+        Log.step("GET user with ID 1");
         
-        Response response = api.get(USERS_ENDPOINT, 1);
+        Response response = get(USERS_ENDPOINT, 1);
         
         ResponseValidator.assertStatus(response, 200);
         ResponseValidator.assertBodyContains(response, "email");
         
-        User user = ResponseValidator.extractAs(response, User.class);
-        Log.info("User retrieved: " + user);
+        String name = response.jsonPath().getString("name");
+        Log.info("User name: " + name);
     }
 
-    @Test(groups = {"regression", "api"}, description = "POST creates new user")
+    @Test(priority = 3, description = "POST create new user")
     public void testCreateUser() {
         Log.step("POST create new user");
         
         User newUser = new User("John Doe", "johndoe", "john@example.com");
-        Response response = api.post(USERS_ENDPOINT, newUser);
+        Response response = post(USERS_ENDPOINT, newUser);
         
         ResponseValidator.assertStatus(response, 201);
         
@@ -57,24 +63,84 @@ public class UserTests extends BaseTest {
         Log.info("Created user ID: " + createdId);
     }
 
-    @Test(groups = {"regression", "api"}, description = "PUT updates existing user")
+    @Test(priority = 4, description = "PUT update existing user")
     public void testUpdateUser() {
-        Log.step("PUT update existing user");
+        Log.step("PUT update user with ID 1");
         
         User updatedUser = new User("Jane Doe", "janedoe", "jane@example.com");
-        Response response = api.put(USERS_ENDPOINT, 1, updatedUser);
+        Response response = put(USERS_ENDPOINT, 1, updatedUser);
         
         ResponseValidator.assertStatus(response, 200);
         ResponseValidator.assertBodyContains(response, "janedoe");
     }
 
-    @Test(groups = {"regression", "api"}, description = "DELETE removes user")
+    @Test(priority = 5, description = "DELETE user by ID")
     public void testDeleteUser() {
-        Log.step("DELETE user by ID");
+        Log.step("DELETE user with ID 1");
         
-        Response response = api.delete(USERS_ENDPOINT, 1);
+        Response response = delete(USERS_ENDPOINT, 1);
         
         ResponseValidator.assertStatus(response, 200);
         Log.info("User deleted successfully");
+    }
+
+    // ===== DATA-DRIVEN TESTS =====
+
+    {{#if utilities.dataProvider}}
+    /**
+     * DataProvider for data-driven user tests.
+     * Reads from src/test/resources/testdata/users.csv
+     */
+    @DataProvider(name = "userTestData")
+    public Object[][] getUserTestData() {
+        List<Map<String, String>> data = TestDataReader.readCsv("users.csv");
+        Object[][] testData = new Object[data.size()][3];
+        
+        for (int i = 0; i < data.size(); i++) {
+            testData[i][0] = Integer.parseInt(data.get(i).get("id"));
+            testData[i][1] = data.get(i).get("name");
+            testData[i][2] = Integer.parseInt(data.get(i).get("expectedStatus"));
+        }
+        
+        return testData;
+    }
+
+    @Test(priority = 6, dataProvider = "userTestData", 
+          description = "Data-driven GET user by ID")
+    public void testGetUserWithData(int userId, String expectedName, int expectedStatus) {
+        Log.step("Data-driven GET user with ID: " + userId);
+        
+        Response response = get(USERS_ENDPOINT, userId);
+        
+        ResponseValidator.assertStatus(response, expectedStatus);
+        
+        if (expectedStatus == 200) {
+            String actualName = response.jsonPath().getString("name");
+            Log.info("Expected: " + expectedName + ", Actual: " + actualName);
+        }
+    }
+    {{/if}}
+
+    /**
+     * DataProvider for negative test cases.
+     */
+    @DataProvider(name = "invalidUserIds")
+    public Object[][] getInvalidUserIds() {
+        return new Object[][] {
+            {0, 404},
+            {-1, 404},
+            {99999, 404}
+        };
+    }
+
+    @Test(priority = 7, dataProvider = "invalidUserIds",
+          description = "Negative test - invalid user IDs")
+    public void testGetInvalidUser(int userId, int expectedStatus) {
+        Log.step("Testing invalid user ID: " + userId);
+        
+        Response response = get(USERS_ENDPOINT, userId);
+        
+        ResponseValidator.assertStatus(response, expectedStatus);
+        Log.info("Correctly returned " + expectedStatus + " for user ID: " + userId);
     }
 }

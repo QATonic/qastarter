@@ -1,0 +1,109 @@
+/**
+* Response Validator - Common assertions for API responses.
+* Provides consistent validation patterns for REST API testing.
+*/
+import type { Response } from 'supertest';
+import { log } from './Logger';
+
+export class ResponseValidator {
+private response: Response;
+
+constructor(response: Response) {
+this.response = response;
+}
+
+/**
+* Assert response status code
+*/
+assertStatus(expectedStatus: number): this {
+const actual = this.response.status;
+log.info(`Expected: ${expectedStatus}, Actual: ${actual}`);
+expect(actual).toBe(expectedStatus);
+return this;
+}
+
+/**
+* Assert response is successful (2xx)
+*/
+assertSuccess(): this {
+expect(this.response.status).toBeGreaterThanOrEqual(200);
+expect(this.response.status).toBeLessThan(300);
+return this;
+}
+
+/**
+* Assert response body contains a specific key
+*/
+assertBodyContains(key: string): this {
+const body = JSON.stringify(this.response.body);
+expect(body).toContain(key);
+return this;
+}
+
+/**
+* Assert response body is not empty
+*/
+assertBodyNotEmpty(): this {
+const body = this.response.body;
+expect(body).toBeDefined();
+if (Array.isArray(body)) {
+expect(body.length).toBeGreaterThan(0);
+} else if (typeof body === 'object') {
+expect(Object.keys(body).length).toBeGreaterThan(0);
+}
+return this;
+}
+
+/**
+* Assert response body has a specific property with value
+*/
+assertProperty(key: string, expectedValue: unknown): this {
+expect(this.response.body).toHaveProperty(key, expectedValue);
+return this;
+}
+
+/**
+* Assert response body array has specific length
+*/
+assertArrayLength(length: number): this {
+expect(Array.isArray(this.response.body)).toBe(true);
+expect(this.response.body.length).toBe(length);
+return this;
+}
+
+/**
+* Assert response body matches JSON schema
+*/
+assertMatchesSchema(schema: object): this {
+// Basic schema check - can be extended with ajv for full JSON Schema
+const body = this.response.body;
+for (const [key, type] of Object.entries(schema)) {
+expect(body).toHaveProperty(key);
+if (type === 'string') expect(typeof body[key]).toBe('string');
+if (type === 'number') expect(typeof body[key]).toBe('number');
+if (type === 'boolean') expect(typeof body[key]).toBe('boolean');
+}
+return this;
+}
+
+/**
+* Extract value from response body
+*/
+extractValue<T>(key: string): T {
+    return this.response.body[key] as T;
+    }
+
+    /**
+    * Get response body
+    */
+    getBody<T>(): T {
+        return this.response.body as T;
+        }
+
+        /**
+        * Get response headers
+        */
+        getHeader(name: string): string | undefined {
+        return this.response.headers[name.toLowerCase()];
+        }
+        }

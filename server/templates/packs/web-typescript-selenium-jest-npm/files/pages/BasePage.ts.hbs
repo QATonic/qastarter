@@ -1,71 +1,72 @@
 /**
- * Base Page - Parent class for all page objects.
- */
-import { WebDriver, By, until, WebElement } from "selenium-webdriver";
+* Base Page - Parent class for all page objects.
+* Uses centralized WaitHelpers for all explicit wait operations.
+*/
+import { WebDriver, By, WebElement } from "selenium-webdriver";
 import { DriverManager } from "../utils/DriverManager";
+import WaitHelpers from "../utils/WaitHelpers";
 import { config } from "../config/ConfigReader";
 
 export class BasePage {
-  protected driver: WebDriver;
-  protected timeout: number;
+protected driver: WebDriver;
+protected waitHelpers: WaitHelpers;
 
-  constructor() {
-    // Note: Driver should be initialized before page object creation
-  }
+constructor() {
+// Note: Driver should be initialized before page object creation
+}
 
-  protected async getDriver(): Promise<WebDriver> {
-    this.driver = await DriverManager.getDriver();
-    this.timeout = config.timeout;
-    return this.driver;
+protected async getDriver(): Promise<WebDriver> {
+  this.driver = await DriverManager.getDriver();
+  this.waitHelpers = new WaitHelpers(this.driver, config.timeout);
+  return this.driver;
   }
 
   async click(locator: By): Promise<void> {
-    const driver = await this.getDriver();
-    const element = await driver.wait(until.elementLocated(locator), this.timeout);
-    await driver.wait(until.elementIsEnabled(element), this.timeout);
+    await this.getDriver();
+    const element = await this.waitHelpers.waitForElementClickable(locator);
     await element.click();
-  }
-
-  async type(locator: By, text: string): Promise<void> {
-    const driver = await this.getDriver();
-    const element = await driver.wait(until.elementLocated(locator), this.timeout);
-    await element.clear();
-    await element.sendKeys(text);
-  }
-
-  async getText(locator: By): Promise<string> {
-    const driver = await this.getDriver();
-    const element = await driver.wait(until.elementLocated(locator), this.timeout);
-    return await element.getText();
-  }
-
-  async isDisplayed(locator: By): Promise<boolean> {
-    try {
-      const driver = await this.getDriver();
-      const element = await driver.findElement(locator);
-      return await element.isDisplayed();
-    } catch {
-      return false;
     }
-  }
 
-  async waitForElement(locator: By): Promise<WebElement> {
-    const driver = await this.getDriver();
-    return await driver.wait(until.elementLocated(locator), this.timeout);
-  }
+    async type(locator: By, text: string): Promise<void> {
+      await this.getDriver();
+      const element = await this.waitHelpers.waitForElementVisible(locator);
+      await element.clear();
+      await element.sendKeys(text);
+      }
 
-  async getTitle(): Promise<string> {
-    const driver = await this.getDriver();
-    return await driver.getTitle();
-  }
+      async getText(locator: By): Promise<string> {
+        await this.getDriver();
+        const element = await this.waitHelpers.waitForElementVisible(locator);
+        return await element.getText();
+        }
 
-  async getCurrentUrl(): Promise<string> {
-    const driver = await this.getDriver();
-    return await driver.getCurrentUrl();
-  }
+        async isDisplayed(locator: By): Promise<boolean> {
+          try {
+          const driver = await this.getDriver();
+          const element = await driver.findElement(locator);
+          return await element.isDisplayed();
+          } catch {
+          return false;
+          }
+          }
 
-  async navigateTo(url: string): Promise<void> {
-    const driver = await this.getDriver();
-    await driver.get(url);
-  }
-}
+          async waitForElement(locator: By): Promise<WebElement> {
+            await this.getDriver();
+            return await this.waitHelpers.waitForElementLocated(locator);
+            }
+
+            async getTitle(): Promise<string> {
+              const driver = await this.getDriver();
+              return await driver.getTitle();
+              }
+
+              async getCurrentUrl(): Promise<string> {
+                const driver = await this.getDriver();
+                return await driver.getCurrentUrl();
+                }
+
+                async navigateTo(url: string): Promise<void> {
+                  const driver = await this.getDriver();
+                  await driver.get(url);
+                  }
+                  }

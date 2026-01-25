@@ -12,9 +12,22 @@
     "buildTool": "nuget"
   },
   "dynamicSupport": {
-    "reportingTools": ["allure", "extent-reports", "nunit-html"],
-    "cicdTools": ["jenkins", "github-actions", "gitlab-ci", "azure-devops", "circleci"],
-    "testingPatterns": ["page-object-model", "bdd"]
+    "reportingTools": [
+      "allure",
+      "extent-reports",
+      "nunit-html"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "page-object-model",
+      "bdd"
+    ]
   },
   "toolVersions": {
     "dotnet": "8.0",
@@ -22,23 +35,159 @@
     "nunit": "4.0.1"
   },
   "files": [
-    {"path": "{{projectName}}.csproj", "isTemplate": true},
-    {"path": "appsettings.json", "isTemplate": true},
-    {"path": "README.md", "isTemplate": true},
-    {"path": ".gitignore", "isTemplate": false},
-    {"path": "Jenkinsfile", "isTemplate": true, "conditional": {"cicdTool": "jenkins"}},
-    {"path": ".github/workflows/tests.yml", "isTemplate": true, "conditional": {"cicdTool": "github-actions"}},
-    {"path": ".gitlab-ci.yml", "isTemplate": true, "conditional": {"cicdTool": "gitlab-ci"}},
-    {"path": "azure-pipelines.yml", "isTemplate": true, "conditional": {"cicdTool": "azure-devops"}},
-    {"path": ".circleci/config.yml", "isTemplate": true, "conditional": {"cicdTool": "circleci"}},
-    {"path": "Dockerfile", "isTemplate": true},
-    {"path": "Config/ConfigReader.cs", "isTemplate": true},
-    {"path": "Pages/BasePage.cs", "isTemplate": true},
-    {"path": "Pages/LoginPage.cs", "isTemplate": true},
-    {"path": "Utils/DriverManager.cs", "isTemplate": true},
-    {"path": "Tests/LoginTests.cs", "isTemplate": true},
-    {"path": "Features/Login.feature", "isTemplate": true, "conditional": {"testingPattern": "bdd"}},
-    {"path": "StepDefinitions/LoginSteps.cs", "isTemplate": true, "conditional": {"testingPattern": "bdd"}}
+    {
+      "path": "{{projectName}}.csproj",
+      "isTemplate": true
+    },
+    {
+      "path": "appsettings.json",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true
+    },
+    {
+      "path": "Config/ConfigReader.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Pages/BasePage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Pages/LoginPage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/DriverManager.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Tests/LoginTests.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Features/Login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "StepDefinitions/LoginSteps.cs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Config/BrowserConfig.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Config/EnvConfig.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/users.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Pages/HomePage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Tests/BaseTest.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/DataReader.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/DriverFactory.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/Logger.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/ScreenshotHelper.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/ScreenshotUtils.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/WaitHelpers.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/RetryHelper.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/TestDataReader.cs",
+      "isTemplate": true
+    }
   ],
-  "directories": ["logs", "screenshots", "reports"]
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
 }

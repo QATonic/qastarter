@@ -164,10 +164,6 @@
       "isTemplate": true
     },
     {
-      "path": "src/main/java/{{packagePath}}/listeners/TestWatcher.java",
-      "isTemplate": true
-    },
-    {
       "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
       "isTemplate": true,
       "conditional": {
@@ -234,12 +230,18 @@
       "isTemplate": true
     },
     {
-      "path": "src/main/resources/testdata/sample.json",
-      "isTemplate": true
+      "path": "src/test/resources/testdata/sample.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
-      "path": "src/main/resources/testdata/users.csv",
-      "isTemplate": true
+      "path": "src/test/resources/testdata/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "src/main/resources/extent-config.xml",

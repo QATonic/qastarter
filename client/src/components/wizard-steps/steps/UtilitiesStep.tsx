@@ -10,6 +10,7 @@ import { Settings, FileJson, Camera, FileText, Database, Container, Boxes } from
 import WizardStep from '../../WizardStep';
 import HelpTooltip from '../../HelpTooltip';
 import { useWizard } from '../WizardContext';
+import { defaultUtilities } from '@shared/schema';
 
 interface UtilityItem {
   key: keyof typeof defaultUtilities;
@@ -24,14 +25,6 @@ interface DockerItem {
   description: string;
   icon: React.ElementType;
 }
-
-const defaultUtilities = {
-  configReader: true,
-  jsonReader: false,
-  screenshotUtility: true,
-  logger: true,
-  dataProvider: false,
-};
 
 const utilityItems: UtilityItem[] = [
   {

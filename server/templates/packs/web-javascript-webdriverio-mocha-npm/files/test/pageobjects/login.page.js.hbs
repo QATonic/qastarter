@@ -1,40 +1,40 @@
 /**
- * Login Page Object
- * 
- * HOW TO CUSTOMIZE FOR YOUR APPLICATION:
- * 1. Open your app's login page in a browser
- * 2. Right-click on each element → Inspect → Copy selector
- * 3. Replace the placeholder selectors below with your actual selectors
- */
+* Login Page Object
+*
+* HOW TO CUSTOMIZE FOR YOUR APPLICATION:
+* 1. Open your app's login page in a browser
+* 2. Right-click on each element → Inspect → Copy selector
+* 3. Replace the placeholder selectors below with your actual selectors
+*/
 import BasePage from './base.page.js';
 
 class LoginPage extends BasePage {
-  
-  // ============================================
-  // UPDATE THESE SELECTORS FOR YOUR APPLICATION
-  // ============================================
-  // Tip: Use browser DevTools (F12) to find correct selectors
-  get usernameInput() { return $('#username'); }           // Your username/email input field
-  get passwordInput() { return $('#password'); }           // Your password input field
-  get loginButton() { return $('button[type="submit"]'); } // Your login/submit button
-  get flashMessage() { return $('#flash'); }               // Success/error message element
-  // ============================================
-  
-  async login(username, password) {
-    // UPDATE: Change '/login' to your actual login page path
-    await this.open('/login');
-    await this.setValue(this.usernameInput, username);
-    await this.setValue(this.passwordInput, password);
-    await this.clickElement(this.loginButton);
-  }
-  
-  async getFlashMessage() {
-    return await this.getText(this.flashMessage);
-  }
-  
-  async isFlashMessageDisplayed() {
-    return await this.isDisplayed(this.flashMessage);
-  }
+
+// ============================================
+// UPDATE THESE SELECTORS FOR YOUR APPLICATION
+// ============================================
+// Tip: Use browser DevTools (F12) to find correct selectors
+get usernameInput() { return $('#user-name'); } // SauceDemo username
+get passwordInput() { return $('#password'); } // SauceDemo password
+get loginButton() { return $('#login-button'); } // SauceDemo login button
+get flashMessage() { return $('[data-test="error"]'); } // SauceDemo error message
+// ============================================
+
+async login(username, password) {
+// UPDATE: Change '/login' to your actual login page path
+await this.open('/');
+await this.setValue(this.usernameInput, username);
+await this.setValue(this.passwordInput, password);
+await this.clickElement(this.loginButton);
+}
+
+async getFlashMessage() {
+return await this.getText(this.flashMessage);
+}
+
+async isFlashMessageDisplayed() {
+return await this.isDisplayed(this.flashMessage);
+}
 }
 
 export default new LoginPage();

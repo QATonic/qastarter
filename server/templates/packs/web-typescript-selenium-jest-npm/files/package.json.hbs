@@ -1,35 +1,37 @@
 {
-  "name": "{{artifactId}}",
-  "version": "1.0.0",
-  "description": "{{projectName}} - Selenium TypeScript Automation Framework",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest",
-    "test:smoke": "jest --testPathPattern=smoke",
-    "test:ci": "jest --ci --reporters=default --reporters=jest-junit",
+"name": "{{artifactId}}",
+"version": "1.0.0",
+"description": "{{projectName}} - Selenium TypeScript Automation Framework",
+"main": "index.js",
+"scripts": {
+"test": "jest",
+"test:smoke": "jest --testPathPattern=smoke",
+"test:ci": "jest --ci --reporters=default --reporters=jest-junit",
 {{#if (eq reportingTool "allure")}}
-    "allure:generate": "allure generate allure-results -o allure-report --clean",
-    "allure:open": "allure open allure-report",
+"allure:generate": "allure generate allure-results -o allure-report --clean",
+"allure:open": "allure open allure-report",
 {{/if}}
-    "lint": "eslint . --ext .ts",
-    "clean": "rimraf node_modules dist reports screenshots"
-  },
-  "dependencies": {
-    "selenium-webdriver": "^4.16.0",
-    "dotenv": "^16.3.0"
-  },
-  "devDependencies": {
-    "@types/jest": "^29.5.0",
-    "@types/node": "^20.10.0",
-    "@types/selenium-webdriver": "^4.1.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.1.0",
-    "typescript": "^5.3.0",
+"lint": "eslint . --ext .ts",
+"format": "prettier --write .",
+"clean": "rimraf node_modules dist reports screenshots"
+},
+"dependencies": {
+"selenium-webdriver": "^4.16.0",
+"dotenv": "^16.3.0"
+},
+"devDependencies": {
+"@types/jest": "^29.5.0",
+"@types/node": "^20.10.0",
+"@types/selenium-webdriver": "^4.1.0",
+"jest": "^29.7.0",
+"prettier": "^3.2.4",
+"ts-jest": "^29.1.0",
+"typescript": "^5.3.0",
 {{#if (eq reportingTool "allure")}}
-    "allure-jest": "^2.13.0",
-    "allure-commandline": "^2.24.0",
+"allure-jest": "^2.13.0",
+"allure-commandline": "^2.24.0",
 {{/if}}
-    "rimraf": "^5.0.0"
-  },
-  "keywords": ["selenium", "typescript", "jest", "automation", "testing"]
+"rimraf": "^5.0.0"
+},
+"keywords": ["selenium", "typescript", "jest", "automation", "testing"]
 }

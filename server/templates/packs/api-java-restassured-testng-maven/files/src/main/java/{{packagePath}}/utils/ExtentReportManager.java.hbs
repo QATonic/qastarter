@@ -9,23 +9,23 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * ExtentReportManager - Manages ExtentReports for API test reporting.
- */
+* ExtentReportManager - Manages ExtentReports for API test reporting.
+*/
 public class ExtentReportManager {
 
-    private static ExtentReports extent;
-    private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
+private static ExtentReports extent;
+private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
 
-    public static ExtentReports getInstance() {
+        public static ExtentReports getInstance() {
         if (extent == null) {
-            createInstance();
+        createInstance();
         }
         return extent;
-    }
+        }
 
-    private static void createInstance() {
+        private static void createInstance() {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-        String reportPath = "target/extent-reports/API_Report_" + timestamp + ".html";
+        String reportPath = "reports/extent-reports/API_Report_" + timestamp + ".html";
 
         ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
         sparkReporter.config().setDocumentTitle("API Test Report");
@@ -38,51 +38,51 @@ public class ExtentReportManager {
         extent.setSystemInfo("Environment", System.getProperty("env", "dev"));
         extent.setSystemInfo("Framework", "REST Assured + TestNG");
         extent.setSystemInfo("Java Version", System.getProperty("java.version"));
-    }
+        }
 
-    public static ExtentTest createTest(String testName) {
+        public static ExtentTest createTest(String testName) {
         ExtentTest extentTest = getInstance().createTest(testName);
         test.set(extentTest);
         return extentTest;
-    }
+        }
 
-    public static ExtentTest createTest(String testName, String description) {
+        public static ExtentTest createTest(String testName, String description) {
         ExtentTest extentTest = getInstance().createTest(testName, description);
         test.set(extentTest);
         return extentTest;
-    }
+        }
 
-    public static ExtentTest getTest() {
+        public static ExtentTest getTest() {
         return test.get();
-    }
+        }
 
-    public static void flush() {
+        public static void flush() {
         if (extent != null) {
-            extent.flush();
+        extent.flush();
         }
-    }
+        }
 
-    public static void logPass(String message) {
+        public static void logPass(String message) {
         if (getTest() != null) {
-            getTest().pass(message);
+        getTest().pass(message);
         }
-    }
+        }
 
-    public static void logFail(String message) {
+        public static void logFail(String message) {
         if (getTest() != null) {
-            getTest().fail(message);
+        getTest().fail(message);
         }
-    }
+        }
 
-    public static void logInfo(String message) {
+        public static void logInfo(String message) {
         if (getTest() != null) {
-            getTest().info(message);
+        getTest().info(message);
         }
-    }
+        }
 
-    public static void logWarning(String message) {
+        public static void logWarning(String message) {
         if (getTest() != null) {
-            getTest().warning(message);
+        getTest().warning(message);
         }
-    }
-}
+        }
+        }

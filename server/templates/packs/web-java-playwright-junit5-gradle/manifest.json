@@ -146,10 +146,6 @@
       }
     },
     {
-      "path": "src/main/java/{{packagePath}}/listeners/RetryTransformer.java",
-      "isTemplate": true
-    },
-    {
       "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
       "isTemplate": true,
       "conditional": {
@@ -209,11 +205,17 @@
     },
     {
       "path": "src/test/resources/testdata/sample.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "src/test/resources/testdata/users.csv",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "src/main/resources/config/dev.properties",

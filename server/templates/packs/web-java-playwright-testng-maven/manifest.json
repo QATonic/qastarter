@@ -135,6 +135,7 @@
     },
     {
       "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
+      "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
       "isTemplate": true,
       "conditional": {
         "utilities.dataProvider": true
@@ -184,6 +185,20 @@
       "isTemplate": true,
       "conditional": {
         "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/testdata/sample.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "src/test/resources/testdata/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
       }
     },
     {

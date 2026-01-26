@@ -1,49 +1,52 @@
 /**
- * Base Page - Parent class for all page objects.
- */
+* Base Page - Parent class for all page objects.
+*/
 const { By, until } = require("selenium-webdriver");
 const { DriverManager } = require("../utils/DriverManager");
 const { config } = require("../config/ConfigReader");
 
 class BasePage {
-  async getDriver() {
-    return await DriverManager.getDriver();
-  }
+async getDriver() {
+return await DriverManager.getDriver();
+}
 
-  async click(locator) {
-    const driver = await this.getDriver();
-    const element = await driver.wait(until.elementLocated(locator), config.timeout);
-    await driver.wait(until.elementIsEnabled(element), config.timeout);
-    await element.click();
-  }
+async click(locator) {
+const driver = await this.getDriver();
+const element = await driver.wait(until.elementLocated(locator), config.timeout);
+await driver.wait(until.elementIsEnabled(element), config.timeout);
+await element.click();
+}
 
-  async type(locator, text) {
-    const driver = await this.getDriver();
-    const element = await driver.wait(until.elementLocated(locator), config.timeout);
-    await element.clear();
-    await element.sendKeys(text);
-  }
+async type(locator, text) {
+const driver = await this.getDriver();
+const element = await driver.wait(until.elementLocated(locator), config.timeout);
+await element.clear();
+await element.sendKeys(text);
+}
 
-  async getText(locator) {
-    const driver = await this.getDriver();
-    const element = await driver.wait(until.elementLocated(locator), config.timeout);
-    return await element.getText();
-  }
+async getText(locator) {
+const driver = await this.getDriver();
+const element = await driver.wait(until.elementLocated(locator), config.timeout);
+return await element.getText();
+}
 
-  async isDisplayed(locator) {
-    try {
-      const driver = await this.getDriver();
-      const element = await driver.findElement(locator);
-      return await element.isDisplayed();
-    } catch {
-      return false;
-    }
-  }
+async isDisplayed(locator) {
+try {
+const driver = await this.getDriver();
+const element = await driver.findElement(locator);
+return await element.isDisplayed();
+} catch (e) {
+if (e.name === 'NoSuchElementError' || e.name === 'StaleElementReferenceError') {
+return false;
+}
+throw e;
+}
+}
 
-  async getCurrentUrl() {
-    const driver = await this.getDriver();
-    return await driver.getCurrentUrl();
-  }
+async getCurrentUrl() {
+const driver = await this.getDriver();
+return await driver.getCurrentUrl();
+}
 }
 
 module.exports = { BasePage };

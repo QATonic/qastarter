@@ -8,52 +8,52 @@ from config.config_reader import config
 
 
 class BasePage:
-    """Base class for all page objects."""
-    
-    def __init__(self):
-        self.page: Page = PlaywrightManager.get_page()
-        self.timeout = config.timeout * 1000  # Playwright uses ms
-    
-    def click(self, selector: str):
-        """Click an element."""
-        log.action(f"Click: {selector}")
-        self.page.click(selector, timeout=self.timeout)
-    
-    def type_text(self, selector: str, text: str):
-        """Type text into an element."""
-        log.action(f"Type into: {selector}")
-        self.page.fill(selector, text, timeout=self.timeout)
-    
-    def get_text(self, selector: str) -> str:
-        """Get text from an element."""
-        return self.page.text_content(selector, timeout=self.timeout) or ""
-    
-    def is_displayed(self, selector: str) -> bool:
-        """Check if element is visible."""
-        try:
-            return self.page.is_visible(selector, timeout=5000)
-        except:
-            return False
-    
-    def wait_for_element(self, selector: str) -> Locator:
-        """Wait for element to be visible."""
-        locator = self.page.locator(selector)
-        locator.wait_for(state="visible", timeout=self.timeout)
-        return locator
-    
-    def get_title(self) -> str:
-        """Get page title."""
-        return self.page.title()
-    
-    def get_current_url(self) -> str:
-        """Get current URL."""
-        return self.page.url
-    
-    def navigate_to(self, url: str):
-        """Navigate to URL."""
-        log.step(f"Navigating to: {url}")
-        self.page.goto(url)
-    
-    def log_action(self, message: str):
-        """Log a page action."""
-        log.step(f"[{self.__class__.__name__}] {message}")
+"""Base class for all page objects."""
+
+def __init__(self):
+self.page: Page = PlaywrightManager.get_page()
+self.timeout = config.timeout * 1000 # Playwright uses ms
+
+def click(self, selector: str):
+"""Click an element."""
+log.action(f"Click: {selector}")
+self.page.click(selector, timeout=self.timeout)
+
+def type_text(self, selector: str, text: str):
+"""Type text into an element."""
+log.action(f"Type into: {selector}")
+self.page.fill(selector, text, timeout=self.timeout)
+
+def get_text(self, selector: str) -> str:
+"""Get text from an element."""
+return self.page.text_content(selector, timeout=self.timeout) or ""
+
+def is_displayed(self, selector: str) -> bool:
+"""Check if element is visible."""
+try:
+return self.page.is_visible(selector, timeout=5000)
+except Exception:
+return False
+
+def wait_for_element(self, selector: str) -> Locator:
+"""Wait for element to be visible."""
+locator = self.page.locator(selector)
+locator.wait_for(state="visible", timeout=self.timeout)
+return locator
+
+def get_title(self) -> str:
+"""Get page title."""
+return self.page.title()
+
+def get_current_url(self) -> str:
+"""Get current URL."""
+return self.page.url
+
+def navigate_to(self, url: str):
+"""Navigate to URL."""
+log.step(f"Navigating to: {url}")
+self.page.goto(url)
+
+def log_action(self, message: str):
+"""Log a page action."""
+log.step(f"[{self.__class__.__name__}] {message}")

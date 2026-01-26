@@ -1,42 +1,47 @@
 /**
 * Login Tests using WebDriverIO with Mocha.
-* Demonstrates both configuration-based and data-driven testing.
 */
-const { LoginPage } = require("../pages/LoginPage");
-const TestDataReader = require("../utils/TestDataReader");
+import LoginPage from '../pageobjects/login.page.js';
+import DataReader from '../../utils/dataReader.js';
 
 describe("Login Tests", () => {
-const loginPage = new LoginPage();
-
-beforeEach(async () => { await loginPage.open("/"); });
+beforeEach(async () => {
+await LoginPage.open();
+});
 
 it("should login successfully", async () => {
-await loginPage.login("standard_user", "secret_sauce");
-expect(await loginPage.isLoginSuccessful()).toBe(true);
+await LoginPage.login("standard_user", "secret_sauce");
+expect(await LoginPage.flashMessage).not.toBeDisplayed(); // SauceDemo successful login goes to inventory, no flash
+message usually, or we check URL
+await expect(browser).toHaveUrlContaining('inventory');
 });
 
 it("should show error with invalid credentials", async () => {
-await loginPage.login("invalid", "wrong");
-expect(await loginPage.isErrorDisplayed()).toBe(true);
+await LoginPage.login("invalid", "wrong");
+await expect(LoginPage.flashMessage).toBeDisplayed();
+await expect(LoginPage.flashMessage).toHaveTextContaining('Epic sadface');
 });
 
+{{#if utilities.dataProvider}}
 /**
-* Data-driven tests using CSV test data
+* Data-driven tests using JSON test data
 */
 describe("Data-driven login tests", () => {
-const testData = TestDataReader.readCsv("users.csv");
+const testData = DataReader.getUsers(); // Returns object with keys
+const users = Object.values(testData);
 
-testData.forEach((user) => {
+users.forEach((user) => {
 it(`should verify login for user: ${user.username}`, async () => {
-await loginPage.open("/");
-await loginPage.login(user.username, user.password);
+await LoginPage.open();
+await LoginPage.login(user.username, user.password);
 
-if (user.expected === "success") {
-expect(await loginPage.isLoginSuccessful()).toBe(true);
+if (user.username === "standard_user") {
+await expect(browser).toHaveUrlContaining('inventory');
 } else {
-expect(await loginPage.isErrorDisplayed()).toBe(true);
+await expect(LoginPage.flashMessage).toBeDisplayed();
 }
 });
 });
 });
+{{/if}}
 });

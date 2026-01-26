@@ -43,6 +43,10 @@
       "isTemplate": true
     },
     {
+      "path": "pyproject.toml",
+      "isTemplate": true
+    },
+    {
       "path": "setup.py",
       "isTemplate": true
     },
@@ -131,7 +135,10 @@
     },
     {
       "path": "data/users.csv",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "pages/__init__.py",
@@ -166,10 +173,6 @@
       "isTemplate": true
     },
     {
-      "path": "utils/screenshot_util.py",
-      "isTemplate": true
-    },
-    {
       "path": "utils/screenshot_utils.py",
       "isTemplate": true
     },
@@ -183,7 +186,10 @@
     },
     {
       "path": "utils/data_reader.py",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "tests/__init__.py",

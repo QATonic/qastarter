@@ -4,66 +4,78 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * Configuration Reader - Loads environment-specific properties.
- * 
- * Usage:
- *   -Denv=qa (defaults to "dev")
- *   -Dbrowser=firefox (defaults to value in properties)
- *   -Dheadless=true
- * 
- * Config files: src/main/resources/config/{env}.properties
- */
+* Configuration Reader - Loads environment-specific properties.
+*
+* Usage:
+* -Denv=qa (defaults to "dev")
+* -Dbrowser=firefox (defaults to value in properties)
+* -Dheadless=true
+*
+* Config files: src/main/resources/config/{env}.properties
+*/
 public class ConfigurationReader {
 
-    private static final Properties properties = new Properties();
-    private static String currentEnvironment;
+private static final Properties properties = new Properties();
+private static String currentEnvironment;
 
-    static {
-        String env = System.getProperty("env", "dev");
-        currentEnvironment = (env == null || env.isEmpty()) ? "dev" : env;
-        loadConfig();
-    }
+static {
+String env = System.getProperty("env", "dev");
+currentEnvironment = (env == null || env.isEmpty()) ? "dev" : env;
+loadConfig();
+}
 
-    private static void loadConfig() {
-        String configFile = "config/" + currentEnvironment + ".properties";
-        try (InputStream input = ConfigurationReader.class.getClassLoader().getResourceAsStream(configFile)) {
-            if (input != null) {
-                properties.load(input);
-                System.out.println("[CONFIG] Loaded: " + configFile);
-            } else {
-                System.err.println("[CONFIG] File not found: " + configFile);
-            }
-        } catch (Exception e) {
-            System.err.println("[CONFIG] Error loading: " + e.getMessage());
-        }
-    }
+private static void loadConfig() {
+String configFile = "config/" + currentEnvironment + ".properties";
+try (InputStream input = ConfigurationReader.class.getClassLoader().getResourceAsStream(configFile)) {
+if (input != null) {
+properties.load(input);
+System.out.println("[CONFIG] Loaded: " + configFile);
+} else {
+System.err.println("[CONFIG] File not found: " + configFile);
+}
+} catch (Exception e) {
+System.err.println("[CONFIG] Error loading: " + e.getMessage());
+}
+}
 
-    public static String getProperty(String key) {
-        return System.getProperty(key, properties.getProperty(key));
-    }
+public static String getProperty(String key) {
+return System.getProperty(key, properties.getProperty(key));
+}
 
-    public static String getProperty(String key, String defaultValue) {
-        String value = getProperty(key);
-        return value != null ? value : defaultValue;
-    }
+public static String getProperty(String key, String defaultValue) {
+String value = getProperty(key);
+return value != null ? value : defaultValue;
+}
 
-    public static String getBaseUrl() {
-        return getProperty("base.url");
-    }
+public static String getBaseUrl() {
+return getProperty("base.url");
+}
 
-    public static String getBrowser() {
-        return getProperty("browser", "chrome");
-    }
+public static String getBrowser() {
+return getProperty("browser", "chrome");
+}
 
-    public static boolean isHeadless() {
-        return Boolean.parseBoolean(getProperty("headless", "false"));
-    }
+public static boolean isHeadless() {
+return Boolean.parseBoolean(getProperty("headless", "false"));
+}
 
-    public static int getTimeout() {
-        return Integer.parseInt(getProperty("timeout.default", "30"));
-    }
+public static int getIntProperty(String key, int defaultValue) {
+String value = getProperty(key);
+if (value == null) {
+return defaultValue;
+}
+try {
+return Integer.parseInt(value);
+} catch (NumberFormatException e) {
+return defaultValue;
+}
+}
 
-    public static String getCurrentEnvironment() {
-        return currentEnvironment;
-    }
+public static int getTimeout() {
+return Integer.parseInt(getProperty("timeout.default", "30"));
+}
+
+public static String getCurrentEnvironment() {
+return currentEnvironment;
+}
 }

@@ -7,25 +7,26 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Log {
-    private static final String LOG_DIR = "logs";
-    private static PrintWriter logWriter;
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+private static final String LOG_DIR = "logs";
+private static PrintWriter logWriter;
+private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    static {
-        try {
-            new File(LOG_DIR).mkdirs();
-            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-            logWriter = new PrintWriter(new FileWriter(LOG_DIR + "/desktop_test_" + timestamp + ".log", true));
-        } catch (Exception e) { System.err.println("[Log] Failed: " + e.getMessage()); }
-    }
+static {
+try {
+new File("reports").mkdirs();
+new File(LOG_DIR).mkdirs();
+String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+logWriter = new PrintWriter(new FileWriter(LOG_DIR + "/desktop_test_" + timestamp + ".log", true));
+} catch (Exception e) { System.err.println("[Log] Failed: " + e.getMessage()); }
+}
 
-    private static void log(String level, String message) {
-        String logLine = String.format("%s | %-8s | %s", dateFormat.format(new Date()), level, message);
-        System.out.println(logLine);
-        if (logWriter != null) { logWriter.println(logLine); logWriter.flush(); }
-    }
+private static void log(String level, String message) {
+String logLine = String.format("%s | %-8s | %s", dateFormat.format(new Date()), level, message);
+System.out.println(logLine);
+if (logWriter != null) { logWriter.println(logLine); logWriter.flush(); }
+}
 
-    public static void info(String message) { log("INFO", message); }
-    public static void error(String message) { log("ERROR", message); }
-    public static void step(String message) { log("STEP", message); }
+public static void info(String message) { log("INFO", message); }
+public static void error(String message) { log("ERROR", message); }
+public static void step(String message) { log("STEP", message); }
 }

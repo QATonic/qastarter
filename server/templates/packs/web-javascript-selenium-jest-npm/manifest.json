@@ -43,6 +43,10 @@
       "isTemplate": true
     },
     {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
       "path": "README.md",
       "isTemplate": true
     },
@@ -64,10 +68,6 @@
     },
     {
       "path": "utils/DriverManager.js",
-      "isTemplate": true
-    },
-    {
-      "path": "tests/login.spec.js",
       "isTemplate": true
     },
     {
@@ -115,8 +115,18 @@
       "isTemplate": true
     },
     {
+      "path": "data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
       "path": "data/users.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "docker-compose.yml",
@@ -167,7 +177,10 @@
     },
     {
       "path": "utils/dataReader.js",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "utils/driverFactory.js",

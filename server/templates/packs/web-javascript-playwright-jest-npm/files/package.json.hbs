@@ -1,7 +1,23 @@
 {
-  "name": "{{artifactId}}",
-  "version": "1.0.0",
-  "scripts": {"test": "jest"},
-  "dependencies": {"playwright": "^1.41.0", "dotenv": "^16.3.0"},
-  "devDependencies": {"jest": "^29.7.0"}
+"name": "{{artifactId}}",
+"version": "1.0.0",
+"scripts": {
+"test": "jest",
+"lint": "eslint .",
+"format": "prettier --write ."
+},
+"dependencies": {"playwright": "^1.41.0", "dotenv": "^16.3.0"},
+"devDependencies": {
+"jest": "^29.7.0",
+"prettier": "^3.2.4",
+"jest-playwright-preset": "^3.0.1",
+{{#if (eq reportingTool "allure")}}
+"allure-jest": "^2.15.1",
+"allure-commandline": "^2.27.0",
+{{/if}}
+{{#if (eq reportingTool "jest-html")}}
+"jest-html-reporter": "^3.10.2",
+{{/if}}
+"jest-circus": "^29.7.0"
+}
 }

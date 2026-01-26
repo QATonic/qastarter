@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -17,12 +16,12 @@
         <maven.compiler.source>{{toolVersions.java}}</maven.compiler.source>
         <maven.compiler.target>{{toolVersions.java}}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        
+
         <!-- Appium and Mobile Testing Dependencies -->
         <appium.version>{{toolVersions.appium}}</appium.version>
         <selenium.version>4.16.0</selenium.version>
         <testng.version>{{toolVersions.testng}}</testng.version>
-        
+
         <!-- Reporting Dependencies -->
         {{#if (eq reportingTool "allure")}}
         <allure.version>{{toolVersions.allure}}</allure.version>
@@ -32,16 +31,16 @@
         <extent.version>{{toolVersions.extentreports}}</extent.version>
         {{/if}}
         <log4j.version>{{toolVersions.log4j}}</log4j.version>
-        
+
         <!-- BDD Dependencies -->
         {{#if (eq testingPattern "bdd")}}
         <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
         {{/if}}
-        
+
         <!-- Utility Dependencies -->
         <jackson.version>2.16.0</jackson.version>
         <opencsv.version>5.8</opencsv.version>
-        
+
         <!-- Build Plugin Versions -->
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <maven.surefire.version>3.2.2</maven.surefire.version>
@@ -205,17 +204,25 @@
             </plugin>
             {{/if}}
 
-            <!-- Maven Surefire Report Plugin -->
-            {{#if (eq reportingTool "junit-reports")}}
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>${maven.surefire.version}</version>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/surefire-reports</outputDirectory>
-                </configuration>
             </plugin>
             {{/if}}
+
+            <!-- Spotless Plugin for Code Formatting -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat>
+                            <version>1.17.0</version>
+                            <style>
+                                AOSP
+                            </style>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

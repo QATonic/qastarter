@@ -1,13 +1,28 @@
 {
-  "name": "{{artifactId}}",
-  "version": "1.0.0",
-  "description": "{{projectName}} - Cypress JavaScript Automation Framework",
-  "scripts": {
-    "test": "cypress run",
-    "test:open": "cypress open",
-    "test:headed": "cypress run --headed"
-  },
-  "devDependencies": {
-    "cypress": "^13.6.0"
-  }
+"name": "{{artifactId}}",
+"version": "1.0.0",
+"description": "{{projectName}} - Cypress JavaScript Automation Framework",
+"scripts": {
+"test": "cypress run",
+"test:open": "cypress open",
+"test:headed": "cypress run --headed",
+"lint": "eslint .",
+"lint:fix": "eslint . --fix",
+"format": "prettier --write ."
+},
+"devDependencies": {
+"cypress": "^13.6.0",
+"eslint": "^8.56.0",
+"eslint-plugin-cypress": "^2.15.1",
+"prettier": "^3.2.4"
+{{#if (eq reportingTool "allure")}},
+"@shelex/cypress-allure-plugin": "^2.40.0",
+"allure-commandline": "^2.27.0"
+{{/if}}
+{{#if (eq reportingTool "mochawesome")}},
+"mochawesome": "^7.1.0",
+"mochawesome-merge": "^4.3.0",
+"mochawesome-report-generator": "^6.2.0"
+{{/if}}
+}
 }

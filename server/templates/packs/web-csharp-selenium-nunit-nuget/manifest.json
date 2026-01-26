@@ -44,6 +44,10 @@
       "isTemplate": true
     },
     {
+      "path": ".editorconfig",
+      "isTemplate": true
+    },
+    {
       "path": "README.md",
       "isTemplate": true
     },
@@ -141,8 +145,18 @@
       "isTemplate": true
     },
     {
+      "path": "Data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
       "path": "Data/users.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "Pages/HomePage.cs",
@@ -154,7 +168,10 @@
     },
     {
       "path": "Utils/DataReader.cs",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "Utils/DriverFactory.cs",
@@ -166,10 +183,6 @@
     },
     {
       "path": "Utils/ScreenshotHelper.cs",
-      "isTemplate": true
-    },
-    {
-      "path": "Utils/ScreenshotUtils.cs",
       "isTemplate": true
     },
     {

@@ -3,12 +3,12 @@ Documentation Login Page Keywords
 Resource ../common.resource
 
 *** Variables ***
-${LOGIN_URL} ${BASE_URL}/login
-${USERNAME_FIELD} id=username
+${LOGIN_URL} ${BASE_URL}/
+${USERNAME_FIELD} id=user-name
 ${PASSWORD_FIELD} id=password
 ${LOGIN_BUTTON} id=login-button
-${ERROR_MESSAGE} css=.error-message
-${WELCOME_MESSAGE} css=.welcome-message
+${ERROR_MESSAGE} css=[data-test='error']
+${WELCOME_MESSAGE} id=inventory_container
 
 *** Keywords ***
 Navigate To Login Page

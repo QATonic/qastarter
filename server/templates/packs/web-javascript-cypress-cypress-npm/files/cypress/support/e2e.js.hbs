@@ -1,6 +1,6 @@
-// Cypress E2E Support File
-Cypress.Commands.add("login", (username, password) => {
-  cy.get("#user-name").type(username);
-  cy.get("#password").type(password);
-  cy.get("#login-button").click();
-});
+// Import commands.js using ES2015 syntax:
+import './commands'
+
+{{#if (eq reportingTool "allure")}}
+import '@shelex/cypress-allure-plugin';
+{{/if}}

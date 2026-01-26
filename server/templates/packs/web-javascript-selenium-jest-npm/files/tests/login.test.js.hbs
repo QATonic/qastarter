@@ -48,6 +48,11 @@ expect(isLoggedIn).toBe(true);
 * Data-driven tests using test.each
 * Reads test data from data/users.csv
 */
+{{#if utilities.dataProvider}}
+/**
+* Data-driven tests using test.each
+* Reads test data from data/users.csv
+*/
 describe('Data-driven login tests', () => {
 const testData = TestDataReader.readCsv('users.csv');
 
@@ -67,4 +72,5 @@ expect(hasError).toBe(true);
 }
 );
 });
+{{/if}}
 });

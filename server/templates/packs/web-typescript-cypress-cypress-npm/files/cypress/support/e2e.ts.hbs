@@ -1,22 +1,9 @@
 /**
- * Cypress E2E Support File.
- */
+* Cypress E2E Support File.
+*/
 {{#if (eq reportingTool "allure")}}
 import "@shelex/cypress-allure-plugin";
 {{/if}}
 
-// Add custom commands here
-Cypress.Commands.add("login", (username: string, password: string) => {
-  cy.get("#user-name").type(username);
-  cy.get("#password").type(password);
-  cy.get("#login-button").click();
-});
-
-// Declare custom commands
-declare global {
-  namespace Cypress {
-    interface Chainable {
-      login(username: string, password: string): Chainable<void>;
-    }
-  }
-}
+// Import commands.ts
+import './commands';

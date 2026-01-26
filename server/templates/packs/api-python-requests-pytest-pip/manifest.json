@@ -134,6 +134,9 @@
     {
       "path": "utils/json_utils.py",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "JSON utilities"
     },
     {

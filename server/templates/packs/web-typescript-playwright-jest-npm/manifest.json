@@ -39,6 +39,14 @@
       "isTemplate": true
     },
     {
+      "path": ".eslintrc.json",
+      "isTemplate": true
+    },
+    {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
       "path": "tsconfig.json",
       "isTemplate": true
     },
@@ -115,8 +123,11 @@
       "isTemplate": true
     },
     {
-      "path": "data/dev.json",
-      "isTemplate": true
+      "path": "data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "data/qa.json",
@@ -191,7 +202,10 @@
     },
     {
       "path": "utils/dataReader.ts",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "utils/logger.ts",

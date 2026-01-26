@@ -37,9 +37,10 @@ return WaitHelpers.wait_for_element_visible(self.driver, locator).text
 
 def is_displayed(self, locator: tuple) -> bool:
 """Check if element is displayed."""
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 try:
 return self.driver.find_element(*locator).is_displayed()
-except:
+except (NoSuchElementException, StaleElementReferenceException):
 return False
 
 def wait_for_element(self, locator: tuple) -> WebElement:

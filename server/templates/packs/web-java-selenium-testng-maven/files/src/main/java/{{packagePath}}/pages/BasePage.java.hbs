@@ -3,9 +3,7 @@ package {{javaPackage}}.pages;
 import {{javaPackage}}.core.DriverManager;
 import {{javaPackage}}.utils.Log;
 import {{javaPackage}}.utils.WaitUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 /**
 * Base Page - Extend this in all your page objects.
@@ -51,7 +49,7 @@ return WaitUtils.waitForVisibility(locator).getText();
 protected boolean isDisplayed(By locator) {
 try {
 return driver.findElement(locator).isDisplayed();
-} catch (Exception e) {
+} catch (NoSuchElementException | StaleElementReferenceException e) {
 return false;
 }
 }

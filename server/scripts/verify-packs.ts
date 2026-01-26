@@ -86,7 +86,7 @@ function verifyPacks() {
   }
 
   // Double check: Are there packs that are NOT in the matrix? (Orphaned packs)
-  const orphanedPacks = [...availablePacks].filter((p) => !validConfigs.includes(p));
+  const orphanedPacks = Array.from(availablePacks).filter((p) => !validConfigs.includes(p));
   if (orphanedPacks.length > 0) {
     console.log(`\n⚠️ Orphaned Packs (Files exist but not reachable via current Matrix logic):`);
     orphanedPacks.forEach((p) => console.log(` - ${p}`));

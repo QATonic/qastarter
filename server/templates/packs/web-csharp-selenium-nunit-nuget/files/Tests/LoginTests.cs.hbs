@@ -50,6 +50,7 @@ Assert.That(_loginPage.IsErrorDisplayed(), Is.True,
 "Error message should be displayed");
 }
 
+{{#if utilities.dataProvider}}
 /// <summary>
     /// Data-driven test using TestCaseSource with CSV data.
     /// Reads test data from testdata/users.csv
@@ -81,5 +82,6 @@ private static IEnumerable<object[]> GetLoginTestData()
     yield return new object[] { row["username"], row["password"], row["expected"] };
     }
     }
+    {{/if}}
     }
     }

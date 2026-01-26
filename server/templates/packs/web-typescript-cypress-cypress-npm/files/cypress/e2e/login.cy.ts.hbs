@@ -29,6 +29,7 @@ loginPage.login("invalid_user", "wrong_password");
 loginPage.verifyErrorDisplayed();
 });
 
+{{#if utilities.dataProvider}}
 /**
 * Data-driven tests using fixtures
 * Test data loaded from cypress/fixtures/users.json
@@ -55,4 +56,5 @@ cy.clearLocalStorage();
 });
 });
 });
+{{/if}}
 });

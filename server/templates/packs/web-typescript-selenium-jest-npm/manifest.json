@@ -48,6 +48,10 @@
       "isTemplate": true
     },
     {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
       "path": "README.md",
       "isTemplate": true
     },
@@ -123,8 +127,18 @@
       "isTemplate": true
     },
     {
+      "path": "data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
       "path": "data/users.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "pages/BasePage.ts",
@@ -152,7 +166,10 @@
     },
     {
       "path": "utils/DataReader.ts",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "utils/Logger.ts",
@@ -168,10 +185,6 @@
     },
     {
       "path": "utils/WaitHelpers.ts",
-      "isTemplate": true
-    },
-    {
-      "path": "tests/login.spec.ts",
       "isTemplate": true
     },
     {

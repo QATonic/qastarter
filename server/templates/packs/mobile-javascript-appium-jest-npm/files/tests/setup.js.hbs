@@ -10,42 +10,44 @@ let testData;
 
 // Create necessary directories
 beforeAll(() => {
-  ['logs', 'screenshots', 'reports'].forEach(dir => {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-  });
+['logs', 'screenshots', 'reports'].forEach(dir => {
+if (!fs.existsSync(dir)) {
+fs.mkdirSync(dir, { recursive: true });
+}
+});
 
-  // Load test data
-  const dataFile = path.join('data', `${settings.testEnv}.json`);
-  testData = loadJsonFile(dataFile);
+// Load test data
+const dataFile = path.join('data', `${settings.testEnv}.json`);
+testData = loadJsonFile(dataFile);
 });
 
 beforeEach(async () => {
-  // Get capabilities based on platform
-  const caps = settings.platform.toLowerCase() === 'android'
-    ? capabilities.getAndroidCapabilities()
-    : capabilities.getIOSCapabilities();
+// Get capabilities based on platform
+const caps = settings.platform.toLowerCase() === 'android'
+? capabilities.getAndroidCapabilities()
+: capabilities.getIOSCapabilities();
 
-  // Create driver
-  driver = await remote({
-    protocol: 'http',
-    hostname: new URL(settings.appiumServer).hostname,
-    port: parseInt(new URL(settings.appiumServer).port) || 4723,
-    path: '/',
-    capabilities: caps,
-    logLevel: 'error'
-  });
-
-  await driver.setImplicitTimeout(settings.implicitWait);
-
-  // Make driver and testData available globally
-  global.driver = driver;
-  global.testData = testData;
+// Create driver
+driver = await remote({
+protocol: 'http',
+hostname: new URL(settings.appiumServer).hostname,
+port: parseInt(new URL(settings.appiumServer).port) || 4723,
+path: '/',
+capabilities: caps,
+logLevel: 'error'
 });
 
-afterEach(async () => {
-  if (driver) {
-    await driver.deleteSession();
-  }
+await driver.setImplicitTimeout(settings.implicitWait);
+
+// Make driver and testData available globally
+global.driver = driver;
+global.testData = testData;
 });
+
+if (driver) {
+await driver.deleteSession();
+}
+});
+
+// Configure retries
+jest.retryTimes(2);

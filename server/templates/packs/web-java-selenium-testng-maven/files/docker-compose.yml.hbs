@@ -14,7 +14,7 @@ services:
 {{#if (eq framework "selenium")}}
   # Selenium Grid (optional)
   selenium-hub:
-    image: selenium/hub:4
+    image: selenium/hub:{{toolVersions.selenium}}
     container_name: selenium-hub
     ports:
       - "4442:4442"
@@ -22,7 +22,7 @@ services:
       - "4444:4444"
 
   chrome:
-    image: selenium/node-chrome:4
+    image: selenium/node-chrome:{{toolVersions.selenium}}
     depends_on:
       - selenium-hub
     environment:

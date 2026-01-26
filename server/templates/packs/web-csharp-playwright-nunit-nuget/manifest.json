@@ -37,6 +37,10 @@
       "isTemplate": true
     },
     {
+      "path": ".editorconfig",
+      "isTemplate": true
+    },
+    {
       "path": "Config/ConfigReader.cs",
       "isTemplate": true
     },
@@ -105,8 +109,18 @@
       "isTemplate": true
     },
     {
+      "path": "Data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
       "path": "Data/users.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "Dockerfile",
@@ -151,7 +165,10 @@
     },
     {
       "path": "Utils/DataReader.cs",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "Utils/Logger.cs",
@@ -163,10 +180,6 @@
     },
     {
       "path": "Utils/ScreenshotHelper.cs",
-      "isTemplate": true
-    },
-    {
-      "path": "Utils/ScreenshotUtils.cs",
       "isTemplate": true
     },
     {

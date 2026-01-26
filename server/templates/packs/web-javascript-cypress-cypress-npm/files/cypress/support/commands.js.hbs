@@ -1,28 +1,28 @@
 // Custom command for login
 Cypress.Commands.add('login', (username, password) => {
-  cy.get('#username').type(username);
-  cy.get('#password').type(password);
-  cy.get('button[type="submit"]').click();
+cy.get('#user-name').type(username);
+cy.get('#password').type(password);
+cy.get('#login-button').click();
 });
 
 // Custom command for logout
 Cypress.Commands.add('logout', () => {
-  cy.get('button[data-action="logout"], .logout').click();
+cy.get('button[data-action="logout"], .logout').click();
 });
 
 // Custom command to check if element exists
 Cypress.Commands.add('elementExists', (selector) => {
-  return cy.get('body').then(($body) => {
-    return cy.wrap($body.find(selector).length > 0);
-  });
+return cy.get('body').then(($body) => {
+return cy.wrap($body.find(selector).length > 0);
+});
 });
 
 // Custom command for waiting with custom timeout
 Cypress.Commands.add('waitForElement', (selector, timeout = 10000) => {
-  cy.get(selector, { timeout }).should('be.visible');
+cy.get(selector, { timeout }).should('be.visible');
 });
 
 // Custom command for taking full page screenshot
 Cypress.Commands.add('fullScreenshot', (filename) => {
-  cy.screenshot(filename, { capture: 'fullPage' });
+cy.screenshot(filename, { capture: 'fullPage' });
 });

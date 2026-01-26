@@ -41,6 +41,10 @@
       "isTemplate": true
     },
     {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
       "path": "README.md",
       "isTemplate": true
     },
@@ -109,7 +113,10 @@
     },
     {
       "path": "cypress/fixtures/users.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "cypress/pages/HomePage.js",

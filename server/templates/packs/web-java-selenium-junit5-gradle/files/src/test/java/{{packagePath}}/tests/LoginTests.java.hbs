@@ -50,6 +50,7 @@ assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
 Log.info("Invalid login test passed - error displayed as expected");
 }
 
+{{#if utilities.dataProvider}}
 /**
 * Data-driven test using JUnit 5 ParameterizedTest with CSV file source.
 * Reads test data from src/main/resources/testdata/users.csv
@@ -74,4 +75,5 @@ assertTrue(loginPage.isErrorDisplayed(),
 }
 Log.info("Data-driven test passed for: " + username);
 }
+{{/if}}
 }

@@ -39,6 +39,10 @@
       "isTemplate": true
     },
     {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
       "path": "tsconfig.json",
       "isTemplate": true
     },
@@ -127,6 +131,13 @@
       "isTemplate": true,
       "conditional": {
         "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "test/data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
       }
     },
     {

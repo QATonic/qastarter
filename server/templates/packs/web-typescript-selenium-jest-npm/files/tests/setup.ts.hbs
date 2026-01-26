@@ -4,11 +4,14 @@ import * as path from 'path';
 // Create directories if they don't exist
 const dirs = ['logs', 'screenshots', 'test-results', 'allure-results'];
 dirs.forEach(dir => {
-  const dirPath = path.join(process.cwd(), dir);
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
-  }
+const dirPath = path.join(process.cwd(), dir);
+if (!fs.existsSync(dirPath)) {
+fs.mkdirSync(dirPath, { recursive: true });
+}
 });
 
 // Set test timeout
 jest.setTimeout(60000);
+
+// Configure retries
+jest.retryTimes(2);

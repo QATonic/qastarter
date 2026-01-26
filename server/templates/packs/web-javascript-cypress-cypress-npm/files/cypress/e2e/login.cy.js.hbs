@@ -21,6 +21,11 @@ loginPage.verifyErrorDisplayed();
 * Data-driven tests using fixtures
 * Test data loaded from cypress/fixtures/users.json
 */
+{{#if utilities.dataProvider}}
+/**
+* Data-driven tests using fixtures
+* Test data loaded from cypress/fixtures/users.json
+*/
 context("Data-driven login tests", () => {
 beforeEach(() => {
 cy.fixture("users.json").as("loginData");
@@ -43,4 +48,5 @@ cy.clearLocalStorage();
 });
 });
 });
+{{/if}}
 });

@@ -3,101 +3,101 @@ import path from 'path';
 import Logger from './logger.js';
 
 /**
- * Test data reader utility.
- * Reads test data from JSON files.
- */
+* Test data reader utility.
+* Reads test data from JSON files.
+*/
 class DataReader {
-  
-  static DATA_DIR = './test/data';
-  
-  /**
-   * Read JSON file
-   */
-  static readJson(filename) {
-    const filepath = path.join(DataReader.DATA_DIR, filename);
-    
-    try {
-      const content = fs.readFileSync(filepath, 'utf8');
-      const data = JSON.parse(content);
-      Logger.debug(`Loaded data from: ${filename}`);
-      return data;
-    } catch (error) {
-      Logger.error(`Failed to read JSON file: ${filename}`, error);
-      throw error;
-    }
-  }
-  
-  /**
-   * Get test users
-   */
-  static getUsers() {
-    return DataReader.readJson('users.js');
-  }
-  
-  /**
-   * Get specific user by type
-   */
-  static getUser(userType) {
-    const users = DataReader.getUsers();
-    const user = users[userType];
-    
-    if (!user) {
-      throw new Error(`User type not found: ${userType}`);
-    }
-    
-    Logger.data('Loaded user', userType);
-    return user;
-  }
-  
-  /**
-   * Get environment config
-   */
-  static getEnvironmentConfig(env = process.env.TEST_ENV || 'dev') {
-    const config = DataReader.readJson(`${env}.json`);
-    Logger.data('Loaded environment config', env);
-    return config;
-  }
-  
-  /**
-   * Get test data by key
-   */
-  static getData(filename, key = null) {
-    const data = DataReader.readJson(filename);
-    
-    if (key) {
-      return data[key];
-    }
-    
-    return data;
-  }
-  
-  /**
-   * Load CSV file as array of objects
-   */
-  static readCsv(filename) {
-    const filepath = path.join(DataReader.DATA_DIR, filename);
-    
-    try {
-      const content = fs.readFileSync(filepath, 'utf8');
-      const lines = content.trim().split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      
-      const data = lines.slice(1).map(line => {
-        const values = line.split(',').map(v => v.trim());
-        const obj = {};
-        headers.forEach((header, index) => {
-          obj[header] = values[index];
-        });
-        return obj;
-      });
-      
-      Logger.debug(`Loaded CSV data from: ${filename}`);
-      return data;
-    } catch (error) {
-      Logger.error(`Failed to read CSV file: ${filename}`, error);
-      throw error;
-    }
-  }
+
+static DATA_DIR = './test/data';
+
+/**
+* Read JSON file
+*/
+static readJson(filename) {
+const filepath = path.join(DataReader.DATA_DIR, filename);
+
+try {
+const content = fs.readFileSync(filepath, 'utf8');
+const data = JSON.parse(content);
+Logger.debug(`Loaded data from: ${filename}`);
+return data;
+} catch (error) {
+Logger.error(`Failed to read JSON file: ${filename}`, error);
+throw error;
+}
+}
+
+/**
+* Get test users
+*/
+static getUsers() {
+return DataReader.readJson('users.json');
+}
+
+/**
+* Get specific user by type
+*/
+static getUser(userType) {
+const users = DataReader.getUsers();
+const user = users[userType];
+
+if (!user) {
+throw new Error(`User type not found: ${userType}`);
+}
+
+Logger.data('Loaded user', userType);
+return user;
+}
+
+/**
+* Get environment config
+*/
+static getEnvironmentConfig(env = process.env.TEST_ENV || 'dev') {
+const config = DataReader.readJson(`${env}.json`);
+Logger.data('Loaded environment config', env);
+return config;
+}
+
+/**
+* Get test data by key
+*/
+static getData(filename, key = null) {
+const data = DataReader.readJson(filename);
+
+if (key) {
+return data[key];
+}
+
+return data;
+}
+
+/**
+* Load CSV file as array of objects
+*/
+static readCsv(filename) {
+const filepath = path.join(DataReader.DATA_DIR, filename);
+
+try {
+const content = fs.readFileSync(filepath, 'utf8');
+const lines = content.trim().split('\n');
+const headers = lines[0].split(',').map(h => h.trim());
+
+const data = lines.slice(1).map(line => {
+const values = line.split(',').map(v => v.trim());
+const obj = {};
+headers.forEach((header, index) => {
+obj[header] = values[index];
+});
+return obj;
+});
+
+Logger.debug(`Loaded CSV data from: ${filename}`);
+return data;
+} catch (error) {
+Logger.error(`Failed to read CSV file: ${filename}`, error);
+throw error;
+}
+}
 }
 
 export default DataReader;

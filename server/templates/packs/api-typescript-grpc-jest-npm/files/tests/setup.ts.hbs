@@ -17,3 +17,6 @@ console.log('gRPC test suite completed');
 
 // Increase test timeout for gRPC calls
 jest.setTimeout(30000);
+
+// Configure retries
+jest.retryTimes(2);

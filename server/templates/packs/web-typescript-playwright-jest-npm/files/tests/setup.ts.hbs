@@ -4,11 +4,11 @@ import testConfig from '../config/test.config';
 import ScreenshotHelper from '../utils/screenshotHelper';
 
 // Create necessary directories
-const dirs = ['logs', 'screenshots', 'test-results'];
+const dirs = ['logs', 'screenshots', 'test-results', 'playwright-report', 'trace'];
 dirs.forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
+if (!fs.existsSync(dir)) {
+fs.mkdirSync(dir, { recursive: true });
+}
 });
 
 // Set default timeout
@@ -16,10 +16,13 @@ jest.setTimeout(testConfig.defaultTimeout);
 
 // Screenshot on test failure
 if (testConfig.screenshotOnFailure) {
-  afterEach(async () => {
-    const testName = expect.getState().currentTestName || 'unknown';
-    if (expect.getState().isExpectingAssertions) {
-      await ScreenshotHelper.captureOnFailure(page, testName);
-    }
-  });
+afterEach(async () => {
+const testName = expect.getState().currentTestName || 'unknown';
+if (expect.getState().isExpectingAssertions) {
+await ScreenshotHelper.captureOnFailure(page, testName);
 }
+});
+}
+
+// Configure retries
+jest.retryTimes(2);

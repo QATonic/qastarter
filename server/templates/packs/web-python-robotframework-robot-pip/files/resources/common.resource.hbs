@@ -1,49 +1,29 @@
 *** Settings ***
-Library    SeleniumLibrary
-Library    Collections
-Library    String
+Library SeleniumLibrary
+Library Collections
+Library String
 
 *** Variables ***
-${BROWSER}             chrome
-${BASE_URL}            https://www.saucedemo.com/
-${TIMEOUT}             30s
-${USERNAME}            standard_user
-${PASSWORD}            secret_sauce
+${BROWSER} chrome
+${BASE_URL} https://www.saucedemo.com/
+${TIMEOUT} 30s
+${USERNAME} standard_user
+${PASSWORD} secret_sauce
 
 # Locators
-${USERNAME_FIELD}      id:user-name
-${PASSWORD_FIELD}      id:password
-${LOGIN_BUTTON}        id:login-button
-${ERROR_MESSAGE}       css:[data-test='error']
+${USERNAME_FIELD} id:user-name
+${PASSWORD_FIELD} id:password
+${LOGIN_BUTTON} id:login-button
+${ERROR_MESSAGE} css:[data-test='error']
 
 *** Keywords ***
 Open Browser To Login Page
-    Open Browser    ${BASE_URL}    ${BROWSER}
-    Maximize Browser Window
-    Set Selenium Implicit Wait    ${TIMEOUT}
+Open Browser ${BASE_URL} ${BROWSER}
+Maximize Browser Window
+Set Selenium Implicit Wait ${TIMEOUT}
 
 Close Browser Session
-    Close Browser
+Close Browser
 
-Enter Username
-    [Arguments]    ${username}
-    Input Text    ${USERNAME_FIELD}    ${username}
-
-Enter Password
-    [Arguments]    ${password}
-    Input Text    ${PASSWORD_FIELD}    ${password}
-
-Click Login Button
-    Click Button    ${LOGIN_BUTTON}
-
-Login With Credentials
-    [Arguments]    ${username}    ${password}
-    Enter Username    ${username}
-    Enter Password    ${password}
-    Click Login Button
-
-Verify Login Success
-    Wait Until Location Contains    inventory    timeout=${TIMEOUT}
-
-Verify Error Message Displayed
-    Wait Until Element Is Visible    ${ERROR_MESSAGE}    timeout=${TIMEOUT}
+Take Screenshot On Failure
+Run Keyword If Test Failed Capture Page Screenshot

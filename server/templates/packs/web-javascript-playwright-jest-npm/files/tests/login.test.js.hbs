@@ -10,7 +10,9 @@
 */
 const LoginPage = require('../pages/LoginPage');
 const envConfig = require('../config/env.config');
-const TestDataReader = require('../utils/TestDataReader');
+{{#if utilities.dataProvider}}
+const TestDataReader = require('../utils/dataReader');
+{{/if}}
 
 describe('Login Tests', () => {
 let loginPage;
@@ -41,6 +43,7 @@ expect(await loginPage.isUsernameVisible()).toBe(true);
 expect(await loginPage.isPasswordVisible()).toBe(true);
 });
 
+{{#if utilities.dataProvider}}
 /**
 * Data-driven tests using test.each
 * Reads test data from data/users.csv
@@ -65,4 +68,5 @@ expect(hasError).toBe(true);
 }
 );
 });
+{{/if}}
 });

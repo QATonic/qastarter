@@ -47,6 +47,7 @@ const isLoggedIn = await loginPage.isLoginSuccessful();
 expect(isLoggedIn).toBe(true);
 });
 
+{{#if utilities.dataProvider}}
 /**
 * Data-driven test example using TestDataReader
 * Reads test data from data/users.csv
@@ -75,4 +76,5 @@ expect(hasError).toBe(true);
 }
 );
 });
+{{/if}}
 });

@@ -11,30 +11,30 @@ useESM: true,
 }],
 },
 
-// Retry failed tests up to 2 times for flaky API tests
-retryTimes: 2,
+// Retry logic moved to setupFilesAfterEnv
+setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
 
-coverageDirectory: 'coverage',
-collectCoverageFrom: [
-'tests/**/*.ts',
-'!tests/**/*.spec.ts',
-'!**/node_modules/**'
-],
-testMatch: [
-'**/tests/**/*.spec.ts'
-],
-reporters: [
-'default'{{#if (eq reportingTool "jest-html")}},
-['jest-html-reporter', {
-pageTitle: '{{projectName}} - API Test Report',
-outputPath: 'reports/test-report.html',
-includeFailureMsg: true,
-includeConsoleLog: true
-}]{{/if}}{{#if (eq reportingTool "allure")}},
-['jest-allure', {
-resultsDir: 'allure-results'
-}]{{/if}}
-],
-testTimeout: 30000,
-verbose: true
-};
+    coverageDirectory: 'coverage',
+    collectCoverageFrom: [
+    'tests/**/*.ts',
+    '!tests/**/*.spec.ts',
+    '!**/node_modules/**'
+    ],
+    testMatch: [
+    '**/tests/**/*.spec.ts'
+    ],
+    reporters: [
+    'default'{{#if (eq reportingTool "jest-html")}},
+    ['jest-html-reporter', {
+    pageTitle: '{{projectName}} - API Test Report',
+    outputPath: 'reports/test-report.html',
+    includeFailureMsg: true,
+    includeConsoleLog: true
+    }]{{/if}}{{#if (eq reportingTool "allure")}},
+    ['jest-allure', {
+    resultsDir: 'allure-results'
+    }]{{/if}}
+    ],
+    testTimeout: 30000,
+    verbose: true
+    };

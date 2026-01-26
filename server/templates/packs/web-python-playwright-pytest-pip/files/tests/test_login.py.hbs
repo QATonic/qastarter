@@ -41,6 +41,7 @@ login_page.login("invalid_user", "wrong_password")
 assert login_page.is_error_displayed(), "Error message should be displayed"
 log.info("Invalid login test passed")
 
+{{#if utilities.dataProvider}}
 {{#if (eq reportingTool "allure")}}
 @allure.title("Data-Driven Login Test")
 @allure.severity(allure.severity_level.NORMAL)
@@ -60,3 +61,4 @@ else:
 assert login_page.is_error_displayed(), f"Error should be displayed for: {username}"
 
 log.info(f"Data-driven test passed for: {username}")
+{{/if}}

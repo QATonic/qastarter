@@ -45,8 +45,11 @@ protected async getDriver(): Promise<WebDriver> {
           const driver = await this.getDriver();
           const element = await driver.findElement(locator);
           return await element.isDisplayed();
-          } catch {
+          } catch (e: any) {
+          if (e.name === 'NoSuchElementError' || e.name === 'StaleElementReferenceError') {
           return false;
+          }
+          throw e;
           }
           }
 

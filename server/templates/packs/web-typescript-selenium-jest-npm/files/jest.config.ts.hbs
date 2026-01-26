@@ -9,9 +9,7 @@ setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   verbose: true,
   collectCoverage: false,
 
-  // Retry failed tests up to 2 times
-  // Requires jest-circus (default in Jest 27+)
-  retryTimes: 2,
+
 
   reporters: [
   'default'{{#if (eq reportingTool "allure")}},

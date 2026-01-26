@@ -1,17 +1,24 @@
 {
-  "name": "{{artifactId}}",
-  "version": "1.0.0",
-  "description": "{{projectName}} - Selenium JavaScript Automation Framework",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest",
-    "test:ci": "jest --ci"
-  },
-  "dependencies": {
-    "selenium-webdriver": "^4.16.0",
-    "dotenv": "^16.3.0"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0"
-  }
+"name": "{{artifactId}}",
+"version": "1.0.0",
+"description": "{{projectName}} - Selenium JavaScript Automation Framework",
+"main": "index.js",
+"scripts": {
+"test": "jest",
+"test:ci": "jest --ci",
+"lint": "eslint .",
+"format": "prettier --write ."
+},
+"dependencies": {
+"selenium-webdriver": "^4.16.0",
+"dotenv": "^16.3.0"
+},
+"devDependencies": {
+"jest": "^29.7.0",
+"prettier": "^3.2.4",
+{{#if (eq reportingTool "allure")}}
+"allure-jest": "^2.15.1",
+"allure-commandline": "^2.27.0"
+{{/if}}
+}
 }

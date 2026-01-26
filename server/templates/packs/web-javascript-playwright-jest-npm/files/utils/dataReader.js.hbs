@@ -2,11 +2,20 @@ const fs = require('fs');
 const path = require('path');
 
 class DataReader {
-  static readJSON(filename) {
-    const filepath = path.join(process.cwd(), 'data', filename);
-    const data = fs.readFileSync(filepath, 'utf8');
-    return JSON.parse(data);
-  }
+static readJSON(filename) {
+const filepath = path.join(process.cwd(), 'data', filename);
+const data = fs.readFileSync(filepath, 'utf8');
+return JSON.parse(data);
+}
+
+static readCsv(filename) {
+const filepath = path.join(process.cwd(), 'data', filename);
+const data = fs.readFileSync(filepath, 'utf8');
+const lines = data.split('\n').filter(line => line.trim() !== '');
+// Remove header
+lines.shift();
+return lines.map(line => line.split(',').map(item => item.trim()));
+}
 }
 
 module.exports = DataReader;

@@ -236,11 +236,17 @@
     },
     {
       "path": "src/test/resources/testdata/sample.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "src/test/resources/testdata/users.csv",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     }
   ],
   "directories": [

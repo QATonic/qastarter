@@ -16,15 +16,11 @@
       "isTemplate": true
     },
     {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
       "path": "wdio.conf.js",
-      "isTemplate": true
-    },
-    {
-      "path": "test/pages/BasePage.js",
-      "isTemplate": true
-    },
-    {
-      "path": "test/pages/LoginPage.js",
       "isTemplate": true
     },
     {
@@ -111,8 +107,11 @@
       }
     },
     {
-      "path": "test/data/users.js",
-      "isTemplate": true
+      "path": "test/data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "test/pageobjects/base.page.js",
@@ -128,7 +127,10 @@
     },
     {
       "path": "utils/dataReader.js",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "utils/logger.js",

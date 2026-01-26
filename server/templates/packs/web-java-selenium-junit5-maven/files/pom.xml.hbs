@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>{{groupId}}</groupId>
@@ -17,7 +16,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        
+
         <!-- Dependency Versions -->
         <selenium.version>{{toolVersions.selenium}}</selenium.version>
         <junit.version>{{toolVersions.junit5}}</junit.version>
@@ -34,12 +33,12 @@
         {{/if}}
         <jackson.version>2.15.2</jackson.version>
         <commons-csv.version>1.10.0</commons-csv.version>
-        
+
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
-        
+
         <!-- Test Configuration -->
         <browser>chrome</browser>
         <headless>false</headless>
@@ -70,7 +69,7 @@
             <artifactId>junit-jupiter-params</artifactId>
             <version>${junit.version}</version>
         </dependency>
-{{#if (eq testingPattern "bdd")}}
+        {{#if (eq testingPattern "bdd")}}
 
         <!-- Cucumber -->
         <dependency>
@@ -83,8 +82,8 @@
             <artifactId>cucumber-junit-platform-engine</artifactId>
             <version>${cucumber.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "extent-reports")}}
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
 
         <!-- ExtentReports -->
         <dependency>
@@ -92,8 +91,8 @@
             <artifactId>extentreports</artifactId>
             <version>${extentreports.version}</version>
         </dependency>
-{{/if}}
-{{#if (eq reportingTool "allure")}}
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
 
         <!-- Allure -->
         <dependency>
@@ -101,14 +100,14 @@
             <artifactId>allure-junit5</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{#if (eq testingPattern "bdd")}}
+        {{#if (eq testingPattern "bdd")}}
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-cucumber7-jvm</artifactId>
             <version>${allure.version}</version>
         </dependency>
-{{/if}}
-{{/if}}
+        {{/if}}
+        {{/if}}
 
         <!-- Log4j2 -->
         <dependency>
@@ -160,12 +159,15 @@
                         <browser>${browser}</browser>
                         <headless>${headless}</headless>
                         <env>${env}</env>
-                        <junit.jupiter.extensions.autodetection.enabled>true</junit.jupiter.extensions.autodetection.enabled>
+                        <junit.jupiter.extensions.autodetection.enabled>true
+                        </junit.jupiter.extensions.autodetection.enabled>
                     </systemPropertyVariables>
                     <useSystemClassLoader>false</useSystemClassLoader>
-                    <argLine>-Dfile.encoding=UTF-8{{#if (eq reportingTool "allure")}} -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}</argLine>
+                    <argLine>-Dfile.encoding=UTF-8{{#if (eq reportingTool "allure")}}
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}
+                    </argLine>
                 </configuration>
-{{#if (eq reportingTool "allure")}}
+                {{#if (eq reportingTool "allure")}}
                 <dependencies>
                     <dependency>
                         <groupId>org.aspectj</groupId>
@@ -173,9 +175,24 @@
                         <version>${aspectj.version}</version>
                     </dependency>
                 </dependencies>
-{{/if}}
+                {{/if}}
             </plugin>
-{{#if (eq reportingTool "allure")}}
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat>
+                            <version>1.17.0</version>
+                            <style>
+                                AOSP
+                            </style>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+            </plugin>
+            {{#if (eq reportingTool "allure")}}
 
             <!-- Allure Maven Plugin -->
             <plugin>
@@ -187,7 +204,7 @@
                     <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
                 </configuration>
             </plugin>
-{{/if}}
+            {{/if}}
         </plugins>
     </build>
 

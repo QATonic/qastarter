@@ -6,17 +6,19 @@ import {{javaPackage}}.utils.Log;
 
 public class BaseTest {
 
-    @BeforeMethod
-    public void setup() {
-        Log.info("========================================");
-        Log.info("Desktop Test Started");
-        WinAppDriverManager.initDriver();
-    }
+@BeforeMethod
+public void setup() {
+Log.info("========================================");
+Log.info("Desktop Test Started");
+Log.info("Desktop Test Started");
+String appPath = {{javaPackage}}.config.ConfigurationReader.getAppPath();
+DriverManager.initializeDriver(appPath);
+}
 
-    @AfterMethod
-    public void teardown() {
-        WinAppDriverManager.quitDriver();
-        Log.info("Desktop Test Completed");
-        Log.info("========================================");
-    }
+@AfterMethod
+public void teardown() {
+DriverManager.quitDriver();
+Log.info("Desktop Test Completed");
+Log.info("========================================");
+}
 }

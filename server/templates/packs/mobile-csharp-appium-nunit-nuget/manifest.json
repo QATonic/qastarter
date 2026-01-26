@@ -93,6 +93,9 @@
     {
       "path": "Data/TestData.cs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "Test data model classes"
     },
     {

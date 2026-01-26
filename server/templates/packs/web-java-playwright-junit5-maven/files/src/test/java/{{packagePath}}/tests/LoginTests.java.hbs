@@ -4,7 +4,7 @@ import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.core.BaseTest;
 import {{javaPackage}}.pages.LoginPage;
 import {{javaPackage}}.utils.Log;
-import {{javaPackage}}.utils.TestDataReader;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Tag;
@@ -51,6 +51,7 @@ assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
 Log.info("Invalid login test passed - error displayed as expected");
 }
 
+{{#if utilities.dataProvider}}
 /**
 * Data-driven test using JUnit 5 ParameterizedTest with CSV file source.
 * Reads test data from src/main/resources/testdata/users.csv
@@ -75,4 +76,5 @@ assertTrue(loginPage.isErrorDisplayed(),
 }
 Log.info("Data-driven test passed for: " + username);
 }
+{{/if}}
 }

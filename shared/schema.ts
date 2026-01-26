@@ -91,6 +91,16 @@ export const projectConfigSchema = z.object({
     .optional(),
 });
 
+export const defaultUtilities = {
+  configReader: true,
+  jsonReader: false,
+  screenshotUtility: true,
+  logger: true,
+  dataProvider: false,
+  includeDocker: false,
+  includeDockerCompose: false,
+};
+
 export type ProjectConfig = z.infer<typeof projectConfigSchema>;
 
 // API response schemas

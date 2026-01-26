@@ -1,17 +1,23 @@
 const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
-  e2e: {
-    baseUrl: "https://www.saucedemo.com/",
-    specPattern: "cypress/e2e/**/*.cy.js",
-    supportFile: "cypress/support/e2e.js",
-    video: true,
-    screenshotOnRunFailure: true,
-    viewportWidth: 1920,
-    viewportHeight: 1080,
-    env: {
-      username: "standard_user",
-      password: "secret_sauce"
-    },
-  },
+e2e: {
+baseUrl: "https://www.saucedemo.com/",
+specPattern: "cypress/e2e/**/*.cy.js",
+supportFile: "cypress/support/e2e.js",
+video: true,
+screenshotOnRunFailure: true,
+viewportWidth: 1920,
+viewportHeight: 1080,
+env: {
+username: "standard_user",
+password: "secret_sauce"
+},
+setupNodeEvents(on, config) {
+{{#if (eq reportingTool "allure")}}
+require('@shelex/cypress-allure-plugin/writer')(on, config);
+{{/if}}
+return config;
+},
+},
 });

@@ -51,10 +51,6 @@
       "isTemplate": true
     },
     {
-      "path": "tests/login.robot",
-      "isTemplate": true
-    },
-    {
       "path": ".circleci/config.yml",
       "isTemplate": true,
       "conditional": {

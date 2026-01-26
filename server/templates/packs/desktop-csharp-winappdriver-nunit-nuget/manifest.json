@@ -130,6 +130,9 @@
     {
       "path": "Utils/DataReader.cs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "Test data file reader"
     },
     {

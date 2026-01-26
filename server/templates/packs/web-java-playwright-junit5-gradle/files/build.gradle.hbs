@@ -2,8 +2,15 @@ plugins {
 id 'java'
 id 'jacoco'
 {{#if (eq reportingTool "allure")}}
-id 'io.qameta.allure' version '2.11.2'
+id 'io.qameta.allure' version '2.11.2' apply false
 {{/if}}
+id 'com.diffplug.spotless' version '6.25.0'
+}
+
+spotless {
+java {
+googleJavaFormat('1.17.0').aosp()
+}
 }
 
 group = '{{groupId}}'

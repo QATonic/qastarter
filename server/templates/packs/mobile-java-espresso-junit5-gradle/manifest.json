@@ -140,7 +140,7 @@
     {
       "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
       "isTemplate": true,
-      "description": "Cucumber TestNG runner",
+      "description": "Cucumber JUnit 5 Suite Runner",
       "conditional": {
         "testingPattern": "bdd"
       }

@@ -1,53 +1,50 @@
 /**
 * Login Tests using WebdriverIO with TypeScript.
-* Demonstrates both configuration-based and data-driven testing.
 */
-import { LoginPage } from "../pages/LoginPage";
-import TestDataReader from "../utils/TestDataReader";
+import LoginPage from "../pageobjects/login.page";
+import { validUser, invalidUser } from "../data/users";
+{{#if utilities.dataProvider}}
+import DataReader from "../utils/dataReader";
 
-interface UserTestData {
-username: string;
-password: string;
-expected: string;
+/**
+* Data-driven tests using JSON test data
+*/
+describe("Data-driven login tests", () => {
+const testData = DataReader.getUsers(); // Returns object with keys
+const users = Object.values(testData);
+
+users.forEach((user: any) => {
+it(`should verify login for user: ${user.username}`, async () => {
+await LoginPage.open();
+await LoginPage.login(user.username, user.password);
+
+if (user.username === "standard_user") {
+await expect(browser).toHaveUrlContaining('inventory');
+} else {
+await expect(LoginPage.flashMessage).toBeDisplayed();
 }
-
+});
+});
+});
+{{/if}}
 describe("Login Tests", () => {
-const loginPage = new LoginPage();
-const username = "standard_user";
-const password = "secret_sauce";
-
 beforeEach(async () => {
-await loginPage.open("/");
+await LoginPage.open();
 });
 
 it("should login successfully with valid credentials", async () => {
-await loginPage.login(username, password);
-expect(await loginPage.isLoginSuccessful()).toBe(true);
+await LoginPage.login(validUser.username, validUser.password);
+
+// SauceDemo success check
+await expect(browser).toHaveUrlContaining('inventory');
+await expect(LoginPage.flashMessage).not.toBeDisplayed();
 });
 
 it("should show error with invalid credentials", async () => {
-await loginPage.login("invalid_user", "wrong_password");
-expect(await loginPage.isErrorDisplayed()).toBe(true);
-});
+await LoginPage.login(invalidUser.username, invalidUser.password);
 
-/**
-* Data-driven tests using CSV test data
-* Reads test data from test/data/users.csv
-*/
-describe("Data-driven login tests", () => {
-const testData = TestDataReader.readCsv("users.csv") as UserTestData[];
-
-testData.forEach((user) => {
-it(`should verify login for user: ${user.username}`, async () => {
-await loginPage.open("/");
-await loginPage.login(user.username, user.password);
-
-if (user.expected === "success") {
-expect(await loginPage.isLoginSuccessful()).toBe(true);
-} else {
-expect(await loginPage.isErrorDisplayed()).toBe(true);
-}
-});
-});
+// SauceDemo error check
+await expect(LoginPage.flashMessage).toBeDisplayed();
+await expect(LoginPage.flashMessage).toHaveTextContaining('Epic sadface');
 });
 });

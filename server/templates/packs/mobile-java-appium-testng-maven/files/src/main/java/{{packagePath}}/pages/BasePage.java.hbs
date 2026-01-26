@@ -5,50 +5,52 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import {{javaPackage}}.core.AppiumManager;
+import {{javaPackage}}.core.DriverManager;
 import {{javaPackage}}.config.ConfigReader;
 import {{javaPackage}}.utils.Log;
 
 import java.time.Duration;
 
 /**
- * Base Page - Common mobile actions for all pages.
- */
+* Base Page - Common mobile actions for all pages.
+*/
 public class BasePage {
 
-    protected AppiumDriver driver;
-    protected WebDriverWait wait;
+protected AppiumDriver driver;
+protected WebDriverWait wait;
 
-    public BasePage() {
-        this.driver = AppiumManager.getDriver();
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getImplicitWait()));
-    }
+public BasePage() {
+this.driver = DriverManager.getDriver();
+this.wait = new WebDriverWait(driver, Duration.ofSeconds(Long.parseLong(ConfigReader.getProperty("mobile.implicit.wait",
+"10"))));
+}
 
-    protected void tap(By locator) {
-        Log.info("Tap: " + locator);
-        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
-    }
+protected void tap(By locator) {
+Log.info("Tap: " + locator);
+wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+}
 
-    protected void type(By locator, String text) {
-        Log.info("Type: " + text + " into " + locator);
-        WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        element.clear();
-        element.sendKeys(text);
-    }
+protected void type(By locator, String text) {
+Log.info("Type: " + text + " into " + locator);
+WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+element.clear();
+element.sendKeys(text);
+}
 
-    protected String getText(By locator) {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
-    }
+protected String getText(By locator) {
+return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
+}
 
-    protected boolean isDisplayed(By locator) {
-        try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
+protected boolean isDisplayed(By locator) {
+try {
+return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).isDisplayed();
+} catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException |
+org.openqa.selenium.StaleElementReferenceException e) {
+return false;
+}
+}
 
-    protected void waitForElement(By locator) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-    }
+protected void waitForElement(By locator) {
+wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+}
 }

@@ -109,12 +109,6 @@
       "description": "Thread-safe Appium driver lifecycle management"
     },
     {
-      "path": "src/main/java/{{packagePath}}/core/MobileDriverFactory.java",
-      "template": "src/main/java/{{packagePath}}/core/MobileDriverFactory.java.hbs",
-      "isTemplate": true,
-      "description": "Mobile driver instantiation for Android and iOS"
-    },
-    {
       "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
       "template": "src/main/java/{{packagePath}}/core/BaseTest.java.hbs",
       "isTemplate": true,
@@ -312,12 +306,18 @@
       "path": "src/test/resources/testdata/users.csv",
       "template": "src/test/resources/testdata/users.csv.hbs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "Sample CSV test data file for mobile tests"
     },
     {
       "path": "src/test/resources/testdata/sample.json",
       "template": "src/test/resources/testdata/sample.json.hbs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "Sample JSON test data file for mobile tests"
     },
     {

@@ -37,6 +37,7 @@ _loginPage.Login("invalid_user", "wrong_password");
 Assert.That(_loginPage.IsErrorDisplayed(), Is.True);
 }
 
+{{#if utilities.dataProvider}}
 /// <summary>
     /// Data-driven test using TestCaseSource with CSV data.
     /// Reads test data from testdata/users.csv
@@ -69,5 +70,6 @@ private static IEnumerable<object[]> GetLoginTestData()
     yield return new object[] { row["username"], row["password"], row["expected"] };
     }
     }
+    {{/if}}
     }
     }

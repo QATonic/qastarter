@@ -153,6 +153,9 @@
     {
       "path": "data/users.json",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "User test data"
     },
     {

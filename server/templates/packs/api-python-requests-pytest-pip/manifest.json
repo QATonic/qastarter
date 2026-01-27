@@ -171,12 +171,20 @@
     },
     {
       "path": "tests/test_data_driven.py",
+      "template": "tests/test_data_driven.py.hbs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "Data-driven tests"
     },
     {
       "path": "data/users.json",
+      "template": "data/users.json.hbs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "Test user data"
     },
     {

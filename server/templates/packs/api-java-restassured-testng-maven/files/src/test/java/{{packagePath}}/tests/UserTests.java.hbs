@@ -7,7 +7,9 @@ import {{javaPackage}}.core.BaseTest;
 import {{javaPackage}}.core.ResponseValidator;
 import {{javaPackage}}.models.User;
 import {{javaPackage}}.utils.Log;
+{{#if utilities.dataProvider}}
 import {{javaPackage}}.utils.TestDataReader;
+{{/if}}
 
 import java.util.List;
 import java.util.Map;
@@ -84,6 +86,7 @@ List
 
     // ===== DATA-DRIVEN TESTS =====
 
+    {{#if utilities.dataProvider}}
     /**
      * DataProvider for data-driven user tests.
      * Reads from src/test/resources/testdata/users.csv
@@ -116,6 +119,7 @@ List
             Log.info("Expected: " + expectedName + ", Actual: " + actualName);
         }
     }
+    {{/if}}
 
     /**
      * DataProvider for negative test cases.

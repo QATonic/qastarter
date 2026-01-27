@@ -36,6 +36,7 @@ throw error;
 }
 });
 
+{{#if utilities.dataProvider}}
 /**
 * Data-driven tests using test.each
 * Reads test data from data/users.json
@@ -63,4 +64,5 @@ throw error;
 }
 );
 });
+{{/if}}
 });

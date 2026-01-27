@@ -137,7 +137,11 @@
     },
     {
       "path": "Data/users.json",
+      "template": "Data/users.json.hbs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "User test data"
     },
     {

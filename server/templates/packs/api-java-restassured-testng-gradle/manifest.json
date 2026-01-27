@@ -200,7 +200,19 @@
       "path": "src/test/resources/testdata/users.json",
       "template": "src/test/resources/testdata/users.json.hbs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "Test data"
+    },
+    {
+      "path": "src/test/resources/testdata/users.csv",
+      "template": "src/test/resources/testdata/users.csv.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "CSV Test data"
     },
     {
       "path": "src/main/resources/extent-config.xml",

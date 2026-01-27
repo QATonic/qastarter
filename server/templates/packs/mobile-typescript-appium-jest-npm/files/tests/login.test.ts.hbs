@@ -46,6 +46,11 @@ throw error;
 * Data-driven tests using test.each
 * Reads test data from data/users.json
 */
+{{#if utilities.dataProvider}}
+/**
+* Data-driven tests using test.each
+* Reads test data from data/users.json
+*/
 describe('Data-driven login tests', () => {
 const testData = TestDataReader.readJson('users.json') as UserTestData[];
 
@@ -69,4 +74,5 @@ throw error;
 }
 );
 });
+{{/if}}
 });

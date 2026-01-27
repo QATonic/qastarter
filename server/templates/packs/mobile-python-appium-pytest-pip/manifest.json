@@ -84,6 +84,14 @@
       "description": "QA environment data"
     },
     {
+      "path": "data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "User test data in CSV format"
+    },
+    {
       "path": "tests/__init__.py",
       "isTemplate": false,
       "description": "Tests package init"

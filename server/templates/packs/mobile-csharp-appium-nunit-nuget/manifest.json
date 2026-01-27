@@ -99,6 +99,14 @@
       "description": "Test data model classes"
     },
     {
+      "path": "Data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "CSV test data"
+    },
+    {
       "path": "Tests/Pages/BasePage.cs",
       "isTemplate": true,
       "description": "Base page class with common functionality"
@@ -151,6 +159,9 @@
     {
       "path": "Data/users.json",
       "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
       "description": "User test data"
     },
     {

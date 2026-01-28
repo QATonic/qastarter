@@ -38,6 +38,8 @@ const frameworkIcons: Record<string, React.ElementType> = {
   pyautogui: MonitorSmartphone,
   espresso: Smartphone,
   xcuitest: Smartphone,
+  flutter: Smartphone,
+  resty: Server,
 };
 
 export default function FrameworkStep() {
@@ -85,10 +87,9 @@ export default function FrameworkStep() {
                 key={framework}
                 className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-                  ${
-                    isSelected
-                      ? 'bg-primary/5 border-primary/30 shadow-sm'
-                      : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
+                  ${isSelected
+                    ? 'bg-primary/5 border-primary/30 shadow-sm'
+                    : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
                   }
                   ${!config.testingType ? 'opacity-50 pointer-events-none' : ''}
                 `}
@@ -113,7 +114,7 @@ export default function FrameworkStep() {
                     <Label htmlFor={framework} className="text-sm font-medium cursor-pointer">
                       {
                         validationLabels.frameworks[
-                          framework as keyof typeof validationLabels.frameworks
+                        framework as keyof typeof validationLabels.frameworks
                         ]
                       }
                     </Label>

@@ -1,0 +1,15 @@
+package utils
+
+type Config struct {
+BaseURL string
+}
+
+var AppConfig *Config
+
+func LoadConfig() {
+// Simple configuration loading
+// In a real app, you might use viper or read from .env
+AppConfig = &Config{
+BaseURL: "https://reqres.in",
+}
+}

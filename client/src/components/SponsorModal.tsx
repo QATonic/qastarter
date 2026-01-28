@@ -32,11 +32,12 @@ export default function SponsorModal({ triggerClassName }: SponsorModalProps) {
         <Button
           variant="outline"
           size="sm"
-          className={`gap-1.5 bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 dark:from-primary dark:to-purple-600 text-white dark:text-white border-primary dark:border-primary font-medium ${triggerClassName}`}
+          className={`gap-1.5 bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 dark:from-primary dark:to-purple-600 text-white dark:text-white border-primary dark:border-primary font-medium whitespace-nowrap ${triggerClassName}`}
           data-testid="button-sponsor"
+          aria-label="Sponsor Project"
         >
-          <Heart className="h-4 w-4" />
-          <span className="hidden sm:inline">Support</span>
+          <Heart className="h-4 w-4 fill-white" />
+          <span className="hidden lg:inline">Support</span>
         </Button>
       </DialogTrigger>
 

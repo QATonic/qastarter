@@ -1,0 +1,27 @@
+name: Go Playwright Tests
+
+on:
+push:
+branches: [ main, master ]
+pull_request:
+branches: [ main, master ]
+
+jobs:
+test:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v3
+
+- name: Set up Go
+uses: actions/setup-go@v4
+with:
+go-version: '1.21'
+
+- name: Install dependencies
+run: go mod download
+
+- name: Install Playwright Browsers
+run: go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
+
+- name: Run Tests
+run: go test ./tests/... -v

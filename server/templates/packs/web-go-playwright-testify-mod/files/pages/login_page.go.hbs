@@ -1,0 +1,32 @@
+package pages
+
+import "github.com/playwright-community/playwright-go"
+
+type LoginPage struct {
+*BasePage
+UsernameInput playwright.Locator
+PasswordInput playwright.Locator
+LoginButton playwright.Locator
+ErrorMessage playwright.Locator
+}
+
+func NewLoginPage(page playwright.Page) *LoginPage {
+return &LoginPage{
+BasePage: NewBasePage(page),
+UsernameInput: page.Locator("[data-test='username']"),
+PasswordInput: page.Locator("[data-test='password']"),
+LoginButton: page.Locator("[data-test='login-button']"),
+ErrorMessage: page.Locator("[data-test='error']"),
+}
+}
+
+func (p *LoginPage) Login(username, password string) {
+p.UsernameInput.Fill(username)
+p.PasswordInput.Fill(password)
+p.LoginButton.Click()
+}
+
+func (p *LoginPage) GetErrorMessage() string {
+text, _ := p.ErrorMessage.TextContent()
+return text
+}

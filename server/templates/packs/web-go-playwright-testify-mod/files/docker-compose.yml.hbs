@@ -1,0 +1,10 @@
+version: '3'
+services:
+test-runner:
+build: .
+environment:
+- HEADLESS=true
+volumes:
+- ./logs:/app/logs
+- ./reports:/app/reports
+- ./screenshots:/app/screenshots

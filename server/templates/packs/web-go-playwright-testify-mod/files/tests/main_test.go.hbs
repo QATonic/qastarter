@@ -1,0 +1,12 @@
+package tests
+
+import (
+"os"
+"testing"
+)
+
+func TestMain(m *testing.M) {
+// Global Setup can go here
+code := m.Run()
+os.Exit(code)
+}

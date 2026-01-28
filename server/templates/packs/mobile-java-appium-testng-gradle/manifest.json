@@ -189,6 +189,7 @@
     {
       "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
       "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
+      "isTemplate": true,
       "conditional": {
         "utilities.dataProvider": true
       },

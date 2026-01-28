@@ -1,0 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+namespace {{projectNamespace}}.Utils
+{
+public static class TestDataReader
+{
+public static IEnumerable<Dictionary<string, string>> ReadCsv(string filename)
+    {
+    var filepath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", filename);
+    var lines = File.ReadAllLines(filepath);
+
+    if (lines.Length < 2) yield break; var headers=lines[0].Split(','); foreach (var line in lines.Skip(1)) { var
+        values=line.Split(','); var row=new Dictionary<string, string>();
+
+        for (var i = 0; i < headers.Length; i++) { if (i < values.Length) { row[headers[i].Trim()]=values[i].Trim(); } }
+            yield return row; } } } }

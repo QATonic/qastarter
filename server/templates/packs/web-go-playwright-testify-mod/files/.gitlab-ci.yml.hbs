@@ -1,0 +1,15 @@
+image: mcr.microsoft.com/playwright:v1.40.0-focal
+
+stages:
+- test
+
+test:
+stage: test
+script:
+- apt-get update && apt-get install -y golang
+- go mod download
+- go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
+- go test ./tests/... -v
+artifacts:
+reports:
+junit: report.xml

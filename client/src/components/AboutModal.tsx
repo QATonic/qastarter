@@ -24,7 +24,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
             <div>
               <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">QAStarter</DialogTitle>
               <DialogDescription className="text-base">
-                Your testing foundation, pre-built Templates
+                Your testing foundation, fully implemented projects, ready to run.
               </DialogDescription>
             </div>
           </div>
@@ -41,7 +41,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
               QAStarter is a free, web-based application designed to simplify the setup of QA
               automation projects. Similar to Spring Initializr but tailored for quality assurance
               engineers, it provides a wizard-based interface for configuring and generating
-              complete QA automation project structures.
+              complete, production-ready QA automation projects with full source code.
             </p>
           </div>
 
@@ -57,7 +57,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
                 <div>
                   <div className="font-medium text-sm">Multiple Frameworks</div>
                   <div className="text-xs text-muted-foreground">
-                    Selenium, Playwright, Cypress, Appium
+                    Selenium, Playwright, Cypress, Appium, Flutter, Resty
                   </div>
                 </div>
               </div>
@@ -66,7 +66,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
                 <div>
                   <div className="font-medium text-sm">Language Support</div>
                   <div className="text-xs text-muted-foreground">
-                    Java, Python, JavaScript, TypeScript, C#
+                    Java, Python, JS/TS, C#, Go, Dart
                   </div>
                 </div>
               </div>
@@ -75,7 +75,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
                 <div>
                   <div className="font-medium text-sm">Testing Patterns</div>
                   <div className="text-xs text-muted-foreground">
-                    POM, BDD, Hybrid, Keyword-Driven
+                    POM, BDD, Hybrid, Contract Testing, Fluent
                   </div>
                 </div>
               </div>
@@ -144,7 +144,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </p>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center p-3 bg-background/50 rounded-lg">
-                <div className="text-2xl font-bold text-primary">43+</div>
+                <div className="text-2xl font-bold text-primary">46+</div>
                 <div className="text-xs text-muted-foreground">Templates</div>
               </div>
               <div className="text-center p-3 bg-background/50 rounded-lg">

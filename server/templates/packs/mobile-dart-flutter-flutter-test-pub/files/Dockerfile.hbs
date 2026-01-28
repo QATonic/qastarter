@@ -1,0 +1,11 @@
+FROM ghcr.io/cirruslabs/flutter:3.16.0
+
+WORKDIR /app
+
+COPY pubspec.yaml pubspec.lock ./
+RUN flutter pub get
+
+COPY . .
+
+RUN flutter analyze
+CMD ["flutter", "test"]

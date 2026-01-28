@@ -1,0 +1,100 @@
+{
+    "id": "mobile-dart-flutter-flutter-test-pub",
+    "displayName": "Flutter Mobile Framework",
+    "description": "Cross-platform Mobile authentication framework using Flutter and Dart",
+    "version": "1.0.0",
+    "supportsDynamic": true,
+    "supportedCombination": {
+        "testingType": "mobile",
+        "framework": "flutter",
+        "language": "dart",
+        "testRunner": "flutter-test",
+        "buildTool": "pub"
+    },
+    "dynamicSupport": {
+        "reportingTools": [
+            "flutter-test-report"
+        ],
+        "cicdTools": [
+            "jenkins",
+            "github-actions",
+            "gitlab-ci",
+            "azure-devops"
+        ],
+        "testingPatterns": [
+            "integration-test"
+        ]
+    },
+    "toolVersions": {
+        "flutter": "3.16.0+",
+        "dart": "3.2.0+"
+    },
+    "files": [
+        {
+            "path": "pubspec.yaml",
+            "isTemplate": true
+        },
+        {
+            "path": "README.md",
+            "isTemplate": true
+        },
+        {
+            "path": ".gitignore",
+            "isTemplate": false
+        },
+        {
+            "path": "lib/main.dart",
+            "isTemplate": true
+        },
+        {
+            "path": "test/widget_test.dart",
+            "isTemplate": true
+        },
+        {
+            "path": "integration_test/app_test.dart",
+            "isTemplate": true
+        },
+        {
+            "path": ".github/workflows/tests.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "github-actions"
+            }
+        },
+        {
+            "path": "Jenkinsfile",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "jenkins"
+            }
+        },
+        {
+            "path": ".gitlab-ci.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "gitlab-ci"
+            }
+        },
+        {
+            "path": "azure-pipelines.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "azure-devops"
+            }
+        },
+        {
+            "path": "Dockerfile",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.includeDocker": true
+            }
+        }
+    ],
+    "directories": [
+        "lib",
+        "test",
+        "integration_test",
+        "android",
+        "ios"
+    ]
+}

@@ -1,0 +1,15 @@
+# Binaries
+*.exe
+*.test
+
+# Playwright
+/ms-playwright/
+
+# Logs and Reports
+logs/
+reports/
+screenshots/
+*.log
+
+# Vendor
+vendor/

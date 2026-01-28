@@ -1,0 +1,44 @@
+package client
+
+import (
+"{{projectName}}/utils"
+"github.com/go-resty/resty/v2"
+)
+
+type APIClient struct {
+Client *resty.Client
+}
+
+func NewAPIClient() *APIClient {
+client := resty.New()
+client.SetBaseURL(utils.AppConfig.BaseURL)
+client.SetHeader("Content-Type", "application/json")
+
+// Log requests and responses
+client.OnBeforeRequest(func(c *resty.Client, r *resty.Request) error {
+utils.Log.Infof("Request: %s %s", r.Method, r.URL)
+return nil
+})
+
+client.OnAfterResponse(func(c *resty.Client, r *resty.Response) error {
+utils.Log.Infof("Response Status: %s", r.Status())
+return nil
+})
+
+return &APIClient{
+Client: client,
+}
+}
+
+func (c *APIClient) GetUser(id string) (*resty.Response, error) {
+return c.Client.R().
+SetResult(&map[string]interface{}{}).
+Get("/api/users/" + id)
+}
+
+func (c *APIClient) CreateUser(body interface{}) (*resty.Response, error) {
+return c.Client.R().
+SetBody(body).
+SetResult(&map[string]interface{}{}).
+Post("/api/users")
+}

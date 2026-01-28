@@ -214,6 +214,26 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Language: TypeScript</p>
     </div>
   ),
+  resty: (
+    <div>
+      <p className="font-medium mb-1">Resty</p>
+      <p className="text-xs">Simple HTTP and REST client library for Go.</p>
+      <p className="text-xs mt-1">✓ Chainable Request Builder</p>
+      <p className="text-xs">✓ Automatic Content Marshaling</p>
+      <p className="text-xs">✓ Retries and Timeouts</p>
+      <p className="text-xs mt-1 italic">Language: Go</p>
+    </div>
+  ),
+  flutter: (
+    <div>
+      <p className="font-medium mb-1">Flutter</p>
+      <p className="text-xs">Google's UI toolkit for building natively compiled applications.</p>
+      <p className="text-xs mt-1">✓ Single codebase for Mobile, Web, Desktop</p>
+      <p className="text-xs">✓ Integration Tests with Flutter Driver</p>
+      <p className="text-xs">✓ Widget Testing</p>
+      <p className="text-xs mt-1 italic">Language: Dart</p>
+    </div>
+  ),
 
   // Languages
   java: (
@@ -284,6 +304,26 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Full Java interoperability</p>
       <p className="text-xs">✓ Android Studio integration</p>
       <p className="text-xs mt-1 italic">Best for: Android and modern JVM projects</p>
+    </div>
+  ),
+  go: (
+    <div>
+      <p className="font-medium mb-1">Go (Golang)</p>
+      <p className="text-xs">Statically typed, compiled language tailored for performance.</p>
+      <p className="text-xs mt-1">✓ Fast compilation and execution</p>
+      <p className="text-xs">✓ Built-in concurrency (Goroutines)</p>
+      <p className="text-xs">✓ Simple dependency management (Modules)</p>
+      <p className="text-xs mt-1 italic">Best for: High-performance API and Web testing</p>
+    </div>
+  ),
+  dart: (
+    <div>
+      <p className="font-medium mb-1">Dart</p>
+      <p className="text-xs">Client-optimized language for fast apps on any platform.</p>
+      <p className="text-xs mt-1">✓ Optimized for UI (Flutter)</p>
+      <p className="text-xs">✓ Sound null safety</p>
+      <p className="text-xs">✓ Productive tooling</p>
+      <p className="text-xs mt-1 italic">Best for: Mobile development with Flutter</p>
     </div>
   ),
 
@@ -372,6 +412,26 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1 italic">Best for: Microservices and API integrations</p>
     </div>
   ),
+  'fluent-assertions': (
+    <div>
+      <p className="font-medium mb-1">Fluent Assertions</p>
+      <p className="text-xs">Expressive assertion style that reads like natural language.</p>
+      <p className="text-xs mt-1">✓ Improved readability</p>
+      <p className="text-xs">✓ Detailed failure messages</p>
+      <p className="text-xs">✓ Chainable assertion methods</p>
+      <p className="text-xs mt-1 italic">Used by: Resty (Go)</p>
+    </div>
+  ),
+  'integration-test': (
+    <div>
+      <p className="font-medium mb-1">Integration Tests</p>
+      <p className="text-xs">Verify that individual components work together correctly.</p>
+      <p className="text-xs mt-1">✓ Use real device/emulator (Flutter)</p>
+      <p className="text-xs">✓ Test entire user flows</p>
+      <p className="text-xs">✓ Validate data persistence</p>
+      <p className="text-xs mt-1 italic">Used by: Flutter</p>
+    </div>
+  ),
 
   // Test Runners
   testng: (
@@ -440,6 +500,26 @@ export const helpContent: HelpContent = {
       <p className="text-xs mt-1">✓ UI and unit testing</p>
       <p className="text-xs">✓ Performance testing</p>
       <p className="text-xs">✓ Xcode integration</p>
+    </div>
+  ),
+  testify: (
+    <div>
+      <p className="font-medium mb-1">Testify</p>
+      <p className="text-xs">Most popular testing toolkit for Go.</p>
+      <p className="text-xs mt-1">✓ Assertion and Requirement libraries</p>
+      <p className="text-xs">✓ Mocking support</p>
+      <p className="text-xs">✓ Suite support</p>
+      <p className="text-xs mt-1 italic">Standard for Go testing</p>
+    </div>
+  ),
+  'flutter-test': (
+    <div>
+      <p className="font-medium mb-1">Flutter Test</p>
+      <p className="text-xs">Native testing framework for Dart and Flutter.</p>
+      <p className="text-xs mt-1">✓ Widget Testing</p>
+      <p className="text-xs">✓ Integration Testing</p>
+      <p className="text-xs">✓ Golden file capabilities</p>
+      <p className="text-xs mt-1 italic">Standard for Flutter apps</p>
     </div>
   ),
   robot: (
@@ -512,6 +592,26 @@ export const helpContent: HelpContent = {
       <p className="text-xs">✓ Xcode integration</p>
       <p className="text-xs">✓ Cross-platform support</p>
       <p className="text-xs mt-1 italic">Standard for Swift projects</p>
+    </div>
+  ),
+  mod: (
+    <div>
+      <p className="font-medium mb-1">Go Modules (mod)</p>
+      <p className="text-xs">Official dependency management system for Go.</p>
+      <p className="text-xs mt-1">✓ go.mod and go.sum files</p>
+      <p className="text-xs">✓ Versioned modules</p>
+      <p className="text-xs">✓ Reproducible builds</p>
+      <p className="text-xs mt-1 italic">Standard for Go projects</p>
+    </div>
+  ),
+  pub: (
+    <div>
+      <p className="font-medium mb-1">Pub</p>
+      <p className="text-xs">Package manager for the Dart programming language.</p>
+      <p className="text-xs mt-1">✓ pubspec.yaml configuration</p>
+      <p className="text-xs">✓ Asset management</p>
+      <p className="text-xs">✓ Version constraints</p>
+      <p className="text-xs mt-1 italic">Standard for Dart/Flutter projects</p>
     </div>
   ),
 

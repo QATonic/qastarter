@@ -1,17 +1,12 @@
 [
-  {
-    "username": "user1@example.com",
-    "password": "Pass@123",
-    "expectedResult": "success"
-  },
-  {
-    "username": "user2@example.com",
-    "password": "Pass@456",
-    "expectedResult": "success"
-  },
-  {
-    "username": "invalid@example.com",
-    "password": "wrong",
-    "expectedResult": "failure"
-  }
+{
+"username": "standard_user",
+"password": "secret_sauce",
+"expected": "success"
+},
+{
+"username": "locked_out_user",
+"password": "secret_sauce",
+"expected": "error"
+}
 ]

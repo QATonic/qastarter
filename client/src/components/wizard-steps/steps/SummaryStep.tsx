@@ -92,8 +92,8 @@ export default function SummaryStep() {
               Zero-Config Verified
             </h4>
             <p className="text-xs text-green-700 dark:text-green-400 mt-0.5">
-              This template includes Production-Ready Page Object Model, CI/CD workflows, and
-              externalized data configuration.
+              This template includes Full Source Code, Production-Ready Page Object Model, CI/CD
+              workflows, and externalized data configuration.
             </p>
           </div>
         </div>

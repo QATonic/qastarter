@@ -1,0 +1,28 @@
+package utils
+
+import (
+"encoding/csv"
+"encoding/json"
+"os"
+)
+
+func ReadJSON(path string, target interface{}) error {
+file, err := os.Open(path)
+if err != nil {
+return err
+}
+defer file.Close()
+
+return json.NewDecoder(file).Decode(target)
+}
+
+func ReadCSV(path string) ([][]string, error) {
+file, err := os.Open(path)
+if err != nil {
+return nil, err
+}
+defer file.Close()
+
+reader := csv.NewReader(file)
+return reader.ReadAll()
+}

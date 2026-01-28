@@ -20,6 +20,14 @@ export default function ProjectMetadataStep() {
   const projectNameError = (() => {
     const name = config.projectName.trim();
     if (!name) return null;
+
+    // Dart specific validation (snake_case required, no hyphens)
+    if (config.language === 'dart') {
+      if (!/^[a-z0-9_]+$/.test(name)) {
+        return 'Dart projects require lowercase snake_case (e.g., my_project)';
+      }
+    }
+
     if (!/^[a-zA-Z0-9_-]+$/.test(name))
       return 'Only letters, numbers, hyphens, and underscores allowed';
     if (name.length > 100) return 'Maximum 100 characters';

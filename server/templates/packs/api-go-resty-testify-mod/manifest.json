@@ -1,0 +1,154 @@
+{
+    "id": "api-go-resty-testify-mod",
+    "displayName": "Go Resty Testify Framework",
+    "description": "Production-ready API automation framework with Go, Resty, and Testify",
+    "version": "1.0.0",
+    "supportsDynamic": true,
+    "supportedCombination": {
+        "testingType": "api",
+        "framework": "resty",
+        "language": "go",
+        "testRunner": "testify",
+        "buildTool": "mod"
+    },
+    "dynamicSupport": {
+        "reportingTools": [
+            "allure",
+            "testify-report"
+        ],
+        "cicdTools": [
+            "jenkins",
+            "github-actions",
+            "gitlab-ci",
+            "azure-devops"
+        ],
+        "testingPatterns": [
+            "fluent-assertions"
+        ]
+    },
+    "toolVersions": {
+        "go": "1.21+",
+        "resty": "v2.11.0",
+        "testify": "v1.8.4"
+    },
+    "files": [
+        {
+            "path": "go.mod",
+            "isTemplate": true
+        },
+        {
+            "path": "go.sum",
+            "isTemplate": false
+        },
+        {
+            "path": "README.md",
+            "isTemplate": true
+        },
+        {
+            "path": ".gitignore",
+            "isTemplate": false
+        },
+        {
+            "path": "tests/main_test.go",
+            "isTemplate": true
+        },
+        {
+            "path": "tests/users_test.go",
+            "isTemplate": true
+        },
+        {
+            "path": "client/api_client.go",
+            "isTemplate": true
+        },
+        {
+            "path": "models/user.go",
+            "isTemplate": true
+        },
+        {
+            "path": "utils/config.go",
+            "isTemplate": true
+        },
+        {
+            "path": "utils/logger.go",
+            "isTemplate": true
+        },
+        {
+            "path": ".github/workflows/tests.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "github-actions"
+            }
+        },
+        {
+            "path": "Jenkinsfile",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "jenkins"
+            }
+        },
+        {
+            "path": ".gitlab-ci.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "gitlab-ci"
+            }
+        },
+        {
+            "path": "azure-pipelines.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "azure-devops"
+            }
+        },
+        {
+            "path": "Dockerfile",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.includeDocker": true
+            }
+        },
+        {
+            "path": "docker-compose.yml",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.includeDockerCompose": true
+            }
+        },
+        {
+            "path": "utils/data_reader.go",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.dataProvider": true
+            }
+        },
+        {
+            "path": "testdata/users.json",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.dataProvider": true
+            }
+        },
+        {
+            "path": "testdata/users.csv",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.dataProvider": true
+            }
+        },
+        {
+            "path": "allure.properties",
+            "isTemplate": true,
+            "conditional": {
+                "reportingTool": "allure"
+            }
+        }
+    ],
+    "directories": [
+        "tests",
+        "client",
+        "models",
+        "utils",
+        "logs",
+        "reports"
+    ]
+}

@@ -29,8 +29,8 @@ export const validationMatrix: ValidationMatrix = {
   // Testing Type -> Available Frameworks
   frameworks: {
     web: ['selenium', 'playwright', 'cypress', 'webdriverio', 'robotframework'],
-    mobile: ['appium', 'espresso', 'xcuitest'],
-    api: ['restassured', 'requests', 'supertest', 'restsharp', 'graphql', 'grpc'],
+    mobile: ['appium', 'espresso', 'xcuitest', 'flutter'],
+    api: ['restassured', 'requests', 'supertest', 'restsharp', 'graphql', 'grpc', 'resty'],
     desktop: ['winappdriver', 'pyautogui'],
   },
 
@@ -38,7 +38,7 @@ export const validationMatrix: ValidationMatrix = {
   languages: {
     // Web frameworks
     selenium: ['java', 'python', 'csharp', 'javascript', 'typescript'],
-    playwright: ['javascript', 'typescript', 'python', 'java', 'csharp'],
+    playwright: ['javascript', 'typescript', 'python', 'java', 'csharp', 'go'],
     cypress: ['javascript', 'typescript'],
     webdriverio: ['javascript', 'typescript'],
     robotframework: ['python'], // Robot Framework uses Python
@@ -47,6 +47,7 @@ export const validationMatrix: ValidationMatrix = {
     appium: ['java', 'python', 'csharp', 'javascript', 'typescript'],
     espresso: ['java', 'kotlin'],
     xcuitest: ['swift'],
+    flutter: ['dart'],
 
     // API frameworks
     restassured: ['java'],
@@ -55,6 +56,7 @@ export const validationMatrix: ValidationMatrix = {
     restsharp: ['csharp'],
     graphql: ['typescript'],
     grpc: ['typescript'],
+    resty: ['go'],
 
     // Desktop frameworks
     winappdriver: ['csharp', 'java', 'python'],
@@ -70,6 +72,8 @@ export const validationMatrix: ValidationMatrix = {
     typescript: ['jest', 'mocha', 'cypress'],
     csharp: ['nunit'],
     swift: ['xctest'],
+    go: ['testify'],
+    dart: ['flutter-test'],
   },
 
   // Language -> Available Build Tools (general mapping)
@@ -81,6 +85,8 @@ export const validationMatrix: ValidationMatrix = {
     typescript: ['npm'],
     csharp: ['nuget', 'dotnet-cli'],
     swift: ['spm'],
+    go: ['mod'],
+    dart: ['pub'],
   },
 
   // Framework + Language -> Test Runner (precise mapping based on actual templates)
@@ -98,6 +104,7 @@ export const validationMatrix: ValidationMatrix = {
     'playwright-python': ['pytest'],
     'playwright-csharp': ['nunit'],
     'playwright-javascript': ['jest'],
+    'playwright-go': ['testify'],
     'playwright-typescript': ['jest'],
 
     // Web - Cypress (uses its own test runner)
@@ -125,11 +132,17 @@ export const validationMatrix: ValidationMatrix = {
     // Mobile - XCUITest
     'xcuitest-swift': ['xctest'],
 
+    // Mobile - Flutter
+    'flutter-dart': ['flutter-test'],
+
     // API - RestAssured
     'restassured-java': ['testng'],
 
     // API - Requests
     'requests-python': ['pytest'],
+
+    // API - Resty
+    'resty-go': ['testify'],
 
     // API - Supertest
     'supertest-javascript': ['jest'],
@@ -221,6 +234,15 @@ export const validationMatrix: ValidationMatrix = {
 
     // Desktop - PyAutoGUI
     'pyautogui-python': ['pip'],
+
+    // API - Resty
+    'resty-go': ['mod'],
+
+    // Web - Playwright Go
+    'playwright-go': ['mod'],
+
+    // Mobile - Flutter
+    'flutter-dart': ['pub'],
   },
 
   // Framework + Language -> Reporting Tool (precise mapping based on actual templates)
@@ -291,6 +313,15 @@ export const validationMatrix: ValidationMatrix = {
 
     // Desktop - PyAutoGUI
     'pyautogui-python': ['allure', 'pytest-html'],
+
+    // API - Resty
+    'resty-go': ['allure'],
+
+    // Web - Playwright Go
+    'playwright-go': ['allure'],
+
+    // Mobile - Flutter
+    'flutter-dart': [],
   },
 
   // Framework -> Available CI/CD Tools (standardized across all templates)
@@ -456,6 +487,15 @@ export const validationMatrix: ValidationMatrix = {
 
     // Desktop - PyAutoGUI (Functional patterns + BDD)
     'pyautogui-python': ['functional-patterns', 'bdd'],
+
+    // API - Resty
+    'resty-go': ['fluent-assertions'],
+
+    // Web - Playwright Go
+    'playwright-go': ['page-object-model'],
+
+    // Mobile - Flutter
+    'flutter-dart': ['integration-test'],
   },
 };
 
@@ -766,6 +806,7 @@ export const validationLabels = {
     appium: 'Appium',
     espresso: 'Espresso',
     xcuitest: 'XCUITest',
+    flutter: 'Flutter',
 
     // API
     restassured: 'REST Assured',
@@ -774,6 +815,7 @@ export const validationLabels = {
     restsharp: 'RestSharp',
     graphql: 'GraphQL Testing',
     grpc: 'gRPC Testing',
+    resty: 'Resty',
 
     // Desktop
     winappdriver: 'WinAppDriver',
@@ -788,6 +830,8 @@ export const validationLabels = {
     typescript: 'TypeScript',
     csharp: 'C#',
     swift: 'Swift',
+    go: 'Go (Golang)',
+    dart: 'Dart',
   },
 
   testRunners: {
@@ -800,6 +844,8 @@ export const validationLabels = {
     xctest: 'XCTest',
     cypress: 'Cypress',
     robot: 'Robot Framework',
+    'flutter-test': 'Flutter Test',
+    testify: 'Testify',
   },
 
   buildTools: {
@@ -810,6 +856,8 @@ export const validationLabels = {
     nuget: 'NuGet',
     'dotnet-cli': '.NET CLI',
     spm: 'Swift Package Manager',
+    pub: 'Dart Pub',
+    mod: 'Go Mod',
   },
 
   cicdTools: {
@@ -850,6 +898,8 @@ export const validationLabels = {
     'contract-testing': 'Contract Testing (Pact)',
     'schema-validation': 'Schema Validation',
     'functional-patterns': 'Functional Patterns',
+    'fluent-assertions': 'Fluent Assertions',
+    'integration-test': 'Integration Tests',
     hybrid: 'Hybrid Pattern',
   },
 };

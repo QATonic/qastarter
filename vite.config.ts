@@ -27,6 +27,9 @@ export default defineConfig({
     },
   },
   root: path.resolve(__dirname, "client"),
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,

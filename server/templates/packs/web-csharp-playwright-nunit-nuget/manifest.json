@@ -76,7 +76,8 @@
     },
     {
       "path": ".gitignore",
-      "isTemplate": false
+      "template": ".gitignore.hbs",
+      "isTemplate": true
     },
     {
       "path": ".gitlab-ci.yml",

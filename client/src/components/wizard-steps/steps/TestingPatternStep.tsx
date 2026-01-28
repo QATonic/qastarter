@@ -21,6 +21,8 @@ const patternIcons: Record<string, React.ElementType> = {
   fluent: Layers,
   'functional-patterns': Layers,
   'contract-testing': FileJson2,
+  'fluent-assertions': Layers,
+  'integration-test': Layers,
 };
 
 export default function TestingPatternStep() {
@@ -65,7 +67,7 @@ export default function TestingPatternStep() {
             const isSelected = config.testingPattern === pattern;
             const label =
               validationLabels.testingPatterns[
-                pattern as keyof typeof validationLabels.testingPatterns
+              pattern as keyof typeof validationLabels.testingPatterns
               ] || pattern;
 
             return (
@@ -73,10 +75,9 @@ export default function TestingPatternStep() {
                 key={pattern}
                 className={`
                   flex items-center gap-4 p-4 rounded-lg border cursor-pointer transition-all
-                  ${
-                    isSelected
-                      ? 'bg-primary/5 border-primary/30 shadow-sm'
-                      : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
+                  ${isSelected
+                    ? 'bg-primary/5 border-primary/30 shadow-sm'
+                    : 'bg-card hover:bg-muted/30 hover:border-muted-foreground/20'
                   }
                   ${!config.framework ? 'opacity-50 pointer-events-none' : ''}
                 `}

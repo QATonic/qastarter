@@ -1,0 +1,46 @@
+package tests
+
+import (
+"testing"
+"{{projectName}}/pages"
+"{{projectName}}/utils"
+
+"github.com/stretchr/testify/assert"
+"github.com/stretchr/testify/suite"
+)
+
+type LoginTestSuite struct {
+suite.Suite
+Driver *utils.Driver
+}
+
+func (suite *LoginTestSuite) SetupSuite() {
+suite.Driver = utils.InitDriver()
+}
+
+func (suite *LoginTestSuite) TearDownSuite() {
+suite.Driver.Close()
+}
+
+func (suite *LoginTestSuite) SetupTest() {
+suite.Driver.Page.Goto(utils.BaseURL)
+}
+
+func (suite *LoginTestSuite) TestValidLogin() {
+loginPage := pages.NewLoginPage(suite.Driver.Page)
+loginPage.Login("standard_user", "secret_sauce")
+
+// Assert URL contains inventory.html
+assert.Contains(suite.T(), suite.Driver.Page.URL(), "inventory.html")
+}
+
+func (suite *LoginTestSuite) TestInvalidLogin() {
+loginPage := pages.NewLoginPage(suite.Driver.Page)
+loginPage.Login("locked_out_user", "secret_sauce")
+
+assert.Contains(suite.T(), loginPage.GetErrorMessage(), "Epic sadface")
+}
+
+func TestLoginSuite(t *testing.T) {
+suite.Run(t, new(LoginTestSuite))
+}

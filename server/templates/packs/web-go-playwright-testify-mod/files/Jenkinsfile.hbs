@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    tools {
+        go 'go-1.21'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Dependencies') {
+            steps {
+                sh 'go mod download'
+                sh 'go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'go test ./tests/... -v'
+            }
+        }
+    }
+
+    post {
+        always {
+            junit 'report.xml'
+        }
+    }
+}

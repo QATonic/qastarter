@@ -74,9 +74,9 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
             </h1>
 
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed text-balance">
-              Create production-ready test automation frameworks instantly. Selenium, Playwright,
-              Cypress, Robot Framework, Appium, RestAssured with Page Object Model, BDD, Contract
-              Testing, and complete CI/CD integration.
+              Get fully implemented, production-ready test automation frameworks instantly. Includes
+              source code for Selenium, Playwright, Cypress, Robot, Appium, Flutter, RestAssured,
+              Resty with POM, BDD, and valid CI/CD pipelines.
             </p>
 
             {/* Trust badges - simplified */}
@@ -121,17 +121,17 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
             {/* Quick Stats - cleaner design */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
               <div className="text-center p-6 rounded-xl bg-card border border-border/50 shadow-sm">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">16</div>
+                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">18</div>
                 <div className="text-sm font-medium text-foreground">Frameworks</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Selenium, Playwright, Robot Framework
+                  Selenium, Playwright, Robot, Flutter
                 </div>
               </div>
               <div className="text-center p-6 rounded-xl bg-card border border-border/50 shadow-sm">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">6</div>
+                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">8</div>
                 <div className="text-sm font-medium text-foreground">Languages</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  Java, Python, Kotlin, TypeScript
+                  Java, Python, TS, Go, Dart
                 </div>
               </div>
               <div className="text-center p-6 rounded-xl bg-card border border-border/50 shadow-sm">
@@ -153,7 +153,8 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                 </div>
                 <h3 className="text-lg font-semibold mb-2 text-foreground">Lightning Fast</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Generate complete project structures in seconds. No more hours of manual setup.
+                  Get fully functional projects with source code in seconds. Skip the setup and start
+                  coding tests immediately.
                 </p>
               </CardContent>
             </Card>
@@ -165,7 +166,8 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                 </div>
                 <h3 className="text-lg font-semibold mb-2 text-foreground">Production Ready</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Best practices built-in with secure dependencies and proper configurations.
+                  Includes Page Objects, Helper Utilities, and working sample tests. Best practices
+                  built-in.
                 </p>
               </CardContent>
             </Card>
@@ -190,7 +192,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
             </p>
 
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground text-balance">
-              43+ Production-Ready Templates
+              46+ Production-Ready Templates
             </h2>
 
             <p className="text-base md:text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
@@ -209,7 +211,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['Selenium', 'Playwright', 'Cypress', 'Robot Framework', 'Appium'].map(
+                  {['Selenium', 'Playwright', 'Cypress', 'Appium', 'Flutter', 'Resty'].map(
                     (tech) => (
                       <div
                         key={tech}
@@ -234,7 +236,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['Java', 'Python', 'Kotlin', 'JavaScript', 'TypeScript', 'C#'].map((tech) => (
+                  {['Java', 'Python', 'Kotlin', 'TypeScript', 'Go', 'Dart'].map((tech) => (
                     <div
                       key={tech}
                       className="group flex items-center space-x-3 p-3 rounded-lg bg-green-500/5 dark:bg-green-500/10 border border-green-500/10 hover:border-green-500/20 transition-all duration-300 hover-elevate"
@@ -257,7 +259,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['TestNG', 'JUnit', 'Pytest', 'Jest', 'Mocha'].map((tech) => (
+                  {['TestNG', 'JUnit', 'Pytest', 'Jest', 'Testify', 'Flutter Test'].map((tech) => (
                     <div
                       key={tech}
                       className="group flex items-center space-x-3 p-3 rounded-lg bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/10 hover:border-purple-500/20 transition-all duration-300 hover-elevate"
@@ -280,7 +282,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['Maven', 'Gradle', 'npm', 'GitHub Actions', 'Jenkins'].map((tech) => (
+                  {['Maven', 'Gradle', 'npm', 'Go Mod', 'Pub', 'GitHub Actions'].map((tech) => (
                     <div
                       key={tech}
                       className="group flex items-center space-x-3 p-3 rounded-lg bg-orange-500/5 dark:bg-orange-500/10 border border-orange-500/10 hover:border-orange-500/20 transition-all duration-300 hover-elevate"
@@ -331,7 +333,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                     <Smartphone className="h-12 w-12 text-green-600 mb-4 mx-auto" />
                     <h3 className="text-lg font-bold mb-2">Mobile Testing</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Appium for Android & iOS, Espresso, XCUITest frameworks with device cloud
+                      Appium, Flutter, Espresso, XCUITest frameworks with device cloud
                       integration
                     </p>
                     <div className="text-xs text-muted-foreground space-y-1">
@@ -347,8 +349,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                     <Server className="h-12 w-12 text-purple-600 mb-4 mx-auto" />
                     <h3 className="text-lg font-bold mb-2">API Testing</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      RestAssured, Supertest, GraphQL, gRPC with Contract Testing and Schema
-                      Validation
+                      RestAssured, Resty (Go), Supertest, GraphQL, gRPC with Contract Testing
                     </p>
                     <div className="text-xs text-muted-foreground space-y-1">
                       <div>✓ Contract Testing (Pact)</div>
@@ -395,7 +396,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
                       A free QA automation framework generator supporting Selenium, Playwright,
-                      Cypress, Robot Framework, Appium across Java, Python, Kotlin, JavaScript,
+                      Cypress, Robot Framework, Appium, Flutter across Java, Python, Go, Dart,
                       TypeScript, and C#. No signup required.
                     </AccordionContent>
                   </AccordionItem>
@@ -405,8 +406,8 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                       <span className="text-sm font-medium">Which frameworks are supported?</span>
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
-                      43+ templates: Web (Selenium, Playwright, Cypress, Robot Framework), Mobile
-                      (Appium, Espresso with Kotlin), API (RestAssured, Supertest, GraphQL, gRPC),
+                      46+ templates: Web (Selenium, Playwright, Cypress), Mobile
+                      (Appium, Espresso, Flutter), API (RestAssured, Resty, Supertest),
                       and Desktop (WinAppDriver) with POM, BDD, and Docker support.
                     </AccordionContent>
                   </AccordionItem>
@@ -428,9 +429,9 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
-                      Page Object Model setup, sample tests, test runner config, build tools, CI/CD
-                      pipelines (GitHub Actions, Jenkins), and reporting integration (Allure,
-                      ExtentReports).
+                      Complete source code with Page Object Model implementation, working sample
+                      tests, configured runners, reusable utilities, CI/CD pipelines, and reporting
+                      integration.
                     </AccordionContent>
                   </AccordionItem>
 

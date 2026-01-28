@@ -1,0 +1,36 @@
+package utils
+
+import (
+"os"
+"path/filepath"
+"time"
+
+"github.com/sirupsen/logrus"
+)
+
+var Log *logrus.Logger
+
+func InitLogger() {
+Log = logrus.New()
+
+// Create logs directory
+logDir := "logs"
+if _, err := os.Stat(logDir); os.IsNotExist(err) {
+os.Mkdir(logDir, 0755)
+}
+
+// Log to file
+timestamp := time.Now().Format("2006-01-02_15-04-05")
+logPath := filepath.Join(logDir, "test_run_"+timestamp+".log")
+file, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+if err == nil {
+Log.Out = file
+} else {
+Log.Info("Failed to log to file, using default stderr")
+}
+
+Log.SetFormatter(&logrus.TextFormatter{
+FullTimestamp: true,
+})
+Log.SetLevel(logrus.InfoLevel)
+}

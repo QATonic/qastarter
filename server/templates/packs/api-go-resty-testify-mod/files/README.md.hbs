@@ -1,0 +1,39 @@
+# {{projectName}}
+
+REST API Automation Framework using Go, Resty, and Testify.
+
+## 🚀 Features
+- **Language**: Go (Golang)
+- **HTTP Client**: [Resty](https://github.com/go-resty/resty)
+- **Assertions**: [Testify](https://github.com/stretchr/testify)
+- **Reporting**: Console / Allure (Optional)
+- **CI/CD**: GitHub Actions (Optional)
+
+## 📂 Project Structure
+```
+├── client/ # API Client Wrapper
+├── models/ # Go Structs for JSON Mapping
+├── tests/ # Test Files
+├── utils/ # Logger and Config
+├── go.mod # Dependencies
+└── README.md # Documentation
+```
+
+## 🛠️ Setup
+1. Install [Go](https://go.dev/dl/) (v1.21+)
+2. Clone the repository
+3. Install dependencies:
+```bash
+go mod download
+```
+
+## 🏃‍♂️ Running Tests
+Run all tests:
+```bash
+go test ./tests/... -v
+```
+
+Run specific test:
+```bash
+go test ./tests/... -run TestGetUser -v
+```

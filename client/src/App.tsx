@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 // Lazy load pages for code splitting
 const Home = lazy(() => import('@/pages/Home'));
+const Docs = lazy(() => import('@/pages/Docs'));
 const ApiDocs = lazy(() => import('@/pages/ApiDocs'));
 const NotFound = lazy(() => import('@/pages/not-found'));
 
@@ -46,6 +47,7 @@ function Router() {
     <Suspense fallback={<PageLoader />}>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/docs" component={Docs} />
         <Route path="/api-docs" component={ApiDocs} />
         <Route component={NotFound} />
       </Switch>

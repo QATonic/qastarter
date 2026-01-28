@@ -1,0 +1,31 @@
+FROM golang:1.21-focal
+
+# Install Playwright dependencies
+RUN apt-get update && apt-get install -y \
+    nodejs \
+    npm \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Install Playwright browsers
+RUN go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
+
+COPY . .
+
+CMD ["go", "test", "./tests/...", "-v"]

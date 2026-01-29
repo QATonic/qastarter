@@ -11,9 +11,10 @@ import {
 
 interface SponsorModalProps {
   triggerClassName?: string;
+  mobileView?: boolean;
 }
 
-export default function SponsorModal({ triggerClassName }: SponsorModalProps) {
+export default function SponsorModal({ triggerClassName, mobileView = false }: SponsorModalProps) {
   const [copied, setCopied] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -29,16 +30,27 @@ export default function SponsorModal({ triggerClassName }: SponsorModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className={`gap-1.5 bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 dark:from-primary dark:to-purple-600 text-white dark:text-white border-primary dark:border-primary font-medium whitespace-nowrap ${triggerClassName}`}
-          data-testid="button-sponsor"
-          aria-label="Sponsor Project"
-        >
-          <Heart className="h-4 w-4 fill-white" />
-          <span className="hidden lg:inline">Support</span>
-        </Button>
+        {mobileView ? (
+          <Button
+            variant="ghost"
+            className={`justify-start gap-3 h-12 text-lg font-medium w-full ${triggerClassName}`}
+            data-testid="button-sponsor-mobile"
+          >
+            <Heart className="h-5 w-5" />
+            Support Project
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className={`gap-1.5 bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 dark:from-primary dark:to-purple-600 text-white dark:text-white border-primary dark:border-primary font-medium whitespace-nowrap ${triggerClassName}`}
+            data-testid="button-sponsor"
+            aria-label="Sponsor Project"
+          >
+            <Heart className="h-4 w-4 fill-white" />
+            <span className="hidden lg:inline">Support</span>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden">

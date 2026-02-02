@@ -74,6 +74,22 @@
       }
     },
     {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      },
+      "description": "Docker configuration"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      },
+      "description": "Docker Compose configuration"
+    },
+    {
       "path": "{{projectName}}UITests/BaseScreen.swift",
       "isTemplate": true,
       "description": "Base Screen Object class"

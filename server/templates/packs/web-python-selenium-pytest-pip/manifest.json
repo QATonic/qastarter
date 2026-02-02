@@ -99,11 +99,17 @@
     },
     {
       "path": "Dockerfile",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
     },
     {
       "path": "docker-compose.yml",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     },
     {
       "path": "config/__init__.py",

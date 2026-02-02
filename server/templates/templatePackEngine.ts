@@ -14,6 +14,7 @@ import {
 } from '../services/cacheService';
 import { loadSharedVersions, mergeVersions } from './shared/versionLoader';
 import { logger } from '../utils/logger';
+import { isSampleTestFile as checkSampleTestFile } from './sampleTestPatterns';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,36 +23,41 @@ export type { TemplateFile } from './types';
 
 export class TemplatePackEngine {
   private packsDirectory: string;
+  private hb: typeof handlebars;
 
   constructor(packsDirectory: string = path.join(__dirname, 'packs')) {
     this.packsDirectory = packsDirectory;
+    // Use isolated Handlebars instance for security (Defense in Depth)
+    this.hb = handlebars.create();
+    // Disable dynamic partials as they are not used and pose a security risk
+    this.hb.registerPartial = () => { };
     this.registerHelpers();
   }
 
   private registerHelpers() {
     // Existing helpers
-    handlebars.registerHelper('eq', (a: any, b: any) => a === b);
-    handlebars.registerHelper('or', (...args: any[]) => {
+    this.hb.registerHelper('eq', (a: any, b: any) => a === b);
+    this.hb.registerHelper('or', (...args: any[]) => {
       const opts = args.pop();
       return args.some(Boolean);
     });
-    handlebars.registerHelper(
+    this.hb.registerHelper(
       'includes',
       (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val)
     );
 
     // New helpers for sophisticated templates
-    handlebars.registerHelper('lowerCase', (str: string) => (str ? str.toLowerCase() : ''));
-    handlebars.registerHelper('upperCase', (str: string) => (str ? str.toUpperCase() : ''));
-    handlebars.registerHelper('pascalCase', (str: string) => {
+    this.hb.registerHelper('lowerCase', (str: string) => (str ? str.toLowerCase() : ''));
+    this.hb.registerHelper('upperCase', (str: string) => (str ? str.toUpperCase() : ''));
+    this.hb.registerHelper('pascalCase', (str: string) => {
       if (!str) return '';
       return str.replace(/(?:^|[-_])([a-z])/g, (_, char) => char.toUpperCase());
     });
-    handlebars.registerHelper('packageToPath', (packageName: string) => {
+    this.hb.registerHelper('packageToPath', (packageName: string) => {
       if (!packageName) return '';
       return packageName.replace(/\./g, '/');
     });
-    handlebars.registerHelper('escapeXml', (str: string) => {
+    this.hb.registerHelper('escapeXml', (str: string) => {
       if (!str) return '';
       return str.replace(/[<>&'"]/g, (char) => {
         const entities: Record<string, string> = {
@@ -64,11 +70,11 @@ export class TemplatePackEngine {
         return entities[char] || char;
       });
     });
-    handlebars.registerHelper('json', (obj: any) => JSON.stringify(obj, null, 2));
-    handlebars.registerHelper('join', (arr: string[], separator: string = ', ') =>
+    this.hb.registerHelper('json', (obj: any) => JSON.stringify(obj, null, 2));
+    this.hb.registerHelper('join', (arr: string[], separator: string = ', ') =>
       Array.isArray(arr) ? arr.join(separator) : ''
     );
-    handlebars.registerHelper('ternary', (condition: any, trueVal: any, falseVal: any) =>
+    this.hb.registerHelper('ternary', (condition: any, trueVal: any, falseVal: any) =>
       condition ? trueVal : falseVal
     );
   }
@@ -244,7 +250,7 @@ export class TemplatePackEngine {
       }
 
       // Now Handlebars can compile without seeing raw blocks
-      const template = handlebars.compile(processedContent);
+      const template = this.hb.compile(processedContent);
       let result = template(context);
 
       // Restore raw blocks AFTER Handlebars rendering (if any were extracted)
@@ -278,7 +284,7 @@ export class TemplatePackEngine {
    */
   private processTemplatePath(filePath: string, context: TemplateContext): string {
     try {
-      const template = handlebars.compile(filePath);
+      const template = this.hb.compile(filePath);
       return template(context);
     } catch (error) {
       throw new Error(`Template path processing failed for ${filePath}: ${error}`);
@@ -287,94 +293,10 @@ export class TemplatePackEngine {
 
   /**
    * Check if a file is a sample/example test file
+   * Uses centralized patterns from sampleTestPatterns.ts
    */
   private isSampleTestFile(filePath: string): boolean {
-    const lowerPath = filePath.toLowerCase();
-    const fileName = filePath.split('/').pop()?.toLowerCase() || '';
-
-    // Exclude essential test infrastructure files (NOT sample tests)
-    const isInfrastructure =
-      fileName === 'conftest.py.hbs' ||
-      fileName === 'setup.js.hbs' ||
-      fileName === 'setup.ts.hbs' ||
-      fileName === 'basetest.cs.hbs' ||
-      fileName === 'hooks.java.hbs' ||
-      fileName === 'hooks.cs.hbs' ||
-      fileName === 'basescreen.swift.hbs' ||
-      fileName === 'testdata.swift.hbs' ||
-      fileName.startsWith('base') ||
-      fileName.includes('testdata.');
-
-    if (isInfrastructure) {
-      return false;
-    }
-
-    // Check if file is in a test directory
-    const isInTestDirectory =
-      lowerPath.includes('/tests/') ||
-      lowerPath.includes('/test/') ||
-      lowerPath.includes('/src/test/') ||
-      lowerPath.includes('/androidtest/') || // Android Espresso
-      lowerPath.includes('/uitests/') || // Swift XCUITest
-      lowerPath.includes('/features/') || // BDD feature files
-      lowerPath.includes('/step_defs/') || // Python BDD steps
-      lowerPath.includes('/step-definitions/') || // TypeScript BDD steps
-      lowerPath.includes('/stepdefinitions/') || // Java BDD steps
-      lowerPath.includes('/steps/') || // Generic BDD steps
-      lowerPath.includes('/bdd/') || // BDD directory
-      lowerPath.includes('/cypress/e2e/') || // Cypress E2E tests
-      lowerPath.includes('/cypress/integration/') || // Cypress integration (old)
-      lowerPath.match(/\/tests\//i) ||
-      lowerPath.match(/\/test\//i) ||
-      lowerPath.match(/\/androidtest\//i) ||
-      lowerPath.match(/\/uitests\//i) ||
-      lowerPath.match(/\/features\//i) ||
-      lowerPath.match(/\/step_defs\//i) ||
-      lowerPath.match(/\/step-definitions\//i) ||
-      lowerPath.match(/\/stepdefinitions\//i) ||
-      lowerPath.match(/\/steps\//i) ||
-      lowerPath.match(/\/bdd\//i) ||
-      lowerPath.match(/\/cypress\/e2e\//i) ||
-      lowerPath.match(/\/cypress\/integration\//i);
-
-    if (!isInTestDirectory) {
-      return false;
-    }
-
-    // Check if it's a test file by extension and naming patterns
-    const isTestFile =
-      // Java test patterns
-      fileName.endsWith('tests.java.hbs') ||
-      fileName.endsWith('test.java.hbs') ||
-      fileName.endsWith('steps.java.hbs') ||
-      fileName.includes('testrunner.java.hbs') ||
-      fileName.includes('suite.java.hbs') ||
-      // Python test patterns
-      fileName.startsWith('test_') ||
-      fileName.endsWith('_test.py.hbs') ||
-      // JavaScript/TypeScript test patterns
-      fileName.endsWith('.test.js.hbs') ||
-      fileName.endsWith('.test.ts.hbs') ||
-      fileName.endsWith('.spec.js.hbs') ||
-      fileName.endsWith('.spec.ts.hbs') ||
-      fileName.endsWith('.steps.js.hbs') || // BDD step definitions
-      fileName.endsWith('.steps.ts.hbs') || // BDD step definitions
-      fileName.endsWith('_steps.js.hbs') || // Alternative BDD naming
-      fileName.endsWith('_steps.ts.hbs') || // Alternative BDD naming
-      fileName.endsWith('.cy.js.hbs') || // Cypress tests
-      fileName.endsWith('.cy.ts.hbs') || // Cypress tests
-      // C# test patterns
-      fileName.endsWith('tests.cs.hbs') ||
-      fileName.endsWith('test.cs.hbs') ||
-      // Swift test patterns
-      fileName.endsWith('test.swift.hbs') ||
-      fileName.endsWith('uitest.swift.hbs') ||
-      fileName.endsWith('tests.swift.hbs') ||
-      // BDD feature files (Gherkin)
-      fileName.endsWith('.feature.hbs') ||
-      fileName.endsWith('.story.hbs');
-
-    return isTestFile;
+    return checkSampleTestFile(filePath);
   }
 
   /**

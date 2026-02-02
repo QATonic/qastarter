@@ -1,0 +1,169 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Skip to main content" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - button "QAStarter - Go to home page" [ref=e8] [cursor=pointer]:
+          - img "QAStarter Logo" [ref=e10]
+          - generic [ref=e11]: QAStarter
+        - navigation "Main navigation" [ref=e12]:
+          - button "Docs" [ref=e13] [cursor=pointer]:
+            - img
+            - generic [ref=e14]: Docs
+          - button "Star" [ref=e15] [cursor=pointer]:
+            - img
+            - generic [ref=e16]: Star
+          - button "Trends" [ref=e17] [cursor=pointer]:
+            - img
+            - generic [ref=e18]: Trends
+          - button "Sponsor Project" [ref=e19] [cursor=pointer]:
+            - img
+            - generic [ref=e20]: Support
+          - button "About" [ref=e21] [cursor=pointer]:
+            - img
+            - generic [ref=e22]: About
+          - button "Switch to dark mode" [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]:
+              - img
+              - img
+            - generic [ref=e25]: Switch to dark mode
+    - main [ref=e26]:
+      - generic [ref=e27]:
+        - navigation "Progress indicator" [ref=e28]:
+          - generic [ref=e29]:
+            - heading "Step 2 of 12" [level=2] [ref=e30]
+            - generic "17 percent complete" [ref=e31]: 17% Complete
+          - progressbar [ref=e32]:
+            - list "Wizard steps" [ref=e34]:
+              - listitem [ref=e35]:
+                - 'button "Testing Type: completed, click to navigate" [ref=e36] [cursor=pointer]':
+                  - img [ref=e37]
+                - generic [ref=e40]: Testing Type
+              - listitem [ref=e41]:
+                - 'button "Framework: current, click to navigate" [ref=e42] [cursor=pointer]':
+                  - generic [ref=e43]: "2"
+                - generic [ref=e44]: Framework
+              - listitem [ref=e45]:
+                - 'button "Language: upcoming" [disabled] [ref=e46]':
+                  - generic [ref=e47]: "3"
+                - generic [ref=e48]: Language
+              - listitem [ref=e49]:
+                - 'button "Testing Pattern: upcoming" [disabled] [ref=e50]':
+                  - generic [ref=e51]: "4"
+                - generic [ref=e52]: Testing Pattern
+              - listitem [ref=e53]:
+                - 'button "Test Runner: upcoming" [disabled] [ref=e54]':
+                  - generic [ref=e55]: "5"
+                - generic [ref=e56]: Test Runner
+              - listitem [ref=e57]:
+                - 'button "Build Tool: upcoming" [disabled] [ref=e58]':
+                  - generic [ref=e59]: "6"
+                - generic [ref=e60]: Build Tool
+              - listitem [ref=e61]:
+                - 'button "Project Metadata: upcoming" [disabled] [ref=e62]':
+                  - generic [ref=e63]: "7"
+                - generic [ref=e64]: Project Metadata
+              - listitem [ref=e65]:
+                - 'button "CI/CD: upcoming" [disabled] [ref=e66]':
+                  - generic [ref=e67]: "8"
+                - generic [ref=e68]: CI/CD
+              - listitem [ref=e69]:
+                - 'button "Reporting: upcoming" [disabled] [ref=e70]':
+                  - generic [ref=e71]: "9"
+                - generic [ref=e72]: Reporting
+              - listitem [ref=e73]:
+                - 'button "Utilities: upcoming" [disabled] [ref=e74]':
+                  - generic [ref=e75]: "10"
+                - generic [ref=e76]: Utilities
+              - listitem [ref=e77]:
+                - 'button "Dependencies: upcoming" [disabled] [ref=e78]':
+                  - generic [ref=e79]: "11"
+                - generic [ref=e80]: Dependencies
+              - listitem [ref=e81]:
+                - 'button "Summary: upcoming" [disabled] [ref=e82]':
+                  - generic [ref=e83]: "12"
+                - generic [ref=e84]: Summary
+          - generic [ref=e88]: "Currently on step 2 of 12: Framework"
+        - region "Testing Framework , Step 1 of 12" [active] [ref=e91]:
+          - generic [ref=e92]:
+            - generic [ref=e93]:
+              - text: Testing Framework
+              - generic [ref=e94]: ", Step 1 of 12"
+            - paragraph [ref=e95]: Choose the testing framework for your project
+          - generic [ref=e96]:
+            - form "Testing Framework configuration" [ref=e97]:
+              - radiogroup [ref=e99]:
+                - generic [ref=e100] [cursor=pointer]:
+                  - img [ref=e102]
+                  - generic [ref=e106]:
+                    - radio "Selenium WebDriver" [ref=e107]
+                    - generic [ref=e108]: Selenium WebDriver
+                    - button "Show help information" [ref=e109]:
+                      - img [ref=e110]
+                - generic [ref=e113] [cursor=pointer]:
+                  - img [ref=e115]
+                  - generic [ref=e120]:
+                    - radio "Playwright" [ref=e121]
+                    - generic [ref=e122]: Playwright
+                    - button "Show help information" [ref=e123]:
+                      - img [ref=e124]
+                - generic [ref=e127] [cursor=pointer]:
+                  - img [ref=e129]
+                  - generic [ref=e134]:
+                    - radio "Cypress" [ref=e135]
+                    - generic [ref=e136]: Cypress
+                    - button "Show help information" [ref=e137]:
+                      - img [ref=e138]
+                - generic [ref=e141] [cursor=pointer]:
+                  - img [ref=e143]
+                  - generic [ref=e147]:
+                    - radio "WebdriverIO" [ref=e148]
+                    - generic [ref=e149]: WebdriverIO
+                    - button "Show help information" [ref=e150]:
+                      - img [ref=e151]
+                - generic [ref=e154] [cursor=pointer]:
+                  - img [ref=e156]
+                  - generic [ref=e161]:
+                    - radio "Robot Framework" [ref=e162]
+                    - generic [ref=e163]: Robot Framework
+                    - button "Show help information" [ref=e164]:
+                      - img [ref=e165]
+            - navigation "Wizard navigation" [ref=e168]:
+              - button "Go to previous step (Alt+P)" [ref=e169] [cursor=pointer]:
+                - img
+                - text: Previous
+              - button "Go to next step (Alt+N)" [ref=e171] [cursor=pointer]:
+                - text: Next
+                - img
+    - contentinfo [ref=e172]:
+      - generic [ref=e173]:
+        - generic [ref=e174]:
+          - generic [ref=e175]:
+            - generic [ref=e176]:
+              - img "QAStarter Logo" [ref=e177]
+              - generic [ref=e178]: QAStarter
+            - generic [ref=e179]:
+              - generic [ref=e180]: Made with
+              - img [ref=e181]
+              - generic [ref=e183]: by QATonic Innovations
+          - generic [ref=e184]:
+            - button "Visit LinkedIn" [ref=e185] [cursor=pointer]:
+              - img
+              - generic [ref=e186]: LinkedIn
+            - button "Visit Twitter/X" [ref=e187] [cursor=pointer]:
+              - img
+              - generic [ref=e188]: Twitter/X
+            - button "Visit YouTube" [ref=e189] [cursor=pointer]:
+              - img
+              - generic [ref=e190]: YouTube
+            - button "Visit Instagram" [ref=e191] [cursor=pointer]:
+              - img
+              - generic [ref=e192]: Instagram
+        - paragraph [ref=e194]: © 2026 QAStarter by QATonic Innovations. All rights reserved.
+```

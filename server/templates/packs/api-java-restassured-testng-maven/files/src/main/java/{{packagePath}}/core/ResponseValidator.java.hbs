@@ -3,37 +3,62 @@ package {{javaPackage}}.core;
 import io.restassured.response.Response;
 import {{javaPackage}}.utils.Log;
 import static org.testng.Assert.*;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
 /**
- * Response Validator - Common assertions for API responses.
- */
+* Response Validator - Common assertions for API responses.
+*
+* Includes JSON Schema validation and response time assertions.
+*/
 public class ResponseValidator {
 
-    public static void assertStatus(Response response, int expectedStatus) {
-        int actual = response.getStatusCode();
-        Log.info("Expected: " + expectedStatus + ", Actual: " + actual);
-        assertEquals(actual, expectedStatus, "Status code mismatch");
-    }
+public static void assertStatus(Response response, int expectedStatus) {
+int actual = response.getStatusCode();
+Log.info("Expected: " + expectedStatus + ", Actual: " + actual);
+assertEquals(actual, expectedStatus, "Status code mismatch");
+}
 
-    public static void assertBodyContains(Response response, String key) {
-        String body = response.getBody().asString();
-        assertTrue(body.contains(key), "Response should contain: " + key);
-    }
+public static void assertBodyContains(Response response, String key) {
+String body = response.getBody().asString();
+assertTrue(body.contains(key), "Response should contain: " + key);
+}
 
-    public static void assertBodyNotEmpty(Response response) {
-        String body = response.getBody().asString();
-        assertFalse(body.isEmpty(), "Response body should not be empty");
-    }
+public static void assertBodyNotEmpty(Response response) {
+String body = response.getBody().asString();
+assertFalse(body.isEmpty(), "Response body should not be empty");
+}
 
+/**
+* Validates response against a JSON Schema file in classpath.
+*
+* @param response The API response to validate
+* @param schemaPath Path to schema file in classpath (e.g., "schemas/user-schema.json")
+*/
+public static void assertMatchesSchema(Response response, String schemaPath) {
+Log.info("Validating response against schema: " + schemaPath);
+response.then().assertThat().body(matchesJsonSchemaInClasspath(schemaPath));
+Log.info("Schema validation passed");
+}
+
+/**
+* Asserts that response time is within acceptable threshold.
+*
+* @param response The API response
+* @param maxMillis Maximum acceptable response time in milliseconds
+*/
+public static void assertResponseTime(Response response, long maxMillis) {
+long actualTime = response.getTime();
+Log.info("Response time: " + actualTime + "ms (max: " + maxMillis + "ms)");
+assertTrue(actualTime <= maxMillis, "Response time " + actualTime + "ms exceeded threshold of " + maxMillis + "ms" ); }
     public static <T> T extractAs(Response response, Class<T> clazz) {
         return response.as(clazz);
-    }
+        }
 
-    public static String extractValue(Response response, String jsonPath) {
+        public static String extractValue(Response response, String jsonPath) {
         return response.jsonPath().getString(jsonPath);
-    }
+        }
 
-    public static int extractIntValue(Response response, String jsonPath) {
+        public static int extractIntValue(Response response, String jsonPath) {
         return response.jsonPath().getInt(jsonPath);
-    }
-}
+        }
+        }

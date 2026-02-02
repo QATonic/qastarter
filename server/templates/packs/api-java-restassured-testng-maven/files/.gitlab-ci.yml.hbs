@@ -1,60 +1,85 @@
-variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-  ENVIRONMENT: "qa"
-
-image: maven:3.9-eclipse-temurin-11
-
-cache:
-  paths:
-    - .m2/repository/
-    - target/
+# {{projectName}} - GitLab CI Pipeline
+# REST API Test Automation with REST Assured, TestNG, and Maven
 
 stages:
-  - test
-  - report
+- build
+- test
+- report
 
-test:
-  stage: test
-  script:
-    - mvn $MAVEN_CLI_OPTS clean test {{#if (eq testingPattern "bdd")}}-Dincludes="**/runners/*TestRunner.java"{{else}}-Denvironment=$ENVIRONMENT{{/if}}
-  artifacts:
-    when: always
-    paths:
-      - target/surefire-reports/
-      {{#if (eq reportingTool "allure")}}
-      - target/allure-results/
-      {{/if}}
-      {{#if (eq reportingTool "extentreports")}}
-      - test-output/extent-reports/
-      {{/if}}
-    expire_in: 30 days
-  only:
-    - main
-    - develop
-    - merge_requests
-  variables:
-    TEST_ENV: qa
+variables:
+MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Xmx1024m"
+JAVA_VERSION: "17"
+
+cache:
+key: ${CI_COMMIT_REF_SLUG}
+paths:
+- .m2/repository/
+
+build:
+stage: build
+image: maven:3.9-eclipse-temurin-17
+script:
+- mvn clean compile -DskipTests
+artifacts:
+paths:
+- target/
+expire_in: 1 hour
+
+api-tests:
+stage: test
+image: maven:3.9-eclipse-temurin-17
+parallel:
+matrix:
+- ENVIRONMENT: [qa, dev]
+script:
+- echo "Running API tests on $ENVIRONMENT environment"
+{{#if (eq testingPattern "bdd")}}
+- mvn test -Dincludes="**/runners/*TestRunner.java"
+{{else}}
+- mvn test -Denvironment=$ENVIRONMENT
+{{/if}}
+artifacts:
+when: always
+paths:
+- target/surefire-reports/
+{{#if (eq reportingTool "allure")}}
+- target/allure-results/
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+- reports/extent-reports/
+{{/if}}
+reports:
+junit: target/surefire-reports/TEST-*.xml
+expire_in: 7 days
+allow_failure: true
 
 {{#if (eq reportingTool "allure")}}
-generate_allure_report:
-  stage: report
-  image: maven:3.9-eclipse-temurin-11
-  dependencies:
-    - test
-  before_script:
-    - apt-get update && apt-get install -y wget
-    - wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
-    - tar -zxvf allure-2.25.0.tgz -C /opt/
-    - ln -s /opt/allure-2.25.0/bin/allure /usr/local/bin/allure
-  script:
-    - allure generate target/allure-results --clean -o allure-report
-  artifacts:
-    when: always
-    paths:
-      - allure-report/
-    expire_in: 30 days
-  only:
-    - main
-    - develop
+allure-report:
+stage: report
+image: frankescobar/allure-docker-service:2.21.0
+needs:
+- job: api-tests
+artifacts: true
+script:
+- allure generate target/allure-results --clean -o allure-report
+artifacts:
+paths:
+- allure-report/
+expire_in: 14 days
+when: always
+{{/if}}
+
+{{#if (eq reportingTool "extent-reports")}}
+publish-extent-report:
+stage: report
+needs:
+- job: api-tests
+artifacts: true
+script:
+- echo "ExtentReports available in artifacts"
+artifacts:
+paths:
+- reports/extent-reports/
+expire_in: 14 days
+when: always
 {{/if}}

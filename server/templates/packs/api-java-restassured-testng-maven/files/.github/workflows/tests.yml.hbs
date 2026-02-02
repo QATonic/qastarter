@@ -1,101 +1,102 @@
+# {{projectName}} - GitHub Actions Workflow
+# REST API Test Automation with REST Assured, TestNG, and Maven
+
 name: API Tests
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main, develop ]
-  workflow_dispatch:
+push:
+branches: [main, develop]
+pull_request:
+branches: [main]
+workflow_dispatch:
+inputs:
+environment:
+description: 'Test environment'
+required: true
+default: 'qa'
+type: choice
+options:
+- dev
+- qa
+- staging
+
+env:
+JAVA_VERSION: '17'
+MAVEN_OPTS: '-Xmx1024m'
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        environment: [dev, qa]
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Set up JDK 11
-        uses: actions/setup-java@v4
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-          cache: 'maven'
-      
-      - name: Run {{#if (eq testingPattern "bdd")}}Cucumber BDD{{else}}TestNG{{/if}} tests
-        env:
-          ENVIRONMENT: ${{ matrix.environment }}
-        run: |
-          mvn clean test {{#if (eq testingPattern "bdd")}}-Dincludes="**/runners/*TestRunner.java"{{else}}-Denvironment=${{ matrix.environment }}{{/if}}
-      
-      {{#if (eq reportingTool "allure")}}
-      - name: Install Allure CLI
-        if: always()
-        run: |
-          wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
-          tar -zxvf allure-2.25.0.tgz -C /opt/
-          sudo ln -s /opt/allure-2.25.0/bin/allure /usr/bin/allure
-      
-      - name: Generate Allure Report
-        if: always()
-        run: |
-          allure generate target/allure-results --clean -o allure-report
-      
-      - name: Upload Allure results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-results-${{ matrix.environment }}
-          path: target/allure-results
-          retention-days: 30
-      
-      - name: Upload Allure report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report-${{ matrix.environment }}
-          path: allure-report
-          retention-days: 30
-      {{/if}}
-      
-      {{#if (eq reportingTool "extentreports")}}
-      - name: Upload ExtentReports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: extent-reports-${{ matrix.environment }}
-          path: test-output/extent-reports
-          retention-days: 30
-      {{/if}}
-      
-      {{#if (eq reportingTool "testng-reports")}}
-      - name: Upload TestNG HTML Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: testng-reports-${{ matrix.environment }}
-          path: target/surefire-reports/emailable-report.html
-          retention-days: 30
-      {{/if}}
-      
-      {{#if (eq reportingTool "junit-html")}}
-      - name: Upload JUnit HTML Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-html-reports-${{ matrix.environment }}
-          path: target/surefire-reports/*.html
-          retention-days: 30
-      {{/if}}
-      
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results-${{ matrix.environment }}
-          path: target/surefire-reports
-          retention-days: 30
+api-tests:
+runs-on: ubuntu-latest
+strategy:
+matrix:
+environment: [qa]
+
+steps:
+- name: Checkout code
+uses: actions/checkout@v4
+
+- name: Set up JDK ${{{{raw}}}}{{ env.JAVA_VERSION }}{{{{/raw}}}}
+uses: actions/setup-java@v4
+with:
+java-version: ${{{{raw}}}}{{ env.JAVA_VERSION }}{{{{/raw}}}}
+distribution: 'temurin'
+cache: maven
+
+- name: Cache Maven packages
+uses: actions/cache@v3
+with:
+path: ~/.m2/repository
+key: ${{{{raw}}}}{{ runner.os }}{{{{/raw}}}}-maven-${{{{raw}}}}{{ hashFiles('**/pom.xml') }}{{{{/raw}}}}
+restore-keys: |
+${{{{raw}}}}{{ runner.os }}{{{{/raw}}}}-maven-
+
+- name: Run API Tests
+run: |
+{{#if (eq testingPattern "bdd")}}
+mvn clean test -Dincludes="**/runners/*TestRunner.java"
+{{else}}
+mvn clean test -Denvironment=${{{{raw}}}}{{ matrix.environment }}{{{{/raw}}}}
+{{/if}}
+continue-on-error: true
+
+{{#if (eq reportingTool "allure")}}
+- name: Generate Allure Report
+uses: simple-elf/allure-report-action@master
+if: always()
+with:
+allure_results: target/allure-results
+allure_report: allure-report
+allure_history: allure-history
+
+- name: Upload Allure Report
+uses: actions/upload-artifact@v4
+if: always()
+with:
+name: allure-report
+path: allure-report/
+retention-days: 30
+{{/if}}
+
+{{#if (eq reportingTool "extent-reports")}}
+- name: Upload ExtentReports
+uses: actions/upload-artifact@v4
+if: always()
+with:
+name: extent-reports
+path: reports/extent-reports/
+retention-days: 30
+{{/if}}
+
+- name: Upload Test Results
+uses: actions/upload-artifact@v4
+if: always()
+with:
+name: test-results
+path: target/surefire-reports/
+retention-days: 14
+
+- name: Publish Test Results
+uses: EnricoMi/publish-unit-test-result-action@v2
+if: always()
+with:
+files: target/surefire-reports/TEST-*.xml

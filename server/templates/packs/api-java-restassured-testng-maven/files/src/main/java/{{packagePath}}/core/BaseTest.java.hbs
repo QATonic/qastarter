@@ -1,24 +1,47 @@
 package {{javaPackage}}.core;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import {{javaPackage}}.config.ConfigReader;
 import {{javaPackage}}.utils.Log;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
+{{#if (eq reportingTool "allure")}}
+import io.qameta.allure.restassured.AllureRestAssured;
+{{/if}}
 
 import static io.restassured.RestAssured.given;
 
 /**
  * Base Test - Setup and teardown for API tests.
+ * 
+ * Uses RequestSpecBuilder for centralized request configuration.
  */
 public class BaseTest {
 
     protected static final String USERS_ENDPOINT = "/users";
+    protected static RequestSpecification requestSpec;
 
     @BeforeClass
     public void setup() {
         RestAssured.baseURI = ConfigReader.getBaseUrl();
+        
+        // Build centralized request specification
+        RequestSpecBuilder builder = new RequestSpecBuilder()
+            .setBaseUri(ConfigReader.getBaseUrl())
+            .setContentType(ContentType.JSON)
+            .setAccept(ContentType.JSON);
+        
+        {{#if (eq reportingTool "allure")}}
+        // Add Allure filter for request/response logging
+        builder.addFilter(new AllureRestAssured());
+        {{/if}}
+        
+        requestSpec = builder.build();
+        
         Log.info("API Base URL: " + RestAssured.baseURI);
     }
 
@@ -30,7 +53,7 @@ public class BaseTest {
     protected Response get(String endpoint) {
         Log.info("GET " + endpoint);
         return given()
-            .contentType("application/json")
+            .spec(requestSpec)
             .get(endpoint);
     }
 
@@ -41,7 +64,7 @@ public class BaseTest {
     protected Response post(String endpoint, Object body) {
         Log.info("POST " + endpoint);
         return given()
-            .contentType("application/json")
+            .spec(requestSpec)
             .body(body)
             .post(endpoint);
     }
@@ -49,7 +72,7 @@ public class BaseTest {
     protected Response put(String endpoint, int id, Object body) {
         Log.info("PUT " + endpoint + "/" + id);
         return given()
-            .contentType("application/json")
+            .spec(requestSpec)
             .body(body)
             .put(endpoint + "/" + id);
     }
@@ -57,6 +80,7 @@ public class BaseTest {
     protected Response delete(String endpoint, int id) {
         Log.info("DELETE " + endpoint + "/" + id);
         return given()
+            .spec(requestSpec)
             .delete(endpoint + "/" + id);
     }
 }

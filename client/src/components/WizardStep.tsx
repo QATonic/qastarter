@@ -100,10 +100,11 @@ export default function WizardStep({
           role="navigation"
         >
           <Button
+            variant="outline"
             onClick={onPrevious}
             disabled={!canGoPrevious}
             data-testid="button-previous"
-            className="hover-elevate active-elevate-2"
+            className="hover-elevate active-elevate-2 border-primary/20 hover:border-primary hover:text-primary transition-colors"
             aria-label="Go to previous step (Alt+P)"
             aria-disabled={!canGoPrevious}
           >
@@ -128,7 +129,7 @@ export default function WizardStep({
               onClick={onNext}
               disabled={!canGoNext}
               data-testid="button-next"
-              className="hover-elevate active-elevate-2"
+              className="hover-elevate active-elevate-2 bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 text-white shadow-lg shadow-purple-500/20 border-0 transition-all"
               aria-label={
                 isLastStep ? 'Generate and download your project' : 'Go to next step (Alt+N)'
               }

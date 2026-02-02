@@ -115,10 +115,10 @@ describe('sanitizeFilePath', () => {
     expect(sanitizeFilePath('test/resources')).toBe('test/resources');
   });
 
-  it('should remove path traversal attempts', () => {
-    expect(sanitizeFilePath('../../../etc/passwd')).toBe('etc/passwd');
-    expect(sanitizeFilePath('src/../../../secret')).toBe('src/secret');
-    expect(sanitizeFilePath('..\\..\\windows\\system32')).toBe('windows/system32');
+  it('should throw on path traversal attempts', () => {
+    expect(() => sanitizeFilePath('../../../etc/passwd')).toThrow('path traversal detected');
+    expect(() => sanitizeFilePath('src/../../../secret')).toThrow('path traversal detected');
+    expect(() => sanitizeFilePath('..\\..\\windows\\system32')).toThrow('path traversal detected');
   });
 
   it('should normalize backslashes to forward slashes', () => {
@@ -126,7 +126,7 @@ describe('sanitizeFilePath', () => {
     expect(sanitizeFilePath('test\\resources')).toBe('test/resources');
   });
 
-  it('should remove absolute path indicators', () => {
+  it('should clean absolute path indicators', () => {
     expect(sanitizeFilePath('/etc/passwd')).toBe('etc/passwd');
     expect(sanitizeFilePath('C:\\Windows\\System32')).toBe('Windows/System32');
     expect(sanitizeFilePath('D:/Projects/test')).toBe('Projects/test');
@@ -233,13 +233,20 @@ describe('Security: Path Traversal Prevention', () => {
     });
   });
 
-  it('should sanitize all malicious file paths', () => {
+  it('should throw or sanitize all malicious file paths', () => {
     maliciousInputs.forEach((input) => {
-      const result = sanitizeFilePath(input);
-      expect(result).not.toContain('..');
-      expect(result).not.toMatch(/^[a-zA-Z]:/);
-      expect(result).not.toMatch(/^\//);
-      expect(result).not.toContain('\0');
+      // sanitizeFilePath should throw for path traversal or absolute paths
+      try {
+        const result = sanitizeFilePath(input);
+        // If it doesn't throw, the result should still be safe
+        expect(result).not.toContain('..');
+        expect(result).not.toMatch(/^[a-zA-Z]:/);
+        expect(result).not.toMatch(/^\//);
+        expect(result).not.toContain('\0');
+      } catch (e) {
+        // Expected for dangerous inputs - pass
+        expect((e as Error).message).toMatch(/path traversal|absolute paths/);
+      }
     });
   });
 });

@@ -100,7 +100,7 @@ export default function LandingPage({ onStartGeneration }: LandingPageProps) {
                 size="lg"
                 onClick={onStartGeneration}
                 data-testid="button-start-generation"
-                className="gap-2.5 bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-6 text-lg shadow-lg shadow-primary/25 transition-all duration-200 border-0 h-auto"
+                className="gap-2.5 bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 text-white font-semibold px-8 py-6 text-lg shadow-lg shadow-purple-500/20 transition-all duration-200 border-0 h-auto"
               >
                 <Code2 className="h-5 w-5" />
                 Start Generating

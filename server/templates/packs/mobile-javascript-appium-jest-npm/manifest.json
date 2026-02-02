@@ -54,10 +54,42 @@
     {
       "path": "Dockerfile",
       "isTemplate": true,
-      "description": "Docker configuration for containerized testing",
       "conditional": {
         "utilities.includeDocker": true
-      }
+      },
+      "description": "Docker configuration for containerized testing"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      },
+      "description": "Docker Compose for Appium testing"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline"
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      },
+      "description": "CircleCI pipeline"
+    },
+    {
+      "path": "allure.properties",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure configuration"
     },
     {
       "path": ".gitignore",

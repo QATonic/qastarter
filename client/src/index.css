@@ -6,15 +6,16 @@
 
 /* LIGHT MODE */
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+  --button-outline: rgba(0, 0, 0, .10);
+  --badge-outline: rgba(0, 0, 0, .05);
 
   /* Automatic computation of border around primary / danger buttons */
-  --opaque-button-border-intensity: -8; /* In terms of percentages */
+  --opaque-button-border-intensity: -8;
+  /* In terms of percentages */
 
   /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  --elevate-1: rgba(0, 0, 0, .03);
+  --elevate-2: rgba(0, 0, 0, .08);
 
   --background: 0 0% 100%;
 
@@ -81,7 +82,8 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
-  --radius: .625rem; /* 10px - slightly more modern */
+  --radius: .625rem;
+  /* 10px - slightly more modern */
   --shadow-2xs: 0px 2px 0px 0px hsl(220 14% 89% / 0.05);
   --shadow-xs: 0px 2px 0px 0px hsl(220 14% 89% / 0.08);
   --shadow-sm: 0px 2px 0px 0px hsl(220 14% 89% / 0.08), 0px 1px 2px -1px hsl(220 14% 89% / 0.10);
@@ -125,14 +127,15 @@
 }
 
 .dark {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
+  --button-outline: rgba(255, 255, 255, .10);
+  --badge-outline: rgba(255, 255, 255, .05);
 
-  --opaque-button-border-intensity: 9;  /* In terms of percentages */
+  --opaque-button-border-intensity: 9;
+  /* In terms of percentages */
 
   /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(255,255,255, .05);
-  --elevate-2: rgba(255,255,255, .10);
+  --elevate-1: rgba(255, 255, 255, .05);
+  --elevate-2: rgba(255, 255, 255, .10);
 
   --background: 224 71% 4%;
 
@@ -224,7 +227,12 @@
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight text-foreground;
   }
 
@@ -365,7 +373,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }

@@ -41,7 +41,7 @@
 ## ✨ Features
 
 - 🚀 **Instant Generation** - Create complete test automation projects in seconds
-- 🎯 **43+ Templates** - Covering web, mobile, API, and desktop testing
+- 🎯 **46+ Templates** - Covering web, mobile, API, and desktop testing
 - 🔧 **Production Ready** - Page Object Model, utilities, config, and more included
 - 📊 **CI/CD Integration** - GitHub Actions, GitLab CI, Azure DevOps, Jenkins, CircleCI
 - 📈 **Reporting Tools** - Allure, ExtentReports, HTML reports

@@ -2,21 +2,24 @@ package {{javaPackage}}.listeners;
 
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
+import {{javaPackage}}.config.ConfigReader;
 import {{javaPackage}}.utils.Log;
 
 /**
  * Retry Analyzer - Retries failed tests.
+ *
+ * Configure max retries via 'test.retry.count' property (default: 2).
  */
 public class RetryAnalyzer implements IRetryAnalyzer {
 
     private int retryCount = 0;
-    private static final int MAX_RETRIES = 2;
+    private static final int MAX_RETRIES = ConfigReader.getRetryCount();
 
     @Override
     public boolean retry(ITestResult result) {
         if (retryCount < MAX_RETRIES) {
             retryCount++;
-            Log.warn("Retrying: " + result.getName() + " (Attempt " + retryCount + ")");
+            Log.warn("Retrying: " + result.getName() + " (Attempt " + retryCount + " of " + MAX_RETRIES + ")");
             return true;
         }
         return false;

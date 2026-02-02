@@ -53,12 +53,16 @@ export function ResumeDialog({ open, onResume, onStartFresh, timestamp }: Resume
           <AlertDialogCancel
             onClick={onStartFresh}
             data-testid="button-start-fresh"
-            className="gap-2"
+            className="gap-2 hover:bg-destructive/10 hover:text-destructive border-destructive/20 text-destructive/80"
           >
             <Trash2 className="w-4 h-4" />
             Start Fresh
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onResume} data-testid="button-resume">
+          <AlertDialogAction
+            onClick={onResume}
+            data-testid="button-resume"
+            className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary hover:to-purple-600 text-white border-0"
+          >
             Resume
           </AlertDialogAction>
         </AlertDialogFooter>

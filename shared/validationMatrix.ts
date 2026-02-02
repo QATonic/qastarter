@@ -1,6 +1,6 @@
 // Comprehensive validation matrix for QAStarter wizard steps
 // Defines compatibility between testing types, frameworks, languages, and tools
-// Updated: January 2026 - Aligned with actual template inventory (43 templates)
+// Updated: January 2026 - Aligned with actual template inventory (46 templates)
 
 export interface ValidationMatrix {
   testingTypes: string[];

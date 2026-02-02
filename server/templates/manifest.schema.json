@@ -1,0 +1,160 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://qastarter.com/schemas/manifest.schema.json",
+    "title": "QAStarter Template Pack Manifest",
+    "description": "Schema for validating QAStarter template pack manifest.json files",
+    "type": "object",
+    "required": [
+        "id",
+        "displayName",
+        "version",
+        "supportedCombination",
+        "files"
+    ],
+    "properties": {
+        "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+-[a-z0-9]+-[a-z0-9-]+-[a-z0-9-]+-[a-z0-9-]+$",
+            "description": "Unique pack identifier in format: testingType-language-framework-testRunner-buildTool"
+        },
+        "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Human-readable name for the template pack"
+        },
+        "description": {
+            "type": "string",
+            "description": "Brief description of the template pack"
+        },
+        "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$",
+            "description": "Semantic version (e.g., 1.0.0)"
+        },
+        "supportsDynamic": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether this pack supports dynamic options like CI/CD tools"
+        },
+        "supportedCombination": {
+            "type": "object",
+            "required": [
+                "testingType",
+                "framework",
+                "language",
+                "testRunner",
+                "buildTool"
+            ],
+            "properties": {
+                "testingType": {
+                    "type": "string",
+                    "enum": [
+                        "web",
+                        "mobile",
+                        "api",
+                        "desktop"
+                    ]
+                },
+                "framework": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "language": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "testRunner": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "buildTool": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            },
+            "additionalProperties": false
+        },
+        "dynamicSupport": {
+            "type": "object",
+            "properties": {
+                "reportingTools": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "cicdTools": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "testingPatterns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "toolVersions": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "Version mappings for dependencies (e.g., selenium: 4.27.0)"
+        },
+        "sampleTestPatterns": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Glob patterns to identify sample test files (optional override)"
+        },
+        "files": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "path",
+                    "isTemplate"
+                ],
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "File path (may contain Handlebars expressions)"
+                    },
+                    "template": {
+                        "type": "string",
+                        "description": "Alternative template path if different from output path"
+                    },
+                    "isTemplate": {
+                        "type": "boolean",
+                        "description": "Whether this file should be processed with Handlebars"
+                    },
+                    "mode": {
+                        "type": "string",
+                        "description": "File permissions mode (e.g., '755' for executable)"
+                    },
+                    "conditional": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "description": "Conditions for including this file (e.g., cicdTool: jenkins)"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1
+        },
+        "directories": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Empty directories to create in the project"
+        }
+    },
+    "additionalProperties": false
+}

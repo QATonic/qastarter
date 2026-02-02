@@ -88,6 +88,20 @@
             "conditional": {
                 "utilities.includeDocker": true
             }
+        },
+        {
+            "path": "docker-compose.yml",
+            "isTemplate": true,
+            "conditional": {
+                "utilities.includeDockerCompose": true
+            }
+        },
+        {
+            "path": ".circleci/config.yml",
+            "isTemplate": true,
+            "conditional": {
+                "cicdTool": "circleci"
+            }
         }
     ],
     "directories": [

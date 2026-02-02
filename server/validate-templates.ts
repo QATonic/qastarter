@@ -3,7 +3,7 @@
  * Template Validation Script
  *
  * Validates all template packs for:
- * - Valid manifest.json structure
+ * - Valid manifest.json structure (using Zod schema)
  * - Handlebars syntax in .hbs files
  * - Required files exist
  * - Template context variables are valid
@@ -15,6 +15,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import handlebars from 'handlebars';
 import { fileURLToPath } from 'url';
+import { z } from 'zod';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PACKS_DIR = path.join(__dirname, 'templates', 'packs');
@@ -27,20 +28,42 @@ interface ValidationResult {
   filesValidated: number;
 }
 
-interface ManifestFile {
-  path: string;
-  isTemplate: boolean;
-  conditional?: Record<string, any>;
-  mode?: string;
-}
+// Zod schema for manifest validation (mirrors manifest.schema.json)
+const manifestFileSchema = z.object({
+  path: z.string().min(1),
+  template: z.string().optional(),
+  isTemplate: z.boolean(),
+  mode: z.string().optional(),
+  conditional: z.record(z.any()).optional(),
+});
 
-interface Manifest {
-  name: string;
-  version: string;
-  description?: string;
-  toolVersions?: Record<string, string>;
-  files: ManifestFile[];
-}
+const manifestSchema = z.object({
+  id: z.string().regex(/^[a-z0-9]+-[a-z0-9]+-[a-z0-9-]+-[a-z0-9-]+-[a-z0-9-]+$/,
+    'ID must follow format: testingType-language-framework-testRunner-buildTool'),
+  displayName: z.string().min(1),
+  description: z.string().optional(),
+  version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semantic (x.y.z)'),
+  supportsDynamic: z.boolean().optional().default(true),
+  supportedCombination: z.object({
+    testingType: z.enum(['web', 'mobile', 'api', 'desktop']),
+    framework: z.string().min(1),
+    language: z.string().min(1),
+    testRunner: z.string().min(1),
+    buildTool: z.string().min(1),
+  }),
+  dynamicSupport: z.object({
+    reportingTools: z.array(z.string()).optional(),
+    cicdTools: z.array(z.string()).optional(),
+    testingPatterns: z.array(z.string()).optional(),
+  }).optional(),
+  toolVersions: z.record(z.string()).optional(),
+  sampleTestPatterns: z.array(z.string()).optional(),
+  files: z.array(manifestFileSchema).min(1),
+  directories: z.array(z.string()).optional(),
+});
+
+type Manifest = z.infer<typeof manifestSchema>;
+type ManifestFile = z.infer<typeof manifestFileSchema>;
 
 // Register Handlebars helpers (same as templatePackEngine)
 function registerHelpers(): void {
@@ -93,35 +116,21 @@ async function validateManifest(
 
   try {
     const content = await fs.readFile(manifestPath, 'utf-8');
-    const manifest = JSON.parse(content) as Manifest;
+    const rawManifest = JSON.parse(content);
 
-    // Validate required fields
-    if (!manifest.name) {
-      errors.push('Missing required field: name');
-    }
-    if (!manifest.version) {
-      errors.push('Missing required field: version');
-    }
-    if (!manifest.files || !Array.isArray(manifest.files)) {
-      errors.push('Missing or invalid files array');
-    }
+    // Use Zod schema validation for comprehensive checking
+    const result = manifestSchema.safeParse(rawManifest);
 
-    // Validate version format (semver-like)
-    if (manifest.version && !/^\d+\.\d+\.\d+/.test(manifest.version)) {
-      errors.push(`Invalid version format: ${manifest.version} (expected: x.y.z)`);
+    if (!result.success) {
+      // Extract detailed error messages from Zod
+      result.error.issues.forEach((issue) => {
+        const path = issue.path.join('.');
+        errors.push(`${path || 'root'}: ${issue.message}`);
+      });
+      return { manifest: null, errors };
     }
 
-    // Validate file entries
-    manifest.files?.forEach((file, index) => {
-      if (!file.path) {
-        errors.push(`File entry ${index}: missing path`);
-      }
-      if (typeof file.isTemplate !== 'boolean') {
-        errors.push(`File entry ${index}: isTemplate must be boolean`);
-      }
-    });
-
-    return { manifest: errors.length === 0 ? manifest : null, errors };
+    return { manifest: result.data, errors: [] };
   } catch (error) {
     if ((error as Error & { code?: string }).code === 'ENOENT') {
       errors.push('manifest.json not found');

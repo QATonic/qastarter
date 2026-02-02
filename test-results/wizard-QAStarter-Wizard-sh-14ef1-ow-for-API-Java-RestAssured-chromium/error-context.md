@@ -1,0 +1,155 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Skip to main content" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - button "QAStarter - Go to home page" [ref=e8] [cursor=pointer]:
+          - img "QAStarter Logo" [ref=e10]
+          - generic [ref=e11]: QAStarter
+        - navigation "Main navigation" [ref=e12]:
+          - button "Docs" [ref=e13] [cursor=pointer]:
+            - img
+            - generic [ref=e14]: Docs
+          - button "Star" [ref=e15] [cursor=pointer]:
+            - img
+            - generic [ref=e16]: Star
+          - button "Trends" [ref=e17] [cursor=pointer]:
+            - img
+            - generic [ref=e18]: Trends
+          - button "Sponsor Project" [ref=e19] [cursor=pointer]:
+            - img
+            - generic [ref=e20]: Support
+          - button "About" [ref=e21] [cursor=pointer]:
+            - img
+            - generic [ref=e22]: About
+          - button "Switch to dark mode" [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]:
+              - img
+              - img
+            - generic [ref=e25]: Switch to dark mode
+    - main [ref=e26]:
+      - generic [ref=e27]:
+        - navigation "Progress indicator" [ref=e28]:
+          - generic [ref=e29]:
+            - heading "Step 4 of 12" [level=2] [ref=e30]
+            - generic "33 percent complete" [ref=e31]: 33% Complete
+          - progressbar [ref=e32]:
+            - list "Wizard steps" [ref=e34]:
+              - listitem [ref=e35]:
+                - 'button "Testing Type: completed, click to navigate" [ref=e36] [cursor=pointer]':
+                  - img [ref=e37]
+                - generic [ref=e40]: Testing Type
+              - listitem [ref=e41]:
+                - 'button "Framework: completed, click to navigate" [ref=e42] [cursor=pointer]':
+                  - img [ref=e43]
+                - generic [ref=e46]: Framework
+              - listitem [ref=e47]:
+                - 'button "Language: completed, click to navigate" [ref=e48] [cursor=pointer]':
+                  - img [ref=e49]
+                - generic [ref=e52]: Language
+              - listitem [ref=e53]:
+                - 'button "Testing Pattern: current, click to navigate" [ref=e54] [cursor=pointer]':
+                  - generic [ref=e55]: "4"
+                - generic [ref=e56]: Testing Pattern
+              - listitem [ref=e57]:
+                - 'button "Test Runner: upcoming" [disabled] [ref=e58]':
+                  - generic [ref=e59]: "5"
+                - generic [ref=e60]: Test Runner
+              - listitem [ref=e61]:
+                - 'button "Build Tool: upcoming" [disabled] [ref=e62]':
+                  - generic [ref=e63]: "6"
+                - generic [ref=e64]: Build Tool
+              - listitem [ref=e65]:
+                - 'button "Project Metadata: upcoming" [disabled] [ref=e66]':
+                  - generic [ref=e67]: "7"
+                - generic [ref=e68]: Project Metadata
+              - listitem [ref=e69]:
+                - 'button "CI/CD: upcoming" [disabled] [ref=e70]':
+                  - generic [ref=e71]: "8"
+                - generic [ref=e72]: CI/CD
+              - listitem [ref=e73]:
+                - 'button "Reporting: upcoming" [disabled] [ref=e74]':
+                  - generic [ref=e75]: "9"
+                - generic [ref=e76]: Reporting
+              - listitem [ref=e77]:
+                - 'button "Utilities: upcoming" [disabled] [ref=e78]':
+                  - generic [ref=e79]: "10"
+                - generic [ref=e80]: Utilities
+              - listitem [ref=e81]:
+                - 'button "Dependencies: upcoming" [disabled] [ref=e82]':
+                  - generic [ref=e83]: "11"
+                - generic [ref=e84]: Dependencies
+              - listitem [ref=e85]:
+                - 'button "Summary: upcoming" [disabled] [ref=e86]':
+                  - generic [ref=e87]: "12"
+                - generic [ref=e88]: Summary
+          - generic [ref=e92]: "Currently on step 4 of 12: Testing Pattern"
+        - region "Testing Pattern , Step 3 of 12" [active] [ref=e95]:
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - text: Testing Pattern
+              - generic [ref=e98]: ", Step 3 of 12"
+            - paragraph [ref=e99]: Choose your testing architecture pattern
+          - generic [ref=e100]:
+            - form "Testing Pattern configuration" [ref=e101]:
+              - radiogroup [ref=e103]:
+                - generic [ref=e104] [cursor=pointer]:
+                  - img [ref=e106]
+                  - generic [ref=e111]:
+                    - radio "Fluent Pattern" [ref=e112]
+                    - generic [ref=e113]: Fluent Pattern
+                    - button "Show help information" [ref=e114]:
+                      - img [ref=e115]
+                - generic [ref=e118] [cursor=pointer]:
+                  - img [ref=e120]
+                  - generic [ref=e124]:
+                    - radio "Behavior-Driven Development (BDD)" [ref=e125]
+                    - generic [ref=e126]: Behavior-Driven Development (BDD)
+                    - button "Show help information" [ref=e127]:
+                      - img [ref=e128]
+                - generic [ref=e131] [cursor=pointer]:
+                  - img [ref=e133]
+                  - generic [ref=e139]:
+                    - radio "Contract Testing (Pact)" [ref=e140]
+                    - generic [ref=e141]: Contract Testing (Pact)
+                    - button "Show help information" [ref=e142]:
+                      - img [ref=e143]
+            - navigation "Wizard navigation" [ref=e146]:
+              - button "Go to previous step (Alt+P)" [ref=e147] [cursor=pointer]:
+                - img
+                - text: Previous
+              - button "Go to next step (Alt+N)" [ref=e149] [cursor=pointer]:
+                - text: Next
+                - img
+    - contentinfo [ref=e150]:
+      - generic [ref=e151]:
+        - generic [ref=e152]:
+          - generic [ref=e153]:
+            - generic [ref=e154]:
+              - img "QAStarter Logo" [ref=e155]
+              - generic [ref=e156]: QAStarter
+            - generic [ref=e157]:
+              - generic [ref=e158]: Made with
+              - img [ref=e159]
+              - generic [ref=e161]: by QATonic Innovations
+          - generic [ref=e162]:
+            - button "Visit LinkedIn" [ref=e163] [cursor=pointer]:
+              - img
+              - generic [ref=e164]: LinkedIn
+            - button "Visit Twitter/X" [ref=e165] [cursor=pointer]:
+              - img
+              - generic [ref=e166]: Twitter/X
+            - button "Visit YouTube" [ref=e167] [cursor=pointer]:
+              - img
+              - generic [ref=e168]: YouTube
+            - button "Visit Instagram" [ref=e169] [cursor=pointer]:
+              - img
+              - generic [ref=e170]: Instagram
+        - paragraph [ref=e172]: © 2026 QAStarter by QATonic Innovations. All rights reserved.
+```

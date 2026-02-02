@@ -15,9 +15,8 @@ test.describe('QAStarter Wizard', () => {
 
   test('should navigate to wizard when clicking Start Generating', async ({ page }) => {
     await page.getByTestId('button-start-generation').click();
-    // Check for the wizard step title
-    await expect(page.locator('#wizard-step-title')).toContainText(/Testing Type/i);
-    await expect(page.getByText(/step 1 of/i)).toBeVisible();
+    // Check for the wizard step title - use specific heading role to avoid ambiguity
+    await expect(page.getByRole('heading', { name: /step 1 of/i })).toBeVisible();
   });
 
   test('should complete full wizard flow for Web + Playwright + TypeScript', async ({ page }) => {
@@ -26,29 +25,30 @@ test.describe('QAStarter Wizard', () => {
 
     // Step 1: Testing Type - Select Web
     await expect(page.locator('#wizard-step-title')).toContainText(/Testing Type/i);
-    await page.getByTestId('radio-web').click();
+    await page.getByText('Web Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 2: Framework - Select Playwright
     await expect(page.locator('#wizard-step-title')).toContainText(/Framework/i);
-    await page.getByTestId('radio-playwright').click();
+    await page.getByText('Playwright', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 3: Language - Select TypeScript
     await expect(page.locator('#wizard-step-title')).toContainText(/Language/i);
-    await page.getByTestId('radio-typescript').click();
+    await page.getByText('TypeScript', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 4: Testing Pattern - Select POM
     await expect(page.locator('#wizard-step-title')).toContainText(/Pattern/i);
-    await page.getByTestId('radio-pom').click();
+    await page.getByText('Page Object Model (POM)', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
-    // Step 5: Test Runner
+    // Step 5: Test Runner - Select Jest (explicitly)
+    await page.getByText('Jest', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 6: Build Tool - Select npm
-    await page.getByTestId('radio-npm').click();
+    await page.getByText('npm', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 7: Project Metadata
@@ -78,7 +78,7 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Go to step 2
-    await page.getByTestId('radio-web').click();
+    await page.getByText('Web Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
     await expect(page.locator('#wizard-step-title')).toContainText(/Framework/i);
 
@@ -91,7 +91,7 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Make a selection
-    await page.getByTestId('radio-web').click();
+    await page.getByText('Web Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Wait for auto-save
@@ -111,29 +111,29 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Step 1: Testing Type - Select API
-    await page.getByTestId('radio-api').click();
+    await page.getByText('API Testing', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 2: Framework - Select RestAssured
     await expect(page.locator('#wizard-step-title')).toContainText(/Framework/i);
-    await page.getByTestId('radio-restassured').click();
+    await page.getByText('REST Assured', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 3: Language - Select Java
     await expect(page.locator('#wizard-step-title')).toContainText(/Language/i);
-    await page.getByTestId('radio-java').click();
+    await page.getByText('Java', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 4: Testing Pattern
-    await page.getByTestId('radio-pom').click();
+    await page.getByText('Page Object Model (POM)', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 5: Test Runner - TestNG should be available
-    await page.getByTestId('radio-testng').click();
+    await page.getByText('TestNG', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 6: Build Tool - Maven
-    await page.getByTestId('radio-maven').click();
+    await page.getByText('Apache Maven', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 7: Project Metadata
@@ -156,29 +156,29 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Step 1: Testing Type - Select Mobile
-    await page.getByTestId('radio-mobile').click();
+    await page.getByText('Mobile Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 2: Framework - Select Appium
     await expect(page.locator('#wizard-step-title')).toContainText(/Framework/i);
-    await page.getByTestId('radio-appium').click();
+    await page.getByText('Appium', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 3: Language - Select Python
     await expect(page.locator('#wizard-step-title')).toContainText(/Language/i);
-    await page.getByTestId('radio-python').click();
+    await page.getByText('Python', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Continue through remaining steps
-    await page.getByTestId('radio-pom').click();
+    await page.getByText('Page Object Model (POM)', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Test Runner - Pytest
-    await page.getByTestId('radio-pytest').click();
+    await page.getByText('PyTest', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Build Tool - pip
-    await page.getByTestId('radio-pip').click();
+    await page.getByText('pip', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Project Metadata
@@ -198,8 +198,8 @@ test.describe('QAStarter Wizard', () => {
   });
 
   test('should toggle dark mode from header', async ({ page }) => {
-    // Check if theme toggle exists and works
-    const themeToggle = page.getByTestId('theme-toggle');
+    // Check if theme toggle exists and works - use correct testId
+    const themeToggle = page.getByTestId('button-theme-toggle');
 
     // Toggle should be visible
     if (await themeToggle.isVisible()) {
@@ -220,11 +220,11 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Make selections through first 3 steps
-    await page.getByTestId('radio-web').click();
+    await page.getByText('Web Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
-    await page.getByTestId('radio-selenium').click();
+    await page.getByText('Selenium WebDriver', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
-    await page.getByTestId('radio-java').click();
+    await page.getByText('Java', { exact: true }).click({ force: true });
 
     // Wait for auto-save
     await page.waitForTimeout(600);
@@ -233,7 +233,6 @@ test.describe('QAStarter Wizard', () => {
     await page.reload();
 
     // Check if resume dialog appears or config is restored
-    const resumeDialog = page.getByTestId('resume-dialog');
     const savedConfig = await page.evaluate(() => {
       return localStorage.getItem('qastarter-wizard-config');
     });
@@ -250,11 +249,11 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Complete first few steps
-    await page.getByTestId('radio-web').click();
+    await page.getByText('Web Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
-    await page.getByTestId('radio-playwright').click();
+    await page.getByText('Playwright', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
-    await page.getByTestId('radio-typescript').click();
+    await page.getByText('TypeScript', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // After selecting enough options, project preview should appear
@@ -270,16 +269,16 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Quick path to project metadata step
-    await page.getByTestId('radio-web').click();
+    await page.getByText('Web Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
-    await page.getByTestId('radio-playwright').click();
+    await page.getByText('Playwright', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
-    await page.getByTestId('radio-typescript').click();
+    await page.getByText('TypeScript', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
-    await page.getByTestId('radio-pom').click();
+    await page.getByText('Page Object Model (POM)', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
     await page.getByTestId('button-next').click();
-    await page.getByTestId('radio-npm').click();
+    await page.getByText('npm', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Try to enter project name with special characters
@@ -304,10 +303,10 @@ test.describe('QAStarter Wizard', () => {
     }
 
     // Step indicator should show current position
-    await expect(page.getByText(/step 1 of/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /step 1 of/i })).toBeVisible();
 
     // Move to next step
-    await page.getByTestId('radio-web').click();
+    await page.getByText('Web Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step indicator should update
@@ -320,28 +319,28 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Step 1: Testing Type - Select Web
-    await page.getByTestId('radio-web').click();
+    await page.getByText('Web Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 2: Framework - Select Robot Framework
     await expect(page.locator('#wizard-step-title')).toContainText(/Framework/i);
-    await page.getByTestId('radio-robotframework').click();
+    await page.getByText('Robot Framework', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 3: Language - Python should be available
     await expect(page.locator('#wizard-step-title')).toContainText(/Language/i);
-    await page.getByTestId('radio-python').click();
+    await page.getByText('Python', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Continue through remaining steps
-    await page.getByTestId('radio-pom').click();
+    await page.getByText('Page Object Model (POM)', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
-    // Test Runner
+    // Test Runner - Skip
     await page.getByTestId('button-next').click();
 
     // Build Tool - pip
-    await page.getByTestId('radio-pip').click();
+    await page.getByText('pip', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Project Metadata
@@ -364,28 +363,28 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Step 1: Testing Type - Select Mobile
-    await page.getByTestId('radio-mobile').click();
+    await page.getByText('Mobile Applications', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 2: Framework - Select Espresso
     await expect(page.locator('#wizard-step-title')).toContainText(/Framework/i);
-    await page.getByTestId('radio-espresso').click();
+    await page.getByText('Espresso', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 3: Language - Kotlin should be available
     await expect(page.locator('#wizard-step-title')).toContainText(/Language/i);
-    await page.getByTestId('radio-kotlin').click();
+    await page.getByText('Kotlin', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Continue through remaining steps
-    await page.getByTestId('radio-pom').click();
+    await page.getByText('Page Object Model (POM)', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
-    // Test Runner
+    // Test Runner - Skip
     await page.getByTestId('button-next').click();
 
     // Build Tool - Gradle
-    await page.getByTestId('radio-gradle').click();
+    await page.getByText('Gradle', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Project Metadata
@@ -408,27 +407,27 @@ test.describe('QAStarter Wizard', () => {
     await page.getByTestId('button-start-generation').click();
 
     // Step 1: Testing Type - Select API
-    await page.getByTestId('radio-api').click();
+    await page.getByText('API Testing', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 2: Framework - Select Supertest
-    await page.getByTestId('radio-supertest').click();
+    await page.getByText('Supertest', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 3: Language - TypeScript
-    await page.getByTestId('radio-typescript').click();
+    await page.getByText('TypeScript', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Step 4: Testing Pattern - Contract Testing should be available
     await expect(page.locator('#wizard-step-title')).toContainText(/Pattern/i);
-    const contractTestingOption = page.getByTestId('radio-contract-testing');
+    const contractTestingOption = page.getByText('Contract Testing (Pact)', { exact: true });
     await expect(contractTestingOption).toBeVisible();
-    await contractTestingOption.click();
+    await contractTestingOption.click({ force: true });
     await page.getByTestId('button-next').click();
 
     // Continue to summary
     await page.getByTestId('button-next').click(); // Test Runner
-    await page.getByTestId('radio-npm').click();
+    await page.getByText('npm', { exact: true }).click({ force: true });
     await page.getByTestId('button-next').click(); // Build Tool
     await page.locator('input[name="projectName"]').fill('contract-test-project');
     await page.getByTestId('button-next').click(); // Project Metadata

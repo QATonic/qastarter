@@ -5,49 +5,60 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Config Reader - Reads environment-specific properties.
- */
+* Config Reader - Reads environment-specific properties.
+*/
 public class ConfigReader {
 
-    private static Properties properties;
-    private static final String CONFIG_DIR = "src/main/resources/config/";
+private static Properties properties;
+private static final String CONFIG_DIR = "src/main/resources/config/";
 
-    static {
-        loadConfig();
-    }
+static {
+loadConfig();
+}
 
-    private static void loadConfig() {
-        String env = System.getProperty("env", "dev");
-        String configFile = CONFIG_DIR + env + ".properties";
+private static void loadConfig() {
+String env = System.getProperty("env", "dev");
+String configFile = CONFIG_DIR + env + ".properties";
 
-        properties = new Properties();
-        try (FileInputStream fis = new FileInputStream(configFile)) {
-            properties.load(fis);
-            System.out.println("[Config] Loaded: " + configFile);
-        } catch (IOException e) {
-            System.err.println("[Config] Failed to load: " + configFile);
-            setDefaults();
-        }
-    }
+properties = new Properties();
+try (FileInputStream fis = new FileInputStream(configFile)) {
+properties.load(fis);
+System.out.println("[Config] Loaded: " + configFile);
+} catch (IOException e) {
+System.err.println("[Config] Failed to load: " + configFile);
+setDefaults();
+}
+}
 
-    private static void setDefaults() {
-        properties.setProperty("base.url", "https://jsonplaceholder.typicode.com");
-        properties.setProperty("timeout", "30");
-    }
+private static void setDefaults() {
+properties.setProperty("base.url", "https://jsonplaceholder.typicode.com");
+properties.setProperty("timeout", "30");
+properties.setProperty("test.retry.count", "2");
+}
 
-    public static String getBaseUrl() {
-        return properties.getProperty("base.url", "https://jsonplaceholder.typicode.com");
-    }
+public static String getBaseUrl() {
+return properties.getProperty("base.url", "https://jsonplaceholder.typicode.com");
+}
 
-    public static int getTimeout() {
-        return Integer.parseInt(properties.getProperty("timeout", "30"));
-    }
+public static int getTimeout() {
+return Integer.parseInt(properties.getProperty("timeout", "30"));
+}
 
-    public static String getContentType() {
-        return properties.getProperty("content.type", "application/json");
-    }
+public static String getContentType() {
+return properties.getProperty("content.type", "application/json");
+}
 
-    public static String getProperty(String key) {
-        return properties.getProperty(key);
-    }
+/**
+* Get the maximum number of retry attempts for failed tests.
+* Configure via 'test.retry.count' property in environment properties.
+*
+* @return Maximum retry count (default: 2)
+*/
+public static int getRetryCount() {
+return Integer.parseInt(properties.getProperty("test.retry.count", "2"));
+}
+
+public static String getProperty(String key) {
+return properties.getProperty(key);
+}
 }

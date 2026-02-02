@@ -82,7 +82,7 @@ QAStarter/
 │       ├── components/   # UI components
 │       └── pages/        # Page components
 ├── server/           # Express backend
-│   ├── templates/    # Template packs (43+)
+│   ├── templates/    # Template packs (46+)
 │   └── services/     # Business logic
 └── shared/           # Shared validation & schemas
 ```

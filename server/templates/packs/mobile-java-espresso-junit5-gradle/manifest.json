@@ -176,6 +176,14 @@
       "conditional": {
         "utilities.includeDockerCompose": true
       }
+    },
+    {
+      "path": "allure.properties",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure configuration"
     }
   ],
   "supportedCombination": {

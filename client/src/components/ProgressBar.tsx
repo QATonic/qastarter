@@ -85,12 +85,12 @@ export default function ProgressBar({
                     className={cn(
                       'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300 border-2',
                       isCompleted
-                        ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/25'
+                        ? 'bg-gradient-to-br from-primary to-purple-600 text-white border-transparent shadow-lg shadow-purple-500/30'
                         : isCurrent
-                          ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/25 animate-pulse'
+                          ? 'bg-gradient-to-br from-primary to-purple-600 text-white border-transparent shadow-lg shadow-purple-500/30 animate-pulse'
                           : 'bg-muted text-muted-foreground border-muted',
                       isClickable
-                        ? 'cursor-pointer hover:scale-110 hover:shadow-xl hover:shadow-primary/30 hover-elevate'
+                        ? 'cursor-pointer hover:scale-110 hover:shadow-xl hover:shadow-purple-500/40 hover-elevate'
                         : 'cursor-default'
                     )}
                     onClick={() => handleStepClick(index)}
@@ -130,7 +130,7 @@ export default function ProgressBar({
         <div className="absolute top-4 left-4 right-4 -z-10 hidden md:block" aria-hidden="true">
           <div className="h-0.5 bg-muted">
             <div
-              className="h-full bg-primary transition-all duration-300"
+              className="h-full bg-gradient-to-r from-primary to-purple-600 transition-all duration-300"
               style={{ width: `${(currentStep / (totalSteps - 1)) * 100}%` }}
             />
           </div>

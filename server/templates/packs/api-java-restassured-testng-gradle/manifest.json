@@ -222,6 +222,33 @@
         "reportingTool": "extent-reports"
       },
       "description": "ExtentReports config"
+    },
+    {
+      "path": "Dockerfile",
+      "template": "Dockerfile.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      },
+      "description": "Docker configuration"
+    },
+    {
+      "path": "docker-compose.yml",
+      "template": "docker-compose.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      },
+      "description": "Docker Compose configuration"
+    },
+    {
+      "path": "allure.properties",
+      "template": "allure.properties.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure configuration"
     }
   ],
   "directories": [

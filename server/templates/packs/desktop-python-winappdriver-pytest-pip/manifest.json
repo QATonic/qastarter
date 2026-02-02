@@ -163,10 +163,58 @@
     {
       "path": "Dockerfile",
       "isTemplate": true,
-      "description": "Docker configuration for Windows containers",
       "conditional": {
         "utilities.includeDocker": true
-      }
+      },
+      "description": "Docker configuration for Windows containers"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      },
+      "description": "Docker Compose configuration"
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
+      "description": "Jenkins pipeline"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline"
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      },
+      "description": "CircleCI configuration"
+    },
+    {
+      "path": "allure.properties",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure configuration"
     }
   ],
   "supportedCombination": {

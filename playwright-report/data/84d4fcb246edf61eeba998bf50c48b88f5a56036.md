@@ -1,0 +1,140 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - link "Skip to main content" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e4]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - button "QAStarter - Go to home page" [ref=e8] [cursor=pointer]:
+          - img "QAStarter Logo" [ref=e10]
+          - generic [ref=e11]: QAStarter
+        - navigation "Main navigation" [ref=e12]:
+          - button "Docs" [ref=e13] [cursor=pointer]:
+            - img
+            - generic [ref=e14]: Docs
+          - button "Star" [ref=e15] [cursor=pointer]:
+            - img
+            - generic [ref=e16]: Star
+          - button "Trends" [ref=e17] [cursor=pointer]:
+            - img
+            - generic [ref=e18]: Trends
+          - button "Sponsor Project" [ref=e19] [cursor=pointer]:
+            - img
+            - generic [ref=e20]: Support
+          - button "About" [ref=e21] [cursor=pointer]:
+            - img
+            - generic [ref=e22]: About
+          - button "Switch to dark mode" [ref=e23] [cursor=pointer]:
+            - generic [ref=e24]:
+              - img
+              - img
+            - generic [ref=e25]: Switch to dark mode
+    - main [ref=e26]:
+      - generic [ref=e27]:
+        - navigation "Progress indicator" [ref=e28]:
+          - generic [ref=e29]:
+            - heading "Step 7 of 12" [level=2] [ref=e30]
+            - generic "58 percent complete" [ref=e31]: 58% Complete
+          - progressbar [ref=e32]:
+            - list "Wizard steps" [ref=e34]:
+              - listitem [ref=e35]:
+                - 'button "Testing Type: completed, click to navigate" [ref=e36] [cursor=pointer]':
+                  - img [ref=e37]
+                - generic [ref=e40]: Testing Type
+              - listitem [ref=e41]:
+                - 'button "Framework: completed, click to navigate" [ref=e42] [cursor=pointer]':
+                  - img [ref=e43]
+                - generic [ref=e46]: Framework
+              - listitem [ref=e47]:
+                - 'button "Language: completed, click to navigate" [ref=e48] [cursor=pointer]':
+                  - img [ref=e49]
+                - generic [ref=e52]: Language
+              - listitem [ref=e53]:
+                - 'button "Testing Pattern: completed, click to navigate" [ref=e54] [cursor=pointer]':
+                  - img [ref=e55]
+                - generic [ref=e58]: Testing Pattern
+              - listitem [ref=e59]:
+                - 'button "Test Runner: completed, click to navigate" [ref=e60] [cursor=pointer]':
+                  - img [ref=e61]
+                - generic [ref=e64]: Test Runner
+              - listitem [ref=e65]:
+                - 'button "Build Tool: completed, click to navigate" [ref=e66] [cursor=pointer]':
+                  - img [ref=e67]
+                - generic [ref=e70]: Build Tool
+              - listitem [ref=e71]:
+                - 'button "Project Metadata: current, click to navigate" [ref=e72] [cursor=pointer]':
+                  - generic [ref=e73]: "7"
+                - generic [ref=e74]: Project Metadata
+              - listitem [ref=e75]:
+                - 'button "CI/CD: upcoming" [disabled] [ref=e76]':
+                  - generic [ref=e77]: "8"
+                - generic [ref=e78]: CI/CD
+              - listitem [ref=e79]:
+                - 'button "Reporting: upcoming" [disabled] [ref=e80]':
+                  - generic [ref=e81]: "9"
+                - generic [ref=e82]: Reporting
+              - listitem [ref=e83]:
+                - 'button "Utilities: upcoming" [disabled] [ref=e84]':
+                  - generic [ref=e85]: "10"
+                - generic [ref=e86]: Utilities
+              - listitem [ref=e87]:
+                - 'button "Dependencies: upcoming" [disabled] [ref=e88]':
+                  - generic [ref=e89]: "11"
+                - generic [ref=e90]: Dependencies
+              - listitem [ref=e91]:
+                - 'button "Summary: upcoming" [disabled] [ref=e92]':
+                  - generic [ref=e93]: "12"
+                - generic [ref=e94]: Summary
+          - generic [ref=e98]: "Currently on step 7 of 12: Project Metadata"
+        - region "Project Metadata , Step 6 of 12" [active] [ref=e101]:
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - text: Project Metadata
+              - generic [ref=e104]: ", Step 6 of 12"
+            - paragraph [ref=e105]: Configure your project name and identifiers
+          - generic [ref=e106]:
+            - form "Project Metadata configuration" [ref=e107]:
+              - generic [ref=e109]:
+                - generic [ref=e110]:
+                  - generic [ref=e111]: Project Name *
+                  - button "Show help information" [ref=e112] [cursor=pointer]:
+                    - img [ref=e113]
+                - textbox "Project Name *" [ref=e116]:
+                  - /placeholder: my-qa-project
+            - navigation "Wizard navigation" [ref=e117]:
+              - button "Go to previous step (Alt+P)" [ref=e118] [cursor=pointer]:
+                - img
+                - text: Previous
+              - button "Go to next step (Alt+N)" [ref=e120] [cursor=pointer]:
+                - text: Next
+                - img
+    - contentinfo [ref=e121]:
+      - generic [ref=e122]:
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]:
+              - img "QAStarter Logo" [ref=e126]
+              - generic [ref=e127]: QAStarter
+            - generic [ref=e128]:
+              - generic [ref=e129]: Made with
+              - img [ref=e130]
+              - generic [ref=e132]: by QATonic Innovations
+          - generic [ref=e133]:
+            - button "Visit LinkedIn" [ref=e134] [cursor=pointer]:
+              - img
+              - generic [ref=e135]: LinkedIn
+            - button "Visit Twitter/X" [ref=e136] [cursor=pointer]:
+              - img
+              - generic [ref=e137]: Twitter/X
+            - button "Visit YouTube" [ref=e138] [cursor=pointer]:
+              - img
+              - generic [ref=e139]: YouTube
+            - button "Visit Instagram" [ref=e140] [cursor=pointer]:
+              - img
+              - generic [ref=e141]: Instagram
+        - paragraph [ref=e143]: © 2026 QAStarter by QATonic Innovations. All rights reserved.
+```

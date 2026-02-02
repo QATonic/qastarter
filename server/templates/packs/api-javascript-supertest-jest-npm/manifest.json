@@ -1,6 +1,7 @@
 {
   "id": "api-javascript-supertest-jest-npm",
   "displayName": "JavaScript Supertest API Framework",
+  "description": "Professional API automation framework with JavaScript, Supertest, Jest, and npm",
   "version": "2.0.0",
   "supportsDynamic": true,
   "supportedCombination": {
@@ -18,27 +19,186 @@
   "files": [
     {
       "path": "package.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "Node.js package configuration"
+    },
+    {
+      "path": "jest.config.js",
+      "isTemplate": true,
+      "description": "Jest configuration"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      },
+      "description": "GitHub Actions workflow"
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
+      "description": "Jenkins pipeline"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline"
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      },
+      "description": "Docker configuration"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      },
+      "description": "Docker Compose configuration"
+    },
+    {
+      "path": "allure.properties",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure configuration"
     },
     {
       "path": "config/ConfigReader.js",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "Configuration reader"
     },
     {
       "path": "config/dev.json",
-      "isTemplate": false
+      "isTemplate": false,
+      "description": "Development environment config"
+    },
+    {
+      "path": "config/environments.js",
+      "isTemplate": true,
+      "description": "Environment configurations"
+    },
+    {
+      "path": "config/settings.js",
+      "isTemplate": true,
+      "description": "Application settings"
     },
     {
       "path": "core/ApiClient.js",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "API client wrapper"
+    },
+    {
+      "path": "core/SchemaValidator.js",
+      "isTemplate": true,
+      "description": "JSON Schema validation"
+    },
+    {
+      "path": "models/User.js",
+      "isTemplate": true,
+      "description": "User model"
+    },
+    {
+      "path": "schemas/user.schema.json",
+      "isTemplate": true,
+      "description": "User JSON schema"
     },
     {
       "path": "utils/Logger.js",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "Logging utility"
+    },
+    {
+      "path": "utils/retryHelper.js",
+      "isTemplate": true,
+      "description": "Retry logic helper"
+    },
+    {
+      "path": "utils/authHelper.js",
+      "isTemplate": true,
+      "description": "Authentication helper"
+    },
+    {
+      "path": "utils/dataGenerator.js",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "Test data generator"
+    },
+    {
+      "path": "tests/setup.js",
+      "isTemplate": true,
+      "description": "Jest test setup"
     },
     {
       "path": "tests/UserTests.spec.js",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "User API tests"
+    },
+    {
+      "path": "tests/api/users.spec.js",
+      "isTemplate": true,
+      "description": "Users endpoint tests"
+    },
+    {
+      "path": "tests/api/auth.spec.js",
+      "isTemplate": true,
+      "description": "Authentication tests"
+    },
+    {
+      "path": "tests/api/health.spec.js",
+      "isTemplate": true,
+      "description": "Health check tests"
+    },
+    {
+      "path": "tests/data/users.js",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "User test data"
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Login feature file"
+    },
+    {
+      "path": "step-definitions/loginSteps.js",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Login step definitions"
     }
   ],
   "directories": [

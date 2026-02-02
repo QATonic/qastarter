@@ -3,34 +3,16 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import LandingPage from '@/components/LandingPage';
 import Wizard from '@/components/Wizard';
+import SuccessView from '@/components/SuccessView';
 import { useToast } from '@/hooks/use-toast';
 
-type AppState = 'landing' | 'wizard' | 'generating';
+type AppState = 'landing' | 'wizard' | 'generating' | 'success';
 
-interface WizardConfig {
-  testingType: string;
-  framework: string;
-  language: string;
-  testingPattern: string;
-  testRunner: string;
-  buildTool: string;
-  projectName: string;
-  groupId?: string;
-  artifactId?: string;
-  cicdTool: string;
-  reportingTool: string;
-  utilities: {
-    configReader: boolean;
-    jsonReader: boolean;
-    screenshotUtility: boolean;
-    logger: boolean;
-    dataProvider: boolean;
-  };
-  dependencies: string[];
-}
+import { WizardConfig } from '@/components/wizard-steps/types';
 
 export default function Home() {
   const [appState, setAppState] = useState<AppState>('landing');
+  const [projectConfig, setProjectConfig] = useState<WizardConfig | null>(null);
   const { toast } = useToast();
 
   const handleStartGeneration = () => {
@@ -79,11 +61,12 @@ export default function Home() {
 
   const handleWizardComplete = async (config: WizardConfig) => {
     setAppState('generating');
+    setProjectConfig(config);
 
     try {
       console.log('Generating project with config:', config);
       await handleDownload(config);
-      setAppState('landing');
+      setAppState('success');
     } catch (error) {
       console.error('Error generating project:', error);
       toast({
@@ -124,6 +107,13 @@ export default function Home() {
               <p className="text-muted-foreground">This may take a few seconds</p>
             </div>
           </div>
+        )}
+
+        {appState === 'success' && projectConfig && (
+          <SuccessView
+            config={projectConfig}
+            onGenerateAnother={handleBackToLanding}
+          />
         )}
       </main>
 

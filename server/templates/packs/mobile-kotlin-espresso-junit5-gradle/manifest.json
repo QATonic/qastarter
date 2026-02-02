@@ -80,6 +80,54 @@
       "description": "Jenkins pipeline"
     },
     {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline"
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      },
+      "description": "CircleCI pipeline"
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      },
+      "description": "Docker configuration"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      },
+      "description": "Docker Compose configuration"
+    },
+    {
+      "path": "allure.properties",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure configuration"
+    },
+    {
       "path": "app/build.gradle.kts",
       "isTemplate": true,
       "description": "App module Gradle build"

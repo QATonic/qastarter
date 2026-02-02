@@ -1,5 +1,38 @@
 package {{javaPackage}}.utils;
 
+{{#if utilities.logger}}
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+* Log - Logging utility using Log4j2.
+*
+* Uses Log4j2 for enterprise-grade logging with rolling files and configurable levels.
+* Configure via src/main/resources/log4j2.xml
+*/
+public class Log {
+
+private static final Logger logger = LogManager.getLogger(Log.class);
+
+public static void info(String message) { logger.info(message); }
+public static void debug(String message) { logger.debug(message); }
+public static void warn(String message) { logger.warn(message); }
+public static void error(String message) { logger.error(message); }
+public static void step(String message) { logger.info("[STEP] " + message); }
+
+public static void error(String message, Throwable t) {
+logger.error(message, t);
+}
+
+public static void startTest(String name) {
+logger.info("========== START: {} ==========", name);
+}
+
+public static void endTest(String name) {
+logger.info("========== END: {} ==========", name);
+}
+}
+{{else}}
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -7,47 +40,50 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Log - Simple logging utility.
- */
+* Log - Simple logging utility.
+*
+* Provides basic file and console logging without external dependencies.
+*/
 public class Log {
 
-    private static PrintWriter logWriter;
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+private static PrintWriter logWriter;
+private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    static {
-        try {
-            new File("logs").mkdirs();
-            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-            logWriter = new PrintWriter(new FileWriter("logs/api_test_" + timestamp + ".log", true));
-        } catch (Exception e) {
-            System.err.println("Failed to create log file: " + e.getMessage());
-        }
-    }
-
-    private static void log(String level, String message) {
-        String line = formatter.format(new Date()) + " | " + level + " | " + message;
-        System.out.println(line);
-        if (logWriter != null) {
-            logWriter.println(line);
-            logWriter.flush();
-        }
-    }
-
-    public static void info(String message) { log("INFO", message); }
-    public static void debug(String message) { log("DEBUG", message); }
-    public static void warn(String message) { log("WARN", message); }
-    public static void error(String message) { log("ERROR", message); }
-    public static void step(String message) { log("STEP", message); }
-
-    public static void error(String message, Throwable t) {
-        log("ERROR", message + " - " + t.getMessage());
-    }
-
-    public static void startTest(String name) {
-        log("START", "========== " + name + " ==========");
-    }
-
-    public static void endTest(String name) {
-        log("END", "========== " + name + " ==========");
-    }
+static {
+try {
+new File("logs").mkdirs();
+String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+logWriter = new PrintWriter(new FileWriter("logs/api_test_" + timestamp + ".log", true));
+} catch (Exception e) {
+System.err.println("Failed to create log file: " + e.getMessage());
 }
+}
+
+private static void log(String level, String message) {
+String line = formatter.format(new Date()) + " | " + level + " | " + message;
+System.out.println(line);
+if (logWriter != null) {
+logWriter.println(line);
+logWriter.flush();
+}
+}
+
+public static void info(String message) { log("INFO", message); }
+public static void debug(String message) { log("DEBUG", message); }
+public static void warn(String message) { log("WARN", message); }
+public static void error(String message) { log("ERROR", message); }
+public static void step(String message) { log("STEP", message); }
+
+public static void error(String message, Throwable t) {
+log("ERROR", message + " - " + t.getMessage());
+}
+
+public static void startTest(String name) {
+log("START", "========== " + name + " ==========");
+}
+
+public static void endTest(String name) {
+log("END", "========== " + name + " ==========");
+}
+}
+{{/if}}

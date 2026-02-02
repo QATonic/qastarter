@@ -1,0 +1,106 @@
+package {{javaPackage}}.utils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+* TestDataReader - Utility for reading test data from JSON and CSV files.
+*
+* Provides data-driven testing support for TestNG DataProviders.
+*/
+public class TestDataReader {
+
+private static final String TEST_DATA_PATH = "src/test/resources/testdata/";
+private static final ObjectMapper objectMapper = new ObjectMapper();
+
+/**
+* Reads JSON file and returns as JsonNode.
+*
+* @param fileName Name of the JSON file in testdata directory
+* @return JsonNode containing the parsed JSON
+*/
+public static JsonNode readJson(String fileName) {
+try {
+String content = new String(Files.readAllBytes(Paths.get(TEST_DATA_PATH + fileName)));
+return objectMapper.readTree(content);
+} catch (IOException e) {
+Log.error("Failed to read JSON file: " + fileName, e);
+throw new RuntimeException("Failed to read JSON file: " + fileName, e);
+}
+}
+
+/**
+* Reads JSON file and returns as a List of Maps.
+*
+* @param fileName Name of the JSON file in testdata directory
+* @return List of Maps containing the JSON data
+*/
+public static List<Map<String, Object>> readJsonAsList(String fileName) {
+    try {
+    String content = new String(Files.readAllBytes(Paths.get(TEST_DATA_PATH + fileName)));
+    return objectMapper.readValue(content, new TypeReference<List<Map<String, Object>>>() {});
+        } catch (IOException e) {
+        Log.error("Failed to read JSON file: " + fileName, e);
+        throw new RuntimeException("Failed to read JSON file: " + fileName, e);
+        }
+        }
+
+        /**
+        * Reads CSV file and returns as List of Maps.
+        * First row is treated as header.
+        *
+        * @param fileName Name of the CSV file in testdata directory
+        * @return List of Maps with column name as key
+        */
+        public static List<Map<String, String>> readCsv(String fileName) {
+            List<Map<String, String>> data = new ArrayList<>();
+                    String filePath = TEST_DATA_PATH + fileName;
+
+                    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                    String headerLine = br.readLine();
+                    if (headerLine == null) {
+                    return data;
+                    }
+
+                    String[] headers = headerLine.split(",");
+                    String line;
+
+                    while ((line = br.readLine()) != null) {
+                    String[] values = line.split(",");
+                    Map<String, String> row = new HashMap<>();
+
+                            for (int i = 0; i < headers.length && i < values.length; i++) { row.put(headers[i].trim(),
+                                values[i].trim()); } data.add(row); } Log.info("Loaded " + data.size() + " rows from " + fileName);
+        } catch (IOException e) {
+            Log.error(" Failed to read CSV file: " + fileName, e);
+            throw new RuntimeException(" Failed to read CSV file: " + fileName, e);
+        }
+
+        return data;
+    }
+
+    /**
+     * Converts List of Maps to Object[][] for TestNG DataProvider.
+     *
+     * @param data List of Maps containing test data
+     * @return Object[][] suitable for TestNG DataProvider
+     */
+    public static Object[][] toDataProviderArray(List<Map<String, String>> data) {
+        Object[][] result = new Object[data.size()][1];
+        for (int i = 0; i < data.size(); i++) {
+            result[i][0] = data.get(i);
+        }
+        return result;
+    }
+}

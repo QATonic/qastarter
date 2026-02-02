@@ -39,6 +39,22 @@
       "isTemplate": false
     },
     {
+      "path": ".github/workflows/tests.yml",
+      "template": ".github/workflows/tests.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "template": ".gitlab-ci.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
       "path": "azure-pipelines.yml",
       "template": "azure-pipelines.yml.hbs",
       "isTemplate": true,
@@ -52,6 +68,22 @@
       "isTemplate": true,
       "conditional": {
         "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "template": "Dockerfile.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "docker-compose.yml",
+      "template": "docker-compose.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
       }
     },
     {
@@ -73,6 +105,14 @@
       "path": "src/main/java/{{packagePath}}/utils/Log.java",
       "template": "src/main/java/{{packagePath}}/utils/Log.java.hbs",
       "isTemplate": true
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataReader.java",
+      "template": "src/main/java/{{packagePath}}/utils/TestDataReader.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
     },
     {
       "path": "src/main/java/{{packagePath}}/utils/ExtentReportManager.java",
@@ -106,32 +146,6 @@
       }
     },
     {
-      "path": "src/test/resources/testdata/users.json",
-      "template": "src/test/resources/testdata/users.json.hbs",
-      "isTemplate": true,
-      "conditional": {
-        "utilities.dataProvider": true
-      },
-      "description": "Test data"
-    },
-    {
-      "path": "src/test/resources/testdata/users.csv",
-      "template": "src/test/resources/testdata/users.csv.hbs",
-      "isTemplate": true,
-      "conditional": {
-        "utilities.dataProvider": true
-      },
-      "description": "CSV Test data"
-    },
-    {
-      "path": "src/test/resources/features/users.feature",
-      "template": "src/test/resources/features/users.feature.hbs",
-      "isTemplate": true,
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
       "path": "src/test/java/{{packagePath}}/steps/UserSteps.java",
       "template": "src/test/java/{{packagePath}}/steps/UserSteps.java.hbs",
       "isTemplate": true,
@@ -148,14 +162,72 @@
       }
     },
     {
+      "path": "src/test/resources/features/users.feature",
+      "template": "src/test/resources/features/users.feature.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "src/test/resources/testdata/users.json",
+      "template": "src/test/resources/testdata/users.json.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "src/test/resources/testdata/users.csv",
+      "template": "src/test/resources/testdata/users.csv.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "src/test/resources/schemas/user-schema.json",
+      "template": "src/test/resources/schemas/user-schema.json.hbs",
+      "isTemplate": true
+    },
+    {
       "path": "src/main/resources/config/dev.properties",
-      "template": "src/main/resources/config/dev.properties",
-      "isTemplate": false
+      "template": "src/main/resources/config/dev.properties.hbs",
+      "isTemplate": true
     },
     {
       "path": "src/main/resources/config/qa.properties",
-      "template": "src/main/resources/config/qa.properties",
-      "isTemplate": false
+      "template": "src/main/resources/config/qa.properties.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/config/prod.properties",
+      "template": "src/main/resources/config/prod.properties.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "template": "src/main/resources/log4j2.xml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.logger": true
+      }
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "template": "src/main/resources/extent-config.xml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      }
+    },
+    {
+      "path": "allure.properties",
+      "template": "allure.properties.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      }
     },
     {
       "path": "src/test/resources/testng.xml",
@@ -163,13 +235,13 @@
       "isTemplate": true
     },
     {
-      "path": "Dockerfile",
-      "template": "Dockerfile.hbs",
+      "path": "src/test/resources/api-tests.xml",
+      "template": "src/test/resources/api-tests.xml.hbs",
       "isTemplate": true
     },
     {
-      "path": "docker-compose.yml",
-      "template": "docker-compose.yml.hbs",
+      "path": "src/test/resources/regression-tests.xml",
+      "template": "src/test/resources/regression-tests.xml.hbs",
       "isTemplate": true
     }
   ],

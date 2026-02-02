@@ -92,7 +92,17 @@
     },
     {
       "path": "Dockerfile",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
     },
     {
       "path": "Config/ConfigReader.cs",

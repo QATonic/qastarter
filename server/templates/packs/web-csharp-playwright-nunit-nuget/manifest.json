@@ -131,6 +131,13 @@
       }
     },
     {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
       "path": "Features/Login.feature",
       "isTemplate": true,
       "conditional": {

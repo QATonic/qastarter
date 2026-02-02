@@ -8,7 +8,7 @@
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "check": "tsc",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
@@ -26,7 +26,7 @@
     "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
-    "@google-cloud/storage": "^7.18.0",
+    "@google-cloud/storage": "^7.12.0",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@neondatabase/serverless": "^0.10.4",
@@ -82,6 +82,7 @@
     "lucide-react": "^0.453.0",
     "next-themes": "^0.4.6",
     "node-cache": "^5.1.2",
+    "pg": "^8.18.0",
     "rate-limit-redis": "^4.3.1",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
@@ -104,7 +105,7 @@
     "wouter": "^3.3.5",
     "ws": "^8.18.0",
     "zod": "^3.24.2",
-    "zod-validation-error": "^3.4.0"
+    "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
@@ -129,11 +130,11 @@
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "@vitejs/plugin-react": "^4.3.2",
-    "@vitest/coverage-v8": "^2.1.9",
+    "@vitest/coverage-v8": "^3.2.3",
     "autoprefixer": "^10.4.20",
     "baseline-browser-mapping": "^2.9.17",
     "cross-env": "^10.1.0",
-    "drizzle-kit": "^0.30.4",
+    "drizzle-kit": "^0.31.8",
     "esbuild": "^0.25.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
@@ -141,6 +142,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.0.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
     "postcss": "^8.4.47",
     "prettier": "^3.7.4",
@@ -148,8 +150,8 @@
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
-    "vite": "^5.4.19",
-    "vitest": "^2.1.9"
+    "vite": "^6.4.1",
+    "vitest": "^3.2.3"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"

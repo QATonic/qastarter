@@ -86,6 +86,13 @@
       }
     },
     {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
       "path": "Jenkinsfile",
       "isTemplate": true,
       "conditional": {

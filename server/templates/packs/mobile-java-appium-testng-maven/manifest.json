@@ -337,12 +337,18 @@
       "path": "Dockerfile",
       "template": "Dockerfile.hbs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      },
       "description": "Docker configuration for containerized testing"
     },
     {
       "path": "docker-compose.yml",
       "template": "docker-compose.yml.hbs",
       "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      },
       "description": "Docker Compose for Appium testing"
     }
   ],

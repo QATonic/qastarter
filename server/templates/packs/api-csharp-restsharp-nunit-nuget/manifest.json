@@ -1,6 +1,7 @@
 {
   "id": "api-csharp-restsharp-nunit-nuget",
   "displayName": "C# RestSharp NUnit API Framework",
+  "description": "Professional API automation framework with C#, RestSharp, NUnit, and NuGet",
   "version": "2.0.0",
   "supportsDynamic": true,
   "supportedCombination": {
@@ -18,31 +19,215 @@
   "files": [
     {
       "path": "{{projectName}}.csproj",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": ".NET project file"
     },
     {
       "path": "appsettings.json",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "Application settings"
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      },
+      "description": "GitHub Actions workflow"
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
+      "description": "Jenkins pipeline"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline"
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      },
+      "description": "Docker configuration"
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      },
+      "description": "Docker Compose configuration"
+    },
+    {
+      "path": "allure.properties",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "allure"
+      },
+      "description": "Allure configuration"
     },
     {
       "path": "Config/ConfigReader.cs",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "Configuration reader"
+    },
+    {
+      "path": "Config/Environments.cs",
+      "isTemplate": true,
+      "description": "Environment configurations"
+    },
+    {
+      "path": "Config/Settings.cs",
+      "isTemplate": true,
+      "description": "Application settings model"
     },
     {
       "path": "Core/ApiClient.cs",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "API client wrapper"
+    },
+    {
+      "path": "Core/RequestBuilder.cs",
+      "isTemplate": true,
+      "description": "Request builder utility"
+    },
+    {
+      "path": "Core/ResponseValidator.cs",
+      "isTemplate": true,
+      "description": "Response validation helper"
     },
     {
       "path": "Models/User.cs",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "User model"
+    },
+    {
+      "path": "Models/ApiResponse.cs",
+      "isTemplate": true,
+      "description": "API response model"
+    },
+    {
+      "path": "Schemas/user-schema.json",
+      "isTemplate": true,
+      "description": "User JSON schema"
     },
     {
       "path": "Utils/Log.cs",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "Logging utility"
+    },
+    {
+      "path": "Utils/Logger.cs",
+      "isTemplate": true,
+      "description": "Logger implementation"
+    },
+    {
+      "path": "Utils/AuthManager.cs",
+      "isTemplate": true,
+      "description": "Authentication manager"
+    },
+    {
+      "path": "Utils/JsonUtils.cs",
+      "isTemplate": true,
+      "description": "JSON utilities"
+    },
+    {
+      "path": "Utils/RetryHelper.cs",
+      "isTemplate": true,
+      "description": "Retry logic helper"
+    },
+    {
+      "path": "Utils/DataReader.cs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "Test data reader"
+    },
+    {
+      "path": "Data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "User test data"
+    },
+    {
+      "path": "Data/test-cases.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "Test case data"
+    },
+    {
+      "path": "Tests/BaseTest.cs",
+      "isTemplate": true,
+      "description": "Base test class"
     },
     {
       "path": "Tests/UserTests.cs",
-      "isTemplate": true
+      "isTemplate": true,
+      "description": "User API tests"
+    },
+    {
+      "path": "Tests/AuthenticationTests.cs",
+      "isTemplate": true,
+      "description": "Authentication tests"
+    },
+    {
+      "path": "Tests/DataDrivenTests.cs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      },
+      "description": "Data-driven tests"
+    },
+    {
+      "path": "Features/Login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Login feature file"
+    },
+    {
+      "path": "Features/User.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "User feature file"
+    },
+    {
+      "path": "StepDefinitions/LoginSteps.cs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Login step definitions"
     }
   ],
   "directories": [

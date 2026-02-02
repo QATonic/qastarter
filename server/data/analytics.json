@@ -2117,5 +2117,18 @@
     "cicdTool": null,
     "reportingTool": null,
     "createdAt": "2026-02-02T18:43:23.900Z"
+  },
+  {
+    "id": 164,
+    "projectName": "test-playwright-ts",
+    "testingType": "web",
+    "framework": "playwright",
+    "language": "typescript",
+    "testingPattern": "page-object-model",
+    "testRunner": "jest",
+    "buildTool": "npm",
+    "cicdTool": "github-actions",
+    "reportingTool": "allure",
+    "createdAt": "2026-02-02T19:54:02.967Z"
   }
 ]

@@ -55,7 +55,7 @@ interface TrendsModalProps {
 
 export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ['/api/stats'],
+    queryKey: ['/api/analytics/stats'],
     retry: false,
     enabled: open,
   }) as { data: any; isLoading: boolean };

@@ -6,6 +6,8 @@
  */
 
 import { logger } from '../utils/logger';
+import { storage } from '../storage';
+import { ProjectConfig } from '@shared/schema';
 
 // Analytics event types
 export type AnalyticsEventType =
@@ -31,34 +33,17 @@ export interface AnalyticsEvent {
 }
 
 export interface GenerationStats {
-  totalGenerations: number;
-  byTestingType: Record<string, number>;
-  byFramework: Record<string, number>;
-  byLanguage: Record<string, number>;
-  byCiCd: Record<string, number>;
-  popularCombinations: Array<{
-    testingType: string;
-    framework: string;
-    language: string;
-    count: number;
-  }>;
-  recentGenerations: number; // Last 24 hours
+  totalGenerated: number;
+  byTestingType: any[];
+  byFramework: any[];
+  byLanguage: any[];
+  recentGenerations: any[];
 }
 
-// In-memory analytics store (for development/simple deployments)
-// In production, you'd use a database or external analytics service
-class AnalyticsStore {
+// In-memory analytics store for high-volume ephemeral events (wizard steps, etc.)
+// Project generation data is persisted to DB via storage.ts
+class EphemeralAnalyticsStore {
   private events: AnalyticsEvent[] = [];
-  private generationStats: GenerationStats = {
-    totalGenerations: 0,
-    byTestingType: {},
-    byFramework: {},
-    byLanguage: {},
-    byCiCd: {},
-    popularCombinations: [],
-    recentGenerations: 0,
-  };
-  private combinationCounts: Map<string, number> = new Map();
   private readonly MAX_EVENTS = 10000; // Keep only last 10k events in memory
   private readonly MAX_MEMORY_MB = 50; // Maximum memory for analytics store
   private memoryCheckCounter = 0;
@@ -76,11 +61,6 @@ class AnalyticsStore {
     if (this.memoryCheckCounter >= 500) {
       this.memoryCheckCounter = 0;
       this.checkMemoryUsage();
-    }
-
-    // Update stats for generation events
-    if (event.eventType === 'project_generate') {
-      this.updateGenerationStats(event);
     }
 
     // Log for structured logging
@@ -102,58 +82,6 @@ class AnalyticsStore {
     }
   }
 
-  private updateGenerationStats(event: AnalyticsEvent): void {
-    const { testingType, framework, language, cicdTool } = event.data;
-
-    this.generationStats.totalGenerations++;
-
-    // Update by category
-    if (testingType) {
-      this.generationStats.byTestingType[testingType] =
-        (this.generationStats.byTestingType[testingType] || 0) + 1;
-    }
-    if (framework) {
-      this.generationStats.byFramework[framework] =
-        (this.generationStats.byFramework[framework] || 0) + 1;
-    }
-    if (language) {
-      this.generationStats.byLanguage[language] =
-        (this.generationStats.byLanguage[language] || 0) + 1;
-    }
-    if (cicdTool) {
-      this.generationStats.byCiCd[cicdTool] = (this.generationStats.byCiCd[cicdTool] || 0) + 1;
-    }
-
-    // Track popular combinations
-    if (testingType && framework && language) {
-      const combo = `${testingType}|${framework}|${language}`;
-      this.combinationCounts.set(combo, (this.combinationCounts.get(combo) || 0) + 1);
-      this.updatePopularCombinations();
-    }
-  }
-
-  private updatePopularCombinations(): void {
-    const combos = Array.from(this.combinationCounts.entries())
-      .map(([key, count]) => {
-        const [testingType, framework, language] = key.split('|');
-        return { testingType, framework, language, count };
-      })
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
-
-    this.generationStats.popularCombinations = combos;
-  }
-
-  getStats(): GenerationStats {
-    // Calculate recent generations (last 24 hours)
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    this.generationStats.recentGenerations = this.events.filter(
-      (e) => e.eventType === 'project_generate' && e.timestamp > oneDayAgo
-    ).length;
-
-    return { ...this.generationStats };
-  }
-
   getRecentEvents(limit: number = 100): AnalyticsEvent[] {
     return this.events.slice(-limit);
   }
@@ -163,8 +91,8 @@ class AnalyticsStore {
   }
 }
 
-// Singleton instance
-const analyticsStore = new AnalyticsStore();
+// Singleton instance for ephemeral events
+const ephemeralStore = new EphemeralAnalyticsStore();
 
 /**
  * Generate a session ID (for anonymous session tracking)
@@ -204,13 +132,13 @@ export function trackEvent(
     metadata,
   };
 
-  analyticsStore.addEvent(event);
+  ephemeralStore.addEvent(event);
 }
 
 /**
- * Track project generation with full configuration
+ * Track project generation with persistent storage
  */
-export function trackProjectGeneration(
+export async function trackProjectGeneration(
   sessionId: string,
   config: {
     testingType: string;
@@ -218,34 +146,53 @@ export function trackProjectGeneration(
     language: string;
     testRunner: string;
     buildTool: string;
+    projectName: string; // Added projectName
     cicdTool?: string;
     reportingTool?: string;
     utilities?: Record<string, boolean>;
   },
   metadata: AnalyticsEvent['metadata'] = {}
-): void {
+): Promise<void> {
   const enabledUtilities = config.utilities
     ? Object.entries(config.utilities)
       .filter(([_, enabled]) => enabled)
       .map(([key]) => key)
     : [];
 
+  // 1. Track ephemeral event for live monitoring/logging
   trackEvent(
     'project_generate',
     sessionId,
     {
-      testingType: config.testingType,
-      framework: config.framework,
-      language: config.language,
-      testRunner: config.testRunner,
-      buildTool: config.buildTool,
-      cicdTool: config.cicdTool || 'none',
-      reportingTool: config.reportingTool || 'none',
+      ...config,
       utilitiesCount: enabledUtilities.length,
       utilities: enabledUtilities,
     },
     metadata
   );
+
+  // 2. Persist to storage (DB)
+  try {
+    // Adapter to match ProjectConfig interface if needed, or pass directly if matches
+    // config has almost all ProjectConfig fields except maybe testingPattern if not passed
+    const projectConfig: ProjectConfig = {
+      projectName: config.projectName || 'untitled-project',
+      testingType: config.testingType as any,
+      framework: config.framework,
+      language: config.language,
+      testRunner: config.testRunner,
+      buildTool: config.buildTool,
+      testingPattern: 'page-object-model', // Default implicitly
+      cicdTool: config.cicdTool,
+      reportingTool: config.reportingTool,
+      includeSampleTests: true,
+      utilities: config.utilities
+    };
+
+    await storage.saveProjectGeneration(projectConfig);
+  } catch (error) {
+    logger.error('Failed to persist project generation stats', { error });
+  }
 }
 
 /**
@@ -265,17 +212,17 @@ export function trackWizardStep(
 }
 
 /**
- * Get aggregated analytics stats
+ * Get aggregated analytics stats from persistent storage
  */
-export function getAnalyticsStats(): GenerationStats {
-  return analyticsStore.getStats();
+export async function getAnalyticsStats(): Promise<GenerationStats> {
+  return await storage.getProjectGenerationStats();
 }
 
 /**
  * Get recent analytics events
  */
 export function getRecentAnalyticsEvents(limit: number = 100): AnalyticsEvent[] {
-  return analyticsStore.getRecentEvents(limit);
+  return ephemeralStore.getRecentEvents(limit);
 }
 
 export default {

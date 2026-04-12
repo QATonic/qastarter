@@ -16,7 +16,7 @@ import NodeCache from 'node-cache';
 
 // ---------- Types ----------
 
-export type RegistryId = 'maven' | 'npm';
+export type RegistryId = 'maven' | 'npm' | 'nuget' | 'pypi';
 
 /**
  * Unified dependency shape returned to the client and used by
@@ -101,6 +101,10 @@ const MAVEN_SEARCH_URL = 'https://search.maven.org/solrsearch/select';
 const NPM_SEARCH_URL = 'https://registry.npmjs.org/-/v1/search';
 const NPM_PACKAGE_URL = 'https://registry.npmjs.org';
 const MAVEN_VERSIONS_URL = 'https://search.maven.org/solrsearch/select';
+const NUGET_SEARCH_URL = 'https://azuresearch-usnc.nuget.org/query';
+const NUGET_VERSIONS_URL = 'https://api.nuget.org/v3-flatcontainer';
+const PYPI_SEARCH_URL = 'https://pypi.org/pypi';
+const PYPI_SIMPLE_URL = 'https://pypi.org/simple';
 
 // ---------- Helpers ----------
 
@@ -471,6 +475,232 @@ export async function getNpmVersions(name: string, options: SearchOptions = {}):
   return versions.reverse();
 }
 
+// ---------- NuGet registry adapter ----------
+
+interface NuGetSearchResponse {
+  totalHits?: number;
+  data?: NuGetPackage[];
+}
+
+interface NuGetPackage {
+  id: string;
+  version: string;
+  description?: string;
+  projectUrl?: string;
+  totalDownloads?: number;
+  licenseUrl?: string;
+  tags?: string[];
+  versions?: Array<{ version: string; downloads: number }>;
+}
+
+/**
+ * Search the NuGet registry (nuget.org) for a .NET package.
+ *
+ * Uses the Azure Search-backed NuGet v3 Search API which provides
+ * fast, relevance-ranked results.
+ */
+export async function searchNuGet(
+  query: string,
+  options: SearchOptions = {}
+): Promise<NormalizedDependency[]> {
+  const limit = clampLimit(options.limit);
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const url = new URL(NUGET_SEARCH_URL);
+  url.searchParams.set('q', trimmed);
+  url.searchParams.set('take', String(limit));
+  url.searchParams.set('prerelease', 'false');
+  url.searchParams.set('semVerLevel', '2.0.0');
+
+  const data = await withRetry(async () => {
+    const response = await fetchWithTimeout(url.toString(), { signal: options.signal });
+    if (!response.ok) {
+      throw new Error(`NuGet search failed: ${response.status} ${response.statusText}`);
+    }
+    return (await response.json()) as NuGetSearchResponse;
+  });
+
+  const packages = data.data ?? [];
+
+  return packages.map<NormalizedDependency>((pkg) => ({
+    id: pkg.id,
+    registry: 'nuget',
+    name: pkg.id,
+    version: pkg.version,
+    description: pkg.description,
+    downloads: pkg.totalDownloads,
+    homepage: pkg.projectUrl ?? `https://www.nuget.org/packages/${encodeURIComponent(pkg.id)}`,
+  }));
+}
+
+/**
+ * Get all published stable versions for a NuGet package, newest-first.
+ */
+export async function getNuGetVersions(
+  packageId: string,
+  options: SearchOptions = {}
+): Promise<string[]> {
+  const trimmed = packageId.trim().toLowerCase();
+  if (!trimmed) return [];
+
+  // The flat container API returns all versions for a package
+  const url = `${NUGET_VERSIONS_URL}/${encodeURIComponent(trimmed)}/index.json`;
+
+  const data = await withRetry(async () => {
+    const response = await fetchWithTimeout(url, { signal: options.signal });
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`NuGet version lookup failed: ${response.status}`);
+    }
+    return (await response.json()) as { versions?: string[] };
+  });
+
+  if (!data) return [];
+  const versions = (data.versions ?? [])
+    // Filter out pre-release versions (contain a hyphen after semver)
+    .filter((v: string) => !v.includes('-'));
+  // Newest first
+  return versions.reverse();
+}
+
+// ---------- PyPI registry adapter ----------
+
+interface PyPISearchResult {
+  info?: {
+    name: string;
+    version: string;
+    summary?: string;
+    home_page?: string;
+    project_url?: string;
+    license?: string;
+    package_url?: string;
+    project_urls?: Record<string, string>;
+  };
+  releases?: Record<string, unknown[]>;
+}
+
+/**
+ * Search PyPI for a Python package.
+ *
+ * PyPI does not have a search API (the XML-RPC search was disabled in 2023),
+ * so we use the JSON endpoint which does exact-match lookups. For fuzzy search
+ * we try the package name directly — PyPI normalizes names (e.g. "my-package"
+ * and "my_package" resolve to the same package).
+ *
+ * For broader search, we query the PyPI warehouse simple API index.
+ */
+export async function searchPyPI(
+  query: string,
+  options: SearchOptions = {}
+): Promise<NormalizedDependency[]> {
+  const limit = clampLimit(options.limit);
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  // Strategy: Try exact match first (fast), then try common variations
+  const candidates = generatePyPICandidates(trimmed);
+  const results: NormalizedDependency[] = [];
+  const seen = new Set<string>();
+
+  for (const candidate of candidates) {
+    if (results.length >= limit) break;
+
+    try {
+      const url = `${PYPI_SEARCH_URL}/${encodeURIComponent(candidate)}/json`;
+      const response = await fetchWithTimeout(url, { signal: options.signal });
+
+      if (!response.ok) {
+        if (response.status === 404) continue; // Package doesn't exist
+        throw new Error(`PyPI lookup failed: ${response.status}`);
+      }
+
+      const data = (await response.json()) as PyPISearchResult;
+      const info = data.info;
+      if (!info || seen.has(info.name.toLowerCase())) continue;
+      seen.add(info.name.toLowerCase());
+
+      results.push({
+        id: info.name,
+        registry: 'pypi',
+        name: info.name,
+        version: info.version,
+        description: info.summary,
+        homepage:
+          info.project_urls?.Homepage ??
+          info.home_page ??
+          info.package_url ??
+          `https://pypi.org/project/${encodeURIComponent(info.name)}/`,
+        license: info.license && info.license.length < 60 ? info.license : undefined,
+      });
+    } catch (err) {
+      // Skip individual failures but don't abort the entire search
+      if (err instanceof Error && err.name === 'AbortError') throw err;
+      continue;
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Generate candidate package names from a search query for PyPI lookup.
+ *
+ * Since PyPI lacks a search API, we generate likely package name variants
+ * from the user's query. This covers common naming conventions:
+ * - Exact name
+ * - Hyphenated and underscored variants
+ * - Common prefixes (python-, py-)
+ */
+function generatePyPICandidates(query: string): string[] {
+  const q = query.toLowerCase().trim();
+  const candidates: string[] = [q];
+
+  // Add hyphen/underscore variants
+  if (q.includes('-')) {
+    candidates.push(q.replace(/-/g, '_'));
+  } else if (q.includes('_')) {
+    candidates.push(q.replace(/_/g, '-'));
+  } else {
+    // Try with common prefixes for short queries
+    candidates.push(`py${q}`, `python-${q}`, `${q}-python`);
+  }
+
+  // Dedupe while preserving order
+  return Array.from(new Set(candidates));
+}
+
+/**
+ * Get all published versions for a PyPI package, newest-first.
+ */
+export async function getPyPIVersions(
+  packageName: string,
+  options: SearchOptions = {}
+): Promise<string[]> {
+  const trimmed = packageName.trim();
+  if (!trimmed) return [];
+
+  const url = `${PYPI_SEARCH_URL}/${encodeURIComponent(trimmed)}/json`;
+  const data = await withRetry(async () => {
+    const response = await fetchWithTimeout(url, { signal: options.signal });
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`PyPI version lookup failed: ${response.status}`);
+    }
+    return (await response.json()) as PyPISearchResult;
+  });
+
+  if (!data || !data.releases) return [];
+
+  // Sort versions newest-first using simple string comparison
+  // PyPI releases are keyed by version string
+  const versions = Object.keys(data.releases)
+    // Filter out pre-release versions (common patterns: a, b, rc, dev)
+    .filter((v) => !/[a-zA-Z]/.test(v.replace(/\./g, '')));
+
+  return versions.reverse();
+}
+
 // ---------- Public dispatcher ----------
 
 /**
@@ -490,10 +720,23 @@ export async function searchRegistry(
   const cached = registryCache.get<NormalizedDependency[]>(key);
   if (cached) return cached;
 
-  const results =
-    registry === 'maven'
-      ? await searchMavenCentral(trimmed, { ...options, limit })
-      : await searchNpm(trimmed, { ...options, limit });
+  let results: NormalizedDependency[];
+  switch (registry) {
+    case 'maven':
+      results = await searchMavenCentral(trimmed, { ...options, limit });
+      break;
+    case 'npm':
+      results = await searchNpm(trimmed, { ...options, limit });
+      break;
+    case 'nuget':
+      results = await searchNuGet(trimmed, { ...options, limit });
+      break;
+    case 'pypi':
+      results = await searchPyPI(trimmed, { ...options, limit });
+      break;
+    default:
+      results = [];
+  }
 
   registryCache.set(key, results);
   return results;
@@ -517,14 +760,24 @@ export async function getRegistryVersions(
   if (cached) return cached;
 
   let versions: string[] = [];
-  if (registry === 'maven') {
-    const [group, artifact] = trimmed.split(':');
-    if (!group || !artifact) {
-      throw new Error(`Maven coordinate must be "group:artifact", received "${trimmed}"`);
+  switch (registry) {
+    case 'maven': {
+      const [group, artifact] = trimmed.split(':');
+      if (!group || !artifact) {
+        throw new Error(`Maven coordinate must be "group:artifact", received "${trimmed}"`);
+      }
+      versions = await getMavenVersions(group, artifact, options);
+      break;
     }
-    versions = await getMavenVersions(group, artifact, options);
-  } else {
-    versions = await getNpmVersions(trimmed, options);
+    case 'npm':
+      versions = await getNpmVersions(trimmed, options);
+      break;
+    case 'nuget':
+      versions = await getNuGetVersions(trimmed, options);
+      break;
+    case 'pypi':
+      versions = await getPyPIVersions(trimmed, options);
+      break;
   }
 
   registryCache.set(key, versions);

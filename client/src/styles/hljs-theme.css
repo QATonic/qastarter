@@ -1,0 +1,134 @@
+/**
+ * highlight.js theme for QAStarter
+ *
+ * Matches the app's light/dark mode via CSS custom properties.
+ * Inspired by VS Code's default themes.
+ */
+
+/* --- Light mode --- */
+.hljs-preview .hljs-keyword,
+.hljs-preview .hljs-selector-tag,
+.hljs-preview .hljs-built_in,
+.hljs-preview .hljs-name {
+  color: #0550ae;
+}
+
+.hljs-preview .hljs-string,
+.hljs-preview .hljs-attr,
+.hljs-preview .hljs-template-variable,
+.hljs-preview .hljs-addition {
+  color: #0a3069;
+}
+
+.hljs-preview .hljs-comment,
+.hljs-preview .hljs-quote {
+  color: #6e7781;
+  font-style: italic;
+}
+
+.hljs-preview .hljs-number,
+.hljs-preview .hljs-literal,
+.hljs-preview .hljs-variable,
+.hljs-preview .hljs-tag .hljs-attr {
+  color: #0550ae;
+}
+
+.hljs-preview .hljs-type,
+.hljs-preview .hljs-class .hljs-title,
+.hljs-preview .hljs-title.class_ {
+  color: #953800;
+}
+
+.hljs-preview .hljs-symbol,
+.hljs-preview .hljs-bullet,
+.hljs-preview .hljs-meta {
+  color: #6639ba;
+}
+
+.hljs-preview .hljs-function,
+.hljs-preview .hljs-title.function_ {
+  color: #8250df;
+}
+
+.hljs-preview .hljs-deletion {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+
+.hljs-preview .hljs-addition {
+  color: #116329;
+  background-color: #dafbe1;
+}
+
+.hljs-preview .hljs-section {
+  color: #0550ae;
+  font-weight: bold;
+}
+
+.hljs-preview .hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-preview .hljs-strong {
+  font-weight: bold;
+}
+
+/* --- Dark mode --- */
+.dark .hljs-preview .hljs-keyword,
+.dark .hljs-preview .hljs-selector-tag,
+.dark .hljs-preview .hljs-built_in,
+.dark .hljs-preview .hljs-name {
+  color: #ff7b72;
+}
+
+.dark .hljs-preview .hljs-string,
+.dark .hljs-preview .hljs-attr,
+.dark .hljs-preview .hljs-template-variable,
+.dark .hljs-preview .hljs-addition {
+  color: #a5d6ff;
+}
+
+.dark .hljs-preview .hljs-comment,
+.dark .hljs-preview .hljs-quote {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.dark .hljs-preview .hljs-number,
+.dark .hljs-preview .hljs-literal,
+.dark .hljs-preview .hljs-variable,
+.dark .hljs-preview .hljs-tag .hljs-attr {
+  color: #79c0ff;
+}
+
+.dark .hljs-preview .hljs-type,
+.dark .hljs-preview .hljs-class .hljs-title,
+.dark .hljs-preview .hljs-title.class_ {
+  color: #ffa657;
+}
+
+.dark .hljs-preview .hljs-symbol,
+.dark .hljs-preview .hljs-bullet,
+.dark .hljs-preview .hljs-meta {
+  color: #d2a8ff;
+}
+
+.dark .hljs-preview .hljs-function,
+.dark .hljs-preview .hljs-title.function_ {
+  color: #d2a8ff;
+}
+
+.dark .hljs-preview .hljs-deletion {
+  color: #ffdcd7;
+  background-color: #67060c;
+}
+
+.dark .hljs-preview .hljs-addition {
+  color: #aff5b4;
+  background-color: #033a16;
+}
+
+.dark .hljs-preview .hljs-section {
+  color: #79c0ff;
+  font-weight: bold;
+}

@@ -42,6 +42,24 @@ export const BOM = {
     restsharp: '110.2.0',
     appium: '5.0.0', // Dotnet client
   },
+  kotlin: {
+    kotlin: '1.9.22',
+    espresso: '3.5.1',
+    junit5: '5.10.1',
+    gradle: '8.4',
+    androidGradlePlugin: '8.2.0',
+    allure: '2.25.0',
+  },
+  go: {
+    version: '1.21+',
+    playwrightGo: '0.4101.1',
+    resty: '2.11.0',
+    testify: '1.8.4',
+  },
+  dart: {
+    dart: '3.2.0+',
+    flutter: '3.16.0+',
+  },
   swift: {
     swift: '5.9',
     xctest: 'latest', // Part of Xcode

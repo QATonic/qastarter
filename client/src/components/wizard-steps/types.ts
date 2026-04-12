@@ -8,8 +8,10 @@ import React from 'react';
  * Registry a user-picked dependency was fetched from.
  * 'maven' -> Maven Central (Java / Kotlin / Scala builds)
  * 'npm'   -> npm registry (JavaScript / TypeScript builds)
+ * 'nuget' -> NuGet (.NET / C# builds)
+ * 'pypi'  -> PyPI (Python builds)
  */
-export type DependencyRegistry = 'maven' | 'npm';
+export type DependencyRegistry = 'maven' | 'npm' | 'nuget' | 'pypi';
 
 /**
  * A dependency the user explicitly added via the dependency search UI.

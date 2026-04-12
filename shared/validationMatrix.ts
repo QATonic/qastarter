@@ -285,7 +285,7 @@ export const validationMatrix: ValidationMatrix = {
     'espresso-kotlin': ['allure', 'junit-reports'],
 
     // Mobile - XCUITest
-    'xcuitest-swift': [],
+    'xcuitest-swift': ['xcresult', 'junit-reports'],
 
     // API - RestAssured
     'restassured-java': ['allure', 'extent-reports', 'testng-reports', 'junit-html'],
@@ -321,7 +321,7 @@ export const validationMatrix: ValidationMatrix = {
     'playwright-go': ['allure'],
 
     // Mobile - Flutter
-    'flutter-dart': [],
+    'flutter-dart': ['flutter-test-report', 'junit-reports'],
   },
 
   // Framework -> Available CI/CD Tools (standardized across all templates)
@@ -887,6 +887,7 @@ export const validationLabels = {
     'jest-html': 'Jest HTML',
     'nunit-reports': 'NUnit Reports',
     'robot-reports': 'Robot Framework Reports',
+    'flutter-test-report': 'Flutter Test Report',
   },
 
   testingPatterns: {

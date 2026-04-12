@@ -1,0 +1,21 @@
+gatling {
+  core {
+    runDescription = "{{projectName}} - Performance Test"
+    encoding = "utf-8"
+    simulationClass = "{{javaPackage}}.simulations.LoadSimulation"
+  }
+  http {
+    fetchedCssSelectorCache = 200
+    fetchedHtmlCacheEnabled = true
+  }
+  data {
+    writers = [console, file]
+  }
+  charting {
+    noReports = false
+    indicators {
+      lowerBound = 200
+      higherBound = 500
+    }
+  }
+}

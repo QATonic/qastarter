@@ -198,6 +198,13 @@
       "path": "Utils/Log.cs",
       "isTemplate": true,
       "description": "Logging utility"
+    },
+    {
+      "path": "Utils/TestDataFactory.cs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
     }
   ],
   "supportedCombination": {

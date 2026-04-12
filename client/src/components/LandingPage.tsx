@@ -16,6 +16,7 @@ import {
   Smartphone,
   Server,
   Monitor,
+  Gauge,
   Play,
   Github,
   Star,
@@ -23,10 +24,10 @@ import {
   ScrollText,
   Rocket,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { validationMatrix } from '@shared/validationMatrix';
+import { validationMatrix, validationLabels } from '@shared/validationMatrix';
 
 const YOUTUBE_VIDEO_ID = 'YYEBwX9oqas';
 const GITHUB_REPO_URL = 'https://github.com/QATonic/qastarter';
@@ -46,6 +47,64 @@ export default function LandingPage() {
       for (const lang of languages) allLanguages.add(lang);
     }
     return { frameworkCount: allFrameworks.size, languageCount: allLanguages.size };
+  }, []);
+
+  // ── Live stats from server (graceful degradation to static values) ──
+  const [liveStats, setLiveStats] = useState<{
+    totalGenerated: number;
+    topFramework: { id: string; label: string; count: number } | null;
+    githubStars: number | null;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchLiveStats() {
+      try {
+        const [statsRes, githubRes] = await Promise.allSettled([
+          fetch('/api/v1/stats').then((r) => r.json()),
+          fetch('/api/v1/stats/github').then((r) => r.json()),
+        ]);
+
+        if (cancelled) return;
+
+        const stats =
+          statsRes.status === 'fulfilled' && statsRes.value?.success
+            ? statsRes.value.data
+            : null;
+        const github =
+          githubRes.status === 'fulfilled' && githubRes.value?.success
+            ? githubRes.value.data
+            : null;
+
+        if (stats) {
+          const topFw = stats.byFramework?.[0];
+          setLiveStats({
+            totalGenerated: stats.totalGenerated ?? 0,
+            topFramework: topFw
+              ? {
+                  id: topFw.framework ?? '',
+                  label:
+                    validationLabels.frameworks[
+                      topFw.framework as keyof typeof validationLabels.frameworks
+                    ] ??
+                    topFw.framework ??
+                    '',
+                  count: topFw.count ?? 0,
+                }
+              : null,
+            githubStars: github?.stars ?? null,
+          });
+        }
+      } catch {
+        // Silently fail — static fallback values remain
+      }
+    }
+
+    fetchLiveStats();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
@@ -92,8 +151,8 @@ export default function LandingPage() {
 
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed text-balance">
               Get fully implemented, production-ready test automation frameworks instantly. Includes
-              source code for Selenium, Playwright, Cypress, Robot, Appium, Flutter, RestAssured,
-              Resty with POM, BDD, and valid CI/CD pipelines.
+              source code for Selenium, Playwright, Cypress, Appium, RestAssured, k6 with POM, BDD,
+              cloud device farms, OpenAPI-driven test stubs, Faker data factories, and CI/CD pipelines.
             </p>
 
             {/* Trust badges - simplified */}
@@ -172,30 +231,78 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Quick Stats - cleaner design */}
+            {/* Quick Stats - live data with static fallback */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+              {/* Card 1: Projects Generated (live) or Frameworks (static) */}
               <div className="text-center p-6 rounded-xl bg-card border border-border/50 shadow-sm">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  {frameworkCount}
-                </div>
-                <div className="text-sm font-medium text-foreground">Frameworks</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Selenium, Playwright, Robot, Flutter
-                </div>
+                {liveStats && liveStats.totalGenerated > 0 ? (
+                  <>
+                    <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      {liveStats.totalGenerated.toLocaleString()}
+                    </div>
+                    <div className="text-sm font-medium text-foreground">Projects Generated</div>
+                    <div className="text-xs text-muted-foreground mt-1">and counting</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      {frameworkCount}
+                    </div>
+                    <div className="text-sm font-medium text-foreground">Frameworks</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Selenium, Playwright, Robot, Flutter
+                    </div>
+                  </>
+                )}
               </div>
+
+              {/* Card 2: Frameworks + Most Popular badge (live) or Languages (static) */}
               <div className="text-center p-6 rounded-xl bg-card border border-border/50 shadow-sm">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  {languageCount}
-                </div>
-                <div className="text-sm font-medium text-foreground">Languages</div>
-                <div className="text-xs text-muted-foreground mt-1">Java, Python, TS, Go, Dart</div>
+                {liveStats?.topFramework ? (
+                  <>
+                    <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      {frameworkCount}
+                    </div>
+                    <div className="text-sm font-medium text-foreground">Frameworks</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Top pick: {liveStats.topFramework.label}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      {languageCount}
+                    </div>
+                    <div className="text-sm font-medium text-foreground">Languages</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Java, Python, TS, Go, Dart
+                    </div>
+                  </>
+                )}
               </div>
+
+              {/* Card 3: GitHub Stars (live) or Setup Time (static) */}
               <div className="text-center p-6 rounded-xl bg-card border border-border/50 shadow-sm">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
-                  2<span className="text-xl font-normal text-muted-foreground ml-1">min</span>
-                </div>
-                <div className="text-sm font-medium text-foreground">Setup Time</div>
-                <div className="text-xs text-muted-foreground mt-1">Download & start coding</div>
+                {liveStats && liveStats.githubStars !== null && liveStats.githubStars > 0 ? (
+                  <>
+                    <div className="text-4xl md:text-5xl font-bold text-primary mb-2 inline-flex items-center gap-2 justify-center">
+                      {liveStats.githubStars.toLocaleString()}
+                      <Star className="h-7 w-7 text-amber-500 fill-amber-500" />
+                    </div>
+                    <div className="text-sm font-medium text-foreground">GitHub Stars</div>
+                    <div className="text-xs text-muted-foreground mt-1">Open source community</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+                      2<span className="text-xl font-normal text-muted-foreground ml-1">min</span>
+                    </div>
+                    <div className="text-sm font-medium text-foreground">Setup Time</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Download &amp; start coding
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -248,12 +355,12 @@ export default function LandingPage() {
             </p>
 
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-foreground text-balance">
-              46+ Production-Ready Templates
+              49+ Production-Ready Templates
             </h2>
 
             <p className="text-base md:text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Web, Mobile, API, and Desktop automation with Page Object Model, BDD, Contract
-              Testing, CI/CD pipelines, and Docker support.
+              Web, Mobile, API, Desktop, and Performance testing with POM, BDD, cloud device farms,
+              OpenAPI-driven stubs, Faker test data, CI/CD pipelines, and Docker support.
             </p>
 
             {/* Enhanced Technology Categories */}
@@ -267,7 +374,7 @@ export default function LandingPage() {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['Selenium', 'Playwright', 'Cypress', 'Appium', 'Flutter', 'Resty'].map(
+                  {['Selenium', 'Playwright', 'Cypress', 'Appium', 'Flutter', 'Resty', 'k6', 'RestSharp'].map(
                     (tech) => (
                       <div
                         key={tech}
@@ -292,7 +399,7 @@ export default function LandingPage() {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['Java', 'Python', 'Kotlin', 'TypeScript', 'Go', 'Dart'].map((tech) => (
+                  {['Java', 'Python', 'Kotlin', 'TypeScript', 'C#', 'Go', 'Dart'].map((tech) => (
                     <div
                       key={tech}
                       className="group flex items-center space-x-3 p-3 rounded-lg bg-green-500/5 dark:bg-green-500/10 border border-green-500/10 hover:border-green-500/20 transition-all duration-300 hover-elevate"
@@ -315,7 +422,7 @@ export default function LandingPage() {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['TestNG', 'JUnit', 'Pytest', 'Jest', 'Testify', 'Flutter Test'].map((tech) => (
+                  {['TestNG', 'JUnit', 'Pytest', 'Jest', 'NUnit', 'Testify', 'Locust'].map((tech) => (
                     <div
                       key={tech}
                       className="group flex items-center space-x-3 p-3 rounded-lg bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/10 hover:border-rose-500/20 transition-all duration-300 hover-elevate"
@@ -338,7 +445,7 @@ export default function LandingPage() {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['Maven', 'Gradle', 'npm', 'Go Mod', 'Pub', 'GitHub Actions'].map((tech) => (
+                  {['Maven', 'Gradle', 'npm', 'dotnet', 'Go Mod', 'GitHub Actions', 'Jenkins'].map((tech) => (
                     <div
                       key={tech}
                       className="group flex items-center space-x-3 p-3 rounded-lg bg-orange-500/5 dark:bg-orange-500/10 border border-orange-500/10 hover:border-orange-500/20 transition-all duration-300 hover-elevate"
@@ -367,7 +474,7 @@ export default function LandingPage() {
                 with industry best practices
               </p>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 max-w-7xl mx-auto">
                 <Card className="hover-elevate">
                   <CardContent className="pt-8 pb-8">
                     <Globe className="h-12 w-12 text-blue-600 mb-4 mx-auto" />
@@ -396,7 +503,7 @@ export default function LandingPage() {
                           className="inline h-3 w-3 text-green-500 mr-1"
                           aria-hidden="true"
                         />
-                        Parallel Test Execution
+                        BrowserStack / Sauce Labs
                       </div>
                     </div>
                   </CardContent>
@@ -440,9 +547,17 @@ export default function LandingPage() {
                     <Server className="h-12 w-12 text-rose-600 mb-4 mx-auto" />
                     <h3 className="text-lg font-bold mb-2">API Testing</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      RestAssured, Resty (Go), Supertest, GraphQL, gRPC with Contract Testing
+                      RestAssured, Resty (Go), Supertest, RestSharp, GraphQL, gRPC with Contract
+                      Testing
                     </p>
                     <div className="text-xs text-muted-foreground space-y-1">
+                      <div>
+                        <CheckCircle
+                          className="inline h-3 w-3 text-green-500 mr-1"
+                          aria-hidden="true"
+                        />
+                        OpenAPI Schema-Driven Stubs
+                      </div>
                       <div>
                         <CheckCircle
                           className="inline h-3 w-3 text-green-500 mr-1"
@@ -455,14 +570,7 @@ export default function LandingPage() {
                           className="inline h-3 w-3 text-green-500 mr-1"
                           aria-hidden="true"
                         />
-                        JSON/XML Validation
-                      </div>
-                      <div>
-                        <CheckCircle
-                          className="inline h-3 w-3 text-green-500 mr-1"
-                          aria-hidden="true"
-                        />
-                        Authentication Support
+                        Multi-Environment Config
                       </div>
                     </div>
                   </CardContent>
@@ -501,6 +609,39 @@ export default function LandingPage() {
                     </div>
                   </CardContent>
                 </Card>
+
+                <Card className="hover-elevate">
+                  <CardContent className="pt-8 pb-8">
+                    <Gauge className="h-12 w-12 text-purple-600 mb-4 mx-auto" />
+                    <h3 className="text-lg font-bold mb-2">Performance</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      k6, Gatling, Locust for load, stress, and scalability testing
+                    </p>
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <div>
+                        <CheckCircle
+                          className="inline h-3 w-3 text-green-500 mr-1"
+                          aria-hidden="true"
+                        />
+                        Load & Stress Tests
+                      </div>
+                      <div>
+                        <CheckCircle
+                          className="inline h-3 w-3 text-green-500 mr-1"
+                          aria-hidden="true"
+                        />
+                        Threshold Assertions
+                      </div>
+                      <div>
+                        <CheckCircle
+                          className="inline h-3 w-3 text-green-500 mr-1"
+                          aria-hidden="true"
+                        />
+                        HTML Reports
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
 
@@ -523,8 +664,9 @@ export default function LandingPage() {
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
                       A free QA automation framework generator supporting Selenium, Playwright,
-                      Cypress, Robot Framework, Appium, Flutter across Java, Python, Go, Dart,
-                      TypeScript, and C#. No signup required.
+                      Cypress, Robot Framework, Appium, Flutter, k6, Gatling across Java, Python,
+                      Go, Dart, TypeScript, C#, and Kotlin. Includes cloud device farms, OpenAPI
+                      schema-driven stubs, Faker test data, and a CLI tool. No signup required.
                     </AccordionContent>
                   </AccordionItem>
 
@@ -533,9 +675,10 @@ export default function LandingPage() {
                       <span className="text-sm font-medium">Which frameworks are supported?</span>
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
-                      46+ templates: Web (Selenium, Playwright, Cypress), Mobile (Appium, Espresso,
-                      Flutter), API (RestAssured, Resty, Supertest), and Desktop (WinAppDriver) with
-                      POM, BDD, and Docker support.
+                      49+ templates: Web (Selenium, Playwright, Cypress), Mobile (Appium, Espresso,
+                      Flutter), API (RestAssured, Resty, Supertest, RestSharp), Desktop (WinAppDriver,
+                      PyAutoGUI), and Performance (k6, Gatling, Locust) with POM, BDD, cloud device
+                      farms, OpenAPI-driven stubs, and Docker support.
                     </AccordionContent>
                   </AccordionItem>
 
@@ -556,9 +699,10 @@ export default function LandingPage() {
                       </span>
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
-                      Complete source code with Page Object Model implementation, working sample
-                      tests, configured runners, reusable utilities, CI/CD pipelines, and reporting
-                      integration.
+                      Complete source code with Page Object Model, working sample tests, configured
+                      runners, reusable utilities, Faker test data factories, cloud device farm configs,
+                      OpenAPI-generated test stubs, multi-environment support, CI/CD pipelines, and
+                      reporting integration.
                     </AccordionContent>
                   </AccordionItem>
 

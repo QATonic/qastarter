@@ -20,6 +20,9 @@
 "dotenv": "^16.3.0"
 },
 "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+{{#if utilities.faker}}
+"@faker-js/faker": "^{{toolVersions.fakerJs}}",
+{{/if}}
 "@types/jest": "^29.5.0",
 "@types/node": "^20.10.0",
 "@types/selenium-webdriver": "^4.1.0",

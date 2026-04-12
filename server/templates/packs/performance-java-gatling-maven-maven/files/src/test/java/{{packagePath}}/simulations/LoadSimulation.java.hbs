@@ -1,0 +1,47 @@
+package {{javaPackage}}.simulations;
+
+import io.gatling.javaapi.core.*;
+import io.gatling.javaapi.http.*;
+
+import java.time.Duration;
+
+import static io.gatling.javaapi.core.CoreDsl.*;
+import static io.gatling.javaapi.http.HttpDsl.*;
+
+/**
+ * Load Simulation - simulates normal expected traffic.
+ *
+ * Ramp up to target users, hold steady, then ramp down.
+ * Use this to establish baseline performance metrics.
+ */
+public class LoadSimulation extends Simulation {
+
+    private final HttpProtocolBuilder httpProtocol = http
+            .baseUrl("{{baseUrl}}")
+            .acceptHeader("text/html,application/json")
+            .acceptEncodingHeader("gzip, deflate")
+            .userAgentHeader("Gatling/{{toolVersions.gatling}}");
+
+    private final ScenarioBuilder loadScenario = scenario("Load Test")
+            .exec(
+                    http("Homepage")
+                            .get("/")
+                            .check(status().is(200))
+            )
+            .pause(Duration.ofSeconds(1));
+
+    {
+        setUp(
+                loadScenario.injectOpen(
+                        rampUsers(50).during(Duration.ofMinutes(1)),
+                        constantUsersPerSec(10).during(Duration.ofMinutes(3)),
+                        rampUsers(0).during(Duration.ofMinutes(1))
+                )
+        )
+        .protocols(httpProtocol)
+        .assertions(
+                global().responseTime().percentile(95.0).lt(500),
+                global().failedRequests().percent().lt(1.0)
+        );
+    }
+}

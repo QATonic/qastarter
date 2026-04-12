@@ -209,6 +209,13 @@
       "path": "core/winappdriver_manager.py",
       "isTemplate": true,
       "description": "WinAppDriver session manager"
+    },
+    {
+      "path": "utils/test_data_factory.py",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
     }
   ],
   "supportedCombination": {

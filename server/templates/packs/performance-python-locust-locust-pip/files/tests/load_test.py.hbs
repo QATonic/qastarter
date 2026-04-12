@@ -1,0 +1,38 @@
+"""
+Load Test — simulates normal expected traffic.
+
+Run: locust -f tests/load_test.py --host={{baseUrl}} --headless -u 50 -r 10 --run-time 5m
+"""
+
+from locust import HttpUser, task, between, events
+from config.settings import THRESHOLDS
+
+
+class LoadTestUser(HttpUser):
+    """Standard load test: steady traffic at expected levels."""
+
+    wait_time = between(1, 2)
+
+    @task(5)
+    def browse_homepage(self):
+        with self.client.get("/", name="GET /", catch_response=True) as response:
+            if response.elapsed.total_seconds() > THRESHOLDS["response_time_p95"]:
+                response.failure(f"Response too slow: {response.elapsed.total_seconds():.2f}s")
+
+    @task(2)
+    def api_request(self):
+        with self.client.get("/api/health", name="GET /api/health", catch_response=True) as response:
+            if response.status_code != 200:
+                response.failure(f"Unexpected status: {response.status_code}")
+
+
+@events.quitting.add_listener
+def check_fail_ratio(environment, **kwargs):
+    """Fail the test if error rate exceeds threshold."""
+    stats = environment.runner.stats.total
+    if stats.num_requests == 0:
+        return
+    fail_ratio = stats.num_failures / stats.num_requests
+    if fail_ratio > THRESHOLDS["error_rate"]:
+        environment.process_exit_code = 1
+        print(f"FAIL: Error rate {fail_ratio:.2%} exceeds threshold {THRESHOLDS['error_rate']:.2%}")

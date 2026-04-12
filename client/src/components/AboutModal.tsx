@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Heart, Zap, Shield, Download } from 'lucide-react';
+import { Heart, Zap, Shield, Download, Cloud, FlaskConical } from 'lucide-react';
 import QAStarterLogo from './QAStarterLogo';
 
 interface AboutModalProps {
@@ -58,7 +58,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
                 <div>
                   <div className="font-medium text-sm">Multiple Frameworks</div>
                   <div className="text-xs text-muted-foreground">
-                    Selenium, Playwright, Cypress, Appium, Flutter, Resty
+                    Selenium, Playwright, Cypress, Appium, Flutter, Resty, k6
                   </div>
                 </div>
               </div>
@@ -67,7 +67,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
                 <div>
                   <div className="font-medium text-sm">Language Support</div>
                   <div className="text-xs text-muted-foreground">
-                    Java, Python, JS/TS, C#, Go, Dart
+                    Java, Python, JS/TS, C#, Go, Dart, Kotlin
                   </div>
                 </div>
               </div>
@@ -85,7 +85,25 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
                 <div>
                   <div className="font-medium text-sm">CI/CD Ready</div>
                   <div className="text-xs text-muted-foreground">
-                    GitHub Actions, Azure DevOps, Jenkins
+                    GitHub Actions, Azure DevOps, Jenkins, GitLab CI
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2">
+                <Cloud className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="font-medium text-sm">Cloud Device Farms</div>
+                  <div className="text-xs text-muted-foreground">
+                    BrowserStack, Sauce Labs integration
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2">
+                <FlaskConical className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <div className="font-medium text-sm">Test Data & OpenAPI</div>
+                  <div className="text-xs text-muted-foreground">
+                    Faker libraries, OpenAPI schema-driven stubs
                   </div>
                 </div>
               </div>
@@ -145,7 +163,7 @@ export default function AboutModal({ open, onOpenChange }: AboutModalProps) {
             </p>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="text-center p-3 bg-background/50 rounded-lg">
-                <div className="text-2xl font-bold text-primary">46+</div>
+                <div className="text-2xl font-bold text-primary">49+</div>
                 <div className="text-xs text-muted-foreground">Templates</div>
               </div>
               <div className="text-center p-3 bg-background/50 rounded-lg">

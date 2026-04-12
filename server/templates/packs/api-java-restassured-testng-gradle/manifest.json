@@ -408,6 +408,20 @@
       "template": "src/test/resources/testdata/test-requests.json.hbs",
       "isTemplate": true,
       "description": "Sample test request payloads"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataFactory.java",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/OpenApiTests.java",
+      "isTemplate": true,
+      "conditional": {
+        "hasOpenApiEndpoints": true
+      }
     }
   ],
   "directories": [

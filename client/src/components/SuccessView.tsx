@@ -9,10 +9,12 @@ import {
   MonitorSmartphone,
   Lightbulb,
   ChevronDown,
+  Github,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { WizardConfig } from '@/components/wizard-steps/types';
+import GitHubPushDialog from '@/components/GitHubPushDialog';
 
 interface SuccessViewProps {
   config: WizardConfig;
@@ -33,6 +35,7 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [showIDE, setShowIDE] = useState(false);
   const [showTroubleshooting, setShowTroubleshooting] = useState(false);
+  const [showGitHubDialog, setShowGitHubDialog] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -293,6 +296,26 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
       tips.push('WinAppDriver requires Windows Developer Mode enabled.');
     }
 
+    // Cloud Device Farm tips
+    if (config.cloudDeviceFarm === 'browserstack') {
+      tips.push('Set BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY environment variables before running tests.');
+      tips.push('Update browserstack.yml with your desired browser/OS combinations.');
+    }
+    if (config.cloudDeviceFarm === 'saucelabs') {
+      tips.push('Set SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables before running tests.');
+      tips.push('Update saucelabs.yml with your desired platform configurations.');
+    }
+
+    // Faker test data tips
+    if (config.utilities?.faker) {
+      tips.push('The TestDataFactory class provides realistic test data. Import and use it in your tests for dynamic data generation.');
+    }
+
+    // OpenAPI tips
+    if (config.openApiSpecUrl) {
+      tips.push('OpenAPI-generated test stubs are in the tests directory. Review and customize assertions for your specific API responses.');
+    }
+
     tips.push('Check the README.md in your generated project for framework-specific setup details.');
 
     return tips;
@@ -501,16 +524,32 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
             </div>
           </CardContent>
 
-          <CardFooter className="pb-8 px-8">
-            <Button
-              onClick={onGenerateAnother}
-              className="w-full gap-2 text-md font-medium h-12 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/20 transition-all rounded-xl border-0"
-              size="lg"
-            >
-              <RefreshCw className="w-4 h-4" /> Generate Another Project
-            </Button>
+          <CardFooter className="pb-8 px-8 flex-col gap-3">
+            <div className="flex gap-3 w-full">
+              <Button
+                onClick={() => setShowGitHubDialog(true)}
+                variant="outline"
+                className="flex-1 gap-2 text-md font-medium h-12 rounded-xl border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all"
+                size="lg"
+              >
+                <Github className="w-4 h-4" /> Push to GitHub
+              </Button>
+              <Button
+                onClick={onGenerateAnother}
+                className="flex-1 gap-2 text-md font-medium h-12 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/20 transition-all rounded-xl border-0"
+                size="lg"
+              >
+                <RefreshCw className="w-4 h-4" /> Generate Another
+              </Button>
+            </div>
           </CardFooter>
         </Card>
+
+        <GitHubPushDialog
+          open={showGitHubDialog}
+          onOpenChange={setShowGitHubDialog}
+          config={config}
+        />
       </motion.div>
     </div>
   );

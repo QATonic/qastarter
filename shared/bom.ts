@@ -13,6 +13,7 @@ export const BOM = {
     cucumber: '7.15.0',
     appium: '9.0.0', // Java client
     restAssured: '5.3.0',
+    datafaker: '2.1.0', // Test data generation
   },
   python: {
     version: '3.8+',
@@ -21,6 +22,7 @@ export const BOM = {
     requests: '2.31.0',
     appium: '3.1.0', // Python client
     pyautogui: '0.9.54',
+    faker: '22.0.0', // Test data generation
   },
   javascript: {
     node: '18+',
@@ -32,6 +34,7 @@ export const BOM = {
     webdriverio: '8.24.0',
     appium: '9.0.0', // JS client
     supertest: '6.3.3',
+    fakerJs: '8.4.0', // Test data generation (@faker-js/faker)
   },
   csharp: {
     dotnet: '8.0',
@@ -41,6 +44,7 @@ export const BOM = {
     testSdk: '17.8.0',
     restsharp: '110.2.0',
     appium: '5.0.0', // Dotnet client
+    bogus: '35.4.0', // Test data generation
   },
   kotlin: {
     kotlin: '1.9.22',
@@ -55,6 +59,7 @@ export const BOM = {
     playwrightGo: '0.4101.1',
     resty: '2.11.0',
     testify: '1.8.4',
+    gofakeit: '6.28.0', // Test data generation
   },
   dart: {
     dart: '3.2.0+',

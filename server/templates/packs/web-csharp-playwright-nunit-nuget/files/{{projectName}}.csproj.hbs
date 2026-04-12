@@ -6,6 +6,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    {{#if utilities.faker}}
+    <!-- Bogus — Test data generation -->
+    <PackageReference Include="Bogus" Version="{{toolVersions.bogus}}" />
+    {{/if}}
     <!-- Playwright -->
     <PackageReference Include="Microsoft.Playwright" Version="1.41.0" />
     <PackageReference Include="Microsoft.Playwright.NUnit" Version="1.41.0" />

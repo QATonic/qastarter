@@ -26,9 +26,9 @@ export type InsertProjectGeneration = z.infer<typeof insertProjectGenerationSche
 
 // Project configuration schema - Updated to match validation matrix system
 export const projectConfigSchema = z.object({
-  testingType: z.enum(['web', 'mobile', 'api', 'desktop'], {
+  testingType: z.enum(['web', 'mobile', 'api', 'desktop', 'performance'], {
     required_error: 'Testing type is required',
-    invalid_type_error: 'Testing type must be one of: web, mobile, api, desktop',
+    invalid_type_error: 'Testing type must be one of: web, mobile, api, desktop, performance',
   }),
   framework: z
     .string({
@@ -113,11 +113,41 @@ export const projectConfigSchema = z.object({
   deviceName: z.string().max(200).optional(),
   /** Mobile platform OS version (e.g., "13.0", "16.0") */
   platformVersion: z.string().max(50).optional(),
+  /** Cloud device farm provider for web and mobile testing */
+  cloudDeviceFarm: z.enum(['none', 'browserstack', 'saucelabs']).optional().default('none'),
+  /** OpenAPI/Swagger spec URL for API schema-driven test generation */
+  openApiSpecUrl: z
+    .string()
+    .max(2000)
+    .optional()
+    .refine(
+      (val) => !val || /^https:\/\/.+/i.test(val),
+      'OpenAPI spec URL must use HTTPS'
+    ),
   /** API authentication type */
   apiAuthType: z.enum(['none', 'bearer', 'basic', 'api-key']).optional(),
   /** API auth token / key value */
   apiAuthToken: z.string().max(500).optional(),
   includeSampleTests: z.boolean().optional().default(true),
+  /**
+   * Named environments for multi-environment test execution.
+   * Each entry defines a target (e.g. dev, staging, prod) with its own
+   * base URL and optional credentials.
+   */
+  environments: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(50),
+        baseUrl: z.string().min(1).max(500).refine(
+          (val) => /^https?:\/\/.+/i.test(val),
+          'Base URL must start with http:// or https://'
+        ),
+        username: z.string().max(200).optional(),
+        password: z.string().max(200).optional(),
+      })
+    )
+    .max(10, 'A project can include at most 10 environments')
+    .optional(),
   utilities: z
     .object({
       configReader: z.boolean().optional(),
@@ -125,6 +155,7 @@ export const projectConfigSchema = z.object({
       screenshotUtility: z.boolean().optional(),
       logger: z.boolean().optional(),
       dataProvider: z.boolean().optional(),
+      faker: z.boolean().optional(),
       includeDocker: z.boolean().optional(),
       includeDockerCompose: z.boolean().optional(),
     })
@@ -174,6 +205,7 @@ export const defaultUtilities = {
   screenshotUtility: true,
   logger: true,
   dataProvider: false,
+  faker: false,
   includeDocker: false,
   includeDockerCompose: false,
 };

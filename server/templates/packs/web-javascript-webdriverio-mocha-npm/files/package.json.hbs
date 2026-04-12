@@ -9,6 +9,9 @@
     "format": "prettier --write ."
   },
   "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+    {{#if utilities.faker}}
+    "@faker-js/faker": "^{{toolVersions.fakerJs}}",
+    {{/if}}
     "@wdio/cli": "^8.27.0",
     "@wdio/local-runner": "^8.27.0",
     "@wdio/mocha-framework": "^8.27.0",

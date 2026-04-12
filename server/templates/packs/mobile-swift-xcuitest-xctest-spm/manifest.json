@@ -133,6 +133,20 @@
       "conditional": {
         "testingPattern": "bdd"
       }
+    },
+    {
+      "path": "config/browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "config/saucelabs.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "saucelabs"
+      }
     }
   ],
   "supportedCombination": {

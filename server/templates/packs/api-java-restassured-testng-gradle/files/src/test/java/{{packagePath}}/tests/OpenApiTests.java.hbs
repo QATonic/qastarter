@@ -1,0 +1,53 @@
+package {{javaPackage}}.tests;
+
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.testng.Assert.assertTrue;
+
+/**
+ * Auto-generated API tests from OpenAPI specification.
+ * Each test validates a single endpoint's basic contract (status code + response).
+ */
+public class OpenApiTests {
+
+    @BeforeClass
+    public void setup() {
+        RestAssured.baseURI = "{{baseUrl}}";
+    }
+
+{{#each openApiEndpoints}}
+    /**
+     * {{summary}}
+     * {{method}} {{path}}
+     */
+    @Test(description = "{{method}} {{path}} — {{summary}}")
+    public void test{{@index}}_{{operationId}}() {
+        Response response = given()
+{{#each parameters}}
+{{#if (eq in "query")}}
+            .queryParam("{{name}}", "test-value")
+{{/if}}
+{{#if (eq in "header")}}
+            .header("{{name}}", "test-value")
+{{/if}}
+{{/each}}
+{{#if requestBody}}
+            .contentType("{{requestBody.contentType}}")
+            .body("{}")
+{{/if}}
+        .when()
+            .{{lowerCase method}}("{{path}}")
+        .then()
+            .extract().response();
+
+        int statusCode = response.getStatusCode();
+        assertTrue(statusCode >= 200 && statusCode < 500,
+            "Expected success/client status but got " + statusCode);
+    }
+
+{{/each}}
+}

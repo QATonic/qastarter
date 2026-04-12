@@ -8,3 +8,4 @@ export { default as analyticsRoutes } from './analyticsRoutes';
 export { default as configRoutes } from './configRoutes';
 export { default as projectRoutes } from './projectRoutes';
 export { default as dependencyRoutes } from './dependencyRoutes';
+export { default as githubRoutes } from './githubRoutes';

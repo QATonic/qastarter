@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    {{#if utilities.faker}}
+    <!-- Bogus — Test data generation -->
+    <PackageReference Include="Bogus" Version="{{toolVersions.bogus}}" />
+    {{/if}}
     <!-- Selenium -->
     <PackageReference Include="Selenium.WebDriver" Version="4.16.0" />
     <PackageReference Include="Selenium.Support" Version="4.16.0" />

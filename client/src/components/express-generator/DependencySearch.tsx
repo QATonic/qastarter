@@ -250,8 +250,14 @@ export default function DependencySearch() {
         }}
         className="w-full"
       >
+        {/* Tailwind safelist: grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 */}
         {registries.length > 1 && (
-          <TabsList className={cn('grid w-full h-9', `grid-cols-${registries.length}`)}>
+          <TabsList className={cn('grid w-full h-9', {
+            'grid-cols-1': registries.length === 1,
+            'grid-cols-2': registries.length === 2,
+            'grid-cols-3': registries.length === 3,
+            'grid-cols-4': registries.length >= 4,
+          })}>
             {registries.map((r) => (
               <TabsTrigger key={r} value={r} className="text-xs gap-1.5">
                 <Package className="w-3.5 h-3.5" />

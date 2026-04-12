@@ -1,0 +1,35 @@
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { BASE_URL, defaultHeaders } from './helpers/utils.js';
+
+/**
+ * Spike Test — simulates a sudden surge of traffic.
+ *
+ * Tests how the system handles a sudden massive increase
+ * in users, then an immediate drop. Common for flash sales,
+ * product launches, or breaking news events.
+ */
+export const options = {
+  stages: [
+    { duration: '30s', target: 10 },    // baseline
+    { duration: '30s', target: 500 },   // spike!
+    { duration: '1m', target: 500 },    // hold spike
+    { duration: '30s', target: 10 },    // drop back
+    { duration: '2m', target: 10 },     // recovery
+    { duration: '30s', target: 0 },     // ramp down
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<2000'],
+    http_req_failed: ['rate<0.10'],
+  },
+};
+
+export default function () {
+  const res = http.get(`${BASE_URL}`, { headers: defaultHeaders });
+
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+  });
+
+  sleep(0.3);
+}

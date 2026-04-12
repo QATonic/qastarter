@@ -17,3 +17,8 @@ jsonschema>=4.20.0
 python-dotenv>=1.0.0
 PyYAML>=6.0.1
 colorlog>=6.8.0
+
+{{#if utilities.faker}}
+# Test Data Generation
+faker>={{toolVersions.faker}}
+{{/if}}

@@ -5,3 +5,8 @@ robotframework-seleniumlibrary>=6.1.0
 allure-robotframework>=2.13.0
 {{/if}}
 webdriver-manager>=4.0.0
+
+{{#if utilities.faker}}
+# Test Data Generation
+faker>={{toolVersions.faker}}
+{{/if}}

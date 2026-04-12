@@ -1,0 +1,104 @@
+package {{javaPackage}}.utils;
+
+import net.datafaker.Faker;
+import java.util.Locale;
+import java.util.UUID;
+
+/**
+ * TestDataFactory — Generates realistic test data using DataFaker.
+ * Use this factory in your tests to avoid hard-coded values.
+ *
+ * <p>Example usage:
+ * <pre>
+ *   String email = TestDataFactory.randomEmail();
+ *   String name  = TestDataFactory.randomFullName();
+ * </pre>
+ */
+public class TestDataFactory {
+
+    private static final Faker faker = new Faker(Locale.US);
+
+    private TestDataFactory() {
+        // Utility class — no instances
+    }
+
+    // ── User Data ──────────────────────────────────────────────────
+
+    public static String randomFirstName() {
+        return faker.name().firstName();
+    }
+
+    public static String randomLastName() {
+        return faker.name().lastName();
+    }
+
+    public static String randomFullName() {
+        return faker.name().fullName();
+    }
+
+    public static String randomEmail() {
+        return faker.internet().emailAddress();
+    }
+
+    public static String randomUsername() {
+        return faker.internet().username();
+    }
+
+    public static String randomPassword() {
+        return faker.internet().password(8, 16, true, true, true);
+    }
+
+    public static String randomPhoneNumber() {
+        return faker.phoneNumber().cellPhone();
+    }
+
+    // ── Address Data ───────────────────────────────────────────────
+
+    public static String randomStreetAddress() {
+        return faker.address().streetAddress();
+    }
+
+    public static String randomCity() {
+        return faker.address().city();
+    }
+
+    public static String randomState() {
+        return faker.address().state();
+    }
+
+    public static String randomZipCode() {
+        return faker.address().zipCode();
+    }
+
+    public static String randomCountry() {
+        return faker.address().country();
+    }
+
+    // ── Business Data ──────────────────────────────────────────────
+
+    public static String randomCompanyName() {
+        return faker.company().name();
+    }
+
+    public static String randomJobTitle() {
+        return faker.job().title();
+    }
+
+    // ── Text & Numbers ─────────────────────────────────────────────
+
+    public static String randomSentence() {
+        return faker.lorem().sentence();
+    }
+
+    public static String randomParagraph() {
+        return faker.lorem().paragraph();
+    }
+
+    public static int randomInt(int min, int max) {
+        return faker.number().numberBetween(min, max);
+    }
+
+    public static String randomUUID() {
+        return UUID.randomUUID().toString();
+    }
+}

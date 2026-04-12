@@ -18,6 +18,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import type { EnvironmentConfig } from '@/components/wizard-steps/types';
 import {
   ChevronDown,
   Globe,
@@ -29,6 +30,10 @@ import {
   RotateCcw,
   Sparkles,
   Package,
+  Plus,
+  X,
+  Layers,
+  Cloud,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -390,6 +395,22 @@ export default function ConfigPanel() {
                     />
                   </div>
                 )}
+                <div className="space-y-1 pt-2 border-t border-border/30">
+                  <Label htmlFor="openApiSpecUrl" className="text-xs text-muted-foreground">
+                    OpenAPI / Swagger Spec URL{' '}
+                    <span className="text-muted-foreground/60">(optional)</span>
+                  </Label>
+                  <Input
+                    id="openApiSpecUrl"
+                    value={config.openApiSpecUrl || ''}
+                    onChange={(e) => updateConfig('openApiSpecUrl', e.target.value)}
+                    placeholder="https://petstore3.swagger.io/api/v3/openapi.json"
+                    maxLength={2000}
+                  />
+                  <p className="text-[10px] text-muted-foreground">
+                    Paste a URL to auto-generate test stubs for each endpoint. HTTPS only.
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -501,6 +522,110 @@ export default function ConfigPanel() {
               />
             </div>
 
+            {/* Cloud Device Farm — only for web and mobile testing */}
+            {(config.testingType === 'web' || config.testingType === 'mobile') && (
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <Cloud className="w-4 h-4 text-muted-foreground" />
+                  <Label className="text-sm font-medium">Cloud Device Farm</Label>
+                </div>
+                <OptionButtonGroup
+                  options={['none', ...getFilteredOptions('cloudDeviceFarm')]}
+                  value={config.cloudDeviceFarm || 'none'}
+                  onChange={(value) => updateConfig('cloudDeviceFarm', value)}
+                  labels={validationLabels.cloudDeviceFarms}
+                />
+              </div>
+            )}
+
+            {/* Environments */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-muted-foreground" />
+                  <Label className="text-sm font-medium">Environments</Label>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs gap-1"
+                  onClick={() => {
+                    const envs: EnvironmentConfig[] = config.environments ?? [];
+                    if (envs.length >= 10) return;
+                    const names = ['dev', 'staging', 'prod', 'qa', 'uat'];
+                    const usedNames = new Set(envs.map((e) => e.name));
+                    const nextName = names.find((n) => !usedNames.has(n)) || `env-${envs.length + 1}`;
+                    updateConfig('environments', [
+                      ...envs,
+                      { name: nextName, baseUrl: 'https://example.com' },
+                    ]);
+                  }}
+                  disabled={(config.environments ?? []).length >= 10}
+                  aria-label="Add environment"
+                >
+                  <Plus className="w-3 h-3" /> Add
+                </Button>
+              </div>
+              {(config.environments ?? []).length === 0 ? (
+                <p className="text-xs text-muted-foreground px-1">
+                  Add environments to generate multi-env config files (e.g. dev, staging, prod).
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  {(config.environments ?? []).map((env: EnvironmentConfig, idx: number) => (
+                    <div
+                      key={idx}
+                      className="rounded-md border border-border/50 p-3 space-y-2 relative"
+                    >
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute top-2 right-2 h-6 w-6 text-muted-foreground hover:text-destructive"
+                        onClick={() => {
+                          const envs = [...(config.environments ?? [])];
+                          envs.splice(idx, 1);
+                          updateConfig('environments', envs);
+                        }}
+                        aria-label={`Remove ${env.name} environment`}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                      <div className="grid grid-cols-2 gap-2 pr-8">
+                        <div>
+                          <Label className="text-[11px] text-muted-foreground">Name</Label>
+                          <Input
+                            value={env.name}
+                            onChange={(e) => {
+                              const envs = [...(config.environments ?? [])];
+                              envs[idx] = { ...envs[idx], name: e.target.value };
+                              updateConfig('environments', envs);
+                            }}
+                            placeholder="dev"
+                            className="h-8 text-xs"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-[11px] text-muted-foreground">Base URL</Label>
+                          <Input
+                            value={env.baseUrl}
+                            onChange={(e) => {
+                              const envs = [...(config.environments ?? [])];
+                              envs[idx] = { ...envs[idx], baseUrl: e.target.value };
+                              updateConfig('environments', envs);
+                            }}
+                            placeholder="https://dev.example.com"
+                            className="h-8 text-xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Utilities */}
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-2">
@@ -514,6 +639,7 @@ export default function ConfigPanel() {
                   { key: 'screenshotUtility', label: 'Screenshot Utility' },
                   { key: 'logger', label: 'Logger' },
                   { key: 'dataProvider', label: 'Data Provider' },
+                  { key: 'faker', label: 'Test Data (Faker)' },
                   { key: 'includeDocker', label: 'Docker' },
                   { key: 'includeDockerCompose', label: 'Docker Compose' },
                 ].map(({ key, label }) => (

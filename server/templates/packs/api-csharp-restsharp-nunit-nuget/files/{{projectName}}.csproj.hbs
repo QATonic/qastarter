@@ -6,6 +6,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    {{#if utilities.faker}}
+    <!-- Bogus — Test data generation -->
+    <PackageReference Include="Bogus" Version="{{toolVersions.bogus}}" />
+    {{/if}}
     <!-- RestSharp -->
     <PackageReference Include="RestSharp" Version="110.2.0" />
 

@@ -1,0 +1,16 @@
+{
+  "projectName": "{{projectName}}",
+  "targetUrl": "{{baseUrl}}",
+  "thresholds": {
+    "http_req_duration_p95": 500,
+    "http_req_duration_p99": 1500,
+    "http_req_failed_rate": 0.01,
+    "http_reqs_rate": 100
+  },
+  "loadProfile": {
+    "loadTest": { "vus": 50, "duration": "5m" },
+    "stressTest": { "maxVus": 200, "duration": "12m" },
+    "spikeTest": { "spikeVus": 500, "duration": "5m" },
+    "soakTest": { "vus": 50, "duration": "30m" }
+  }
+}

@@ -77,6 +77,12 @@ export class TemplatePackEngine {
     this.hb.registerHelper('ternary', (condition: any, trueVal: any, falseVal: any) =>
       condition ? trueVal : falseVal
     );
+    this.hb.registerHelper('camelCase', (str: string) => {
+      if (!str) return '';
+      return str
+        .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
+        .replace(/^(.)/, (c) => c.toLowerCase());
+    });
   }
 
   /**
@@ -155,7 +161,8 @@ export class TemplatePackEngine {
    */
   private createTemplateContext(
     config: ProjectConfig,
-    toolVersions: Record<string, string>
+    toolVersions: Record<string, string>,
+    openApiEndpoints: import('@shared/openApiTypes').OpenApiEndpoint[] = []
   ): TemplateContext {
     // Safe path sanitization
     const sanitizePath = (input: string): string => {
@@ -180,6 +187,11 @@ export class TemplatePackEngine {
     const userDeps = Array.isArray(config.dependencies) ? config.dependencies : [];
     const mavenDeps = userDeps.filter((d) => d.registry === 'maven');
     const npmDeps = userDeps.filter((d) => d.registry === 'npm');
+    const nugetDeps = userDeps.filter((d) => d.registry === 'nuget');
+    const pypiDeps = userDeps.filter((d) => d.registry === 'pypi');
+
+    // Multi-environment config
+    const environments = Array.isArray(config.environments) ? config.environments : [];
 
     // Base URL the generated sample tests will target. Default depends
     // on testing type: web → SauceDemo, api → JSONPlaceholder.
@@ -219,6 +231,9 @@ export class TemplatePackEngine {
     const apiAuthType = (config.apiAuthType || 'none') as 'none' | 'bearer' | 'basic' | 'api-key';
     const apiAuthToken = (config.apiAuthToken && config.apiAuthToken.trim()) || '';
 
+    // Cloud device farm config — guard against undefined/null config value.
+    const cloudDeviceFarm = (config.cloudDeviceFarm ? String(config.cloudDeviceFarm).trim() : '') || 'none';
+
     return {
       ...config,
       groupId,
@@ -237,18 +252,27 @@ export class TemplatePackEngine {
       appPath,
       deviceName,
       platformVersion,
+      cloudDeviceFarm,
       apiAuthType,
       apiAuthToken,
-      envs: ['dev', 'qa', 'prod'],
+      envs: environments.length > 0 ? environments.map((e) => e.name) : ['dev', 'qa', 'prod'],
+      environments,
+      hasEnvironments: environments.length > 0,
+      openApiEndpoints,
+      hasOpenApiEndpoints: openApiEndpoints.length > 0,
       toolVersions,
       timestamp: new Date().toISOString().replace(/[:.]/g, '-'),
       userDependencies: {
         all: userDeps,
         maven: mavenDeps,
         npm: npmDeps,
+        nuget: nugetDeps,
+        pypi: pypiDeps,
         hasAny: userDeps.length > 0,
         hasMaven: mavenDeps.length > 0,
         hasNpm: npmDeps.length > 0,
+        hasNuget: nugetDeps.length > 0,
+        hasPypi: pypiDeps.length > 0,
       },
     };
   }
@@ -369,7 +393,11 @@ export class TemplatePackEngine {
   /**
    * Evaluate if a file should be included based on conditional rules
    */
-  private shouldIncludeFile(fileConfig: TemplatePackFile, config: ProjectConfig): boolean {
+  private shouldIncludeFile(
+    fileConfig: TemplatePackFile,
+    config: ProjectConfig,
+    context?: TemplateContext
+  ): boolean {
     // Check if sample tests should be excluded
     if (config.includeSampleTests === false && this.isSampleTestFile(fileConfig.path)) {
       return false;
@@ -380,14 +408,24 @@ export class TemplatePackEngine {
       return true;
     }
 
-    // Evaluate each condition
+    // Evaluate each condition — check config first, fall back to context
+    // for computed fields (e.g., hasOpenApiEndpoints, hasEnvironments)
     for (const [key, expectedValue] of Object.entries(fileConfig.conditional)) {
       // Handle nested keys like "utilities.logger"
       const keys = key.split('.');
-      let actualValue: any = config;
 
+      // Try resolving from config first
+      let actualValue: any = config;
       for (const k of keys) {
         actualValue = actualValue?.[k];
+      }
+
+      // If not found in config, try resolving from context (computed fields)
+      if (actualValue === undefined && context) {
+        actualValue = context;
+        for (const k of keys) {
+          actualValue = actualValue?.[k];
+        }
       }
 
       // Check if actual value matches expected value
@@ -419,7 +457,7 @@ export class TemplatePackEngine {
    */
   async *generateProjectStream(
     config: ProjectConfig,
-    options: { strict?: boolean } = { strict: true }
+    options: { strict?: boolean; openApiEndpoints?: import('@shared/openApiTypes').OpenApiEndpoint[] } = { strict: true }
   ): AsyncGenerator<TemplateFile> {
     const packKey = this.getTemplatePackKey(config);
 
@@ -428,11 +466,11 @@ export class TemplatePackEngine {
       const manifest = await this.loadManifest(packKey);
 
       // Create template context
-      const context = this.createTemplateContext(config, manifest.toolVersions);
+      const context = this.createTemplateContext(config, manifest.toolVersions, options.openApiEndpoints);
 
       for (const fileConfig of manifest.files) {
         // Check if file should be included based on conditional rules
-        if (!this.shouldIncludeFile(fileConfig, config)) {
+        if (!this.shouldIncludeFile(fileConfig, config, context)) {
           continue;
         }
 

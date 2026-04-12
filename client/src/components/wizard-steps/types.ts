@@ -60,19 +60,34 @@ export interface WizardConfig {
   apiAuthType?: string;
   /** API auth token/key value */
   apiAuthToken?: string;
+  /** OpenAPI / Swagger spec URL for auto-generating endpoint test stubs (API type only) */
+  openApiSpecUrl?: string;
+  /** Cloud device farm provider (browserstack, saucelabs, or none) */
+  cloudDeviceFarm: string;
   cicdTool: string;
   reportingTool: string;
+  /** Named environments for multi-env test execution (dev, staging, prod, etc.) */
+  environments: EnvironmentConfig[];
   utilities: {
     configReader: boolean;
     jsonReader: boolean;
     screenshotUtility: boolean;
     logger: boolean;
     dataProvider: boolean;
+    faker: boolean;
     includeDocker: boolean;
     includeDockerCompose: boolean;
   };
   /** User-picked dependencies (from Maven Central / npm search) */
   dependencies: UserDependency[];
+}
+
+/** A named target environment with its own URL and optional credentials. */
+export interface EnvironmentConfig {
+  name: string;
+  baseUrl: string;
+  username?: string;
+  password?: string;
 }
 
 export interface WizardStepProps {
@@ -115,14 +130,18 @@ export const DEFAULT_CONFIG: WizardConfig = {
   platformVersion: '',
   apiAuthType: 'none',
   apiAuthToken: '',
+  openApiSpecUrl: '',
+  cloudDeviceFarm: 'none',
   cicdTool: '',
   reportingTool: '',
+  environments: [],
   utilities: {
     configReader: true,
     jsonReader: false,
     screenshotUtility: true,
     logger: true,
     dataProvider: false,
+    faker: false,
     includeDocker: false,
     includeDockerCompose: false,
   },

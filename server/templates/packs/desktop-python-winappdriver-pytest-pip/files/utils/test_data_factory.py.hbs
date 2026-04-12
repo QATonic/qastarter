@@ -1,0 +1,99 @@
+"""
+Test Data Factory — Generates realistic test data using Faker.
+Use this factory in your tests to avoid hard-coded values.
+
+Example usage::
+
+    from utils.test_data_factory import TestDataFactory
+
+    email = TestDataFactory.random_email()
+    name  = TestDataFactory.random_full_name()
+"""
+
+from faker import Faker
+
+fake = Faker()
+
+
+class TestDataFactory:
+    """Utility class for generating random test data."""
+
+    # ── User Data ──────────────────────────────────────────────────
+
+    @staticmethod
+    def random_first_name() -> str:
+        return fake.first_name()
+
+    @staticmethod
+    def random_last_name() -> str:
+        return fake.last_name()
+
+    @staticmethod
+    def random_full_name() -> str:
+        return fake.name()
+
+    @staticmethod
+    def random_email() -> str:
+        return fake.email()
+
+    @staticmethod
+    def random_username() -> str:
+        return fake.user_name()
+
+    @staticmethod
+    def random_password(length: int = 12) -> str:
+        return fake.password(length=length)
+
+    @staticmethod
+    def random_phone_number() -> str:
+        return fake.phone_number()
+
+    # ── Address Data ───────────────────────────────────────────────
+
+    @staticmethod
+    def random_street_address() -> str:
+        return fake.street_address()
+
+    @staticmethod
+    def random_city() -> str:
+        return fake.city()
+
+    @staticmethod
+    def random_state() -> str:
+        return fake.state()
+
+    @staticmethod
+    def random_zip_code() -> str:
+        return fake.zipcode()
+
+    @staticmethod
+    def random_country() -> str:
+        return fake.country()
+
+    # ── Business Data ──────────────────────────────────────────────
+
+    @staticmethod
+    def random_company_name() -> str:
+        return fake.company()
+
+    @staticmethod
+    def random_job_title() -> str:
+        return fake.job()
+
+    # ── Text & Numbers ─────────────────────────────────────────────
+
+    @staticmethod
+    def random_sentence() -> str:
+        return fake.sentence()
+
+    @staticmethod
+    def random_paragraph() -> str:
+        return fake.paragraph()
+
+    @staticmethod
+    def random_int(min_val: int = 0, max_val: int = 1000) -> int:
+        return fake.random_int(min=min_val, max=max_val)
+
+    @staticmethod
+    def random_uuid() -> str:
+        return fake.uuid4()

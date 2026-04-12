@@ -1,0 +1,95 @@
+/**
+ * TestDataFactory — Generates realistic test data using @faker-js/faker.
+ * Use this factory in your tests to avoid hard-coded values.
+ *
+ * @example
+ *   const TestDataFactory = require('./utils/testDataFactory');
+ *   const email = TestDataFactory.randomEmail();
+ *   const name  = TestDataFactory.randomFullName();
+ */
+
+const { faker } = require('@faker-js/faker');
+
+class TestDataFactory {
+  // ── User Data ──────────────────────────────────────────────────
+
+  static randomFirstName() {
+    return faker.person.firstName();
+  }
+
+  static randomLastName() {
+    return faker.person.lastName();
+  }
+
+  static randomFullName() {
+    return faker.person.fullName();
+  }
+
+  static randomEmail() {
+    return faker.internet.email();
+  }
+
+  static randomUsername() {
+    return faker.internet.username();
+  }
+
+  static randomPassword() {
+    return faker.internet.password({ length: 12 });
+  }
+
+  static randomPhoneNumber() {
+    return faker.phone.number();
+  }
+
+  // ── Address Data ───────────────────────────────────────────────
+
+  static randomStreetAddress() {
+    return faker.location.streetAddress();
+  }
+
+  static randomCity() {
+    return faker.location.city();
+  }
+
+  static randomState() {
+    return faker.location.state();
+  }
+
+  static randomZipCode() {
+    return faker.location.zipCode();
+  }
+
+  static randomCountry() {
+    return faker.location.country();
+  }
+
+  // ── Business Data ──────────────────────────────────────────────
+
+  static randomCompanyName() {
+    return faker.company.name();
+  }
+
+  static randomJobTitle() {
+    return faker.person.jobTitle();
+  }
+
+  // ── Text & Numbers ─────────────────────────────────────────────
+
+  static randomSentence() {
+    return faker.lorem.sentence();
+  }
+
+  static randomParagraph() {
+    return faker.lorem.paragraph();
+  }
+
+  static randomInt(min = 0, max = 1000) {
+    return faker.number.int({ min, max });
+  }
+
+  static randomUUID() {
+    return faker.string.uuid();
+  }
+}
+
+module.exports = TestDataFactory;

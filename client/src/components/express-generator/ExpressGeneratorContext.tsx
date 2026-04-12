@@ -26,6 +26,9 @@ const URL_KEY_MAP: Record<string, keyof WizardConfig> = {
   rp: 'reportingTool',
   gid: 'groupId',
   aid: 'artifactId',
+  url: 'baseUrl',
+  cf: 'cloudDeviceFarm',
+  oas: 'openApiSpecUrl',
 };
 
 const REVERSE_URL_KEY_MAP: Record<string, string> = Object.fromEntries(
@@ -193,6 +196,10 @@ function reducer(state: WizardConfig, action: Action): WizardConfig {
         updated.platformVersion = '';
         updated.apiAuthType = 'none';
         updated.apiAuthToken = '';
+        // Reset cloud device farm when switching to types that don't support it
+        if (action.value !== 'web' && action.value !== 'mobile') {
+          updated.cloudDeviceFarm = 'none';
+        }
       }
 
       // When baseUrl changes for web, auto-switch credentials

@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'TEST_TYPE', choices: ['load', 'stress'], description: 'Performance test type')
+        string(name: 'USERS', defaultValue: '50', description: 'Number of concurrent users')
+        string(name: 'RUN_TIME', defaultValue: '5m', description: 'Test duration')
+    }
+
+    stages {
+        stage('Setup Python') {
+            steps {
+                sh 'python3 -m venv venv'
+                sh './venv/bin/pip install -r requirements.txt'
+            }
+        }
+
+        stage('Run Locust Test') {
+            steps {
+                sh """./venv/bin/locust -f tests/{{raw}}${params.TEST_TYPE}{{/raw}}_test.py \
+                    --host={{baseUrl}} \
+                    --headless \
+                    -u {{raw}}${params.USERS}{{/raw}} \
+                    -r 10 \
+                    --run-time {{raw}}${params.RUN_TIME}{{/raw}} \
+                    --html=results/report.html \
+                    --csv=results/results"""
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'results/**', allowEmptyArchive: true
+        }
+        cleanup {
+            sh 'rm -rf venv'
+        }
+    }
+}

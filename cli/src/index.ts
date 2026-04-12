@@ -6,6 +6,7 @@ import ora from 'ora';
 import path from 'path';
 import { fetchMetadata, generateProject, type GenerateOptions } from './lib/api.js';
 import { promptForOptions } from './lib/prompts.js';
+import { runUpdate } from './commands/update.js';
 
 const program = new Command();
 
@@ -124,6 +125,21 @@ program
       console.log();
     } catch (error) {
       spinner.fail('Failed to fetch options');
+      console.error(
+        chalk.red(`\nError: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      );
+      process.exit(1);
+    }
+  });
+
+program
+  .command('update')
+  .description('Check and update dependency versions against the QAStarter BOM')
+  .option('--dry-run', 'Show what would be updated without making changes', false)
+  .action(async (options) => {
+    try {
+      await runUpdate({ dryRun: options.dryRun });
+    } catch (error) {
       console.error(
         chalk.red(`\nError: ${error instanceof Error ? error.message : 'Unknown error'}`)
       );

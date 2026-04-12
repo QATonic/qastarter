@@ -4,6 +4,9 @@
   "description": "{{projectName}} - gRPC API Testing with TypeScript",
   "scripts": {"test": "jest"},
   "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+    {{#if utilities.faker}}
+    "@faker-js/faker": "^{{toolVersions.fakerJs}}",
+    {{/if}}
     "@grpc/grpc-js": "^1.9.0",
     "@grpc/proto-loader": "^0.7.0",
     "@types/jest": "^29.5.0",

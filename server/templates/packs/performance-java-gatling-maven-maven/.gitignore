@@ -1,0 +1,6 @@
+target/
+results/
+*.class
+*.log
+.idea/
+*.iml

@@ -4,6 +4,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    {{#if utilities.faker}}
+    <!-- Bogus — Test data generation -->
+    <PackageReference Include="Bogus" Version="{{toolVersions.bogus}}" />
+    {{/if}}
     <PackageReference Include="Appium.WebDriver" Version="5.0.0" />
     <PackageReference Include="NUnit" Version="4.0.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />

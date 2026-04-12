@@ -204,6 +204,20 @@
       "path": "utils/logger.js",
       "isTemplate": true,
       "description": "Logging utility"
+    },
+    {
+      "path": "utils/testDataFactory.js",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "tests/openapi.test.js",
+      "isTemplate": true,
+      "conditional": {
+        "hasOpenApiEndpoints": true
+      }
     }
   ],
   "directories": [

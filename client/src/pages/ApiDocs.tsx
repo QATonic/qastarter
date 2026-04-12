@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Link } from 'wouter';
-import { ArrowLeft, Copy, Check, Terminal, Code, Database, Zap } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Terminal, Code, Database, Zap, FileCode2, Gauge } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
@@ -107,12 +107,18 @@ export default function ApiDocs() {
         </div>
 
         <Tabs defaultValue="generate" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="generate" data-testid="tab-generate">
-              Generate Project
+              Generate
             </TabsTrigger>
             <TabsTrigger value="metadata" data-testid="tab-metadata">
               Metadata
+            </TabsTrigger>
+            <TabsTrigger value="bom" data-testid="tab-bom">
+              BOM
+            </TabsTrigger>
+            <TabsTrigger value="stats" data-testid="tab-stats">
+              Stats
             </TabsTrigger>
           </TabsList>
 
@@ -166,7 +172,7 @@ curl "https://qastarter.com/api/v1/generate?framework=cypress&language=typescrip
                           <td className="py-2 pr-4">
                             <code>web</code>
                           </td>
-                          <td className="py-2">Type: web, mobile, api, desktop</td>
+                          <td className="py-2">Type: web, mobile, api, desktop, performance</td>
                         </tr>
                         <tr>
                           <td className="py-2 pr-4 font-mono text-xs">framework</td>
@@ -236,7 +242,7 @@ curl "https://qastarter.com/api/v1/generate?framework=cypress&language=typescrip
                           </td>
                           <td className="py-2">
                             Comma-separated: configReader, jsonReader, screenshotUtility, logger,
-                            dataProvider
+                            dataProvider, faker
                           </td>
                         </tr>
                         <tr>
@@ -245,6 +251,34 @@ curl "https://qastarter.com/api/v1/generate?framework=cypress&language=typescrip
                             <code>true</code>
                           </td>
                           <td className="py-2">Include sample test files (true/false)</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2 pr-4 font-mono text-xs">baseUrl</td>
+                          <td className="py-2 pr-4">
+                            <em>auto</em>
+                          </td>
+                          <td className="py-2">
+                            Target URL for generated tests (auto-set based on testing type)
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="py-2 pr-4 font-mono text-xs">cloudDeviceFarm</td>
+                          <td className="py-2 pr-4">
+                            <code>none</code>
+                          </td>
+                          <td className="py-2">
+                            Cloud provider: none, browserstack, saucelabs (web/mobile only)
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="py-2 pr-4 font-mono text-xs">openApiSpecUrl</td>
+                          <td className="py-2 pr-4">
+                            <em>none</em>
+                          </td>
+                          <td className="py-2">
+                            OpenAPI/Swagger spec URL for API type (HTTPS only, auto-generates
+                            endpoint test stubs)
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -299,10 +333,44 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
   testingPattern=page-object-model&\\
   cicdTool=github-actions&\\
   reportingTool=allure&\\
-  utilities=logger,screenshotUtility,configReader&\\
+  cloudDeviceFarm=browserstack&\\
+  utilities=logger,screenshotUtility,configReader,faker&\\
   includeSampleTests=true" \\
   -o my-selenium-tests.zip`}
                 />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Badge variant="default">POST</Badge>
+                  <code className="text-lg font-mono">/api/v1/generate-project</code>
+                </div>
+                <CardDescription>
+                  Generate a project using a JSON body (preferred for complex configurations).
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <CodeBlock
+                  code={`curl -X POST https://qastarter.com/api/v1/generate-project \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "testingType": "api",
+    "framework": "supertest",
+    "language": "typescript",
+    "testRunner": "jest",
+    "buildTool": "npm",
+    "projectName": "my-api-tests",
+    "openApiSpecUrl": "https://petstore3.swagger.io/api/v3/openapi.json",
+    "utilities": { "faker": true, "configReader": true }
+  }' \\
+  -o my-api-tests.zip`}
+                />
+                <p className="text-sm text-muted-foreground">
+                  The POST endpoint accepts the same fields as the GET endpoint, but as a JSON body.
+                  This is useful for passing complex configurations like OpenAPI URLs and environments.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -375,6 +443,125 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
                     <li>Validate configurations before making generate requests</li>
                   </ul>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="bom" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">GET</Badge>
+                  <code className="text-lg font-mono">/api/v1/bom</code>
+                </div>
+                <CardDescription>
+                  Get the Bill of Materials (BOM) with recommended dependency versions for all
+                  supported languages.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="font-semibold mb-3">Request</h3>
+                  <CodeBlock code={'curl "https://qastarter.com/api/v1/bom"'} />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-3">Response Structure</h3>
+                  <CodeBlock
+                    code={`{
+  "success": true,
+  "data": {
+    "java": {
+      "selenium": "4.18.1",
+      "testng": "7.9.0",
+      "datafaker": "2.1.0",
+      ...
+    },
+    "python": {
+      "selenium": "4.18.0",
+      "faker": "22.0.0",
+      ...
+    },
+    "javascript": {
+      "playwright": "1.42.0",
+      "fakerJs": "8.4.0",
+      ...
+    },
+    ...
+  }
+}`}
+                    language="json"
+                  />
+                </div>
+                <div>
+                  <h3 className="font-semibold mb-3">Use Cases</h3>
+                  <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
+                    <li>
+                      Power the <code>qastarter update</code> CLI command for dependency updates
+                    </li>
+                    <li>Build custom tooling that stays in sync with QAStarter versions</li>
+                    <li>Audit dependency versions in existing projects against latest BOM</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="stats" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">GET</Badge>
+                  <code className="text-lg font-mono">/api/v1/stats</code>
+                </div>
+                <CardDescription>
+                  Get generation statistics including total count and framework popularity.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <CodeBlock
+                  code={`curl "https://qastarter.com/api/v1/stats"
+
+# Response:
+{
+  "success": true,
+  "data": {
+    "totalGenerated": 1250,
+    "byFramework": [
+      { "framework": "selenium", "count": 420 },
+      { "framework": "playwright", "count": 310 },
+      ...
+    ]
+  }
+}`}
+                  language="json"
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary">GET</Badge>
+                  <code className="text-lg font-mono">/api/v1/stats/github</code>
+                </div>
+                <CardDescription>
+                  Get GitHub repository star count (cached with 1-hour TTL).
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CodeBlock
+                  code={`curl "https://qastarter.com/api/v1/stats/github"
+
+# Response:
+{
+  "success": true,
+  "data": {
+    "stars": 42,
+    "url": "https://github.com/QATonic/qastarter"
+  }
+}`}
+                  language="json"
+                />
               </CardContent>
             </Card>
           </TabsContent>

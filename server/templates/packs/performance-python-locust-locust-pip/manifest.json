@@ -1,0 +1,90 @@
+{
+  "id": "performance-python-locust-locust-pip",
+  "displayName": "Locust Performance Test Suite",
+  "description": "Performance testing with Locust using Python",
+  "version": "1.0.0",
+  "supportedCombination": {
+    "testingType": "performance",
+    "framework": "locust",
+    "language": "python",
+    "testRunner": "locust",
+    "buildTool": "pip"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "locust-html"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "load-test",
+      "stress-test",
+      "spike-test",
+      "soak-test"
+    ]
+  },
+  "toolVersions": {
+    "python": "3.8+",
+    "locust": "2.23.0"
+  },
+  "files": [
+    {
+      "path": "requirements.txt",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "locustfile.py",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/load_test.py",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/stress_test.py",
+      "isTemplate": true
+    },
+    {
+      "path": "config/settings.py",
+      "isTemplate": true
+    },
+    {
+      "path": ".github/workflows/performance.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "utils/test_data_factory.py",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    }
+  ],
+  "directories": [
+    "results",
+    "reports"
+  ]
+}

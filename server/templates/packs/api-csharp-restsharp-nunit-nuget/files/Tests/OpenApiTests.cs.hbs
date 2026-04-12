@@ -1,0 +1,39 @@
+using NUnit.Framework;
+using RestSharp;
+using System.Threading.Tasks;
+
+namespace {{csharpNamespace}}.Tests
+{
+    /// <summary>
+    /// Auto-generated API tests from OpenAPI specification.
+    /// Each test validates a single endpoint's basic contract.
+    /// </summary>
+    [TestFixture]
+    public class OpenApiTests
+    {
+        private RestClient _client;
+
+        [SetUp]
+        public void Setup()
+        {
+            _client = new RestClient("{{baseUrl}}");
+        }
+
+{{#each openApiEndpoints}}
+        /// <summary>{{method}} {{path}} — {{summary}}</summary>
+        [Test]
+        public async Task Test_{{operationId}}()
+        {
+            var request = new RestRequest("{{path}}", Method.{{method}});
+{{#if requestBody}}
+            request.AddJsonBody(new { });
+{{/if}}
+            var response = await _client.ExecuteAsync(request);
+
+            Assert.That((int)response.StatusCode, Is.GreaterThanOrEqualTo(200).And.LessThan(500),
+                $"Expected success/client status but got {(int)response.StatusCode}");
+        }
+
+{{/each}}
+    }
+}

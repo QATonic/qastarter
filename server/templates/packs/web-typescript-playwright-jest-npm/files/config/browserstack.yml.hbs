@@ -1,0 +1,29 @@
+# BrowserStack Configuration for {{projectName}}
+# Docs: https://www.browserstack.com/docs/automate/selenium
+
+userName: BROWSERSTACK_USERNAME
+accessKey: BROWSERSTACK_ACCESS_KEY
+
+platforms:
+  - browserName: chrome
+    browserVersion: latest
+    os: Windows
+    osVersion: 11
+  - browserName: firefox
+    browserVersion: latest
+    os: Windows
+    osVersion: 11
+  - browserName: safari
+    browserVersion: latest
+    os: OS X
+    osVersion: Ventura
+
+buildName: "{{projectName}} - Build #1"
+projectName: "{{projectName}}"
+debug: true
+networkLogs: true
+consoleLogs: info
+
+# Local testing (uncomment to enable)
+# local: true
+# localIdentifier: "{{artifactId}}-local"

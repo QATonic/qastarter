@@ -195,6 +195,13 @@
       "path": "pages/notepad_page.py",
       "isTemplate": true,
       "description": "Notepad page object"
+    },
+    {
+      "path": "utils/test_data_factory.py",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
     }
   ],
   "supportedCombination": {

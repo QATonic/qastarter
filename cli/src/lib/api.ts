@@ -131,6 +131,23 @@ export async function fetchMetadata(): Promise<MetadataResponse> {
   return transformMetadata(raw);
 }
 
+/**
+ * Fetch the Bill of Materials (library versions) from the QAStarter API.
+ * Falls back to null if the server is unreachable.
+ */
+export async function fetchBom(): Promise<Record<string, Record<string, string>> | null> {
+  try {
+    const response = await fetch(`${getApiUrl()}/api/v1/bom`, {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) return null;
+    const body = await response.json();
+    return body?.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateProject(
   options: GenerateOptions,
   outputPath: string

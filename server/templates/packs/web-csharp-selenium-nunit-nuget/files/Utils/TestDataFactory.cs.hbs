@@ -1,0 +1,63 @@
+using Bogus;
+
+namespace {{csharpNamespace}}.Utils
+{
+    /// <summary>
+    /// TestDataFactory — Generates realistic test data using Bogus.
+    /// Use this factory in your tests to avoid hard-coded values.
+    /// </summary>
+    /// <example>
+    /// <code>
+    ///   var email = TestDataFactory.RandomEmail();
+    ///   var name  = TestDataFactory.RandomFullName();
+    /// </code>
+    /// </example>
+    public static class TestDataFactory
+    {
+        private static readonly Faker Faker = new("en");
+
+        // ── User Data ──────────────────────────────────────────────────
+
+        public static string RandomFirstName() => Faker.Name.FirstName();
+
+        public static string RandomLastName() => Faker.Name.LastName();
+
+        public static string RandomFullName() => Faker.Name.FullName();
+
+        public static string RandomEmail() => Faker.Internet.Email();
+
+        public static string RandomUsername() => Faker.Internet.UserName();
+
+        public static string RandomPassword() => Faker.Internet.Password(length: 12);
+
+        public static string RandomPhoneNumber() => Faker.Phone.PhoneNumber();
+
+        // ── Address Data ───────────────────────────────────────────────
+
+        public static string RandomStreetAddress() => Faker.Address.StreetAddress();
+
+        public static string RandomCity() => Faker.Address.City();
+
+        public static string RandomState() => Faker.Address.State();
+
+        public static string RandomZipCode() => Faker.Address.ZipCode();
+
+        public static string RandomCountry() => Faker.Address.Country();
+
+        // ── Business Data ──────────────────────────────────────────────
+
+        public static string RandomCompanyName() => Faker.Company.CompanyName();
+
+        public static string RandomJobTitle() => Faker.Name.JobTitle();
+
+        // ── Text & Numbers ─────────────────────────────────────────────
+
+        public static string RandomSentence() => Faker.Lorem.Sentence();
+
+        public static string RandomParagraph() => Faker.Lorem.Paragraph();
+
+        public static int RandomInt(int min = 0, int max = 1000) => Faker.Random.Int(min, max);
+
+        public static string RandomUUID() => Faker.Random.Guid().ToString();
+    }
+}

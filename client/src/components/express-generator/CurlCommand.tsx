@@ -9,6 +9,10 @@ export default function CurlCommand() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Build the JSON payload from the current config
+  const enabledUtilities = Object.entries(config.utilities)
+    .filter(([, v]) => v)
+    .map(([k]) => k);
+
   const payload = JSON.stringify(
     {
       testingType: config.testingType,
@@ -22,6 +26,15 @@ export default function CurlCommand() {
       reportingTool: config.reportingTool,
       ...(config.groupId ? { groupId: config.groupId } : {}),
       ...(config.artifactId ? { artifactId: config.artifactId } : {}),
+      ...(config.baseUrl ? { baseUrl: config.baseUrl } : {}),
+      ...(config.cloudDeviceFarm && config.cloudDeviceFarm !== 'none'
+        ? { cloudDeviceFarm: config.cloudDeviceFarm }
+        : {}),
+      ...(config.openApiSpecUrl ? { openApiSpecUrl: config.openApiSpecUrl } : {}),
+      ...(enabledUtilities.length > 0 ? { utilities: enabledUtilities.join(',') } : {}),
+      ...(config.environments && config.environments.length > 0
+        ? { environments: config.environments }
+        : {}),
     },
     null,
     2

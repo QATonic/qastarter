@@ -21,6 +21,10 @@ dependencies {
 implementation '{{group}}:{{name}}:{{version}}'
 {{/each}}
 {{/if}}
+    {{#if utilities.faker}}
+    // DataFaker — Test data generation
+    implementation 'net.datafaker:datafaker:{{toolVersions.datafaker}}'
+    {{/if}}
 }
 
 test {

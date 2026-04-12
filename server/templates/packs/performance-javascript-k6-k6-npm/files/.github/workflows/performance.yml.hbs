@@ -1,0 +1,47 @@
+name: k6 Performance Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Test type to run'
+        required: true
+        default: 'load'
+        type: choice
+        options:
+          - load
+          - stress
+          - spike
+          - soak
+      base_url:
+        description: 'Target base URL'
+        required: false
+        default: '{{baseUrl}}'
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install k6
+        run: |
+          curl -sL https://github.com/grafana/k6/releases/download/v{{toolVersions.k6}}/k6-v{{toolVersions.k6}}-linux-amd64.tar.gz | tar xz
+          sudo mv k6-v{{toolVersions.k6}}-linux-amd64/k6 /usr/local/bin/
+          k6 version
+
+      - name: Run Performance Test
+        env:
+          BASE_URL: "{{raw}}${{ github.event.inputs.base_url || '{{/raw}}{{baseUrl}}{{raw}}' }}{{/raw}}"
+        run: |
+          k6 run scripts/{{raw}}${{ github.event.inputs.test_type }}{{/raw}}-test.js \
+            --out json=results/output.json
+
+      - name: Upload Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-results
+          path: results/
+          retention-days: 14

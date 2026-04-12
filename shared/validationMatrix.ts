@@ -19,12 +19,14 @@ export interface ValidationMatrix {
   frameworkLanguageReportingTools: Record<string, string[]>;
   // New: Framework + Language -> Testing Pattern mapping for more precise validation
   frameworkLanguageTestingPatterns: Record<string, string[]>;
+  // Cloud device farm providers by testing type
+  cloudDeviceFarms: Record<string, string[]>;
 }
 
 // Main validation matrix defining all compatibility rules
 export const validationMatrix: ValidationMatrix = {
   // Available testing types
-  testingTypes: ['web', 'mobile', 'api', 'desktop'],
+  testingTypes: ['web', 'mobile', 'api', 'desktop', 'performance'],
 
   // Testing Type -> Available Frameworks
   frameworks: {
@@ -32,6 +34,7 @@ export const validationMatrix: ValidationMatrix = {
     mobile: ['appium', 'espresso', 'xcuitest', 'flutter'],
     api: ['restassured', 'requests', 'supertest', 'restsharp', 'graphql', 'grpc', 'resty'],
     desktop: ['winappdriver', 'pyautogui'],
+    performance: ['k6', 'gatling', 'locust'],
   },
 
   // Framework -> Available Languages
@@ -61,6 +64,11 @@ export const validationMatrix: ValidationMatrix = {
     // Desktop frameworks
     winappdriver: ['csharp', 'java', 'python'],
     pyautogui: ['python'],
+
+    // Performance frameworks
+    k6: ['javascript'],
+    gatling: ['java'],
+    locust: ['python'],
   },
 
   // Language -> Available Test Runners (general mapping)
@@ -164,6 +172,11 @@ export const validationMatrix: ValidationMatrix = {
 
     // Desktop - PyAutoGUI
     'pyautogui-python': ['pytest'],
+
+    // Performance
+    'k6-javascript': ['k6'],
+    'gatling-java': ['maven'],
+    'locust-python': ['locust'],
   },
 
   // Framework + Language -> Build Tool (precise mapping based on actual templates)
@@ -243,6 +256,11 @@ export const validationMatrix: ValidationMatrix = {
 
     // Mobile - Flutter
     'flutter-dart': ['pub'],
+
+    // Performance
+    'k6-javascript': ['npm'],
+    'gatling-java': ['maven'],
+    'locust-python': ['pip'],
   },
 
   // Framework + Language -> Reporting Tool (precise mapping based on actual templates)
@@ -322,6 +340,11 @@ export const validationMatrix: ValidationMatrix = {
 
     // Mobile - Flutter
     'flutter-dart': ['flutter-test-report', 'junit-reports'],
+
+    // Performance
+    'k6-javascript': ['k6-html-report', 'k6-json'],
+    'gatling-java': ['gatling-reports'],
+    'locust-python': ['locust-html'],
   },
 
   // Framework -> Available CI/CD Tools (standardized across all templates)
@@ -342,6 +365,9 @@ export const validationMatrix: ValidationMatrix = {
     grpc: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     winappdriver: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
     pyautogui: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
+    k6: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
+    gatling: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
+    locust: ['jenkins', 'github-actions', 'gitlab-ci', 'azure-devops', 'circleci'],
   },
 
   // Framework -> Available Reporting Tools
@@ -389,6 +415,9 @@ export const validationMatrix: ValidationMatrix = {
     grpc: ['jest-html-reporter', 'allure'],
     winappdriver: ['allure', 'extent-reports', 'pytest-html', 'nunit-reports'],
     pyautogui: ['allure', 'pytest-html'],
+    k6: ['k6-html-report', 'k6-json'],
+    gatling: ['gatling-reports'],
+    locust: ['locust-html'],
   },
 
   // Framework -> Available Testing Patterns
@@ -417,6 +446,11 @@ export const validationMatrix: ValidationMatrix = {
     // Desktop frameworks - POM is standard, some have additional patterns
     winappdriver: ['page-object-model', 'bdd'],
     pyautogui: ['functional-patterns', 'bdd'],
+
+    // Performance frameworks - load testing patterns
+    k6: ['load-test', 'stress-test', 'spike-test', 'soak-test'],
+    gatling: ['load-test', 'stress-test', 'spike-test', 'soak-test'],
+    locust: ['load-test', 'stress-test', 'spike-test', 'soak-test'],
   },
 
   // Framework + Language -> Testing Pattern (precise mapping based on actual templates)
@@ -496,6 +530,21 @@ export const validationMatrix: ValidationMatrix = {
 
     // Mobile - Flutter
     'flutter-dart': ['integration-test'],
+
+    // Performance
+    'k6-javascript': ['load-test', 'stress-test', 'spike-test', 'soak-test'],
+    'gatling-java': ['load-test', 'stress-test', 'spike-test', 'soak-test'],
+    'locust-python': ['load-test', 'stress-test', 'spike-test', 'soak-test'],
+  },
+
+  // Testing Type -> Available Cloud Device Farms
+  // Only applicable to web and mobile testing types
+  cloudDeviceFarms: {
+    web: ['browserstack', 'saucelabs'],
+    mobile: ['browserstack', 'saucelabs'],
+    api: [],
+    desktop: [],
+    performance: [],
   },
 };
 
@@ -702,6 +751,11 @@ export class WizardValidator {
         }
         return config.framework ? this.getAvailableTestingPatterns(config.framework) : [];
 
+      case 'cloudDeviceFarm':
+        return config.testingType
+          ? validationMatrix.cloudDeviceFarms[config.testingType] || []
+          : [];
+
       default:
         return [];
     }
@@ -781,6 +835,14 @@ export class WizardValidator {
       }
     }
 
+    // Reset cloud device farm if testing type doesn't support it
+    if (config.testingType && config.cloudDeviceFarm && config.cloudDeviceFarm !== 'none') {
+      const availableFarms = validationMatrix.cloudDeviceFarms[config.testingType] || [];
+      if (!availableFarms.includes(config.cloudDeviceFarm)) {
+        newConfig.cloudDeviceFarm = 'none';
+      }
+    }
+
     return newConfig;
   }
 }
@@ -792,6 +854,7 @@ export const validationLabels = {
     mobile: 'Mobile Applications',
     api: 'API Testing',
     desktop: 'Desktop Applications',
+    performance: 'Performance Testing',
   },
 
   frameworks: {
@@ -820,6 +883,11 @@ export const validationLabels = {
     // Desktop
     winappdriver: 'WinAppDriver',
     pyautogui: 'PyAutoGUI',
+
+    // Performance
+    k6: 'k6 (Grafana)',
+    gatling: 'Gatling',
+    locust: 'Locust',
   },
 
   languages: {
@@ -846,6 +914,9 @@ export const validationLabels = {
     robot: 'Robot Framework',
     'flutter-test': 'Flutter Test',
     testify: 'Testify',
+    k6: 'k6 Runner',
+    locust: 'Locust Runner',
+    maven: 'Maven (Gatling)',
   },
 
   buildTools: {
@@ -888,6 +959,10 @@ export const validationLabels = {
     'nunit-reports': 'NUnit Reports',
     'robot-reports': 'Robot Framework Reports',
     'flutter-test-report': 'Flutter Test Report',
+    'k6-html-report': 'k6 HTML Report',
+    'k6-json': 'k6 JSON Output',
+    'gatling-reports': 'Gatling Reports',
+    'locust-html': 'Locust HTML Report',
   },
 
   testingPatterns: {
@@ -902,5 +977,15 @@ export const validationLabels = {
     'fluent-assertions': 'Fluent Assertions',
     'integration-test': 'Integration Tests',
     hybrid: 'Hybrid Pattern',
+    'load-test': 'Load Test',
+    'stress-test': 'Stress Test',
+    'spike-test': 'Spike Test',
+    'soak-test': 'Soak / Endurance Test',
+  },
+
+  cloudDeviceFarms: {
+    none: 'None (Local)',
+    browserstack: 'BrowserStack',
+    saucelabs: 'Sauce Labs',
   },
 };

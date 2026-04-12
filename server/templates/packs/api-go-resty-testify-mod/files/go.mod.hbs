@@ -3,6 +3,9 @@
 go 1.21
 
 require (
+{{#if utilities.faker}}
+	github.com/brianvoe/gofakeit/v6 v{{toolVersions.gofakeit}}
+{{/if}}
 github.com/go-resty/resty/v2 v2.11.0
 github.com/stretchr/testify v1.8.4
 github.com/sirupsen/logrus v1.9.3

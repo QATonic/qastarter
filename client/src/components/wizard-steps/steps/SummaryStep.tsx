@@ -40,6 +40,9 @@ export default function SummaryStep() {
     groupId: config.groupId || '',
     artifactId: config.artifactId || '',
     baseUrl: config.baseUrl || '',
+    cloudDeviceFarm: config.cloudDeviceFarm || 'none',
+    openApiSpecUrl: config.openApiSpecUrl || '',
+    environments: config.environments || [],
     utilities: config.utilities,
   };
 
@@ -60,6 +63,15 @@ export default function SummaryStep() {
       : []),
     ...(config.reportingTool
       ? [{ label: 'Reporting Tool', value: getLabel('reportingTools', config.reportingTool) }]
+      : []),
+    ...(config.cloudDeviceFarm && config.cloudDeviceFarm !== 'none'
+      ? [{ label: 'Cloud Device Farm', value: getLabel('cloudDeviceFarms', config.cloudDeviceFarm) }]
+      : []),
+    ...(config.openApiSpecUrl
+      ? [{ label: 'OpenAPI Spec', value: config.openApiSpecUrl }]
+      : []),
+    ...(config.environments && config.environments.length > 0
+      ? [{ label: 'Environments', value: config.environments.map((e) => e.name).join(', ') }]
       : []),
   ];
 

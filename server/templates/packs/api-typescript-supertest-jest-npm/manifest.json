@@ -234,6 +234,20 @@
       "path": "utils/logger.ts",
       "isTemplate": true,
       "description": "Logging utility"
+    },
+    {
+      "path": "utils/testDataFactory.ts",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "tests/openapi.test.ts",
+      "isTemplate": true,
+      "conditional": {
+        "hasOpenApiEndpoints": true
+      }
     }
   ],
   "directories": [

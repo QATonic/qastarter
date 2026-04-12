@@ -2421,7 +2421,9 @@ colorlog>=6.8.0
 # Linting & Formatting
 black>=24.1.0
 isort>=5.13.0
-pylint>=3.0.0",
+pylint>=3.0.0
+
+",
     "isTemplate": true,
     "mode": undefined,
     "path": "requirements.txt",

@@ -20,6 +20,12 @@ import {
   AlertTriangle,
   Copy,
   Check,
+  Cloud,
+  FlaskConical,
+  FileCode2,
+  Layers,
+  Gauge,
+  TerminalSquare,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -81,9 +87,9 @@ export default function Docs() {
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {[
-                { title: '1. Select Type', desc: 'Choose Web, Mobile, API, or Desktop testing.' },
+                { title: '1. Select Type', desc: 'Choose Web, Mobile, API, Desktop, or Performance testing.' },
                 { title: '2. Choose Tech', desc: 'Pick your language, framework, and tools.' },
-                { title: '3. Configure', desc: 'Set project name, dependencies, and utilities.' },
+                { title: '3. Configure', desc: 'Set project name, cloud farms, test data, environments, and utilities.' },
                 { title: '4. Download', desc: 'Get a production-ready ZIP file instantly.' },
               ].map((step, i) => (
                 <Card key={i} className="relative overflow-hidden border-primary/20">
@@ -109,7 +115,7 @@ export default function Docs() {
             </div>
 
             <Tabs defaultValue="web" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+              <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 h-auto">
                 <TabsTrigger value="web" className="flex gap-2 py-3">
                   <Globe className="h-4 w-4" /> Web
                 </TabsTrigger>
@@ -121,6 +127,9 @@ export default function Docs() {
                 </TabsTrigger>
                 <TabsTrigger value="desktop" className="flex gap-2 py-3">
                   <Laptop className="h-4 w-4" /> Desktop
+                </TabsTrigger>
+                <TabsTrigger value="performance" className="flex gap-2 py-3">
+                  <Gauge className="h-4 w-4" /> Performance
                 </TabsTrigger>
               </TabsList>
 
@@ -154,6 +163,20 @@ export default function Docs() {
                         <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
                         <span>
                           <b>Reporting:</b> Allure or ExtentReports integration.
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>Cloud Device Farm:</b> BrowserStack or Sauce Labs configuration for
+                          cross-browser testing in the cloud.
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>Test Data (Faker):</b> Auto-generated test data factories using
+                          DataFaker, Faker.js, Bogus, or language-native libraries.
                         </span>
                       </li>
                     </ul>
@@ -193,6 +216,13 @@ export default function Docs() {
                           <b>Gestures:</b> Swipe, tap, and scroll helpers.
                         </span>
                       </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>Cloud Device Farm:</b> BrowserStack or Sauce Labs for real-device
+                          testing at scale.
+                        </span>
+                      </li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -201,8 +231,8 @@ export default function Docs() {
               <TabsContent value="api" className="mt-6 space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>API Automation (RestAssured, Resty)</CardTitle>
-                    <CardDescription>REST and GraphQL testing framework</CardDescription>
+                    <CardTitle>API Automation (RestAssured, Resty, Supertest, RestSharp)</CardTitle>
+                    <CardDescription>REST, GraphQL, and OpenAPI schema-driven testing</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <ul className="grid md:grid-cols-2 gap-3">
@@ -230,6 +260,20 @@ export default function Docs() {
                           <b>Endpoints Class:</b> Centralized API route management.
                         </span>
                       </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>OpenAPI Schema-Driven:</b> Paste a Swagger/OpenAPI URL to auto-generate
+                          endpoint-specific test stubs for every path and method.
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>Multi-Environment:</b> Configure dev/staging/prod environments with
+                          separate base URLs and credentials.
+                        </span>
+                      </li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -238,7 +282,7 @@ export default function Docs() {
               <TabsContent value="desktop" className="mt-6 space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Desktop Automation (WinAppDriver)</CardTitle>
+                    <CardTitle>Desktop Automation (WinAppDriver, PyAutoGUI)</CardTitle>
                     <CardDescription>Windows application testing</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -265,6 +309,47 @@ export default function Docs() {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              <TabsContent value="performance" className="mt-6 space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Performance Testing (k6, Gatling, Locust)</CardTitle>
+                    <CardDescription>Load, stress, and scalability testing frameworks</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ul className="grid md:grid-cols-2 gap-3">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>k6 (JavaScript):</b> Modern load testing with scripted scenarios,
+                          thresholds, and built-in metrics.
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>Gatling (Java/Scala):</b> High-performance load testing with detailed
+                          HTML reports and Scala DSL.
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>Locust (Python):</b> Distributed load testing with a Python-based user
+                          behavior definition and web UI.
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />{' '}
+                        <span>
+                          <b>Pre-built Scenarios:</b> Ramp-up, spike, soak, and stress test patterns
+                          included out of the box.
+                        </span>
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </Tabs>
           </section>
 
@@ -283,6 +368,7 @@ export default function Docs() {
                 <br />• <b>Java:</b> JDK 11+ & Maven/Gradle
                 <br />• <b>JavaScript/TypeScript:</b> Node.js 16+
                 <br />• <b>Python:</b> Python 3.8+
+                <br />• <b>C#:</b> .NET 6.0+ SDK
                 <br />• <b>Go:</b> Go 1.18+
               </AlertDescription>
             </Alert>
@@ -319,10 +405,34 @@ export default function Docs() {
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-4">
+                <AccordionTrigger className="text-lg font-medium">
+                  C# (.NET)
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-2">
+                  <DocCodeBlock
+                    code={
+                      '# Restore Dependencies\ndotnet restore\n\n# Build Project\ndotnet build\n\n# Run Tests\ndotnet test'
+                    }
+                  />
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-5">
                 <AccordionTrigger className="text-lg font-medium">Go (Mod)</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-2">
                   <DocCodeBlock
                     code={'# Install Dependencies\ngo mod download\n\n# Run Tests\ngo test ./...'}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-6">
+                <AccordionTrigger className="text-lg font-medium">
+                  Performance (k6/Locust)
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-2">
+                  <DocCodeBlock
+                    code={
+                      '# k6 (JavaScript)\nk6 run scripts/load-test.js\n\n# Locust (Python)\nlocust -f locustfile.py --host=https://your-api.com\n\n# Gatling (Java)\nmvn gatling:test'
+                    }
                   />
                 </AccordionContent>
               </AccordionItem>
@@ -382,6 +492,165 @@ export default function Docs() {
                     </div>
                   </li>
                 </ul>
+              </CardContent>
+            </Card>
+          </section>
+          {/* New Features Section */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2 border-b pb-2">
+              <FileCode2 className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-bold">New Features</h2>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Cloud Device Farm */}
+              <Card className="border-l-4 border-l-purple-500">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Cloud className="h-5 w-5 text-purple-500" />
+                    Cloud Device Farm
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Run your Web and Mobile tests on BrowserStack or Sauce Labs cloud infrastructure.
+                    Select a cloud provider in the generator and your project will include:
+                  </p>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Cloud-specific configuration files (browserstack.yml / saucelabs.yml)
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      RemoteWebDriver setup for cloud execution
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Cloud SDK dependencies pre-configured
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Test Data (Faker) */}
+              <Card className="border-l-4 border-l-emerald-500">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FlaskConical className="h-5 w-5 text-emerald-500" />
+                    Test Data (Faker)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Enable the Faker utility to get a TestDataFactory class with realistic test data
+                    generation. Supported libraries per language:
+                  </p>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Java: DataFaker 2.x
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Python: Faker 22.x
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      JS/TS: @faker-js/faker 8.x
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      C#: Bogus 35.x / Go: gofakeit 6.x
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* OpenAPI Schema-Driven */}
+              <Card className="border-l-4 border-l-blue-500">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileCode2 className="h-5 w-5 text-blue-500" />
+                    OpenAPI Schema-Driven
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    For API testing, paste an OpenAPI 3.x or Swagger 2.0 spec URL and QAStarter will
+                    auto-generate endpoint-specific test stubs:
+                  </p>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Test methods for each path + HTTP method
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Request/response body validation stubs
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      HTTPS-only URL validation with safety checks
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Multi-Environment Config */}
+              <Card className="border-l-4 border-l-orange-500">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Layers className="h-5 w-5 text-orange-500" />
+                    Multi-Environment Config
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Define multiple target environments (dev, staging, prod) with separate URLs and
+                    credentials. Your generated project will include:
+                  </p>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Per-environment configuration files
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Environment switcher via CLI flag or env variable
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                      Up to 10 named environments supported
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* CLI Tool Section */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-2 border-b pb-2">
+              <TerminalSquare className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-bold">CLI Tool</h2>
+            </div>
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  QAStarter also provides a command-line interface for generating projects and keeping
+                  dependencies up to date.
+                </p>
+                <DocCodeBlock
+                  code={
+                    '# Install the CLI globally\nnpm install -g qastarter\n\n# Generate a new project interactively\nqastarter new\n\n# Generate with options\nqastarter new --framework selenium --language java --cloud-farm browserstack\n\n# List available template packs\nqastarter list\n\n# Update project dependencies to latest BOM versions\nqastarter update\n\n# Dry-run to see what would change\nqastarter update --dry-run'
+                  }
+                />
+                <p className="text-sm text-muted-foreground">
+                  The <code>update</code> command detects your build file (pom.xml, package.json,
+                  requirements.txt, build.gradle, .csproj, go.mod), compares dependency versions
+                  against the QAStarter BOM, and offers to update them in-place.
+                </p>
               </CardContent>
             </Card>
           </section>

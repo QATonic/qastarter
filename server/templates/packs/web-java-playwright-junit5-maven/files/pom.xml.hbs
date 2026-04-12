@@ -154,6 +154,14 @@
         </dependency>
         {{/each}}
         {{/if}}
+        {{#if utilities.faker}}
+        <!-- DataFaker — Test data generation -->
+        <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>{{toolVersions.datafaker}}</version>
+        </dependency>
+        {{/if}}
     </dependencies>
 
     <build>

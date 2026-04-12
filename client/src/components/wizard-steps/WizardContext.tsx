@@ -195,6 +195,11 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
       // API: reset auth
       newConfig.apiAuthType = 'none';
       newConfig.apiAuthToken = '';
+
+      // Reset cloud device farm when switching to types that don't support it
+      if (value !== 'web' && value !== 'mobile') {
+        newConfig.cloudDeviceFarm = 'none';
+      }
     }
 
     // When baseUrl changes for web, auto-switch credentials

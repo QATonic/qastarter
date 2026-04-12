@@ -14,6 +14,9 @@
 "dotenv": "^16.3.0"
 },
 "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+{{#if utilities.faker}}
+"@faker-js/faker": "^{{toolVersions.fakerJs}}",
+{{/if}}
 "jest": "^29.7.0",
 "prettier": "^3.2.4",
 {{#if (eq reportingTool "allure")}}

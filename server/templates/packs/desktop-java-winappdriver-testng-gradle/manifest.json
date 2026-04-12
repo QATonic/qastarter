@@ -330,6 +330,13 @@
       "template": "src/test/resources/regression-tests.xml.hbs",
       "isTemplate": true,
       "description": "Regression test suite configuration"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataFactory.java",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
     }
   ],
   "directories": [

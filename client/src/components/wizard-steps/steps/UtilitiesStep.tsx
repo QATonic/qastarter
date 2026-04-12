@@ -6,11 +6,22 @@ import type React from 'react';
 
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Settings, FileJson, Camera, FileText, Database, Container, Boxes } from 'lucide-react';
+import {
+  Settings,
+  FileJson,
+  Camera,
+  FileText,
+  Database,
+  Container,
+  Boxes,
+  FlaskConical,
+  Cloud,
+} from 'lucide-react';
 import WizardStep from '../../WizardStep';
 import HelpTooltip from '../../HelpTooltip';
 import { useWizard } from '../WizardContext';
 import { defaultUtilities } from '@shared/schema';
+import { validationLabels } from '@shared/validationMatrix';
 
 interface UtilityItem {
   key: keyof typeof defaultUtilities;
@@ -56,6 +67,12 @@ const utilityItems: UtilityItem[] = [
     label: 'Data Provider',
     description: 'Data-driven testing utilities',
     icon: Database,
+  },
+  {
+    key: 'faker',
+    label: 'Test Data (Faker)',
+    description: 'Auto-generate realistic test data with Faker/Bogus/DataFaker libraries',
+    icon: FlaskConical,
   },
 ];
 
@@ -202,8 +219,43 @@ export default function UtilitiesStep() {
             })}
         </div>
 
+        {/* Cloud Device Farm — only for web and mobile */}
+        {(config.testingType === 'web' || config.testingType === 'mobile') && (
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+              Cloud Device Farm (Optional)
+            </h3>
+            <div className="grid grid-cols-3 gap-3">
+              {['none', 'browserstack', 'saucelabs'].map((farm) => {
+                const isSelected = (config.cloudDeviceFarm || 'none') === farm;
+                const label =
+                  farm === 'none'
+                    ? 'None (Local)'
+                    : (validationLabels.cloudDeviceFarms as Record<string, string>)[farm] || farm;
+                return (
+                  <button
+                    key={farm}
+                    type="button"
+                    className={`
+                      flex items-center justify-center gap-2 p-3 rounded-lg border text-sm font-medium transition-all
+                      ${isSelected ? 'bg-purple-500/10 border-purple-500/40 text-purple-700 dark:text-purple-300' : 'bg-card hover:bg-muted/30 border-border text-muted-foreground'}
+                    `}
+                    onClick={() => updateConfig('cloudDeviceFarm', farm)}
+                  >
+                    <Cloud className={`w-4 h-4 ${isSelected ? 'text-purple-500' : ''}`} />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Run tests on BrowserStack or Sauce Labs cloud infrastructure instead of local browsers.
+            </p>
+          </div>
+        )}
+
         {/* Summary */}
-        <div className="p-3 bg-muted/50 rounded-lg flex items-center justify-between">
+        <div className="p-3 bg-muted/50 rounded-lg flex items-center justify-between flex-wrap gap-2">
           <p className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">{utilityCount}</span> utilities selected
           </p>
@@ -211,6 +263,11 @@ export default function UtilitiesStep() {
             <p className="text-sm text-blue-600">
               <span className="font-medium">{dockerCount}</span> Docker{' '}
               {dockerCount === 1 ? 'file' : 'files'}
+            </p>
+          )}
+          {config.cloudDeviceFarm && config.cloudDeviceFarm !== 'none' && (
+            <p className="text-sm text-purple-600">
+              {(validationLabels.cloudDeviceFarms as Record<string, string>)[config.cloudDeviceFarm] || config.cloudDeviceFarm}
             </p>
           )}
         </div>

@@ -325,6 +325,20 @@
       "path": "src/main/java/{{packagePath}}/utils/JSONUtils.java",
       "isTemplate": true,
       "description": "JSONUtils"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataFactory.java",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/OpenApiTests.java",
+      "isTemplate": true,
+      "conditional": {
+        "hasOpenApiEndpoints": true
+      }
     }
   ],
   "supportedCombination": {

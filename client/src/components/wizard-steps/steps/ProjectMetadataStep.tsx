@@ -4,10 +4,12 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, CheckCircle2, Plus, X, Layers } from 'lucide-react';
 import WizardStep from '../../WizardStep';
 import HelpTooltip from '../../HelpTooltip';
 import { useWizard } from '../WizardContext';
+import type { EnvironmentConfig } from '../types';
 
 export default function ProjectMetadataStep() {
   const { config, updateConfig, handleNext, handlePrevious, currentStep, steps } = useWizard();
@@ -325,6 +327,108 @@ export default function ProjectMetadataStep() {
               </div>
             )}
           </>
+        )}
+
+        {/* OpenAPI Spec URL — shown for API testing type */}
+        {config.testingType === 'api' && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="openApiSpecUrl" className="text-sm font-medium">
+                OpenAPI / Swagger Spec URL
+              </Label>
+              <HelpTooltip content="Paste a URL to an OpenAPI 3.x or Swagger 2.0 spec. QAStarter will auto-generate endpoint-specific test stubs. HTTPS only." />
+            </div>
+            <Input
+              id="openApiSpecUrl"
+              value={config.openApiSpecUrl || ''}
+              onChange={(e) => updateConfig('openApiSpecUrl', e.target.value)}
+              placeholder="https://petstore3.swagger.io/api/v3/openapi.json"
+              maxLength={2000}
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional. Leave empty for standard static test stubs.
+            </p>
+          </div>
+        )}
+
+        {/* Multi-Environment Configuration — shown for web and API testing */}
+        {(config.testingType === 'web' || config.testingType === 'api') && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-muted-foreground" />
+                <Label className="text-sm font-medium">Environments</Label>
+                <HelpTooltip content="Define target environments (dev, staging, prod) with separate base URLs. Generated config files will include environment-specific settings." />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs gap-1"
+                onClick={() => {
+                  const envs: EnvironmentConfig[] = config.environments ?? [];
+                  if (envs.length >= 10) return;
+                  const names = ['dev', 'staging', 'prod', 'qa', 'uat'];
+                  const usedNames = new Set(envs.map((e) => e.name));
+                  const nextName = names.find((n) => !usedNames.has(n)) || `env-${envs.length + 1}`;
+                  updateConfig('environments', [
+                    ...envs,
+                    { name: nextName, baseUrl: 'https://example.com' },
+                  ]);
+                }}
+                disabled={(config.environments ?? []).length >= 10}
+                aria-label="Add environment"
+              >
+                <Plus className="w-3 h-3" /> Add
+              </Button>
+            </div>
+            {(config.environments ?? []).length > 0 && (
+              <div className="space-y-2">
+                {config.environments.map((env, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input
+                      value={env.name}
+                      onChange={(e) => {
+                        const envs = [...config.environments];
+                        envs[i] = { ...envs[i], name: e.target.value };
+                        updateConfig('environments', envs);
+                      }}
+                      placeholder="env name"
+                      className="w-28 text-xs"
+                    />
+                    <Input
+                      value={env.baseUrl}
+                      onChange={(e) => {
+                        const envs = [...config.environments];
+                        envs[i] = { ...envs[i], baseUrl: e.target.value };
+                        updateConfig('environments', envs);
+                      }}
+                      placeholder="https://..."
+                      className="flex-1 text-xs"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                      onClick={() => {
+                        const envs = config.environments.filter((_, idx) => idx !== i);
+                        updateConfig('environments', envs);
+                      }}
+                      aria-label={`Remove ${env.name} environment`}
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {(config.environments ?? []).length === 0 && (
+              <p className="text-xs text-muted-foreground">
+                Optional. Add environments to generate multi-env configuration files.
+              </p>
+            )}
+          </div>
         )}
 
         {/* Java-specific metadata — only Group ID; Artifact ID is auto-derived from Project Name */}

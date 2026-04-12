@@ -24,6 +24,7 @@ import {
   configRoutes,
   projectRoutes,
   dependencyRoutes,
+  githubRoutes,
 } from './routes/index';
 import { apiVersionRedirect } from './middleware/apiVersionRedirect';
 
@@ -76,6 +77,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api', configRoutes);
   app.use('/api', projectRoutes);
   app.use('/api', dependencyRoutes);
+  app.use('/api', githubRoutes);
 
   const httpServer = createServer(app);
   return httpServer;

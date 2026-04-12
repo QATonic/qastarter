@@ -3,6 +3,8 @@ import { ProjectTemplateGenerator, TemplateFile } from '../templates';
 import { storage } from '../storage';
 import { logGeneration } from '../utils/logger';
 import { sanitizeFilename } from '@shared/sanitize';
+import { parseOpenApiFromUrl } from './openApiService';
+import type { OpenApiEndpoint } from '@shared/openApiTypes';
 import archiver from 'archiver';
 import path from 'path';
 import { Response } from 'express';
@@ -81,9 +83,26 @@ export class ProjectService {
     let totalSize = 0;
     const streamStart = Date.now();
 
+    // Parse OpenAPI spec if provided (API testing type only)
+    let openApiEndpoints: OpenApiEndpoint[] = [];
+    if (config.testingType === 'api' && config.openApiSpecUrl) {
+      try {
+        const endpoints = await parseOpenApiFromUrl(config.openApiSpecUrl);
+        if (endpoints) {
+          openApiEndpoints = endpoints;
+          reqLogger.info('Parsed OpenAPI spec', { endpointCount: endpoints.length });
+        }
+      } catch (err) {
+        reqLogger.warn('OpenAPI parsing failed, falling back to static stubs', {
+          error: err instanceof Error ? err.message : String(err),
+        });
+        // Silently continue — generation will use default static stubs
+      }
+    }
+
     try {
       // Consume the generator
-      for await (const file of this.templateGenerator.generateProjectStream(config)) {
+      for await (const file of this.templateGenerator.generateProjectStream(config, { strict: true, openApiEndpoints })) {
         archive.append(file.content, { name: file.path });
         fileCount++;
         totalSize += Buffer.byteLength(file.content, 'utf8');

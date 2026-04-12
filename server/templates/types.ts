@@ -11,12 +11,20 @@ export interface UserDependencyBuckets {
   maven: UserDependency[];
   /** npm registry dependencies (package name) */
   npm: UserDependency[];
+  /** NuGet dependencies (.NET) */
+  nuget: UserDependency[];
+  /** PyPI dependencies (Python) */
+  pypi: UserDependency[];
   /** True if at least one user dep was picked */
   hasAny: boolean;
   /** True if at least one Maven dep was picked */
   hasMaven: boolean;
   /** True if at least one npm dep was picked */
   hasNpm: boolean;
+  /** True if at least one NuGet dep was picked */
+  hasNuget: boolean;
+  /** True if at least one PyPI dep was picked */
+  hasPypi: boolean;
 }
 
 export interface TemplatePackManifest {
@@ -74,11 +82,21 @@ export interface TemplateContext extends ProjectConfig {
   deviceName: string;
   /** Mobile platform OS version */
   platformVersion: string;
+  /** Cloud device farm provider (browserstack, saucelabs, or none) */
+  cloudDeviceFarm: string;
   /** API auth type */
   apiAuthType: 'none' | 'bearer' | 'basic' | 'api-key';
   /** API auth token/key value */
   apiAuthToken: string;
   envs: string[];
+  /** Named environments with URLs and optional credentials for multi-env test execution */
+  environments: Array<{ name: string; baseUrl: string; username?: string; password?: string }>;
+  /** True when at least one named environment is configured */
+  hasEnvironments: boolean;
+  /** Parsed OpenAPI endpoints for API schema-driven test generation */
+  openApiEndpoints: import('@shared/openApiTypes').OpenApiEndpoint[];
+  /** True when at least one OpenAPI endpoint is available */
+  hasOpenApiEndpoints: boolean;
   toolVersions: Record<string, string>;
   timestamp: string;
   /**

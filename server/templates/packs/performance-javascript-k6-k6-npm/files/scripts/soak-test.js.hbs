@@ -1,0 +1,32 @@
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { BASE_URL, defaultHeaders } from './helpers/utils.js';
+
+/**
+ * Soak / Endurance Test — extended duration under normal load.
+ *
+ * Runs for a prolonged period to uncover memory leaks,
+ * connection pool exhaustion, or gradual performance degradation.
+ */
+export const options = {
+  stages: [
+    { duration: '2m', target: 50 },    // ramp up
+    { duration: '25m', target: 50 },   // hold steady for extended period
+    { duration: '3m', target: 0 },     // ramp down
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500', 'p(99)<1500'],
+    http_req_failed: ['rate<0.01'],
+  },
+};
+
+export default function () {
+  const res = http.get(`${BASE_URL}`, { headers: defaultHeaders });
+
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 500ms': (r) => r.timings.duration < 500,
+  });
+
+  sleep(1);
+}

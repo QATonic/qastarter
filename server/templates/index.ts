@@ -47,10 +47,13 @@ export class ProjectTemplateGenerator {
     }
   }
 
-  public async *generateProjectStream(config: ProjectConfig): AsyncGenerator<TemplateFile> {
+  public async *generateProjectStream(
+    config: ProjectConfig,
+    options?: { strict?: boolean; openApiEndpoints?: import('@shared/openApiTypes').OpenApiEndpoint[] }
+  ): AsyncGenerator<TemplateFile> {
     const hasTemplatePack = await this.templatePackEngine.hasTemplatePack(config);
     if (hasTemplatePack) {
-      yield* this.templatePackEngine.generateProjectStream(config, { strict: true });
+      yield* this.templatePackEngine.generateProjectStream(config, { strict: true, ...options });
     } else {
       throw new Error(
         `No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}.`

@@ -1,0 +1,56 @@
+name: Locust Performance Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Test type to run'
+        required: true
+        default: 'load'
+        type: choice
+        options:
+          - load
+          - stress
+      users:
+        description: 'Number of concurrent users'
+        required: false
+        default: '50'
+      run_time:
+        description: 'Test duration (e.g., 5m)'
+        required: false
+        default: '5m'
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python {{toolVersions.python}}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Locust Test
+        run: |
+          locust -f tests/{{raw}}${{ github.event.inputs.test_type }}{{/raw}}_test.py \
+            --host={{baseUrl}} \
+            --headless \
+            -u {{raw}}${{ github.event.inputs.users }}{{/raw}} \
+            -r 10 \
+            --run-time {{raw}}${{ github.event.inputs.run_time }}{{/raw}} \
+            --html=results/report.html \
+            --csv=results/results
+
+      - name: Upload Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: locust-results
+          path: results/
+          retention-days: 14

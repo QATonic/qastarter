@@ -146,6 +146,20 @@
       "path": "tests/integration/auth.integration.test.ts",
       "isTemplate": true,
       "description": "Authentication integration tests"
+    },
+    {
+      "path": "utils/testDataFactory.ts",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "tests/openapi.test.ts",
+      "isTemplate": true,
+      "conditional": {
+        "hasOpenApiEndpoints": true
+      }
     }
   ],
   "directories": [

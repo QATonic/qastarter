@@ -225,6 +225,20 @@
       "path": ".gitignore",
       "isTemplate": true,
       "description": "Git ignore rules"
+    },
+    {
+      "path": "Utils/TestDataFactory.cs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "Tests/OpenApiTests.cs",
+      "isTemplate": true,
+      "conditional": {
+        "hasOpenApiEndpoints": true
+      }
     }
   ],
   "directories": [

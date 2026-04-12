@@ -4,7 +4,9 @@
  */
 
 import { Router } from 'express';
+import { Octokit } from '@octokit/rest';
 import { projectConfigSchema, type ProjectConfig } from '@shared/schema';
+import { BOM } from '@shared/bom';
 import { WizardValidator, validationMatrix, validationLabels } from '@shared/validationMatrix';
 import {
   asyncHandler,
@@ -13,6 +15,10 @@ import {
   generateRequestId,
 } from '../errors';
 import { storage } from '../storage';
+
+// ── GitHub stars cache (1-hour TTL) ──────────────────────────────────
+let githubStarsCache: { stars: number; forks: number; updatedAt: number } | null = null;
+const GITHUB_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 const router = Router();
 
@@ -29,6 +35,64 @@ router.get(
     });
   })
 );
+
+/**
+ * GET /v1/stats/github
+ * Returns GitHub stars/forks for the QAStarter repo (cached, 1-hour TTL).
+ * Uses unauthenticated Octokit — 60 req/hour rate limit is fine with cache.
+ */
+router.get(
+  '/v1/stats/github',
+  asyncHandler(async (_req, res) => {
+    const now = Date.now();
+
+    // Serve from cache when fresh
+    if (githubStarsCache && now - githubStarsCache.updatedAt < GITHUB_CACHE_TTL_MS) {
+      return res.json({
+        success: true,
+        data: { stars: githubStarsCache.stars, forks: githubStarsCache.forks },
+      });
+    }
+
+    try {
+      const octokit = new Octokit();
+      const { data } = await octokit.repos.get({
+        owner: 'QATonic',
+        repo: 'qastarter',
+      });
+
+      githubStarsCache = {
+        stars: data.stargazers_count,
+        forks: data.forks_count,
+        updatedAt: now,
+      };
+
+      res.json({
+        success: true,
+        data: { stars: data.stargazers_count, forks: data.forks_count },
+      });
+    } catch {
+      // Return stale cache if available, otherwise zeros
+      const fallback = githubStarsCache ?? { stars: 0, forks: 0 };
+      res.json({
+        success: true,
+        data: { stars: fallback.stars, forks: fallback.forks },
+      });
+    }
+  })
+);
+
+/**
+ * GET /v1/bom
+ * Returns the Bill of Materials (library versions) so the CLI
+ * `update` command can compare against local project dependencies.
+ */
+router.get('/v1/bom', (_req, res) => {
+  res.json({
+    success: true,
+    data: BOM,
+  });
+});
 
 /**
  * Get wizard configuration options

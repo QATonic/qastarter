@@ -300,6 +300,13 @@
         "utilities.includeDocker": true
       },
       "description": "Docker configuration for Windows containers"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataFactory.java",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
     }
   ],
   "supportedCombination": {

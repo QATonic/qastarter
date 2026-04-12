@@ -286,6 +286,20 @@
         "testingPattern": "contract-testing"
       },
       "description": "Pact consumer test"
+    },
+    {
+      "path": "utils/test_data_factory.py",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "tests/test_openapi.py",
+      "isTemplate": true,
+      "conditional": {
+        "hasOpenApiEndpoints": true
+      }
     }
   ]
 }

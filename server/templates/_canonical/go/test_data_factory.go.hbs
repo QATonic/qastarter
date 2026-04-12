@@ -1,0 +1,103 @@
+package utils
+
+import (
+	"fmt"
+
+	"github.com/brianvoe/gofakeit/v6"
+)
+
+// TestDataFactory provides methods for generating realistic test data
+// using gofakeit. Use it in your tests to avoid hard-coded values.
+//
+// Example:
+//
+//	factory := utils.NewTestDataFactory()
+//	email := factory.RandomEmail()
+//	name  := factory.RandomFullName()
+type TestDataFactory struct{}
+
+// NewTestDataFactory creates a new factory with a random seed.
+func NewTestDataFactory() *TestDataFactory {
+	gofakeit.Seed(0) // random seed
+	return &TestDataFactory{}
+}
+
+// ── User Data ──────────────────────────────────────────────────
+
+func (f *TestDataFactory) RandomFirstName() string {
+	return gofakeit.FirstName()
+}
+
+func (f *TestDataFactory) RandomLastName() string {
+	return gofakeit.LastName()
+}
+
+func (f *TestDataFactory) RandomFullName() string {
+	return fmt.Sprintf("%s %s", gofakeit.FirstName(), gofakeit.LastName())
+}
+
+func (f *TestDataFactory) RandomEmail() string {
+	return gofakeit.Email()
+}
+
+func (f *TestDataFactory) RandomUsername() string {
+	return gofakeit.Username()
+}
+
+func (f *TestDataFactory) RandomPassword() string {
+	return gofakeit.Password(true, true, true, true, false, 12)
+}
+
+func (f *TestDataFactory) RandomPhoneNumber() string {
+	return gofakeit.Phone()
+}
+
+// ── Address Data ───────────────────────────────────────────────
+
+func (f *TestDataFactory) RandomStreetAddress() string {
+	return gofakeit.Street()
+}
+
+func (f *TestDataFactory) RandomCity() string {
+	return gofakeit.City()
+}
+
+func (f *TestDataFactory) RandomState() string {
+	return gofakeit.State()
+}
+
+func (f *TestDataFactory) RandomZipCode() string {
+	return gofakeit.Zip()
+}
+
+func (f *TestDataFactory) RandomCountry() string {
+	return gofakeit.Country()
+}
+
+// ── Business Data ──────────────────────────────────────────────
+
+func (f *TestDataFactory) RandomCompanyName() string {
+	return gofakeit.Company()
+}
+
+func (f *TestDataFactory) RandomJobTitle() string {
+	return gofakeit.JobTitle()
+}
+
+// ── Text & Numbers ─────────────────────────────────────────────
+
+func (f *TestDataFactory) RandomSentence() string {
+	return gofakeit.Sentence(8)
+}
+
+func (f *TestDataFactory) RandomParagraph() string {
+	return gofakeit.Paragraph(2, 3, 8, " ")
+}
+
+func (f *TestDataFactory) RandomInt(min, max int) int {
+	return gofakeit.IntRange(min, max)
+}
+
+func (f *TestDataFactory) RandomUUID() string {
+	return gofakeit.UUID()
+}

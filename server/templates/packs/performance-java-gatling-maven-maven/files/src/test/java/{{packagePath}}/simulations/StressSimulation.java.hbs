@@ -1,0 +1,47 @@
+package {{javaPackage}}.simulations;
+
+import io.gatling.javaapi.core.*;
+import io.gatling.javaapi.http.*;
+
+import java.time.Duration;
+
+import static io.gatling.javaapi.core.CoreDsl.*;
+import static io.gatling.javaapi.http.HttpDsl.*;
+
+/**
+ * Stress Simulation - pushes the system beyond normal capacity.
+ *
+ * Gradually increases load to find the breaking point.
+ */
+public class StressSimulation extends Simulation {
+
+    private final HttpProtocolBuilder httpProtocol = http
+            .baseUrl("{{baseUrl}}")
+            .acceptHeader("text/html,application/json")
+            .acceptEncodingHeader("gzip, deflate")
+            .userAgentHeader("Gatling/{{toolVersions.gatling}}");
+
+    private final ScenarioBuilder stressScenario = scenario("Stress Test")
+            .exec(
+                    http("Homepage")
+                            .get("/")
+                            .check(status().is(200))
+            )
+            .pause(Duration.ofMillis(500));
+
+    {
+        setUp(
+                stressScenario.injectOpen(
+                        rampUsers(100).during(Duration.ofMinutes(2)),
+                        constantUsersPerSec(20).during(Duration.ofMinutes(3)),
+                        rampUsers(200).during(Duration.ofMinutes(2)),
+                        constantUsersPerSec(40).during(Duration.ofMinutes(3))
+                )
+        )
+        .protocols(httpProtocol)
+        .assertions(
+                global().responseTime().percentile(95.0).lt(1000),
+                global().failedRequests().percent().lt(5.0)
+        );
+    }
+}

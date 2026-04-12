@@ -279,6 +279,27 @@
       "path": "src/main/resources/setup.properties",
       "isTemplate": true,
       "description": "Quick setup guide"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataFactory.java",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "config/browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "config/saucelabs.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "saucelabs"
+      }
     }
   ],
   "directories": [

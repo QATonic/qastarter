@@ -38,7 +38,7 @@ const manifestSchema = z.object({
     .optional(),
   supportsDynamic: z.boolean().optional().default(true),
   supportedCombination: z.object({
-    testingType: z.enum(['web', 'mobile', 'api', 'desktop']),
+    testingType: z.enum(['web', 'mobile', 'api', 'desktop', 'performance']),
     framework: z.string().min(1),
     language: z.string().min(1),
     testRunner: z.string().min(1),

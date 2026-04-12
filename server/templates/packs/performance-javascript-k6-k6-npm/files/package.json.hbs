@@ -1,0 +1,20 @@
+{
+  "name": "{{projectName}}",
+  "version": "1.0.0",
+  "description": "Performance test suite using k6",
+  "scripts": {
+    "test:load": "k6 run scripts/load-test.js",
+    "test:stress": "k6 run scripts/stress-test.js",
+    "test:spike": "k6 run scripts/spike-test.js",
+    "test:soak": "k6 run scripts/soak-test.js",
+    "test:all": "npm run test:load && npm run test:stress",
+    "report": "k6 run --out json=results/output.json scripts/load-test.js"
+  },
+  "keywords": ["k6", "performance-testing", "load-testing"],
+  "license": "MIT",
+  "devDependencies": {
+    {{#if utilities.faker}}
+    "@faker-js/faker": "^{{toolVersions.fakerJs}}"
+    {{/if}}
+  }
+}

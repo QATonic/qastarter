@@ -15,6 +15,9 @@
 "format": "prettier --write ."
 },
 "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+{{#if utilities.faker}}
+"@faker-js/faker": "^{{toolVersions.fakerJs}}",
+{{/if}}
 "cypress": "^13.6.0",
 "eslint": "^8.56.0",
 "eslint-plugin-cypress": "^2.15.1",

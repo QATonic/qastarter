@@ -1,0 +1,99 @@
+{
+  "id": "performance-javascript-k6-k6-npm",
+  "displayName": "k6 Performance Test Suite",
+  "description": "Performance testing with k6 (Grafana) using JavaScript",
+  "version": "1.0.0",
+  "supportedCombination": {
+    "testingType": "performance",
+    "framework": "k6",
+    "language": "javascript",
+    "testRunner": "k6",
+    "buildTool": "npm"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "k6-html-report",
+      "k6-json"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "load-test",
+      "stress-test",
+      "spike-test",
+      "soak-test"
+    ]
+  },
+  "toolVersions": {
+    "k6": "0.49.0",
+    "node": "18+"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "scripts/load-test.js",
+      "isTemplate": true
+    },
+    {
+      "path": "scripts/stress-test.js",
+      "isTemplate": true
+    },
+    {
+      "path": "scripts/spike-test.js",
+      "isTemplate": true
+    },
+    {
+      "path": "scripts/soak-test.js",
+      "isTemplate": true
+    },
+    {
+      "path": "scripts/helpers/utils.js",
+      "isTemplate": true
+    },
+    {
+      "path": "config/thresholds.json",
+      "isTemplate": true
+    },
+    {
+      "path": ".github/workflows/performance.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "utils/testDataFactory.js",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    }
+  ],
+  "directories": [
+    "results",
+    "reports"
+  ]
+}

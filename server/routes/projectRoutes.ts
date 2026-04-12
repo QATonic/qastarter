@@ -301,9 +301,10 @@ router.get(
       utilities: utilitiesParam,
     } = req.query as Record<string, string>;
 
-    const validTestingTypes = ['web', 'mobile', 'api', 'desktop'] as const;
-    const testingType = validTestingTypes.includes(testingTypeParam as any)
-      ? (testingTypeParam as 'web' | 'mobile' | 'api' | 'desktop')
+    const validTestingTypes = ['web', 'mobile', 'api', 'desktop', 'performance'] as const;
+    type TestingType = (typeof validTestingTypes)[number];
+    const testingType: TestingType = validTestingTypes.includes(testingTypeParam as any)
+      ? (testingTypeParam as TestingType)
       : 'web';
 
     const utilitiesArray = utilitiesParam

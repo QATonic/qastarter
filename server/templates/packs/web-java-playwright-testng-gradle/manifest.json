@@ -246,6 +246,27 @@
       "conditional": {
         "utilities.dataProvider": true
       }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataFactory.java",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "config/browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "config/saucelabs.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "saucelabs"
+      }
     }
   ],
   "directories": [

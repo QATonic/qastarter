@@ -125,6 +125,20 @@
       "path": "app/src/androidTest/kotlin/{{packagePath}}/runner/CustomTestRunner.kt",
       "isTemplate": true,
       "description": "Custom test runner"
+    },
+    {
+      "path": "config/browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "config/saucelabs.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "saucelabs"
+      }
     }
   ],
   "directories": [

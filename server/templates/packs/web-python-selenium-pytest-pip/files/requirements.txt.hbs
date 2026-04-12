@@ -34,3 +34,8 @@ colorlog>=6.8.0
 black>=24.1.0
 isort>=5.13.0
 pylint>=3.0.0
+
+{{#if utilities.faker}}
+# Test Data Generation
+faker>={{toolVersions.faker}}
+{{/if}}

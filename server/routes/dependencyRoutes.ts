@@ -19,7 +19,7 @@ import { ValidationError, ExternalServiceError, asyncHandler, generateRequestId 
 
 const router = Router();
 
-const SUPPORTED_REGISTRIES: readonly RegistryId[] = ['maven', 'npm'] as const;
+const SUPPORTED_REGISTRIES: readonly RegistryId[] = ['maven', 'npm', 'nuget', 'pypi'] as const;
 
 // Per-IP rate limiter — dependency search can easily be abused to proxy
 // arbitrary traffic, so we keep it tight.
@@ -67,7 +67,7 @@ function parseLimit(value: unknown): number | undefined {
  *         required: true
  *         schema:
  *           type: string
- *           enum: [maven, npm]
+ *           enum: [maven, npm, nuget, pypi]
  *       - in: query
  *         name: q
  *         required: true
@@ -134,7 +134,7 @@ router.get(
  *         required: true
  *         schema:
  *           type: string
- *           enum: [maven, npm]
+ *           enum: [maven, npm, nuget, pypi]
  *       - in: query
  *         name: id
  *         required: true
@@ -190,7 +190,13 @@ router.get(
  * are unhelpful surfaced to end users.
  */
 function humanizeUpstreamError(err: unknown, registry: RegistryId): string {
-  const upstream = registry === 'maven' ? 'Maven Central' : 'the npm registry';
+  const registryNames: Record<RegistryId, string> = {
+    maven: 'Maven Central',
+    npm: 'the npm registry',
+    nuget: 'the NuGet registry',
+    pypi: 'PyPI',
+  };
+  const upstream = registryNames[registry];
 
   if (err instanceof Error) {
     const name = err.name;

@@ -60,15 +60,49 @@ const DEBOUNCE_MS = 350;
 const MIN_QUERY_LEN = 2;
 
 /**
- * Map a language id to the registry it lives in.
+ * Map a language id to the primary registry it uses.
  * Falls back to npm because most "general" use cases are JS-based.
  */
 function defaultRegistryFor(language: string | undefined): DependencyRegistry {
   if (!language) return 'npm';
   const lc = language.toLowerCase();
   if (lc === 'java' || lc === 'kotlin' || lc === 'scala') return 'maven';
+  if (lc === 'csharp' || lc === 'c#') return 'nuget';
+  if (lc === 'python') return 'pypi';
   return 'npm';
 }
+
+/** Registries available for a given language — shown as tabs. */
+function availableRegistriesFor(language: string | undefined): DependencyRegistry[] {
+  if (!language) return ['npm', 'maven'];
+  const lc = language.toLowerCase();
+  if (lc === 'java' || lc === 'kotlin' || lc === 'scala') return ['maven'];
+  if (lc === 'csharp' || lc === 'c#') return ['nuget'];
+  if (lc === 'python') return ['pypi'];
+  if (lc === 'go') return ['npm']; // Go modules not yet supported — fallback
+  if (lc === 'dart') return ['npm']; // Pub.dev not yet supported — fallback
+  return ['npm'];
+}
+
+/** Human-readable label and placeholder for each registry. */
+const REGISTRY_META: Record<DependencyRegistry, { label: string; placeholder: string }> = {
+  maven: {
+    label: 'Maven Central',
+    placeholder: 'Search Maven Central (e.g. selenium-java, jackson, lombok)...',
+  },
+  npm: {
+    label: 'npm',
+    placeholder: 'Search npm (e.g. axios, lodash, dotenv)...',
+  },
+  nuget: {
+    label: 'NuGet',
+    placeholder: 'Search NuGet (e.g. Selenium.WebDriver, RestSharp, Newtonsoft.Json)...',
+  },
+  pypi: {
+    label: 'PyPI',
+    placeholder: 'Search PyPI (e.g. selenium, requests, pytest)...',
+  },
+};
 
 export default function DependencySearch() {
   const { config, updateConfig } = useExpressGenerator();
@@ -199,6 +233,7 @@ export default function DependencySearch() {
     [selected, updateConfig]
   );
 
+  const registries = availableRegistriesFor(config.language);
   const hasResults = results.length > 0;
   const isSearching = debouncedQuery.length >= MIN_QUERY_LEN;
 
@@ -215,16 +250,16 @@ export default function DependencySearch() {
         }}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2 h-9">
-          <TabsTrigger value="maven" className="text-xs gap-1.5">
-            <Package className="w-3.5 h-3.5" />
-            Maven Central
-          </TabsTrigger>
-          <TabsTrigger value="npm" className="text-xs gap-1.5">
-            <Package className="w-3.5 h-3.5" />
-            npm
-          </TabsTrigger>
-        </TabsList>
+        {registries.length > 1 && (
+          <TabsList className={cn('grid w-full h-9', `grid-cols-${registries.length}`)}>
+            {registries.map((r) => (
+              <TabsTrigger key={r} value={r} className="text-xs gap-1.5">
+                <Package className="w-3.5 h-3.5" />
+                {REGISTRY_META[r].label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        )}
 
         <TabsContent value={registry} className="mt-3 space-y-2">
           {/* Search input */}
@@ -235,13 +270,9 @@ export default function DependencySearch() {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={
-                registry === 'maven'
-                  ? 'Search Maven Central (e.g. selenium-java, jackson, lombok)...'
-                  : 'Search npm (e.g. axios, lodash, dotenv)...'
-              }
+              placeholder={REGISTRY_META[registry].placeholder}
               className="pl-9 pr-9 h-10"
-              aria-label={`Search ${registry === 'maven' ? 'Maven Central' : 'npm registry'}`}
+              aria-label={`Search ${REGISTRY_META[registry].label}`}
             />
             {loading && (
               <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary animate-spin" />
@@ -259,12 +290,12 @@ export default function DependencySearch() {
               <div className="p-4 text-center text-sm text-muted-foreground">
                 <Search className="w-5 h-5 mx-auto mb-2 opacity-40" />
                 Type at least {MIN_QUERY_LEN} characters to search{' '}
-                {registry === 'maven' ? 'Maven Central' : 'npm'}.
+                {REGISTRY_META[registry].label}.
               </div>
             ) : loading && results.length === 0 ? (
               <div className="flex flex-col items-center gap-2 p-6 text-sm text-muted-foreground">
                 <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                <span>Searching {registry === 'maven' ? 'Maven Central' : 'npm'}...</span>
+                <span>Searching {REGISTRY_META[registry].label}...</span>
               </div>
             ) : !loading && results.length === 0 ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
@@ -274,6 +305,12 @@ export default function DependencySearch() {
                   <p className="text-xs mt-1 opacity-70">
                     Tip: Try the exact artifact name (e.g. &quot;selenium-java&quot; instead of
                     &quot;selenium&quot;).
+                  </p>
+                )}
+                {registry === 'pypi' && (
+                  <p className="text-xs mt-1 opacity-70">
+                    Tip: Try the exact package name (e.g. &quot;selenium&quot;, &quot;requests&quot;,
+                    &quot;pytest&quot;).
                   </p>
                 )}
               </div>

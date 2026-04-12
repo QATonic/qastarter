@@ -23,6 +23,7 @@ import {
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import CodeHighlight from '@/components/CodeHighlight';
 
 interface ProjectFile {
   name: string;
@@ -417,7 +418,10 @@ export default function ProjectPreview({ configuration }: ProjectPreviewProps) {
               <h3 className="text-sm font-medium mb-2">File Preview</h3>
               <ScrollArea className="h-80 border rounded-md p-2">
                 {selectedFile ? (
-                  <pre className="text-xs font-mono whitespace-pre-wrap">{selectedFile}</pre>
+                  <CodeHighlight
+                    code={selectedFile}
+                    filename={selectedFilePath ?? undefined}
+                  />
                 ) : (
                   <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">
                     Click any file on the left to peek at its contents

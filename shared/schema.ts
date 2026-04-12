@@ -140,7 +140,7 @@ export const projectConfigSchema = z.object({
     .array(
       z.object({
         id: z.string().min(1),
-        registry: z.enum(['maven', 'npm']),
+        registry: z.enum(['maven', 'npm', 'nuget', 'pypi']),
         name: z.string().min(1),
         version: z.string().min(1),
         group: z.string().optional(),
@@ -158,7 +158,7 @@ export const projectConfigSchema = z.object({
  */
 export const userDependencySchema = z.object({
   id: z.string().min(1),
-  registry: z.enum(['maven', 'npm']),
+  registry: z.enum(['maven', 'npm', 'nuget', 'pypi']),
   name: z.string().min(1),
   version: z.string().min(1),
   group: z.string().optional(),

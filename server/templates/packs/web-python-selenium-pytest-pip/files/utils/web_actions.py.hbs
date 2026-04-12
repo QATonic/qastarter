@@ -1,0 +1,94 @@
+"""
+Reusable web interaction methods with built-in waits
+"""
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.select import Select
+from utils.wait_helpers import WaitHelpers
+from utils.logger import Logger
+
+logger = Logger.get_logger(__name__)
+
+class WebActions:
+    """Web action utilities"""
+    
+    def __init__(self, driver: WebDriver):
+        self.driver = driver
+        self.actions = ActionChains(driver)
+    
+    def click_element(self, locator: tuple) -> None:
+        """Click element with wait"""
+        element = WaitHelpers.wait_for_element_clickable(self.driver, locator)
+        logger.info(f"Clicking: {locator}")
+        element.click()
+    
+    def type_text(self, locator: tuple, text: str, clear_first: bool = True) -> None:
+        """Type text with wait"""
+        element = WaitHelpers.wait_for_element_visible(self.driver, locator)
+        logger.info(f"Typing '{text}' into: {locator}")
+        if clear_first:
+            element.clear()
+        element.send_keys(text)
+    
+    def get_element_text(self, locator: tuple) -> str:
+        """Get element text with wait"""
+        element = WaitHelpers.wait_for_element_visible(self.driver, locator)
+        return element.text
+    
+    def hover_over_element(self, locator: tuple) -> None:
+        """Hover over element"""
+        element = WaitHelpers.wait_for_element_visible(self.driver, locator)
+        logger.info(f"Hovering over: {locator}")
+        self.actions.move_to_element(element).perform()
+    
+    def double_click_element(self, locator: tuple) -> None:
+        """Double click element"""
+        element = WaitHelpers.wait_for_element_clickable(self.driver, locator)
+        logger.info(f"Double clicking: {locator}")
+        self.actions.double_click(element).perform()
+    
+    def right_click_element(self, locator: tuple) -> None:
+        """Right click element"""
+        element = WaitHelpers.wait_for_element_clickable(self.driver, locator)
+        logger.info(f"Right clicking: {locator}")
+        self.actions.context_click(element).perform()
+    
+    def drag_and_drop(self, source_locator: tuple, target_locator: tuple) -> None:
+        """Drag and drop"""
+        source = WaitHelpers.wait_for_element_visible(self.driver, source_locator)
+        target = WaitHelpers.wait_for_element_visible(self.driver, target_locator)
+        logger.info(f"Drag from {source_locator} to {target_locator}")
+        self.actions.drag_and_drop(source, target).perform()
+    
+    def select_dropdown_by_text(self, locator: tuple, text: str) -> None:
+        """Select dropdown option by visible text"""
+        element = WaitHelpers.wait_for_element_visible(self.driver, locator)
+        select = Select(element)
+        logger.info(f"Selecting '{text}' from dropdown: {locator}")
+        select.select_by_visible_text(text)
+    
+    def select_dropdown_by_value(self, locator: tuple, value: str) -> None:
+        """Select dropdown option by value"""
+        element = WaitHelpers.wait_for_element_visible(self.driver, locator)
+        select = Select(element)
+        logger.info(f"Selecting value '{value}' from dropdown: {locator}")
+        select.select_by_value(value)
+    
+    def press_key(self, locator: tuple, key: str) -> None:
+        """Press keyboard key"""
+        element = WaitHelpers.wait_for_element_visible(self.driver, locator)
+        logger.info(f"Pressing {key} on: {locator}")
+        element.send_keys(getattr(Keys, key.upper()))
+    
+    def scroll_to_element(self, locator: tuple) -> None:
+        """Scroll to element"""
+        element = WaitHelpers.wait_for_element_present(self.driver, locator)
+        logger.info(f"Scrolling to: {locator}")
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+    
+    def execute_javascript(self, script: str, *args) -> any:
+        """Execute JavaScript"""
+        logger.info(f"Executing JS: {script}")
+        return self.driver.execute_script(script, *args)

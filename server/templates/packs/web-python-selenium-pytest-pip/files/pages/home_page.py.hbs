@@ -1,0 +1,46 @@
+"""
+Home Page Object Model
+"""
+from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
+from config.config import Config
+
+class HomePage(BasePage):
+    """Home page object"""
+    
+    # Locators
+    LOGO = (By.CSS_SELECTOR, ".logo")
+    USER_MENU = (By.CSS_SELECTOR, ".user-menu")
+    LOGOUT_BUTTON = (By.LINK_TEXT, "Logout")
+    WELCOME_MESSAGE = (By.CSS_SELECTOR, ".welcome-message")
+    NAVIGATION_MENU = (By.CSS_SELECTOR, ".nav-menu")
+    
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.url = f"{Config.get_base_url()}/dashboard"
+    
+    def navigate(self) -> None:
+        """Navigate to home page"""
+        self.navigate_to(self.url)
+    
+    def is_loaded(self) -> bool:
+        """Verify home page is loaded"""
+        return self.is_displayed(self.LOGO) and self.is_displayed(self.NAVIGATION_MENU)
+    
+    def get_welcome_message(self) -> str:
+        """Get welcome message"""
+        return self.get_text(self.WELCOME_MESSAGE)
+    
+    def click_user_menu(self) -> None:
+        """Click user menu"""
+        self.click(self.USER_MENU)
+    
+    def logout(self) -> None:
+        """Perform logout"""
+        self.logger.info("Logging out")
+        self.click_user_menu()
+        self.click(self.LOGOUT_BUTTON)
+    
+    def is_user_logged_in(self) -> bool:
+        """Verify user is logged in"""
+        return self.is_displayed(self.USER_MENU)

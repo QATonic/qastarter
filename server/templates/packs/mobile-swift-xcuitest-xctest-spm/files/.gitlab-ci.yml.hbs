@@ -1,0 +1,26 @@
+stages:
+  - test
+
+variables:
+  LC_ALL: "en_US.UTF-8"
+  LANG: "en_US.UTF-8"
+
+test:ios:
+  stage: test
+  tags:
+    - ios
+    - xcode
+  script:
+    - xcodebuild -scheme {{projectName}} -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' test
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "xcresult")}}
+      - DerivedData/Logs/Test/*.xcresult
+      {{/if}}
+      - screenshots/
+      - logs/
+    expire_in: 7 days
+  only:
+    - main
+    - develop

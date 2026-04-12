@@ -1,0 +1,41 @@
+trigger:
+- main
+- develop
+
+pool:
+vmImage: 'ubuntu-latest'
+
+variables:
+pythonVersion: '{{toolVersions.python}}'
+HEADLESS: 'true'
+
+stages:
+- stage: Test
+jobs:
+- job: RobotTests
+steps:
+- task: UsePythonVersion@0
+inputs:
+versionSpec: '$(pythonVersion)'
+
+- script: |
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+displayName: 'Install dependencies'
+
+- script: |
+robot --variable HEADLESS:true --outputdir results tests/
+displayName: 'Run Robot Framework tests'
+
+- task: PublishTestResults@2
+condition: always()
+inputs:
+testResultsFormat: 'JUnit'
+testResultsFiles: '**/output.xml'
+searchFolder: 'results'
+
+- task: PublishBuildArtifacts@1
+condition: always()
+inputs:
+PathtoPublish: 'results'
+ArtifactName: 'robot-results'

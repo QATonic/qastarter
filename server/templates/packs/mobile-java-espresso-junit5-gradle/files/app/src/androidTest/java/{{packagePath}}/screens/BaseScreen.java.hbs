@@ -1,0 +1,191 @@
+package {{packageName}}.screens;
+
+import android.view.View;
+
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.matcher.ViewMatchers;
+
+import {{packageName}}.utils.Log;
+import {{packageName}}.utils.WaitUtils;
+
+import org.hamcrest.Matcher;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+
+/**
+ * Base screen class for Page Object Model pattern.
+ * All screen classes should extend this class.
+ */
+public abstract class BaseScreen {
+
+    /**
+     * Click on element by ID
+     */
+    protected void clickById(int viewId) {
+        Log.step("Clicking element with ID: " + viewId);
+        WaitUtils.waitForView(withId(viewId));
+        onView(withId(viewId)).perform(click());
+    }
+
+    /**
+     * Click on element by text
+     */
+    protected void clickByText(String text) {
+        Log.step("Clicking element with text: " + text);
+        WaitUtils.waitForView(withText(text));
+        onView(withText(text)).perform(click());
+    }
+
+    /**
+     * Type text into field by ID
+     */
+    protected void typeTextById(int viewId, String text) {
+        Log.step("Typing '" + text + "' into element with ID: " + viewId);
+        WaitUtils.waitForView(withId(viewId));
+        onView(withId(viewId))
+                .perform(replaceText(text), closeSoftKeyboard());
+    }
+
+    /**
+     * Type text with keyboard visible
+     */
+    protected void typeTextWithKeyboard(int viewId, String text) {
+        Log.step("Typing '" + text + "' with keyboard into element with ID: " + viewId);
+        WaitUtils.waitForView(withId(viewId));
+        onView(withId(viewId)).perform(typeText(text));
+    }
+
+    /**
+     * Clear text field by ID
+     */
+    protected void clearTextById(int viewId) {
+        Log.step("Clearing text in element with ID: " + viewId);
+        onView(withId(viewId)).perform(replaceText(""));
+    }
+
+    /**
+     * Get text from element by ID
+     */
+    protected String getTextById(int viewId) {
+        final String[] text = new String[1];
+        onView(withId(viewId)).perform(new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isDisplayed();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Get text from view";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                if (view instanceof android.widget.TextView) {
+                    text[0] = ((android.widget.TextView) view).getText().toString();
+                }
+            }
+        });
+        Log.debug("Got text: " + text[0]);
+        return text[0];
+    }
+
+    /**
+     * Verify element is displayed by ID
+     */
+    protected void verifyDisplayedById(int viewId) {
+        Log.step("Verifying element is displayed with ID: " + viewId);
+        WaitUtils.waitForView(withId(viewId));
+        onView(withId(viewId)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Verify element is displayed by text
+     */
+    protected void verifyDisplayedByText(String text) {
+        Log.step("Verifying element is displayed with text: " + text);
+        WaitUtils.waitForView(withText(text));
+        onView(withText(text)).check(matches(isDisplayed()));
+    }
+
+    /**
+     * Verify element is enabled by ID
+     */
+    protected void verifyEnabledById(int viewId) {
+        Log.step("Verifying element is enabled with ID: " + viewId);
+        onView(withId(viewId)).check(matches(isEnabled()));
+    }
+
+    /**
+     * Verify text matches by ID
+     */
+    protected void verifyTextById(int viewId, String expectedText) {
+        Log.step("Verifying text '" + expectedText + "' in element with ID: " + viewId);
+        onView(withId(viewId)).check(matches(withText(expectedText)));
+    }
+
+    /**
+     * Scroll to element by ID
+     */
+    protected void scrollToById(int viewId) {
+        Log.step("Scrolling to element with ID: " + viewId);
+        onView(withId(viewId)).perform(scrollTo());
+    }
+
+    /**
+     * Check if element is displayed (returns boolean)
+     */
+    protected boolean isDisplayedById(int viewId) {
+        try {
+            onView(withId(viewId)).check(matches(isDisplayed()));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Get ViewInteraction for custom actions
+     */
+    protected ViewInteraction getViewById(int viewId) {
+        return onView(withId(viewId));
+    }
+
+    /**
+     * Get ViewInteraction by text
+     */
+    protected ViewInteraction getViewByText(String text) {
+        return onView(withText(text));
+    }
+
+    /**
+     * Get ViewInteraction by matcher
+     */
+    protected ViewInteraction getView(Matcher<View> matcher) {
+        return onView(matcher);
+    }
+
+    /**
+     * Abstract method to verify screen is loaded
+     */
+    public abstract boolean isLoaded();
+
+    /**
+     * Get screen name for logging
+     */
+    protected String getScreenName() {
+        return getClass().getSimpleName();
+    }
+}

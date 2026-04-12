@@ -1,0 +1,45 @@
+const { ApiClient } = require("../core/ApiClient");
+const { log } = require("../utils/Logger");
+
+const USERS_ENDPOINT = "/users";
+
+describe("User API Tests", () => {
+  let api;
+
+  beforeAll(() => { api = new ApiClient(); });
+
+  test("GET all users returns 200", async () => {
+    log.step("GET all users");
+    const response = await api.get(USERS_ENDPOINT);
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(0);
+  });
+
+  test("GET single user returns user data", async () => {
+    log.step("GET single user by ID");
+    const response = await api.get(`${USERS_ENDPOINT}/1`);
+    expect(response.status).toBe(200);
+    expect(response.body.email).toBeDefined();
+  });
+
+  test("POST creates new user", async () => {
+    log.step("POST create new user");
+    const newUser = { name: "John Doe", username: "johndoe", email: "john@example.com" };
+    const response = await api.post(USERS_ENDPOINT, newUser);
+    expect(response.status).toBe(201);
+    expect(response.body.id).toBeDefined();
+  });
+
+  test("PUT updates existing user", async () => {
+    log.step("PUT update existing user");
+    const updatedUser = { name: "Jane Doe", username: "janedoe", email: "jane@example.com" };
+    const response = await api.put(`${USERS_ENDPOINT}/1`, updatedUser);
+    expect(response.status).toBe(200);
+  });
+
+  test("DELETE removes user", async () => {
+    log.step("DELETE user by ID");
+    const response = await api.delete(`${USERS_ENDPOINT}/1`);
+    expect(response.status).toBe(200);
+  });
+});

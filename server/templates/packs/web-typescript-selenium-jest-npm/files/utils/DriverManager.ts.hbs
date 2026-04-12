@@ -1,0 +1,87 @@
+/**
+ * Driver Manager - WebDriver lifecycle management.
+ * 
+ * Selenium 4.16+ uses built-in Selenium Manager.
+ * No need for separate driver setup!
+ */
+import { Builder, WebDriver, Capabilities } from "selenium-webdriver";
+import { Options as ChromeOptions } from "selenium-webdriver/chrome";
+import { Options as FirefoxOptions } from "selenium-webdriver/firefox";
+import { Options as EdgeOptions } from "selenium-webdriver/edge";
+import { config } from "../config/ConfigReader";
+
+class DriverManager {
+  private static driver: WebDriver | null = null;
+
+  static async getDriver(): Promise<WebDriver> {
+    if (!this.driver) {
+      throw new Error("Driver not initialized. Call initDriver() first.");
+    }
+    return this.driver;
+  }
+
+  static async initDriver(
+    browser?: string,
+    headless?: boolean
+  ): Promise<WebDriver> {
+    if (this.driver) {
+      console.log("[Driver] Quitting existing driver");
+      await this.quitDriver();
+    }
+
+    browser = browser || config.browser;
+    headless = headless !== undefined ? headless : config.headless;
+
+    console.log(`[Driver] Initializing: ${browser} | Headless: ${headless}`);
+
+    const builder = new Builder();
+
+    switch (browser.toLowerCase()) {
+      case "firefox":
+        const ffOptions = new FirefoxOptions();
+        if (headless) ffOptions.addArguments("--headless");
+        builder.forBrowser("firefox").setFirefoxOptions(ffOptions);
+        break;
+
+      case "edge":
+        const edgeOptions = new EdgeOptions();
+        if (headless) edgeOptions.addArguments("--headless");
+        builder.forBrowser("MicrosoftEdge").setEdgeOptions(edgeOptions);
+        break;
+
+      default: // Chrome
+        const chromeOptions = new ChromeOptions();
+        if (headless) chromeOptions.addArguments("--headless=new");
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-dev-shm-usage");
+        builder.forBrowser("chrome").setChromeOptions(chromeOptions);
+        break;
+    }
+
+    this.driver = await builder.build();
+    await this.driver.manage().window().maximize();
+    await this.driver.manage().setTimeouts({ implicit: config.timeout });
+
+    console.log("[Driver] Browser initialized successfully");
+    return this.driver;
+  }
+
+  static async quitDriver(): Promise<void> {
+    if (this.driver) {
+      try {
+        await this.driver.quit();
+        console.log("[Driver] Browser closed");
+      } catch (error) {
+        console.error("[Driver] Error closing browser:", error);
+      } finally {
+        this.driver = null;
+      }
+    }
+  }
+
+  static isInitialized(): boolean {
+    return this.driver !== null;
+  }
+}
+
+export { DriverManager };

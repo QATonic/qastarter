@@ -1,0 +1,37 @@
+interface EnvironmentConfig {
+grpcEndpoint: string;
+useTLS: boolean;
+timeout: number;
+}
+
+const environments: Record<string, EnvironmentConfig> = {
+    dev: {
+    grpcEndpoint: process.env.DEV_GRPC_ENDPOINT || 'localhost:50051',
+    useTLS: false,
+    timeout: 30000,
+    },
+    qa: {
+    grpcEndpoint: process.env.QA_GRPC_ENDPOINT || 'qa-grpc.example.com:443',
+    useTLS: true,
+    timeout: 30000,
+    },
+    staging: {
+    grpcEndpoint: process.env.STAGING_GRPC_ENDPOINT || 'staging-grpc.example.com:443',
+    useTLS: true,
+    timeout: 30000,
+    },
+    prod: {
+    grpcEndpoint: process.env.PROD_GRPC_ENDPOINT || 'grpc.example.com:443',
+    useTLS: true,
+    timeout: 30000,
+    },
+    };
+
+    export const getEnvironmentConfig = (): EnvironmentConfig => {
+    const env = process.env.TEST_ENV || 'dev';
+    return environments[env] || environments.dev;
+    };
+
+    export const getCurrentEnvironment = (): string => {
+    return process.env.TEST_ENV || 'dev';
+    };

@@ -1,0 +1,60 @@
+package {{javaPackage}}.listeners;
+
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+import {{javaPackage}}.utils.Log;
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentReportManager;
+{{/if}}
+
+/**
+ * TestNG Listener - Logs test lifecycle events.
+ */
+public class TestListener implements ITestListener {
+
+    @Override
+    public void onTestStart(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Log.startTest(testName);
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.createTest(testName, result.getMethod().getDescription());
+        {{/if}}
+    }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Log.info("PASSED: " + testName);
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.logPass("Test passed: " + testName);
+        {{/if}}
+        Log.endTest(testName);
+    }
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Log.error("FAILED: " + testName, result.getThrowable());
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.logFail("Test failed: " + result.getThrowable().getMessage());
+        {{/if}}
+        Log.endTest(testName);
+    }
+
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Log.warn("SKIPPED: " + testName);
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.logWarning("Test skipped: " + testName);
+        {{/if}}
+    }
+
+    @Override
+    public void onFinish(org.testng.ITestContext context) {
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentReportManager.flush();
+        Log.info("Extent Report generated at: target/extent-reports/");
+        {{/if}}
+    }
+}

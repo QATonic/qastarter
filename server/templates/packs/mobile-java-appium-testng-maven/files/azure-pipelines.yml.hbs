@@ -1,0 +1,128 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'macOS-latest'
+
+variables:
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
+strategy:
+  matrix:
+    Android:
+      platformName: 'android'
+    iOS:
+      platformName: 'ios'
+
+steps:
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '{{toolVersions.java}}'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+
+- task: Cache@2
+  inputs:
+    key: 'maven | "$(Agent.OS)" | **/pom.xml'
+    restoreKeys: |
+      maven | "$(Agent.OS)"
+      maven
+    path: $(MAVEN_CACHE_FOLDER)
+  displayName: Cache Maven packages
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm install -g appium@{{toolVersions.appium}}
+    appium driver install uiautomator2
+    appium driver install xcuitest
+  displayName: 'Install Appium and drivers'
+
+{{#if (eq reportingTool "allure")}}
+- script: |
+    curl -o allure-{{toolVersions.allure}}.tgz -L https://github.com/allure-framework/allure2/releases/download/{{toolVersions.allure}}/allure-{{toolVersions.allure}}.tgz
+    tar -zxvf allure-{{toolVersions.allure}}.tgz -C $(Agent.HomeDirectory)
+    echo "##vso[task.prependpath]$(Agent.HomeDirectory)/allure-{{toolVersions.allure}}/bin"
+  displayName: 'Install Allure CLI'
+
+{{/if}}
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'clean test'
+    options: '-P$(platformName)'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    mavenVersionOption: 'Default'
+    mavenOptions: '$(MAVEN_OPTS)'
+  displayName: 'Run mobile tests'
+  continueOnError: true
+
+{{#if (eq reportingTool "allure")}}
+- script: |
+    allure generate target/allure-results --clean -o target/allure-report
+  displayName: 'Generate Allure report'
+  condition: always()
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'target/allure-report'
+    ArtifactName: 'allure-report-$(platformName)'
+  displayName: 'Publish Allure report'
+  condition: always()
+{{/if}}
+
+{{#if (eq reportingTool "extent-reports")}}
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'reports'
+    ArtifactName: 'extent-report-$(platformName)'
+  displayName: 'Publish ExtentReports'
+  condition: always()
+{{/if}}
+
+{{#if (eq reportingTool "testng-reports")}}
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'test-output'
+    ArtifactName: 'testng-report-$(platformName)'
+  displayName: 'Publish TestNG reports'
+  condition: always()
+{{/if}}
+
+{{#if (eq reportingTool "junit-reports")}}
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'surefire-report:report-only'
+    mavenOptions: '$(MAVEN_OPTS)'
+  displayName: 'Generate JUnit HTML report'
+  condition: always()
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'target/site'
+    ArtifactName: 'junit-report-$(platformName)'
+  displayName: 'Publish JUnit HTML report'
+  condition: always()
+{{/if}}
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'logs'
+    ArtifactName: 'test-logs-$(platformName)'
+  displayName: 'Publish test logs'
+  condition: always()

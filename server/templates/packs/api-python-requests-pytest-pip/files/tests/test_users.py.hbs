@@ -1,0 +1,76 @@
+"""
+User API Tests - CRUD operations for /users endpoint.
+
+Target API: {{baseUrl}}
+
+Run: pytest tests/ -v
+"""
+import pytest
+from models.user import User
+from utils.logger import log
+
+
+USERS_ENDPOINT = "/users"
+
+
+class TestUserAPI:
+    """User API test cases."""
+    
+    @pytest.mark.smoke
+    def test_get_all_users(self, api):
+        """GET all users returns 200."""
+        log.step("GET all users")
+        
+        response = api.get(USERS_ENDPOINT)
+        
+        assert response.status_code == 200
+        users = response.json()
+        assert len(users) > 0
+        log.info(f"Total users: {len(users)}")
+    
+    @pytest.mark.smoke
+    def test_get_single_user(self, api):
+        """GET single user returns user data."""
+        log.step("GET single user by ID")
+        
+        response = api.get(f"{USERS_ENDPOINT}/1")
+        
+        assert response.status_code == 200
+        user_data = response.json()
+        user = User.from_dict(user_data)
+        assert user.email is not None
+        log.info(f"User: {user.name}")
+    
+    @pytest.mark.regression
+    def test_create_user(self, api):
+        """POST creates new user."""
+        log.step("POST create new user")
+        
+        new_user = User(name="John Doe", username="johndoe", email="john@example.com")
+        response = api.post(USERS_ENDPOINT, new_user.to_dict())
+        
+        assert response.status_code == 201
+        created = response.json()
+        assert "id" in created
+        log.info(f"Created user ID: {created['id']}")
+    
+    @pytest.mark.regression
+    def test_update_user(self, api):
+        """PUT updates existing user."""
+        log.step("PUT update existing user")
+        
+        updated_user = User(name="Jane Doe", username="janedoe", email="jane@example.com")
+        response = api.put(f"{USERS_ENDPOINT}/1", updated_user.to_dict())
+        
+        assert response.status_code == 200
+        assert response.json()["username"] == "janedoe"
+    
+    @pytest.mark.regression
+    def test_delete_user(self, api):
+        """DELETE removes user."""
+        log.step("DELETE user by ID")
+        
+        response = api.delete(f"{USERS_ENDPOINT}/1")
+        
+        assert response.status_code == 200
+        log.info("User deleted successfully")

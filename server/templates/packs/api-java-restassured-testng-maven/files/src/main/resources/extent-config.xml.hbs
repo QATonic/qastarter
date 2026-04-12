@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <!-- Report theme: standard, dark -->
+        <theme>standard</theme>
+        
+        <!-- Document encoding -->
+        <encoding>UTF-8</encoding>
+        
+        <!-- Protocol for script and stylesheets: https, http -->
+        <protocol>https</protocol>
+        
+        <!-- Title of the document -->
+        <documentTitle>{{projectName}} - API Automation Report</documentTitle>
+        
+        <!-- Report name: displayed at top-nav -->
+        <reportName>REST API Test Automation Report</reportName>
+        
+        <!-- Global date format override -->
+        <dateFormat>MMM dd, yyyy HH:mm:ss</dateFormat>
+        
+        <!-- Global time format override -->
+        <timeFormat>HH:mm:ss</timeFormat>
+        
+        <!-- Charts visibility: true, false -->
+        <charts>true</charts>
+        
+        <!-- Enable timeline: true, false -->
+        <timelineEnabled>true</timelineEnabled>
+        
+        <!-- Custom JavaScript -->
+        <scripts>
+            <![CDATA[
+                $(document).ready(function() {
+                    // Custom JavaScript for API test reports
+                    $('.test-content').on('click', function() {
+                        $(this).find('.api-details').toggle();
+                    });
+                    
+                    // Highlight API methods
+                    $('.api-request').each(function() {
+                        var method = $(this).find('.method').text();
+                        $(this).addClass('method-' + method.toLowerCase());
+                    });
+                });
+            ]]>
+        </scripts>
+        
+        <!-- Custom CSS -->
+        <styles>
+            <![CDATA[
+                .badge-primary { 
+                    background-color: #007bff; 
+                    color: white; 
+                }
+                .badge-success { 
+                    background-color: #28a745; 
+                    color: white; 
+                }
+                .badge-danger { 
+                    background-color: #dc3545; 
+                    color: white; 
+                }
+                .badge-warning { 
+                    background-color: #ffc107; 
+                    color: #212529; 
+                }
+                .api-test-header {
+                    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin-bottom: 15px;
+                }
+                .api-request {
+                    background-color: #e7f3ff;
+                    padding: 10px;
+                    border-left: 4px solid #007bff;
+                    margin: 10px 0;
+                    border-radius: 3px;
+                }
+                .api-response {
+                    background-color: #f0f8f0;
+                    padding: 10px;
+                    border-left: 4px solid #28a745;
+                    margin: 10px 0;
+                    border-radius: 3px;
+                }
+                .method-get { border-left-color: #28a745; }
+                .method-post { border-left-color: #007bff; }
+                .method-put { border-left-color: #ffc107; }
+                .method-patch { border-left-color: #fd7e14; }
+                .method-delete { border-left-color: #dc3545; }
+                .json-code {
+                    background-color: #f8f9fa;
+                    border: 1px solid #e9ecef;
+                    border-radius: 3px;
+                    padding: 10px;
+                    font-family: 'Courier New', monospace;
+                    font-size: 12px;
+                    white-space: pre-wrap;
+                }
+            ]]>
+        </styles>
+    </configuration>
+</extentreports>

@@ -1,0 +1,59 @@
+using RestSharp;
+using {{projectNamespace}}.Config;
+using {{projectNamespace}}.Utils;
+
+namespace {{projectNamespace}}.Core
+{
+    /// <summary>
+    /// API Client - HTTP client for REST API testing.
+    /// Target API: {{baseUrl}}
+    /// </summary>
+    public class ApiClient
+    {
+        private readonly RestClient _client;
+
+        public ApiClient()
+        {
+            _client = new RestClient(ConfigReader.Instance.BaseUrl);
+            Log.Instance.Info($"API Client initialized: {ConfigReader.Instance.BaseUrl}");
+        }
+
+        public RestResponse Get(string endpoint)
+        {
+            Log.Instance.Info($"GET {endpoint}");
+            var request = new RestRequest(endpoint, Method.Get);
+            var response = _client.Execute(request);
+            Log.Instance.Info($"Response: {(int)response.StatusCode}");
+            return response;
+        }
+
+        public RestResponse Post<T>(string endpoint, T body) where T : class
+        {
+            Log.Instance.Info($"POST {endpoint}");
+            var request = new RestRequest(endpoint, Method.Post);
+            request.AddJsonBody(body);
+            var response = _client.Execute(request);
+            Log.Instance.Info($"Response: {(int)response.StatusCode}");
+            return response;
+        }
+
+        public RestResponse Put<T>(string endpoint, T body) where T : class
+        {
+            Log.Instance.Info($"PUT {endpoint}");
+            var request = new RestRequest(endpoint, Method.Put);
+            request.AddJsonBody(body);
+            var response = _client.Execute(request);
+            Log.Instance.Info($"Response: {(int)response.StatusCode}");
+            return response;
+        }
+
+        public RestResponse Delete(string endpoint)
+        {
+            Log.Instance.Info($"DELETE {endpoint}");
+            var request = new RestRequest(endpoint, Method.Delete);
+            var response = _client.Execute(request);
+            Log.Instance.Info($"Response: {(int)response.StatusCode}");
+            return response;
+        }
+    }
+}

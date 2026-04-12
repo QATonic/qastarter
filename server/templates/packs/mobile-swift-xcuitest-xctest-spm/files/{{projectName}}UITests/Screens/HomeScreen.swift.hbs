@@ -1,0 +1,112 @@
+import XCTest
+
+/**
+ * Home Screen Page Object
+ * 
+ * ========== IMPORTANT: UPDATE THESE VALUES ==========
+ * Replace the accessibility identifiers below with your actual identifiers.
+ * These are placeholder values that need to match your app's UI elements.
+ * =====================================================
+ */
+class HomeScreen: BaseScreen {
+    
+    // MARK: - Element Identifiers
+    // ========== UPDATE THESE IDENTIFIERS ==========
+    private enum Identifiers {
+        static let welcomeLabel = "welcomeLabel"
+        static let userProfileButton = "userProfileButton"
+        static let menuButton = "menuButton"
+        static let logoutButton = "logoutButton"
+        static let settingsButton = "settingsButton"
+        static let navigationBar = "homeNavigationBar"
+    }
+    // ===============================================
+    
+    // MARK: - Elements
+    var welcomeLabel: XCUIElement {
+        app.staticTexts[Identifiers.welcomeLabel]
+    }
+    
+    var userProfileButton: XCUIElement {
+        app.buttons[Identifiers.userProfileButton]
+    }
+    
+    var menuButton: XCUIElement {
+        app.buttons[Identifiers.menuButton]
+    }
+    
+    var logoutButton: XCUIElement {
+        app.buttons[Identifiers.logoutButton]
+    }
+    
+    var settingsButton: XCUIElement {
+        app.buttons[Identifiers.settingsButton]
+    }
+    
+    var navigationBar: XCUIElement {
+        app.navigationBars[Identifiers.navigationBar]
+    }
+    
+    // MARK: - Actions
+    
+    /// Tap user profile
+    func tapUserProfile() {
+        Logger.step("Tapping user profile")
+        tapElement(userProfileButton)
+    }
+    
+    /// Tap menu button
+    @discardableResult
+    func tapMenu() -> HomeScreen {
+        Logger.step("Tapping menu button")
+        tapElement(menuButton)
+        return self
+    }
+    
+    /// Tap logout button
+    @discardableResult
+    func tapLogout() -> LoginScreen {
+        Logger.step("Tapping logout button")
+        tapElement(logoutButton)
+        return LoginScreen(app: app)
+    }
+    
+    /// Tap settings button
+    func tapSettings() {
+        Logger.step("Tapping settings button")
+        tapElement(settingsButton)
+    }
+    
+    /// Perform logout
+    @discardableResult
+    func logout() -> LoginScreen {
+        Logger.startSection("Performing logout")
+        tapMenu()
+        let loginScreen = tapLogout()
+        Logger.endSection()
+        return loginScreen
+    }
+    
+    // MARK: - Verifications
+    
+    /// Verify home screen is displayed
+    @discardableResult
+    func verifyScreenDisplayed() -> HomeScreen {
+        Logger.step("Verifying home screen is displayed")
+        verifyElementVisible(welcomeLabel)
+        return self
+    }
+    
+    /// Verify welcome message
+    @discardableResult
+    func verifyWelcomeMessage(_ expectedMessage: String) -> HomeScreen {
+        Logger.step("Verifying welcome message: \(expectedMessage)")
+        verifyText(welcomeLabel, expectedText: expectedMessage)
+        return self
+    }
+    
+    /// Check if screen is loaded
+    func isLoaded() -> Bool {
+        return waitForElement(welcomeLabel)
+    }
+}

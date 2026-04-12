@@ -1,0 +1,10 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
+export default class DataReader {
+  static readJSON<T>(filename: string): T {
+    const filepath = path.join(process.cwd(), 'data', filename);
+    const data = fs.readFileSync(filepath, 'utf8');
+    return JSON.parse(data);
+  }
+}

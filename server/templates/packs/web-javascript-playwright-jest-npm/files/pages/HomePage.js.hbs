@@ -1,0 +1,38 @@
+const BasePage = require('./BasePage');
+const envConfig = require('../config/env.config');
+
+class HomePage extends BasePage {
+  constructor(page) {
+    super(page);
+    this.url = `${envConfig.getBaseUrl()}/dashboard`;
+    
+    // Locators
+    this.logo = '.logo';
+    this.userMenu = '.user-menu';
+    this.logoutButton = 'text=Logout';
+    this.welcomeMessage = '.welcome-message';
+  }
+
+  async navigateToHome() {
+    await this.navigate(this.url);
+  }
+
+  async isLoaded() {
+    return await this.isVisible(this.logo);
+  }
+
+  async getWelcomeMessage() {
+    return await this.getText(this.welcomeMessage);
+  }
+
+  async logout() {
+    await this.click(this.userMenu);
+    await this.click(this.logoutButton);
+  }
+
+  async isUserLoggedIn() {
+    return await this.isVisible(this.userMenu);
+  }
+}
+
+module.exports = HomePage;

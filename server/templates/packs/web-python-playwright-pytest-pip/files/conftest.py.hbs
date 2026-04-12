@@ -1,0 +1,32 @@
+import pytest
+import os
+from pathlib import Path
+from playwright.sync_api import Page, Browser
+from config.test_config import TestConfig
+from utils.screenshot_helper import ScreenshotHelper
+from utils.logger import logger
+
+# Create directories
+for directory in ['logs', 'screenshots', 'test-results']:
+    Path(directory).mkdir(exist_ok=True)
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    return {
+        **browser_context_args,
+        "viewport": {"width": 1920, "height": 1080},
+        "ignore_https_errors": True
+    }
+
+@pytest.fixture(scope="function", autouse=True)
+def capture_screenshot_on_failure(request, page: Page):
+    yield
+    if request.node.rep_call.failed if hasattr(request.node, 'rep_call') else False:
+        test_name = request.node.name
+        ScreenshotHelper.capture_on_failure(page, test_name)
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+    setattr(item, f"rep_{rep.when}", rep)

@@ -1,0 +1,275 @@
+package {{groupId}}.config;
+
+/**
+ * Environment enumeration for desktop testing environments
+ * Defines available test environments and their properties
+ */
+public enum Environment {
+    DEV("dev", "Development Environment", "http://dev-winappdriver:4723"),
+    QA("qa", "Quality Assurance Environment", "http://qa-winappdriver:4723"),
+    STAGING("staging", "Staging Environment", "http://staging-winappdriver:4723"),
+    PROD("prod", "Production Environment", "http://prod-winappdriver:4723"),
+    LOCAL("local", "Local Development Environment", "http://127.0.0.1:4723");
+
+    private final String name;
+    private final String description;
+    private final String winAppDriverUrl;
+
+    /**
+     * Constructor
+     * @param name Environment name
+     * @param description Environment description
+     * @param winAppDriverUrl WinAppDriver URL for this environment
+     */
+    Environment(String name, String description, String winAppDriverUrl) {
+        this.name = name;
+        this.description = description;
+        this.winAppDriverUrl = winAppDriverUrl;
+    }
+
+    /**
+     * Get environment name
+     * @return Environment name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Get environment description
+     * @return Environment description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Get WinAppDriver URL for this environment
+     * @return WinAppDriver URL
+     */
+    public String getWinAppDriverUrl() {
+        return winAppDriverUrl;
+    }
+
+    /**
+     * Get environment by name
+     * @param name Environment name
+     * @return Environment enum or null if not found
+     */
+    public static Environment fromName(String name) {
+        if (name == null) {
+            return null;
+        }
+        
+        for (Environment env : Environment.values()) {
+            if (env.getName().equalsIgnoreCase(name)) {
+                return env;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get current environment from system property or configuration
+     * @return Current environment (defaults to LOCAL if not specified)
+     */
+    public static Environment getCurrentEnvironment() {
+        String envName = System.getProperty("environment");
+        if (envName == null) {
+            envName = ConfigurationReader.getEnvironment();
+        }
+        
+        Environment env = fromName(envName);
+        return env != null ? env : LOCAL;
+    }
+
+    /**
+     * Check if current environment is development
+     * @return true if current environment is DEV or LOCAL
+     */
+    public static boolean isDevelopment() {
+        Environment current = getCurrentEnvironment();
+        return current == DEV || current == LOCAL;
+    }
+
+    /**
+     * Check if current environment is production
+     * @return true if current environment is PROD
+     */
+    public static boolean isProduction() {
+        return getCurrentEnvironment() == PROD;
+    }
+
+    /**
+     * Check if current environment is testing (QA or STAGING)
+     * @return true if current environment is QA or STAGING
+     */
+    public static boolean isTesting() {
+        Environment current = getCurrentEnvironment();
+        return current == QA || current == STAGING;
+    }
+
+    /**
+     * Get configuration file name for current environment
+     * @return Configuration file name
+     */
+    public String getConfigFileName() {
+        return "config/" + name + ".properties";
+    }
+
+    /**
+     * Get base URL for applications in this environment
+     * @return Base application URL
+     */
+    public String getBaseUrl() {
+        switch (this) {
+            case DEV:
+                return "http://dev-app.example.com";
+            case QA:
+                return "http://qa-app.example.com";
+            case STAGING:
+                return "http://staging-app.example.com";
+            case PROD:
+                return "http://app.example.com";
+            case LOCAL:
+            default:
+                return "http://localhost";
+        }
+    }
+
+    /**
+     * Get database connection string for this environment
+     * @return Database connection string
+     */
+    public String getDatabaseConnectionString() {
+        switch (this) {
+            case DEV:
+                return "jdbc:sqlserver://dev-db.example.com:1433;databaseName=TestApp";
+            case QA:
+                return "jdbc:sqlserver://qa-db.example.com:1433;databaseName=TestApp";
+            case STAGING:
+                return "jdbc:sqlserver://staging-db.example.com:1433;databaseName=TestApp";
+            case PROD:
+                return "jdbc:sqlserver://prod-db.example.com:1433;databaseName=TestApp";
+            case LOCAL:
+            default:
+                return "jdbc:sqlserver://localhost:1433;databaseName=TestApp";
+        }
+    }
+
+    /**
+     * Get timeout values for this environment
+     * @return Default timeout in seconds
+     */
+    public int getDefaultTimeout() {
+        switch (this) {
+            case PROD:
+                return 60; // Longer timeout for production
+            case STAGING:
+                return 45;
+            case QA:
+                return 30;
+            case DEV:
+            case LOCAL:
+            default:
+                return 30;
+        }
+    }
+
+    /**
+     * Check if debug mode should be enabled for this environment
+     * @return true if debug mode should be enabled
+     */
+    public boolean isDebugEnabled() {
+        return this == DEV || this == LOCAL;
+    }
+
+    /**
+     * Check if screenshot capture should be enabled for this environment
+     * @return true if screenshot capture should be enabled
+     */
+    public boolean isScreenshotEnabled() {
+        // Enable screenshots for all environments except LOCAL (for performance)
+        return this != LOCAL;
+    }
+
+    /**
+     * Check if video recording should be enabled for this environment
+     * @return true if video recording should be enabled
+     */
+    public boolean isVideoRecordingEnabled() {
+        // Enable video recording only for QA and STAGING environments
+        return this == QA || this == STAGING;
+    }
+
+    /**
+     * Get retry count for failed tests in this environment
+     * @return Number of retry attempts
+     */
+    public int getRetryCount() {
+        switch (this) {
+            case PROD:
+                return 0; // No retries in production
+            case STAGING:
+                return 1; // Limited retries in staging
+            case QA:
+                return 2; // More retries in QA
+            case DEV:
+            case LOCAL:
+            default:
+                return 1; // Standard retry for development
+        }
+    }
+
+    /**
+     * Get log level for this environment
+     * @return Log level string
+     */
+    public String getLogLevel() {
+        switch (this) {
+            case PROD:
+                return "WARN"; // Minimal logging in production
+            case STAGING:
+                return "INFO";
+            case QA:
+                return "INFO";
+            case DEV:
+                return "DEBUG";
+            case LOCAL:
+            default:
+                return "DEBUG"; // Verbose logging for development
+        }
+    }
+
+    /**
+     * Check if parallel execution should be enabled for this environment
+     * @return true if parallel execution should be enabled
+     */
+    public boolean isParallelExecutionEnabled() {
+        // Enable parallel execution in QA and STAGING for faster feedback
+        return this == QA || this == STAGING;
+    }
+
+    /**
+     * Get thread count for parallel execution
+     * @return Number of parallel threads
+     */
+    public int getParallelThreadCount() {
+        switch (this) {
+            case QA:
+                return 3; // More threads for QA
+            case STAGING:
+                return 2; // Moderate threads for staging
+            case DEV:
+            case LOCAL:
+            case PROD:
+            default:
+                return 1; // Single thread for other environments
+        }
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + description + ")";
+    }
+}

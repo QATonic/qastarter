@@ -1,0 +1,53 @@
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor';
+
+// Page Objects (simplified for Cypress)
+const loginPage = {
+  visit: () => cy.visit('/login'),
+  usernameField: () => cy.get('[data-testid="input-username"]'),
+  passwordField: () => cy.get('[data-testid="input-password"]'),
+  loginButton: () => cy.get('[data-testid="button-login"]'),
+  errorMessage: () => cy.get('[data-testid="text-error"]'),
+  isDisplayed: () => cy.url().should('include', '/login')
+};
+
+const homePage = {
+  welcomeMessage: () => cy.get('[data-testid="text-welcome"]'),
+  isDisplayed: () => cy.url().should('include', '/home')
+};
+
+// Given Steps
+Given('I navigate to the login page', () => {
+  loginPage.visit();
+  loginPage.isDisplayed();
+});
+
+// When Steps
+When('I enter username {string} and password {string}', (username, password) => {
+  if (username) {
+    loginPage.usernameField().clear().type(username);
+  }
+  if (password) {
+    loginPage.passwordField().clear().type(password);
+  }
+});
+
+When('I click the login button', () => {
+  loginPage.loginButton().click();
+});
+
+// Then Steps
+Then('I should be redirected to the home page', () => {
+  homePage.isDisplayed();
+});
+
+Then('I should see a welcome message', () => {
+  homePage.welcomeMessage().should('exist').and('contain', 'Welcome');
+});
+
+Then('I should see an error message {string}', (expectedError) => {
+  loginPage.errorMessage().should('exist').and('contain', expectedError);
+});
+
+Then('I should remain on the login page', () => {
+  loginPage.isDisplayed();
+});

@@ -1,0 +1,32 @@
+{
+  "testdata": [
+    ["Mobile Test Data 1", "Value 1", "Expected Result 1"],
+    ["Mobile Test Data 2", "Value 2", "Expected Result 2"],
+    ["Android Specific Data", "Android Value", "Android Result"],
+    ["iOS Specific Data", "iOS Value", "iOS Result"]
+  ],
+  "capabilities": {
+    "android": {
+      "platformName": "Android",
+      "deviceName": "Test Device"
+    },
+    "ios": {
+      "platformName": "iOS", 
+      "deviceName": "Test iPhone"
+    }
+  },
+  "environments": {
+    "dev": {
+      "url": "https://dev-app.example.com",
+      "timeout": 10
+    },
+    "qa": {
+      "url": "https://qa-app.example.com", 
+      "timeout": 15
+    },
+    "prod": {
+      "url": "https://app.example.com",
+      "timeout": 20
+    }
+  }
+}

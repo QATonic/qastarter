@@ -1,0 +1,46 @@
+import { Before, After, AfterStep, Status, setDefaultTimeout } from '@cucumber/cucumber';
+import { CustomWorld } from './world';
+import { logger } from '../utils/logger';
+import { captureScreenshot } from '../utils/screenshotHelper';
+
+// Set default timeout for steps
+setDefaultTimeout(60000);
+
+Before(async function (this: CustomWorld, { pickle }) {
+  logger.info(`Starting scenario: ${pickle.name}`);
+  await this.init();
+});
+
+After(async function (this: CustomWorld, { result, pickle }) {
+  if (result?.status === Status.FAILED) {
+    logger.error(`Scenario failed: ${pickle.name}`);
+    
+    // Capture screenshot on failure
+    if (this.page) {
+      const screenshot = await captureScreenshot(this.page, `failed-${Date.now()}`);
+      this.attach(screenshot, 'image/png');
+    }
+    
+    // Capture page content on failure
+    if (this.page) {
+      const pageContent = await this.page.content();
+      this.attach(pageContent, 'text/html');
+    }
+  } else {
+    logger.info(`Scenario passed: ${pickle.name}`);
+  }
+  
+  await this.cleanup();
+});
+
+AfterStep(async function (this: CustomWorld, { result, pickleStep }) {
+  if (result?.status === Status.FAILED) {
+    logger.error(`Step failed: ${pickleStep.text}`);
+    
+    // Capture screenshot on step failure
+    if (this.page) {
+      const screenshot = await captureScreenshot(this.page, `step-failed-${Date.now()}`);
+      this.attach(screenshot, 'image/png');
+    }
+  }
+});

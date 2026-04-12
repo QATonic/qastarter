@@ -1,0 +1,11 @@
+package pages
+
+import "github.com/playwright-community/playwright-go"
+
+type BasePage struct {
+Page playwright.Page
+}
+
+func NewBasePage(page playwright.Page) *BasePage {
+return &BasePage{Page: page}
+}

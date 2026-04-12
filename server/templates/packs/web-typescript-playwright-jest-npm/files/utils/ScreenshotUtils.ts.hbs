@@ -1,0 +1,29 @@
+/**
+ * Screenshot Utilities for Playwright.
+ */
+import * as fs from "fs";
+import * as path from "path";
+import { PlaywrightManager } from "./PlaywrightManager";
+import { log } from "./Logger";
+
+export class ScreenshotUtils {
+  private static screenshotDir = "screenshots";
+
+  static async capture(name: string): Promise<string | null> {
+    try {
+      const page = await PlaywrightManager.getPage();
+      if (!fs.existsSync(this.screenshotDir)) fs.mkdirSync(this.screenshotDir, { recursive: true });
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const filename = `${name.replace(/[^a-zA-Z0-9_-]/g, "_")}_${timestamp}.png`;
+      const filepath = path.join(this.screenshotDir, filename);
+
+      await page.screenshot({ path: filepath });
+      log.info(`Screenshot saved: ${filepath}`);
+      return filepath;
+    } catch (error) {
+      log.error(`Failed to capture screenshot: ${error}`);
+      return null;
+    }
+  }
+}

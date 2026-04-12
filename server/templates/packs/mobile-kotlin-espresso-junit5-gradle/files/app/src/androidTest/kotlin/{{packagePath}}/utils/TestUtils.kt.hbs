@@ -1,0 +1,76 @@
+package {{groupId}}.utils
+
+import android.content.Context
+import android.os.Build
+import android.util.Log
+import androidx.test.platform.app.InstrumentationRegistry
+
+/**
+* Utility functions for Espresso tests.
+*/
+object TestUtils {
+
+private const val TAG = "TestUtils"
+
+/**
+* Get the target application context.
+*/
+fun getAppContext(): Context {
+return InstrumentationRegistry.getInstrumentation().targetContext
+}
+
+/**
+* Get the test application context.
+*/
+fun getTestContext(): Context {
+return InstrumentationRegistry.getInstrumentation().context
+}
+
+/**
+* Log test info.
+*/
+fun logInfo(message: String) {
+Log.i(TAG, message)
+}
+
+/**
+* Log test error.
+*/
+fun logError(message: String, throwable: Throwable? = null) {
+if (throwable != null) {
+Log.e(TAG, message, throwable)
+} else {
+Log.e(TAG, message)
+}
+}
+
+/**
+* Get device information for test reports.
+*/
+fun getDeviceInfo(): Map<String, String> {
+    return mapOf(
+    "device" to Build.DEVICE,
+    "model" to Build.MODEL,
+    "brand" to Build.BRAND,
+    "sdk" to Build.VERSION.SDK_INT.toString(),
+    "release" to Build.VERSION.RELEASE
+    )
+    }
+
+    /**
+    * Check if running on emulator.
+    */
+    fun isEmulator(): Boolean {
+    return Build.FINGERPRINT.contains("generic") ||
+    Build.FINGERPRINT.contains("emulator") ||
+    Build.MODEL.contains("Emulator") ||
+    Build.MODEL.contains("Android SDK built for x86")
+    }
+
+    /**
+    * Generate a unique test ID.
+    */
+    fun generateTestId(): String {
+    return "test_${System.currentTimeMillis()}"
+    }
+    }

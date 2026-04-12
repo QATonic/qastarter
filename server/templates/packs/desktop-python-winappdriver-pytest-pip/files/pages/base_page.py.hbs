@@ -1,0 +1,17 @@
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from core.winappdriver_manager import WinAppDriverManager
+from utils.logger import log
+
+
+class BasePage:
+    def __init__(self):
+        self.driver = WinAppDriverManager.get_driver()
+        self.wait = WebDriverWait(self.driver, 10)
+    
+    def click(self, locator):
+        log.info(f"Click: {locator}")
+        self.wait.until(EC.element_to_be_clickable(locator)).click()
+    
+    def get_text(self, locator):
+        return self.wait.until(EC.visibility_of_element_located(locator)).text

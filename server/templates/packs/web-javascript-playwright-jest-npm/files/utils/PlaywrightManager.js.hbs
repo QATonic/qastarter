@@ -1,0 +1,48 @@
+/**
+ * Playwright Manager - Browser lifecycle management.
+ */
+const { chromium, firefox, webkit } = require("playwright");
+const { config } = require("../config/ConfigReader");
+
+class PlaywrightManager {
+  static browser = null;
+  static context = null;
+  static page = null;
+
+  static async getPage() {
+    if (!this.page) throw new Error("Browser not initialized");
+    return this.page;
+  }
+
+  static async initBrowser(browser, headless) {
+    browser = browser || config.browser;
+    headless = headless !== undefined ? headless : config.headless;
+
+    console.log(`[Playwright] Initializing: ${browser} | Headless: ${headless}`);
+
+    switch (browser.toLowerCase()) {
+      case "firefox":
+        this.browser = await firefox.launch({ headless });
+        break;
+      case "webkit":
+        this.browser = await webkit.launch({ headless });
+        break;
+      default:
+        this.browser = await chromium.launch({ headless });
+    }
+
+    this.context = await this.browser.newContext({ viewport: { width: 1920, height: 1080 } });
+    this.page = await this.context.newPage();
+    console.log("[Playwright] Browser initialized");
+    return this.page;
+  }
+
+  static async closeBrowser() {
+    if (this.context) await this.context.close();
+    if (this.browser) await this.browser.close();
+    this.page = null;
+    console.log("[Playwright] Browser closed");
+  }
+}
+
+module.exports = { PlaywrightManager };

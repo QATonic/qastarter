@@ -1,0 +1,73 @@
+from appium.webdriver.common.appiumby import AppiumBy
+from selenium.webdriver.common.actions import interaction
+from selenium.webdriver.common.actions.action_builder import ActionBuilder
+from selenium.webdriver.common.actions.pointer_input import PointerInput
+
+class AndroidGestures:
+    """Android-specific gesture utilities"""
+    
+    def __init__(self, driver):
+        self.driver = driver
+    
+    def swipe(self, start_x, start_y, end_x, end_y, duration=1000):
+        """Perform swipe gesture"""
+        actions = ActionBuilder(self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
+        actions.pointer_action.move_to_location(start_x, start_y)
+        actions.pointer_action.pointer_down()
+        actions.pointer_action.pause(duration / 1000)
+        actions.pointer_action.move_to_location(end_x, end_y)
+        actions.pointer_action.release()
+        actions.perform()
+    
+    def swipe_up(self):
+        """Swipe up on screen"""
+        size = self.driver.get_window_size()
+        start_x = size['width'] // 2
+        start_y = size['height'] * 0.8
+        end_x = size['width'] // 2
+        end_y = size['height'] * 0.2
+        self.swipe(start_x, start_y, end_x, end_y)
+    
+    def swipe_down(self):
+        """Swipe down on screen"""
+        size = self.driver.get_window_size()
+        start_x = size['width'] // 2
+        start_y = size['height'] * 0.2
+        end_x = size['width'] // 2
+        end_y = size['height'] * 0.8
+        self.swipe(start_x, start_y, end_x, end_y)
+    
+    def swipe_left(self):
+        """Swipe left on screen"""
+        size = self.driver.get_window_size()
+        start_x = size['width'] * 0.8
+        start_y = size['height'] // 2
+        end_x = size['width'] * 0.2
+        end_y = size['height'] // 2
+        self.swipe(start_x, start_y, end_x, end_y)
+    
+    def swipe_right(self):
+        """Swipe right on screen"""
+        size = self.driver.get_window_size()
+        start_x = size['width'] * 0.2
+        start_y = size['height'] // 2
+        end_x = size['width'] * 0.8
+        end_y = size['height'] // 2
+        self.swipe(start_x, start_y, end_x, end_y)
+    
+    def scroll_to_text(self, text):
+        """Scroll to element with text (Android UiAutomator)"""
+        self.driver.find_element(
+            AppiumBy.ANDROID_UIAUTOMATOR,
+            f'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("{text}"))'
+        )
+    
+    def long_press(self, locator, duration=2000):
+        """Long press on element"""
+        element = self.driver.find_element(*locator)
+        actions = ActionBuilder(self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
+        actions.pointer_action.move_to(element)
+        actions.pointer_action.pointer_down()
+        actions.pointer_action.pause(duration / 1000)
+        actions.pointer_action.release()
+        actions.perform()

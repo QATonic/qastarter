@@ -1,0 +1,362 @@
+{
+  "id": "desktop-java-winappdriver-testng-gradle",
+  "displayName": "Java + WinAppDriver + TestNG + Gradle",
+  "name": "desktop-java-winappdriver-testng-gradle",
+  "description": "Professional desktop automation framework with Java, WinAppDriver, TestNG, and Gradle for Windows application testing",
+  "version": "1.0.0",
+  "category": "desktop-testing",
+  "tags": [
+    "desktop",
+    "java",
+    "winappdriver",
+    "testng",
+    "gradle",
+    "automation",
+    "windows"
+  ],
+  "supportsDynamic": true,
+  "toolVersions": {
+    "java": "11",
+    "gradle": "8.5",
+    "winappdriver": "1.2.1",
+    "testng": "7.8.0"
+  },
+  "files": [
+    {
+      "path": "build.gradle",
+      "template": "build.gradle.hbs",
+      "isTemplate": true,
+      "description": "Gradle build configuration"
+    },
+    {
+      "path": "settings.gradle",
+      "template": "settings.gradle.hbs",
+      "isTemplate": true,
+      "description": "Gradle settings"
+    },
+    {
+      "path": "gradle.properties",
+      "template": "gradle.properties.hbs",
+      "isTemplate": true,
+      "description": "Gradle properties"
+    },
+    {
+      "path": "gradlew",
+      "template": "gradlew",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Unix)"
+    },
+    {
+      "path": "gradlew.bat",
+      "template": "gradlew.bat",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Windows)"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "template": "gradle/wrapper/gradle-wrapper.properties.hbs",
+      "isTemplate": true,
+      "description": "Gradle wrapper properties"
+    },
+    {
+      "path": "README.md",
+      "template": "README.md.hbs",
+      "isTemplate": true,
+      "description": "Project documentation"
+    },
+    {
+      "path": ".gitignore",
+      "template": ".gitignore",
+      "isTemplate": false,
+      "description": "Git ignore rules"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "template": ".github/workflows/tests.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      },
+      "description": "GitHub Actions workflow"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "template": ".gitlab-ci.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      },
+      "description": "GitLab CI pipeline"
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "template": "azure-pipelines.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      },
+      "description": "Azure DevOps pipeline"
+    },
+    {
+      "path": ".circleci/config.yml",
+      "template": ".circleci/config.yml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      },
+      "description": "CircleCI configuration"
+    },
+    {
+      "path": "Jenkinsfile",
+      "template": "Jenkinsfile.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      },
+      "description": "Jenkins pipeline"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
+      "template": "src/main/java/{{packagePath}}/config/ConfigurationReader.java.hbs",
+      "isTemplate": true,
+      "description": "Configuration reader"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/config/Environment.java",
+      "template": "src/main/java/{{packagePath}}/config/Environment.java.hbs",
+      "isTemplate": true,
+      "description": "Environment enum"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/DriverManager.java",
+      "template": "src/main/java/{{packagePath}}/core/DriverManager.java.hbs",
+      "isTemplate": true,
+      "description": "Driver lifecycle management"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/BaseTest.java",
+      "template": "src/main/java/{{packagePath}}/core/BaseTest.java.hbs",
+      "isTemplate": true,
+      "description": "Base test class"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/BasePage.java",
+      "template": "src/main/java/{{packagePath}}/pages/BasePage.java.hbs",
+      "isTemplate": true,
+      "description": "Base page class"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/ScreenshotUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Screenshot utilities"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/Log.java",
+      "template": "src/main/java/{{packagePath}}/utils/Log.java.hbs",
+      "isTemplate": true,
+      "description": "Logger wrapper"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",
+      "template": "src/main/java/{{packagePath}}/listeners/TestListener.java.hbs",
+      "isTemplate": true,
+      "description": "TestNG listener"
+    },
+    {
+      "path": "src/main/resources/config/dev.properties",
+      "template": "src/main/resources/config/dev.properties.hbs",
+      "isTemplate": true,
+      "description": "Dev configuration"
+    },
+    {
+      "path": "src/main/resources/config/qa.properties",
+      "template": "src/main/resources/config/qa.properties.hbs",
+      "isTemplate": true,
+      "description": "QA configuration"
+    },
+    {
+      "path": "src/main/resources/log4j2.xml",
+      "template": "src/main/resources/log4j2.xml.hbs",
+      "isTemplate": true,
+      "description": "Log4j2 configuration"
+    },
+    {
+      "path": "src/test/resources/testng.xml",
+      "template": "src/test/resources/testng.xml.hbs",
+      "isTemplate": true,
+      "description": "TestNG suite"
+    },
+    {
+      "path": "src/main/resources/extent-config.xml",
+      "template": "src/main/resources/extent-config.xml.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      },
+      "description": "ExtentReports config"
+    },
+    {
+      "path": "Dockerfile",
+      "template": "Dockerfile.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      },
+      "description": "Docker configuration"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/CapabilitiesManager.java",
+      "template": "src/main/java/{{packagePath}}/core/CapabilitiesManager.java.hbs",
+      "isTemplate": true,
+      "description": "Desktop capabilities configuration for Windows applications"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/core/DesktopDriverFactory.java",
+      "template": "src/main/java/{{packagePath}}/core/DesktopDriverFactory.java.hbs",
+      "isTemplate": true,
+      "description": "Desktop driver instantiation for Windows applications"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java",
+      "template": "src/main/java/{{packagePath}}/listeners/RetryAnalyzer.java.hbs",
+      "isTemplate": true,
+      "description": "TestNG retry analyzer for handling flaky desktop tests"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/CalculatorPage.java",
+      "template": "src/main/java/{{packagePath}}/pages/CalculatorPage.java.hbs",
+      "isTemplate": true,
+      "description": "Sample Windows Calculator page with POM implementation"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/pages/NotepadPage.java",
+      "template": "src/main/java/{{packagePath}}/pages/NotepadPage.java.hbs",
+      "isTemplate": true,
+      "description": "Sample Windows Notepad page with POM implementation"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/DesktopActions.java",
+      "template": "src/main/java/{{packagePath}}/utils/DesktopActions.java.hbs",
+      "isTemplate": true,
+      "description": "Desktop interaction utilities (keyboard shortcuts, window management)"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ElementWaitUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/ElementWaitUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Desktop-specific wait utilities for reliable element interactions"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
+      "template": "src/main/java/{{packagePath}}/utils/ExtentManager.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "reportingTool": "extent-reports"
+      },
+      "description": "ExtentReports manager"
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/WindowsUtils.java",
+      "template": "src/main/java/{{packagePath}}/utils/WindowsUtils.java.hbs",
+      "isTemplate": true,
+      "description": "Windows-specific utilities for process and window management"
+    },
+    {
+      "path": "src/main/resources/config/prod.properties",
+      "template": "src/main/resources/config/prod.properties.hbs",
+      "isTemplate": true,
+      "description": "Production environment configuration"
+    },
+    {
+      "path": "src/main/resources/setup.properties",
+      "template": "src/main/resources/setup.properties.hbs",
+      "isTemplate": true,
+      "description": "Framework setup properties"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/runners/TestRunner.java",
+      "template": "src/test/java/{{packagePath}}/runners/TestRunner.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Cucumber TestNG runner"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java",
+      "template": "src/test/java/{{packagePath}}/stepdefinitions/LoginSteps.java.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Step definitions for login scenarios"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/CalculatorTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/CalculatorTests.java.hbs",
+      "isTemplate": true,
+      "description": "Sample tests for Windows Calculator application"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/NotepadTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/NotepadTests.java.hbs",
+      "isTemplate": true,
+      "description": "Sample tests for Windows Notepad application"
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/tests/WindowsIntegrationTests.java",
+      "template": "src/test/java/{{packagePath}}/tests/WindowsIntegrationTests.java.hbs",
+      "isTemplate": true,
+      "description": "Integration tests for Windows desktop functionality"
+    },
+    {
+      "path": "src/test/resources/desktop-tests.xml",
+      "template": "src/test/resources/desktop-tests.xml.hbs",
+      "isTemplate": true,
+      "description": "Desktop-specific test suite configuration"
+    },
+    {
+      "path": "src/test/resources/features/Login.feature",
+      "template": "src/test/resources/features/Login.feature.hbs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      },
+      "description": "Sample login feature with Gherkin scenarios"
+    },
+    {
+      "path": "src/test/resources/regression-tests.xml",
+      "template": "src/test/resources/regression-tests.xml.hbs",
+      "isTemplate": true,
+      "description": "Regression test suite configuration"
+    }
+  ],
+  "directories": [
+    "reports",
+    "logs"
+  ],
+  "supportedCombination": {
+    "testingType": "desktop",
+    "framework": "winappdriver",
+    "language": "java",
+    "testRunner": "testng",
+    "buildTool": "gradle"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "bdd"
+    ]
+  }
+}

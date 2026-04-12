@@ -1,0 +1,15 @@
+/**
+ * User Model - Interface for JSONPlaceholder /users endpoint.
+ */
+export interface User {
+  id?: number;
+  name: string;
+  username: string;
+  email: string;
+  phone?: string;
+  website?: string;
+}
+
+export function createUser(name: string, username: string, email: string): User {
+  return { name, username, email };
+}

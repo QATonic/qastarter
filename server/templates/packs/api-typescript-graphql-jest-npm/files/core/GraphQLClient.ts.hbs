@@ -1,0 +1,43 @@
+/**
+ * GraphQL Client - HTTP client for GraphQL API testing.
+ * 
+ * Sample API: SpaceX GraphQL API (https://spacex-production.up.railway.app/)
+ */
+import { request, gql } from "graphql-request";
+import { apiConfig } from "../config/ConfigReader";
+import { log } from "../utils/Logger";
+
+export class GraphQLClient {
+  private endpoint: string;
+
+  constructor() {
+    this.endpoint = apiConfig.baseUrl;
+    log.info(`GraphQL Client initialized: ${this.endpoint}`);
+  }
+
+  async query<T>(query: string, variables?: object): Promise<T> {
+    log.info(`GraphQL Query: ${query.substring(0, 50)}...`);
+    try {
+      const response = await request<T>(this.endpoint, query, variables);
+      log.info("Query successful");
+      return response;
+    } catch (error) {
+      log.error(`Query failed: ${error}`);
+      throw error;
+    }
+  }
+
+  async mutation<T>(mutation: string, variables?: object): Promise<T> {
+    log.info(`GraphQL Mutation: ${mutation.substring(0, 50)}...`);
+    try {
+      const response = await request<T>(this.endpoint, mutation, variables);
+      log.info("Mutation successful");
+      return response;
+    } catch (error) {
+      log.error(`Mutation failed: ${error}`);
+      throw error;
+    }
+  }
+}
+
+export { gql };

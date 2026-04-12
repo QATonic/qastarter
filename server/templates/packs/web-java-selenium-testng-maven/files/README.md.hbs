@@ -1,0 +1,293 @@
+# {{projectName}}
+
+A production-ready **{{#if (eq framework "selenium")}}Selenium WebDriver{{else}}Playwright{{/if}}** test automation
+framework using **{{#if (eq testRunner "testng")}}TestNG{{else}}JUnit5{{/if}}** and **{{#if (eq buildTool
+"maven")}}Maven{{else}}Gradle{{/if}}**.
+
+## 🚀 Quick Start
+
+```bash
+# Run all tests
+{{#if (eq buildTool "maven")}}
+mvn clean test
+{{else}}
+gradle clean test
+{{/if}}
+
+# Run with specific browser
+{{#if (eq buildTool "maven")}}
+mvn test -Dbrowser=firefox
+{{else}}
+gradle test -Dbrowser=firefox
+{{/if}}
+
+# Run headless
+{{#if (eq buildTool "maven")}}
+mvn test -Dheadless=true
+{{else}}
+gradle test -Dheadless=true
+{{/if}}
+
+# Run specific environment
+{{#if (eq buildTool "maven")}}
+mvn test -Denv=qa
+{{else}}
+gradle test -Denv=qa
+{{/if}}
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── main/java/{{javaPackage}}/
+│ ├── config/ # Configuration management
+│ ├── core/ # BaseTest, {{#if (eq framework "selenium")}}DriverManager{{else}}PlaywrightManager{{/if}}
+│ ├── pages/ # Page Objects (LoginPage, etc.)
+{{#if (eq testRunner "testng")}}
+│ ├── listeners/ # TestNG listeners
+{{/if}}
+│ └── utils/ # Log, Screenshot, {{#if (eq reportingTool "extent-reports")}}ExtentManager{{/if}}{{#if (eq reportingTool
+"allure")}}AllureManager{{/if}}
+├── main/resources/
+│ └── config/ # dev.properties, qa.properties
+└── test/
+├── java/{{javaPackage}}/
+{{#if (eq testingPattern "bdd")}}
+│ ├── runners/ # Cucumber TestRunner
+│ └── stepdefinitions/
+{{else}}
+│ └── tests/ # Test classes
+{{/if}}
+└── resources/
+{{#if (eq testingPattern "bdd")}}
+└── features/ # Gherkin feature files
+{{else}}
+{{#if (eq testRunner "testng")}}
+└── testng.xml # TestNG suite configuration
+{{/if}}
+{{/if}}
+```
+
+## ⚙️ Configuration
+
+Edit `src/main/resources/config/dev.properties`:
+
+```properties
+base.url={{baseUrl}}
+browser={{#if (eq framework "selenium")}}chrome{{else}}chromium{{/if}}
+headless=false
+username={{testUsername}}
+password={{testPassword}}
+timeout.default=30
+```
+
+## 🧪 Writing Tests
+
+{{#if (eq testingPattern "bdd")}}
+### Feature File (Gherkin)
+```gherkin
+@login
+Feature: Login Functionality
+
+@smoke
+Scenario: Successful login
+Given I am on the login page
+When I login with valid credentials
+Then login should be successful
+```
+
+### Step Definitions
+```java
+@Given("I am on the login page")
+public void iAmOnTheLoginPage() {
+// Implementation
+}
+```
+{{else}}
+### Page Object
+```java
+public class LoginPage extends BasePage {
+public void login(String username, String password) {
+enterUsername(username);
+enterPassword(password);
+clickLogin();
+}
+}
+```
+
+### Test Class
+```java
+public class LoginTests extends BaseTest {
+@Test
+public void testValidLogin() {
+LoginPage loginPage = new LoginPage();
+loginPage.login("{{testUsername}}", "{{testPassword}}");
+Assert.assertTrue(loginPage.isLoginSuccessful());
+}
+}
+```
+
+### Data-Driven Testing (CSV)
+
+Test data location: `src/main/resources/testdata/users.csv`
+
+```csv
+username,password,expected
+{{testUsername}},{{testPassword}},success
+locked_out_user,{{testPassword}},error
+```
+
+```java
+@DataProvider(name = "loginData")
+public Object[][] getLoginData() {
+List<Map<String, String>> data = TestDataReader.readCsv("users.csv");
+    return data.stream()
+    .map(row -> new Object[]{row.get("username"), row.get("password"), row.get("expected")})
+    .toArray(Object[][]::new);
+    }
+
+    @Test(dataProvider = "loginData")
+    public void testLoginWithCSV(String username, String password, String expected) {
+    new LoginPage().login(username, password);
+    if ("success".equals(expected)) {
+    Assert.assertTrue(loginPage.isLoginSuccessful());
+    } else {
+    Assert.assertTrue(loginPage.isErrorDisplayed());
+    }
+    }
+    ```
+    {{/if}}
+
+    ## 📊 Reports
+
+    {{#if (eq reportingTool "extent-reports")}}
+    ### ExtentReports
+    Reports generated in: `reports/ExtentReport_{timestamp}.html`
+
+    Open the HTML file in a browser after test execution.
+    {{/if}}
+    {{#if (eq reportingTool "allure")}}
+    ### Allure Reports
+    ```bash
+    # Generate and open report
+    {{#if (eq buildTool "maven")}}
+    mvn allure:serve
+    {{else}}
+    gradle allureServe
+    {{/if}}
+    ```
+    Results in: `target/allure-results`
+    {{/if}}
+    {{#if (eq reportingTool "testng-reports")}}
+    ### TestNG Reports
+    Reports generated in: `target/surefire-reports/`
+    {{/if}}
+
+    ## 🖥️ Browsers
+
+    | Browser | Config Value |
+    |---------|--------------|
+    {{#if (eq framework "selenium")}}
+    | Chrome | `chrome` |
+    | Firefox | `firefox` |
+    | Edge | `edge` |
+    {{else}}
+    | Chromium | `chromium` |
+    | Firefox | `firefox` |
+    | WebKit | `webkit` |
+    {{/if}}
+
+    ## 📸 Screenshots
+
+    Screenshots are automatically captured on test failure:
+    - Location: `screenshots/`
+    - Format: `FAILED_{TestName}_{timestamp}.png`
+
+    ## 🔧 Prerequisites
+
+    | Requirement | Version | Verify Command |
+    |-------------|---------|----------------|
+    | Java | 17+ | `java -version` |
+    {{#if (eq buildTool "maven")}}
+    | Maven | 3.9+ | `mvn -version` |
+    {{else}}
+    | Gradle | 8+ | `gradle -version` |
+    {{/if}}
+    {{#if (eq framework "selenium")}}
+    | Chrome/Firefox/Edge | Latest | Browser Settings |
+    {{else}}
+    | Playwright | Auto-installed | `npx playwright install` |
+    {{/if}}
+
+    ## 🛠️ Troubleshooting
+
+    ### Common Issues
+
+    <details>
+        <summary><strong>❌ WebDriverException: Cannot find driver</strong></summary>
+
+        **Solution**: Selenium Manager handles driver downloads automatically in Selenium 4.11+.
+        If still failing, ensure Chrome/Firefox is installed and accessible in PATH.
+
+        ```bash
+        # Verify browser installation
+        {{#if (eq framework "selenium")}}
+        google-chrome --version # or firefox --version
+        {{/if}}
+        ```
+    </details>
+
+    <details>
+        <summary><strong>❌ Tests timeout or fail intermittently</strong></summary>
+
+        **Solution**: Increase wait timeouts in config:
+
+        ```properties
+        # In dev.properties
+        implicit.wait=15
+        explicit.wait=20
+        ```
+
+        Or run with retry enabled:
+        ```bash
+        {{#if (eq buildTool "maven")}}
+        mvn test -DretryCount=2
+        {{else}}
+        gradle test -DretryCount=2
+        {{/if}}
+        ```
+    </details>
+
+    <details>
+        <summary><strong>❌ Element not found / StaleElementReferenceException</strong></summary>
+
+        **Solution**: Use explicit waits in your page objects:
+
+        ```java
+        // Use WaitUtils for reliable element interaction
+        WaitUtils.waitForElement(driver, By.id("element-id"), 10);
+        ```
+    </details>
+
+    <details>
+        <summary><strong>❌ CI/CD tests fail but local tests pass</strong></summary>
+
+        **Solution**: Always run headless in CI:
+
+        ```bash
+        {{#if (eq buildTool "maven")}}
+        mvn test -Dheadless=true -Dbrowser=chrome
+        {{else}}
+        gradle test -Dheadless=true -Dbrowser=chrome
+        {{/if}}
+        ```
+    </details>
+
+    ### Getting Help
+
+    - 📖 [Documentation](https://qatonic.com/docs)
+    - 🐛 [Report Issue](https://github.com/qatonic/qastarter/issues)
+
+    ---
+    Generated by [QAStarter](https://qatonic.com)

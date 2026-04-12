@@ -1,0 +1,47 @@
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from pages.base_page import BasePage
+
+class NotepadPage(BasePage):
+    # Locators
+    TEXT_EDITOR = (By.CLASS_NAME, "Edit")
+    FILE_MENU = (By.NAME, "File")
+    EDIT_MENU = (By.NAME, "Edit")
+    FORMAT_MENU = (By.NAME, "Format")
+    
+    def type_text(self, text: str):
+        editor = self.find_element(self.TEXT_EDITOR)
+        self.send_keys(editor, text, "Text Editor")
+        return self
+    
+    def clear_text(self):
+        editor = self.find_element(self.TEXT_EDITOR)
+        editor.clear()
+        return self
+    
+    def get_text(self) -> str:
+        editor = self.find_element(self.TEXT_EDITOR)
+        return self.get_text(editor, "Text Editor")
+    
+    def open_file_menu(self):
+        self.click(self.find_element(self.FILE_MENU), "File Menu")
+        return self
+    
+    def open_edit_menu(self):
+        self.click(self.find_element(self.EDIT_MENU), "Edit Menu")
+        return self
+    
+    def open_format_menu(self):
+        self.click(self.find_element(self.FORMAT_MENU), "Format Menu")
+        return self
+    
+    def close_without_saving(self):
+        editor = self.find_element(self.TEXT_EDITOR)
+        editor.send_keys(Keys.ALT + Keys.F4)
+        
+        # Handle "Do you want to save?" dialog if it appears
+        try:
+            dont_save_button = self.driver.find_element(By.NAME, "Don't Save")
+            dont_save_button.click()
+        except:
+            pass

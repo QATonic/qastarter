@@ -1,0 +1,153 @@
+import Logger from './logger.js';
+
+/**
+ * Wait helper utilities for WebdriverIO.
+ * Provides explicit wait functionality for async operations.
+ */
+class WaitHelpers {
+  
+  static DEFAULT_TIMEOUT = 10000;
+  static SHORT_TIMEOUT = 5000;
+  static LONG_TIMEOUT = 30000;
+  
+  /**
+   * Wait for element to be displayed
+   */
+  static async waitForDisplayed(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to be displayed`);
+    await element.waitForDisplayed({ timeout });
+  }
+  
+  /**
+   * Wait for element to exist in DOM
+   */
+  static async waitForExist(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to exist`);
+    await element.waitForExist({ timeout });
+  }
+  
+  /**
+   * Wait for element to be clickable
+   */
+  static async waitForClickable(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to be clickable`);
+    await element.waitForClickable({ timeout });
+  }
+  
+  /**
+   * Wait for element to be enabled
+   */
+  static async waitForEnabled(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to be enabled`);
+    await element.waitForEnabled({ timeout });
+  }
+  
+  /**
+   * Wait for element to disappear
+   */
+  static async waitForNotDisplayed(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to disappear`);
+    await element.waitForDisplayed({ timeout, reverse: true });
+  }
+  
+  /**
+   * Wait for element to not exist
+   */
+  static async waitForNotExist(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to not exist`);
+    await element.waitForExist({ timeout, reverse: true });
+  }
+  
+  /**
+   * Wait for URL to contain text
+   */
+  static async waitForUrlContains(text, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for URL to contain: ${text}`);
+    await browser.waitUntil(
+      async () => (await browser.getUrl()).includes(text),
+      { timeout, timeoutMsg: `URL did not contain "${text}" within ${timeout}ms` }
+    );
+  }
+  
+  /**
+   * Wait for title to contain text
+   */
+  static async waitForTitleContains(text, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for title to contain: ${text}`);
+    await browser.waitUntil(
+      async () => (await browser.getTitle()).includes(text),
+      { timeout, timeoutMsg: `Title did not contain "${text}" within ${timeout}ms` }
+    );
+  }
+  
+  /**
+   * Wait for element text to equal
+   */
+  static async waitForTextEquals(element, expectedText, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for text to equal: ${expectedText}`);
+    await browser.waitUntil(
+      async () => (await element.getText()) === expectedText,
+      { timeout, timeoutMsg: `Text did not equal "${expectedText}" within ${timeout}ms` }
+    );
+  }
+  
+  /**
+   * Wait for element text to contain
+   */
+  static async waitForTextContains(element, text, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for text to contain: ${text}`);
+    await browser.waitUntil(
+      async () => (await element.getText()).includes(text),
+      { timeout, timeoutMsg: `Text did not contain "${text}" within ${timeout}ms` }
+    );
+  }
+  
+  /**
+   * Wait for element value to equal
+   */
+  static async waitForValueEquals(element, expectedValue, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for value to equal: ${expectedValue}`);
+    await browser.waitUntil(
+      async () => (await element.getValue()) === expectedValue,
+      { timeout, timeoutMsg: `Value did not equal "${expectedValue}" within ${timeout}ms` }
+    );
+  }
+  
+  /**
+   * Wait for custom condition
+   */
+  static async waitForCondition(condition, timeout = WaitHelpers.DEFAULT_TIMEOUT, message = 'Condition not met') {
+    Logger.debug(`Waiting for custom condition`);
+    await browser.waitUntil(condition, { timeout, timeoutMsg: `${message} within ${timeout}ms` });
+  }
+  
+  /**
+   * Wait for page to load completely
+   */
+  static async waitForPageLoad(timeout = WaitHelpers.LONG_TIMEOUT) {
+    Logger.debug(`Waiting for page to load`);
+    await browser.waitUntil(
+      async () => (await browser.execute(() => document.readyState)) === 'complete',
+      { timeout, timeoutMsg: `Page did not load within ${timeout}ms` }
+    );
+  }
+  
+  /**
+   * Wait for network idle (no pending requests)
+   */
+  static async waitForNetworkIdle(timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for network idle`);
+    // This is a simplified version - for production, consider using browser devtools protocol
+    await browser.pause(1000);
+  }
+  
+  /**
+   * Hard wait (use sparingly)
+   */
+  static async hardWait(milliseconds) {
+    Logger.debug(`Hard wait for ${milliseconds}ms`);
+    await browser.pause(milliseconds);
+  }
+}
+
+export default WaitHelpers;

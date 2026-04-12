@@ -1,0 +1,45 @@
+import BasePage from './BasePage';
+import { Browser } from 'webdriverio';
+
+export default class LoginPage extends BasePage {
+  // Locators - Update these based on your app
+  readonly usernameInput = 'id=com.example.app:id/username';
+  readonly passwordInput = 'id=com.example.app:id/password';
+  readonly loginButton = 'id=com.example.app:id/loginButton';
+  readonly errorMessage = 'id=com.example.app:id/errorMessage';
+
+  constructor(driver: Browser<'async'>) {
+    super(driver);
+  }
+
+  async enterUsername(username: string): Promise<void> {
+    await this.sendKeys(this.usernameInput, username);
+  }
+
+  async enterPassword(password: string): Promise<void> {
+    await this.sendKeys(this.passwordInput, password);
+  }
+
+  async clickLoginButton(): Promise<void> {
+    await this.click(this.loginButton);
+    await this.hideKeyboard();
+  }
+
+  async login(username: string, password: string): Promise<void> {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLoginButton();
+  }
+
+  async getErrorMessage(): Promise<string> {
+    return await this.getText(this.errorMessage);
+  }
+
+  async isErrorDisplayed(): Promise<boolean> {
+    return await this.isDisplayed(this.errorMessage, 5000);
+  }
+
+  async isLoginButtonEnabled(): Promise<boolean> {
+    return await this.isEnabled(this.loginButton);
+  }
+}

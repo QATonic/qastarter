@@ -1,0 +1,69 @@
+import XCTest
+
+/**
+ * Screenshot helper for capturing test evidence.
+ */
+enum ScreenshotHelper {
+    
+    /// Capture screenshot and attach to test
+    static func capture(name: String, lifetime: XCTAttachment.Lifetime = .keepAlways) {
+        Logger.info("Capturing screenshot: \(name)")
+        
+        let screenshot = XCUIScreen.main.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = name
+        attachment.lifetime = lifetime
+        
+        XCTContext.runActivity(named: "Screenshot: \(name)") { activity in
+            activity.add(attachment)
+        }
+    }
+    
+    /// Capture screenshot of specific element
+    static func captureElement(_ element: XCUIElement, name: String, lifetime: XCTAttachment.Lifetime = .keepAlways) {
+        Logger.info("Capturing element screenshot: \(name)")
+        
+        guard element.exists else {
+            Logger.warning("Cannot capture screenshot - element does not exist: \(element.identifier)")
+            return
+        }
+        
+        let screenshot = element.screenshot()
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = name
+        attachment.lifetime = lifetime
+        
+        XCTContext.runActivity(named: "Element Screenshot: \(name)") { activity in
+            activity.add(attachment)
+        }
+    }
+    
+    /// Capture screenshot on failure
+    static func captureOnFailure(testName: String) {
+        capture(name: "\(testName)_failure", lifetime: .keepAlways)
+    }
+    
+    /// Capture screenshot with timestamp
+    static func captureWithTimestamp(prefix: String = "screenshot") {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
+        let timestamp = formatter.string(from: Date())
+        capture(name: "\(prefix)_\(timestamp)")
+    }
+}
+
+// MARK: - XCTestCase Extension
+
+extension XCTestCase {
+    
+    /// Take screenshot with auto-generated name
+    func takeScreenshot(_ name: String? = nil) {
+        let screenshotName = name ?? "\(self.name)_\(Date().timeIntervalSince1970)"
+        ScreenshotHelper.capture(name: screenshotName)
+    }
+    
+    /// Take screenshot on test failure
+    func takeScreenshotOnFailure() {
+        ScreenshotHelper.captureOnFailure(testName: self.name)
+    }
+}

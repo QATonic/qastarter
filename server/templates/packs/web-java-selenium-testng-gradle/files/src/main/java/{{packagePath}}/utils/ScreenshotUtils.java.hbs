@@ -1,0 +1,66 @@
+package {{javaPackage}}.utils;
+
+import {{javaPackage}}.core.DriverManager;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Screenshot Utilities - Capture screenshots on demand.
+ * 
+ * Screenshots saved to: screenshots/
+ */
+public class ScreenshotUtils {
+
+    private static final String SCREENSHOT_DIR = "screenshots";
+
+    private ScreenshotUtils() {}
+
+    public static String capture(String testName) {
+        try {
+            WebDriver driver = DriverManager.getDriver();
+            if (driver == null) {
+                Log.error("Cannot capture screenshot - driver is null");
+                return null;
+            }
+
+            Path dir = Paths.get(SCREENSHOT_DIR);
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String sanitizedName = testName.replaceAll("[^a-zA-Z0-9_-]", "_");
+            String fileName = sanitizedName + "_" + timestamp + ".png";
+            Path filePath = dir.resolve(fileName);
+
+            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            Files.copy(screenshot.toPath(), filePath);
+
+            Log.info("Screenshot saved: " + filePath);
+            return filePath.toString();
+
+        } catch (Exception e) {
+            Log.error("Failed to capture screenshot: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static byte[] captureAsBytes() {
+        try {
+            WebDriver driver = DriverManager.getDriver();
+            if (driver == null) return null;
+            return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+        } catch (Exception e) {
+            Log.error("Failed to capture screenshot bytes: " + e.getMessage());
+            return null;
+        }
+    }
+}

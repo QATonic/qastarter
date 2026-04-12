@@ -1,0 +1,82 @@
+"""
+WebDriver Factory with Selenium Manager (Selenium 4+)
+Selenium Manager automatically handles driver downloads and management
+"""
+from selenium import webdriver
+from config.config import Config
+from config.settings import CHROME_OPTIONS, FIREFOX_OPTIONS
+from utils.logger import Logger
+
+logger = Logger.get_logger(__name__)
+
+class DriverFactory:
+    """Factory class for creating WebDriver instances"""
+    
+    @staticmethod
+    def create_driver(browser: str = None, headless: bool = None):
+        """
+        Create WebDriver instance based on browser type
+        Uses Selenium Manager for automatic driver management (Selenium 4+)
+        
+        Args:
+            browser: Browser type (chrome, firefox, edge)
+            headless: Run in headless mode
+            
+        Returns:
+            WebDriver instance
+        """
+        browser = browser or Config.BROWSER
+        headless = headless if headless is not None else Config.HEADLESS
+        
+        logger.info(f"Creating {browser} driver (headless: {headless})")
+        
+        if browser.lower() == 'chrome':
+            return DriverFactory._create_chrome_driver(headless)
+        elif browser.lower() == 'firefox':
+            return DriverFactory._create_firefox_driver(headless)
+        elif browser.lower() == 'edge':
+            return DriverFactory._create_edge_driver(headless)
+        else:
+            raise ValueError(f"Unsupported browser: {browser}")
+    
+    @staticmethod
+    def _create_chrome_driver(headless: bool):
+        """Create Chrome WebDriver using Selenium Manager"""
+        options = webdriver.ChromeOptions()
+        
+        for option in CHROME_OPTIONS:
+            options.add_argument(option)
+        
+        if headless:
+            options.add_argument('--headless=new')
+        
+        driver = webdriver.Chrome(options=options)
+        driver.maximize_window()
+        return driver
+    
+    @staticmethod
+    def _create_firefox_driver(headless: bool):
+        """Create Firefox WebDriver using Selenium Manager"""
+        options = webdriver.FirefoxOptions()
+        
+        for option in FIREFOX_OPTIONS:
+            options.add_argument(option)
+        
+        if headless:
+            options.add_argument('--headless')
+        
+        driver = webdriver.Firefox(options=options)
+        driver.maximize_window()
+        return driver
+    
+    @staticmethod
+    def _create_edge_driver(headless: bool):
+        """Create Edge WebDriver using Selenium Manager"""
+        options = webdriver.EdgeOptions()
+        
+        if headless:
+            options.add_argument('--headless=new')
+        
+        driver = webdriver.Edge(options=options)
+        driver.maximize_window()
+        return driver

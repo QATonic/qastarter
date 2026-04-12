@@ -1,0 +1,28 @@
+package {{javaPackage}}.core;
+
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterClass;
+import {{javaPackage}}.utils.Log;
+
+/**
+ * Base Test - Common setup for all API tests.
+ */
+public class BaseTest {
+
+    protected APIClient api;
+
+    @BeforeClass
+    public void setup() {
+        Log.info("========================================");
+        Log.info("API Test Suite Started");
+        Log.info("========================================");
+        api = new APIClient();
+    }
+
+    @AfterClass
+    public void teardown() {
+        Log.info("========================================");
+        Log.info("API Test Suite Completed");
+        Log.info("========================================");
+    }
+}

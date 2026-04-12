@@ -1,0 +1,66 @@
+package {{groupId}}.screens
+
+import {{groupId}}.R
+
+/**
+* Home screen page object.
+* Provides fluent API for home screen interactions.
+*/
+class HomeScreen : BaseScreen<HomeScreen>() {
+
+    // View IDs - Update these to match your actual layout
+    private val welcomeMessage = onViewById(R.id.welcome_message)
+    private val logoutButton = onViewById(R.id.logout_button)
+    private val navigationMenu = onViewById(R.id.navigation_menu)
+    private val profileButton = onViewById(R.id.profile_button)
+
+    /**
+    * Verify welcome message is displayed.
+    */
+    fun verifyWelcomeMessage(expectedMessage: String): HomeScreen {
+    return verifyText(welcomeMessage, expectedMessage)
+    }
+
+    /**
+    * Verify welcome message is displayed (any text).
+    */
+    fun verifyWelcomeMessageDisplayed(): HomeScreen {
+    return verifyDisplayed(welcomeMessage)
+    }
+
+    /**
+    * Click logout button.
+    */
+    fun clickLogout(): HomeScreen {
+    return click(logoutButton)
+    }
+
+    /**
+    * Verify home screen is displayed.
+    */
+    fun verifyScreenDisplayed(): HomeScreen {
+    return verifyDisplayed(welcomeMessage)
+    }
+
+    /**
+    * Click on profile button.
+    */
+    fun clickProfile(): HomeScreen {
+    return click(profileButton)
+    }
+
+    /**
+    * Open navigation menu.
+    */
+    fun openNavigationMenu(): HomeScreen {
+    return click(navigationMenu)
+    }
+
+    /**
+    * Verify user is logged in.
+    */
+    fun verifyUserLoggedIn(): HomeScreen {
+    verifyDisplayed(welcomeMessage)
+    return verifyDisplayed(logoutButton)
+    }
+    }

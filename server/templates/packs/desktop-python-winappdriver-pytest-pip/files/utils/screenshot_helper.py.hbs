@@ -1,0 +1,24 @@
+import os
+from datetime import datetime
+from config.settings import Settings
+from utils.logger import Logger
+
+class ScreenshotHelper:
+    @staticmethod
+    def take_screenshot(driver, test_name: str):
+        if not driver or not Settings.SCREENSHOT_ON_FAILURE:
+            return
+        
+        try:
+            screenshot_dir = Settings.SCREENSHOT_PATH
+            if not os.path.exists(screenshot_dir):
+                os.makedirs(screenshot_dir)
+            
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            filename = f"{test_name}_{timestamp}.png"
+            filepath = os.path.join(screenshot_dir, filename)
+            
+            driver.save_screenshot(filepath)
+            Logger.info(f"Screenshot saved: {filepath}")
+        except Exception as e:
+            Logger.error(f"Failed to take screenshot: {str(e)}")

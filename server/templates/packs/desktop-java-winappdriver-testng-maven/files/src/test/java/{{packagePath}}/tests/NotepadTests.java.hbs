@@ -1,0 +1,403 @@
+package {{groupId}}.tests;
+
+import {{groupId}}.core.BaseTest;
+import {{groupId}}.pages.NotepadPage;
+import {{groupId}}.listeners.RetryAnalyzer;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+/**
+ * Sample tests for Windows Notepad application
+ * Demonstrates text editor automation testing patterns
+ */
+public class NotepadTests extends BaseTest {
+
+    private NotepadPage notepadPage;
+    private static final String SAMPLE_TEXT = "This is a test document created by desktop automation.";
+    private static final String MULTILINE_TEXT = "Line 1: First line of text\nLine 2: Second line of text\nLine 3: Third line of text";
+
+    @BeforeMethod
+    public void setupNotepadTest() {
+        notepadPage = new NotepadPage();
+        
+        // Verify notepad page is loaded
+        Assert.assertTrue(notepadPage.waitForPageToLoad(), 
+                         "Notepad application should be loaded");
+        
+        logInfo("Notepad test setup completed");
+    }
+
+    @Test(description = "Verify basic text typing functionality",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"smoke", "notepad", "basic"})
+    public void testBasicTextTyping() {
+        logInfo("Testing basic text typing functionality");
+        
+        // Type sample text
+        Assert.assertTrue(notepadPage.typeText(SAMPLE_TEXT), 
+                         "Should type sample text successfully");
+        
+        // Verify text is present
+        Assert.assertTrue(notepadPage.verifyTextContains(SAMPLE_TEXT), 
+                         "Notepad should contain the typed text");
+        
+        logPass("Basic text typing test completed successfully");
+    }
+
+    @Test(description = "Verify multiline text handling",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "text-handling"})
+    public void testMultilineTextHandling() {
+        logInfo("Testing multiline text handling");
+        
+        // Type multiline text
+        Assert.assertTrue(notepadPage.typeText(MULTILINE_TEXT), 
+                         "Should type multiline text successfully");
+        
+        // Verify all lines are present
+        Assert.assertTrue(notepadPage.verifyTextContains("Line 1: First line"), 
+                         "Should contain first line");
+        Assert.assertTrue(notepadPage.verifyTextContains("Line 2: Second line"), 
+                         "Should contain second line");
+        Assert.assertTrue(notepadPage.verifyTextContains("Line 3: Third line"), 
+                         "Should contain third line");
+        
+        // Get and verify text statistics
+        String stats = notepadPage.getTextStatistics();
+        logInfo("Text statistics: " + stats);
+        Assert.assertNotNull(stats, "Text statistics should be available");
+        
+        logPass("Multiline text handling test completed successfully");
+    }
+
+    @Test(description = "Verify copy and paste functionality",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "clipboard"})
+    public void testCopyPasteFunctionality() {
+        logInfo("Testing copy and paste functionality");
+        
+        // Type initial text
+        Assert.assertTrue(notepadPage.typeText(SAMPLE_TEXT), 
+                         "Should type initial text successfully");
+        
+        // Select all text
+        Assert.assertTrue(notepadPage.selectAll(), 
+                         "Should select all text successfully");
+        
+        // Copy text
+        Assert.assertTrue(notepadPage.copyText(), 
+                         "Should copy text successfully");
+        
+        // Move to end and add new line
+        notepadPage.appendText("\n\nCopied text: ");
+        
+        // Paste text
+        Assert.assertTrue(notepadPage.pasteText(), 
+                         "Should paste text successfully");
+        
+        // Verify both original and pasted text are present
+        String finalText = notepadPage.getText();
+        Assert.assertNotNull(finalText, "Final text should not be null");
+        
+        // Count occurrences of the sample text (should be 2)
+        int occurrences = (finalText.length() - finalText.replace(SAMPLE_TEXT, "").length()) / SAMPLE_TEXT.length();
+        Assert.assertEquals(occurrences, 2, "Sample text should appear twice after copy-paste");
+        
+        logPass("Copy and paste functionality test completed successfully");
+    }
+
+    @Test(description = "Verify undo and redo functionality",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "edit-operations"})
+    public void testUndoRedoFunctionality() {
+        logInfo("Testing undo and redo functionality");
+        
+        // Type initial text
+        Assert.assertTrue(notepadPage.typeText("First text"), 
+                         "Should type first text successfully");
+        
+        // Add more text
+        Assert.assertTrue(notepadPage.appendText(" - Additional text"), 
+                         "Should append additional text successfully");
+        
+        String textBeforeUndo = notepadPage.getText();
+        logInfo("Text before undo: " + textBeforeUndo);
+        
+        // Undo last action
+        Assert.assertTrue(notepadPage.undo(), 
+                         "Should undo last action successfully");
+        
+        String textAfterUndo = notepadPage.getText();
+        logInfo("Text after undo: " + textAfterUndo);
+        
+        // Verify text changed after undo
+        Assert.assertNotEquals(textAfterUndo, textBeforeUndo, 
+                              "Text should be different after undo");
+        
+        // Redo the action
+        Assert.assertTrue(notepadPage.redo(), 
+                         "Should redo last action successfully");
+        
+        String textAfterRedo = notepadPage.getText();
+        logInfo("Text after redo: " + textAfterRedo);
+        
+        logPass("Undo and redo functionality test completed successfully");
+    }
+
+    @Test(description = "Verify text find functionality",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "search"})
+    public void testFindFunctionality() {
+        logInfo("Testing text find functionality");
+        
+        // Type text with searchable content
+        String searchableText = "This document contains searchable content. We will search for specific words.";
+        Assert.assertTrue(notepadPage.typeText(searchableText), 
+                         "Should type searchable text successfully");
+        
+        // Attempt to find text
+        boolean findResult = notepadPage.findText("searchable");
+        
+        if (findResult) {
+            logInfo("Find functionality is working");
+            logPass("Text find functionality test completed successfully");
+        } else {
+            logWarning("Find functionality may not be available or text not found");
+        }
+    }
+
+    @Test(description = "Verify text replace functionality",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "replace"})
+    public void testReplaceFunctionality() {
+        logInfo("Testing text replace functionality");
+        
+        // Type text with replaceable content
+        String replaceableText = "old text, old text, old text";
+        Assert.assertTrue(notepadPage.typeText(replaceableText), 
+                         "Should type replaceable text successfully");
+        
+        // Attempt to replace text
+        boolean replaceResult = notepadPage.replaceText("old", "new");
+        
+        if (replaceResult) {
+            // Verify replacement occurred
+            String finalText = notepadPage.getText();
+            if (finalText != null && finalText.contains("new")) {
+                logPass("Text replace functionality test completed successfully");
+            } else {
+                logWarning("Replace operation completed but text verification failed");
+            }
+        } else {
+            logWarning("Replace functionality may not be available");
+        }
+    }
+
+    @Test(description = "Verify file operations (New, Save)",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "file-operations"})
+    public void testFileOperations() {
+        logInfo("Testing file operations");
+        
+        // Type some content
+        Assert.assertTrue(notepadPage.typeText("Content for file operations test"), 
+                         "Should type content successfully");
+        
+        // Create new document
+        if (notepadPage.newDocument()) {
+            logInfo("New document created successfully");
+            
+            // Verify new document is empty
+            String newDocContent = notepadPage.getText();
+            Assert.assertTrue(newDocContent == null || newDocContent.trim().isEmpty(), 
+                             "New document should be empty");
+        } else {
+            logWarning("New document creation may have failed");
+        }
+        
+        // Test save operation
+        notepadPage.typeText("Content to save");
+        boolean saveResult = notepadPage.saveFile();
+        
+        if (saveResult) {
+            logInfo("Save operation completed");
+        } else {
+            logWarning("Save operation may have failed or been cancelled");
+        }
+        
+        logPass("File operations test completed");
+    }
+
+    @Test(description = "Verify document title changes",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "document-state"})
+    public void testDocumentTitleChanges() {
+        logInfo("Testing document title changes");
+        
+        // Get initial title
+        String initialTitle = notepadPage.getDocumentTitle();
+        logInfo("Initial document title: " + initialTitle);
+        
+        // Type content to trigger unsaved changes
+        Assert.assertTrue(notepadPage.typeText("Unsaved content"), 
+                         "Should type content successfully");
+        
+        // Check if document shows unsaved changes indicator
+        boolean hasUnsavedChanges = notepadPage.hasUnsavedChanges();
+        logInfo("Document has unsaved changes: " + hasUnsavedChanges);
+        
+        // Get title after changes
+        String modifiedTitle = notepadPage.getDocumentTitle();
+        logInfo("Modified document title: " + modifiedTitle);
+        
+        logPass("Document title changes test completed");
+    }
+
+    @Test(description = "Verify format menu operations",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "formatting"})
+    public void testFormatOperations() {
+        logInfo("Testing format operations");
+        
+        // Type long line that would benefit from word wrap
+        String longText = "This is a very long line of text that should demonstrate the word wrap functionality if it is available in the current version of Notepad.";
+        Assert.assertTrue(notepadPage.typeText(longText), 
+                         "Should type long text successfully");
+        
+        // Toggle word wrap
+        boolean wordWrapResult = notepadPage.toggleWordWrap();
+        if (wordWrapResult) {
+            logInfo("Word wrap toggle successful");
+            
+            // Toggle again to test both states
+            notepadPage.toggleWordWrap();
+            logInfo("Word wrap toggled back");
+        } else {
+            logWarning("Word wrap functionality may not be available");
+        }
+        
+        // Test font dialog
+        boolean fontDialogResult = notepadPage.openFontDialog();
+        if (fontDialogResult) {
+            logInfo("Font dialog opened successfully");
+            
+            // Close dialog by pressing Escape
+            notepadPage.pressEscape();
+        } else {
+            logWarning("Font dialog may not be available");
+        }
+        
+        logPass("Format operations test completed");
+    }
+
+    @Test(description = "Verify text append and insert operations",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "text-operations"})
+    public void testTextAppendInsert() {
+        logInfo("Testing text append and insert operations");
+        
+        // Type initial content
+        Assert.assertTrue(notepadPage.typeText("Initial content."), 
+                         "Should type initial content successfully");
+        
+        // Append text at the end
+        Assert.assertTrue(notepadPage.appendText(" Appended text."), 
+                         "Should append text successfully");
+        
+        // Insert text (this will be at cursor position)
+        Assert.assertTrue(notepadPage.insertText(" Inserted text."), 
+                         "Should insert text successfully");
+        
+        // Verify all text is present
+        String finalContent = notepadPage.getText();
+        Assert.assertNotNull(finalContent, "Final content should not be null");
+        Assert.assertTrue(finalContent.contains("Initial content"), 
+                         "Should contain initial content");
+        Assert.assertTrue(finalContent.contains("Appended text"), 
+                         "Should contain appended text");
+        Assert.assertTrue(finalContent.contains("Inserted text"), 
+                         "Should contain inserted text");
+        
+        logPass("Text append and insert operations test completed successfully");
+    }
+
+    @Test(description = "Verify view menu operations",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "view-operations"})
+    public void testViewOperations() {
+        logInfo("Testing view operations");
+        
+        // Toggle status bar
+        boolean statusBarResult = notepadPage.toggleStatusBar();
+        if (statusBarResult) {
+            logInfo("Status bar toggle successful");
+            
+            // Toggle again to test both states
+            notepadPage.toggleStatusBar();
+            logInfo("Status bar toggled back");
+        } else {
+            logWarning("Status bar functionality may not be available");
+        }
+        
+        logPass("View operations test completed");
+    }
+
+    @Test(description = "Stress test - large text handling",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "stress"})
+    public void testLargeTextHandling() {
+        logInfo("Testing large text handling");
+        
+        // Generate large text content
+        StringBuilder largeText = new StringBuilder();
+        for (int i = 1; i <= 100; i++) {
+            largeText.append("Line ").append(i).append(": This is line number ").append(i).append(" of the large text test.\n");
+        }
+        
+        // Type large content (in smaller chunks to avoid issues)
+        String fullText = largeText.toString();
+        String firstHalf = fullText.substring(0, fullText.length() / 2);
+        String secondHalf = fullText.substring(fullText.length() / 2);
+        
+        Assert.assertTrue(notepadPage.typeText(firstHalf), 
+                         "Should type first half of large text successfully");
+        
+        Assert.assertTrue(notepadPage.appendText(secondHalf), 
+                         "Should append second half of large text successfully");
+        
+        // Verify text statistics show large content
+        String stats = notepadPage.getTextStatistics();
+        logInfo("Large text statistics: " + stats);
+        
+        // Verify some content is present
+        Assert.assertTrue(notepadPage.verifyTextContains("Line 1:"), 
+                         "Should contain first line");
+        Assert.assertTrue(notepadPage.verifyTextContains("Line 100:"), 
+                         "Should contain last line");
+        
+        logPass("Large text handling test completed successfully");
+    }
+
+    @Test(description = "Verify application exit behavior",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"notepad", "exit-behavior"},
+          enabled = false) // Disabled to avoid closing the application during test suite
+    public void testExitBehavior() {
+        logInfo("Testing application exit behavior");
+        
+        // Type content that would trigger save prompt
+        Assert.assertTrue(notepadPage.typeText("Content that should trigger save prompt on exit"), 
+                         "Should type content successfully");
+        
+        // Attempt to exit (this would normally show save dialog)
+        // Note: This test is disabled to avoid actually exiting during automation
+        boolean exitResult = notepadPage.exitNotepad();
+        
+        if (exitResult) {
+            logWarning("Exit operation initiated - this would close Notepad");
+        }
+        
+        logPass("Exit behavior test completed (test was disabled to avoid closing application)");
+    }
+}

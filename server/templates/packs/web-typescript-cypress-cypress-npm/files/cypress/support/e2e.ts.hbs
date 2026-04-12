@@ -1,0 +1,9 @@
+/**
+* Cypress E2E Support File.
+*/
+{{#if (eq reportingTool "allure")}}
+import "@shelex/cypress-allure-plugin";
+{{/if}}
+
+// Import commands.ts
+import './commands';

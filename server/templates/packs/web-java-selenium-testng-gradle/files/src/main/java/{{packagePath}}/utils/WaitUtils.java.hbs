@@ -1,0 +1,67 @@
+package {{javaPackage}}.utils;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.core.DriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+
+/**
+ * Wait Utilities - Explicit wait helpers.
+ * 
+ * Timeout configured in: src/main/resources/config/{env}.properties
+ */
+public class WaitUtils {
+
+    private WaitUtils() {
+        // Private constructor
+    }
+
+    private static WebDriverWait getWait() {
+        int timeout = ConfigurationReader.getTimeout();
+        return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeout));
+    }
+
+    /**
+     * Wait for element to be visible
+     */
+    public static WebElement waitForVisibility(By locator) {
+        Log.logWait("Waiting for visibility: " + locator);
+        return getWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    /**
+     * Wait for element to be clickable
+     */
+    public static WebElement waitForClickability(By locator) {
+        Log.logWait("Waiting for clickability: " + locator);
+        return getWait().until(ExpectedConditions.elementToBeClickable(locator));
+    }
+
+    /**
+     * Wait for element to be present in DOM
+     */
+    public static WebElement waitForPresence(By locator) {
+        Log.logWait("Waiting for presence: " + locator);
+        return getWait().until(ExpectedConditions.presenceOfElementLocated(locator));
+    }
+
+    /**
+     * Wait for element to disappear
+     */
+    public static boolean waitForInvisibility(By locator) {
+        Log.logWait("Waiting for invisibility: " + locator);
+        return getWait().until(ExpectedConditions.invisibilityOfElementLocated(locator));
+    }
+
+    /**
+     * Wait for text to be present in element
+     */
+    public static boolean waitForTextPresent(By locator, String text) {
+        Log.logWait("Waiting for text '" + text + "' in: " + locator);
+        return getWait().until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+    }
+}

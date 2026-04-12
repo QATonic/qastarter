@@ -1,0 +1,55 @@
+/**
+ * API Client - HTTP client for REST API testing.
+ * 
+ * Target API: {{baseUrl}}
+ */
+import request from "supertest";
+import { apiConfig } from "../config/ConfigReader";
+import { log } from "../utils/Logger";
+
+export class ApiClient {
+  private baseUrl: string;
+
+  constructor() {
+    this.baseUrl = apiConfig.baseUrl;
+    log.info(`API Client initialized: ${this.baseUrl}`);
+  }
+
+  async get(endpoint: string): Promise<request.Response> {
+    log.info(`GET ${endpoint}`);
+    const response = await request(this.baseUrl)
+      .get(endpoint)
+      .set("Content-Type", apiConfig.contentType);
+    log.info(`Response: ${response.status}`);
+    return response;
+  }
+
+  async post(endpoint: string, body: object): Promise<request.Response> {
+    log.info(`POST ${endpoint}`);
+    const response = await request(this.baseUrl)
+      .post(endpoint)
+      .set("Content-Type", apiConfig.contentType)
+      .send(body);
+    log.info(`Response: ${response.status}`);
+    return response;
+  }
+
+  async put(endpoint: string, body: object): Promise<request.Response> {
+    log.info(`PUT ${endpoint}`);
+    const response = await request(this.baseUrl)
+      .put(endpoint)
+      .set("Content-Type", apiConfig.contentType)
+      .send(body);
+    log.info(`Response: ${response.status}`);
+    return response;
+  }
+
+  async delete(endpoint: string): Promise<request.Response> {
+    log.info(`DELETE ${endpoint}`);
+    const response = await request(this.baseUrl)
+      .delete(endpoint)
+      .set("Content-Type", apiConfig.contentType);
+    log.info(`Response: ${response.status}`);
+    return response;
+  }
+}

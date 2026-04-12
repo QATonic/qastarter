@@ -1,0 +1,96 @@
+"""
+Driver Manager - Thread-safe WebDriver lifecycle management.
+
+Usage:
+    from utils.driver_manager import DriverManager
+    
+    DriverManager.init_driver()
+    driver = DriverManager.get_driver()
+    DriverManager.quit_driver()
+
+Supports: Chrome, Firefox, Edge
+Selenium 4.16+ uses built-in Selenium Manager - no separate driver setup needed!
+"""
+import threading
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
+from config.config_reader import config
+from utils.logger import log
+
+
+class DriverManager:
+    """Thread-safe WebDriver manager using thread-local storage."""
+    
+    _driver_local = threading.local()
+    
+    @classmethod
+    def get_driver(cls) -> webdriver.Remote:
+        """Get WebDriver for current thread."""
+        driver = getattr(cls._driver_local, "driver", None)
+        if driver is None:
+            raise RuntimeError("Driver not initialized. Call init_driver() first.")
+        return driver
+    
+    @classmethod
+    def init_driver(cls, browser: str = None, headless: bool = None) -> webdriver.Remote:
+        """Initialize WebDriver for current thread."""
+        if getattr(cls._driver_local, "driver", None) is not None:
+            log.warning("Driver already exists. Quitting existing driver.")
+            cls.quit_driver()
+        
+        browser = browser or config.browser
+        headless = headless if headless is not None else config.headless
+        
+        log.info(f"Initializing browser: {browser} | Headless: {headless}")
+        
+        driver = cls._create_driver(browser.lower(), headless)
+        driver.maximize_window()
+        driver.implicitly_wait(config.timeout)
+        
+        cls._driver_local.driver = driver
+        log.info("Browser initialized successfully")
+        return driver
+    
+    @classmethod
+    def _create_driver(cls, browser: str, headless: bool) -> webdriver.Remote:
+        """Create WebDriver instance based on browser type."""
+        if browser == "firefox":
+            options = FirefoxOptions()
+            if headless:
+                options.add_argument("--headless")
+            return webdriver.Firefox(options=options)
+        
+        elif browser == "edge":
+            options = EdgeOptions()
+            if headless:
+                options.add_argument("--headless")
+            return webdriver.Edge(options=options)
+        
+        else:  # Chrome (default)
+            options = ChromeOptions()
+            if headless:
+                options.add_argument("--headless=new")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-gpu")
+            return webdriver.Chrome(options=options)
+    
+    @classmethod
+    def quit_driver(cls):
+        """Quit WebDriver for current thread."""
+        driver = getattr(cls._driver_local, "driver", None)
+        if driver:
+            try:
+                driver.quit()
+                log.info("Browser closed")
+            except Exception as e:
+                log.error(f"Error closing browser: {e}")
+            finally:
+                cls._driver_local.driver = None
+    
+    @classmethod
+    def is_initialized(cls) -> bool:
+        """Check if driver is initialized for current thread."""
+        return getattr(cls._driver_local, "driver", None) is not None

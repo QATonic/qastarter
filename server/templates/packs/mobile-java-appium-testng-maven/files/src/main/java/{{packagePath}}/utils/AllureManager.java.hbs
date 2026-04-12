@@ -1,0 +1,110 @@
+package {{javaPackage}}.utils;
+
+import io.qameta.allure.Allure;
+import io.qameta.allure.Attachment;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import io.appium.java_client.AppiumDriver;
+import java.io.ByteArrayInputStream;
+
+/**
+ * Allure Reporting Manager for Mobile Testing
+ * Provides utilities for attaching screenshots, logs, and other artifacts to Allure reports
+ */
+public class AllureManager {
+
+    /**
+     * Attach screenshot to Allure report
+     */
+    @Attachment(value = "Screenshot: {name}", type = "image/png")
+    public static byte[] attachScreenshot(String name, AppiumDriver driver) {
+        return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+    }
+
+    /**
+     * Attach screenshot on failure
+     */
+    public static void attachScreenshotOnFailure(AppiumDriver driver) {
+        if (driver != null) {
+            try {
+                byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+                Allure.addAttachment("Failed Test Screenshot", "image/png",
+                        new ByteArrayInputStream(screenshot), "png");
+            } catch (Exception e) {
+                Log.error("Failed to capture screenshot: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Attach text to Allure report
+     */
+    @Attachment(value = "{name}", type = "text/plain")
+    public static String attachText(String name, String text) {
+        return text;
+    }
+
+    /**
+     * Attach JSON to Allure report
+     */
+    @Attachment(value = "{name}", type = "application/json")
+    public static String attachJson(String name, String json) {
+        return json;
+    }
+
+    /**
+     * Attach XML to Allure report
+     */
+    @Attachment(value = "{name}", type = "application/xml")
+    public static String attachXml(String name, String xml) {
+        return xml;
+    }
+
+    /**
+     * Add step to Allure report
+     */
+    public static void addStep(String stepName) {
+        Allure.step(stepName);
+    }
+
+    /**
+     * Add step with lambda to Allure report
+     */
+    public static void addStep(String stepName, Runnable runnable) {
+        Allure.step(stepName, runnable);
+    }
+
+    /**
+     * Attach device information
+     */
+    public static void attachDeviceInfo(AppiumDriver driver) {
+        try {
+            String platform = driver.getCapabilities().getPlatformName().toString();
+            String deviceName = driver.getCapabilities().getCapability("deviceName").toString();
+            String version = driver.getCapabilities().getCapability("platformVersion").toString();
+            
+            String deviceInfo = String.format("Platform: %s\nDevice: %s\nVersion: %s",
+                    platform, deviceName, version);
+            
+            attachText("Device Information", deviceInfo);
+        } catch (Exception e) {
+            Log.error("Failed to attach device info: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Attach app information
+     */
+    public static void attachAppInfo(String appName, String appVersion, String buildNumber) {
+        String appInfo = String.format("App: %s\nVersion: %s\nBuild: %s",
+                appName, appVersion, buildNumber);
+        attachText("App Information", appInfo);
+    }
+
+    /**
+     * Attach test environment
+     */
+    public static void attachEnvironment(String environment) {
+        Allure.addAttachment("Test Environment", environment);
+    }
+}

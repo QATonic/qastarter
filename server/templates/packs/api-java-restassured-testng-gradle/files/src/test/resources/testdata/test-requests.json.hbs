@@ -1,0 +1,58 @@
+{
+  "requests": [
+    ["/users", "GET", 200],
+    ["/users/1", "GET", 200],
+    ["/auth/profile", "GET", 200],
+    ["/health", "GET", 200],
+    ["/version", "GET", 200]
+  ],
+  "post_requests": [
+    ["/users", "POST", 201],
+    ["/auth/login", "POST", 200]
+  ],
+  "put_requests": [
+    ["/users/1", "PUT", 200]
+  ],
+  "delete_requests": [
+    ["/users/999", "DELETE", 404]
+  ],
+  "endpoints": {
+    "users": {
+      "list": "/users",
+      "create": "/users", 
+      "get": "/users/{id}",
+      "update": "/users/{id}",
+      "delete": "/users/{id}"
+    },
+    "auth": {
+      "login": "/auth/login",
+      "logout": "/auth/logout",
+      "profile": "/auth/profile",
+      "refresh": "/auth/refresh"
+    },
+    "health": {
+      "status": "/health",
+      "version": "/version",
+      "metrics": "/metrics"
+    }
+  },
+  "test_scenarios": [
+    {
+      "name": "User CRUD Operations",
+      "steps": [
+        {"method": "POST", "endpoint": "/users", "expectedStatus": 201},
+        {"method": "GET", "endpoint": "/users/{id}", "expectedStatus": 200},
+        {"method": "PUT", "endpoint": "/users/{id}", "expectedStatus": 200},
+        {"method": "DELETE", "endpoint": "/users/{id}", "expectedStatus": 204}
+      ]
+    },
+    {
+      "name": "Authentication Flow",
+      "steps": [
+        {"method": "POST", "endpoint": "/auth/login", "expectedStatus": 200},
+        {"method": "GET", "endpoint": "/auth/profile", "expectedStatus": 200},
+        {"method": "POST", "endpoint": "/auth/logout", "expectedStatus": 200}
+      ]
+    }
+  ]
+}

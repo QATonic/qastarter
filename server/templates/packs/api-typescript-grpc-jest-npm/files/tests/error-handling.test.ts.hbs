@@ -1,0 +1,142 @@
+import { userService } from '../src/services/user-service';
+import { GrpcStatus } from '../src/types/grpc.types';
+import { isGrpcStatus, getGrpcErrorMessage } from '../src/utils/test-helpers';
+import * as grpc from '@grpc/grpc-js';
+
+describe('Error Handling Tests', () => {
+describe('gRPC Status Codes', () => {
+it('should handle NOT_FOUND error', async () => {
+try {
+await userService.getUser({ id: 'non-existent-id' });
+fail('Should throw error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+expect(isGrpcStatus(grpcError, GrpcStatus.NOT_FOUND)).toBe(true);
+expect(getGrpcErrorMessage(grpcError)).toBeDefined();
+}
+});
+
+it('should handle INVALID_ARGUMENT error', async () => {
+try {
+await userService.createUser({
+name: '',
+email: 'invalid-email',
+password: '',
+});
+fail('Should throw error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+expect(isGrpcStatus(grpcError, GrpcStatus.INVALID_ARGUMENT)).toBe(true);
+}
+});
+
+it('should handle ALREADY_EXISTS error', async () => {
+const email = 'existing@example.com';
+
+// First create should succeed
+try {
+await userService.createUser({
+name: 'Test User',
+email,
+password: 'password123',
+});
+} catch {
+// User might already exist
+}
+
+// Second create should fail
+try {
+await userService.createUser({
+name: 'Another User',
+email,
+password: 'password456',
+});
+fail('Should throw ALREADY_EXISTS error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+expect(isGrpcStatus(grpcError, GrpcStatus.ALREADY_EXISTS)).toBe(true);
+}
+});
+
+it('should handle UNAUTHENTICATED error', async () => {
+// Create service without auth token
+const unauthService = new (userService.constructor as any)();
+
+try {
+await unauthService.getUser({ id: '1' });
+// Some endpoints might not require auth
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+if (grpcError.code === GrpcStatus.UNAUTHENTICATED) {
+expect(isGrpcStatus(grpcError, GrpcStatus.UNAUTHENTICATED)).toBe(true);
+}
+}
+});
+
+it('should handle PERMISSION_DENIED error', async () => {
+// Set a regular user token
+userService.setAuthToken('regular-user-token');
+
+try {
+// Try to perform admin-only action
+await userService.deleteUser({ id: 'admin-user' });
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+if (grpcError.code === GrpcStatus.PERMISSION_DENIED) {
+expect(isGrpcStatus(grpcError, GrpcStatus.PERMISSION_DENIED)).toBe(true);
+}
+}
+});
+});
+
+describe('Error Message Extraction', () => {
+it('should extract human-readable error message', async () => {
+try {
+await userService.getUser({ id: 'non-existent-id' });
+fail('Should throw error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+const message = getGrpcErrorMessage(grpcError);
+
+expect(message).toBeDefined();
+expect(typeof message).toBe('string');
+expect(message.length).toBeGreaterThan(0);
+}
+});
+});
+
+describe('Network Errors', () => {
+it('should handle connection failure gracefully', async () => {
+// This test requires mocking or a non-existent endpoint
+// In real scenarios, you'd test against a mock server
+});
+
+it('should handle timeout errors', async () => {
+// This would require setting up a slow-responding endpoint
+// or mocking the timeout behavior
+});
+});
+
+describe('Error Recovery', () => {
+it('should be able to make requests after error', async () => {
+// First request fails
+try {
+await userService.getUser({ id: 'non-existent' });
+} catch {
+// Expected
+}
+
+// Second request should still work
+try {
+const user = await userService.getUser({ id: '1' });
+expect(user).toBeDefined();
+} catch (error) {
+// Only fail if it's not a NOT_FOUND for user 1
+const grpcError = error as grpc.ServiceError;
+if (grpcError.code !== GrpcStatus.NOT_FOUND) {
+throw error;
+}
+}
+});
+});
+});

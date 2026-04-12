@@ -1,0 +1,425 @@
+package {{groupId}}.utils;
+
+import {{groupId}}.core.DriverManager;
+import io.appium.java_client.windows.WindowsDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.function.Function;
+
+/**
+ * Desktop-specific wait utilities for reliable element interactions
+ * Provides robust waiting mechanisms for desktop automation
+ */
+public class ElementWaitUtils {
+
+    private static final int DEFAULT_TIMEOUT = 30;
+    private static final int DEFAULT_POLLING_INTERVAL = 500;
+
+    /**
+     * Wait for element to be present in DOM
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     * @return WebElement if found, null if timeout
+     */
+    public static WebElement waitForElementPresent(By locator, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+            Log.info("Element present: " + locator.toString());
+            return element;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for element present: " + locator.toString());
+            return null;
+        } catch (Exception e) {
+            Log.error("Error waiting for element present: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Wait for element to be present with default timeout
+     * @param locator Element locator
+     * @return WebElement if found, null if timeout
+     */
+    public static WebElement waitForElementPresent(By locator) {
+        return waitForElementPresent(locator, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Wait for element to be visible and enabled
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     * @return WebElement if found and clickable, null if timeout
+     */
+    public static WebElement waitForElementClickable(By locator, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            WebElement element = wait.until(ExpectedConditions.elementToBeClickable(locator));
+            Log.info("Element clickable: " + locator.toString());
+            return element;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for element clickable: " + locator.toString());
+            return null;
+        } catch (Exception e) {
+            Log.error("Error waiting for element clickable: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Wait for element to be clickable with default timeout
+     * @param locator Element locator
+     * @return WebElement if found and clickable, null if timeout
+     */
+    public static WebElement waitForElementClickable(By locator) {
+        return waitForElementClickable(locator, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Wait for element to be visible
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     * @return WebElement if visible, null if timeout
+     */
+    public static WebElement waitForElementVisible(By locator, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            Log.info("Element visible: " + locator.toString());
+            return element;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for element visible: " + locator.toString());
+            return null;
+        } catch (Exception e) {
+            Log.error("Error waiting for element visible: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Wait for element to be visible with default timeout
+     * @param locator Element locator
+     * @return WebElement if visible, null if timeout
+     */
+    public static WebElement waitForElementVisible(By locator) {
+        return waitForElementVisible(locator, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Wait for element to disappear
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     * @return true if element disappeared, false if timeout
+     */
+    public static boolean waitForElementToDisappear(By locator, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            boolean disappeared = wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+            if (disappeared) {
+                Log.info("Element disappeared: " + locator.toString());
+            }
+            return disappeared;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for element to disappear: " + locator.toString());
+            return false;
+        } catch (Exception e) {
+            Log.error("Error waiting for element to disappear: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Wait for element to disappear with default timeout
+     * @param locator Element locator
+     * @return true if element disappeared, false if timeout
+     */
+    public static boolean waitForElementToDisappear(By locator) {
+        return waitForElementToDisappear(locator, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Wait for element text to contain specific text
+     * @param locator Element locator
+     * @param expectedText Text to wait for
+     * @param timeoutInSeconds Timeout in seconds
+     * @return true if text is present, false if timeout
+     */
+    public static boolean waitForElementTextContains(By locator, String expectedText, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            boolean textPresent = wait.until(ExpectedConditions.textToBePresentInElementLocated(locator, expectedText));
+            if (textPresent) {
+                Log.info("Element text contains '" + expectedText + "': " + locator.toString());
+            }
+            return textPresent;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for element text to contain '" + expectedText + "': " + locator.toString());
+            return false;
+        } catch (Exception e) {
+            Log.error("Error waiting for element text: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Wait for element text to contain specific text with default timeout
+     * @param locator Element locator
+     * @param expectedText Text to wait for
+     * @return true if text is present, false if timeout
+     */
+    public static boolean waitForElementTextContains(By locator, String expectedText) {
+        return waitForElementTextContains(locator, expectedText, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Wait for element attribute to have specific value
+     * @param locator Element locator
+     * @param attributeName Attribute name
+     * @param expectedValue Expected attribute value
+     * @param timeoutInSeconds Timeout in seconds
+     * @return true if attribute has expected value, false if timeout
+     */
+    public static boolean waitForElementAttributeValue(By locator, String attributeName, 
+                                                       String expectedValue, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            boolean attributeMatch = wait.until(ExpectedConditions.attributeToBe(locator, attributeName, expectedValue));
+            if (attributeMatch) {
+                Log.info("Element attribute '" + attributeName + "' has value '" + expectedValue + "': " + locator.toString());
+            }
+            return attributeMatch;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for attribute '" + attributeName + "' to be '" + expectedValue + "': " + locator.toString());
+            return false;
+        } catch (Exception e) {
+            Log.error("Error waiting for element attribute: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Wait for multiple elements to be present
+     * @param locator Element locator
+     * @param minimumCount Minimum number of elements expected
+     * @param timeoutInSeconds Timeout in seconds
+     * @return List of WebElements if found, empty list if timeout
+     */
+    public static List<WebElement> waitForElementsPresent(By locator, int minimumCount, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            List<WebElement> elements = wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(locator, minimumCount - 1));
+            Log.info("Found " + elements.size() + " elements: " + locator.toString());
+            return elements;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for " + minimumCount + " elements: " + locator.toString());
+            return List.of(); // Return empty list
+        } catch (Exception e) {
+            Log.error("Error waiting for elements: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    /**
+     * Wait for window title to contain specific text
+     * @param expectedTitle Expected window title or partial title
+     * @param timeoutInSeconds Timeout in seconds
+     * @return true if title matches, false if timeout
+     */
+    public static boolean waitForWindowTitle(String expectedTitle, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            boolean titleMatch = wait.until(ExpectedConditions.titleContains(expectedTitle));
+            if (titleMatch) {
+                Log.info("Window title contains: " + expectedTitle);
+            }
+            return titleMatch;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for window title to contain: " + expectedTitle);
+            return false;
+        } catch (Exception e) {
+            Log.error("Error waiting for window title: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Wait for custom condition
+     * @param condition Custom expected condition
+     * @param timeoutInSeconds Timeout in seconds
+     * @param <T> Return type of the condition
+     * @return Result of the condition or null if timeout
+     */
+    public static <T> T waitForCustomCondition(Function<WindowsDriver, T> condition, int timeoutInSeconds) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            
+            T result = wait.until(condition::apply);
+            Log.info("Custom condition met");
+            return result;
+            
+        } catch (TimeoutException e) {
+            Log.error("Timeout waiting for custom condition");
+            return null;
+        } catch (Exception e) {
+            Log.error("Error waiting for custom condition: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Polling wait - keep trying until condition is met or timeout
+     * @param condition Condition to check
+     * @param timeoutInSeconds Timeout in seconds
+     * @param pollingIntervalMs Polling interval in milliseconds
+     * @return true if condition was met, false if timeout
+     */
+    public static boolean pollingWait(Function<Void, Boolean> condition, int timeoutInSeconds, int pollingIntervalMs) {
+        long startTime = System.currentTimeMillis();
+        long timeoutMillis = timeoutInSeconds * 1000L;
+        
+        while (System.currentTimeMillis() - startTime < timeoutMillis) {
+            try {
+                if (condition.apply(null)) {
+                    Log.info("Polling condition met");
+                    return true;
+                }
+                
+                Thread.sleep(pollingIntervalMs);
+                
+            } catch (InterruptedException e) {
+                Log.warn("Polling wait interrupted: " + e.getMessage());
+                return false;
+            } catch (Exception e) {
+                Log.debug("Polling condition check failed: " + e.getMessage());
+                // Continue polling on condition check failures
+            }
+        }
+        
+        Log.error("Polling wait timeout after " + timeoutInSeconds + " seconds");
+        return false;
+    }
+
+    /**
+     * Polling wait with default polling interval
+     * @param condition Condition to check
+     * @param timeoutInSeconds Timeout in seconds
+     * @return true if condition was met, false if timeout
+     */
+    public static boolean pollingWait(Function<Void, Boolean> condition, int timeoutInSeconds) {
+        return pollingWait(condition, timeoutInSeconds, DEFAULT_POLLING_INTERVAL);
+    }
+
+    /**
+     * Wait with retry mechanism
+     * @param action Action to perform
+     * @param maxRetries Maximum number of retries
+     * @param retryDelayMs Delay between retries in milliseconds
+     * @return true if action succeeded, false if all retries failed
+     */
+    public static boolean waitWithRetry(Runnable action, int maxRetries, int retryDelayMs) {
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                action.run();
+                Log.info("Action succeeded on attempt " + attempt);
+                return true;
+                
+            } catch (Exception e) {
+                if (attempt == maxRetries) {
+                    Log.error("Action failed after " + maxRetries + " attempts: " + e.getMessage());
+                    return false;
+                } else {
+                    Log.warn("Action failed on attempt " + attempt + ", retrying: " + e.getMessage());
+                    
+                    try {
+                        Thread.sleep(retryDelayMs);
+                    } catch (InterruptedException ie) {
+                        Log.warn("Retry delay interrupted");
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    /**
+     * Check if element exists without throwing exception
+     * @param locator Element locator
+     * @return true if element exists, false otherwise
+     */
+    public static boolean isElementPresent(By locator) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            driver.findElement(locator);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        } catch (Exception e) {
+            Log.error("Error checking if element is present: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Check if element is displayed
+     * @param locator Element locator
+     * @return true if element is displayed, false otherwise
+     */
+    public static boolean isElementDisplayed(By locator) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebElement element = driver.findElement(locator);
+            return element.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if element is enabled
+     * @param locator Element locator
+     * @return true if element is enabled, false otherwise
+     */
+    public static boolean isElementEnabled(By locator) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            WebElement element = driver.findElement(locator);
+            return element.isEnabled();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}

@@ -1,0 +1,100 @@
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'  # Run daily at 2 AM UTC
+  workflow_dispatch:     # Manual trigger
+
+jobs:
+  test:
+    runs-on: {{raw}}${{ matrix.os }}{{/raw}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        browser: [chrome, firefox]
+        python-version: ['3.11']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python {{raw}}${{ matrix.python-version }}{{/raw}}
+        uses: actions/setup-python@v4
+        with:
+          python-version: {{raw}}${{ matrix.python-version }}{{/raw}}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run tests
+        env:
+          BROWSER: {{raw}}${{ matrix.browser }}{{/raw}}
+          TEST_ENV: qa
+          HEADLESS: true
+        run: |
+          pytest -v -n auto
+      
+      {{#if (eq reportingTool "allure")}}
+      - name: Install Allure CLI
+        if: always()
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+          tar -zxvf allure-2.25.0.tgz -C /opt/
+          sudo ln -s /opt/allure-2.25.0/bin/allure /usr/bin/allure
+      
+      - name: Generate Allure Report
+        if: always()
+        run: |
+          allure generate allure-results --clean -o allure-report
+      
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: allure-results
+          retention-days: 30
+      
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: allure-report
+          retention-days: 30
+      {{/if}}
+      
+      {{#if (eq reportingTool "pytest-html")}}
+      - name: Upload Pytest HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: reports/report.html
+          retention-days: 30
+      {{/if}}
+      
+      {{#if (eq reportingTool "pytest-json")}}
+      - name: Upload Pytest JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-json-report-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: reports/report.json
+          retention-days: 30
+      {{/if}}
+      
+      - name: Upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-screenshots-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: screenshots/
+          retention-days: 7

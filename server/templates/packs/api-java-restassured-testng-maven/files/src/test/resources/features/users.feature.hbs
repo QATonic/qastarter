@@ -1,0 +1,43 @@
+@api @users
+Feature: User API Testing
+  As an API tester
+  I want to test the User API endpoints
+  So that I can verify CRUD operations work correctly
+
+  Background:
+    Given the API is available
+
+  @smoke @get
+  Scenario: Get all users
+    When I send a GET request to "/users"
+    Then the response status code should be 200
+    And the response should contain a list of users
+
+  @smoke @get
+  Scenario: Get a single user by ID
+    When I send a GET request to "/users/1"
+    Then the response status code should be 200
+    And the response should contain user with id 1
+
+  @smoke @post
+  Scenario: Create a new user
+    Given I have user data:
+      | name     | username | email              |
+      | John Doe | johndoe  | john@example.com   |
+    When I send a POST request to "/users"
+    Then the response status code should be 201
+    And the response should contain the created user
+
+  @regression @put
+  Scenario: Update an existing user
+    Given I have updated user data:
+      | name       | username  | email               |
+      | Jane Smith | janesmith | jane@example.com    |
+    When I send a PUT request to "/users/1"
+    Then the response status code should be 200
+    And the response should contain the updated data
+
+  @regression @delete
+  Scenario: Delete a user
+    When I send a DELETE request to "/users/1"
+    Then the response status code should be 200

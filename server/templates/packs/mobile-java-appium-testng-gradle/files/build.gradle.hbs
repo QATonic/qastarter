@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+}
+
+group = '{{groupId}}'
+version = '1.0.0'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Appium
+    implementation 'io.appium:java-client:9.1.0'
+    
+    // Selenium
+    implementation 'org.seleniumhq.selenium:selenium-java:4.16.0'
+    
+    // TestNG
+    implementation 'org.testng:testng:7.9.0'
+    
+    // Logging
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+{{#if userDependencies.hasMaven}}
+
+// User-picked dependencies (from QAStarter dependency search)
+{{#each userDependencies.maven}}
+implementation '{{group}}:{{name}}:{{version}}'
+{{/each}}
+{{/if}}
+}
+
+test {
+    useTestNG()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}

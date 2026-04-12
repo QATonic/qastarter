@@ -1,0 +1,53 @@
+package {{javaPackage}}.stepdefinitions;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.core.PlaywrightManager;
+import {{javaPackage}}.pages.LoginPage;
+import {{javaPackage}}.utils.Log;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Login Step Definitions for BDD scenarios.
+ */
+public class LoginSteps {
+
+    private LoginPage loginPage;
+
+    @Given("I am on the login page")
+    public void iAmOnTheLoginPage() {
+        Log.step("Navigating to login page");
+        String baseUrl = ConfigurationReader.getBaseUrl();
+        PlaywrightManager.getPage().navigate(baseUrl);
+        loginPage = new LoginPage();
+    }
+
+    @When("I login with valid credentials")
+    public void iLoginWithValidCredentials() {
+        Log.step("Logging in with valid credentials");
+        String username = ConfigurationReader.getProperty("username");
+        String password = ConfigurationReader.getProperty("password");
+        loginPage.login(username, password);
+    }
+
+    @When("I login with username {string} and password {string}")
+    public void iLoginWithUsernameAndPassword(String username, String password) {
+        Log.step("Logging in with username: " + username);
+        loginPage.login(username, password);
+    }
+
+    @Then("login should be successful")
+    public void loginShouldBeSuccessful() {
+        Log.step("Verifying successful login");
+        assertTrue(loginPage.isLoginSuccessful(), "User should be logged in");
+    }
+
+    @Then("I should see an error message")
+    public void iShouldSeeAnErrorMessage() {
+        Log.step("Verifying error message is displayed");
+        assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
+    }
+}

@@ -1,0 +1,21 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using {{projectNamespace}}.Core;
+using {{projectNamespace}}.Utils;
+
+namespace {{projectNamespace}}.Pages
+{
+    public class BasePage
+    {
+        protected IWebDriver Driver => WinAppDriverManager.Driver;
+        protected WebDriverWait Wait => new(Driver, TimeSpan.FromSeconds(10));
+
+        protected void Click(By locator)
+        {
+            Log.Instance.Info($"Click: {locator}");
+            Wait.Until(d => d.FindElement(locator)).Click();
+        }
+
+        protected string GetText(By locator) => Wait.Until(d => d.FindElement(locator)).Text;
+    }
+}

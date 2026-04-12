@@ -1,0 +1,57 @@
+package {{javaPackage}}.stepdefinitions;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.pages.LoginPage;
+import {{javaPackage}}.utils.Log;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Step Definitions for Login Feature (BDD Style)
+ */
+public class LoginSteps {
+
+    private LoginPage loginPage;
+
+    @Given("I am on the login page")
+    public void iAmOnTheLoginPage() {
+        Log.step("Opening login page");
+        String baseUrl = ConfigurationReader.getBaseUrl();
+        DriverManager.getDriver().get(baseUrl);
+        loginPage = new LoginPage();
+        assertTrue(loginPage.isLoaded(), "Login page should be loaded");
+        Log.info("Login page loaded successfully");
+    }
+
+    @When("I login with valid credentials")
+    public void iLoginWithValidCredentials() {
+        Log.step("Logging in with valid credentials from config");
+        String username = ConfigurationReader.getProperty("username");
+        String password = ConfigurationReader.getProperty("password");
+        loginPage.login(username, password);
+    }
+
+    @When("I login with username {string} and password {string}")
+    public void iLoginWithUsernameAndPassword(String username, String password) {
+        Log.step("Logging in with username: " + username);
+        loginPage.login(username, password);
+    }
+
+    @Then("login should be successful")
+    public void loginShouldBeSuccessful() {
+        Log.step("Verifying login success");
+        assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
+        Log.info("Login verified successfully");
+    }
+
+    @Then("I should see an error message")
+    public void iShouldSeeAnErrorMessage() {
+        Log.step("Verifying error message is displayed");
+        assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
+        Log.info("Error message verified: " + loginPage.getErrorMessage());
+    }
+}

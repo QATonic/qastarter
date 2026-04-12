@@ -1,0 +1,26 @@
+import { defineConfig } from "cypress";
+
+export default defineConfig({
+  e2e: {
+    baseUrl: "{{baseUrl}}",
+    specPattern: "cypress/e2e/**/*.cy.ts",
+    supportFile: "cypress/support/e2e.ts",
+    video: true,
+    screenshotOnRunFailure: true,
+    viewportWidth: 1920,
+    viewportHeight: 1080,
+    defaultCommandTimeout: 10000,
+    pageLoadTimeout: 30000,
+    env: {
+      username: "{{testUsername}}",
+      password: "{{testPassword}}"
+    },
+    setupNodeEvents(on, config) {
+{{#if (eq reportingTool "allure")}}
+      // Allure reporter
+      require("@shelex/cypress-allure-plugin/writer")(on, config);
+{{/if}}
+      return config;
+    },
+  },
+});

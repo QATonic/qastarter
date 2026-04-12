@@ -1,0 +1,129 @@
+﻿package {{packageName}}.utils;
+
+import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
+import {{packageName}}.core.DriverManager;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.time.Duration;
+import java.util.Collections;
+
+public class MobileActions {
+
+    private static AppiumDriver getDriver() {
+        return DriverManager.getDriver();
+    }
+
+    public static void swipe(int startX, int startY, int endX, int endY, int durationMs) {
+        try {
+            PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+            Sequence swipe = new Sequence(finger, 1);
+            swipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, startY));
+            swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+            swipe.addAction(finger.createPointerMove(Duration.ofMillis(durationMs), PointerInput.Origin.viewport(), endX, endY));
+            swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+            getDriver().perform(Collections.singletonList(swipe));
+            {{#if utilities.logger}}
+            Log.info("Performed swipe from (" + startX + "," + startY + ") to (" + endX + "," + endY + ")");
+            {{/if}}
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to perform swipe gesture", e);
+            {{/if}}
+            throw new RuntimeException("Swipe gesture failed", e);
+        }
+    }
+
+    public static void swipeUp() {
+        Dimension size = getDriver().manage().window().getSize();
+        int startX = size.width / 2;
+        int startY = (int) (size.height * 0.8);
+        int endY = (int) (size.height * 0.2);
+        swipe(startX, startY, startX, endY, 1000);
+    }
+
+    public static void swipeDown() {
+        Dimension size = getDriver().manage().window().getSize();
+        int startX = size.width / 2;
+        int startY = (int) (size.height * 0.2);
+        int endY = (int) (size.height * 0.8);
+        swipe(startX, startY, startX, endY, 1000);
+    }
+
+    public static void swipeLeft() {
+        Dimension size = getDriver().manage().window().getSize();
+        int startX = (int) (size.width * 0.8);
+        int endX = (int) (size.width * 0.2);
+        int y = size.height / 2;
+        swipe(startX, y, endX, y, 1000);
+    }
+
+    public static void swipeRight() {
+        Dimension size = getDriver().manage().window().getSize();
+        int startX = (int) (size.width * 0.2);
+        int endX = (int) (size.width * 0.8);
+        int y = size.height / 2;
+        swipe(startX, y, endX, y, 1000);
+    }
+
+    public static void tap(int x, int y) {
+        try {
+            PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+            Sequence tap = new Sequence(finger, 1);
+            tap.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), x, y));
+            tap.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+            tap.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+            getDriver().perform(Collections.singletonList(tap));
+        } catch (Exception e) {
+            throw new RuntimeException("Tap gesture failed", e);
+        }
+    }
+
+    public static void tap(WebElement element) {
+        int x = element.getLocation().getX() + (element.getSize().getWidth() / 2);
+        int y = element.getLocation().getY() + (element.getSize().getHeight() / 2);
+        tap(x, y);
+    }
+
+    public static void longPress(int x, int y, int durationMs) {
+        try {
+            PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+            Sequence longPress = new Sequence(finger, 1);
+            longPress.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), x, y));
+            longPress.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+            longPress.addAction(finger.createPointerMove(Duration.ofMillis(durationMs), PointerInput.Origin.viewport(), x, y));
+            longPress.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+            getDriver().perform(Collections.singletonList(longPress));
+        } catch (Exception e) {
+            throw new RuntimeException("Long press failed", e);
+        }
+    }
+
+    public static void longPress(WebElement element, int durationMs) {
+        int x = element.getLocation().getX() + (element.getSize().getWidth() / 2);
+        int y = element.getLocation().getY() + (element.getSize().getHeight() / 2);
+        longPress(x, y, durationMs);
+    }
+
+    public static void scrollToElement(WebElement scrollableElement, WebElement targetElement) {
+        try {
+            int maxScrollAttempts = 10;
+            int scrollAttempts = 0;
+            while (!targetElement.isDisplayed() && scrollAttempts < maxScrollAttempts) {
+                swipeUp();
+                scrollAttempts++;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Scroll to element failed", e);
+        }
+    }
+
+    public static void hideKeyboard() {
+        // Platform specific - best effort
+    }
+}

@@ -1,0 +1,37 @@
+/**
+ * Base Page - Parent class for Cypress page objects.
+ */
+export class BasePage {
+  visit(path: string = "/"): this {
+    cy.visit(path);
+    return this;
+  }
+
+  click(selector: string): this {
+    cy.get(selector).click();
+    return this;
+  }
+
+  type(selector: string, text: string): this {
+    cy.get(selector).clear().type(text);
+    return this;
+  }
+
+  getText(selector: string): Cypress.Chainable<string> {
+    return cy.get(selector).invoke("text");
+  }
+
+  shouldBeVisible(selector: string): this {
+    cy.get(selector).should("be.visible");
+    return this;
+  }
+
+  shouldNotExist(selector: string): this {
+    cy.get(selector).should("not.exist");
+    return this;
+  }
+
+  getUrl(): Cypress.Chainable<string> {
+    return cy.url();
+  }
+}

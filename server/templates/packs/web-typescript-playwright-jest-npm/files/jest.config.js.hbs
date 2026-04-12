@@ -1,0 +1,28 @@
+module.exports = {
+preset: 'jest-playwright-preset',
+testMatch: ['**/tests/**/*.test.ts'],
+setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  transform: {
+  '^.+\\.ts$': 'ts-jest'
+  },
+  testTimeout: 60000,
+  verbose: true,
+  collectCoverage: false,
+
+
+
+  reporters: [
+  'default'{{#if (eq reportingTool "jest-html")}},
+  [
+  'jest-html-reporter',
+  {
+  pageTitle: 'Test Report',
+  outputPath: 'test-results/test-report.html',
+  includeFailureMsg: true
+  }
+  ]{{/if}}{{#if (eq reportingTool "allure")}},
+  ['allure-jest', {
+  resultsDir: 'allure-results'
+  }]{{/if}}
+  ]
+  };

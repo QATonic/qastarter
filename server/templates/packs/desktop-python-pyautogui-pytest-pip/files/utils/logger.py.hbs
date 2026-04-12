@@ -1,0 +1,28 @@
+import logging
+from datetime import datetime
+from pathlib import Path
+
+class Logger:
+    _instance = None
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._setup()
+        return cls._instance
+    
+    def _setup(self):
+        self._logger = logging.getLogger("PyAutoGUI")
+        self._logger.setLevel(logging.DEBUG)
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
+        fh = logging.FileHandler(logs_dir / f"desktop_test_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
+        fh.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s"))
+        ch = logging.StreamHandler()
+        ch.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+        self._logger.addHandler(fh)
+        self._logger.addHandler(ch)
+    
+    def info(self, msg): self._logger.info(msg)
+    def step(self, msg): self._logger.info(f"STEP: {msg}")
+
+log = Logger()

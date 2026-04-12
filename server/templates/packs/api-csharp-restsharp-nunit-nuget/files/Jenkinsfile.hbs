@@ -1,0 +1,173 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['qa', 'dev', 'staging', 'prod'],
+            description: 'Select test environment'
+        )
+    }
+    
+    environment {
+        DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+        DOTNET_NOLOGO = 'true'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Starting {{projectName}} API Test Pipeline"
+                    echo "Environment: ${params.ENVIRONMENT}"
+                }
+                checkout scm
+                sh 'rm -rf TestResults/ allure-report/ allure-results/'
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                script {
+                    echo "Installing .NET SDK {{toolVersions.dotnet}}"
+                }
+                sh '''
+                    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version {{toolVersions.dotnet}}
+                    export PATH="$HOME/.dotnet:$PATH"
+                    dotnet --version
+                '''
+            }
+        }
+        
+        stage('Restore') {
+            steps {
+                script {
+                    echo "Restoring NuGet packages"
+                }
+                sh 'dotnet restore'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                script {
+                    echo "Building project"
+                }
+                sh 'dotnet build --configuration Release --no-restore'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                script {
+                    echo "Running API Tests"
+                }
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh """
+                        dotnet test --configuration Release --no-build \\
+                            --logger "trx;LogFileName=test-results.trx" \\
+                            --logger "html;LogFileName=test-results.html" \\
+                            --results-directory TestResults \\
+                            -e ENVIRONMENT=${params.ENVIRONMENT}
+                    """
+                }
+            }
+        }
+        
+        {{#if (eq reportingTool "allure")}}
+        stage('Install Allure CLI') {
+            steps {
+                script {
+                    sh '''
+                        mkdir -p ${WORKSPACE}/allure
+                        wget -q https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
+                        tar -zxf allure-2.25.0.tgz -C ${WORKSPACE}/allure --strip-components=1
+                        chmod +x ${WORKSPACE}/allure/bin/allure
+                    '''
+                }
+            }
+        }
+        
+        stage('Generate Allure Report') {
+            steps {
+                script {
+                    sh '''
+                        ${WORKSPACE}/allure/bin/allure generate allure-results --clean -o allure-report
+                    '''
+                }
+            }
+        }
+        {{/if}}
+    }
+    
+    post {
+        always {
+            // Publish test results
+            mstest testResultsFile: 'TestResults/*.trx', keepLongStdio: true
+            
+            {{#if (eq reportingTool "allure")}}
+            archiveArtifacts artifacts: 'allure-results/**/*', 
+                           fingerprint: true, 
+                           allowEmptyArchive: true
+            
+            archiveArtifacts artifacts: 'allure-report/**/*', 
+                           fingerprint: true, 
+                           allowEmptyArchive: true
+            
+            allure([
+                includeProperties: false,
+                jdk: '',
+                properties: [],
+                reportBuildPolicy: 'ALWAYS',
+                results: [[path: 'allure-results']]
+            ])
+            {{/if}}
+            
+            {{#if (eq reportingTool "extent-reports")}}
+            archiveArtifacts artifacts: 'TestResults/extent-reports/**/*', 
+                           fingerprint: true, 
+                           allowEmptyArchive: true
+            
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'TestResults/extent-reports',
+                reportFiles: '*.html',
+                reportName: 'ExtentReports',
+                reportTitles: '{{projectName}} API Test Results'
+            ])
+            {{/if}}
+            
+            {{#if (eq reportingTool "nunit-reports")}}
+            archiveArtifacts artifacts: 'TestResults/**/*', 
+                           fingerprint: true, 
+                           allowEmptyArchive: true
+            
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'TestResults',
+                reportFiles: 'test-results.html',
+                reportName: 'NUnit Report',
+                reportTitles: '{{projectName}} NUnit Results'
+            ])
+            {{/if}}
+            
+            cleanWs()
+        }
+        
+        success {
+            script {
+                echo "{{projectName}} API Tests - SUCCESS"
+            }
+        }
+        
+        failure {
+            script {
+                echo "{{projectName}} API Tests - FAILURE"
+            }
+        }
+    }
+}

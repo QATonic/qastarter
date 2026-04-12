@@ -1,0 +1,23 @@
+﻿package utils
+
+import "os"
+
+type Config struct {
+BaseURL   string
+AuthToken string
+}
+
+var AppConfig *Config
+
+func LoadConfig() {
+// Simple configuration loading
+// In a real app, you might use viper or read from .env
+authToken := os.Getenv("AUTH_TOKEN")
+if authToken == "" {
+authToken = "{{apiAuthToken}}"
+}
+AppConfig = &Config{
+BaseURL:   "{{baseUrl}}",
+AuthToken: authToken,
+}
+}

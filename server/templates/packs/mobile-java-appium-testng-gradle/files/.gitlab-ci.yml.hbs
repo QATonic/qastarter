@@ -1,0 +1,97 @@
+image: maven:3.8-openjdk-{{toolVersions.java}}
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+
+stages:
+  - test
+  - report
+
+before_script:
+  - apt-get update -qq
+  - apt-get install -y nodejs npm curl
+  - npm install -g appium@{{toolVersions.appium}}
+  - appium driver install uiautomator2
+  {{#if (eq reportingTool "allure")}}
+  - curl -o allure-{{toolVersions.allure}}.tgz -L https://github.com/allure-framework/allure2/releases/download/{{toolVersions.allure}}/allure-{{toolVersions.allure}}.tgz
+  - tar -zxvf allure-{{toolVersions.allure}}.tgz -C /opt/
+  - ln -s /opt/allure-{{toolVersions.allure}}/bin/allure /usr/bin/allure
+  {{/if}}
+
+test:android:
+  stage: test
+  script:
+    - mvn clean test -Pandroid
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - target/allure-results/
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/
+      {{/if}}
+      {{#if (eq reportingTool "testng-reports")}}
+      - test-output/
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      - target/site/
+      {{/if}}
+      - logs/
+    expire_in: 30 days
+  allow_failure: false
+
+test:ios:
+  stage: test
+  script:
+    - mvn clean test -Pios
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - target/allure-results/
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/
+      {{/if}}
+      {{#if (eq reportingTool "testng-reports")}}
+      - test-output/
+      {{/if}}
+      {{#if (eq reportingTool "junit-reports")}}
+      - target/site/
+      {{/if}}
+      - logs/
+    expire_in: 30 days
+  allow_failure: false
+
+{{#if (eq reportingTool "allure")}}
+generate-report:
+  stage: report
+  dependencies:
+    - test:android
+    - test:ios
+  script:
+    - allure generate target/allure-results --clean -o target/allure-report
+  artifacts:
+    paths:
+      - target/allure-report/
+    expire_in: 30 days
+{{/if}}
+
+{{#if (eq reportingTool "junit-reports")}}
+generate-junit-report:
+  stage: report
+  dependencies:
+    - test:android
+    - test:ios
+  script:
+    - mvn surefire-report:report-only
+  artifacts:
+    paths:
+      - target/site/
+    expire_in: 30 days
+{{/if}}

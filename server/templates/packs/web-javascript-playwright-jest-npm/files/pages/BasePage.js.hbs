@@ -1,0 +1,35 @@
+const { PlaywrightManager } = require("../utils/PlaywrightManager");
+const { config } = require("../config/ConfigReader");
+
+class BasePage {
+  async getPage() { return await PlaywrightManager.getPage(); }
+
+  async click(selector) {
+    const page = await this.getPage();
+    await page.click(selector, { timeout: config.timeout });
+  }
+
+  async type(selector, text) {
+    const page = await this.getPage();
+    await page.fill(selector, text, { timeout: config.timeout });
+  }
+
+  async getText(selector) {
+    const page = await this.getPage();
+    return (await page.textContent(selector)) || "";
+  }
+
+  async isDisplayed(selector) {
+    try {
+      const page = await this.getPage();
+      return await page.isVisible(selector, { timeout: 5000 });
+    } catch { return false; }
+  }
+
+  async getCurrentUrl() {
+    const page = await this.getPage();
+    return page.url();
+  }
+}
+
+module.exports = { BasePage };

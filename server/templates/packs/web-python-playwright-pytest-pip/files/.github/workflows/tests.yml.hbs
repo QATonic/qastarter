@@ -1,0 +1,46 @@
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install --with-deps
+      
+      - name: Run tests
+        env:
+          BROWSER: {{raw}}${{ matrix.browser }}{{/raw}}
+          TEST_ENV: qa
+          HEADLESS: true
+        run: pytest --browser={{raw}}${{ matrix.browser }}{{/raw}}
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: |
+            test-results/
+            screenshots/
+            logs/

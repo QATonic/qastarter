@@ -1,0 +1,126 @@
+import { userService } from '../src/services/user-service';
+import { generateTestUser, validateUserStructure } from '../src/utils/test-helpers';
+import { GrpcStatus } from '../src/types/grpc.types';
+import * as grpc from '@grpc/grpc-js';
+
+describe('User Service Tests', () => {
+let createdUserId: string;
+
+describe('GetUser', () => {
+it('should get user by ID', async () => {
+const user = await userService.getUser({ id: '1' });
+
+expect(user).toBeDefined();
+expect(user.id).toBe('1');
+validateUserStructure(user);
+});
+
+it('should return NOT_FOUND for non-existent user', async () => {
+try {
+await userService.getUser({ id: 'non-existent-id' });
+fail('Should throw NOT_FOUND error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+expect(grpcError.code).toBe(GrpcStatus.NOT_FOUND);
+}
+});
+
+it('should include all user fields', async () => {
+const user = await userService.getUser({ id: '1' });
+
+expect(user).toHaveProperty('id');
+expect(user).toHaveProperty('name');
+expect(user).toHaveProperty('email');
+expect(user).toHaveProperty('role');
+expect(user).toHaveProperty('created_at');
+expect(user).toHaveProperty('updated_at');
+});
+});
+
+describe('CreateUser', () => {
+it('should create a new user', async () => {
+const testUser = generateTestUser();
+
+const user = await userService.createUser(testUser);
+
+expect(user).toBeDefined();
+expect(user.email).toBe(testUser.email);
+expect(user.name).toBe(testUser.name);
+expect(user.id).toBeDefined();
+
+createdUserId = user.id;
+});
+
+it('should fail with ALREADY_EXISTS for duplicate email', async () => {
+const testUser = generateTestUser({ email: 'duplicate@example.com' });
+
+// Create first user
+await userService.createUser(testUser);
+
+// Try to create duplicate
+try {
+await userService.createUser(testUser);
+fail('Should throw ALREADY_EXISTS error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+expect(grpcError.code).toBe(GrpcStatus.ALREADY_EXISTS);
+}
+});
+
+it('should fail with INVALID_ARGUMENT for invalid email', async () => {
+const testUser = generateTestUser({ email: 'invalid-email' });
+
+try {
+await userService.createUser(testUser);
+fail('Should throw INVALID_ARGUMENT error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+expect(grpcError.code).toBe(GrpcStatus.INVALID_ARGUMENT);
+}
+});
+});
+
+describe('UpdateUser', () => {
+it('should update user name', async () => {
+const newName = 'Updated Name';
+
+const user = await userService.updateUser({
+id: createdUserId,
+name: newName,
+});
+
+expect(user.name).toBe(newName);
+});
+
+it('should fail with NOT_FOUND for non-existent user', async () => {
+try {
+await userService.updateUser({
+id: 'non-existent-id',
+name: 'Test',
+});
+fail('Should throw NOT_FOUND error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+expect(grpcError.code).toBe(GrpcStatus.NOT_FOUND);
+}
+});
+});
+
+describe('DeleteUser', () => {
+it('should delete user', async () => {
+const response = await userService.deleteUser({ id: createdUserId });
+
+expect(response.success).toBe(true);
+});
+
+it('should fail with NOT_FOUND for already deleted user', async () => {
+try {
+await userService.deleteUser({ id: createdUserId });
+fail('Should throw NOT_FOUND error');
+} catch (error) {
+const grpcError = error as grpc.ServiceError;
+expect(grpcError.code).toBe(GrpcStatus.NOT_FOUND);
+}
+});
+});
+});

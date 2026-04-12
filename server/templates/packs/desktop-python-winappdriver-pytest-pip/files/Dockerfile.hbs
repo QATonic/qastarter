@@ -1,0 +1,34 @@
+# {{projectName}} - Windows Desktop Test Automation
+# NOTE: WinAppDriver requires Windows containers or Windows host
+# This Dockerfile is for Windows Server Core containers
+
+# escape=`
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+# Install Python
+RUN powershell -Command `
+    Invoke-WebRequest -Uri https://www.python.org/ftp/python/3.11.0/python-3.11.0-amd64.exe -OutFile python-installer.exe; `
+    Start-Process python-installer.exe -ArgumentList '/quiet InstallAllUsers=1 PrependPath=1' -Wait; `
+    Remove-Item python-installer.exe
+
+# Set working directory
+WORKDIR C:\app
+
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy test code
+COPY . .
+
+# Set environment variables
+ENV TEST_ENV=qa
+ENV WINAPPDRIVER_URL=http://localhost:4723
+
+# Create directories for test results
+RUN mkdir C:\app\reports C:\app\screenshots
+
+# Note: WinAppDriver must be running on the host or in a separate container
+# Default command runs all tests
+ENTRYPOINT ["python", "-m", "pytest"]
+CMD ["tests/", "-v", "--html=reports/report.html"]

@@ -1,0 +1,27 @@
+package {{packageName}}.tests
+
+import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import {{packageName}}.MainActivity
+import {{packageName}}.pages.LoginPage
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
+
+@RunWith(AndroidJUnit4::class)
+class LoginTests {
+
+    @get:Rule
+    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @Test
+    fun validLogin_showsProducts() {
+        val loginPage = LoginPage()
+        loginPage.login("standard_user", "secret_sauce")
+        
+        onView(withText("PRODUCTS")).check(matches(isDisplayed()))
+    }
+}

@@ -1,0 +1,119 @@
+package {{groupId}}.screens
+
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.ViewInteraction
+import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isEnabled
+import org.hamcrest.Matcher
+import android.view.View
+import {{groupId}}.utils.WaitHelper
+
+/**
+* Base screen class providing common Espresso operations.
+* All screen objects should extend this class.
+*/
+abstract class BaseScreen<T : BaseScreen<T>> {
+
+    /**
+    * Find a view by its resource ID.
+    */
+    protected fun onViewById(resourceId: Int): ViewInteraction {
+    return onView(ViewMatchers.withId(resourceId))
+    }
+
+    /**
+    * Find a view by its text content.
+    */
+    protected fun onViewByText(text: String): ViewInteraction {
+    return onView(ViewMatchers.withText(text))
+    }
+
+    /**
+    * Find a view by content description.
+    */
+    protected fun onViewByContentDescription(contentDescription: String): ViewInteraction {
+    return onView(ViewMatchers.withContentDescription(contentDescription))
+    }
+
+    /**
+    * Click on a view.
+    */
+    protected fun click(viewInteraction: ViewInteraction): T {
+    WaitHelper.waitForView(viewInteraction)
+    viewInteraction.perform(ViewActions.click())
+    @Suppress("UNCHECKED_CAST")
+    return this as T
+    }
+
+    /**
+    * Type text into a view.
+    */
+    protected fun typeText(viewInteraction: ViewInteraction, text: String): T {
+    WaitHelper.waitForView(viewInteraction)
+    viewInteraction.perform(ViewActions.clearText(), ViewActions.typeText(text))
+    @Suppress("UNCHECKED_CAST")
+    return this as T
+    }
+
+    /**
+    * Clear text from a view.
+    */
+    protected fun clearText(viewInteraction: ViewInteraction): T {
+    WaitHelper.waitForView(viewInteraction)
+    viewInteraction.perform(ViewActions.clearText())
+    @Suppress("UNCHECKED_CAST")
+    return this as T
+    }
+
+    /**
+    * Verify a view is displayed.
+    */
+    protected fun verifyDisplayed(viewInteraction: ViewInteraction): T {
+    WaitHelper.waitForView(viewInteraction)
+    viewInteraction.check(matches(isDisplayed()))
+    @Suppress("UNCHECKED_CAST")
+    return this as T
+    }
+
+    /**
+    * Verify a view contains specific text.
+    */
+    protected fun verifyText(viewInteraction: ViewInteraction, expectedText: String): T {
+    WaitHelper.waitForView(viewInteraction)
+    viewInteraction.check(matches(ViewMatchers.withText(expectedText)))
+    @Suppress("UNCHECKED_CAST")
+    return this as T
+    }
+
+    /**
+    * Verify a view is enabled.
+    */
+    protected fun verifyEnabled(viewInteraction: ViewInteraction): T {
+    WaitHelper.waitForView(viewInteraction)
+    viewInteraction.check(matches(isEnabled()))
+    @Suppress("UNCHECKED_CAST")
+    return this as T
+    }
+
+    /**
+    * Close the keyboard.
+    */
+    protected fun closeKeyboard(): T {
+    onView(ViewMatchers.isRoot()).perform(ViewActions.closeSoftKeyboard())
+    @Suppress("UNCHECKED_CAST")
+    return this as T
+    }
+
+    /**
+    * Scroll to a view and click it.
+    */
+    protected fun scrollAndClick(viewInteraction: ViewInteraction): T {
+    viewInteraction.perform(ViewActions.scrollTo(), ViewActions.click())
+    @Suppress("UNCHECKED_CAST")
+    return this as T
+    }
+    }

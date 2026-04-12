@@ -1,0 +1,40 @@
+/**
+ * Screenshot Utilities - Capture with timestamp.
+ * 
+ * Screenshots saved to: screenshots/
+ */
+import * as fs from "fs";
+import * as path from "path";
+import { DriverManager } from "./DriverManager";
+import { log } from "./Logger";
+
+export class ScreenshotUtils {
+  private static screenshotDir = "screenshots";
+
+  static async capture(name: string): Promise<string | null> {
+    try {
+      const driver = await DriverManager.getDriver();
+      
+      // Create directory
+      if (!fs.existsSync(this.screenshotDir)) {
+        fs.mkdirSync(this.screenshotDir, { recursive: true });
+      }
+
+      // Generate filename with timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const sanitizedName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
+      const filename = `${sanitizedName}_${timestamp}.png`;
+      const filepath = path.join(this.screenshotDir, filename);
+
+      // Capture screenshot
+      const screenshot = await driver.takeScreenshot();
+      fs.writeFileSync(filepath, screenshot, "base64");
+      
+      log.info(`Screenshot saved: ${filepath}`);
+      return filepath;
+    } catch (error) {
+      log.error(`Failed to capture screenshot: ${error}`);
+      return null;
+    }
+  }
+}

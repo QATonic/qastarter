@@ -1,0 +1,214 @@
+{
+  "id": "web-javascript-selenium-jest-npm",
+  "displayName": "JavaScript Selenium Jest Framework",
+  "description": "Production-ready Selenium automation framework with JavaScript and Jest",
+  "version": "2.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "selenium",
+    "language": "javascript",
+    "testRunner": "jest",
+    "buildTool": "npm"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "jest-html"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "node": "18+",
+    "selenium": "4.16.0",
+    "jest": "29.7.0"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": "jest.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "config/ConfigReader.js",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/BasePage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/LoginPage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/DriverManager.js",
+      "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "config/browser.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": "config/env.config.js",
+      "isTemplate": true
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "pages/HomePage.js",
+      "isTemplate": true
+    },
+    {
+      "path": "step-definitions/loginSteps.js",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "tests/login.test.js",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/setup.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/dataReader.js",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "utils/driverFactory.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/logger.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshotHelper.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/ScreenshotUtils.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/waitHelpers.js",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/login.spec.js",
+      "isTemplate": true
+    }
+  ],
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
+}

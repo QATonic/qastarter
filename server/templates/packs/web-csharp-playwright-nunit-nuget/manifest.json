@@ -1,0 +1,199 @@
+{
+  "id": "web-csharp-playwright-nunit-nuget",
+  "displayName": "C# Playwright NUnit Framework",
+  "version": "2.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "playwright",
+    "language": "csharp",
+    "testRunner": "nunit",
+    "buildTool": "nuget"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "dotnet": "8.0",
+    "playwright": "1.40.0",
+    "nunit": "3.14.0"
+  },
+  "files": [
+    {
+      "path": "{{projectName}}.csproj",
+      "isTemplate": true
+    },
+    {
+      "path": ".editorconfig",
+      "isTemplate": true
+    },
+    {
+      "path": "Config/ConfigReader.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Pages/BasePage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Pages/LoginPage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/PlaywrightManager.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Tests/LoginTests.cs",
+      "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitignore",
+      "template": ".gitignore.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "Config/EnvConfig.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Config/TestSettings.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "Data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "Features/Login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "Pages/HomePage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": "StepDefinitions/LoginSteps.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Tests/BaseTest.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/BrowserFactory.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/DataReader.cs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "Utils/Logger.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/RetryHelper.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/ScreenshotHelper.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/WaitHelpers.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/ScreenshotUtils.cs",
+      "isTemplate": true
+    }
+  ],
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
+}

@@ -1,0 +1,25 @@
+using Microsoft.Extensions.Configuration;
+
+namespace {{projectNamespace}}.Config
+{
+    public class ConfigReader
+    {
+        private static readonly Lazy<ConfigReader> _instance = new(() => new ConfigReader());
+        private readonly IConfiguration _config;
+
+        public static ConfigReader Instance => _instance.Value;
+
+        public string WinAppDriverUrl => Get("WinAppDriverUrl", "http://127.0.0.1:4723");
+        public string AppPath => Get("AppPath", "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App");
+
+        private ConfigReader()
+        {
+            _config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .Build();
+        }
+
+        private string Get(string key, string defaultValue) => _config[key] ?? defaultValue;
+    }
+}

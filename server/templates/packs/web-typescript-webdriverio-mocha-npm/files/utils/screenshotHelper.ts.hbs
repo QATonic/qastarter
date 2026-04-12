@@ -1,0 +1,71 @@
+import fs from 'fs';
+import path from 'path';
+import Logger from './logger';
+
+/**
+ * Screenshot helper for capturing test evidence.
+ */
+class ScreenshotHelper {
+  private static readonly SCREENSHOT_DIR = './screenshots';
+  
+  private static ensureDirectoryExists(): void {
+    if (!fs.existsSync(ScreenshotHelper.SCREENSHOT_DIR)) {
+      fs.mkdirSync(ScreenshotHelper.SCREENSHOT_DIR, { recursive: true });
+    }
+  }
+  
+  private static getTimestamp(): string {
+    return new Date().toISOString().replace(/[:.]/g, '-');
+  }
+  
+  static async capture(name = 'screenshot'): Promise<string | null> {
+    ScreenshotHelper.ensureDirectoryExists();
+    
+    const timestamp = ScreenshotHelper.getTimestamp();
+    const filename = `${name}_${timestamp}.png`;
+    const filepath = path.join(ScreenshotHelper.SCREENSHOT_DIR, filename);
+    
+    try {
+      await browser.saveScreenshot(filepath);
+      Logger.info(`Screenshot saved: ${filepath}`);
+      return filepath;
+    } catch (error) {
+      Logger.error(`Failed to capture screenshot: ${name}`, error as Error);
+      return null;
+    }
+  }
+  
+  static async captureOnFailure(testName: string): Promise<string | null> {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9]/g, '_');
+    return await ScreenshotHelper.capture(`failed_${sanitizedName}`);
+  }
+  
+  static async captureElement(element: WebdriverIO.Element, name = 'element'): Promise<string | null> {
+    ScreenshotHelper.ensureDirectoryExists();
+    
+    const timestamp = ScreenshotHelper.getTimestamp();
+    const filename = `${name}_${timestamp}.png`;
+    const filepath = path.join(ScreenshotHelper.SCREENSHOT_DIR, filename);
+    
+    try {
+      await element.saveScreenshot(filepath);
+      Logger.info(`Element screenshot saved: ${filepath}`);
+      return filepath;
+    } catch (error) {
+      Logger.error(`Failed to capture element screenshot: ${name}`, error as Error);
+      return null;
+    }
+  }
+  
+  static clearScreenshots(): void {
+    if (fs.existsSync(ScreenshotHelper.SCREENSHOT_DIR)) {
+      const files = fs.readdirSync(ScreenshotHelper.SCREENSHOT_DIR);
+      files.forEach(file => {
+        fs.unlinkSync(path.join(ScreenshotHelper.SCREENSHOT_DIR, file));
+      });
+      Logger.info('Cleared all screenshots');
+    }
+  }
+}
+
+export default ScreenshotHelper;

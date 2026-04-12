@@ -1,0 +1,63 @@
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using System;
+using {{projectNamespace}}.Utils;
+using {{projectNamespace}}.Config;
+
+namespace {{projectNamespace}}.Pages
+{
+    /// <summary>
+    /// Base Page - Parent class for all page objects.
+    /// </summary>
+    public abstract class BasePage
+    {
+        protected IWebDriver Driver => DriverManager.Driver;
+        protected WebDriverWait Wait { get; }
+        protected int Timeout => ConfigReader.Instance.Timeout;
+
+        protected BasePage()
+        {
+            Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(Timeout));
+        }
+
+        protected void Click(By locator)
+        {
+            Wait.Until(d => d.FindElement(locator).Displayed);
+            Driver.FindElement(locator).Click();
+        }
+
+        protected void Type(By locator, string text)
+        {
+            var element = Wait.Until(d => d.FindElement(locator));
+            element.Clear();
+            element.SendKeys(text);
+        }
+
+        protected string GetText(By locator)
+        {
+            return Wait.Until(d => d.FindElement(locator)).Text;
+        }
+
+        protected bool IsDisplayed(By locator)
+        {
+            try
+            {
+                return Driver.FindElement(locator).Displayed;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        protected IWebElement WaitForElement(By locator)
+        {
+            return Wait.Until(d => d.FindElement(locator));
+        }
+
+        public string GetTitle() => Driver.Title;
+        public string GetCurrentUrl() => Driver.Url;
+
+        public void NavigateTo(string url) => Driver.Navigate().GoToUrl(url);
+    }
+}

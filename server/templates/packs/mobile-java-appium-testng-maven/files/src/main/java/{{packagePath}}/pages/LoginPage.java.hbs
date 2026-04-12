@@ -1,0 +1,46 @@
+package {{javaPackage}}.pages;
+
+import org.openqa.selenium.By;
+import {{javaPackage}}.utils.Log;
+
+/**
+ * Login Page - SauceDemo Mobile app login screen.
+ */
+public class LoginPage extends BasePage {
+
+    // Android locators for SauceDemo app
+    private By usernameField = By.accessibilityId("test-Username");
+    private By passwordField = By.accessibilityId("test-Password");
+    private By loginButton = By.accessibilityId("test-LOGIN");
+    private By errorMessage = By.xpath("//android.widget.TextView[contains(@text, 'Username and password')]");
+    private By productsTitle = By.xpath("//android.widget.TextView[@text='PRODUCTS']");
+
+    public LoginPage enterUsername(String username) {
+        type(usernameField, username);
+        return this;
+    }
+
+    public LoginPage enterPassword(String password) {
+        type(passwordField, password);
+        return this;
+    }
+
+    public void tapLogin() {
+        tap(loginButton);
+    }
+
+    public void login(String username, String password) {
+        Log.step("Login with: " + username);
+        enterUsername(username);
+        enterPassword(password);
+        tapLogin();
+    }
+
+    public boolean isErrorDisplayed() {
+        return isDisplayed(errorMessage);
+    }
+
+    public boolean isLoginSuccessful() {
+        return isDisplayed(productsTitle);
+    }
+}

@@ -1,0 +1,55 @@
+/**
+ * Base Page Object class
+ * All page objects should extend this class
+ */
+export default class BasePage {
+  
+  /**
+   * Open a path relative to baseUrl
+   */
+  open(path) {
+    return browser.url(path);
+  }
+  
+  /**
+   * Wait for element to be displayed
+   */
+  async waitForDisplayed(element, timeout = 10000) {
+    await element.waitForDisplayed({ timeout });
+  }
+  
+  /**
+   * Click element with wait
+   */
+  async clickElement(element) {
+    await this.waitForDisplayed(element);
+    await element.click();
+  }
+  
+  /**
+   * Set value in input field
+   */
+  async setValue(element, value) {
+    await this.waitForDisplayed(element);
+    await element.setValue(value);
+  }
+  
+  /**
+   * Get text from element
+   */
+  async getText(element) {
+    await this.waitForDisplayed(element);
+    return await element.getText();
+  }
+  
+  /**
+   * Check if element is displayed
+   */
+  async isDisplayed(element) {
+    try {
+      return await element.isDisplayed();
+    } catch (error) {
+      return false;
+    }
+  }
+}

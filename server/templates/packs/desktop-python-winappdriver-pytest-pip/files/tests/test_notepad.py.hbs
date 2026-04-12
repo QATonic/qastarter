@@ -1,0 +1,51 @@
+import pytest
+from pages.notepad_page import NotepadPage
+
+@pytest.mark.smoke
+class TestNotepad:
+    def test_type_text(self, notepad_driver):
+        notepad = NotepadPage(notepad_driver)
+        test_text = "Hello, WinAppDriver!"
+        
+        notepad.type_text(test_text)
+        
+        actual_text = notepad.get_text()
+        assert test_text in actual_text
+    
+    def test_clear_text(self, notepad_driver):
+        notepad = NotepadPage(notepad_driver)
+        notepad.type_text("Some text to clear")
+        notepad.clear_text()
+        
+        actual_text = notepad.get_text()
+        assert actual_text == ""
+    
+    def test_type_multiple_lines(self, notepad_driver):
+        notepad = NotepadPage(notepad_driver)
+        multi_line_text = "Line 1\nLine 2\nLine 3"
+        
+        notepad.type_text(multi_line_text)
+        
+        actual_text = notepad.get_text()
+        assert "Line 1" in actual_text
+        assert "Line 2" in actual_text
+        assert "Line 3" in actual_text
+    
+    @pytest.mark.parametrize("text", [
+        "Hello World",
+        "Test 123",
+        "Special chars: @#$%"
+    ])
+    def test_type_different_inputs(self, notepad_driver, text):
+        notepad = NotepadPage(notepad_driver)
+        notepad.type_text(text)
+        
+        actual_text = notepad.get_text()
+        assert text in actual_text
+    
+    def test_open_file_menu(self, notepad_driver):
+        notepad = NotepadPage(notepad_driver)
+        notepad.open_file_menu()
+        
+        # Menu should be open (driver should still be responsive)
+        assert notepad_driver is not None

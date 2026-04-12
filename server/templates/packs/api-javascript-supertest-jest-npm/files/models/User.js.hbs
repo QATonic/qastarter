@@ -1,0 +1,53 @@
+/**
+ * User model and JSON schema
+ */
+
+export const userSchema = {
+  type: 'object',
+  required: ['id', 'name', 'email'],
+  properties: {
+    id: { type: 'number' },
+    name: { type: 'string' },
+    email: { type: 'string', format: 'email' },
+    username: { type: 'string' },
+    phone: { type: 'string' },
+    website: { type: 'string' },
+    address: {
+      type: 'object',
+      properties: {
+        street: { type: 'string' },
+        city: { type: 'string' },
+        zipcode: { type: 'string' }
+      }
+    },
+    company: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        catchPhrase: { type: 'string' }
+      }
+    }
+  }
+};
+
+export const usersArraySchema = {
+  type: 'array',
+  items: userSchema
+};
+
+export class User {
+  constructor(data) {
+    this.id = data.id;
+    this.name = data.name;
+    this.email = data.email;
+    this.username = data.username;
+    this.phone = data.phone;
+    this.website = data.website;
+    this.address = data.address;
+    this.company = data.company;
+  }
+
+  static create(data) {
+    return new User(data);
+  }
+}

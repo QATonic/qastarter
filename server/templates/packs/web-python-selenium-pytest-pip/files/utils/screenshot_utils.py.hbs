@@ -1,0 +1,57 @@
+"""
+Screenshot Utilities - Capture screenshots on demand.
+
+Screenshots saved to: screenshots/
+"""
+import os
+from datetime import datetime
+from pathlib import Path
+from utils.driver_manager import DriverManager
+from utils.logger import log
+
+
+class ScreenshotUtils:
+    """Screenshot capture utilities."""
+    
+    SCREENSHOT_DIR = "screenshots"
+    
+    @classmethod
+    def capture(cls, name: str) -> str:
+        """Capture screenshot and save to file."""
+        try:
+            driver = DriverManager.get_driver()
+            if driver is None:
+                log.error("Cannot capture screenshot - driver is None")
+                return None
+            
+            # Create directory if needed
+            screenshots_dir = Path(cls.SCREENSHOT_DIR)
+            screenshots_dir.mkdir(exist_ok=True)
+            
+            # Generate filename
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            sanitized_name = "".join(c if c.isalnum() or c in "_-" else "_" for c in name)
+            filename = f"{sanitized_name}_{timestamp}.png"
+            filepath = screenshots_dir / filename
+            
+            # Capture screenshot
+            driver.save_screenshot(str(filepath))
+            log.info(f"Screenshot saved: {filepath}")
+            
+            return str(filepath)
+            
+        except Exception as e:
+            log.error(f"Failed to capture screenshot: {e}")
+            return None
+    
+    @classmethod
+    def capture_as_bytes(cls) -> bytes:
+        """Capture screenshot as bytes."""
+        try:
+            driver = DriverManager.get_driver()
+            if driver is None:
+                return None
+            return driver.get_screenshot_as_png()
+        except Exception as e:
+            log.error(f"Failed to capture screenshot bytes: {e}")
+            return None

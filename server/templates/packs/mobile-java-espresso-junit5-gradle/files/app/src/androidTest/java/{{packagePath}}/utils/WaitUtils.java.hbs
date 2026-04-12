@@ -1,0 +1,141 @@
+package {{packageName}}.utils;
+
+import android.view.View;
+
+import androidx.test.espresso.PerformException;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.util.HumanReadables;
+import androidx.test.espresso.util.TreeIterables;
+
+import org.hamcrest.Matcher;
+
+import java.util.concurrent.TimeoutException;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+
+/**
+ * Wait utilities for Espresso tests.
+ * Provides explicit wait functionality for async operations.
+ */
+public class WaitUtils {
+
+    private static final long DEFAULT_TIMEOUT = 10000; // 10 seconds
+    private static final long POLL_INTERVAL = 100; // 100ms
+
+    /**
+     * Wait for view to be displayed
+     */
+    public static void waitForView(final Matcher<View> viewMatcher) {
+        waitForView(viewMatcher, DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Wait for view to be displayed with custom timeout
+     */
+    public static void waitForView(final Matcher<View> viewMatcher, final long timeout) {
+        Log.debug("Waiting for view: " + viewMatcher.toString());
+        onView(isRoot()).perform(waitForViewAction(viewMatcher, timeout));
+    }
+
+    /**
+     * Wait for view by ID
+     */
+    public static void waitForViewById(int viewId) {
+        waitForView(withId(viewId), DEFAULT_TIMEOUT);
+    }
+
+    /**
+     * Wait for view by ID with custom timeout
+     */
+    public static void waitForViewById(int viewId, long timeout) {
+        waitForView(withId(viewId), timeout);
+    }
+
+    /**
+     * Create ViewAction for waiting
+     */
+    private static ViewAction waitForViewAction(final Matcher<View> viewMatcher, final long timeout) {
+        return new ViewAction() {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isRoot();
+            }
+
+            @Override
+            public String getDescription() {
+                return "Wait for view matching: " + viewMatcher.toString() + " with timeout: " + timeout + "ms";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                uiController.loopMainThreadUntilIdle();
+                
+                final long startTime = System.currentTimeMillis();
+                final long endTime = startTime + timeout;
+
+                do {
+                    for (View child : TreeIterables.breadthFirstViewTraversal(view)) {
+                        if (viewMatcher.matches(child)) {
+                            Log.debug("View found after " + (System.currentTimeMillis() - startTime) + "ms");
+                            return;
+                        }
+                    }
+                    uiController.loopMainThreadForAtLeast(POLL_INTERVAL);
+                } while (System.currentTimeMillis() < endTime);
+
+                throw new PerformException.Builder()
+                        .withActionDescription(getDescription())
+                        .withViewDescription(HumanReadables.describe(view))
+                        .withCause(new TimeoutException("Timeout waiting for view: " + viewMatcher.toString()))
+                        .build();
+            }
+        };
+    }
+
+    /**
+     * Wait for a condition to be true
+     */
+    public static void waitForCondition(final Condition condition, final long timeout) {
+        Log.debug("Waiting for condition with timeout: " + timeout + "ms");
+        
+        final long startTime = System.currentTimeMillis();
+        final long endTime = startTime + timeout;
+
+        while (System.currentTimeMillis() < endTime) {
+            if (condition.isSatisfied()) {
+                Log.debug("Condition satisfied after " + (System.currentTimeMillis() - startTime) + "ms");
+                return;
+            }
+            try {
+                Thread.sleep(POLL_INTERVAL);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Wait interrupted", e);
+            }
+        }
+
+        throw new RuntimeException("Timeout waiting for condition after " + timeout + "ms");
+    }
+
+    /**
+     * Wait for a fixed duration (use sparingly)
+     */
+    public static void hardWait(long milliseconds) {
+        Log.debug("Hard wait for " + milliseconds + "ms");
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /**
+     * Condition interface for custom wait conditions
+     */
+    public interface Condition {
+        boolean isSatisfied();
+    }
+}

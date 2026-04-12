@@ -1,0 +1,115 @@
+import { graphqlClient, resetClient } from '../../src/client/graphql-client';
+import { GET_USER, GET_USERS, GET_USER_BY_EMAIL } from '../../src/queries/user.queries';
+import { validateUserStructure } from '../../src/utils/test-helpers';
+
+describe('User Queries', () => {
+beforeEach(() => {
+resetClient();
+});
+
+describe('GET_USER', () => {
+it('should fetch user by ID', async () => {
+const userId = '1';
+
+const { data, errors } = await graphqlClient.query({
+query: GET_USER,
+variables: { id: userId },
+});
+
+if (errors) {
+console.log('GraphQL Errors:', errors);
+}
+
+expect(data).toBeDefined();
+expect(data.user).toBeDefined();
+expect(data.user.id).toBe(userId);
+validateUserStructure(data.user);
+});
+
+it('should return null for non-existent user', async () => {
+const { data } = await graphqlClient.query({
+query: GET_USER,
+variables: { id: 'non-existent-id' },
+});
+
+expect(data.user).toBeNull();
+});
+
+it('should include all user fields from fragment', async () => {
+const { data } = await graphqlClient.query({
+query: GET_USER,
+variables: { id: '1' },
+});
+
+expect(data.user).toHaveProperty('id');
+expect(data.user).toHaveProperty('email');
+expect(data.user).toHaveProperty('name');
+expect(data.user).toHaveProperty('role');
+expect(data.user).toHaveProperty('createdAt');
+expect(data.user).toHaveProperty('updatedAt');
+});
+});
+
+describe('GET_USERS', () => {
+it('should fetch list of users', async () => {
+const { data } = await graphqlClient.query({
+query: GET_USERS,
+variables: { limit: 10 },
+});
+
+expect(data).toBeDefined();
+expect(Array.isArray(data.users)).toBe(true);
+});
+
+it('should respect limit parameter', async () => {
+const limit = 5;
+
+const { data } = await graphqlClient.query({
+query: GET_USERS,
+variables: { limit },
+});
+
+expect(data.users.length).toBeLessThanOrEqual(limit);
+});
+
+it('should support pagination with offset', async () => {
+const { data: firstPage } = await graphqlClient.query({
+query: GET_USERS,
+variables: { limit: 5, offset: 0 },
+});
+
+const { data: secondPage } = await graphqlClient.query({
+query: GET_USERS,
+variables: { limit: 5, offset: 5 },
+});
+
+// First and second page should have different users
+if (firstPage.users.length > 0 && secondPage.users.length > 0) {
+expect(firstPage.users[0].id).not.toBe(secondPage.users[0].id);
+}
+});
+});
+
+describe('GET_USER_BY_EMAIL', () => {
+it('should fetch user by email', async () => {
+const email = 'test@example.com';
+
+const { data } = await graphqlClient.query({
+query: GET_USER_BY_EMAIL,
+variables: { email },
+});
+
+expect(data.userByEmail).toBeDefined();
+expect(data.userByEmail.email).toBe(email);
+});
+
+it('should return null for non-existent email', async () => {
+const { data } = await graphqlClient.query({
+query: GET_USER_BY_EMAIL,
+variables: { email: 'nonexistent@example.com' },
+});
+
+expect(data.userByEmail).toBeNull();
+});
+});
+});

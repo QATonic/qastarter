@@ -1,0 +1,58 @@
+package {{javaPackage}}.pages;
+
+/**
+ * Login Page Object for SauceDemo
+ * URL: {{baseUrl}}
+ * 
+ * HOW TO CUSTOMIZE:
+ *   1. Update locators below for your app
+ *   2. Update credentials in: src/main/resources/config/dev.properties
+ */
+public class LoginPage extends BasePage {
+
+    // SauceDemo locators
+    private final String usernameField = "#user-name";
+    private final String passwordField = "#password";
+    private final String loginButton = "#login-button";
+    private final String errorMessage = "[data-test='error']";
+
+    @Override
+    public boolean isLoaded() {
+        return isDisplayed(loginButton);
+    }
+
+    public LoginPage enterUsername(String username) {
+        logAction("Entering username: " + username);
+        type(usernameField, username);
+        return this;
+    }
+
+    public LoginPage enterPassword(String password) {
+        logAction("Entering password");
+        type(passwordField, password);
+        return this;
+    }
+
+    public void clickLogin() {
+        logAction("Clicking login button");
+        click(loginButton);
+    }
+
+    public void login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
+    }
+
+    public String getErrorMessage() {
+        return isDisplayed(errorMessage) ? getText(errorMessage) : "";
+    }
+
+    public boolean isErrorDisplayed() {
+        return isDisplayed(errorMessage);
+    }
+
+    public boolean isLoginSuccessful() {
+        return getCurrentUrl().contains("inventory");
+    }
+}

@@ -1,0 +1,150 @@
+pipeline {
+    agent any
+    
+    tools {
+        maven 'Maven'
+        jdk 'JDK{{toolVersions.java}}'
+    }
+    
+    parameters {
+        choice(name: 'PLATFORM', choices: ['android', 'ios', 'both'], description: 'Mobile platform to test')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Test environment')
+    }
+    
+    environment {
+        MAVEN_OPTS = '-Dmaven.repo.local=${WORKSPACE}/.m2/repository'
+        {{#if (eq reportingTool "allure")}}
+        ALLURE_HOME = "${WORKSPACE}/allure-{{toolVersions.allure}}"
+        PATH = "${ALLURE_HOME}/bin:${PATH}"
+        {{/if}}
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                script {
+                    sh '''
+                        npm install -g appium@{{toolVersions.appium}}
+                        appium driver install uiautomator2
+                        appium driver install xcuitest
+                    '''
+                    {{#if (eq reportingTool "allure")}}
+                    sh '''
+                        if [ ! -d "${ALLURE_HOME}" ]; then
+                            curl -o allure-{{toolVersions.allure}}.tgz -L https://github.com/allure-framework/allure2/releases/download/{{toolVersions.allure}}/allure-{{toolVersions.allure}}.tgz
+                            tar -zxvf allure-{{toolVersions.allure}}.tgz
+                            rm allure-{{toolVersions.allure}}.tgz
+                        fi
+                    '''
+                    {{/if}}
+                }
+            }
+        }
+        
+        stage('Test Android') {
+            when {
+                expression { params.PLATFORM == 'android' || params.PLATFORM == 'both' }
+            }
+            steps {
+                script {
+                    sh 'mvn clean test -Pandroid -P${ENVIRONMENT}'
+                }
+            }
+        }
+        
+        stage('Test iOS') {
+            when {
+                expression { params.PLATFORM == 'ios' || params.PLATFORM == 'both' }
+            }
+            steps {
+                script {
+                    sh 'mvn clean test -Pios -P${ENVIRONMENT}'
+                }
+            }
+        }
+        
+        {{#if (eq reportingTool "allure")}}
+        stage('Generate Allure Report') {
+            steps {
+                script {
+                    sh 'allure generate target/allure-results --clean -o target/allure-report'
+                }
+            }
+        }
+        {{/if}}
+        
+        {{#if (eq reportingTool "junit-reports")}}
+        stage('Generate JUnit Report') {
+            steps {
+                sh 'mvn surefire-report:report-only'
+            }
+        }
+        {{/if}}
+    }
+    
+    post {
+        always {
+            {{#if (eq reportingTool "allure")}}
+            allure includeProperties: false, jdk: '', results: [[path: 'target/allure-results']]
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/allure-report',
+                reportFiles: 'index.html',
+                reportName: 'Allure Report'
+            ])
+            {{/if}}
+            
+            {{#if (eq reportingTool "extent-reports")}}
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'reports',
+                reportFiles: 'ExtentReport.html',
+                reportName: 'ExtentReports'
+            ])
+            {{/if}}
+            
+            {{#if (eq reportingTool "testng-reports")}}
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'test-output',
+                reportFiles: 'index.html',
+                reportName: 'TestNG Report'
+            ])
+            {{/if}}
+            
+            {{#if (eq reportingTool "junit-reports")}}
+            publishHTML(target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/site',
+                reportFiles: 'surefire-report.html',
+                reportName: 'JUnit HTML Report'
+            ])
+            {{/if}}
+            
+            archiveArtifacts artifacts: 'logs/**/*.log', allowEmptyArchive: true
+            junit testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true
+        }
+        
+        success {
+            echo 'Mobile tests passed successfully!'
+        }
+        
+        failure {
+            echo 'Mobile tests failed. Check the reports for details.'
+        }
+    }
+}

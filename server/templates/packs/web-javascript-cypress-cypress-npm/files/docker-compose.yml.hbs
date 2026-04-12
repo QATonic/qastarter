@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Cypress test runner
+  cypress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: {{projectName}}-cypress
+    environment:
+      - CYPRESS_baseUrl=${CYPRESS_BASE_URL:-http://host.docker.internal:3000}
+      - CYPRESS_VIDEO=true
+      - CYPRESS_SCREENSHOT_ON_RUN_FAILURE=true
+    volumes:
+      - ./cypress:/app/cypress
+      - ./cypress.config.js:/app/cypress.config.js
+      - ./cypress-results:/app/cypress/results
+      - ./cypress-screenshots:/app/cypress/screenshots
+      - ./cypress-videos:/app/cypress/videos
+    networks:
+      - test-network
+    # For running against local app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Chrome browser for headed tests
+  chrome:
+    image: selenium/standalone-chrome:latest
+    container_name: {{projectName}}-chrome
+    shm_size: 2gb
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    networks:
+      - test-network
+
+  # Firefox browser for cross-browser testing
+  firefox:
+    image: selenium/standalone-firefox:latest
+    container_name: {{projectName}}-firefox
+    shm_size: 2gb
+    ports:
+      - "4445:4444"
+      - "7901:7900"
+    networks:
+      - test-network
+    profiles:
+      - cross-browser
+
+networks:
+  test-network:
+    driver: bridge
+
+volumes:
+  cypress-results:
+  cypress-screenshots:
+  cypress-videos:

@@ -1,0 +1,34 @@
+using System;
+using System.IO;
+using System.Threading.Tasks;
+
+namespace {{projectNamespace}}.Utils
+{
+    public class ScreenshotUtils
+    {
+        private const string ScreenshotDir = "screenshots";
+
+        public static async Task<string> CaptureAsync(string name)
+        {
+            try
+            {
+                var page = PlaywrightManager.Page;
+                if (!Directory.Exists(ScreenshotDir)) Directory.CreateDirectory(ScreenshotDir);
+
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                var sanitizedName = System.Text.RegularExpressions.Regex.Replace(name, "[^a-zA-Z0-9_-]", "_");
+                var filename = $"{sanitizedName}_{timestamp}.png";
+                var filepath = Path.Combine(ScreenshotDir, filename);
+
+                await page.ScreenshotAsync(new() { Path = filepath });
+                Logger.Instance.Info($"Screenshot saved: {filepath}");
+                return filepath;
+            }
+            catch (Exception ex)
+            {
+                Logger.Instance.Error($"Failed to capture screenshot: {ex.Message}");
+                return null;
+            }
+        }
+    }
+}

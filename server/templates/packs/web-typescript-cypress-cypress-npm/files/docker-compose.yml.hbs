@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  cypress:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: {{projectName}}-cypress
+    environment:
+      - CYPRESS_baseUrl=${CYPRESS_BASE_URL:-http://host.docker.internal:3000}
+      - CYPRESS_VIDEO=true
+      - CYPRESS_SCREENSHOT_ON_RUN_FAILURE=true
+    volumes:
+      - ./cypress:/app/cypress
+      - ./cypress.config.ts:/app/cypress.config.ts
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./cypress-results:/app/cypress/results
+      - ./cypress-screenshots:/app/cypress/screenshots
+      - ./cypress-videos:/app/cypress/videos
+    networks:
+      - test-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  chrome:
+    image: selenium/standalone-chrome:latest
+    container_name: {{projectName}}-chrome
+    shm_size: 2gb
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

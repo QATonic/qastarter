@@ -1,0 +1,17 @@
+@login
+Feature: Login Functionality
+  As a user
+  I want to login to SauceDemo
+  So that I can access the products page
+
+  @smoke
+  Scenario: Successful login with valid credentials
+    Given I am on the login page
+    When I login with valid credentials
+    Then login should be successful
+
+  @regression
+  Scenario: Failed login with invalid credentials
+    Given I am on the login page
+    When I login with username "invalid_user" and password "wrong_password"
+    Then I should see an error message

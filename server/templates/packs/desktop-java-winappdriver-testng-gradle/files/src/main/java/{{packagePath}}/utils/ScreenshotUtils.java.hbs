@@ -1,0 +1,368 @@
+package {{groupId}}.utils;
+
+import {{groupId}}.config.ConfigurationReader;
+import {{groupId}}.core.DriverManager;
+import io.appium.java_client.windows.WindowsDriver;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.imageio.ImageIO;
+
+/**
+ * Screenshot capture utilities for desktop applications
+ * Supports both WinAppDriver screenshots and full desktop captures
+ */
+public class ScreenshotUtils {
+
+    private static final String SCREENSHOT_DIR = "screenshots";
+    private static final String DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss";
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+
+    static {
+        // Create screenshots directory if it doesn't exist
+        createScreenshotDirectory();
+    }
+
+    /**
+     * Create screenshot directory if it doesn't exist
+     */
+    private static void createScreenshotDirectory() {
+        try {
+            File dir = new File(SCREENSHOT_DIR);
+            if (!dir.exists()) {
+                boolean created = dir.mkdirs();
+                if (created) {
+                    Log.info("Screenshot directory created: " + dir.getAbsolutePath());
+                } else {
+                    Log.warn("Failed to create screenshot directory: " + dir.getAbsolutePath());
+                }
+            }
+        } catch (Exception e) {
+            Log.error("Error creating screenshot directory: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Capture screenshot using WinAppDriver
+     * @param testName Name of the test for screenshot filename
+     * @return Path to the screenshot file or null if failed
+     */
+    public static String captureScreenshot(String testName) {
+        try {
+            WindowsDriver driver = DriverManager.getDriver();
+            if (driver == null) {
+                Log.error("Driver is null, cannot capture screenshot");
+                return null;
+            }
+
+            // Take screenshot
+            File screenshotFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            
+            // Generate filename
+            String timestamp = LocalDateTime.now().format(formatter);
+            String fileName = testName + "_" + timestamp + ".png";
+            String filePath = SCREENSHOT_DIR + File.separator + fileName;
+            
+            // Copy screenshot to destination
+            File destFile = new File(filePath);
+            FileUtils.copyFile(screenshotFile, destFile);
+            
+            Log.info("Screenshot captured: " + filePath);
+            return destFile.getAbsolutePath();
+            
+        } catch (IOException e) {
+            Log.error("Error capturing screenshot: " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            Log.error("Unexpected error capturing screenshot: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Capture screenshot with default naming (timestamp only)
+     * @return Path to the screenshot file or null if failed
+     */
+    public static String captureScreenshot() {
+        String timestamp = LocalDateTime.now().format(formatter);
+        return captureScreenshot("screenshot_" + timestamp);
+    }
+
+    /**
+     * Capture full desktop screenshot using Robot class
+     * @param testName Name of the test for screenshot filename
+     * @return Path to the screenshot file or null if failed
+     */
+    public static String captureDesktopScreenshot(String testName) {
+        try {
+            Robot robot = new Robot();
+            
+            // Get screen dimensions
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            Rectangle screenRect = new Rectangle(screenSize);
+            
+            // Capture screenshot
+            BufferedImage screenshot = robot.createScreenCapture(screenRect);
+            
+            // Generate filename
+            String timestamp = LocalDateTime.now().format(formatter);
+            String fileName = testName + "_desktop_" + timestamp + ".png";
+            String filePath = SCREENSHOT_DIR + File.separator + fileName;
+            
+            // Save screenshot
+            File file = new File(filePath);
+            ImageIO.write(screenshot, "PNG", file);
+            
+            Log.info("Desktop screenshot captured: " + filePath);
+            return file.getAbsolutePath();
+            
+        } catch (AWTException e) {
+            Log.error("AWT error capturing desktop screenshot: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            Log.error("IO error saving desktop screenshot: " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            Log.error("Unexpected error capturing desktop screenshot: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Capture screenshot of specific screen area
+     * @param x X coordinate of top-left corner
+     * @param y Y coordinate of top-left corner
+     * @param width Width of the area to capture
+     * @param height Height of the area to capture
+     * @param testName Name for the screenshot file
+     * @return Path to the screenshot file or null if failed
+     */
+    public static String captureAreaScreenshot(int x, int y, int width, int height, String testName) {
+        try {
+            Robot robot = new Robot();
+            
+            // Define capture rectangle
+            Rectangle captureRect = new Rectangle(x, y, width, height);
+            
+            // Capture screenshot
+            BufferedImage screenshot = robot.createScreenCapture(captureRect);
+            
+            // Generate filename
+            String timestamp = LocalDateTime.now().format(formatter);
+            String fileName = testName + "_area_" + timestamp + ".png";
+            String filePath = SCREENSHOT_DIR + File.separator + fileName;
+            
+            // Save screenshot
+            File file = new File(filePath);
+            ImageIO.write(screenshot, "PNG", file);
+            
+            Log.info("Area screenshot captured: " + filePath + " (Area: " + x + "," + y + " " + width + "x" + height + ")");
+            return file.getAbsolutePath();
+            
+        } catch (AWTException e) {
+            Log.error("AWT error capturing area screenshot: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            Log.error("IO error saving area screenshot: " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            Log.error("Unexpected error capturing area screenshot: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Compare two screenshots and highlight differences
+     * @param baselinePath Path to baseline screenshot
+     * @param actualPath Path to actual screenshot
+     * @param testName Name for the difference screenshot
+     * @return Path to difference screenshot or null if failed
+     */
+    public static String compareScreenshots(String baselinePath, String actualPath, String testName) {
+        try {
+            BufferedImage baselineImg = ImageIO.read(new File(baselinePath));
+            BufferedImage actualImg = ImageIO.read(new File(actualPath));
+            
+            // Check if images have same dimensions
+            if (baselineImg.getWidth() != actualImg.getWidth() || 
+                baselineImg.getHeight() != actualImg.getHeight()) {
+                Log.warn("Screenshots have different dimensions - cannot compare");
+                return null;
+            }
+            
+            // Create difference image
+            BufferedImage diffImg = new BufferedImage(
+                baselineImg.getWidth(), 
+                baselineImg.getHeight(), 
+                BufferedImage.TYPE_INT_RGB
+            );
+            
+            boolean hasDifferences = false;
+            
+            // Compare pixels
+            for (int x = 0; x < baselineImg.getWidth(); x++) {
+                for (int y = 0; y < baselineImg.getHeight(); y++) {
+                    int baselinePixel = baselineImg.getRGB(x, y);
+                    int actualPixel = actualImg.getRGB(x, y);
+                    
+                    if (baselinePixel != actualPixel) {
+                        // Highlight difference in red
+                        diffImg.setRGB(x, y, Color.RED.getRGB());
+                        hasDifferences = true;
+                    } else {
+                        // Keep original pixel (dimmed)
+                        Color original = new Color(baselinePixel);
+                        Color dimmed = new Color(
+                            original.getRed() / 2,
+                            original.getGreen() / 2,
+                            original.getBlue() / 2
+                        );
+                        diffImg.setRGB(x, y, dimmed.getRGB());
+                    }
+                }
+            }
+            
+            if (hasDifferences) {
+                // Save difference image
+                String timestamp = LocalDateTime.now().format(formatter);
+                String fileName = testName + "_diff_" + timestamp + ".png";
+                String filePath = SCREENSHOT_DIR + File.separator + fileName;
+                
+                File file = new File(filePath);
+                ImageIO.write(diffImg, "PNG", file);
+                
+                Log.info("Screenshot comparison completed - differences found: " + filePath);
+                return file.getAbsolutePath();
+            } else {
+                Log.info("Screenshot comparison completed - no differences found");
+                return null;
+            }
+            
+        } catch (IOException e) {
+            Log.error("Error comparing screenshots: " + e.getMessage());
+            return null;
+        } catch (Exception e) {
+            Log.error("Unexpected error comparing screenshots: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Capture screenshot on test failure
+     * @param testName Name of the failed test
+     * @return Path to the screenshot file or null if failed
+     */
+    public static String captureFailureScreenshot(String testName) {
+        String fileName = "FAILED_" + testName;
+        String screenshotPath = captureScreenshot(fileName);
+        
+        if (screenshotPath != null) {
+            Log.info("Failure screenshot captured for test: " + testName);
+        } else {
+            Log.error("Failed to capture failure screenshot for test: " + testName);
+        }
+        
+        return screenshotPath;
+    }
+
+    /**
+     * Capture screenshot before and after an action
+     * @param testName Name of the test
+     * @param actionName Name of the action being performed
+     * @return Array of paths [beforePath, afterPath] or null if failed
+     */
+    public static String[] captureBeforeAfterScreenshots(String testName, String actionName) {
+        String beforePath = captureScreenshot(testName + "_" + actionName + "_BEFORE");
+        
+        if (beforePath == null) {
+            Log.error("Failed to capture before screenshot");
+            return null;
+        }
+        
+        // Return before path immediately, caller should capture after screenshot separately
+        return new String[]{beforePath, null};
+    }
+
+    /**
+     * Capture after screenshot (companion to captureBeforeAfterScreenshots)
+     * @param testName Name of the test
+     * @param actionName Name of the action that was performed
+     * @return Path to the after screenshot or null if failed
+     */
+    public static String captureAfterScreenshot(String testName, String actionName) {
+        return captureScreenshot(testName + "_" + actionName + "_AFTER");
+    }
+
+    /**
+     * Clean up old screenshots (keep only recent ones)
+     * @param maxAgeInDays Maximum age of screenshots to keep
+     */
+    public static void cleanupOldScreenshots(int maxAgeInDays) {
+        try {
+            File screenshotDir = new File(SCREENSHOT_DIR);
+            if (!screenshotDir.exists() || !screenshotDir.isDirectory()) {
+                Log.warn("Screenshot directory not found for cleanup");
+                return;
+            }
+            
+            long maxAgeMillis = maxAgeInDays * 24L * 60L * 60L * 1000L;
+            long cutoffTime = System.currentTimeMillis() - maxAgeMillis;
+            
+            File[] screenshots = screenshotDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".png"));
+            if (screenshots == null) {
+                Log.info("No screenshots found for cleanup");
+                return;
+            }
+            
+            int deletedCount = 0;
+            for (File screenshot : screenshots) {
+                if (screenshot.lastModified() < cutoffTime) {
+                    if (screenshot.delete()) {
+                        deletedCount++;
+                    } else {
+                        Log.warn("Failed to delete old screenshot: " + screenshot.getName());
+                    }
+                }
+            }
+            
+            Log.info("Screenshot cleanup completed - deleted " + deletedCount + " old screenshots");
+            
+        } catch (Exception e) {
+            Log.error("Error during screenshot cleanup: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get screenshot directory path
+     * @return Path to screenshot directory
+     */
+    public static String getScreenshotDirectory() {
+        return new File(SCREENSHOT_DIR).getAbsolutePath();
+    }
+
+    /**
+     * Create a timestamped filename for screenshots
+     * @param prefix Prefix for the filename
+     * @return Timestamped filename
+     */
+    public static String createTimestampedFileName(String prefix) {
+        String timestamp = LocalDateTime.now().format(formatter);
+        return prefix + "_" + timestamp + ".png";
+    }
+
+    /**
+     * Check if screenshot capture is available
+     * @return true if screenshot can be captured
+     */
+    public static boolean isScreenshotAvailable() {
+        WindowsDriver driver = DriverManager.getDriver();
+        return driver != null && driver instanceof TakesScreenshot;
+    }
+}

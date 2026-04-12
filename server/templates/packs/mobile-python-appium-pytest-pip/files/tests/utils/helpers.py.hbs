@@ -1,0 +1,31 @@
+import os
+import json
+from datetime import datetime
+
+def load_json_file(file_path):
+    """Load JSON file"""
+    with open(file_path, 'r') as f:
+        return json.load(f)
+
+def save_screenshot(driver, name):
+    """Save screenshot with timestamp"""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    screenshot_path = f"screenshots/{name}_{timestamp}.png"
+    driver.save_screenshot(screenshot_path)
+    return screenshot_path
+
+def wait_for_app_to_load(driver, timeout=30):
+    """Wait for app to fully load"""
+    driver.implicitly_wait(timeout)
+
+def get_platform():
+    """Get current platform from environment"""
+    return os.getenv("PLATFORM", "Android").lower()
+
+def is_android():
+    """Check if platform is Android"""
+    return get_platform() == "android"
+
+def is_ios():
+    """Check if platform is iOS"""
+    return get_platform() == "ios"

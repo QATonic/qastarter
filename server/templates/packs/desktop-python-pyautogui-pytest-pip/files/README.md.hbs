@@ -1,0 +1,360 @@
+# {{projectName}}
+
+Cross-platform desktop GUI automation framework with Python, PyAutoGUI, and Pytest.
+
+## Features
+
+- **Python {{toolVersions.python}}**: Modern Python with type hints
+- **PyAutoGUI**: Cross-platform GUI automation library
+- **Pytest {{toolVersions.pytest}}**: Powerful testing framework
+- **Image Recognition**: OpenCV-based image matching
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Mouse & Keyboard Control**: Complete automation capabilities
+- **Automatic Screenshots**: Capture on test failure
+- **Logging**: Comprehensive logging with file and console output
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Workflow for Windows runners
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+
+## Prerequisites
+
+### Platform-Specific Requirements
+
+**Windows:**
+- No additional requirements (Calculator and Notepad are built-in)
+
+**macOS:**
+- No additional requirements (Calculator and TextEdit are built-in)
+
+**Linux:**
+- Install GUI applications for testing:
+  ```bash
+  # Ubuntu/Debian
+  sudo apt-get install gnome-calculator gedit
+  
+  # Or for KDE
+  sudo apt-get install kcalc kate
+  ```
+- Install display dependencies:
+  ```bash
+  sudo apt-get install python3-tk python3-dev scrot
+  ```
+
+## Installation
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+## Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with verbose output
+pytest -v
+
+# Run specific test file
+pytest tests/test_calculator.py
+
+# Run platform-specific tests
+pytest -m windows  # Windows only
+pytest -m linux    # Linux only
+pytest -m macos    # macOS only
+
+# Run smoke tests
+pytest -m smoke
+```
+
+## Project Structure
+
+```
+.
+├── config/
+│   └── settings.py              # Configuration management
+├── core/
+│   ├── gui_actions.py           # GUI automation actions
+│   ├── keyboard_actions.py      # Keyboard automation
+│   ├── mouse_actions.py         # Mouse automation
+│   └── image_recognition.py     # Image matching utilities
+├── tests/
+│   ├── conftest.py              # Pytest fixtures
+│   ├── test_calculator.py       # Calculator automation tests
+│   └── test_notepad.py          # Notepad automation tests
+├── utils/
+│   ├── logger.py                # Logging configuration
+│   └── screenshot_helper.py     # Screenshot utilities
+├── images/                      # Reference images for recognition
+├── pytest.ini                   # Pytest configuration
+└── requirements.txt             # Dependencies
+```
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file:
+
+```bash
+# Automation Settings
+PAUSE_DURATION=0.5           # Pause between actions
+FAILSAFE=true                # Move mouse to corner to abort
+
+# Timeouts (in seconds)
+DEFAULT_TIMEOUT=30
+CLICK_DELAY=0.1
+TYPE_INTERVAL=0.05
+
+# Image Recognition
+CONFIDENCE_THRESHOLD=0.8
+IMAGES_PATH=images
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FILE=logs/test-run.log
+
+# Screenshots
+SCREENSHOT_PATH=screenshots
+SCREENSHOT_ON_FAILURE=true
+```
+
+## Writing Tests
+
+### Basic Test Example
+
+```python
+import pytest
+from core.gui_actions import GUIActions
+from core.keyboard_actions import KeyboardActions
+
+@pytest.mark.smoke
+class TestNotepad:
+    @pytest.fixture
+    def notepad_app(self):
+        GUIActions.launch_application("notepad.exe")
+        yield
+        GUIActions.close_application()
+    
+    def test_type_text(self, notepad_app):
+        KeyboardActions.type_text("Hello, PyAutoGUI!")
+```
+
+### Mouse Actions
+
+```python
+from core.mouse_actions import MouseActions
+
+# Move mouse to coordinates
+MouseActions.move_to(100, 200)
+
+# Click at current position
+MouseActions.click()
+
+# Click at specific coordinates
+MouseActions.click(500, 300)
+
+# Double-click
+MouseActions.double_click(500, 300)
+
+# Right-click
+MouseActions.right_click(500, 300)
+
+# Scroll
+MouseActions.scroll(5)  # Scroll up
+MouseActions.scroll(-5)  # Scroll down
+```
+
+### Keyboard Actions
+
+```python
+from core.keyboard_actions import KeyboardActions
+
+# Type text
+KeyboardActions.type_text("Hello World", interval=0.1)
+
+# Press single key
+KeyboardActions.press_key("enter")
+
+# Press hotkey combination
+KeyboardActions.hotkey("ctrl", "c")
+
+# Platform-specific shortcuts
+KeyboardActions.select_all()
+KeyboardActions.copy()
+KeyboardActions.paste()
+```
+
+### Image Recognition
+
+```python
+from core.image_recognition import ImageRecognition
+
+# Find image on screen
+location = ImageRecognition.locate_on_screen("button.png")
+
+# Get center of image
+center = ImageRecognition.locate_center_on_screen("button.png")
+
+# Wait for image to appear
+ImageRecognition.wait_for_image("dialog.png", timeout=30)
+
+# Find and click image
+ImageRecognition.click_image("submit_button.png")
+```
+
+### Parametrized Tests
+
+```python
+@pytest.mark.parametrize("text", [
+    "Hello World",
+    "Test 123",
+    "Special chars: @#$%"
+])
+def test_type_different_text(self, notepad_app, text):
+    KeyboardActions.type_text(text)
+```
+
+## Platform Differences
+
+### Windows
+- Calculator: `calc.exe` (built-in)
+- Notepad: `notepad.exe` (built-in)
+- Hotkeys: Ctrl+C, Ctrl+V, etc.
+
+### macOS
+- Calculator: Built-in, launched via `open -a Calculator`
+- TextEdit: Built-in, launched via `open -a TextEdit`
+- Hotkeys: Cmd+C, Cmd+V, etc.
+
+### Linux
+- Calculator: `gnome-calculator` (GNOME) or `kcalc` (KDE) - **must be installed**
+- Text Editor: `gedit` (GNOME) or `kate` (KDE) - **must be installed**
+- Hotkeys: Ctrl+C, Ctrl+V, etc.
+- Note: Tests will skip if required applications are not installed
+
+## Image Recognition Setup
+
+1. Take screenshots of UI elements you want to interact with
+2. Save them in the `images/` directory
+3. Use `ImageRecognition` class to find and interact with elements
+
+Example:
+```python
+import os
+from config.settings import Settings
+from core.image_recognition import ImageRecognition
+
+# Ensure image exists before using
+image_path = os.path.join(Settings.IMAGES_PATH, "save_button.png")
+if os.path.exists(image_path):
+    ImageRecognition.click_image("save_button.png")
+else:
+    # Handle missing image
+    pass
+```
+
+**Note**: The example tests use keyboard/mouse automation and don't require image assets. Image recognition is optional and useful for complex UI interactions.
+
+## Best Practices
+
+1. **Failsafe**: PyAutoGUI failsafe is enabled by default. Move mouse to screen corner to abort execution.
+
+2. **Wait Times**: Add appropriate delays between actions:
+   ```python
+   GUIActions.wait(1.0)  # Wait 1 second
+   ```
+
+3. **Screen Resolution**: Tests may behave differently on different screen resolutions. Use image recognition for better reliability.
+
+4. **Platform Testing**: Use pytest markers to run platform-specific tests:
+   ```python
+   @pytest.mark.skipif(not Settings.IS_WINDOWS, reason="Windows only")
+   def test_windows_specific(self):
+       pass
+   ```
+
+5. **Image Recognition**: Use confidence threshold to handle slight variations:
+   ```python
+   ImageRecognition.locate_on_screen("button.png", confidence=0.9)
+   ```
+
+## Troubleshooting
+
+### Tests Fail Due to Screen Resolution
+- Adjust coordinates or use image recognition instead
+- Use relative positioning when possible
+
+### Image Not Found
+- Check image exists in `images/` directory
+- Verify image matches exactly what's on screen
+- Lower confidence threshold if needed
+
+### Permission Issues (macOS)
+- Grant Accessibility permissions to Terminal/IDE
+- System Preferences → Security & Privacy → Privacy → Accessibility
+
+### Tests Are Too Fast
+- Increase `PAUSE_DURATION` in settings
+- Add explicit waits with `GUIActions.wait()`
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+The GitHub Actions workflow:
+- Runs on Windows runners with GUI support
+- Executes Windows-specific tests
+- Uploads screenshots and logs
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+**Note**: GUI automation requires an active display. GitHub Actions runners for Linux and macOS are headless by default, so the workflow is configured for Windows only. For local testing on Linux/macOS, run tests manually with an active display.
+
+## Test Markers
+
+- `@pytest.mark.smoke` - Critical path tests
+- `@pytest.mark.regression` - Full regression suite
+- `@pytest.mark.windows` - Windows-specific tests
+- `@pytest.mark.linux` - Linux-specific tests
+- `@pytest.mark.macos` - macOS-specific tests
+
+Run specific markers:
+```bash
+pytest -m smoke
+pytest -m windows
+```
+
+## Reports
+
+- **HTML Report**: `reports/test-report.html`
+- **Screenshots**: `screenshots/`
+- **Logs**: `logs/pytest.log`

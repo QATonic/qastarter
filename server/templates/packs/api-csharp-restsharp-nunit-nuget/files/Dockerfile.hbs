@@ -1,0 +1,49 @@
+# {{projectName}} - API Test Automation
+# Multi-stage Dockerfile for running RestSharp API tests
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /app
+
+# Copy project file and restore dependencies
+COPY *.csproj ./
+RUN dotnet restore
+
+# Copy source code
+COPY . ./
+
+# Build the project
+RUN dotnet build -c Release --no-restore
+
+# Test stage
+FROM build AS test
+WORKDIR /app
+
+# Set environment variables
+ENV TEST_ENV=qa
+ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+# Create directories for test results
+RUN mkdir -p /app/TestResults /app/Reports
+
+# Default command runs all tests
+ENTRYPOINT ["dotnet", "test", "--no-build", "-c", "Release", "--logger:trx", "--results-directory:/app/TestResults"]
+
+# Runtime stage for running specific tests
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS runtime
+WORKDIR /app
+
+# Copy built application
+COPY --from=build /app ./
+
+# Install additional tools
+RUN dotnet tool install --global dotnet-reportgenerator-globaltool
+
+ENV PATH="${PATH}:/root/.dotnet/tools"
+ENV TEST_ENV=qa
+
+# Create output directories
+RUN mkdir -p /app/TestResults /app/Reports
+
+# Entry point for flexible test execution
+ENTRYPOINT ["dotnet", "test"]
+CMD ["--no-build", "-c", "Release", "--logger:trx"]

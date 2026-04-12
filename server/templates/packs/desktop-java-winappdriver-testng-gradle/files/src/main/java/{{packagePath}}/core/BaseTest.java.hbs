@@ -1,0 +1,24 @@
+package {{javaPackage}}.core;
+
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import {{javaPackage}}.utils.Log;
+
+public class BaseTest {
+
+@BeforeMethod
+public void setup() {
+Log.info("========================================");
+Log.info("Desktop Test Started");
+Log.info("Desktop Test Started");
+String appPath = {{javaPackage}}.config.ConfigurationReader.getAppPath();
+DriverManager.initializeDriver(appPath);
+}
+
+@AfterMethod
+public void teardown() {
+DriverManager.quitDriver();
+Log.info("Desktop Test Completed");
+Log.info("========================================");
+}
+}

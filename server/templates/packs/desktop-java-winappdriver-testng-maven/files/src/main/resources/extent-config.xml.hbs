@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <!-- Report Theme: DARK or STANDARD -->
+        <theme>DARK</theme>
+        
+        <!-- Report Name -->
+        <reportName>{{projectName}} Desktop Automation Test Report</reportName>
+        
+        <!-- Document Title -->
+        <documentTitle>Desktop Test Execution Results</documentTitle>
+        
+        <!-- Encoding -->
+        <encoding>UTF-8</encoding>
+        
+        <!-- JavaScript -->
+        <js>
+            <!-- Custom JavaScript can be added here -->
+        </js>
+        
+        <!-- CSS -->
+        <css>
+            /* Custom CSS for report styling */
+            .brand-logo {
+                display: none;
+            }
+            
+            .navbar-brand {
+                font-weight: bold;
+                color: #ffffff;
+            }
+            
+            .test-content {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            
+            .step-details {
+                margin: 10px 0;
+                padding: 8px;
+                border-left: 3px solid #28a745;
+                background-color: rgba(40, 167, 69, 0.1);
+            }
+            
+            .screenshot-container {
+                margin: 10px 0;
+                text-align: center;
+            }
+            
+            .screenshot-container img {
+                max-width: 100%;
+                height: auto;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .error-details {
+                background-color: rgba(220, 53, 69, 0.1);
+                border-left: 3px solid #dc3545;
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 4px;
+            }
+            
+            .test-step {
+                margin: 5px 0;
+                padding: 5px 10px;
+                border-radius: 3px;
+            }
+            
+            .test-step.pass {
+                background-color: rgba(40, 167, 69, 0.1);
+                border-left: 2px solid #28a745;
+            }
+            
+            .test-step.fail {
+                background-color: rgba(220, 53, 69, 0.1);
+                border-left: 2px solid #dc3545;
+            }
+            
+            .test-step.info {
+                background-color: rgba(23, 162, 184, 0.1);
+                border-left: 2px solid #17a2b8;
+            }
+            
+            .test-step.warning {
+                background-color: rgba(255, 193, 7, 0.1);
+                border-left: 2px solid #ffc107;
+            }
+        </css>
+    </configuration>
+</extentreports>

@@ -1,0 +1,52 @@
+/**
+ * GraphQL Queries - Predefined queries for SpaceX API.
+ */
+import { gql } from "graphql-request";
+
+export const GET_COMPANY = gql`
+  query GetCompany {
+    company {
+      name
+      founder
+      founded
+      employees
+      ceo
+      cto
+    }
+  }
+`;
+
+export const GET_ROCKETS = gql`
+  query GetRockets {
+    rockets {
+      id
+      name
+      type
+      active
+      country
+    }
+  }
+`;
+
+export const GET_ROCKET_BY_ID = gql`
+  query GetRocket($id: ID!) {
+    rocket(id: $id) {
+      id
+      name
+      description
+      first_flight
+      success_rate_pct
+    }
+  }
+`;
+
+export const GET_LAUNCHES = gql`
+  query GetLaunches($limit: Int) {
+    launches(limit: $limit) {
+      id
+      mission_name
+      launch_date_utc
+      launch_success
+    }
+  }
+`;

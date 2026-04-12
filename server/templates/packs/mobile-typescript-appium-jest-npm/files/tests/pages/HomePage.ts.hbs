@@ -1,0 +1,29 @@
+import BasePage from './BasePage';
+import { Browser } from 'webdriverio';
+
+export default class HomePage extends BasePage {
+  // Locators - Update these based on your app
+  readonly welcomeMessage = 'id=com.example.app:id/welcomeMessage';
+  readonly userProfile = 'id=com.example.app:id/userProfile';
+  readonly logoutButton = 'id=com.example.app:id/logoutButton';
+
+  constructor(driver: Browser<'async'>) {
+    super(driver);
+  }
+
+  async getWelcomeMessage(): Promise<string> {
+    return await this.getText(this.welcomeMessage);
+  }
+
+  async isHomePageDisplayed(): Promise<boolean> {
+    return await this.isDisplayed(this.welcomeMessage);
+  }
+
+  async isUserProfileDisplayed(): Promise<boolean> {
+    return await this.isDisplayed(this.userProfile);
+  }
+
+  async clickLogout(): Promise<void> {
+    await this.click(this.logoutButton);
+  }
+}

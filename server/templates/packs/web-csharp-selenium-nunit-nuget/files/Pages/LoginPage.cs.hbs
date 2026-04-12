@@ -1,0 +1,45 @@
+using OpenQA.Selenium;
+
+namespace {{projectNamespace}}.Pages
+{
+    /// <summary>
+    /// Login Page - Page object for SauceDemo login.
+    /// </summary>
+    public class LoginPage : BasePage
+    {
+        // Locators (SauceDemo)
+        private By UsernameField => By.Id("user-name");
+        private By PasswordField => By.Id("password");
+        private By LoginButton => By.Id("login-button");
+        private By ErrorMessage => By.CssSelector("[data-test='error']");
+
+        public LoginPage EnterUsername(string username)
+        {
+            Type(UsernameField, username);
+            return this;
+        }
+
+        public LoginPage EnterPassword(string password)
+        {
+            Type(PasswordField, password);
+            return this;
+        }
+
+        public void ClickLogin() => Click(LoginButton);
+
+        public void Login(string username, string password)
+        {
+            EnterUsername(username);
+            EnterPassword(password);
+            ClickLogin();
+        }
+
+        public string GetErrorMessage() => IsErrorDisplayed() ? GetText(ErrorMessage) : "";
+
+        public bool IsErrorDisplayed() => IsDisplayed(ErrorMessage);
+
+        public bool IsLoginSuccessful() => GetCurrentUrl().Contains("inventory");
+
+        public bool IsLoaded() => IsDisplayed(LoginButton);
+    }
+}

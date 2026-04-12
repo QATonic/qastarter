@@ -1,0 +1,28 @@
+import { Page } from 'playwright';
+
+export class WaitHelpers {
+  public static async waitForElement(page: Page, selector: string, timeout: number = 30000): Promise<void> {
+    await page.waitForSelector(selector, { timeout, state: 'visible' });
+  }
+
+  public static async waitForUrl(page: Page, urlPattern: string | RegExp, timeout: number = 30000): Promise<void> {
+    await page.waitForURL(urlPattern, { timeout });
+  }
+
+  public static async waitForText(page: Page, selector: string, text: string, timeout: number = 30000): Promise<void> {
+    await page.waitForFunction(
+      ({ sel, txt }: { sel: string; txt: string }): boolean => {
+        const element = document.querySelector(sel);
+        return element?.textContent?.includes(txt) || false;
+      },
+      { sel: selector, txt: text },
+      { timeout }
+    );
+  }
+
+  public static async sleep(ms: number): Promise<void> {
+    await new Promise<void>(resolve => setTimeout(resolve, ms));
+  }
+}
+
+export default WaitHelpers;

@@ -1,0 +1,68 @@
+"""
+Pytest Fixtures - Setup and teardown for all tests.
+
+This file is automatically discovered by pytest.
+"""
+import pytest
+from utils.driver_manager import DriverManager
+from utils.logger import log
+from utils.screenshot_utils import ScreenshotUtils
+from config.config_reader import config
+{{#if (eq reportingTool "allure")}}
+import allure
+{{/if}}
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_session():
+    """Run once before all tests."""
+    log.info("=" * 60)
+    log.info(" TEST SESSION STARTED")
+    log.info("=" * 60)
+    log.info(f"Environment: {config.get('ENV', 'dev')}")
+    log.info(f"Browser: {config.browser}")
+    log.info(f"Base URL: {config.base_url}")
+    
+    yield
+    
+    log.info("=" * 60)
+    log.info(" TEST SESSION COMPLETED")
+    log.info("=" * 60)
+
+
+@pytest.fixture(scope="function")
+def driver():
+    """Provides WebDriver for each test."""
+    log.info("--- Test Setup ---")
+    DriverManager.init_driver()
+    driver = DriverManager.get_driver()
+    
+    # Navigate to base URL
+    base_url = config.base_url
+    if base_url:
+        driver.get(base_url)
+        log.info(f"Navigated to: {base_url}")
+    
+    yield driver
+    
+    log.info("--- Test Teardown ---")
+    DriverManager.quit_driver()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Capture screenshot on test failure."""
+    outcome = yield
+    report = outcome.get_result()
+    
+    if report.when == "call" and report.failed:
+        log.error(f"TEST FAILED: {item.name}")
+        
+        if DriverManager.is_initialized():
+            screenshot_path = ScreenshotUtils.capture(f"FAILED_{item.name}")
+            if screenshot_path:
+                log.info(f"Screenshot saved: {screenshot_path}")
+{{#if (eq reportingTool "allure")}}
+                with open(screenshot_path, "rb") as f:
+                    allure.attach(f.read(), name="Screenshot", attachment_type=allure.attachment_type.PNG)
+{{/if}}

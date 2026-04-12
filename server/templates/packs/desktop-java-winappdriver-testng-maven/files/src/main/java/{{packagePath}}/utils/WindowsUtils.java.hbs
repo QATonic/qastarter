@@ -1,0 +1,442 @@
+package {{groupId}}.utils;
+
+import com.sun.jna.Native;
+import com.sun.jna.platform.win32.*;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.ptr.IntByReference;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Windows-specific utilities for process and window management
+ * Provides native Windows functionality for desktop automation
+ */
+public class WindowsUtils {
+
+    /**
+     * Check if a process is running
+     * @param processName Name of the process (e.g., "notepad.exe")
+     * @return true if process is running
+     */
+    public static boolean isProcessRunning(String processName) {
+        try {
+            String taskListCmd = "tasklist /FI \"IMAGENAME eq " + processName + "\"";
+            Process process = Runtime.getRuntime().exec(taskListCmd);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.toLowerCase().contains(processName.toLowerCase())) {
+                    Log.info("Process found: " + processName);
+                    return true;
+                }
+            }
+            
+            Log.info("Process not found: " + processName);
+            return false;
+            
+        } catch (IOException e) {
+            Log.error("Error checking if process is running: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Kill a process by name
+     * @param processName Name of the process to kill
+     * @return true if process was killed successfully
+     */
+    public static boolean killProcess(String processName) {
+        try {
+            String killCmd = "taskkill /F /IM " + processName;
+            Process process = Runtime.getRuntime().exec(killCmd);
+            int exitCode = process.waitFor();
+            
+            boolean success = (exitCode == 0);
+            if (success) {
+                Log.info("Process killed successfully: " + processName);
+            } else {
+                Log.warn("Failed to kill process: " + processName);
+            }
+            
+            return success;
+            
+        } catch (IOException | InterruptedException e) {
+            Log.error("Error killing process '" + processName + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get list of running processes
+     * @return List of running process names
+     */
+    public static List<String> getRunningProcesses() {
+        List<String> processes = new ArrayList<>();
+        
+        try {
+            Process process = Runtime.getRuntime().exec("tasklist /FO CSV");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            
+            String line;
+            boolean firstLine = true;
+            while ((line = reader.readLine()) != null) {
+                if (firstLine) {
+                    firstLine = false;
+                    continue; // Skip header line
+                }
+                
+                // Parse CSV format: "ImageName","PID","SessionName","Session#","MemUsage"
+                if (line.startsWith("\"")) {
+                    int endQuote = line.indexOf("\"", 1);
+                    if (endQuote > 1) {
+                        String processName = line.substring(1, endQuote);
+                        processes.add(processName);
+                    }
+                }
+            }
+            
+            Log.info("Retrieved " + processes.size() + " running processes");
+            
+        } catch (IOException e) {
+            Log.error("Error getting running processes: " + e.getMessage());
+        }
+        
+        return processes;
+    }
+
+    /**
+     * Launch an application
+     * @param applicationPath Path to the application executable
+     * @return true if application was launched successfully
+     */
+    public static boolean launchApplication(String applicationPath) {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(applicationPath);
+            processBuilder.start();
+            
+            Log.info("Application launched: " + applicationPath);
+            
+            // Give the application some time to start
+            Thread.sleep(2000);
+            
+            return true;
+            
+        } catch (IOException | InterruptedException e) {
+            Log.error("Error launching application '" + applicationPath + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Launch an application with arguments
+     * @param applicationPath Path to the application executable
+     * @param arguments Command line arguments
+     * @return true if application was launched successfully
+     */
+    public static boolean launchApplication(String applicationPath, String... arguments) {
+        try {
+            List<String> command = new ArrayList<>();
+            command.add(applicationPath);
+            for (String arg : arguments) {
+                command.add(arg);
+            }
+            
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.start();
+            
+            Log.info("Application launched with arguments: " + applicationPath);
+            
+            // Give the application some time to start
+            Thread.sleep(2000);
+            
+            return true;
+            
+        } catch (IOException | InterruptedException e) {
+            Log.error("Error launching application with arguments '" + applicationPath + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get window handle by window title
+     * @param windowTitle Title of the window
+     * @return Window handle or null if not found
+     */
+    public static HWND getWindowByTitle(String windowTitle) {
+        try {
+            HWND hwnd = User32.INSTANCE.FindWindow(null, windowTitle);
+            if (hwnd != null) {
+                Log.info("Window found: " + windowTitle);
+                return hwnd;
+            } else {
+                Log.warn("Window not found: " + windowTitle);
+                return null;
+            }
+        } catch (Exception e) {
+            Log.error("Error finding window '" + windowTitle + "': " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Check if window is visible
+     * @param windowTitle Title of the window
+     * @return true if window is visible
+     */
+    public static boolean isWindowVisible(String windowTitle) {
+        try {
+            HWND hwnd = getWindowByTitle(windowTitle);
+            if (hwnd != null) {
+                boolean visible = User32.INSTANCE.IsWindowVisible(hwnd);
+                Log.info("Window '" + windowTitle + "' visible: " + visible);
+                return visible;
+            }
+            return false;
+        } catch (Exception e) {
+            Log.error("Error checking window visibility '" + windowTitle + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Bring window to foreground
+     * @param windowTitle Title of the window
+     * @return true if window was brought to foreground
+     */
+    public static boolean bringWindowToForeground(String windowTitle) {
+        try {
+            HWND hwnd = getWindowByTitle(windowTitle);
+            if (hwnd != null) {
+                boolean result = User32.INSTANCE.SetForegroundWindow(hwnd);
+                if (result) {
+                    Log.info("Window brought to foreground: " + windowTitle);
+                } else {
+                    Log.warn("Failed to bring window to foreground: " + windowTitle);
+                }
+                return result;
+            }
+            return false;
+        } catch (Exception e) {
+            Log.error("Error bringing window to foreground '" + windowTitle + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Maximize window
+     * @param windowTitle Title of the window
+     * @return true if window was maximized
+     */
+    public static boolean maximizeWindow(String windowTitle) {
+        try {
+            HWND hwnd = getWindowByTitle(windowTitle);
+            if (hwnd != null) {
+                boolean result = User32.INSTANCE.ShowWindow(hwnd, User32.SW_MAXIMIZE);
+                if (result) {
+                    Log.info("Window maximized: " + windowTitle);
+                } else {
+                    Log.warn("Failed to maximize window: " + windowTitle);
+                }
+                return result;
+            }
+            return false;
+        } catch (Exception e) {
+            Log.error("Error maximizing window '" + windowTitle + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Minimize window
+     * @param windowTitle Title of the window
+     * @return true if window was minimized
+     */
+    public static boolean minimizeWindow(String windowTitle) {
+        try {
+            HWND hwnd = getWindowByTitle(windowTitle);
+            if (hwnd != null) {
+                boolean result = User32.INSTANCE.ShowWindow(hwnd, User32.SW_MINIMIZE);
+                if (result) {
+                    Log.info("Window minimized: " + windowTitle);
+                } else {
+                    Log.warn("Failed to minimize window: " + windowTitle);
+                }
+                return result;
+            }
+            return false;
+        } catch (Exception e) {
+            Log.error("Error minimizing window '" + windowTitle + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Close window
+     * @param windowTitle Title of the window
+     * @return true if window was closed
+     */
+    public static boolean closeWindow(String windowTitle) {
+        try {
+            HWND hwnd = getWindowByTitle(windowTitle);
+            if (hwnd != null) {
+                boolean result = User32.INSTANCE.PostMessage(hwnd, User32.WM_CLOSE, null, null);
+                if (result) {
+                    Log.info("Close message sent to window: " + windowTitle);
+                } else {
+                    Log.warn("Failed to send close message to window: " + windowTitle);
+                }
+                return result;
+            }
+            return false;
+        } catch (Exception e) {
+            Log.error("Error closing window '" + windowTitle + "': " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get window dimensions
+     * @param windowTitle Title of the window
+     * @return Window dimensions as [width, height] or null if not found
+     */
+    public static int[] getWindowDimensions(String windowTitle) {
+        try {
+            HWND hwnd = getWindowByTitle(windowTitle);
+            if (hwnd != null) {
+                WinDef.RECT rect = new WinDef.RECT();
+                boolean result = User32.INSTANCE.GetWindowRect(hwnd, rect);
+                if (result) {
+                    int width = rect.right - rect.left;
+                    int height = rect.bottom - rect.top;
+                    Log.info("Window dimensions for '" + windowTitle + "': " + width + "x" + height);
+                    return new int[]{width, height};
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            Log.error("Error getting window dimensions '" + windowTitle + "': " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Get current active window title
+     * @return Title of the currently active window
+     */
+    public static String getActiveWindowTitle() {
+        try {
+            HWND hwnd = User32.INSTANCE.GetForegroundWindow();
+            if (hwnd != null) {
+                char[] windowText = new char[512];
+                User32.INSTANCE.GetWindowText(hwnd, windowText, 512);
+                String title = Native.toString(windowText);
+                Log.info("Active window title: " + title);
+                return title;
+            }
+            return null;
+        } catch (Exception e) {
+            Log.error("Error getting active window title: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Wait for window to appear
+     * @param windowTitle Title of the window to wait for
+     * @param timeoutInSeconds Maximum time to wait in seconds
+     * @return true if window appeared within timeout
+     */
+    public static boolean waitForWindow(String windowTitle, int timeoutInSeconds) {
+        long startTime = System.currentTimeMillis();
+        long timeoutMillis = timeoutInSeconds * 1000L;
+        
+        while (System.currentTimeMillis() - startTime < timeoutMillis) {
+            if (getWindowByTitle(windowTitle) != null) {
+                Log.info("Window appeared: " + windowTitle);
+                return true;
+            }
+            
+            try {
+                Thread.sleep(500); // Check every 500ms
+            } catch (InterruptedException e) {
+                Log.warn("Wait interrupted: " + e.getMessage());
+                return false;
+            }
+        }
+        
+        Log.warn("Timeout waiting for window: " + windowTitle);
+        return false;
+    }
+
+    /**
+     * Send keys to active window
+     * @param keys Keys to send
+     * @return true if keys were sent successfully
+     */
+    public static boolean sendKeysToActiveWindow(String keys) {
+        try {
+            // This is a basic implementation
+            // For more complex key combinations, consider using Robot class
+            for (char c : keys.toCharArray()) {
+                User32.INSTANCE.keybd_event((byte) Character.toUpperCase(c), (byte) 0, 0, 0);
+                User32.INSTANCE.keybd_event((byte) Character.toUpperCase(c), (byte) 0, 2, 0); // Key up
+                Thread.sleep(50);
+            }
+            
+            Log.info("Keys sent to active window: " + keys);
+            return true;
+            
+        } catch (Exception e) {
+            Log.error("Error sending keys to active window: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Take screenshot of specific window
+     * @param windowTitle Title of the window
+     * @param outputPath Path to save screenshot
+     * @return true if screenshot was taken successfully
+     */
+    public static boolean takeWindowScreenshot(String windowTitle, String outputPath) {
+        try {
+            HWND hwnd = getWindowByTitle(windowTitle);
+            if (hwnd == null) {
+                Log.error("Window not found for screenshot: " + windowTitle);
+                return false;
+            }
+
+            // Bring window to foreground first
+            bringWindowToForeground(windowTitle);
+            Thread.sleep(500); // Give time for window to come to front
+            
+            // Use Robot class for screenshot
+            java.awt.Robot robot = new java.awt.Robot();
+            
+            // Get window rectangle
+            WinDef.RECT rect = new WinDef.RECT();
+            User32.INSTANCE.GetWindowRect(hwnd, rect);
+            
+            java.awt.Rectangle windowRect = new java.awt.Rectangle(
+                rect.left, rect.top,
+                rect.right - rect.left,
+                rect.bottom - rect.top
+            );
+            
+            java.awt.image.BufferedImage screenshot = robot.createScreenCapture(windowRect);
+            javax.imageio.ImageIO.write(screenshot, "PNG", new java.io.File(outputPath));
+            
+            Log.info("Window screenshot saved: " + outputPath);
+            return true;
+            
+        } catch (Exception e) {
+            Log.error("Error taking window screenshot: " + e.getMessage());
+            return false;
+        }
+    }
+}

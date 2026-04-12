@@ -1,0 +1,91 @@
+from selenium.webdriver.common.actions import interaction
+from selenium.webdriver.common.actions.action_builder import ActionBuilder
+from selenium.webdriver.common.actions.pointer_input import PointerInput
+
+class IOSGestures:
+    """iOS-specific gesture utilities"""
+    
+    def __init__(self, driver):
+        self.driver = driver
+    
+    def swipe(self, start_x, start_y, end_x, end_y, duration=1000):
+        """Perform swipe gesture"""
+        actions = ActionBuilder(self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
+        actions.pointer_action.move_to_location(start_x, start_y)
+        actions.pointer_action.pointer_down()
+        actions.pointer_action.pause(duration / 1000)
+        actions.pointer_action.move_to_location(end_x, end_y)
+        actions.pointer_action.release()
+        actions.perform()
+    
+    def swipe_up(self):
+        """Swipe up on screen"""
+        size = self.driver.get_window_size()
+        start_x = size['width'] // 2
+        start_y = size['height'] * 0.8
+        end_x = size['width'] // 2
+        end_y = size['height'] * 0.2
+        self.swipe(start_x, start_y, end_x, end_y)
+    
+    def swipe_down(self):
+        """Swipe down on screen"""
+        size = self.driver.get_window_size()
+        start_x = size['width'] // 2
+        start_y = size['height'] * 0.2
+        end_x = size['width'] // 2
+        end_y = size['height'] * 0.8
+        self.swipe(start_x, start_y, end_x, end_y)
+    
+    def swipe_left(self):
+        """Swipe left on screen"""
+        size = self.driver.get_window_size()
+        start_x = size['width'] * 0.8
+        start_y = size['height'] // 2
+        end_x = size['width'] * 0.2
+        end_y = size['height'] // 2
+        self.swipe(start_x, start_y, end_x, end_y)
+    
+    def swipe_right(self):
+        """Swipe right on screen"""
+        size = self.driver.get_window_size()
+        start_x = size['width'] * 0.2
+        start_y = size['height'] // 2
+        end_x = size['width'] * 0.8
+        end_y = size['height'] // 2
+        self.swipe(start_x, start_y, end_x, end_y)
+    
+    def tap(self, locator):
+        """Tap on element"""
+        element = self.driver.find_element(*locator)
+        actions = ActionBuilder(self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
+        actions.pointer_action.move_to(element)
+        actions.pointer_action.pointer_down()
+        actions.pointer_action.pointer_up()
+        actions.perform()
+    
+    def double_tap(self, locator):
+        """Double tap on element"""
+        element = self.driver.find_element(*locator)
+        actions = ActionBuilder(self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
+        
+        # First tap
+        actions.pointer_action.move_to(element)
+        actions.pointer_action.pointer_down()
+        actions.pointer_action.pointer_up()
+        actions.pointer_action.pause(0.1)
+        
+        # Second tap
+        actions.pointer_action.pointer_down()
+        actions.pointer_action.pointer_up()
+        
+        actions.perform()
+    
+    def long_press(self, locator, duration=2000):
+        """Long press on element"""
+        element = self.driver.find_element(*locator)
+        actions = ActionBuilder(self.driver, mouse=PointerInput(interaction.POINTER_TOUCH, "touch"))
+        actions.pointer_action.move_to(element)
+        actions.pointer_action.pointer_down()
+        actions.pointer_action.pause(duration / 1000)
+        actions.pointer_action.release()
+        actions.perform()

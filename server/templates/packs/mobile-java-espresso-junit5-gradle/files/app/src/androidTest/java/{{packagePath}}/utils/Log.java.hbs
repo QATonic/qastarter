@@ -1,0 +1,102 @@
+package {{packageName}}.utils;
+
+import android.util.Log as AndroidLog;
+
+/**
+ * Logging utility for test execution.
+ * Wraps Android Log with test-specific formatting.
+ */
+public class Log {
+
+    private static final String TAG = "{{projectName}}";
+    private static final String SEPARATOR = "========================================";
+    private static final String STEP_PREFIX = "  → ";
+
+    /**
+     * Log info message
+     */
+    public static void info(String message) {
+        AndroidLog.i(TAG, message);
+    }
+
+    /**
+     * Log debug message
+     */
+    public static void debug(String message) {
+        AndroidLog.d(TAG, message);
+    }
+
+    /**
+     * Log warning message
+     */
+    public static void warn(String message) {
+        AndroidLog.w(TAG, message);
+    }
+
+    /**
+     * Log error message
+     */
+    public static void error(String message) {
+        AndroidLog.e(TAG, message);
+    }
+
+    /**
+     * Log error message with exception
+     */
+    public static void error(String message, Throwable throwable) {
+        AndroidLog.e(TAG, message, throwable);
+    }
+
+    /**
+     * Log test step
+     */
+    public static void step(String message) {
+        AndroidLog.i(TAG, STEP_PREFIX + message);
+    }
+
+    /**
+     * Start a new section in logs
+     */
+    public static void startSection(String sectionName) {
+        AndroidLog.i(TAG, SEPARATOR);
+        AndroidLog.i(TAG, sectionName);
+        AndroidLog.i(TAG, SEPARATOR);
+    }
+
+    /**
+     * End a section in logs
+     */
+    public static void endSection() {
+        AndroidLog.i(TAG, SEPARATOR);
+    }
+
+    /**
+     * Log test start
+     */
+    public static void testStart(String testName) {
+        startSection("TEST START: " + testName);
+    }
+
+    /**
+     * Log test end with result
+     */
+    public static void testEnd(String testName, boolean passed) {
+        String result = passed ? "PASSED" : "FAILED";
+        AndroidLog.i(TAG, "TEST " + result + ": " + testName);
+        endSection();
+    }
+
+    /**
+     * Log assertion
+     */
+    public static void assertion(String description) {
+        AndroidLog.i(TAG, "  ✓ ASSERT: " + description);
+    }
+
+    /**
+     * Log data
+     */
+    public static void data(String key, Object value) {
+        AndroidLog.d(TAG, "  DATA: " + key + " = " + value);
+    }
+}

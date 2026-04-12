@@ -1,0 +1,38 @@
+/**
+ * Login Tests - Example test file for SauceDemo.
+ */
+const { DriverManager } = require("../utils/DriverManager");
+const { LoginPage } = require("../pages/LoginPage");
+const { config } = require("../config/ConfigReader");
+
+describe("Login Tests", () => {
+  let loginPage;
+
+  beforeAll(async () => {
+    await DriverManager.initDriver();
+    const driver = await DriverManager.getDriver();
+    await driver.get(config.baseUrl);
+    loginPage = new LoginPage();
+  });
+
+  afterAll(async () => {
+    await DriverManager.quitDriver();
+  });
+
+  beforeEach(async () => {
+    const driver = await DriverManager.getDriver();
+    await driver.get(config.baseUrl);
+  });
+
+  test("should login successfully with valid credentials", async () => {
+    await loginPage.login(config.username, config.password);
+    const isSuccess = await loginPage.isLoginSuccessful();
+    expect(isSuccess).toBe(true);
+  });
+
+  test("should show error with invalid credentials", async () => {
+    await loginPage.login("invalid_user", "wrong_password");
+    const isError = await loginPage.isErrorDisplayed();
+    expect(isError).toBe(true);
+  });
+});

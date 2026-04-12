@@ -1,0 +1,132 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(
+            name: 'DEVICE',
+            choices: ['Pixel_6_Pro_API_34', 'Pixel_7_API_34', 'Nexus_5X_API_33'],
+            description: 'Android Virtual Device to run tests on'
+        )
+        booleanParam(
+            name: 'START_EMULATOR',
+            defaultValue: true,
+            description: 'Start Android emulator before running tests'
+        )
+    }
+    
+    environment {
+        ANDROID_HOME = '/opt/android-sdk'
+        GRADLE_OPTS = '-Xmx2048m'
+        JAVA_HOME = '/usr/lib/jvm/java-17-openjdk'
+    }
+    
+    tools {
+        jdk 'JDK-{{toolVersions.java}}'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                echo "Setting up build environment..."
+                sh 'java -version'
+                sh 'chmod +x gradlew'
+                sh './gradlew --version'
+            }
+        }
+        
+        stage('Start Emulator') {
+            when {
+                expression { params.START_EMULATOR }
+            }
+            steps {
+                script {
+                    sh '''
+                        ${ANDROID_HOME}/emulator/emulator -avd ${DEVICE} -no-window -no-audio -no-boot-anim &
+                        adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+                        adb shell input keyevent 82
+                    '''
+                }
+            }
+        }
+        
+        stage('Compile') {
+            steps {
+                echo "Compiling the project..."
+                sh './gradlew assembleDebug assembleAndroidTest'
+            }
+        }
+        
+        stage('Run Espresso Tests') {
+            steps {
+                echo "Running Espresso tests..."
+                sh './gradlew connectedAndroidTest --continue'
+            }
+            post {
+                always {
+                    {{#if (eq reportingTool "allure")}}
+                    sh './gradlew allureReport || true'
+                    allure([
+                        results: [[path: 'app/build/allure-results']]
+                    ])
+                    archiveArtifacts artifacts: 'app/build/allure-results/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'app/build/allure-report/**/*', allowEmptyArchive: true
+                    {{/if}}
+                    {{#if (eq reportingTool "junit-reports")}}
+                    junit(
+                        testResults: 'app/build/outputs/androidTest-results/connected/**/TEST-*.xml',
+                        allowEmptyResults: true
+                    )
+                    {{/if}}
+                    {{#if (eq reportingTool "extent-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'app/build/reports',
+                        reportFiles: 'ExtentReport_*.html',
+                        reportName: 'Espresso Test Report',
+                        reportTitles: 'Test Execution Report'
+                    ])
+                    {{/if}}
+                    archiveArtifacts(
+                        artifacts: 'app/build/outputs/androidTest-results/**/*',
+                        allowEmptyArchive: true
+                    )
+                    archiveArtifacts(
+                        artifacts: 'app/build/reports/androidTests/**/*',
+                        allowEmptyArchive: true
+                    )
+                }
+                failure {
+                    archiveArtifacts(
+                        artifacts: 'app/build/outputs/screenshots/**/*',
+                        allowEmptyArchive: true
+                    )
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                if (params.START_EMULATOR) {
+                    sh 'adb emu kill || true'
+                }
+            }
+            cleanWs()
+        }
+        success {
+            echo "Tests completed successfully!"
+        }
+        failure {
+            echo "Tests failed or build encountered issues!"
+        }
+    }
+}

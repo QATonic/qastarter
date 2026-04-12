@@ -1,0 +1,36 @@
+# ==================================================
+# {{projectName}} - Requirements
+# ==================================================
+
+# Core
+selenium>=4.16.0
+pytest>=7.4.0
+pytest-xdist>=3.5.0
+pytest-rerunfailures>=12.0
+
+# Reporting
+{{#if (eq reportingTool "pytest-html")}}
+pytest-html>=4.1.0
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+allure-pytest>=2.13.0
+{{/if}}
+
+# BDD
+{{#if (eq testingPattern "bdd")}}
+pytest-bdd>=7.0.0
+{{/if}}
+
+# Utilities
+python-dotenv>=1.0.0
+Pillow>=10.1.0
+PyYAML>=6.0.1
+
+# Logging
+# Logging
+colorlog>=6.8.0
+
+# Linting & Formatting
+black>=24.1.0
+isort>=5.13.0
+pylint>=3.0.0

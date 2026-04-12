@@ -1,0 +1,223 @@
+package {{javaPackage}}.tests;
+
+import io.restassured.response.Response;
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import {{javaPackage}}.core.BaseTest;
+import {{javaPackage}}.core.ResponseValidator;
+import {{javaPackage}}.utils.Log;
+{{#if utilities.dataProvider}}
+import {{javaPackage}}.utils.TestDataReader;
+{{/if}}
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Data-driven API test suite
+ * Tests using external data sources for comprehensive test coverage
+ *
+ * HOW TO USE THIS TEMPLATE:
+ * 1. Update endpoints to match your API
+ * 2. Add test data in src/test/resources/testdata/
+ * 3. Run: mvn clean test -Dgroups=data-driven
+ */
+public class DataDrivenTests extends BaseTest {
+
+    {{#if utilities.dataProvider}}
+    /**
+     * DataProvider for user creation test data.
+     * Reads from src/test/resources/testdata/users.csv
+     */
+    @DataProvider(name = "createUserData")
+    public Object[][] getCreateUserData() {
+        List<Map<String, String>> data = TestDataReader.readCsv("users.csv");
+        Object[][] testData = new Object[data.size()][3];
+
+        for (int i = 0; i < data.size(); i++) {
+            testData[i][0] = data.get(i).get("name");
+            testData[i][1] = data.get(i).get("username");
+            testData[i][2] = data.get(i).get("email");
+        }
+
+        return testData;
+    }
+
+    @Test(dataProvider = "createUserData",
+          groups = {"api", "data-driven"}, description = "Create users from CSV test data")
+    public void testCreateUsersFromData(String name, String username, String email) {
+        Log.step("Creating user from test data: " + username);
+
+        Map<String, String> userData = new HashMap<>();
+        userData.put("name", name);
+        userData.put("username", username);
+        userData.put("email", email);
+
+        Log.info("Sending POST request to create user: " + username);
+        Response response = post(USERS_ENDPOINT, userData);
+
+        // Validate response
+        ResponseValidator.assertStatus(response, 201);
+        ResponseValidator.assertBodyContains(response, username);
+
+        Log.info("User created successfully from test data: " + username);
+    }
+    {{/if}}
+
+    /**
+     * DataProvider for API endpoint testing.
+     */
+    @DataProvider(name = "apiEndpointData")
+    public Object[][] getApiEndpointData() {
+        return new Object[][] {
+            {"/users", "GET", 200},
+            {"/users/1", "GET", 200},
+            {"/users/99999", "GET", 404},
+            {"/posts", "GET", 200},
+            {"/posts/1", "GET", 200}
+        };
+    }
+
+    @Test(dataProvider = "apiEndpointData",
+          groups = {"api", "data-driven"}, description = "Test API endpoints from data")
+    public void testAPIEndpointsFromData(String endpoint, String method, int expectedStatus) {
+        Log.step("Testing API endpoint from data: " + method + " " + endpoint);
+
+        Log.info("Making " + method + " request to " + endpoint);
+
+        Response response;
+        switch (method.toUpperCase()) {
+            case "GET":
+                response = get(endpoint);
+                break;
+            case "POST":
+                response = post(endpoint, "{}");
+                break;
+            case "PUT":
+                response = put(endpoint, 1, "{}");
+                break;
+            case "DELETE":
+                response = delete(endpoint, 1);
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported HTTP method: " + method);
+        }
+
+        // Validate expected status
+        ResponseValidator.assertStatus(response, expectedStatus);
+
+        Log.info("API endpoint test completed: " + method + " " + endpoint + " returned " + response.getStatusCode());
+    }
+
+    /**
+     * DataProvider for authentication scenarios.
+     */
+    @DataProvider(name = "authTestData")
+    public Object[][] getAuthTestData() {
+        return new Object[][] {
+            {"testuser", "testpass123", 200, true},
+            {"invaliduser", "wrongpassword", 401, false},
+            {"testuser", "", 400, false},
+            {"", "testpass123", 400, false}
+        };
+    }
+
+    @Test(dataProvider = "authTestData",
+          groups = {"auth", "data-driven"}, description = "Test authentication scenarios from data")
+    public void testAuthenticationFromData(String username, String password, int expectedStatus, boolean shouldSucceed) {
+        Log.step("Testing authentication from data for user: " + username);
+
+        // Prepare credentials
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("username", username);
+        credentials.put("password", password);
+
+        Log.info("Attempting login with username: " + username);
+        Response response = post("/auth/login", credentials);
+
+        // Validate response
+        ResponseValidator.assertStatus(response, expectedStatus);
+
+        if (shouldSucceed) {
+            ResponseValidator.assertBodyContains(response, "token");
+            Log.info("Authentication successful as expected");
+        } else {
+            ResponseValidator.assertBodyContains(response, "error");
+            Log.info("Authentication failed as expected");
+        }
+    }
+
+    /**
+     * DataProvider for negative test scenarios.
+     */
+    @DataProvider(name = "negativeTestData")
+    public Object[][] getNegativeTestData() {
+        return new Object[][] {
+            {"/users/0", "GET", 404},
+            {"/users/-1", "GET", 404},
+            {"/nonexistent", "GET", 404}
+        };
+    }
+
+    @Test(dataProvider = "negativeTestData",
+          groups = {"negative", "data-driven"}, description = "Test negative scenarios from data")
+    public void testNegativeScenariosFromData(String endpoint, String method, int expectedStatus) {
+        Log.step("Testing negative scenario from data: " + method + " " + endpoint);
+
+        Log.info("Making " + method + " request to " + endpoint + " (expecting failure)");
+
+        Response response;
+        switch (method.toUpperCase()) {
+            case "GET":
+                response = get(endpoint);
+                break;
+            case "POST":
+                response = post(endpoint, "{}");
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported HTTP method: " + method);
+        }
+
+        // Validate expected error status
+        ResponseValidator.assertStatus(response, expectedStatus);
+
+        Log.info("Negative scenario handled correctly: " + method + " " + endpoint + " returned " + response.getStatusCode());
+    }
+
+    @Test(groups = {"api", "performance", "data-driven"}, description = "Load test with multiple sequential requests")
+    public void testSequentialAPIRequests() {
+        Log.step("Testing sequential API requests performance");
+
+        int numberOfRequests = 10;
+        List<Long> responseTimes = new ArrayList<>();
+
+        Log.info("Making " + numberOfRequests + " sequential requests");
+
+        // Execute sequential requests
+        for (int i = 0; i < numberOfRequests; i++) {
+            long startTime = System.currentTimeMillis();
+            Response response = get(USERS_ENDPOINT);
+            long responseTime = System.currentTimeMillis() - startTime;
+
+            responseTimes.add(responseTime);
+            ResponseValidator.assertStatus(response, 200);
+        }
+
+        // Calculate performance metrics
+        long totalTime = responseTimes.stream().mapToLong(Long::longValue).sum();
+        long averageTime = totalTime / numberOfRequests;
+        long maxTime = responseTimes.stream().mapToLong(Long::longValue).max().orElse(0);
+        long minTime = responseTimes.stream().mapToLong(Long::longValue).min().orElse(0);
+
+        Log.info("Performance metrics - Average: " + averageTime + "ms, Max: " + maxTime + "ms, Min: " + minTime + "ms");
+
+        // Assert reasonable performance (adjust thresholds as needed)
+        Assert.assertTrue(averageTime < 5000, "Average response time should be under 5 seconds");
+        Assert.assertTrue(maxTime < 10000, "Maximum response time should be under 10 seconds");
+
+        Log.info("Sequential API requests test completed successfully");
+    }
+}

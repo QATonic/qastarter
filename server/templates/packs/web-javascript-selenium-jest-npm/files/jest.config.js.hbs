@@ -1,0 +1,18 @@
+module.exports = {
+testEnvironment: 'node',
+testMatch: ['**/tests/**/*.test.js'],
+setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  testTimeout: 60000,
+  verbose: true,
+  collectCoverage: false,
+
+
+
+  reporters: [
+  'default'{{#if (eq reportingTool "allure")}},
+  ]{{/if}}{{#if (eq reportingTool "allure")}},
+  ['allure-jest', {
+  resultsDir: 'allure-results'
+  }]{{/if}}
+  ]
+  };

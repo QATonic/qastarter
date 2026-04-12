@@ -1,0 +1,174 @@
+import { graphqlClient } from '../../src/client/graphql-client';
+import { gql } from '@apollo/client/core';
+
+describe('Schema Validation Tests', () => {
+describe('Introspection', () => {
+it('should have a valid schema', async () => {
+const INTROSPECTION_QUERY = gql`
+query IntrospectionQuery {
+__schema {
+queryType {
+name
+}
+mutationType {
+name
+}
+types {
+name
+kind
+}
+}
+}
+`;
+
+const { data, errors } = await graphqlClient.query({
+query: INTROSPECTION_QUERY,
+});
+
+expect(errors).toBeUndefined();
+expect(data.__schema).toBeDefined();
+expect(data.__schema.queryType).toBeDefined();
+});
+
+it('should have User type defined', async () => {
+const TYPE_QUERY = gql`
+query TypeQuery {
+__type(name: "User") {
+name
+kind
+fields {
+name
+type {
+name
+kind
+}
+}
+}
+}
+`;
+
+const { data } = await graphqlClient.query({
+query: TYPE_QUERY,
+});
+
+expect(data.__type).toBeDefined();
+expect(data.__type.name).toBe('User');
+expect(data.__type.fields).toBeDefined();
+});
+
+it('should have required User fields', async () => {
+const TYPE_QUERY = gql`
+query TypeQuery {
+__type(name: "User") {
+fields {
+name
+}
+}
+}
+`;
+
+const { data } = await graphqlClient.query({
+query: TYPE_QUERY,
+});
+
+const fieldNames = data.__type.fields.map((f: any) => f.name);
+expect(fieldNames).toContain('id');
+expect(fieldNames).toContain('email');
+expect(fieldNames).toContain('name');
+});
+});
+
+describe('Query Validation', () => {
+it('should reject invalid queries', async () => {
+const INVALID_QUERY = gql`
+query InvalidQuery {
+nonExistentField
+}
+`;
+
+try {
+await graphqlClient.query({
+query: INVALID_QUERY,
+});
+fail('Should throw error for invalid query');
+} catch (error: any) {
+expect(error.message).toBeDefined();
+}
+});
+
+it('should validate required arguments', async () => {
+// Query that requires an ID but doesn't provide one
+const QUERY_WITHOUT_ARGS = gql`
+query GetUserWithoutId {
+user {
+id
+name
+}
+}
+`;
+
+try {
+await graphqlClient.query({
+query: QUERY_WITHOUT_ARGS,
+});
+fail('Should throw error for missing required argument');
+} catch (error: any) {
+expect(error.message).toBeDefined();
+}
+});
+});
+
+describe('Type Validation', () => {
+it('should validate enum values', async () => {
+const ENUM_QUERY = gql`
+query EnumQuery {
+__type(name: "UserRole") {
+enumValues {
+name
+}
+}
+}
+`;
+
+const { data } = await graphqlClient.query({
+query: ENUM_QUERY,
+});
+
+if (data.__type) {
+const enumValues = data.__type.enumValues.map((e: any) => e.name);
+expect(Array.isArray(enumValues)).toBe(true);
+}
+});
+
+it('should validate input types', async () => {
+const INPUT_TYPE_QUERY = gql`
+query InputTypeQuery {
+__type(name: "CreateUserInput") {
+inputFields {
+name
+type {
+name
+kind
+ofType {
+name
+kind
+}
+}
+}
+}
+}
+`;
+
+const { data } = await graphqlClient.query({
+query: INPUT_TYPE_QUERY,
+});
+
+if (data.__type) {
+expect(data.__type.inputFields).toBeDefined();
+const fieldNames = data.__type.inputFields.map((f: any) => f.name);
+expect(fieldNames).toContain('email');
+expect(fieldNames).toContain('name');
+}
+});
+});
+});

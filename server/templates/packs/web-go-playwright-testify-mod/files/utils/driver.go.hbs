@@ -1,0 +1,54 @@
+package utils
+
+import (
+"log"
+
+"github.com/playwright-community/playwright-go"
+)
+
+type Driver struct {
+PW *playwright.Playwright
+Browser playwright.Browser
+Context playwright.BrowserContext
+Page playwright.Page
+}
+
+func InitDriver() *Driver {
+pw, err := playwright.Run()
+if err != nil {
+log.Fatalf("could not start playwright: %v", err)
+}
+
+browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+Headless: playwright.Bool(false),
+})
+if err != nil {
+log.Fatalf("could not launch browser: %v", err)
+}
+
+context, err := browser.NewContext()
+if err != nil {
+log.Fatalf("could not create context: %v", err)
+}
+
+page, err := context.NewPage()
+if err != nil {
+log.Fatalf("could not create page: %v", err)
+}
+
+return &Driver{
+PW: pw,
+Browser: browser,
+Context: context,
+Page: page,
+}
+}
+
+func (d *Driver) Close() {
+if d.Browser != nil {
+d.Browser.Close()
+}
+if d.PW != nil {
+d.PW.Stop()
+}
+}

@@ -1,0 +1,26 @@
+# Swift XCUITest iOS Testing - Dockerfile
+# Note: XCUITest requires macOS. This Dockerfile is for documentation/CI purposes only.
+
+FROM swift:5.10
+
+WORKDIR /app
+
+# Copy Swift package files
+COPY Package.swift ./
+COPY Sources ./Sources
+COPY Tests ./Tests
+
+# Resolve dependencies
+RUN swift package resolve
+
+# Build the package
+RUN swift build
+
+# Environment variables
+ENV TEST_ENV=qa
+ENV PLATFORM=iOS
+
+# Note: XCUITest cannot run in Docker - requires macOS with Xcode
+# This is a placeholder for CI/CD documentation
+# Actual tests should run on macOS runners (e.g., GitHub Actions macOS, Azure DevOps macOS)
+CMD ["echo", "XCUITest requires macOS. Run on macOS with: xcodebuild test -scheme YourScheme -destination 'platform=iOS Simulator,name=iPhone 15'"]

@@ -1,0 +1,31 @@
+import Ajv from 'ajv';
+import { logger } from '../utils/logger.js';
+
+const ajv = new Ajv({ allErrors: true });
+
+/**
+ * JSON Schema validator for API responses
+ */
+export class SchemaValidator {
+  /**
+   * Validate response against JSON schema
+   */
+  static validate(data, schema) {
+    const valid = ajv.validate(schema, data);
+    
+    if (!valid) {
+      logger.error('Schema validation failed', ajv.errors);
+      throw new Error(`Schema validation failed: ${JSON.stringify(ajv.errors)}`);
+    }
+    
+    return valid;
+  }
+
+  /**
+   * Assert response matches schema
+   */
+  static assertSchema(response, schema) {
+    expect(response.status).toBeLessThan(400);
+    this.validate(response.body, schema);
+  }
+}

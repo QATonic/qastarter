@@ -1,0 +1,30 @@
+package {{javaPackage}}.config;
+
+/**
+ * Environment enumeration for configuration.
+ */
+public enum Environment {
+    DEV("dev"),
+    QA("qa"),
+    STG("stg"),
+    PROD("prod");
+
+    private final String name;
+
+    Environment(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static Environment fromString(String env) {
+        for (Environment e : values()) {
+            if (e.name.equalsIgnoreCase(env)) {
+                return e;
+            }
+        }
+        return DEV;
+    }
+}

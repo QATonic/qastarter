@@ -1,0 +1,54 @@
+# Production Environment Configuration for API Testing
+
+# API Base Configuration
+api.base.url=https://api.example.com
+api.version=v1
+api.timeout=60000
+api.content.type=application/json
+api.accept.type=application/json
+
+# Connection Settings
+api.connection.timeout=20000
+api.socket.timeout=20000
+api.max.connections=200
+
+# Authentication Configuration
+auth.method=oauth
+auth.login.endpoint=/auth/login
+auth.username=prod_user
+auth.password=prod_password
+auth.token.field=access_token
+
+# OAuth Configuration
+auth.oauth.token.endpoint=/oauth/token
+auth.oauth.client.id=prod_client_id
+auth.oauth.client.secret=prod_client_secret
+
+# API Key Configuration (if applicable)
+auth.api.key=prod_api_key_here
+auth.apikey.validation.endpoint=/auth/validate
+
+# Logging Configuration
+api.logging.enabled=false
+log.level=WARN
+log.file.path=logs/api-automation-prod.log
+
+# Test Data Configuration
+test.data.base.path=src/test/resources/testdata
+test.data.users.file=prod_users.json
+test.data.requests.file=prod_requests.json
+
+# Reporting Configuration
+reports.base.path=reports
+extent.report.name=API_Automation_Report_Production
+extent.report.title=API Test Automation Report - Production
+
+# Performance Settings
+api.retry.count=1
+api.retry.delay=3000
+api.response.timeout.threshold=15000
+
+# Database Configuration (if needed)
+db.url=jdbc:postgresql://prod-db:5432/proddb
+db.username=prod_db_user
+db.password=prod_db_password

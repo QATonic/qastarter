@@ -1,0 +1,33 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { Browser } from 'webdriverio';
+import { TestData } from '../types/testData';
+
+export function loadJsonFile<T = TestData>(filePath: string): T {
+  const data = fs.readFileSync(filePath, 'utf8');
+  return JSON.parse(data) as T;
+}
+
+export async function saveScreenshot(driver: Browser<'async'>, name: string): Promise<string> {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const screenshotPath = path.join('screenshots', `${name}_${timestamp}.png`);
+  
+  if (!fs.existsSync('screenshots')) {
+    fs.mkdirSync('screenshots', { recursive: true });
+  }
+  
+  await driver.saveScreenshot(screenshotPath);
+  return screenshotPath;
+}
+
+export function getPlatform(): string {
+  return (process.env.PLATFORM || 'Android').toLowerCase();
+}
+
+export function isAndroid(): boolean {
+  return getPlatform() === 'android';
+}
+
+export function isIOS(): boolean {
+  return getPlatform() === 'ios';
+}

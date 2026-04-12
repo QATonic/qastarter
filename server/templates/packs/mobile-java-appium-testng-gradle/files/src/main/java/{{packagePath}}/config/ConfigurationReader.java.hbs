@@ -1,0 +1,91 @@
+package {{packageName}}.config;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+/**
+ * Configuration reader for mobile automation framework
+ * Loads environment-specific properties for mobile testing
+ */
+public class ConfigurationReader {
+
+    private static Properties properties;
+    private static final String DEFAULT_ENVIRONMENT = "qa";
+
+    static {
+        loadProperties();
+    }
+
+    /**
+     * Load properties from environment-specific file
+     */
+    private static void loadProperties() {
+        try {
+            properties = new Properties();
+            String environment = System.getProperty("test.environment", DEFAULT_ENVIRONMENT);
+            String propertiesFile = "/config/" + environment + ".properties";
+            
+            InputStream inputStream = ConfigurationReader.class.getResourceAsStream(propertiesFile);
+            
+            if (inputStream == null) {
+                // Fallback to default environment
+                inputStream = ConfigurationReader.class.getResourceAsStream("/config/" + DEFAULT_ENVIRONMENT + ".properties");
+                System.out.println("Environment file not found, using default: " + DEFAULT_ENVIRONMENT);
+            }
+            
+            if (inputStream != null) {
+                properties.load(inputStream);
+                inputStream.close();
+                System.out.println("Loaded configuration for environment: " + environment);
+            } else {
+                throw new RuntimeException("Unable to load properties file for environment: " + environment);
+            }
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load configuration properties", e);
+        }
+    }
+
+    /**
+     * Get property value by key
+     * 
+     * @param key Property key
+     * @return Property value
+     */
+    public static String getProperty(String key) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            throw new RuntimeException("Property not found: " + key);
+        }
+        return value;
+    }
+
+    /**
+     * Get property value by key with default value
+     * 
+     * @param key Property key
+     * @param defaultValue Default value if property not found
+     * @return Property value or default value
+     */
+    public static String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    /**
+     * Get current environment
+     * 
+     * @return Current environment name
+     */
+    public static String getEnvironment() {
+        return System.getProperty("test.environment", DEFAULT_ENVIRONMENT);
+    }
+
+    /**
+     * Reload properties (useful for changing environments during runtime)
+     */
+    public static void reloadProperties() {
+        loadProperties();
+    }
+}

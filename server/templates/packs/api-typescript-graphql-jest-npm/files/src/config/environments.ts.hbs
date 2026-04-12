@@ -1,0 +1,32 @@
+interface EnvironmentConfig {
+graphqlEndpoint: string;
+timeout: number;
+}
+
+const environments: Record<string, EnvironmentConfig> = {
+    dev: {
+    graphqlEndpoint: process.env.DEV_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql',
+    timeout: 30000,
+    },
+    qa: {
+    graphqlEndpoint: process.env.QA_GRAPHQL_ENDPOINT || 'https://qa-api.example.com/graphql',
+    timeout: 30000,
+    },
+    staging: {
+    graphqlEndpoint: process.env.STAGING_GRAPHQL_ENDPOINT || 'https://staging-api.example.com/graphql',
+    timeout: 30000,
+    },
+    prod: {
+    graphqlEndpoint: process.env.PROD_GRAPHQL_ENDPOINT || 'https://api.example.com/graphql',
+    timeout: 30000,
+    },
+    };
+
+    export const getEnvironmentConfig = (): EnvironmentConfig => {
+    const env = process.env.TEST_ENV || 'dev';
+    return environments[env] || environments.dev;
+    };
+
+    export const getCurrentEnvironment = (): string => {
+    return process.env.TEST_ENV || 'dev';
+    };

@@ -1,0 +1,74 @@
+using System;
+
+namespace {{projectNamespace}}.Utils
+{
+    /// <summary>
+    /// Logger utility for desktop test execution.
+    /// </summary>
+    public static class Logger
+    {
+        private const string Separator = "========================================";
+        private const string StepPrefix = "  → ";
+
+        public static void Info(string message)
+        {
+            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ℹ️  INFO: {message}");
+        }
+
+        public static void Debug(string message)
+        {
+            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] 🔍 DEBUG: {message}");
+        }
+
+        public static void Warn(string message)
+        {
+            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ⚠️  WARN: {message}");
+        }
+
+        public static void Error(string message)
+        {
+            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ❌ ERROR: {message}");
+        }
+
+        public static void Error(string message, Exception ex)
+        {
+            Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ❌ ERROR: {message}");
+            Console.WriteLine($"Exception: {ex.Message}");
+            Console.WriteLine($"StackTrace: {ex.StackTrace}");
+        }
+
+        public static void Step(string message)
+        {
+            Console.WriteLine($"{StepPrefix}{message}");
+        }
+
+        public static void StartSection(string sectionName)
+        {
+            Console.WriteLine(Separator);
+            Console.WriteLine(sectionName);
+            Console.WriteLine(Separator);
+        }
+
+        public static void EndSection()
+        {
+            Console.WriteLine(Separator);
+        }
+
+        public static void TestStart(string testName)
+        {
+            StartSection($"🧪 TEST START: {testName}");
+        }
+
+        public static void TestEnd(string testName, bool passed)
+        {
+            var result = passed ? "✅ PASSED" : "❌ FAILED";
+            Console.WriteLine($"TEST {result}: {testName}");
+            EndSection();
+        }
+
+        public static void Application(string appName, string windowTitle)
+        {
+            Console.WriteLine($"🖥️ APP: {appName} - {windowTitle}");
+        }
+    }
+}

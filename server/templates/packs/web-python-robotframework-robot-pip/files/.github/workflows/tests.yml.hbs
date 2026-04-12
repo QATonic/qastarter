@@ -1,0 +1,54 @@
+name: Robot Framework Tests
+
+on:
+push:
+branches: [main, develop]
+pull_request:
+branches: [main]
+workflow_dispatch:
+
+jobs:
+test:
+runs-on: ubuntu-latest
+
+steps:
+- uses: actions/checkout@v4
+
+- name: Set up Python
+uses: actions/setup-python@v5
+with:
+python-version: '{{toolVersions.python}}'
+
+- name: Install Chrome
+uses: browser-actions/setup-chrome@latest
+
+- name: Install dependencies
+run: |
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+- name: Run Robot Framework tests
+run: |
+robot --variable HEADLESS:true --outputdir results tests/
+
+- name: Upload test results
+uses: actions/upload-artifact@v4
+if: always()
+with:
+name: robot-results
+path: results/
+
+{{#eq reportingTool "allure"}}
+- name: Generate Allure Report
+if: always()
+run: |
+pip install allure-robotframework
+allure generate results -o allure-report
+
+- name: Upload Allure Report
+uses: actions/upload-artifact@v4
+if: always()
+with:
+name: allure-report
+path: allure-report/
+{{/eq}}

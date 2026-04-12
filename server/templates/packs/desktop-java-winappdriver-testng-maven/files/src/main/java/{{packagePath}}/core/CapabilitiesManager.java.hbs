@@ -1,0 +1,176 @@
+package {{groupId}}.core;
+
+import io.appium.java_client.windows.options.WindowsOptions;
+import {{groupId}}.config.ConfigurationReader;
+import {{groupId}}.utils.Log;
+
+/**
+* Manages WindowsOptions for different desktop applications
+* Provides configuration for WinAppDriver connections
+*
+* Updated for Appium Java Client 9.x - Uses WindowsOptions instead of deprecated DesiredCapabilities
+*/
+public class CapabilitiesManager {
+
+/**
+* Get options for desktop application
+* @param appPath Path to application executable or app ID
+* @return Configured WindowsOptions
+*/
+public static WindowsOptions getDesktopOptions(String appPath) {
+WindowsOptions options = new WindowsOptions();
+
+// Set platform and application
+options.setApp(appPath);
+
+// Set device name (required)
+options.setDeviceName("WindowsPC");
+
+// Set session timeout
+int sessionTimeout = ConfigurationReader.getSessionTimeout();
+options.setNewCommandTimeout(java.time.Duration.ofSeconds(sessionTimeout));
+
+// Additional desktop-specific options
+options.setCapability("ms:waitForAppLaunch", "25");
+options.setCapability("ms:experimental-webdriver", true);
+
+Log.info("Desktop options configured for application: " + appPath);
+
+return options;
+}
+
+/**
+* Get options for Windows Root session (desktop)
+* Allows interaction with desktop elements and launching applications
+* @return Configured WindowsOptions for root session
+*/
+public static WindowsOptions getRootOptions() {
+WindowsOptions options = new WindowsOptions();
+
+// Use Root for desktop session
+options.setApp("Root");
+options.setDeviceName("WindowsPC");
+
+// Set session timeout
+int sessionTimeout = ConfigurationReader.getSessionTimeout();
+options.setNewCommandTimeout(java.time.Duration.ofSeconds(sessionTimeout));
+
+Log.info("Root desktop options configured");
+
+return options;
+}
+
+/**
+* Get options for Calculator application
+* @return Configured WindowsOptions for Calculator
+*/
+public static WindowsOptions getCalculatorOptions() {
+return getDesktopOptions("Microsoft.WindowsCalculator_8wekyb3d8bbwe!App");
+}
+
+/**
+* Get options for Notepad application
+* @return Configured WindowsOptions for Notepad
+*/
+public static WindowsOptions getNotepadOptions() {
+return getDesktopOptions("C:\\Windows\\System32\\notepad.exe");
+}
+
+/**
+* Get options for custom UWP (Universal Windows Platform) application
+* @param packageFamilyName Package family name of the UWP app
+* @param applicationId Application ID within the package
+* @return Configured WindowsOptions for UWP app
+*/
+public static WindowsOptions getUWPOptions(String packageFamilyName, String applicationId) {
+String appId = packageFamilyName + "!" + applicationId;
+return getDesktopOptions(appId);
+}
+
+/**
+* Get options for Win32 application with working directory
+* @param executablePath Path to the executable
+* @param workingDirectory Working directory for the application
+* @return Configured WindowsOptions for Win32 app
+*/
+public static WindowsOptions getWin32Options(String executablePath, String workingDirectory) {
+WindowsOptions options = getDesktopOptions(executablePath);
+
+if (workingDirectory != null && !workingDirectory.trim().isEmpty()) {
+options.setCapability("appWorkingDir", workingDirectory);
+Log.info("Working directory set: " + workingDirectory);
+}
+
+return options;
+}
+
+/**
+* Get options with command line arguments
+* @param appPath Path to application
+* @param arguments Command line arguments
+* @return Configured WindowsOptions with arguments
+*/
+public static WindowsOptions getOptionsWithArguments(String appPath, String arguments) {
+WindowsOptions options = getDesktopOptions(appPath);
+
+if (arguments != null && !arguments.trim().isEmpty()) {
+options.setCapability("appArguments", arguments);
+Log.info("Application arguments set: " + arguments);
+}
+
+return options;
+}
+
+/**
+* Get options for application with top-level window
+* Use when you want to attach to an already running application
+* @param windowHandle Handle of the top-level window to attach to
+* @return Configured WindowsOptions for window attachment
+*/
+public static WindowsOptions getWindowOptions(String windowHandle) {
+WindowsOptions options = new WindowsOptions();
+
+options.setDeviceName("WindowsPC");
+options.setCapability("appTopLevelWindow", windowHandle);
+
+// Set session timeout
+int sessionTimeout = ConfigurationReader.getSessionTimeout();
+options.setNewCommandTimeout(java.time.Duration.ofSeconds(sessionTimeout));
+
+Log.info("Window attachment options configured for handle: " + windowHandle);
+
+return options;
+}
+
+/**
+* Capability options for enhanced configuration
+*/
+public static class CapabilityOptions {
+public String workingDirectory;
+public String arguments;
+public int waitForAppLaunch = 25;
+public boolean enableExperimentalFeatures = true;
+
+public CapabilityOptions() {}
+
+public CapabilityOptions workingDirectory(String dir) {
+this.workingDirectory = dir;
+return this;
+}
+
+public CapabilityOptions arguments(String args) {
+this.arguments = args;
+return this;
+}
+
+public CapabilityOptions waitForAppLaunch(int seconds) {
+this.waitForAppLaunch = seconds;
+return this;
+}
+
+public CapabilityOptions experimentalFeatures(boolean enable) {
+this.enableExperimentalFeatures = enable;
+return this;
+}
+}
+}

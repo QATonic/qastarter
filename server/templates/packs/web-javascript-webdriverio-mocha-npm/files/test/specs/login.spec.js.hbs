@@ -1,0 +1,46 @@
+/**
+* Login Tests using WebDriverIO with Mocha.
+*/
+import LoginPage from '../pageobjects/login.page.js';
+import DataReader from '../../utils/dataReader.js';
+
+describe("Login Tests", () => {
+beforeEach(async () => {
+await LoginPage.open();
+});
+
+it("should login successfully", async () => {
+await LoginPage.login("{{testUsername}}", "{{testPassword}}");
+// SauceDemo successful login goes to inventory, no flash message usually, or we check URL
+await expect(browser).toHaveUrlContaining('inventory');
+});
+
+it("should show error with invalid credentials", async () => {
+await LoginPage.login("invalid", "wrong");
+await expect(LoginPage.flashMessage).toBeDisplayed();
+await expect(LoginPage.flashMessage).toHaveTextContaining('Epic sadface');
+});
+
+{{#if utilities.dataProvider}}
+/**
+* Data-driven tests using JSON test data
+*/
+describe("Data-driven login tests", () => {
+const testData = DataReader.getUsers(); // Returns object with keys
+const users = Object.values(testData);
+
+users.forEach((user) => {
+it(`should verify login for user: ${user.username}`, async () => {
+await LoginPage.open();
+await LoginPage.login(user.username, user.password);
+
+if (user.username === "{{testUsername}}") {
+await expect(browser).toHaveUrlContaining('inventory');
+} else {
+await expect(LoginPage.flashMessage).toBeDisplayed();
+}
+});
+});
+});
+{{/if}}
+});

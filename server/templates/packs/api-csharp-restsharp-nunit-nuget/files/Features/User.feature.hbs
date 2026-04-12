@@ -1,0 +1,18 @@
+{{#if (eq testingPattern "bdd")}}
+Feature: User API
+  As an API consumer
+  I want to manage users via REST API
+  So that I can perform CRUD operations
+
+  @smoke
+  Scenario: Get all users returns 200
+    When I send a GET request to "/users"
+    Then the response status code should be 200
+    And the response should contain a list of users
+
+  @smoke
+  Scenario: Create a new user returns 201
+    Given I have a new user with name "John Doe" and email "john@example.com"
+    When I send a POST request to "/users"
+    Then the response status code should be 201
+{{/if}}

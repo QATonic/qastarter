@@ -1,0 +1,60 @@
+"""
+Pact Provider Verification
+
+Verifies this service against contracts defined by consumers.
+Runs against the actual provider to ensure contract compliance.
+"""
+
+import pytest
+from pact import Verifier
+import os
+
+
+def test_provider_verification():
+"""Verify the provider against consumer contracts."""
+
+provider_base_url = os.environ.get('PROVIDER_BASE_URL', 'http://localhost:8000')
+pact_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'pacts')
+
+verifier = Verifier(
+provider='UserService',
+provider_base_url=provider_base_url,
+)
+
+# Verify against local pact files
+output, _ = verifier.verify_pacts(
+pact_dir=pact_dir,
+verbose=True,
+enable_pending=False,
+provider_states_setup_url=f'{provider_base_url}/_pact/provider-states',
+)
+
+assert output == 0, "Provider verification failed"
+
+
+def test_provider_verification_with_broker():
+"""Verify the provider against contracts from Pact Broker."""
+
+pact_broker_url = os.environ.get('PACT_BROKER_URL')
+pact_broker_token = os.environ.get('PACT_BROKER_TOKEN')
+provider_base_url = os.environ.get('PROVIDER_BASE_URL', 'http://localhost:8000')
+
+if not pact_broker_url:
+pytest.skip("PACT_BROKER_URL not configured")
+
+verifier = Verifier(
+provider='UserService',
+provider_base_url=provider_base_url,
+)
+
+output, _ = verifier.verify_with_broker(
+broker_url=pact_broker_url,
+broker_token=pact_broker_token,
+publish_version=os.environ.get('GIT_COMMIT', '1.0.0'),
+publish_verification_results=os.environ.get('CI', 'false') == 'true',
+provider_states_setup_url=f'{provider_base_url}/_pact/provider-states',
+enable_pending=True,
+include_wip_pacts_since='2024-01-01',
+)
+
+assert output == 0, "Provider verification against broker failed"

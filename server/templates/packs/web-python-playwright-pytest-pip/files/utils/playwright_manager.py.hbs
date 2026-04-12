@@ -1,0 +1,101 @@
+"""
+Playwright Manager - Thread-safe browser lifecycle management.
+
+Usage:
+    from utils.playwright_manager import PlaywrightManager
+    
+    PlaywrightManager.init_browser()
+    page = PlaywrightManager.get_page()
+    PlaywrightManager.quit_browser()
+
+Supports: Chromium, Firefox, WebKit
+"""
+import threading
+from playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
+from config.config_reader import config
+from utils.logger import log
+
+
+class PlaywrightManager:
+    """Thread-safe Playwright browser manager."""
+    
+    _local = threading.local()
+    _playwright = None
+    
+    @classmethod
+    def get_page(cls) -> Page:
+        """Get Page for current thread."""
+        page = getattr(cls._local, "page", None)
+        if page is None:
+            raise RuntimeError("Browser not initialized. Call init_browser() first.")
+        return page
+    
+    @classmethod
+    def get_context(cls) -> BrowserContext:
+        """Get BrowserContext for current thread."""
+        return getattr(cls._local, "context", None)
+    
+    @classmethod
+    def init_browser(cls, browser: str = None, headless: bool = None) -> Page:
+        """Initialize browser for current thread."""
+        if getattr(cls._local, "page", None) is not None:
+            log.warning("Browser already exists. Closing existing browser.")
+            cls.quit_browser()
+        
+        browser = browser or config.browser
+        headless = headless if headless is not None else config.headless
+        
+        log.info(f"Initializing Playwright: {browser} | Headless: {headless}")
+        
+        # Initialize playwright
+        cls._playwright = sync_playwright().start()
+        
+        # Launch browser
+        browser_instance = cls._launch_browser(browser, headless)
+        cls._local.browser = browser_instance
+        
+        # Create context and page
+        context = browser_instance.new_context(
+            viewport={"width": 1920, "height": 1080}
+        )
+        cls._local.context = context
+        
+        page = context.new_page()
+        cls._local.page = page
+        
+        log.info("Playwright browser initialized successfully")
+        return page
+    
+    @classmethod
+    def _launch_browser(cls, browser: str, headless: bool) -> Browser:
+        """Launch browser based on type."""
+        if browser.lower() == "firefox":
+            return cls._playwright.firefox.launch(headless=headless)
+        elif browser.lower() in ("webkit", "safari"):
+            return cls._playwright.webkit.launch(headless=headless)
+        else:  # chromium (default)
+            return cls._playwright.chromium.launch(headless=headless)
+    
+    @classmethod
+    def quit_browser(cls):
+        """Close browser for current thread."""
+        try:
+            if hasattr(cls._local, "context") and cls._local.context:
+                cls._local.context.close()
+            if hasattr(cls._local, "browser") and cls._local.browser:
+                cls._local.browser.close()
+            if cls._playwright:
+                cls._playwright.stop()
+                cls._playwright = None
+            log.info("Playwright browser closed")
+        except Exception as e:
+            log.error(f"Error closing browser: {e}")
+        finally:
+            cls._local.page = None
+            cls._local.context = None
+            cls._local.browser = None
+    
+    @classmethod
+    def is_initialized(cls) -> bool:
+        """Check if browser is initialized."""
+        return getattr(cls._local, "page", None) is not None

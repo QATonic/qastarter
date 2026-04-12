@@ -1,0 +1,49 @@
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build --no-restore
+      
+      - name: Install Playwright browsers
+        run: |
+          dotnet build
+          pwsh -Command "cd bin/Debug/net8.0; ./playwright.ps1 install --with-deps"
+      
+      - name: Run tests
+        env:
+          TEST_ENV: qa
+          BROWSER: {{raw}}${{ matrix.browser }}{{/raw}}
+        run: dotnet test --no-build --verbosity normal
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: |
+            screenshots/
+            TestResults/

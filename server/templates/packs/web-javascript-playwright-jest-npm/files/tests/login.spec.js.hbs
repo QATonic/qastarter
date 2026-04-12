@@ -1,0 +1,31 @@
+const { PlaywrightManager } = require("../utils/PlaywrightManager");
+const { LoginPage } = require("../pages/LoginPage");
+const { config } = require("../config/ConfigReader");
+
+describe("Login Tests", () => {
+  let loginPage;
+
+  beforeAll(async () => {
+    await PlaywrightManager.initBrowser();
+    const page = await PlaywrightManager.getPage();
+    await page.goto(config.baseUrl);
+    loginPage = new LoginPage();
+  });
+
+  afterAll(async () => { await PlaywrightManager.closeBrowser(); });
+
+  beforeEach(async () => {
+    const page = await PlaywrightManager.getPage();
+    await page.goto(config.baseUrl);
+  });
+
+  test("valid login", async () => {
+    await loginPage.login(config.username, config.password);
+    expect(await loginPage.isLoginSuccessful()).toBe(true);
+  });
+
+  test("invalid login", async () => {
+    await loginPage.login("invalid", "wrong");
+    expect(await loginPage.isErrorDisplayed()).toBe(true);
+  });
+});

@@ -1,0 +1,32 @@
+import { Page } from 'playwright';
+import BasePage from './BasePage';
+import envConfig from '../config/env.config';
+
+export default class HomePage extends BasePage {
+  private selectors = {
+    welcomeMessage: '.welcome-message, h1',
+    userProfile: '.user-profile',
+    logoutButton: 'button[data-action="logout"], .logout'
+  };
+
+  constructor(page: Page) {
+    super(page);
+  }
+
+  async navigateToHome(): Promise<void> {
+    await this.navigate(envConfig.getBaseUrl());
+  }
+
+  async getWelcomeMessage(): Promise<string> {
+    return await this.getText(this.selectors.welcomeMessage);
+  }
+
+  async isUserProfileVisible(): Promise<boolean> {
+    return await this.isVisible(this.selectors.userProfile);
+  }
+
+  async logout(): Promise<void> {
+    await this.click(this.selectors.logoutButton);
+    await this.page.waitForURL('**/login', { timeout: 5000 });
+  }
+}

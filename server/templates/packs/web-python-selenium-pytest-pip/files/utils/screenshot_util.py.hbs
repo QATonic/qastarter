@@ -1,0 +1,49 @@
+"""
+Screenshot capture utility for test reporting
+"""
+from pathlib import Path
+from datetime import datetime
+from selenium.webdriver.remote.webdriver import WebDriver
+from config.config import Config
+
+class ScreenshotUtil:
+    """Screenshot utility class"""
+    
+    def __init__(self, driver: WebDriver):
+        self.driver = driver
+        Config.SCREENSHOT_DIR.mkdir(exist_ok=True)
+    
+    def capture_screenshot(self, name: str = None) -> str:
+        """
+        Capture screenshot
+        
+        Args:
+            name: Screenshot name (default: timestamp)
+            
+        Returns:
+            Screenshot file path
+        """
+        if name is None:
+            name = f"screenshot_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        screenshot_path = Config.SCREENSHOT_DIR / f"{name}.png"
+        self.driver.save_screenshot(str(screenshot_path))
+        return str(screenshot_path)
+    
+    def capture_element_screenshot(self, element, name: str = None) -> str:
+        """
+        Capture screenshot of specific element
+        
+        Args:
+            element: WebElement to capture
+            name: Screenshot name
+            
+        Returns:
+            Screenshot file path
+        """
+        if name is None:
+            name = f"element_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        screenshot_path = Config.SCREENSHOT_DIR / f"{name}.png"
+        element.screenshot(str(screenshot_path))
+        return str(screenshot_path)

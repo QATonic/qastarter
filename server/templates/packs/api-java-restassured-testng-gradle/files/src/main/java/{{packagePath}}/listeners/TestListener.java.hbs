@@ -1,0 +1,91 @@
+package {{packageName}}.listeners;
+
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+{{#if (includes reporting "extent-reports")}}
+import {{packageName}}.utils.ExtentManager;
+{{/if}}
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+/**
+ * TestNG listener for API test reporting
+ * Handles test lifecycle events and integrates with reporting tools
+ */
+public class TestListener implements ITestListener {
+
+    @Override
+    public void onTestStart(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        String className = result.getTestClass().getName();
+        
+        {{#if utilities.logger}}
+        Log.startTest(testName + " [" + className + "]");
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.createTest(testName, result.getMethod().getDescription());
+        ExtentManager.logInfo("API test started: " + testName);
+        {{/if}}
+    }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        
+        {{#if utilities.logger}}
+        Log.info("API Test PASSED: " + testName);
+        Log.endTest(testName);
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.logPass("API test completed successfully");
+        {{/if}}
+    }
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        Throwable throwable = result.getThrowable();
+        
+        {{#if utilities.logger}}
+        Log.error("API Test FAILED: " + testName, throwable);
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.logFail("API test failed: " + testName, throwable);
+        {{/if}}
+        
+        {{#if utilities.logger}}
+        Log.endTest(testName);
+        {{/if}}
+    }
+
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        
+        {{#if utilities.logger}}
+        Log.warn("API Test SKIPPED: " + testName);
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.createTest(testName, result.getMethod().getDescription());
+        ExtentManager.logSkip("API test was skipped: " + (result.getThrowable() != null ? result.getThrowable().getMessage() : "No reason provided"));
+        {{/if}}
+    }
+
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        
+        {{#if utilities.logger}}
+        Log.warn("API Test FAILED but within success percentage: " + testName);
+        {{/if}}
+        
+        {{#if (includes reporting "extent-reports")}}
+        ExtentManager.logWarning("API test failed but within success percentage");
+        {{/if}}
+    }
+}

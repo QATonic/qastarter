@@ -1,0 +1,20 @@
+namespace {{projectNamespace}}.Pages
+{
+    public class LoginPage : BasePage
+    {
+        private string UsernameField = "#user-name";
+        private string PasswordField = "#password";
+        private string LoginButton = "#login-button";
+        private string ErrorMessage = "[data-test='error']";
+
+        public async Task LoginAsync(string username, string password)
+        {
+            await TypeAsync(UsernameField, username);
+            await TypeAsync(PasswordField, password);
+            await ClickAsync(LoginButton);
+        }
+
+        public async Task<bool> IsErrorDisplayedAsync() => await IsDisplayedAsync(ErrorMessage);
+        public bool IsLoginSuccessful() => CurrentUrl.Contains("inventory");
+    }
+}

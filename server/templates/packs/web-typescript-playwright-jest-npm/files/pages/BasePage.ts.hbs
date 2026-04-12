@@ -1,0 +1,55 @@
+/**
+ * Base Page - Parent class for all Playwright page objects.
+ */
+import { Page, Locator } from "playwright";
+import { PlaywrightManager } from "../utils/PlaywrightManager";
+import { config } from "../config/ConfigReader";
+
+export class BasePage {
+  protected page: Page;
+  protected timeout: number;
+
+  constructor() {
+    // Note: Page should be initialized before page object creation
+  }
+
+  protected async getPage(): Promise<Page> {
+    this.page = await PlaywrightManager.getPage();
+    this.timeout = config.timeout;
+    return this.page;
+  }
+
+  async click(selector: string): Promise<void> {
+    const page = await this.getPage();
+    await page.click(selector, { timeout: this.timeout });
+  }
+
+  async type(selector: string, text: string): Promise<void> {
+    const page = await this.getPage();
+    await page.fill(selector, text, { timeout: this.timeout });
+  }
+
+  async getText(selector: string): Promise<string> {
+    const page = await this.getPage();
+    return (await page.textContent(selector, { timeout: this.timeout })) || "";
+  }
+
+  async isDisplayed(selector: string): Promise<boolean> {
+    try {
+      const page = await this.getPage();
+      return await page.isVisible(selector, { timeout: 5000 });
+    } catch {
+      return false;
+    }
+  }
+
+  async getCurrentUrl(): Promise<string> {
+    const page = await this.getPage();
+    return page.url();
+  }
+
+  async navigateTo(url: string): Promise<void> {
+    const page = await this.getPage();
+    await page.goto(url);
+  }
+}

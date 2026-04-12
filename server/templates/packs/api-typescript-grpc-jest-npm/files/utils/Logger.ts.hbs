@@ -1,0 +1,25 @@
+import * as fs from "fs";
+import * as path from "path";
+
+class Logger {
+  private logDir = "logs";
+  private logFile: string;
+
+  constructor() {
+    if (!fs.existsSync(this.logDir)) fs.mkdirSync(this.logDir, { recursive: true });
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    this.logFile = path.join(this.logDir, `grpc_test_${timestamp}.log`);
+  }
+
+  private write(level: string, message: string): void {
+    const logLine = `${new Date().toISOString()} | ${level.padEnd(8)} | ${message}`;
+    console.log(logLine);
+    fs.appendFileSync(this.logFile, logLine + "\n");
+  }
+
+  info(message: string): void { this.write("INFO", message); }
+  error(message: string): void { this.write("ERROR", message); }
+  step(message: string): void { this.write("STEP", message); }
+}
+
+export const log = new Logger();

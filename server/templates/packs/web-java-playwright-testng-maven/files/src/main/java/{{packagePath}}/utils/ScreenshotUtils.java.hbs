@@ -1,0 +1,62 @@
+package {{javaPackage}}.utils;
+
+import {{javaPackage}}.core.PlaywrightManager;
+import com.microsoft.playwright.Page;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Screenshot Utilities - Capture screenshots on demand.
+ * 
+ * Screenshots saved to: screenshots/
+ */
+public class ScreenshotUtils {
+
+    private static final String SCREENSHOT_DIR = "screenshots";
+
+    private ScreenshotUtils() {}
+
+    public static String capture(String testName) {
+        try {
+            Page page = PlaywrightManager.getPage();
+            if (page == null) {
+                Log.error("Cannot capture screenshot - page is null");
+                return null;
+            }
+
+            Path dir = Paths.get(SCREENSHOT_DIR);
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String sanitizedName = testName.replaceAll("[^a-zA-Z0-9_-]", "_");
+            String fileName = sanitizedName + "_" + timestamp + ".png";
+            Path filePath = dir.resolve(fileName);
+
+            page.screenshot(new Page.ScreenshotOptions().setPath(filePath));
+
+            Log.info("Screenshot saved: " + filePath);
+            return filePath.toString();
+
+        } catch (Exception e) {
+            Log.error("Failed to capture screenshot: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static byte[] captureAsBytes() {
+        try {
+            Page page = PlaywrightManager.getPage();
+            if (page == null) return null;
+            return page.screenshot();
+        } catch (Exception e) {
+            Log.error("Failed to capture screenshot bytes: " + e.getMessage());
+            return null;
+        }
+    }
+}

@@ -1,0 +1,68 @@
+/**
+* Pact Broker Configuration
+*
+* Utilities for publishing and retrieving pacts from a Pact Broker.
+*/
+
+import { Publisher } from '@pact-foundation/pact';
+import path from 'path';
+
+export interface PactBrokerConfig {
+brokerUrl: string;
+brokerToken?: string;
+consumerVersion: string;
+providerVersionBranch?: string;
+tags?: string[];
+}
+
+/**
+* Publish pact files to Pact Broker
+*/
+export async function publishPacts(config: PactBrokerConfig): Promise<void> {
+    const opts = {
+    pactFilesOrDirs: [path.resolve(process.cwd(), 'pacts')],
+    pactBroker: config.brokerUrl,
+    pactBrokerToken: config.brokerToken,
+    consumerVersion: config.consumerVersion,
+    branch: config.providerVersionBranch,
+    tags: config.tags,
+    };
+
+    const publisher = new Publisher(opts);
+
+    try {
+    await publisher.publishPacts();
+    console.log('Pacts successfully published to broker');
+    } catch (error) {
+    console.error('Failed to publish pacts:', error);
+    throw error;
+    }
+    }
+
+    /**
+    * Get environment-specific configuration
+    */
+    export function getPactBrokerConfig(): PactBrokerConfig {
+    return {
+    brokerUrl: process.env.PACT_BROKER_URL || 'http://localhost:9292',
+    brokerToken: process.env.PACT_BROKER_TOKEN,
+    consumerVersion: process.env.GIT_COMMIT || process.env.npm_package_version || '1.0.0',
+    providerVersionBranch: process.env.GIT_BRANCH || 'main',
+    tags: process.env.PACT_TAGS?.split(',') || ['dev'],
+    };
+    }
+
+    // CLI script for publishing pacts
+    if (require.main === module) {
+    const config = getPactBrokerConfig();
+
+    publishPacts(config)
+    .then(() => {
+    console.log('Pact publication complete');
+    process.exit(0);
+    })
+    .catch((error) => {
+    console.error('Pact publication failed:', error);
+    process.exit(1);
+    });
+    }

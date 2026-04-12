@@ -1,0 +1,496 @@
+package {{groupId}}.pages;
+
+import {{groupId}}.utils.Log;
+import {{groupId}}.utils.DesktopActions;
+import org.openqa.selenium.By;
+
+/**
+ * Sample Windows Notepad page with POM implementation
+ * Demonstrates desktop automation for text editor applications
+ */
+public class NotepadPage extends BasePage {
+
+    // Notepad element locators
+    private final By notepadTitle = By.name("Untitled - Notepad");
+    private final By textEditor = By.className("Edit");
+    private final By menuBar = By.className("MenuBar");
+    
+    // File menu items
+    private final By fileMenu = By.name("File");
+    private final By newMenuItem = By.name("New");
+    private final By openMenuItem = By.name("Open...");
+    private final By saveMenuItem = By.name("Save");
+    private final By saveAsMenuItem = By.name("Save As...");
+    private final By exitMenuItem = By.name("Exit");
+    
+    // Edit menu items
+    private final By editMenu = By.name("Edit");
+    private final By undoMenuItem = By.name("Undo");
+    private final By redoMenuItem = By.name("Redo");
+    private final By cutMenuItem = By.name("Cut");
+    private final By copyMenuItem = By.name("Copy");
+    private final By pasteMenuItem = By.name("Paste");
+    private final By selectAllMenuItem = By.name("Select All");
+    private final By findMenuItem = By.name("Find...");
+    private final By replaceMenuItem = By.name("Replace...");
+    
+    // Format menu items
+    private final By formatMenu = By.name("Format");
+    private final By wordWrapMenuItem = By.name("Word Wrap");
+    private final By fontMenuItem = By.name("Font...");
+    
+    // View menu items
+    private final By viewMenu = By.name("View");
+    private final By statusBarMenuItem = By.name("Status Bar");
+    
+    // Help menu items
+    private final By helpMenu = By.name("Help");
+    private final By aboutMenuItem = By.name("About Notepad");
+    
+    // Dialog boxes
+    private final By saveDialog = By.name("Save As");
+    private final By openDialog = By.name("Open");
+    private final By findDialog = By.name("Find");
+    private final By replaceDialog = By.name("Replace");
+    private final By fontDialog = By.name("Font");
+    
+    // Dialog buttons
+    private final By saveButton = By.name("Save");
+    private final By cancelButton = By.name("Cancel");
+    private final By openButton = By.name("Open");
+    private final By findNextButton = By.name("Find Next");
+    private final By replaceButton = By.name("Replace");
+    private final By replaceAllButton = By.name("Replace All");
+
+    @Override
+    public String getPageTitle() {
+        String title = getCurrentWindowTitle();
+        return title != null ? title : "Notepad";
+    }
+
+    @Override
+    public boolean isPageLoaded() {
+        return isElementDisplayed(textEditor) && isElementDisplayed(menuBar);
+    }
+
+    /**
+     * Type text into the editor
+     * @param text Text to type
+     * @return true if text was typed successfully
+     */
+    public boolean typeText(String text) {
+        if (clickElement(textEditor)) {
+            DesktopActions.sendText(text);
+            Log.info("Typed text: " + text);
+            return true;
+        }
+        Log.error("Failed to click text editor before typing");
+        return false;
+    }
+
+    /**
+     * Clear all text in the editor
+     * @return true if text was cleared successfully
+     */
+    public boolean clearText() {
+        if (clickElement(textEditor)) {
+            selectAll();
+            DesktopActions.pressEscape(); // Clear selection
+            return true;
+        }
+        Log.error("Failed to clear text");
+        return false;
+    }
+
+    /**
+     * Get text from the editor
+     * @return Current text in the editor
+     */
+    public String getText() {
+        String text = getElementText(textEditor);
+        if (text != null) {
+            Log.info("Got text from editor: " + text.substring(0, Math.min(text.length(), 100)) + "...");
+        }
+        return text;
+    }
+
+    /**
+     * Create new document
+     * @return true if new document created successfully
+     */
+    public boolean newDocument() {
+        if (clickElement(fileMenu)) {
+            if (clickElement(newMenuItem)) {
+                Log.info("Created new document");
+                return waitForPageToLoad();
+            }
+        }
+        Log.error("Failed to create new document");
+        return false;
+    }
+
+    /**
+     * Open file using File menu
+     * @return true if open dialog appeared
+     */
+    public boolean openFile() {
+        if (clickElement(fileMenu)) {
+            if (clickElement(openMenuItem)) {
+                // Wait for open dialog to appear
+                if (waitForElementToAppear(openDialog, 5)) {
+                    Log.info("Open file dialog appeared");
+                    return true;
+                }
+            }
+        }
+        Log.error("Failed to open file dialog");
+        return false;
+    }
+
+    /**
+     * Save file using File menu
+     * @return true if save action completed
+     */
+    public boolean saveFile() {
+        if (clickElement(fileMenu)) {
+            if (clickElement(saveMenuItem)) {
+                Log.info("Save file action completed");
+                return true;
+            }
+        }
+        Log.error("Failed to save file");
+        return false;
+    }
+
+    /**
+     * Save file with specific name using Save As
+     * @param fileName Name of the file to save
+     * @return true if file saved successfully
+     */
+    public boolean saveFileAs(String fileName) {
+        if (clickElement(fileMenu)) {
+            if (clickElement(saveAsMenuItem)) {
+                // Wait for save dialog
+                if (waitForElementToAppear(saveDialog, 5)) {
+                    // Type filename (this is simplified - real implementation would need to handle file dialog properly)
+                    DesktopActions.sendText(fileName);
+                    DesktopActions.pressEnter();
+                    Log.info("Saved file as: " + fileName);
+                    return true;
+                }
+            }
+        }
+        Log.error("Failed to save file as: " + fileName);
+        return false;
+    }
+
+    /**
+     * Copy text to clipboard
+     * @return true if copy action completed
+     */
+    public boolean copyText() {
+        if (clickElement(editMenu)) {
+            if (clickElement(copyMenuItem)) {
+                Log.info("Copied text to clipboard");
+                return true;
+            }
+        }
+        // Alternative: use keyboard shortcut
+        DesktopActions.copy();
+        Log.info("Copied text using keyboard shortcut");
+        return true;
+    }
+
+    /**
+     * Paste text from clipboard
+     * @return true if paste action completed
+     */
+    public boolean pasteText() {
+        if (clickElement(textEditor)) {
+            DesktopActions.paste();
+            Log.info("Pasted text from clipboard");
+            return true;
+        }
+        Log.error("Failed to paste text");
+        return false;
+    }
+
+    /**
+     * Select all text
+     * @return true if select all completed
+     */
+    public boolean selectAll() {
+        if (clickElement(editMenu)) {
+            if (clickElement(selectAllMenuItem)) {
+                Log.info("Selected all text via menu");
+                return true;
+            }
+        }
+        // Alternative: use keyboard shortcut
+        DesktopActions.selectAll();
+        Log.info("Selected all text using keyboard shortcut");
+        return true;
+    }
+
+    /**
+     * Undo last action
+     * @return true if undo completed
+     */
+    public boolean undo() {
+        if (clickElement(editMenu)) {
+            if (clickElement(undoMenuItem)) {
+                Log.info("Undo action completed");
+                return true;
+            }
+        }
+        // Alternative: use keyboard shortcut
+        DesktopActions.undo();
+        Log.info("Undo using keyboard shortcut");
+        return true;
+    }
+
+    /**
+     * Redo last undone action
+     * @return true if redo completed
+     */
+    public boolean redo() {
+        if (clickElement(editMenu)) {
+            if (clickElement(redoMenuItem)) {
+                Log.info("Redo action completed");
+                return true;
+            }
+        }
+        // Alternative: use keyboard shortcut
+        DesktopActions.redo();
+        Log.info("Redo using keyboard shortcut");
+        return true;
+    }
+
+    /**
+     * Find text in document
+     * @param searchText Text to search for
+     * @return true if find dialog opened
+     */
+    public boolean findText(String searchText) {
+        if (clickElement(editMenu)) {
+            if (clickElement(findMenuItem)) {
+                // Wait for find dialog
+                if (waitForElementToAppear(findDialog, 5)) {
+                    DesktopActions.sendText(searchText);
+                    if (clickElement(findNextButton)) {
+                        Log.info("Searched for text: " + searchText);
+                        return true;
+                    }
+                }
+            }
+        }
+        Log.error("Failed to find text: " + searchText);
+        return false;
+    }
+
+    /**
+     * Replace text in document
+     * @param findText Text to find
+     * @param replaceText Text to replace with
+     * @return true if replace dialog opened
+     */
+    public boolean replaceText(String findText, String replaceText) {
+        if (clickElement(editMenu)) {
+            if (clickElement(replaceMenuItem)) {
+                // Wait for replace dialog
+                if (waitForElementToAppear(replaceDialog, 5)) {
+                    // This is simplified - real implementation would need to handle dialog fields properly
+                    DesktopActions.sendText(findText);
+                    DesktopActions.pressTab(); // Move to replace field
+                    DesktopActions.sendText(replaceText);
+                    
+                    if (clickElement(replaceAllButton)) {
+                        Log.info("Replaced all occurrences of '" + findText + "' with '" + replaceText + "'");
+                        return true;
+                    }
+                }
+            }
+        }
+        Log.error("Failed to replace text");
+        return false;
+    }
+
+    /**
+     * Toggle word wrap
+     * @return true if word wrap toggle completed
+     */
+    public boolean toggleWordWrap() {
+        if (clickElement(formatMenu)) {
+            if (clickElement(wordWrapMenuItem)) {
+                Log.info("Toggled word wrap");
+                return true;
+            }
+        }
+        Log.error("Failed to toggle word wrap");
+        return false;
+    }
+
+    /**
+     * Open font dialog
+     * @return true if font dialog opened
+     */
+    public boolean openFontDialog() {
+        if (clickElement(formatMenu)) {
+            if (clickElement(fontMenuItem)) {
+                if (waitForElementToAppear(fontDialog, 5)) {
+                    Log.info("Font dialog opened");
+                    return true;
+                }
+            }
+        }
+        Log.error("Failed to open font dialog");
+        return false;
+    }
+
+    /**
+     * Toggle status bar visibility
+     * @return true if status bar toggle completed
+     */
+    public boolean toggleStatusBar() {
+        if (clickElement(viewMenu)) {
+            if (clickElement(statusBarMenuItem)) {
+                Log.info("Toggled status bar");
+                return true;
+            }
+        }
+        Log.error("Failed to toggle status bar");
+        return false;
+    }
+
+    /**
+     * Exit Notepad
+     * @return true if exit action completed
+     */
+    public boolean exitNotepad() {
+        if (clickElement(fileMenu)) {
+            if (clickElement(exitMenuItem)) {
+                Log.info("Exited Notepad");
+                return true;
+            }
+        }
+        // Alternative: Alt+F4
+        DesktopActions.robotKeyboardShortcut(java.awt.event.KeyEvent.VK_ALT, java.awt.event.KeyEvent.VK_F4);
+        Log.info("Exited Notepad using Alt+F4");
+        return true;
+    }
+
+    /**
+     * Check if document has unsaved changes
+     * @return true if document title contains asterisk (indicating unsaved changes)
+     */
+    public boolean hasUnsavedChanges() {
+        String title = getPageTitle();
+        boolean hasChanges = title != null && title.contains("*");
+        Log.info("Document has unsaved changes: " + hasChanges);
+        return hasChanges;
+    }
+
+    /**
+     * Get current document title/filename
+     * @return Document title without "- Notepad" suffix
+     */
+    public String getDocumentTitle() {
+        String fullTitle = getPageTitle();
+        if (fullTitle != null) {
+            // Remove "- Notepad" suffix
+            String docTitle = fullTitle.replace("- Notepad", "").trim();
+            // Remove asterisk if present (unsaved changes indicator)
+            docTitle = docTitle.replace("*", "").trim();
+            Log.info("Document title: " + docTitle);
+            return docTitle;
+        }
+        return null;
+    }
+
+    /**
+     * Get text statistics (character count, word count, etc.)
+     * @return Text statistics as a formatted string
+     */
+    public String getTextStatistics() {
+        String text = getText();
+        if (text != null) {
+            int charCount = text.length();
+            int wordCount = text.trim().isEmpty() ? 0 : text.trim().split("\\s+").length;
+            int lineCount = text.split("\n").length;
+            
+            String stats = String.format("Characters: %d, Words: %d, Lines: %d", charCount, wordCount, lineCount);
+            Log.info("Text statistics: " + stats);
+            return stats;
+        }
+        return null;
+    }
+
+    /**
+     * Append text to existing content
+     * @param text Text to append
+     * @return true if text was appended successfully
+     */
+    public boolean appendText(String text) {
+        if (clickElement(textEditor)) {
+            // Move cursor to end
+            DesktopActions.keyboardShortcut(org.openqa.selenium.Keys.CONTROL, org.openqa.selenium.Keys.END);
+            DesktopActions.sendText(text);
+            Log.info("Appended text: " + text);
+            return true;
+        }
+        Log.error("Failed to append text");
+        return false;
+    }
+
+    /**
+     * Insert text at current cursor position
+     * @param text Text to insert
+     * @return true if text was inserted successfully
+     */
+    public boolean insertText(String text) {
+        if (clickElement(textEditor)) {
+            DesktopActions.sendText(text);
+            Log.info("Inserted text: " + text);
+            return true;
+        }
+        Log.error("Failed to insert text");
+        return false;
+    }
+
+    /**
+     * Wait for element to appear (helper method)
+     * @param locator Element locator
+     * @param timeoutInSeconds Timeout in seconds
+     * @return true if element appeared
+     */
+    private boolean waitForElementToAppear(By locator, int timeoutInSeconds) {
+        return waitForElementText(locator, "", timeoutInSeconds);
+    }
+
+    /**
+     * Verify text content contains expected text
+     * @param expectedText Expected text content
+     * @return true if text contains expected content
+     */
+    public boolean verifyTextContains(String expectedText) {
+        String actualText = getText();
+        if (actualText != null && actualText.contains(expectedText)) {
+            Log.info("Text verification passed. Found expected text: " + expectedText);
+            return true;
+        } else {
+            Log.error("Text verification failed. Expected text not found: " + expectedText);
+            return false;
+        }
+    }
+
+    /**
+     * Get current cursor position (line and column)
+     * @return Cursor position as "Line: X, Column: Y" or null if not available
+     */
+    public String getCursorPosition() {
+        // This would typically require accessing the status bar or using Win32 APIs
+        // For now, return a placeholder
+        Log.info("Cursor position information not available in basic implementation");
+        return null;
+    }
+}

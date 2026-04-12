@@ -1,0 +1,10 @@
+{
+  "name": "{{artifactId}}",
+  "version": "1.0.0",
+  "scripts": {"test": "jest"},
+  "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+    "webdriverio": "^8.27.0",
+    "jest": "^29.7.0",
+    "dotenv": "^16.3.0"
+  }
+}

@@ -1,0 +1,277 @@
+# {{projectName}}
+
+Windows desktop application automation framework with C#, WinAppDriver, and NUnit.
+
+## Features
+
+- **.NET {{toolVersions.dotnet}}**: Modern C# with Windows desktop support
+- **WinAppDriver**: Microsoft's UI automation framework for Windows apps
+- **NUnit {{toolVersions.nunit}}**: Industry-standard testing framework
+- **Page Object Model**: Clean separation of test logic and UI
+- **FluentAssertions**: Readable test assertions
+- **Serilog Logging**: Structured logging
+- **Screenshot Capture**: Automatic screenshots on test failure
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Workflow for Windows runners
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+
+## Prerequisites
+
+### 1. WinAppDriver Installation
+
+Download and install WinAppDriver:
+- Download from: https://github.com/microsoft/WinAppDriver/releases
+- Install the MSI package
+- WinAppDriver.exe will be installed to: `C:\Program Files (x86)\Windows Application Driver\`
+
+### 2. Enable Developer Mode (Windows 10/11)
+
+1. Open Settings → Update & Security → For Developers
+2. Enable "Developer Mode"
+
+## Installation
+
+```bash
+# Restore dependencies
+dotnet restore
+
+# Build project
+dotnet build
+```
+
+## Running Tests
+
+### Start WinAppDriver
+
+Before running tests, start WinAppDriver:
+
+```bash
+# Start WinAppDriver on default port (4723)
+"C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe"
+```
+
+### Run Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run with verbose output
+dotnet test --verbosity normal
+
+# Run specific category
+dotnet test --filter Category=Smoke
+
+# Run with test results
+dotnet test --logger "trx;LogFileName=test-results.trx"
+```
+
+## Project Structure
+
+```
+.
+├── Config/
+│   ├── Settings.cs              # Configuration management
+│   └── WinAppDriverConfig.cs    # WinAppDriver options
+├── Core/
+│   ├── DriverFactory.cs         # Driver session management
+│   ├── ElementActions.cs        # Common element actions
+│   └── WaitHelpers.cs           # Wait utilities
+├── Pages/
+│   ├── BasePage.cs              # Base page object class
+│   ├── CalculatorPage.cs        # Calculator app page object
+│   └── NotepadPage.cs           # Notepad app page object
+├── Tests/
+│   ├── BaseTest.cs              # Base test class
+│   ├── CalculatorTests.cs       # Calculator automation tests
+│   └── NotepadTests.cs          # Notepad automation tests
+├── Utils/
+│   ├── Logger.cs                # Logging configuration
+│   └── ScreenshotHelper.cs      # Screenshot utilities
+└── {{projectName}}.csproj       # Project file
+```
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# WinAppDriver URL
+WINAPPDRIVER_URL=http://127.0.0.1:4723
+
+# Timeouts (in seconds)
+IMPLICIT_WAIT=10
+EXPLICIT_WAIT=30
+
+# Logging
+LOG_LEVEL=Information
+LOG_FILE=logs/test-run.log
+
+# Screenshots
+SCREENSHOT_PATH=Screenshots
+SCREENSHOT_ON_FAILURE=true
+```
+
+## Writing Tests
+
+### Basic Test Example
+
+```csharp
+using NUnit.Framework;
+using FluentAssertions;
+
+[TestFixture]
+public class CalculatorTests : BaseTest
+{
+    private CalculatorPage _calculatorPage;
+
+    [SetUp]
+    public void SetUp()
+    {
+        Driver = DriverFactory.CreateCalculatorDriver();
+        _calculatorPage = new CalculatorPage(Driver);
+    }
+
+    [Test]
+    public void Addition_ShouldCalculateCorrectly()
+    {
+        _calculatorPage.Add(5, 3);
+        
+        var result = _calculatorPage.GetResult();
+        result.Should().Contain("8");
+    }
+}
+```
+
+### Page Object Pattern
+
+```csharp
+public class CalculatorPage : BasePage
+{
+    private By NumberOneButton => By.Name("One");
+    private By PlusButton => By.Name("Plus");
+    
+    public CalculatorPage ClickNumber(int number)
+    {
+        Click(FindElement(NumberOneButton), "Number 1");
+        return this;
+    }
+}
+```
+
+### Data-Driven Tests
+
+```csharp
+[Test]
+[TestCase(1, 1, "2")]
+[TestCase(5, 5, "10")]
+[TestCase(10, 20, "30")]
+public void Addition_WithMultipleInputs(int num1, int num2, string expected)
+{
+    _calculatorPage.Add(num1, num2);
+    var result = _calculatorPage.GetResult();
+    result.Should().Contain(expected);
+}
+```
+
+## Automating Custom Applications
+
+To automate your own Windows application:
+
+1. **Get Application ID or Path**:
+   ```csharp
+   // For Microsoft Store apps
+   var appId = "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App";
+   
+   // For traditional desktop apps
+   var appPath = @"C:\Path\To\Your\Application.exe";
+   ```
+
+2. **Create AppiumOptions**:
+   ```csharp
+   public static AppiumOptions GetCustomAppOptions(string appPath)
+   {
+       var options = new AppiumOptions();
+       options.AddAdditionalAppiumOption("app", appPath);
+       options.AddAdditionalAppiumOption("platformName", "Windows");
+       options.AddAdditionalAppiumOption("deviceName", "WindowsPC");
+       return options;
+   }
+   ```
+
+3. **Inspect UI Elements**:
+   Use tools like:
+   - Inspect.exe (Windows SDK)
+   - Accessibility Insights
+   - WinAppDriver UI Recorder
+
+## Finding Element Locators
+
+Common locator strategies:
+- **By.Name**: `By.Name("Button Name")`
+- **By.AutomationId**: `By.XPath("//Button[@AutomationId='btnSubmit']")`
+- **By.ClassName**: `By.ClassName("Button")`
+- **By.XPath**: `By.XPath("//Edit[@Name='Search']")`
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+The GitHub Actions workflow:
+- Runs on Windows runners
+- Installs WinAppDriver automatically
+- Starts WinAppDriver service
+- Runs tests
+- Uploads screenshots and logs
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Troubleshooting
+
+### WinAppDriver Connection Issues
+- Ensure WinAppDriver is running on port 4723
+- Check Windows Firewall settings
+- Verify Developer Mode is enabled
+
+### Element Not Found
+- Use Inspect.exe to verify element properties
+- Check if app is fully loaded before interacting
+- Increase wait timeouts if needed
+
+### Session Creation Failed
+- Verify application path or ID is correct
+- Ensure application can be launched manually
+- Check WinAppDriver logs for errors
+
+## Test Categories
+
+- `[Category("Smoke")]` - Critical path tests
+
+Run specific categories:
+```bash
+dotnet test --filter Category=Smoke
+```
+
+## Reports
+
+- **Test Results**: `TestResults/*.trx`
+- **Screenshots**: `Screenshots/`
+- **Logs**: `logs/test-run.log`

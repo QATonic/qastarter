@@ -1,0 +1,47 @@
+package {{javaPackage}}.utils;
+
+import io.qameta.allure.Allure;
+import io.qameta.allure.Attachment;
+
+import java.io.ByteArrayInputStream;
+
+/**
+ * Allure Manager - Allure reporting integration.
+ * 
+ * Results saved to: build/allure-results (Gradle) or target/allure-results (Maven)
+ * 
+ * To view report:
+ *   Gradle: gradle allureServe
+ *   Maven: mvn allure:serve
+ */
+public class AllureManager {
+
+    private AllureManager() {}
+
+    @Attachment(value = "{0}", type = "image/png")
+    public static byte[] attachScreenshot(String name, byte[] screenshot) {
+        Log.info("[Allure] Attaching screenshot: " + name);
+        return screenshot;
+    }
+
+    @Attachment(value = "{0}", type = "text/plain")
+    public static String attachText(String name, String text) {
+        return text;
+    }
+
+    public static void attachScreenshotToReport(String name, byte[] screenshot) {
+        Allure.addAttachment(name, new ByteArrayInputStream(screenshot));
+    }
+
+    public static void step(String stepName) {
+        Allure.step(stepName);
+    }
+
+    public static void addDescription(String description) {
+        Allure.description(description);
+    }
+
+    public static void addLink(String name, String url) {
+        Allure.link(name, url);
+    }
+}

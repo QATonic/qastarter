@@ -1,0 +1,64 @@
+import { World, IWorldOptions } from '@cucumber/cucumber';
+import { Browser, BrowserContext, Page, chromium, firefox, webkit } from 'playwright';
+import { logger } from '../utils/logger';
+import { config } from '../config/test.config';
+
+export class CustomWorld extends World {
+  browser!: Browser;
+  context!: BrowserContext;
+  page!: Page;
+  
+  constructor(options: IWorldOptions) {
+    super(options);
+  }
+  
+  async init() {
+    try {
+      const browserType = process.env.BROWSER || 'chromium';
+      const headless = process.env.HEADLESS !== 'false';
+      
+      logger.info(`Initializing ${browserType} browser (headless: ${headless})`);
+      
+      switch (browserType.toLowerCase()) {
+        case 'firefox':
+          this.browser = await firefox.launch({ headless });
+          break;
+        case 'webkit':
+          this.browser = await webkit.launch({ headless });
+          break;
+        default:
+          this.browser = await chromium.launch({ headless });
+      }
+      
+      this.context = await this.browser.newContext({
+        viewport: { width: 1280, height: 720 },
+        recordVideo: config.recordVideo ? { dir: 'videos/' } : undefined,
+        screenshot: 'only-on-failure'
+      });
+      
+      this.page = await this.context.newPage();
+      
+      logger.info('Browser initialized successfully');
+    } catch (error) {
+      logger.error('Failed to initialize browser:', error);
+      throw error;
+    }
+  }
+  
+  async cleanup() {
+    try {
+      if (this.page) {
+        await this.page.close();
+      }
+      if (this.context) {
+        await this.context.close();
+      }
+      if (this.browser) {
+        await this.browser.close();
+      }
+      logger.info('Browser cleanup completed');
+    } catch (error) {
+      logger.error('Error during cleanup:', error);
+    }
+  }
+}

@@ -1,0 +1,81 @@
+package {{javaPackage}}.utils;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * Logger Utility - Consistent logging across the framework.
+ * 
+ * Uses Log4j2. Logs go to: logs/test_latest.log
+ */
+public class Log {
+
+    private static final Logger logger = LogManager.getLogger(Log.class);
+
+    private Log() {}
+
+    public static void info(String message) {
+        logger.info(message);
+    }
+
+    public static void debug(String message) {
+        logger.debug(message);
+    }
+
+    public static void warn(String message) {
+        logger.warn(message);
+    }
+
+    public static void error(String message) {
+        logger.error(message);
+    }
+
+    public static void error(String message, Throwable throwable) {
+        logger.error(message, throwable);
+    }
+
+    /**
+     * Log a test step
+     */
+    public static void step(String stepDescription) {
+        logger.info("STEP: " + stepDescription);
+    }
+
+    /**
+     * Log an action (click, type, etc.)
+     */
+    public static void action(String actionDescription) {
+        logger.info("ACTION: " + actionDescription);
+    }
+
+    /**
+     * Log wait operation
+     */
+    public static void logWait(String waitDescription) {
+        logger.debug("WAIT: " + waitDescription);
+    }
+
+    /**
+     * Log assertion
+     */
+    public static void assertion(String assertionDescription) {
+        logger.info("ASSERT: " + assertionDescription);
+    }
+
+    /**
+     * Log test start
+     */
+    public static void testStart(String testName) {
+        logger.info("========================================");
+        logger.info("TEST START: " + testName);
+        logger.info("========================================");
+    }
+
+    /**
+     * Log test end
+     */
+    public static void testEnd(String testName, String status) {
+        logger.info("TEST END: " + testName + " - " + status);
+        logger.info("========================================");
+    }
+}

@@ -1,0 +1,31 @@
+package {{javaPackage}}.runners;
+
+import io.cucumber.testng.AbstractTestNGCucumberTests;
+import io.cucumber.testng.CucumberOptions;
+import org.testng.annotations.DataProvider;
+
+/**
+ * Cucumber TestNG Runner - Executes BDD feature files.
+ * 
+ * Run: mvn clean test -Dtest=TestRunner
+ */
+@CucumberOptions(
+    features = "src/test/resources/features",
+    glue = {"{{javaPackage}}.stepdefinitions"},
+    plugin = {
+        "pretty",
+        "html:target/cucumber-reports/cucumber.html",
+        "json:target/cucumber-reports/cucumber.json",
+        "junit:target/cucumber-reports/cucumber.xml"
+    },
+    monochrome = true,
+    tags = ""
+)
+public class TestRunner extends AbstractTestNGCucumberTests {
+
+    @Override
+    @DataProvider(parallel = true)
+    public Object[][] scenarios() {
+        return super.scenarios();
+    }
+}

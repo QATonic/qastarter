@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+{{#if (eq reportingTool "allure")}}
+    id 'io.qameta.allure' version '2.11.2'
+{{/if}}
+}
+
+group = '{{groupId}}'
+version = '1.0.0'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // RestAssured
+    implementation 'io.rest-assured:rest-assured:5.4.0'
+    implementation 'io.rest-assured:json-path:5.4.0'
+    implementation 'io.rest-assured:json-schema-validator:5.4.0'
+    
+    // TestNG
+    implementation 'org.testng:testng:7.9.0'
+    
+    // JSON
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    
+{{#if (eq reportingTool "allure")}}
+    // Allure
+    implementation 'io.qameta.allure:allure-testng:2.24.0'
+{{/if}}
+
+    // Logging
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+{{#if userDependencies.hasMaven}}
+
+// User-picked dependencies (from QAStarter dependency search)
+{{#each userDependencies.maven}}
+implementation '{{group}}:{{name}}:{{version}}'
+{{/each}}
+{{/if}}
+}
+
+test {
+    useTestNG()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}

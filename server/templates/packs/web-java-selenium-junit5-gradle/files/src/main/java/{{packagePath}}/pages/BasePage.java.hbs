@@ -1,0 +1,61 @@
+package {{javaPackage}}.pages;
+
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.WaitUtils;
+import org.openqa.selenium.*;
+
+/**
+* Base Page - Extend this in all your page objects.
+* Uses centralized WaitUtils for all explicit wait operations.
+*/
+public abstract class BasePage {
+
+protected WebDriver driver;
+
+public BasePage() {
+this.driver = DriverManager.getDriver();
+}
+
+protected void click(By locator) {
+Log.action("Click: " + locator);
+WaitUtils.waitForClickability(driver, locator).click();
+}
+
+protected void type(By locator, String text) {
+Log.action("Type into: " + locator);
+WebElement element = WaitUtils.waitForVisibility(driver, locator);
+element.clear();
+element.sendKeys(text);
+}
+
+protected String getText(By locator) {
+return WaitUtils.waitForVisibility(driver, locator).getText();
+}
+
+protected boolean isDisplayed(By locator) {
+try {
+return driver.findElement(locator).isDisplayed();
+} catch (org.openqa.selenium.NoSuchElementException | org.openqa.selenium.StaleElementReferenceException e) {
+return false;
+}
+}
+
+protected void waitForElement(By locator) {
+WaitUtils.waitForVisibility(driver, locator);
+}
+
+public String getPageTitle() {
+return driver.getTitle();
+}
+
+public String getCurrentUrl() {
+return driver.getCurrentUrl();
+}
+
+protected void logAction(String action) {
+Log.step("[" + getClass().getSimpleName() + "] " + action);
+}
+
+public abstract boolean isLoaded();
+}

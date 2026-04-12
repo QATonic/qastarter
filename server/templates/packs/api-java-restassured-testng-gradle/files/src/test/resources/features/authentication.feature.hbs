@@ -1,0 +1,66 @@
+@api @authentication
+Feature: Authentication API Testing
+  As an API consumer
+  I want to authenticate with the API
+  So that I can access protected resources
+
+  Background:
+    Given the API base URL is configured
+
+  @smoke @login
+  Scenario: Successful login with valid credentials
+    Given I have valid login credentials with username "testuser@example.com" and password "Test@123"
+    When I send a POST request to "/api/auth/login" endpoint
+    Then the response status code should be 200
+    And the response should contain authentication token
+    And the authentication token should not be empty
+
+  @negative @login
+  Scenario: Login with invalid credentials
+    Given I have login credentials with username "invalid@example.com" and password "WrongPassword"
+    When I send a POST request to "/api/auth/login" endpoint
+    Then the response status code should be 401
+    And the response should contain error message "Invalid credentials"
+
+  @negative @login
+  Scenario: Login with missing credentials
+    Given I have incomplete login credentials
+    When I send a POST request to "/api/auth/login" endpoint
+    Then the response status code should be 400
+    And the response should contain validation error
+
+  @smoke @protected
+  Scenario: Access protected resource with valid token
+    Given I have a valid authentication token
+    When I send an authenticated GET request to "/api/protected/profile" endpoint
+    Then the response status code should be 200
+    And the response should contain user profile information
+
+  @negative @protected
+  Scenario: Access protected resource with invalid token
+    Given I have an invalid authentication token
+    When I send an authenticated GET request to "/api/protected/profile" endpoint
+    Then the response status code should be 401
+    And the response should contain error message "Invalid token"
+
+  @negative @protected
+  Scenario: Access protected resource without token
+    Given I do not have an authentication token
+    When I send a GET request to "/api/protected/profile" endpoint
+    Then the response status code should be 401
+    And the response should contain error message "Authentication required"
+
+  @regression @logout
+  Scenario: Logout successfully
+    Given I have a valid authentication token
+    When I send a POST request to "/api/auth/logout" endpoint
+    Then the response status code should be 200
+    And the response should contain logout confirmation
+
+  @regression @token
+  Scenario: Refresh authentication token
+    Given I have a valid refresh token
+    When I send a POST request to "/api/auth/refresh" endpoint
+    Then the response status code should be 200
+    And the response should contain new authentication token
+    And the new token should be different from the old token

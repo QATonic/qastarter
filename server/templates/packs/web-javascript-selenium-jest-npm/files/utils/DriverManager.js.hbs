@@ -1,0 +1,72 @@
+/**
+ * Driver Manager - WebDriver lifecycle management.
+ * Selenium 4.16+ uses built-in Selenium Manager.
+ */
+const { Builder } = require("selenium-webdriver");
+const chrome = require("selenium-webdriver/chrome");
+const firefox = require("selenium-webdriver/firefox");
+const edge = require("selenium-webdriver/edge");
+const { config } = require("../config/ConfigReader");
+
+class DriverManager {
+  static driver = null;
+
+  static async getDriver() {
+    if (!this.driver) {
+      throw new Error("Driver not initialized. Call initDriver() first.");
+    }
+    return this.driver;
+  }
+
+  static async initDriver(browser, headless) {
+    browser = browser || config.browser;
+    headless = headless !== undefined ? headless : config.headless;
+
+    console.log(`[Driver] Initializing: ${browser} | Headless: ${headless}`);
+
+    const builder = new Builder();
+
+    switch (browser.toLowerCase()) {
+      case "firefox":
+        const ffOptions = new firefox.Options();
+        if (headless) ffOptions.addArguments("--headless");
+        builder.forBrowser("firefox").setFirefoxOptions(ffOptions);
+        break;
+
+      case "edge":
+        const edgeOptions = new edge.Options();
+        if (headless) edgeOptions.addArguments("--headless");
+        builder.forBrowser("MicrosoftEdge").setEdgeOptions(edgeOptions);
+        break;
+
+      default:
+        const chromeOptions = new chrome.Options();
+        if (headless) chromeOptions.addArguments("--headless=new");
+        chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+        builder.forBrowser("chrome").setChromeOptions(chromeOptions);
+        break;
+    }
+
+    this.driver = await builder.build();
+    await this.driver.manage().window().maximize();
+    await this.driver.manage().setTimeouts({ implicit: config.timeout });
+
+    console.log("[Driver] Browser initialized");
+    return this.driver;
+  }
+
+  static async quitDriver() {
+    if (this.driver) {
+      try {
+        await this.driver.quit();
+        console.log("[Driver] Browser closed");
+      } catch (error) {
+        console.error("[Driver] Error:", error);
+      } finally {
+        this.driver = null;
+      }
+    }
+  }
+}
+
+module.exports = { DriverManager };

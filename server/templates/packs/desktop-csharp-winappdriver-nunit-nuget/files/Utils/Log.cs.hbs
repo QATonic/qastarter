@@ -1,0 +1,30 @@
+using System;
+using System.IO;
+
+namespace {{projectNamespace}}.Utils
+{
+    public class Log
+    {
+        private static readonly Lazy<Log> _instance = new(() => new Log());
+        private readonly string _logFile;
+
+        public static Log Instance => _instance.Value;
+
+        private Log()
+        {
+            var logDir = "logs";
+            if (!Directory.Exists(logDir)) Directory.CreateDirectory(logDir);
+            _logFile = Path.Combine(logDir, $"desktop_test_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log");
+        }
+
+        private void Write(string level, string message)
+        {
+            var logLine = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} | {level,-8} | {message}";
+            Console.WriteLine(logLine);
+            File.AppendAllText(_logFile, logLine + Environment.NewLine);
+        }
+
+        public void Info(string message) => Write("INFO", message);
+        public void Step(string message) => Write("STEP", message);
+    }
+}

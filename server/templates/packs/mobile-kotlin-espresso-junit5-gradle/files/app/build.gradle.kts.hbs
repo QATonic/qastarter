@@ -1,0 +1,75 @@
+plugins {
+id("com.android.application") version "{{toolVersions.androidGradlePlugin}}"
+id("org.jetbrains.kotlin.android") version "{{toolVersions.kotlin}}"
+{{#eq reportingTool "allure"}}
+id("io.qameta.allure") version "{{toolVersions.allure}}"
+{{/eq}}
+}
+
+android {
+namespace = "{{groupId}}"
+compileSdk = 34
+
+defaultConfig {
+applicationId = "{{groupId}}"
+minSdk = 24
+targetSdk = 34
+versionCode = 1
+versionName = "1.0"
+
+testInstrumentationRunner = "{{groupId}}.runner.CustomTestRunner"
+}
+
+buildTypes {
+release {
+isMinifyEnabled = false
+proguardFiles(
+getDefaultProguardFile("proguard-android-optimize.txt"),
+"proguard-rules.pro"
+)
+}
+}
+
+compileOptions {
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+}
+
+kotlinOptions {
+jvmTarget = "11"
+}
+
+testOptions {
+animationsDisabled = true
+unitTests.isReturnDefaultValues = true
+}
+}
+
+dependencies {
+// Core
+implementation("androidx.core:core-ktx:1.12.0")
+implementation("androidx.appcompat:appcompat:1.6.1")
+implementation("com.google.android.material:material:1.11.0")
+
+// Testing
+androidTestImplementation("androidx.test.ext:junit:1.1.5")
+androidTestImplementation("androidx.test.espresso:espresso-core:{{toolVersions.espresso}}")
+androidTestImplementation("androidx.test.espresso:espresso-contrib:{{toolVersions.espresso}}")
+androidTestImplementation("androidx.test.espresso:espresso-intents:{{toolVersions.espresso}}")
+androidTestImplementation("androidx.test:runner:1.5.2")
+androidTestImplementation("androidx.test:rules:1.5.0")
+
+// JUnit 5 for Android
+androidTestImplementation("org.junit.jupiter:junit-jupiter-api:{{toolVersions.junit5}}")
+androidTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:{{toolVersions.junit5}}")
+androidTestImplementation("de.mannodermaus.junit5:android-test-core:1.4.0")
+androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.4.0")
+
+// Coroutines for async testing
+androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+{{#eq reportingTool "allure"}}
+// Allure
+androidTestImplementation("io.qameta.allure:allure-kotlin-android:{{toolVersions.allure}}")
+{{/eq}}
+}

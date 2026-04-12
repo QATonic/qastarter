@@ -1,0 +1,13 @@
+module.exports = {
+  browsers: ['chromium', 'firefox', 'webkit'],
+  launchOptions: {
+    headless: process.env.HEADLESS !== 'false'
+  },
+  contextOptions: {
+    viewport: {
+      width: 1920,
+      height: 1080
+    },
+    ignoreHTTPSErrors: true
+  }
+};

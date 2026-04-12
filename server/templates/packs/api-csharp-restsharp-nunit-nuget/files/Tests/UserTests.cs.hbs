@@ -1,0 +1,66 @@
+using NUnit.Framework;
+using RestSharp;
+using System.Net;
+using System.Text.Json;
+using {{projectNamespace}}.Core;
+using {{projectNamespace}}.Models;
+using {{projectNamespace}}.Utils;
+
+namespace {{projectNamespace}}.Tests
+{
+    [TestFixture]
+    public class UserTests
+    {
+        private ApiClient _api;
+        private const string UsersEndpoint = "/users";
+
+        [SetUp]
+        public void Setup() => _api = new ApiClient();
+
+        [Test, Category("Smoke")]
+        public void GetAllUsers_ReturnsSuccess()
+        {
+            Log.Instance.Step("GET all users");
+            var response = _api.Get(UsersEndpoint);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var users = JsonSerializer.Deserialize<User[]>(response.Content!);
+            Assert.That(users?.Length, Is.GreaterThan(0));
+        }
+
+        [Test, Category("Smoke")]
+        public void GetSingleUser_ReturnsUserData()
+        {
+            Log.Instance.Step("GET single user by ID");
+            var response = _api.Get($"{UsersEndpoint}/1");
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            var user = JsonSerializer.Deserialize<User>(response.Content!);
+            Assert.That(user?.Email, Is.Not.Null);
+        }
+
+        [Test, Category("Regression")]
+        public void CreateUser_ReturnsCreated()
+        {
+            Log.Instance.Step("POST create new user");
+            var newUser = new User { Name = "John Doe", Username = "johndoe", Email = "john@example.com" };
+            var response = _api.Post(UsersEndpoint, newUser);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Created));
+        }
+
+        [Test, Category("Regression")]
+        public void UpdateUser_ReturnsSuccess()
+        {
+            Log.Instance.Step("PUT update existing user");
+            var updatedUser = new User { Name = "Jane Doe", Username = "janedoe", Email = "jane@example.com" };
+            var response = _api.Put($"{UsersEndpoint}/1", updatedUser);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+
+        [Test, Category("Regression")]
+        public void DeleteUser_ReturnsSuccess()
+        {
+            Log.Instance.Step("DELETE user by ID");
+            var response = _api.Delete($"{UsersEndpoint}/1");
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        }
+    }
+}

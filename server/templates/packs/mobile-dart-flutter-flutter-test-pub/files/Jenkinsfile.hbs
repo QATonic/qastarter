@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    tools {
+        // Assuming Flutter is installed on the agent or use Docker agent
+        // For standard Jenkins, usually uses a Docker agent with Flutter
+    }
+
+    environment {
+        FLUTTER_CHANNEL = 'stable'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Dependencies') {
+            steps {
+                sh 'flutter pub get'
+            }
+        }
+
+        stage('Analyze') {
+            steps {
+                sh 'flutter analyze'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'flutter test'
+            }
+        }
+    }
+}

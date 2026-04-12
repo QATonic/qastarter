@@ -1,0 +1,9 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
+export const apiConfig = {
+  grpcHost: process.env.GRPC_HOST || "localhost:50051",
+  timeout: parseInt(process.env.TIMEOUT || "30") * 1000,
+};
+
+console.log(`[Config] gRPC Host: ${apiConfig.grpcHost}`);

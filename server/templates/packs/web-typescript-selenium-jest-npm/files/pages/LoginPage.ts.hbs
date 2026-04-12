@@ -1,0 +1,53 @@
+/**
+ * Login Page - Page object for SauceDemo login.
+ */
+import { By } from "selenium-webdriver";
+import { BasePage } from "./BasePage";
+
+export class LoginPage extends BasePage {
+  // Locators (SauceDemo)
+  private usernameField = By.id("user-name");
+  private passwordField = By.id("password");
+  private loginButton = By.id("login-button");
+  private errorMessage = By.css("[data-test='error']");
+
+  async enterUsername(username: string): Promise<LoginPage> {
+    await this.type(this.usernameField, username);
+    return this;
+  }
+
+  async enterPassword(password: string): Promise<LoginPage> {
+    await this.type(this.passwordField, password);
+    return this;
+  }
+
+  async clickLogin(): Promise<void> {
+    await this.click(this.loginButton);
+  }
+
+  async login(username: string, password: string): Promise<void> {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLogin();
+  }
+
+  async getErrorMessage(): Promise<string> {
+    if (await this.isErrorDisplayed()) {
+      return await this.getText(this.errorMessage);
+    }
+    return "";
+  }
+
+  async isErrorDisplayed(): Promise<boolean> {
+    return await this.isDisplayed(this.errorMessage);
+  }
+
+  async isLoginSuccessful(): Promise<boolean> {
+    const url = await this.getCurrentUrl();
+    return url.includes("inventory");
+  }
+
+  async isLoaded(): Promise<boolean> {
+    return await this.isDisplayed(this.loginButton);
+  }
+}

@@ -1,0 +1,225 @@
+package {{packageName}}.utils;
+
+import io.appium.java_client.AppiumDriver;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import {{packageName}}.core.DriverManager;
+import {{packageName}}.config.ConfigurationReader;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * Screenshot capture utility for mobile test reporting
+ * Handles screenshot capture and storage with automatic naming
+ */
+public class ScreenshotUtils {
+
+    private static final String SCREENSHOT_BASE_PATH = ConfigurationReader.getProperty("screenshot.base.path", "reports/screenshots");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS");
+
+    /**
+     * Take screenshot with automatic naming
+     * 
+     * @param testName Name of the test for screenshot naming
+     * @return Screenshot file path
+     */
+    public static String takeScreenshot(String testName) {
+        try {
+            AppiumDriver driver = DriverManager.getDriver();
+            
+            // Create screenshot directory if it doesn't exist
+            String platform = DriverManager.getCurrentPlatform();
+            String screenshotDir = SCREENSHOT_BASE_PATH + "/" + platform;
+            createDirectory(screenshotDir);
+            
+            // Generate unique filename
+            String timestamp = LocalDateTime.now().format(DATE_FORMAT);
+            String fileName = testName + "_" + timestamp + ".png";
+            String filePath = screenshotDir + "/" + fileName;
+            
+            // Take screenshot
+            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File destinationFile = new File(filePath);
+            
+            FileUtils.copyFile(screenshot, destinationFile);
+            
+            {{#if utilities.logger}}
+            Log.info("Screenshot captured: " + filePath);
+            {{/if}}
+            
+            return filePath;
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to capture screenshot for test: " + testName, e);
+            {{/if}}
+            return null;
+        }
+    }
+
+    /**
+     * Take screenshot with custom file name
+     * 
+     * @param fileName Custom file name (without extension)
+     * @return Screenshot file path
+     */
+    public static String takeScreenshot(String fileName, String customPath) {
+        try {
+            AppiumDriver driver = DriverManager.getDriver();
+            
+            // Create directory if needed
+            createDirectory(customPath);
+            
+            String filePath = customPath + "/" + fileName + ".png";
+            
+            // Take screenshot
+            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File destinationFile = new File(filePath);
+            
+            FileUtils.copyFile(screenshot, destinationFile);
+            
+            {{#if utilities.logger}}
+            Log.info("Screenshot captured: " + filePath);
+            {{/if}}
+            
+            return filePath;
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to capture screenshot: " + fileName, e);
+            {{/if}}
+            return null;
+        }
+    }
+
+    /**
+     * Take screenshot on test failure
+     * 
+     * @param testName Name of the failed test
+     * @param throwable Exception that caused the failure
+     * @return Screenshot file path
+     */
+    public static String takeFailureScreenshot(String testName, Throwable throwable) {
+        try {
+            String failureName = testName + "_FAILURE";
+            String screenshotPath = takeScreenshot(failureName);
+            
+            {{#if utilities.logger}}
+            Log.error("Test failed: " + testName + ". Screenshot: " + screenshotPath, throwable);
+            {{/if}}
+            
+            return screenshotPath;
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to capture failure screenshot for: " + testName, e);
+            {{/if}}
+            return null;
+        }
+    }
+
+    /**
+     * Take screenshot before performing critical action
+     * 
+     * @param actionName Name of the action being performed
+     * @return Screenshot file path
+     */
+    public static String takeActionScreenshot(String actionName) {
+        String screenshotName = "BEFORE_" + actionName.toUpperCase().replace(" ", "_");
+        return takeScreenshot(screenshotName);
+    }
+
+    /**
+     * Take screenshot after performing critical action
+     * 
+     * @param actionName Name of the action that was performed
+     * @return Screenshot file path
+     */
+    public static String takePostActionScreenshot(String actionName) {
+        String screenshotName = "AFTER_" + actionName.toUpperCase().replace(" ", "_");
+        return takeScreenshot(screenshotName);
+    }
+
+    /**
+     * Create directory if it doesn't exist
+     * 
+     * @param directoryPath Path to create
+     */
+    private static void createDirectory(String directoryPath) {
+        try {
+            File directory = new File(directoryPath);
+            if (!directory.exists()) {
+                boolean created = directory.mkdirs();
+                if (created) {
+                    {{#if utilities.logger}}
+                    Log.debug("Created screenshot directory: " + directoryPath);
+                    {{/if}}
+                } else {
+                    {{#if utilities.logger}}
+                    Log.warn("Failed to create screenshot directory: " + directoryPath);
+                    {{/if}}
+                }
+            }
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Error creating directory: " + directoryPath, e);
+            {{/if}}
+        }
+    }
+
+    /**
+     * Get default screenshot directory for current platform
+     * 
+     * @return Screenshot directory path
+     */
+    public static String getScreenshotDirectory() {
+        String platform = DriverManager.getCurrentPlatform();
+        return SCREENSHOT_BASE_PATH + "/" + platform;
+    }
+
+    /**
+     * Clean up old screenshots (older than specified days)
+     * 
+     * @param daysToKeep Number of days to keep screenshots
+     */
+    public static void cleanupOldScreenshots(int daysToKeep) {
+        try {
+            File screenshotDir = new File(SCREENSHOT_BASE_PATH);
+            if (!screenshotDir.exists()) {
+                return;
+            }
+
+            long cutoffTime = System.currentTimeMillis() - (daysToKeep * 24 * 60 * 60 * 1000L);
+            
+            File[] files = screenshotDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile() && file.getName().endsWith(".png") && file.lastModified() < cutoffTime) {
+                        boolean deleted = file.delete();
+                        {{#if utilities.logger}}
+                        if (deleted) {
+                            Log.debug("Deleted old screenshot: " + file.getName());
+                        }
+                        {{/if}}
+                    }
+                }
+            }
+            
+            {{#if utilities.logger}}
+            Log.info("Screenshot cleanup completed. Kept files newer than " + daysToKeep + " days.");
+            {{/if}}
+            
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Error during screenshot cleanup", e);
+            {{/if}}
+        }
+    }
+}

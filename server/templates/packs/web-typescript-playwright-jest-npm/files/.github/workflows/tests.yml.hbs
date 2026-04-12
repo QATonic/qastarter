@@ -1,0 +1,104 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox]
+      fail-fast: false
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js {{toolVersions.node}}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '{{toolVersions.node}}'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps {{raw}}${{ matrix.browser }}{{/raw}}
+      
+      - name: Run tests
+        env:
+          BROWSER: {{raw}}${{ matrix.browser }}{{/raw}}
+          TEST_ENV: qa
+          HEADLESS: true
+        run: npm test
+      {{#if (eq reportingTool "allure")}}
+      
+      - name: Generate Allure Report
+        if: always()
+        run: npm run report:generate
+      
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: allure-results
+          retention-days: 7
+      
+      - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: allure-report
+          retention-days: 7
+      {{/if}}
+      {{#if (eq reportingTool "jest-html")}}
+      
+      - name: Upload HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: test-results/test-report.html
+          retention-days: 7
+      {{/if}}
+      {{#if (eq reportingTool "junit")}}
+      
+      - name: Upload JUnit Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-reports-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: test-results/junit-results.xml
+          retention-days: 7
+      
+      - name: Publish Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: test-results/junit-results.xml
+      {{/if}}
+      
+      - name: Upload Screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: screenshots
+          retention-days: 7
+      
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-{{raw}}${{ matrix.browser }}{{/raw}}
+          path: logs
+          retention-days: 7

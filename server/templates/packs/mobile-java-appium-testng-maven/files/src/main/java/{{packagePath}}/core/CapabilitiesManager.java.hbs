@@ -1,0 +1,122 @@
+package {{packageName}}.core;
+
+import io.appium.java_client.android.options.UiAutomator2Options;
+import io.appium.java_client.ios.options.XCUITestOptions;
+import {{packageName}}.config.ConfigurationReader;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.time.Duration;
+
+/**
+* Mobile capabilities management for Android and iOS platforms
+* Updated for Appium Java Client 9.x - Uses UiAutomator2Options/XCUITestOptions
+*/
+public class CapabilitiesManager {
+
+/**
+* Get Android options using UiAutomator2Options (Appium 9.x)
+*
+* @return UiAutomator2Options for Android
+*/
+public static UiAutomator2Options getAndroidOptions() {
+UiAutomator2Options options = new UiAutomator2Options();
+
+// Device settings
+String deviceName = ConfigurationReader.getProperty("mobile.android.deviceName", "{{deviceName}}");
+options.setDeviceName(deviceName);
+
+// Platform version (optional)
+String platformVersion = ConfigurationReader.getProperty("mobile.android.platformVersion");
+if (platformVersion != null && !platformVersion.isEmpty()) {
+options.setPlatformVersion(platformVersion);
+}
+
+// UDID (optional for device identification)
+String udid = ConfigurationReader.getProperty("mobile.android.udid");
+if (udid != null && !udid.isEmpty()) {
+options.setUdid(udid);
+}
+
+// App settings
+String app = ConfigurationReader.getProperty("mobile.android.app");
+if (app != null && !app.isEmpty()) {
+options.setApp(app);
+}
+
+String appPackage = ConfigurationReader.getProperty("mobile.android.appPackage");
+if (appPackage != null && !appPackage.isEmpty()) {
+options.setAppPackage(appPackage);
+}
+
+String appActivity = ConfigurationReader.getProperty("mobile.android.appActivity");
+if (appActivity != null && !appActivity.isEmpty()) {
+options.setAppActivity(appActivity);
+}
+
+// Reset behavior
+boolean noReset = Boolean.parseBoolean(ConfigurationReader.getProperty("mobile.android.noReset", "true"));
+options.setNoReset(noReset);
+
+// Timeouts
+int commandTimeout = Integer.parseInt(ConfigurationReader.getProperty("mobile.android.newCommandTimeout", "300"));
+options.setNewCommandTimeout(Duration.ofSeconds(commandTimeout));
+
+{{#if utilities.logger}}
+Log.info("Android options configured for device: " + deviceName);
+{{/if}}
+
+return options;
+}
+
+/**
+* Get iOS options using XCUITestOptions (Appium 9.x)
+*
+* @return XCUITestOptions for iOS
+*/
+public static XCUITestOptions getIOSOptions() {
+XCUITestOptions options = new XCUITestOptions();
+
+// Device settings
+String deviceName = ConfigurationReader.getProperty("mobile.ios.deviceName", "iPhone Simulator");
+options.setDeviceName(deviceName);
+
+// Platform version
+String platformVersion = ConfigurationReader.getProperty("mobile.ios.platformVersion");
+if (platformVersion != null && !platformVersion.isEmpty()) {
+options.setPlatformVersion(platformVersion);
+}
+
+// UDID
+String udid = ConfigurationReader.getProperty("mobile.ios.udid");
+if (udid != null && !udid.isEmpty()) {
+options.setUdid(udid);
+}
+
+// App settings
+String app = ConfigurationReader.getProperty("mobile.ios.app");
+if (app != null && !app.isEmpty()) {
+options.setApp(app);
+}
+
+String bundleId = ConfigurationReader.getProperty("mobile.ios.bundleId");
+if (bundleId != null && !bundleId.isEmpty()) {
+options.setBundleId(bundleId);
+}
+
+// Reset behavior
+boolean noReset = Boolean.parseBoolean(ConfigurationReader.getProperty("mobile.ios.noReset", "true"));
+options.setNoReset(noReset);
+
+// Timeouts
+int commandTimeout = Integer.parseInt(ConfigurationReader.getProperty("mobile.ios.newCommandTimeout", "300"));
+options.setNewCommandTimeout(Duration.ofSeconds(commandTimeout));
+
+{{#if utilities.logger}}
+Log.info("iOS options configured for device: " + deviceName);
+{{/if}}
+
+return options;
+}
+}

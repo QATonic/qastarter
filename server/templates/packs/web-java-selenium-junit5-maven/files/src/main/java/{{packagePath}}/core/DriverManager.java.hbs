@@ -1,0 +1,63 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.utils.Log;
+import org.openqa.selenium.WebDriver;
+
+/**
+ * Driver Manager - Thread-safe WebDriver lifecycle management.
+ * 
+ * Supports parallel test execution via ThreadLocal.
+ */
+public class DriverManager {
+
+    private static final ThreadLocal<WebDriver> driverThreadLocal = new ThreadLocal<>();
+
+    private DriverManager() {}
+
+    public static WebDriver getDriver() {
+        WebDriver driver = driverThreadLocal.get();
+        if (driver == null) {
+            throw new IllegalStateException("Driver not initialized. Call initializeDriver() first.");
+        }
+        return driver;
+    }
+
+    public static void initializeDriver() {
+        if (driverThreadLocal.get() != null) {
+            Log.warn("Driver already exists. Cleaning up...");
+            quitDriver();
+        }
+
+        String browser = ConfigurationReader.getBrowser();
+        boolean headless = ConfigurationReader.isHeadless();
+
+        Log.info("Initializing browser: " + browser + " | Headless: " + headless);
+
+        WebDriver driver = BrowserFactory.createDriver(browser, headless);
+        driverThreadLocal.set(driver);
+
+        int timeout = ConfigurationReader.getTimeout();
+        driver.manage().window().maximize();
+
+        Log.info("Browser initialized successfully");
+    }
+
+    public static void quitDriver() {
+        WebDriver driver = driverThreadLocal.get();
+        if (driver != null) {
+            try {
+                driver.quit();
+                Log.info("Browser closed");
+            } catch (Exception e) {
+                Log.error("Error closing browser: " + e.getMessage());
+            } finally {
+                driverThreadLocal.remove();
+            }
+        }
+    }
+
+    public static boolean isDriverInitialized() {
+        return driverThreadLocal.get() != null;
+    }
+}

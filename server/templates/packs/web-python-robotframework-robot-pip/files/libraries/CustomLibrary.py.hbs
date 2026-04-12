@@ -1,0 +1,112 @@
+"""
+Custom Python Library for {{projectName}}
+
+Provides custom keywords for Robot Framework tests.
+"""
+
+from robot.api.deco import keyword
+from robot.api import logger
+import os
+import json
+import yaml
+
+
+class CustomLibrary:
+"""Custom library with utility keywords."""
+
+ROBOT_LIBRARY_SCOPE = 'GLOBAL'
+
+def __init__(self):
+self.config = {}
+
+@keyword("Load Configuration")
+def load_configuration(self, environment: str = "dev") -> dict:
+"""Load configuration from YAML file.
+
+Args:
+environment: Environment name (dev, qa, prod)
+
+Returns:
+Configuration dictionary
+"""
+config_path = os.path.join("variables", f"{environment}.yaml")
+
+if not os.path.exists(config_path):
+logger.warn(f"Config file not found: {config_path}")
+return {}
+
+with open(config_path, 'r') as f:
+self.config = yaml.safe_load(f)
+
+logger.info(f"Loaded configuration for {environment}")
+return self.config
+
+@keyword("Get Config Value")
+def get_config_value(self, key: str, default: str = "") -> str:
+"""Get a configuration value by key.
+
+Args:
+key: Configuration key
+default: Default value if key not found
+
+Returns:
+Configuration value
+"""
+return self.config.get(key, default)
+
+@keyword("Generate Random Email")
+def generate_random_email(self, domain: str = "test.com") -> str:
+"""Generate a random email address.
+
+Args:
+domain: Email domain
+
+Returns:
+Random email address
+"""
+import uuid
+return f"user_{uuid.uuid4().hex[:8]}@{domain}"
+
+@keyword("Log Test Information")
+def log_test_information(self, message: str, level: str = "INFO"):
+"""Log a message with specified level.
+
+Args:
+message: Message to log
+level: Log level (INFO, WARN, ERROR, DEBUG)
+"""
+level_map = {
+"INFO": logger.info,
+"WARN": logger.warn,
+"ERROR": logger.error,
+"DEBUG": logger.debug
+}
+log_func = level_map.get(level.upper(), logger.info)
+log_func(message)
+
+@keyword("Read JSON File")
+def read_json_file(self, file_path: str) -> dict:
+"""Read and parse a JSON file.
+
+Args:
+file_path: Path to JSON file
+
+Returns:
+Parsed JSON as dictionary
+"""
+with open(file_path, 'r') as f:
+return json.load(f)
+
+@keyword("Save Screenshot With Timestamp")
+def save_screenshot_with_timestamp(self, base_name: str = "screenshot") -> str:
+"""Generate a unique screenshot filename with timestamp.
+
+Args:
+base_name: Base name for the screenshot
+
+Returns:
+Full screenshot path
+"""
+from datetime import datetime
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+return f"screenshots/{base_name}_{timestamp}.png"

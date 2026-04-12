@@ -14,7 +14,7 @@
     "url": "git+https://github.com/QATonic/QAStarter.git",
     "directory": "cli"
   },
-  "homepage": "https://qastarter.com",
+  "homepage": "https://qastarter.qatonic.com",
   "bugs": {
     "url": "https://github.com/QATonic/QAStarter/issues"
   },

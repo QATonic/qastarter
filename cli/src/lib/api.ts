@@ -148,6 +148,114 @@ export async function fetchBom(): Promise<Record<string, Record<string, string>>
   }
 }
 
+/**
+ * Low-level helper: stream the generated project ZIP for a given config.
+ * Callers decide whether to save it to disk or extract it in-process.
+ */
+export async function generateProjectBuffer(options: GenerateOptions): Promise<{
+  buffer: Buffer;
+  filename: string;
+}> {
+  const params = new URLSearchParams();
+  params.set('projectName', options.projectName);
+  params.set('testingType', options.testingType);
+  params.set('framework', options.framework);
+  params.set('language', options.language);
+  if (options.testRunner) params.set('testRunner', options.testRunner);
+  if (options.buildTool) params.set('buildTool', options.buildTool);
+  if (options.testingPattern) params.set('testingPattern', options.testingPattern);
+  if (options.cicdTool) params.set('cicdTool', options.cicdTool);
+  if (options.reportingTool) params.set('reportingTool', options.reportingTool);
+  if (options.utilities && options.utilities.length > 0) {
+    params.set('utilities', options.utilities.join(','));
+  }
+  if (options.includeSampleTests !== undefined) {
+    params.set('includeSampleTests', String(options.includeSampleTests));
+  }
+
+  const url = `${getApiUrl()}/api/v1/generate?${params.toString()}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to generate project (HTTP ${response.status}): ${errorText}`);
+  }
+
+  const contentDisposition = response.headers.get('content-disposition');
+  let filename = `${options.projectName}.zip`;
+  if (contentDisposition) {
+    const match = contentDisposition.match(/filename="?([^"]+)"?/);
+    if (match) filename = match[1];
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  return { buffer, filename };
+}
+
+/**
+ * POST to /api/v1/project-preview — returns project file tree and sample contents.
+ */
+export async function previewProject(
+  options: GenerateOptions
+): Promise<Record<string, unknown>> {
+  const response = await fetch(`${getApiUrl()}/api/v1/project-preview`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(options),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to preview project (HTTP ${response.status}): ${await response.text()}`);
+  }
+  const body = (await response.json()) as { data?: Record<string, unknown> };
+  return body.data ?? {};
+}
+
+/**
+ * POST to /api/v1/project-dependencies — returns resolved dependency map for a combo.
+ */
+export async function getProjectDependencies(
+  options: GenerateOptions
+): Promise<Record<string, unknown>> {
+  const response = await fetch(`${getApiUrl()}/api/v1/project-dependencies`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(options),
+  });
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch dependencies (HTTP ${response.status}): ${await response.text()}`
+    );
+  }
+  const body = (await response.json()) as { data?: Record<string, unknown> };
+  return body.data ?? {};
+}
+
+/**
+ * POST to /api/v1/validate-config — returns {valid, errors[]}.
+ */
+export async function validateConfig(
+  options: GenerateOptions
+): Promise<{ valid: boolean; errors?: Array<{ field: string; message: string }> }> {
+  const response = await fetch(`${getApiUrl()}/api/v1/validate-config`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(options),
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    // Incompatible combos return 400; surface as structured error instead of throwing.
+    try {
+      const body = JSON.parse(text) as { error?: { message?: string } };
+      return { valid: false, errors: [{ field: 'combination', message: body.error?.message ?? text }] };
+    } catch {
+      return { valid: false, errors: [{ field: 'combination', message: text }] };
+    }
+  }
+  const body = (await response.json()) as {
+    data?: { valid: boolean; errors?: Array<{ field: string; message: string }> };
+  };
+  return body.data ?? { valid: true };
+}
+
 export async function generateProject(
   options: GenerateOptions,
   outputPath: string

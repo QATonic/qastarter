@@ -201,6 +201,11 @@
       "description": "CircleCI configuration"
     },
     {
+      "path": "config/dev.ini",
+      "isTemplate": false,
+      "description": "Development environment configuration"
+    },
+    {
       "path": "config/config_reader.py",
       "isTemplate": true,
       "description": "Configuration reader"

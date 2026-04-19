@@ -1,7 +1,7 @@
 plugins {
     id 'java'
 {{#if (eq reportingTool "allure")}}
-    id 'io.qameta.allure' version '2.11.2'
+    id 'io.qameta.allure' version '{{toolVersions.allure}}'
 {{/if}}
 }
 
@@ -15,20 +15,20 @@ repositories {
 
 dependencies {
     // RestAssured
-    implementation 'io.rest-assured:rest-assured:5.4.0'
-    implementation 'io.rest-assured:json-path:5.4.0'
-    implementation 'io.rest-assured:json-schema-validator:5.4.0'
+    implementation 'io.rest-assured:rest-assured:{{toolVersions.restassured}}'
+    implementation 'io.rest-assured:json-path:{{toolVersions.restassured}}'
+    implementation 'io.rest-assured:json-schema-validator:{{toolVersions.restassured}}'
     
     // TestNG
-    implementation 'org.testng:testng:7.9.0'
+    implementation 'org.testng:testng:{{toolVersions.testng}}'
     
     // JSON
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    implementation 'com.google.code.gson:gson:{{toolVersions.gson}}'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:{{toolVersions.jackson}}'
     
 {{#if (eq reportingTool "allure")}}
     // Allure
-    implementation 'io.qameta.allure:allure-testng:2.24.0'
+    implementation 'io.qameta.allure:allure-testng:{{toolVersions.allure}}'
 {{/if}}
 
     // Logging

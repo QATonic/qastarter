@@ -1,1 +1,1 @@
-# Package init
+# Tests package

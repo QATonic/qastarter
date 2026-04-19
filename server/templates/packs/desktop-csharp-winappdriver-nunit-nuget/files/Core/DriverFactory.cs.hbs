@@ -7,6 +7,8 @@ namespace {{projectNamespace}}.Core;
 
 public static class DriverFactory
 {
+    public static WindowsDriver<WindowsElement>? Driver { get; private set; }
+
     public static WindowsDriver<WindowsElement> CreateDriver(AppiumOptions options)
     {
         try
@@ -17,6 +19,7 @@ public static class DriverFactory
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(Settings.ImplicitWaitSeconds);
             
             Logger.Info($"WinAppDriver session created for: {options.ToCapabilities().GetCapability("app")}");
+            Driver = driver;
             return driver;
         }
         catch (Exception ex)
@@ -48,6 +51,7 @@ public static class DriverFactory
             try
             {
                 driver.Quit();
+                Driver = null;
                 Logger.Info("WinAppDriver session closed");
             }
             catch (Exception ex)

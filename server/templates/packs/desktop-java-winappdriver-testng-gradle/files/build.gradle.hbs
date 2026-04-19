@@ -11,9 +11,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.appium:java-client:9.1.0'
-    implementation 'org.seleniumhq.selenium:selenium-java:4.16.0'
-    implementation 'org.testng:testng:7.9.0'
+    implementation 'io.appium:java-client:{{toolVersions.appium}}'
+    implementation 'org.seleniumhq.selenium:selenium-java:{{toolVersions.selenium}}'
+    implementation 'org.testng:testng:{{toolVersions.testng}}'
 {{#if userDependencies.hasMaven}}
 
 // User-picked dependencies (from QAStarter dependency search)

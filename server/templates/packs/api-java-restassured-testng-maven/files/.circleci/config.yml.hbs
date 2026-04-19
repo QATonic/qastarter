@@ -63,7 +63,7 @@ jobs:
           destination: allure-report-<<parameters.environment>>
       {{/if}}
       
-      {{#if (eq reportingTool "extentreports")}}
+      {{#if (eq reportingTool "extent-reports")}}
       - store_artifacts:
           path: test-output/extent-reports
           destination: extent-reports-<<parameters.environment>>

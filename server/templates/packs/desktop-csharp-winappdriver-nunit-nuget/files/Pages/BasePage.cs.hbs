@@ -7,7 +7,7 @@ namespace {{projectNamespace}}.Pages
 {
     public class BasePage
     {
-        protected IWebDriver Driver => WinAppDriverManager.Driver;
+        protected IWebDriver Driver => DriverFactory.Driver;
         protected WebDriverWait Wait => new(Driver, TimeSpan.FromSeconds(10));
 
         protected void Click(By locator)

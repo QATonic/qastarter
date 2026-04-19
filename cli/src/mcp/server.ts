@@ -343,6 +343,13 @@ const TOOLS: ToolDef[] = [
 // ---------- server wiring ----------
 
 export async function runMcpServer(): Promise<void> {
+  // Tag every downstream REST call with the MCP client header so the
+  // backend can (a) apply the relaxed MCP rate limit and (b) separate
+  // AI vs human combo picks in analytics. Explicit user override wins.
+  if (!process.env.QASTARTER_CLIENT) {
+    process.env.QASTARTER_CLIENT = 'mcp';
+  }
+
   const server = new Server(
     { name: SERVER_NAME, version: SERVER_VERSION },
     { capabilities: { tools: {}, resources: {} } }

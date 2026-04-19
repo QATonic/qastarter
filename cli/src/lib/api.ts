@@ -82,6 +82,23 @@ export function getApiUrl(): string {
   return process.env.QASTARTER_API_URL || DEFAULT_API_URL;
 }
 
+/**
+ * Headers to attach to every REST call. Tagged with `X-QAStarter-Client` so
+ * the backend can (a) raise the rate limit for trusted MCP clients and
+ * (b) separate AI vs human combo picks in analytics. Set
+ * `QASTARTER_CLIENT=mcp` from the MCP server's entry point; optionally pass
+ * `QASTARTER_MCP_TOKEN` to claim the elevated limit if the server is
+ * configured with `QASTARTER_MCP_BYPASS_TOKEN`.
+ */
+export function clientHeaders(): Record<string, string> {
+  const out: Record<string, string> = {};
+  const client = process.env.QASTARTER_CLIENT;
+  if (client) out['X-QAStarter-Client'] = client;
+  const token = process.env.QASTARTER_MCP_TOKEN;
+  if (token) out['X-QAStarter-Token'] = token;
+  return out;
+}
+
 function transformMetadata(raw: RawMetadataResponse): MetadataResponse {
   const testingTypeMap = new Map<string, string[]>();
   raw.data.testingTypes.forEach((tt) => {
@@ -123,7 +140,9 @@ function transformMetadata(raw: RawMetadataResponse): MetadataResponse {
 }
 
 export async function fetchMetadata(): Promise<MetadataResponse> {
-  const response = await fetch(`${getApiUrl()}/api/v1/metadata`);
+  const response = await fetch(`${getApiUrl()}/api/v1/metadata`, {
+    headers: clientHeaders(),
+  });
   if (!response.ok) {
     throw new Error(`Failed to fetch metadata: ${response.statusText}`);
   }
@@ -138,6 +157,7 @@ export async function fetchMetadata(): Promise<MetadataResponse> {
 export async function fetchBom(): Promise<Record<string, Record<string, string>> | null> {
   try {
     const response = await fetch(`${getApiUrl()}/api/v1/bom`, {
+      headers: clientHeaders(),
       signal: AbortSignal.timeout(5000),
     });
     if (!response.ok) return null;
@@ -174,7 +194,7 @@ export async function generateProjectBuffer(options: GenerateOptions): Promise<{
   }
 
   const url = `${getApiUrl()}/api/v1/generate?${params.toString()}`;
-  const response = await fetch(url);
+  const response = await fetch(url, { headers: clientHeaders() });
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Failed to generate project (HTTP ${response.status}): ${errorText}`);
@@ -199,7 +219,7 @@ export async function previewProject(
 ): Promise<Record<string, unknown>> {
   const response = await fetch(`${getApiUrl()}/api/v1/project-preview`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...clientHeaders() },
     body: JSON.stringify(options),
   });
   if (!response.ok) {
@@ -217,7 +237,7 @@ export async function getProjectDependencies(
 ): Promise<Record<string, unknown>> {
   const response = await fetch(`${getApiUrl()}/api/v1/project-dependencies`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...clientHeaders() },
     body: JSON.stringify(options),
   });
   if (!response.ok) {
@@ -237,7 +257,7 @@ export async function validateConfig(
 ): Promise<{ valid: boolean; errors?: Array<{ field: string; message: string }> }> {
   const response = await fetch(`${getApiUrl()}/api/v1/validate-config`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...clientHeaders() },
     body: JSON.stringify(options),
   });
   if (!response.ok) {
@@ -280,7 +300,7 @@ export async function generateProject(
   }
 
   const url = `${getApiUrl()}/api/v1/generate?${params.toString()}`;
-  const response = await fetch(url);
+  const response = await fetch(url, { headers: clientHeaders() });
 
   if (!response.ok) {
     const errorText = await response.text();

@@ -17,9 +17,39 @@ import {
   asyncHandler,
 } from '../errors';
 import { createRequestLogger } from '../utils/logger';
-import { rateLimitConfig } from '../config';
+import { mcpConfig, rateLimitConfig } from '../config';
+import { trackEvent, generateSessionId } from '../services/analyticsService';
 
 const router = Router();
+
+/**
+ * Classify the caller so we can (a) tag analytics with a `source` field and
+ * (b) give MCP-aware AI clients a higher rate-limit budget — they iterate
+ * far faster than humans clicking through the wizard.
+ *
+ *  - `mcp-trusted`: `X-QAStarter-Client: mcp` **and** `X-QAStarter-Token`
+ *    matches the server's `QASTARTER_MCP_BYPASS_TOKEN` env. Gets the
+ *    elevated `rateLimitConfig.mcpGeneration.max`.
+ *  - `mcp`:         `X-QAStarter-Client: mcp` without a valid token — still
+ *    tagged for telemetry but subject to the default anonymous limit.
+ *  - `cli`:         CLI-shaped user agents (curl / node-fetch / go-http / …).
+ *  - `web`:         everything else (presumed a browser).
+ */
+export type ClientSource = 'mcp-trusted' | 'mcp' | 'cli' | 'web';
+
+export function detectClientSource(req: Request): ClientSource {
+  const client = String(req.headers[mcpConfig.clientHeader] || '').toLowerCase();
+  if (client === mcpConfig.clientHeaderValue) {
+    const token = String(req.headers[mcpConfig.tokenHeader] || '');
+    if (mcpConfig.bypassToken && token === mcpConfig.bypassToken) {
+      return 'mcp-trusted';
+    }
+    return 'mcp';
+  }
+  const ua = String(req.headers['user-agent'] || '').toLowerCase();
+  if (/(curl|wget|node|axios|fetch|undici|go-http)/.test(ua)) return 'cli';
+  return 'web';
+}
 
 /**
  * Reusable validation helper to reduce code duplication (DRY)
@@ -39,10 +69,18 @@ function validateProjectConfigBody(body: unknown, requestId: string): ProjectCon
   return validationResult.data;
 }
 
-// Project generation rate limiter
+// Project generation rate limiter.
+//
+// The `max` is resolved per-request: trusted MCP clients (valid bypass token)
+// get `rateLimitConfig.mcpGeneration.max`, everyone else gets the default
+// anonymous cap. This keeps wizard users honest while letting AI assistants
+// iterate quickly during a single session.
 const generateProjectLimiter = rateLimit({
   windowMs: rateLimitConfig.generation.windowMs,
-  max: rateLimitConfig.generation.max,
+  max: (req) =>
+    detectClientSource(req as Request) === 'mcp-trusted'
+      ? rateLimitConfig.mcpGeneration.max
+      : rateLimitConfig.generation.max,
   message: {
     success: false,
     error: {
@@ -87,6 +125,25 @@ router.post(
         requestId
       );
     }
+
+    // Tag the generation event with the client source so we can distinguish
+    // AI/MCP picks from human wizard picks in analytics.
+    trackEvent(
+      'project_generate',
+      generateSessionId(),
+      {
+        source: detectClientSource(req),
+        testingType: config.testingType,
+        framework: config.framework,
+        language: config.language,
+        testRunner: config.testRunner,
+        buildTool: config.buildTool,
+        testingPattern: config.testingPattern,
+      },
+      {
+        userAgent: typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : undefined,
+      }
+    );
 
     await projectService.generateAndStreamProject(config, res, requestId, reqLogger);
   })
@@ -359,6 +416,23 @@ router.get(
         requestId
       );
     }
+
+    // Tag the generation event with the client source (mcp / cli / web).
+    trackEvent(
+      'project_generate',
+      generateSessionId(),
+      {
+        source: detectClientSource(req),
+        testingType: config.testingType,
+        framework: config.framework,
+        language: config.language,
+        testRunner: config.testRunner,
+        buildTool: config.buildTool,
+      },
+      {
+        userAgent: typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : undefined,
+      }
+    );
 
     const reqLogger = createRequestLogger(requestId);
     await projectService.generateAndStreamProject(config, res, requestId, reqLogger);

@@ -7,15 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-04-20
+
 ### Added
-- `qastarter mcp` — Model Context Protocol (MCP) server over stdio, so
+- `qastarter mcp` — Model Context Protocol (MCP) server over stdio so
   Claude Desktop / Cursor / Claude Code / Windsurf can scaffold QAStarter
-  projects directly. Six tools exposed: `list_combinations`,
-  `validate_combination`, `get_bom`, `get_dependencies`, `preview_project`,
-  `generate_project`. Writes files safely (relative paths only by default,
-  refuses non-empty targetDir unless `force`, zip-slip guarded).
+  projects directly. Six tools: `list_combinations`, `validate_combination`,
+  `get_bom`, `get_dependencies`, `preview_project`, `generate_project`.
+  Safe-by-default file writes — relative paths only, refuses non-empty
+  targetDir unless `force: true`, zip-slip guarded.
+- All REST calls now send `X-QAStarter-Client` (and optional
+  `X-QAStarter-Token`) headers. The `mcp` entry point sets
+  `QASTARTER_CLIENT=mcp` automatically so the backend can grant a relaxed
+  rate limit and tag telemetry with the AI source.
 - Programmatic API helpers in `lib/api.ts`: `generateProjectBuffer`,
-  `previewProject`, `getProjectDependencies`, `validateConfig`.
+  `previewProject`, `getProjectDependencies`, `validateConfig`,
+  `clientHeaders`.
 
 ## [1.0.0] - 2026-01-05
 

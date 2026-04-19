@@ -182,6 +182,23 @@ QASTARTER_API_URL=http://localhost:5000 qastarter mcp
 
 Same `QASTARTER_API_URL` override used by the CLI's `new`/`list`/`update` commands.
 
+### Rate limits
+
+Anonymous users (web UI + untagged CLI): **10 project generations per 15 minutes per IP**.
+
+MCP clients that send `X-QAStarter-Client: mcp` are tagged for telemetry; if the server operator sets `QASTARTER_MCP_BYPASS_TOKEN` and you pass a matching `X-QAStarter-Token` (via `QASTARTER_MCP_TOKEN` env), the limit becomes **100 per 15 minutes** — enough headroom for an AI iterating through options.
+
+```bash
+QASTARTER_API_URL=https://qa.internal.example.com \
+  QASTARTER_MCP_TOKEN=your-shared-secret \
+  qastarter mcp
+```
+
+### Health checks for operators
+
+- `GET /api/v1/health` — liveness (always 200 while the process is up).
+- `GET /api/v1/health/deep` — probes the metadata route (MCP depends on it), counts template packs on disk, and pings the cache. Returns **503** if any probe fails — wire this into uptime monitoring.
+
 ## Links
 
 - 🌐 [Web App](https://qastarter.com)

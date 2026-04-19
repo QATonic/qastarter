@@ -12,11 +12,31 @@ export const rateLimitConfig = {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // 15 minutes
     max: parseInt(process.env.RATE_LIMIT_MAX || '100', 10), // Max requests per window
   },
-  // Project generation rate limiting (stricter)
+  // Project generation rate limiting (stricter, for anonymous browser/CLI users).
   generation: {
     windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // 15 minutes
     max: parseInt(process.env.RATE_LIMIT_GENERATE_MAX || '10', 10), // Max generations per window
   },
+  // Relaxed limit for authenticated MCP / AI clients that present a valid
+  // X-QAStarter-Client header (and optionally X-QAStarter-Token). AI assistants
+  // iterate much faster than humans clicking through a wizard.
+  mcpGeneration: {
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10), // 15 minutes
+    max: parseInt(process.env.RATE_LIMIT_MCP_GENERATE_MAX || '100', 10), // 10× the anon limit
+  },
+};
+
+/**
+ * Optional shared secret for trusted MCP / AI clients. When set, clients that
+ * present `X-QAStarter-Token: <value>` along with `X-QAStarter-Client: mcp`
+ * get the elevated `rateLimitConfig.mcpGeneration.max`. Unset = header-only
+ * hint (still bumped, but any client can claim it) — fine for open-source use.
+ */
+export const mcpConfig = {
+  bypassToken: process.env.QASTARTER_MCP_BYPASS_TOKEN || '',
+  clientHeader: 'x-qastarter-client',
+  tokenHeader: 'x-qastarter-token',
+  clientHeaderValue: 'mcp',
 };
 
 // Server Configuration
@@ -72,6 +92,7 @@ export const apiConfig = {
 // Export all configs
 export default {
   rateLimit: rateLimitConfig,
+  mcp: mcpConfig,
   server: serverConfig,
   cache: cacheConfig,
   log: logConfig,

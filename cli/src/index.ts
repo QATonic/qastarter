@@ -147,4 +147,23 @@ program
     }
   });
 
+program
+  .command('mcp')
+  .description(
+    'Run QAStarter as a Model Context Protocol (MCP) server over stdio for AI clients (Claude Desktop, Cursor, Claude Code, etc.)'
+  )
+  .action(async () => {
+    try {
+      // Lazy-import so the MCP SDK is only loaded when this command runs.
+      const { runMcpServer } = await import('./mcp/server.js');
+      await runMcpServer();
+    } catch (error) {
+      // stdout is reserved for the MCP protocol — always log errors to stderr.
+      process.stderr.write(
+        `[qastarter-mcp] fatal: ${error instanceof Error ? error.stack ?? error.message : String(error)}\n`
+      );
+      process.exit(1);
+    }
+  });
+
 program.parse();

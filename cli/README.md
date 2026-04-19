@@ -122,6 +122,66 @@ Set custom API URL (for local/self-hosted development):
 export QASTARTER_API_URL=http://localhost:5000
 ```
 
+## MCP server (AI assistants)
+
+QAStarter ships a built-in [Model Context Protocol](https://modelcontextprotocol.io/) server so Claude Desktop, Cursor, Claude Code, Windsurf and other MCP-aware AI clients can scaffold projects directly into your workspace — no browser, no download, no rate limit.
+
+### Quick start
+
+```bash
+# Option A — one-off via npx (no global install)
+npx @qatonic/qastarter-cli mcp
+
+# Option B — global install, then run
+npm i -g @qatonic/qastarter-cli
+qastarter mcp
+```
+
+The server talks JSON-RPC over stdio, so your MCP client invokes it for you — you shouldn't normally run it by hand.
+
+### Claude Desktop / Claude Code config
+
+Add to `claude_desktop_config.json` (macOS/Windows/Linux) or your `mcp` block:
+
+```json
+{
+  "mcpServers": {
+    "qastarter": {
+      "command": "npx",
+      "args": ["-y", "@qatonic/qastarter-cli", "mcp"]
+    }
+  }
+}
+```
+
+Restart the client and ask: *"Use qastarter to scaffold a Playwright TypeScript project with Jest reporter into ./tests/e2e."*
+
+### Exposed tools
+
+| Tool | What it does |
+|---|---|
+| `list_combinations` | Every supported (type × framework × language × runner × build tool). Call this first. |
+| `validate_combination` | Confirm a combo is supported before scaffolding. |
+| `get_bom` | Pinned library/tool versions per language. |
+| `get_dependencies` | The dep map that would be added to your project. |
+| `preview_project` | Dry-run — returns the file tree and sample files without writing to disk. |
+| `generate_project` | Writes the full project into `targetDir`. Safe by default: relative paths only, refuses non-empty dirs unless `force: true`. |
+
+### Safety
+
+- `generate_project` rejects absolute `targetDir` paths unless you pass `allowAbsolute: true`.
+- It refuses non-empty target directories unless `force: true`.
+- ZIP extraction is zip-slip guarded — entries that resolve outside `targetDir` are rejected.
+- All file writes happen locally; your AI client never sees any credentials.
+
+### Pointing at a local server
+
+```bash
+QASTARTER_API_URL=http://localhost:5000 qastarter mcp
+```
+
+Same `QASTARTER_API_URL` override used by the CLI's `new`/`list`/`update` commands.
+
 ## Links
 
 - 🌐 [Web App](https://qastarter.com)

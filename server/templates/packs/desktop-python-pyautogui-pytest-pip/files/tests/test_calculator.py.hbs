@@ -17,7 +17,7 @@ APP_COMMAND = "{{appPath}}"
 @pytest.mark.skipif(not Settings.IS_WINDOWS, reason="Calculator test is Windows-specific")
 class TestCalculator:
     @pytest.fixture(scope="function")
-    def calculator_app(self, check_calculator_available):
+    def calculator_app(self):
         """Launch Calculator before each test"""
         GUIActions.launch_application(Settings.get_calculator_command())
         time.sleep(2)  # Wait for app to fully load

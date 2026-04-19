@@ -1,34 +1,34 @@
 # {{projectName}} - REST API Test Automation
 # Multi-stage Dockerfile for running RestAssured API tests
 
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
-COPY pom.xml ./
-RUN mvn dependency:go-offline -B
+# Copy build files and download dependencies
+COPY build.gradle settings.gradle ./
+RUN gradle dependencies --no-daemon
 
 # Copy source code
 COPY src ./src
 
 # Build the project
-RUN mvn compile -DskipTests
+RUN gradle compileJava --no-daemon
 
 # Test stage
-FROM maven:3.9-eclipse-temurin-17 AS test
+FROM gradle:8.5-jdk17 AS test
 WORKDIR /app
 
 # Copy built application
 COPY --from=build /app ./
-COPY --from=build /root/.m2 /root/.m2
+COPY --from=build /root/.gradle /root/.gradle
 
 # Set environment variables
 ENV TEST_ENV=qa
-ENV MAVEN_OPTS="-Xmx1024m"
+ENV GRADLE_OPTS="-Xmx1024m"
 
 # Create directories for test results
-RUN mkdir -p /app/target/surefire-reports /app/target/allure-results
+RUN mkdir -p /app/build/reports/tests /app/build/allure-results
 
 # Default command runs all tests
-ENTRYPOINT ["mvn", "test"]
+ENTRYPOINT ["gradle", "test", "--no-daemon"]
 CMD ["-Denv=qa"]

@@ -8,8 +8,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
   ENVIRONMENT: 'qa'
 
 stages:
@@ -27,32 +26,30 @@ stages:
         steps:
           - task: Cache@2
             inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              key: 'gradle | "$(Agent.OS)" | **/build.gradle'
               restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(MAVEN_CACHE_FOLDER)
-            displayName: 'Cache Maven packages'
-          
-          - task: Maven@3
+                gradle | "$(Agent.OS)"
+                gradle
+              path: $(GRADLE_USER_HOME)
+            displayName: 'Cache Gradle packages'
+
+          - task: Gradle@3
             inputs:
-              mavenPomFile: 'pom.xml'
-              goals: 'clean test'
+              gradleWrapperFile: 'gradlew'
+              tasks: 'clean test'
               {{#if (eq testingPattern "bdd")}}
               options: '-Dincludes="**/runners/*TestRunner.java"'
               {{else}}
               options: '-Denvironment=$(ENVIRONMENT)'
               {{/if}}
               publishJUnitResults: true
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              testResultsFiles: '**/build/test-results/test/TEST-*.xml'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '1.11'
-              mavenVersionOption: 'Default'
-              mavenOptions: '$(MAVEN_OPTS)'
             displayName: 'Run {{#if (eq testingPattern "bdd")}}Cucumber BDD{{else}}TestNG{{/if}} Tests'
             env:
               ENVIRONMENT: $(ENVIRONMENT)
-          
+
           {{#if (eq reportingTool "allure")}}
           - script: |
               wget https://github.com/allure-framework/allure2/releases/download/2.25.0/allure-2.25.0.tgz
@@ -60,20 +57,20 @@ stages:
               sudo ln -s /opt/allure-2.25.0/bin/allure /usr/local/bin/allure
             displayName: 'Install Allure CLI'
             condition: always()
-          
+
           - script: |
-              allure generate target/allure-results --clean -o allure-report
+              allure generate build/allure-results --clean -o allure-report
             displayName: 'Generate Allure report'
             condition: always()
-          
+
           - task: PublishBuildArtifacts@1
             inputs:
-              PathtoPublish: 'target/allure-results'
+              PathtoPublish: 'build/allure-results'
               ArtifactName: 'allure-results-$(ENVIRONMENT)'
               publishLocation: 'Container'
             displayName: 'Publish Allure results'
             condition: always()
-          
+
           - task: PublishBuildArtifacts@1
             inputs:
               PathtoPublish: 'allure-report'
@@ -82,8 +79,8 @@ stages:
             displayName: 'Publish Allure report'
             condition: always()
           {{/if}}
-          
-          {{#if (eq reportingTool "extentreports")}}
+
+          {{#if (eq reportingTool "extent-reports")}}
           - task: PublishBuildArtifacts@1
             inputs:
               PathtoPublish: 'test-output/extent-reports'
@@ -92,21 +89,21 @@ stages:
             displayName: 'Publish ExtentReports'
             condition: always()
           {{/if}}
-          
+
           {{#if (eq reportingTool "testng-reports")}}
           - task: PublishBuildArtifacts@1
             inputs:
-              PathtoPublish: 'target/surefire-reports'
+              PathtoPublish: 'build/reports/tests'
               ArtifactName: 'testng-reports-$(ENVIRONMENT)'
               publishLocation: 'Container'
             displayName: 'Publish TestNG Reports'
             condition: always()
           {{/if}}
-          
+
           {{#if (eq reportingTool "junit-html")}}
           - task: PublishBuildArtifacts@1
             inputs:
-              PathtoPublish: 'target/surefire-reports'
+              PathtoPublish: 'build/reports/tests'
               ArtifactName: 'junit-html-reports-$(ENVIRONMENT)'
               publishLocation: 'Container'
             displayName: 'Publish JUnit HTML Reports'

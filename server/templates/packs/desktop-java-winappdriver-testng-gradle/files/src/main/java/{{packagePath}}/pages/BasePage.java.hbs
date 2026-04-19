@@ -5,8 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import {{javaPackage}}.core.WinAppDriverManager;
-import {{javaPackage}}.config.ConfigReader;
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.utils.Log;
 
 import java.time.Duration;
@@ -17,8 +17,8 @@ public class BasePage {
     protected WebDriverWait wait;
 
     public BasePage() {
-        this.driver = WinAppDriverManager.getDriver();
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getImplicitWait()));
+        this.driver = DriverManager.getDriver();
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigurationReader.getImplicitWait()));
     }
 
     protected void click(By locator) {

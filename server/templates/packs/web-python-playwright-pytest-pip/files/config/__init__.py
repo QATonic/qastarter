@@ -1,1 +1,1 @@
-# Package init
+# Config package

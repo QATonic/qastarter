@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application' version '8.1.2'
 {{#if (eq reportingTool "allure")}}
-    id 'io.qameta.allure' version '2.11.2'
+    id 'io.qameta.allure' version '{{toolVersions.allure}}'
 {{/if}}
 }
 
@@ -65,21 +65,21 @@ dependencies {
 {{#if (eq reportingTool "allure")}}
 
     // Allure
-    androidTestImplementation 'io.qameta.allure:allure-java-commons:2.24.0'
+    androidTestImplementation 'io.qameta.allure:allure-java-commons:{{toolVersions.allure}}'
 {{#if (eq testingPattern "bdd")}}
-    androidTestImplementation 'io.qameta.allure:allure-cucumber7-jvm:2.24.0'
+    androidTestImplementation 'io.qameta.allure:allure-cucumber7-jvm:{{toolVersions.allure}}'
 {{/if}}
 {{/if}}
 {{#if (eq reportingTool "extent-reports")}}
 
     // ExtentReports
-    androidTestImplementation 'com.aventstack:extentreports:5.0.9'
+    androidTestImplementation 'com.aventstack:extentreports:{{toolVersions.extentreports}}'
 {{/if}}
 {{#if (eq testingPattern "bdd")}}
 
     // Cucumber BDD
-    androidTestImplementation 'io.cucumber:cucumber-java:7.14.0'
-    androidTestImplementation 'io.cucumber:cucumber-android:7.14.0'
+    androidTestImplementation 'io.cucumber:cucumber-java:{{toolVersions.cucumber}}'
+    androidTestImplementation 'io.cucumber:cucumber-android:{{toolVersions.cucumber}}'
 {{/if}}
 {{#if userDependencies.hasMaven}}
 
@@ -97,7 +97,7 @@ implementation '{{group}}:{{name}}:{{version}}'
 
 // Allure configuration
 allure {
-    version = '2.24.0'
+    version = '{{toolVersions.allure}}'
     autoconfigure = true
 }
 {{/if}}

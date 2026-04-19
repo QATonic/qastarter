@@ -24,13 +24,13 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-          cache: 'maven'
+          cache: 'gradle'
       
       - name: Run {{#if (eq testingPattern "bdd")}}Cucumber BDD{{else}}TestNG{{/if}} tests
         env:
           ENVIRONMENT: ${{ matrix.environment }}
         run: |
-          mvn clean test {{#if (eq testingPattern "bdd")}}-Dincludes="**/runners/*TestRunner.java"{{else}}-Denvironment=${{ matrix.environment }}{{/if}}
+          ./gradlew clean test {{#if (eq testingPattern "bdd")}}-Dincludes="**/runners/*TestRunner.java"{{else}}-Denvironment=${{ matrix.environment }}{{/if}}
       
       {{#if (eq reportingTool "allure")}}
       - name: Install Allure CLI
@@ -62,7 +62,7 @@ jobs:
           retention-days: 30
       {{/if}}
       
-      {{#if (eq reportingTool "extentreports")}}
+      {{#if (eq reportingTool "extent-reports")}}
       - name: Upload ExtentReports
         if: always()
         uses: actions/upload-artifact@v4

@@ -54,6 +54,13 @@ export const toolVersions = {
   jesthtmlreporter: '3.10.2',
   mochawesome: '7.1.3',
 
+  // Test Data Generation
+  fakerJs: '8.4.0', // @faker-js/faker for JS/TS
+  faker: '22.0.0', // Python Faker
+  datafaker: '2.1.0', // Java DataFaker
+  bogus: '35.4.0', // C# Bogus
+  gofakeit: '6.28.0', // Go gofakeit
+
   // Utilities
   log4j: '2.23.0', // Updated from 2.22.0
   winston: '3.12.0', // Updated from 3.11.0

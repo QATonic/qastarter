@@ -17,10 +17,7 @@
     ],
     "cicdTools": [
       "jenkins",
-      "github-actions",
-      "gitlab-ci",
-      "azure-devops",
-      "circleci"
+      "github-actions"
     ],
     "testingPatterns": [
       "load-test",

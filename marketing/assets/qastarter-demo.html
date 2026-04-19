@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QAStarter Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: white;
+    }
+    .container {
+      max-width: 850px;
+      width: 100%;
+      padding: 20px;
+    }
+    h1 { text-align: center; margin-bottom: 8px; font-size: 24px; }
+    .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 14px; }
+    .slideshow {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #1a1a1a;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .slideshow img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .slideshow img.active { opacity: 1; }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .step-label {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 16px;
+      color: #10b981;
+      font-weight: 600;
+      min-height: 24px;
+    }
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #333;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .dot.active { background: #10b981; }
+    .progress {
+      width: 100%;
+      height: 3px;
+      background: #222;
+      border-radius: 2px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      transition: width 0.3s;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    button {
+      padding: 8px 20px;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { border-color: #10b981; }
+    button.primary { background: #10b981; border-color: #10b981; color: #000; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⚡ QAStarter Demo</h1>
+    <p class="subtitle">Generate production-ready test automation frameworks in seconds</p>
+    <div class="slideshow" id="slideshow">
+      <img src="screenshots/01-landing-page.png" alt="Step 1" class="active" />
+      <img src="screenshots/02-config-panel-empty.png" alt="Step 2" class="" />
+      <img src="screenshots/03-web-selected.png" alt="Step 3" class="" />
+      <img src="screenshots/04-selenium-selected.png" alt="Step 4" class="" />
+      <img src="screenshots/05-java-selected.png" alt="Step 5" class="" />
+      <img src="screenshots/06-testng-maven-selected.png" alt="Step 6" class="" />
+      <img src="screenshots/07-project-name-set.png" alt="Step 7" class="" />
+      <img src="screenshots/08-advanced-options.png" alt="Step 8" class="" />
+      <img src="screenshots/09-project-ready.png" alt="Step 9" class="" />
+      <img src="screenshots/10-success-page.png" alt="Step 10" class="" />
+    </div>
+    <div class="step-label" id="stepLabel"></div>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="controls" id="dots"></div>
+    <div class="btn-row">
+      <button onclick="prev()">← Previous</button>
+      <button onclick="togglePlay()" id="playBtn" class="primary">⏸ Pause</button>
+      <button onclick="next()">Next →</button>
+    </div>
+  </div>
+  <script>
+    const labels = [
+      'Landing Page — Free QA Automation Framework Generator',
+      'Express Config Panel — Choose your stack',
+      'Select Testing Type: Web Applications',
+      'Select Framework: Selenium WebDriver',
+      'Select Language: Java',
+      'Select Test Runner: TestNG + Build Tool: Maven',
+      'Set Project Name: selenium-java-tests',
+      'Advanced Options: GitHub Actions + Allure Reports',
+      'Click Generate & Download',
+      'Project Ready! Download your framework'
+    ];
+    const imgs = document.querySelectorAll('#slideshow img');
+    const dotsEl = document.getElementById('dots');
+    const stepLabel = document.getElementById('stepLabel');
+    const progressBar = document.getElementById('progressBar');
+    const playBtn = document.getElementById('playBtn');
+    let current = 0;
+    let playing = true;
+    let timer;
+
+    // Create dots
+    imgs.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.onclick = () => goTo(i);
+      dotsEl.appendChild(dot);
+    });
+
+    function goTo(idx) {
+      imgs[current].classList.remove('active');
+      dotsEl.children[current].classList.remove('active');
+      current = idx;
+      imgs[current].classList.add('active');
+      dotsEl.children[current].classList.add('active');
+      stepLabel.textContent = 'Step ' + (current + 1) + ': ' + (labels[current] || '');
+      progressBar.style.width = ((current + 1) / imgs.length * 100) + '%';
+    }
+
+    function next() { goTo((current + 1) % imgs.length); }
+    function prev() { goTo((current - 1 + imgs.length) % imgs.length); }
+
+    function togglePlay() {
+      playing = !playing;
+      playBtn.textContent = playing ? '⏸ Pause' : '▶ Play';
+      if (playing) startTimer();
+      else clearInterval(timer);
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(next, 2000);
+    }
+
+    goTo(0);
+    startTimer();
+  </script>
+</body>
+</html>

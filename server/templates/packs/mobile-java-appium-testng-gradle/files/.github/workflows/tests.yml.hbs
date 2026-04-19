@@ -24,7 +24,7 @@ jobs:
         with:
           java-version: '{{toolVersions.java}}'
           distribution: 'temurin'
-          cache: 'maven'
+          cache: 'gradle'
 
       - name: Install Node.js (for Appium)
         uses: actions/setup-node@v4
@@ -46,7 +46,7 @@ jobs:
 
       {{/if}}
       - name: Run mobile tests
-        run: mvn clean test -P${{ matrix.platform }}
+        run: ./gradlew clean test -P${{ matrix.platform }}
         continue-on-error: true
 
       {{#if (eq reportingTool "allure")}}

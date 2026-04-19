@@ -63,8 +63,8 @@ gradle-app.setting
     <description>UI Automation Framework using Selenium WebDriver, TestNG, and Maven</description>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -138,8 +138,8 @@ gradle-app.setting
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>\${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>17</source>
-                    <target>17</target>
+                    <source>\${maven.compiler.source}</source>
+                    <target>\${maven.compiler.target}</target>
                 </configuration>
             </plugin>
 
@@ -1844,7 +1844,8 @@ htmlcov/
     "path": ".gitignore",
   },
   {
-    "content": "# Package init",
+    "content": "# Config package
+",
     "isTemplate": false,
     "mode": undefined,
     "path": "config/__init__.py",
@@ -2111,7 +2112,8 @@ def pytest_runtest_makereport(item, call):
     "path": "data/qa.json",
   },
   {
-    "content": "# Package init",
+    "content": "# Pages package
+",
     "isTemplate": false,
     "mode": undefined,
     "path": "pages/__init__.py",
@@ -2429,7 +2431,8 @@ pylint>=3.0.0
     "path": "requirements.txt",
   },
   {
-    "content": "# Package init",
+    "content": "# Tests package
+",
     "isTemplate": false,
     "mode": undefined,
     "path": "tests/__init__.py",
@@ -2534,7 +2537,8 @@ log.info("Invalid login test passed")
     "path": "tests/test_login.py",
   },
   {
-    "content": "# Package init",
+    "content": "# Utils package
+",
     "isTemplate": false,
     "mode": undefined,
     "path": "utils/__init__.py",

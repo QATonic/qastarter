@@ -2,7 +2,7 @@ plugins {
 id 'java'
 id 'jacoco'
 {{#if (eq reportingTool "allure")}}
-id 'io.qameta.allure' version '2.11.2' apply false
+id 'io.qameta.allure' version '{{toolVersions.allure}}' apply false
 {{/if}}
 id 'com.diffplug.spotless' version '6.25.0'
 }
@@ -28,19 +28,19 @@ mavenCentral()
 
 ext {
 // Dependency versions
-seleniumVersion = '4.27.0'
-testngVersion = '7.8.0'
-log4jVersion = '2.20.0'
+seleniumVersion = '{{toolVersions.selenium}}'
+testngVersion = '{{toolVersions.testng}}'
+log4jVersion = '{{toolVersions.log4j}}'
 {{#if (eq reportingTool "extent-reports")}}
-extentReportsVersion = '5.0.9'
+extentReportsVersion = '{{toolVersions.extentreports}}'
 {{/if}}
 {{#if (eq reportingTool "allure")}}
-allureVersion = '2.24.0'
+allureVersion = '{{toolVersions.allure}}'
 {{/if}}
 {{#if (eq testingPattern "bdd")}}
-cucumberVersion = '7.14.0'
+cucumberVersion = '{{toolVersions.cucumber}}'
 {{/if}}
-jacksonVersion = '2.15.2'
+jacksonVersion = '{{toolVersions.jackson}}'
 commonsCsvVersion = '1.10.0'
 
 // Test configuration
@@ -197,19 +197,19 @@ delete "screenshots"
 
 // Gradle wrapper task
 wrapper {
-gradleVersion = '8.4'
+gradleVersion = '{{toolVersions.gradle}}'
 distributionType = Wrapper.DistributionType.BIN
 }
 {{#if (eq reportingTool "allure")}}
 
 // Allure configuration
 allure {
-version = '2.24.0'
+version = '{{toolVersions.allure}}'
 autoconfigure = true
 aspectjweaver = true
 
 useTestNG {
-version = '2.24.0'
+version = '{{toolVersions.allure}}'
 }
 }
 {{/if}}

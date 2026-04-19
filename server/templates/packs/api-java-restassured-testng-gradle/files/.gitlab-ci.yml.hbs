@@ -1,14 +1,13 @@
 variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   ENVIRONMENT: "qa"
 
-image: maven:3.9-eclipse-temurin-11
+image: gradle:8.5-jdk17
 
 cache:
   paths:
-    - .m2/repository/
-    - target/
+    - .gradle/
+    - build/
 
 stages:
   - test
@@ -17,15 +16,15 @@ stages:
 test:
   stage: test
   script:
-    - mvn $MAVEN_CLI_OPTS clean test {{#if (eq testingPattern "bdd")}}-Dincludes="**/runners/*TestRunner.java"{{else}}-Denvironment=$ENVIRONMENT{{/if}}
+    - ./gradlew clean test {{#if (eq testingPattern "bdd")}}-Dincludes="**/runners/*TestRunner.java"{{else}}-Denvironment=$ENVIRONMENT{{/if}}
   artifacts:
     when: always
     paths:
-      - target/surefire-reports/
+      - build/test-results/
       {{#if (eq reportingTool "allure")}}
-      - target/allure-results/
+      - build/allure-results/
       {{/if}}
-      {{#if (eq reportingTool "extentreports")}}
+      {{#if (eq reportingTool "extent-reports")}}
       - test-output/extent-reports/
       {{/if}}
     expire_in: 30 days
@@ -39,7 +38,7 @@ test:
 {{#if (eq reportingTool "allure")}}
 generate_allure_report:
   stage: report
-  image: maven:3.9-eclipse-temurin-11
+  image: gradle:8.5-jdk17
   dependencies:
     - test
   before_script:
@@ -48,7 +47,7 @@ generate_allure_report:
     - tar -zxvf allure-2.25.0.tgz -C /opt/
     - ln -s /opt/allure-2.25.0/bin/allure /usr/local/bin/allure
   script:
-    - allure generate target/allure-results --clean -o allure-report
+    - allure generate build/allure-results --clean -o allure-report
   artifacts:
     when: always
     paths:

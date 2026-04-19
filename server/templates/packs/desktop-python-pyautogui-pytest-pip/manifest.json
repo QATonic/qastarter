@@ -192,6 +192,11 @@
       "description": "PyAutoGUI session manager"
     },
     {
+      "path": "pages/__init__.py",
+      "isTemplate": false,
+      "description": "Package marker"
+    },
+    {
       "path": "pages/notepad_page.py",
       "isTemplate": true,
       "description": "Notepad page object"

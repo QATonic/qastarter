@@ -16,7 +16,7 @@ ENV CHROME_BIN=/usr/bin/chromium-browser \
 WORKDIR /app
 
 # Copy project files
-COPY pom.xml ./
+COPY build.gradle settings.gradle ./
 {{#if (eq buildTool "maven")}}
 COPY mvnw ./
 COPY .mvn .mvn

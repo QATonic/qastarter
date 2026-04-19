@@ -11,11 +11,11 @@ jobs:
     executor: macos-executor
     steps:
       - checkout
-      
+
       - restore_cache:
           keys:
-            - maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}- checksum "pom.xml" 
-            - maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}-
+            - gradle-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}gradle{{/if}}- checksum "build.gradle"
+            - gradle-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}gradle{{/if}}-
 
       - run:
           name: Install Java
@@ -40,23 +40,23 @@ jobs:
       {{/if}}
       - run:
           name: Run Android tests
-          command: mvn clean test -Pandroid
+          command: ./gradlew clean test -Pandroid
           no_output_timeout: 30m
 
       {{#if (eq reportingTool "allure")}}
       - run:
           name: Generate Allure report
-          command: allure generate target/allure-results --clean -o target/allure-report
+          command: allure generate build/allure-results --clean -o build/allure-report
           when: always
 
       {{/if}}
       - save_cache:
           paths:
-            - ~/.m2
-          key: maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}- checksum "pom.xml" 
+            - ~/.gradle
+          key: gradle-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}gradle{{/if}}- checksum "build.gradle"
 
       - store_artifacts:
-          path: {{#if (eq reportingTool "allure")}}target/allure-report{{else}}{{#if (eq reportingTool "extent-reports")}}reports{{else}}{{#if (eq reportingTool "testng-reports")}}test-output{{else}}target/site{{/if}}{{/if}}{{/if}}
+          path: {{#if (eq reportingTool "allure")}}build/allure-report{{else}}{{#if (eq reportingTool "extent-reports")}}reports{{else}}{{#if (eq reportingTool "testng-reports")}}test-output{{else}}build/reports/tests{{/if}}{{/if}}{{/if}}
           destination: test-reports
 
       - store_artifacts:
@@ -64,17 +64,17 @@ jobs:
           destination: test-logs
 
       - store_test_results:
-          path: target/surefire-reports
+          path: build/test-results
 
   test-ios:
     executor: macos-executor
     steps:
       - checkout
-      
+
       - restore_cache:
           keys:
-            - maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}- checksum "pom.xml" 
-            - maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}-
+            - gradle-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}gradle{{/if}}- checksum "build.gradle"
+            - gradle-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}gradle{{/if}}-
 
       - run:
           name: Install Java
@@ -99,23 +99,23 @@ jobs:
       {{/if}}
       - run:
           name: Run iOS tests
-          command: mvn clean test -Pios
+          command: ./gradlew clean test -Pios
           no_output_timeout: 30m
 
       {{#if (eq reportingTool "allure")}}
       - run:
           name: Generate Allure report
-          command: allure generate target/allure-results --clean -o target/allure-report
+          command: allure generate build/allure-results --clean -o build/allure-report
           when: always
 
       {{/if}}
       - save_cache:
           paths:
-            - ~/.m2
-          key: maven-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}pom{{/if}}- checksum "pom.xml" 
+            - ~/.gradle
+          key: gradle-deps-{{#if (eq testingPattern "bdd")}}bdd{{else}}gradle{{/if}}- checksum "build.gradle"
 
       - store_artifacts:
-          path: {{#if (eq reportingTool "allure")}}target/allure-report{{else}}{{#if (eq reportingTool "extent-reports")}}reports{{else}}{{#if (eq reportingTool "testng-reports")}}test-output{{else}}target/site{{/if}}{{/if}}{{/if}}
+          path: {{#if (eq reportingTool "allure")}}build/allure-report{{else}}{{#if (eq reportingTool "extent-reports")}}reports{{else}}{{#if (eq reportingTool "testng-reports")}}test-output{{else}}build/reports/tests{{/if}}{{/if}}{{/if}}
           destination: test-reports
 
       - store_artifacts:
@@ -123,7 +123,7 @@ jobs:
           destination: test-logs
 
       - store_test_results:
-          path: target/surefire-reports
+          path: build/test-results
 
 workflows:
   mobile-testing:

@@ -1,44 +1,44 @@
 version: 2.1
 
 executors:
-  maven-executor:
+  gradle-executor:
     docker:
       - image: cimg/openjdk:11.0
     working_directory: ~/project
     environment:
-      MAVEN_OPTS: -Xmx1024m
+      GRADLE_OPTS: -Xmx1024m
 
 jobs:
   test:
-    executor: maven-executor
+    executor: gradle-executor
     parameters:
       environment:
         type: string
         default: "qa"
     steps:
       - checkout
-      
+
       - restore_cache:
           keys:
-            - maven-repo-v1-{{ checksum "pom.xml" }}
-            - maven-repo-v1-
-      
+            - gradle-repo-v1-{{ checksum "build.gradle" }}
+            - gradle-repo-v1-
+
       - run:
           name: Install dependencies
-          command: mvn dependency:go-offline
-      
+          command: ./gradlew dependencies --no-daemon
+
       - save_cache:
           paths:
-            - ~/.m2
-          key: maven-repo-v1-{{ checksum "pom.xml" }}
-      
+            - ~/.gradle
+          key: gradle-repo-v1-{{ checksum "build.gradle" }}
+
       - run:
           name: Run {{#if (eq testingPattern "bdd")}}Cucumber BDD{{else}}TestNG{{/if}} tests
           command: |
-            mvn clean test {{#if (eq testingPattern "bdd")}}-Dincludes="**/runners/*TestRunner.java"{{else}}-Denvironment=<<parameters.environment>>{{/if}}
+            ./gradlew clean test {{#if (eq testingPattern "bdd")}}-Dincludes="**/runners/*TestRunner.java"{{else}}-Denvironment=<<parameters.environment>>{{/if}} --no-daemon
           environment:
             ENVIRONMENT: <<parameters.environment>>
-      
+
       {{#if (eq reportingTool "allure")}}
       - run:
           name: Install Allure CLI
@@ -47,42 +47,42 @@ jobs:
             tar -zxvf allure-2.25.0.tgz -C /opt/
             sudo ln -s /opt/allure-2.25.0/bin/allure /usr/local/bin/allure
           when: always
-      
+
       - run:
           name: Generate Allure report
           command: |
-            allure generate target/allure-results --clean -o allure-report
+            allure generate build/allure-results --clean -o allure-report
           when: always
-      
+
       - store_artifacts:
-          path: target/allure-results
+          path: build/allure-results
           destination: allure-results-<<parameters.environment>>
-      
+
       - store_artifacts:
           path: allure-report
           destination: allure-report-<<parameters.environment>>
       {{/if}}
-      
-      {{#if (eq reportingTool "extentreports")}}
+
+      {{#if (eq reportingTool "extent-reports")}}
       - store_artifacts:
           path: test-output/extent-reports
           destination: extent-reports-<<parameters.environment>>
       {{/if}}
-      
+
       {{#if (eq reportingTool "testng-reports")}}
       - store_artifacts:
-          path: target/surefire-reports
+          path: build/reports/tests
           destination: testng-reports-<<parameters.environment>>
       {{/if}}
-      
+
       {{#if (eq reportingTool "junit-html")}}
       - store_artifacts:
-          path: target/surefire-reports
+          path: build/reports/tests
           destination: junit-html-reports-<<parameters.environment>>
       {{/if}}
-      
+
       - store_test_results:
-          path: target/surefire-reports
+          path: build/test-results
 
 workflows:
   test-workflow:

@@ -30,10 +30,8 @@
         <allure.version>{{toolVersions.allure}}</allure.version>
         <aspectj.version>1.9.20</aspectj.version>
         {{/if}}
-        {{#if (eq reportingTool "extent-reports")}}
-        <!-- ExtentReports -->
+        <!-- ExtentReports (used by TestListener regardless of reporting tool selection) -->
         <extentreports.version>{{toolVersions.extentreports}}</extentreports.version>
-        {{/if}}
         {{#if (eq testingPattern "bdd")}}
         <!-- Cucumber BDD -->
         <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
@@ -86,15 +84,13 @@
             <version>${cucumber.version}</version>
         </dependency>
         {{/if}}
-        {{#if (eq reportingTool "extent-reports")}}
 
-        <!-- ExtentReports -->
+        <!-- ExtentReports (used by TestListener) -->
         <dependency>
             <groupId>com.aventstack</groupId>
             <artifactId>extentreports</artifactId>
             <version>${extentreports.version}</version>
         </dependency>
-        {{/if}}
         {{#if (eq reportingTool "allure")}}
 
         <!-- Allure -->

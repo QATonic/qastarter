@@ -9,11 +9,12 @@ public class HomePage : BasePage
     private const string UserProfile = ".user-profile";
     private const string LogoutButton = "button[data-action='logout'], .logout";
 
-    public HomePage(IPage page) : base(page) { }
+    // BasePage acquires the IPage via PlaywrightManager — no constructor argument needed.
+    public HomePage() { }
 
     public async Task NavigateToHomeAsync()
     {
-        await NavigateAsync(EnvConfig.Instance.BaseUrl);
+        await NavigateToAsync(EnvConfig.Instance.BaseUrl);
     }
 
     public async Task<string?> GetWelcomeMessageAsync()
@@ -23,7 +24,7 @@ public class HomePage : BasePage
 
     public async Task<bool> IsUserProfileVisibleAsync()
     {
-        return await IsVisibleAsync(UserProfile);
+        return await IsDisplayedAsync(UserProfile);
     }
 
     public async Task LogoutAsync()

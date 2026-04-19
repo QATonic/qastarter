@@ -153,7 +153,10 @@
     },
     {
       "path": "StepDefinitions/LoginSteps.cs",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     },
     {
       "path": "Tests/BaseTest.cs",

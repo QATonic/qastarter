@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace {{projectNamespace}}.Utils
@@ -8,7 +9,7 @@ namespace {{projectNamespace}}.Utils
     /// </summary>
     public static class RetryHelper
     {
-        private static readonly Logger _logger = new Logger();
+        // Logger is a static class — use its static methods directly via the alias below.
 
         /// <summary>
         /// Execute an API request with retry logic
@@ -36,7 +37,7 @@ namespace {{projectNamespace}}.Utils
                     {
                         if (attempt > 1)
                         {
-                            _logger.Info($"Request succeeded on attempt {attempt}");
+                            Logger.Info($"Request succeeded on attempt {attempt}");
                         }
                         return lastResponse;
                     }
@@ -44,7 +45,7 @@ namespace {{projectNamespace}}.Utils
                     // Retry on server errors (5xx) or rate limiting (429)
                     if ((int)lastResponse.StatusCode >= 500 || (int)lastResponse.StatusCode == 429)
                     {
-                        _logger.Warning($"Attempt {attempt}/{maxRetries} failed with status {lastResponse.StatusCode}. Retrying...");
+                        Logger.Warning($"Attempt {attempt}/{maxRetries} failed with status {lastResponse.StatusCode}. Retrying...");
                         
                         if (attempt < maxRetries)
                         {
@@ -59,7 +60,7 @@ namespace {{projectNamespace}}.Utils
                 catch (Exception ex)
                 {
                     lastException = ex;
-                    _logger.Error($"Attempt {attempt}/{maxRetries} threw exception: {ex.Message}");
+                    Logger.Error($"Attempt {attempt}/{maxRetries} threw exception: {ex.Message}");
 
                     if (attempt < maxRetries)
                     {
@@ -100,7 +101,7 @@ namespace {{projectNamespace}}.Utils
 
                     if ((int)lastResponse.StatusCode >= 500 || (int)lastResponse.StatusCode == 429)
                     {
-                        _logger.Warning($"Attempt {attempt}/{maxRetries} failed. Retrying...");
+                        Logger.Warning($"Attempt {attempt}/{maxRetries} failed. Retrying...");
                         
                         if (attempt < maxRetries)
                         {
@@ -114,7 +115,7 @@ namespace {{projectNamespace}}.Utils
                 catch (Exception ex)
                 {
                     lastException = ex;
-                    _logger.Error($"Attempt {attempt}/{maxRetries} threw exception: {ex.Message}");
+                    Logger.Error($"Attempt {attempt}/{maxRetries} threw exception: {ex.Message}");
 
                     if (attempt < maxRetries)
                     {

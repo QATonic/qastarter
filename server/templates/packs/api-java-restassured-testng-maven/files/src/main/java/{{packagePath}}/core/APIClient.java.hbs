@@ -6,6 +6,8 @@ import io.restassured.specification.RequestSpecification;
 import {{javaPackage}}.config.ConfigReader;
 import {{javaPackage}}.utils.Log;
 
+import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 
 /**
@@ -43,11 +45,31 @@ public class APIClient {
     }
 
     /**
+     * GET request with additional headers
+     */
+    public Response get(String endpoint, Map<String, String> headers) {
+        Log.info("GET " + endpoint);
+        Response response = getRequestSpec().headers(headers).get(endpoint);
+        Log.info("Response: " + response.getStatusCode());
+        return response;
+    }
+
+    /**
      * POST request with body
      */
     public Response post(String endpoint, Object body) {
         Log.info("POST " + endpoint);
         Response response = getRequestSpec().body(body).post(endpoint);
+        Log.info("Response: " + response.getStatusCode());
+        return response;
+    }
+
+    /**
+     * POST request with body and additional headers
+     */
+    public Response post(String endpoint, Object body, Map<String, String> headers) {
+        Log.info("POST " + endpoint);
+        Response response = getRequestSpec().headers(headers).body(body).post(endpoint);
         Log.info("Response: " + response.getStatusCode());
         return response;
     }

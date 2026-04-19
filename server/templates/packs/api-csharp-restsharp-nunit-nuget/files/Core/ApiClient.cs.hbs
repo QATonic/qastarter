@@ -55,5 +55,56 @@ namespace {{projectNamespace}}.Core
             Log.Instance.Info($"Response: {(int)response.StatusCode}");
             return response;
         }
+
+        // -------- Auth / header helpers --------
+
+        private readonly System.Collections.Generic.Dictionary<string, string> _defaultHeaders = new();
+
+        public void SetAuthToken(string token)
+        {
+            _defaultHeaders["Authorization"] = $"Bearer {token}";
+        }
+
+        public void SetApiKey(string apiKey, string headerName = "X-API-Key")
+        {
+            _defaultHeaders[headerName] = apiKey;
+        }
+
+        public void SetBasicAuth(string username, string password)
+        {
+            var raw = System.Text.Encoding.UTF8.GetBytes($"{username}:{password}");
+            _defaultHeaders["Authorization"] = $"Basic {System.Convert.ToBase64String(raw)}";
+        }
+
+        public void SetHeader(string name, string value)
+        {
+            _defaultHeaders[name] = value;
+        }
+
+        public void ClearAuth()
+        {
+            _defaultHeaders.Remove("Authorization");
+        }
+
+        public async System.Threading.Tasks.Task<RestResponse<T>> GetAsync<T>(string endpoint)
+        {
+            Log.Instance.Info($"GET(async) {endpoint}");
+            var request = new RestRequest(endpoint, Method.Get);
+            foreach (var h in _defaultHeaders) request.AddHeader(h.Key, h.Value);
+            var response = await _client.ExecuteAsync<T>(request);
+            Log.Instance.Info($"Response: {(int)response.StatusCode}");
+            return response;
+        }
+
+        public async System.Threading.Tasks.Task<RestResponse<T>> PostAsync<T>(string endpoint, object? body = null)
+        {
+            Log.Instance.Info($"POST(async) {endpoint}");
+            var request = new RestRequest(endpoint, Method.Post);
+            foreach (var h in _defaultHeaders) request.AddHeader(h.Key, h.Value);
+            if (body != null) request.AddJsonBody(body);
+            var response = await _client.ExecuteAsync<T>(request);
+            Log.Instance.Info($"Response: {(int)response.StatusCode}");
+            return response;
+        }
     }
 }

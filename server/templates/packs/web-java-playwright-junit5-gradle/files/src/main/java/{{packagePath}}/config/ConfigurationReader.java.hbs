@@ -63,6 +63,12 @@ public class ConfigurationReader {
         return Integer.parseInt(getProperty("timeout.default", "30"));
     }
 
+    public static int getIntProperty(String key, int defaultValue) {
+        String value = getProperty(key);
+        if (value == null) return defaultValue;
+        try { return Integer.parseInt(value); } catch (NumberFormatException e) { return defaultValue; }
+    }
+
     public static String getCurrentEnvironment() {
         return currentEnvironment;
     }

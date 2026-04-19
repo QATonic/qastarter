@@ -5,7 +5,7 @@ namespace {{projectNamespace}}.Pages;
 
 public class NotepadPage : BasePage
 {
-    public NotepadPage(WindowsDriver<WindowsElement> driver) : base(driver) { }
+    public NotepadPage(WindowsDriver driver) : base(driver) { }
 
     // Locators
     private By TextEditor => By.ClassName("Edit");
@@ -64,7 +64,7 @@ public class NotepadPage : BasePage
         // Handle "Do you want to save?" dialog if it appears
         try
         {
-            var dontSaveButton = Driver.FindElementByName("Don't Save");
+            var dontSaveButton = Driver.FindElement(By.Name("Don't Save"));
             dontSaveButton?.Click();
         }
         catch

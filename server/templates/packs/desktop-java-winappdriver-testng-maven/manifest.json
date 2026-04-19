@@ -176,10 +176,7 @@
       "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
       "template": "src/main/java/{{packagePath}}/utils/ExtentManager.java.hbs",
       "isTemplate": true,
-      "description": "ExtentReports configuration for desktop test reporting",
-      "conditional": {
-        "reportingTool": "extent-reports"
-      }
+      "description": "ExtentReports configuration for desktop test reporting"
     },
     {
       "path": "src/main/java/{{packagePath}}/listeners/TestListener.java",

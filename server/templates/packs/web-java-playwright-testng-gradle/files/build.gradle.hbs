@@ -57,8 +57,8 @@ dependencies {
 // Playwright
 implementation "com.microsoft.playwright:playwright:${playwrightVersion}"
 
-// TestNG
-testImplementation "org.testng:testng:${testngVersion}"
+// TestNG — used in src/main/java (BaseTest), must be on the compile classpath.
+implementation "org.testng:testng:${testngVersion}"
 {{#if (eq reportingTool "extent-reports")}}
 
 // ExtentReports

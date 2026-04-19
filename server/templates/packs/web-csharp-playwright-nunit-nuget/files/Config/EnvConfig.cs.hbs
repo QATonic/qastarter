@@ -10,7 +10,7 @@ public class EnvConfig
 
     private EnvConfig()
     {
-        _environment = Environment.GetEnvironmentVariable("TEST_ENV") ?? "dev";
+        _environment = System.Environment.GetEnvironmentVariable("TEST_ENV") ?? "dev";
         var configPath = Path.Combine("Data", $"{_environment}.json");
         var jsonContent = File.ReadAllText(configPath);
         _config = JObject.Parse(jsonContent);

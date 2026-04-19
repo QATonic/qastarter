@@ -284,13 +284,10 @@ public class WindowsUtils {
         try {
             HWND hwnd = getWindowByTitle(windowTitle);
             if (hwnd != null) {
-                boolean result = User32.INSTANCE.PostMessage(hwnd, User32.WM_CLOSE, null, null);
-                if (result) {
-                    Log.info("Close message sent to window: " + windowTitle);
-                } else {
-                    Log.warn("Failed to send close message to window: " + windowTitle);
-                }
-                return result;
+                // JNA's PostMessage wrapper in recent JNA releases returns void; best-effort send.
+                User32.INSTANCE.PostMessage(hwnd, User32.WM_CLOSE, null, null);
+                Log.info("Close message sent to window: " + windowTitle);
+                return true;
             }
             return false;
         } catch (Exception e) {
@@ -380,17 +377,19 @@ public class WindowsUtils {
      */
     public static boolean sendKeysToActiveWindow(String keys) {
         try {
-            // This is a basic implementation
-            // For more complex key combinations, consider using Robot class
+            // Use java.awt.Robot for keyboard events — JNA's User32 Java binding
+            // doesn't expose keybd_event directly in recent releases.
+            java.awt.Robot robot = new java.awt.Robot();
             for (char c : keys.toCharArray()) {
-                User32.INSTANCE.keybd_event((byte) Character.toUpperCase(c), (byte) 0, 0, 0);
-                User32.INSTANCE.keybd_event((byte) Character.toUpperCase(c), (byte) 0, 2, 0); // Key up
-                Thread.sleep(50);
+                int keyCode = java.awt.event.KeyEvent.getExtendedKeyCodeForChar(c);
+                if (keyCode != java.awt.event.KeyEvent.VK_UNDEFINED) {
+                    robot.keyPress(keyCode);
+                    robot.keyRelease(keyCode);
+                    Thread.sleep(50);
+                }
             }
-            
             Log.info("Keys sent to active window: " + keys);
             return true;
-            
         } catch (Exception e) {
             Log.error("Error sending keys to active window: " + e.getMessage());
             return false;

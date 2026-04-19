@@ -1,3 +1,5 @@
+using System;
+using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using {{projectNamespace}}.Utils;
 
@@ -5,7 +7,7 @@ namespace {{projectNamespace}}.Core;
 
 public static class ElementActions
 {
-    public static void Click(WindowsElement element, string elementName = "Element")
+    public static void Click(AppiumElement element, string elementName = "Element")
     {
         try
         {
@@ -19,7 +21,7 @@ public static class ElementActions
         }
     }
 
-    public static void SendKeys(WindowsElement element, string text, string elementName = "Element")
+    public static void SendKeys(AppiumElement element, string text, string elementName = "Element")
     {
         try
         {
@@ -34,7 +36,7 @@ public static class ElementActions
         }
     }
 
-    public static string GetText(WindowsElement element, string elementName = "Element")
+    public static string GetText(AppiumElement element, string elementName = "Element")
     {
         try
         {
@@ -49,7 +51,7 @@ public static class ElementActions
         }
     }
 
-    public static string GetAttribute(WindowsElement element, string attributeName, string elementName = "Element")
+    public static string GetAttribute(AppiumElement element, string attributeName, string elementName = "Element")
     {
         try
         {
@@ -64,7 +66,7 @@ public static class ElementActions
         }
     }
 
-    public static bool IsDisplayed(WindowsElement element, string elementName = "Element")
+    public static bool IsDisplayed(AppiumElement element, string elementName = "Element")
     {
         try
         {
@@ -79,7 +81,7 @@ public static class ElementActions
         }
     }
 
-    public static bool IsEnabled(WindowsElement element, string elementName = "Element")
+    public static bool IsEnabled(AppiumElement element, string elementName = "Element")
     {
         try
         {

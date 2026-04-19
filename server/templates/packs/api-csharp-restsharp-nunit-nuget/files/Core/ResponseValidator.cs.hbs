@@ -78,7 +78,7 @@ public class ResponseValidator<T>
     {
         var header = _response.Headers?.FirstOrDefault(h => h.Name == "Content-Type");
         header.Should().NotBeNull();
-        header!.Value.Should().Contain(contentType);
+        (header!.Value?.ToString() ?? string.Empty).Should().Contain(contentType);
         return this;
     }
 

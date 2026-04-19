@@ -10,6 +10,7 @@ import java.util.Properties;
 public class ConfigReader {
 
 private static Properties properties;
+private static String environment;
 private static final String CONFIG_DIR = "src/main/resources/config/";
 
 static {
@@ -17,8 +18,8 @@ loadConfig();
 }
 
 private static void loadConfig() {
-String env = System.getProperty("env", "dev");
-String configFile = CONFIG_DIR + env + ".properties";
+environment = System.getProperty("env", "dev");
+String configFile = CONFIG_DIR + environment + ".properties";
 
 properties = new Properties();
 try (FileInputStream fis = new FileInputStream(configFile)) {
@@ -60,5 +61,13 @@ return Integer.parseInt(properties.getProperty("test.retry.count", "2"));
 
 public static String getProperty(String key) {
 return properties.getProperty(key);
+}
+
+public static String getProperty(String key, String defaultValue) {
+return properties.getProperty(key, defaultValue);
+}
+
+public static String getEnvironment() {
+return environment;
 }
 }

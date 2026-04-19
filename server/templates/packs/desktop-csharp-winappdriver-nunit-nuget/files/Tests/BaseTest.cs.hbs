@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using OpenQA.Selenium.Appium.Windows;
 using {{projectNamespace}}.Core;
@@ -7,7 +8,7 @@ namespace {{projectNamespace}}.Tests;
 
 public class BaseTest
 {
-protected WindowsDriver<WindowsElement> Driver = null!;
+protected WindowsDriver Driver = null!;
 
     [OneTimeSetUp]
     public void OneTimeSetUp()

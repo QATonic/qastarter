@@ -1,6 +1,7 @@
 package {{javaPackage}}.pages;
 
 import org.openqa.selenium.By;
+import io.appium.java_client.AppiumBy;
 import {{javaPackage}}.utils.Log;
 
 /**
@@ -9,9 +10,9 @@ import {{javaPackage}}.utils.Log;
 public class LoginPage extends BasePage {
 
     // Android locators for SauceDemo app
-    private By usernameField = By.accessibilityId("test-Username");
-    private By passwordField = By.accessibilityId("test-Password");
-    private By loginButton = By.accessibilityId("test-LOGIN");
+    private By usernameField = AppiumBy.accessibilityId("test-Username");
+    private By passwordField = AppiumBy.accessibilityId("test-Password");
+    private By loginButton = AppiumBy.accessibilityId("test-LOGIN");
     private By errorMessage = By.xpath("//android.widget.TextView[contains(@text, 'Username and password')]");
     private By productsTitle = By.xpath("//android.widget.TextView[@text='PRODUCTS']");
 

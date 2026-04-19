@@ -1,7 +1,7 @@
 package {{packageName}}.core;
 
 import io.restassured.specification.RequestSpecification;
-import {{packageName}}.config.ConfigurationReader;
+import {{packageName}}.config.ConfigReader;
 import {{packageName}}.utils.JSONUtils;
 {{#if utilities.logger}}
 import {{packageName}}.utils.Log;
@@ -21,8 +21,8 @@ public class RequestBuilder {
     private final String acceptType;
 
     public RequestBuilder() {
-        this.contentType = ConfigurationReader.getProperty("api.content.type", "application/json");
-        this.acceptType = ConfigurationReader.getProperty("api.accept.type", "application/json");
+        this.contentType = ConfigReader.getProperty("api.content.type", "application/json");
+        this.acceptType = ConfigReader.getProperty("api.accept.type", "application/json");
     }
 
     /**

@@ -1,6 +1,7 @@
 package {{javaPackage}}.pages;
 
 import org.openqa.selenium.By;
+import io.appium.java_client.AppiumBy;
 import {{javaPackage}}.utils.Log;
 
 /**
@@ -22,7 +23,7 @@ public class CalculatorPage extends BasePage {
     private By buttonClear = By.name("Clear");
 
     // Result
-    private By resultDisplay = By.accessibilityId("CalculatorResults");
+    private By resultDisplay = AppiumBy.accessibilityId("CalculatorResults");
 
     public CalculatorPage clickNumber(int number) {
         By button = switch (number) {

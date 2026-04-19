@@ -14,12 +14,12 @@ private CalculatorPage _calc;
 [SetUp]
 public void Setup()
 {
-WinAppDriverManager.InitDriver();
+DriverManager.InitDriver();
 _calc = new CalculatorPage();
 }
 
 [TearDown]
-public void TearDown() => WinAppDriverManager.QuitDriver();
+public void TearDown() => DriverManager.QuitDriver();
 
 [Test, Category("Smoke")]
 public void TestAddition()

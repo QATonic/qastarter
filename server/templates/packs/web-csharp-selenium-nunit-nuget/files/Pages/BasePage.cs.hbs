@@ -11,12 +11,20 @@ namespace {{projectNamespace}}.Pages
     /// </summary>
     public abstract class BasePage
     {
-        protected IWebDriver Driver => DriverManager.Driver;
+        protected IWebDriver Driver { get; }
         protected WebDriverWait Wait { get; }
         protected int Timeout => ConfigReader.Instance.Timeout;
 
         protected BasePage()
         {
+            Driver = DriverManager.Driver;
+            Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(Timeout));
+        }
+
+        /// <summary>Explicit driver ctor for pages that take the driver as a ctor arg (POM-style).</summary>
+        protected BasePage(IWebDriver driver)
+        {
+            Driver = driver;
             Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(Timeout));
         }
 

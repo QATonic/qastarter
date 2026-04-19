@@ -236,12 +236,30 @@ try {
 int maxScrollAttempts = 10;
 int scrollAttempts = 0;
 
-while (!targetElement.isDisplayed() && scrollAttempts < maxScrollAttempts) { swipeUp(); scrollAttempts++; } {{#if
-    utilities.logger}} Log.info("Scrolled to target element after " + scrollAttempts + " attempts"); {{/if}} } catch
-    (Exception e) { {{#if utilities.logger}} Log.error("Failed to scroll to element", e); {{/if}} throw new
-    RuntimeException("Scroll to element failed", e); } } /** * Hide mobile keyboard (Platform Specific best effort) */
-    public static void hideKeyboard() { // Appium 9 doesn't guarantee hideKeyboard on generic AppiumDriver // This is a
-    best-effort implementation try { // For Android, this often works if the driver is castable, // but strictly
-    speaking W3C doesn't have a direct 'hideKeyboard' // Usually clicking outside or 'Done' is preferred. // We'll leave
-    this empty or use specific driver casting if needed. // Ideally: ((AndroidDriver) getDriver()).hideKeyboard(); }
-    catch (Exception e) { // Ignore } } }
+while (!targetElement.isDisplayed() && scrollAttempts < maxScrollAttempts) {
+    swipeUp();
+    scrollAttempts++;
+}
+{{#if utilities.logger}}
+Log.info("Scrolled to target element after " + scrollAttempts + " attempts");
+{{/if}}
+} catch (Exception e) {
+{{#if utilities.logger}}
+Log.error("Failed to scroll to element", e);
+{{/if}}
+throw new RuntimeException("Scroll to element failed", e);
+}
+}
+
+/**
+ * Hide mobile keyboard (best effort — Appium 9 removed the generic hideKeyboard API on AppiumDriver).
+ * For Android/iOS specific drivers, cast and call hideKeyboard() directly.
+ */
+public static void hideKeyboard() {
+    try {
+        // Generic best-effort no-op; prefer ((AndroidDriver) getDriver()).hideKeyboard() in your page objects.
+    } catch (Exception e) {
+        // Intentionally ignored — hiding the keyboard should never break a test.
+    }
+}
+}

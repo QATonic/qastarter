@@ -1,12 +1,14 @@
+using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Appium.Windows;
 using {{projectNamespace}}.Config;
+using System.IO;
 
 namespace {{projectNamespace}}.Utils;
 
 public static class ScreenshotHelper
 {
-    public static void TakeScreenshot(WindowsDriver<WindowsElement>? driver, string testName)
+    public static void TakeScreenshot(WindowsDriver? driver, string testName)
     {
         if (driver == null || !Settings.TakeScreenshotOnFailure)
             return;

@@ -83,6 +83,12 @@ export class TemplatePackEngine {
         .replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''))
         .replace(/^(.)/, (c) => c.toLowerCase());
     });
+    this.hb.registerHelper('replace', (str: unknown, find: unknown, replace: unknown) => {
+      if (typeof str !== 'string' || typeof find !== 'string' || typeof replace !== 'string') {
+        return str ?? '';
+      }
+      return str.split(find).join(replace);
+    });
   }
 
   /**

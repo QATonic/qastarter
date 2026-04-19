@@ -285,7 +285,7 @@ public class ElementWaitUtils {
             WindowsDriver driver = DriverManager.getDriver();
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
             
-            T result = wait.until(condition::apply);
+            T result = wait.until(d -> condition.apply((WindowsDriver) d));
             Log.info("Custom condition met");
             return result;
             

@@ -205,6 +205,12 @@
       "conditional": {
         "utilities.faker": true
       }
+    },
+    {
+      "path": "Core/DriverManager.cs",
+      "template": "Core/DriverManager.cs.hbs",
+      "isTemplate": true,
+      "description": "Ambient WindowsDriver access for page objects"
     }
   ],
   "supportedCombination": {

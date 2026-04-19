@@ -3,6 +3,7 @@ package {{javaPackage}}.utils;
 import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.core.DriverManager;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -23,6 +24,11 @@ public class WaitUtils {
     private static WebDriverWait getWait() {
         int timeout = ConfigurationReader.getTimeout();
         return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeout));
+    }
+
+    private static WebDriverWait getWait(WebDriver driver) {
+        int timeout = ConfigurationReader.getTimeout();
+        return new WebDriverWait(driver, Duration.ofSeconds(timeout));
     }
 
     /**
@@ -63,5 +69,32 @@ public class WaitUtils {
     public static boolean waitForTextPresent(By locator, String text) {
         Log.logWait("Waiting for text '" + text + "' in: " + locator);
         return getWait().until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+    }
+
+    // -------- Driver-explicit overloads (for callers that hold their own WebDriver) --------
+
+    public static WebElement waitForVisibility(WebDriver driver, By locator) {
+        Log.logWait("Waiting for visibility: " + locator);
+        return getWait(driver).until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    public static WebElement waitForClickability(WebDriver driver, By locator) {
+        Log.logWait("Waiting for clickability: " + locator);
+        return getWait(driver).until(ExpectedConditions.elementToBeClickable(locator));
+    }
+
+    public static WebElement waitForPresence(WebDriver driver, By locator) {
+        Log.logWait("Waiting for presence: " + locator);
+        return getWait(driver).until(ExpectedConditions.presenceOfElementLocated(locator));
+    }
+
+    public static boolean waitForInvisibility(WebDriver driver, By locator) {
+        Log.logWait("Waiting for invisibility: " + locator);
+        return getWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(locator));
+    }
+
+    public static boolean waitForTextPresent(WebDriver driver, By locator, String text) {
+        Log.logWait("Waiting for text '" + text + "' in: " + locator);
+        return getWait(driver).until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
     }
 }

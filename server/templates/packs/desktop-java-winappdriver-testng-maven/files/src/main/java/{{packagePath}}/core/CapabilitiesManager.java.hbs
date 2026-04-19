@@ -24,7 +24,7 @@ WindowsOptions options = new WindowsOptions();
 options.setApp(appPath);
 
 // Set device name (required)
-options.setDeviceName("WindowsPC");
+options.setCapability("deviceName", "WindowsPC");
 
 // Set session timeout
 int sessionTimeout = ConfigurationReader.getSessionTimeout();
@@ -49,7 +49,7 @@ WindowsOptions options = new WindowsOptions();
 
 // Use Root for desktop session
 options.setApp("Root");
-options.setDeviceName("WindowsPC");
+options.setCapability("deviceName", "WindowsPC");
 
 // Set session timeout
 int sessionTimeout = ConfigurationReader.getSessionTimeout();
@@ -130,7 +130,7 @@ return options;
 public static WindowsOptions getWindowOptions(String windowHandle) {
 WindowsOptions options = new WindowsOptions();
 
-options.setDeviceName("WindowsPC");
+options.setCapability("deviceName", "WindowsPC");
 options.setCapability("appTopLevelWindow", windowHandle);
 
 // Set session timeout

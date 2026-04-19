@@ -37,6 +37,8 @@ namespace {{projectNamespace}}.Utils
             Console.WriteLine($"StackTrace: {ex.StackTrace}");
         }
 
+        public static void Error(Exception ex, string message) => Error(message, ex);
+
         public static void Step(string message)
         {
             Console.WriteLine($"{StepPrefix}{message}");

@@ -1,4 +1,5 @@
 using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
 using {{projectNamespace}}.Utils;
 
 namespace {{projectNamespace}}.Pages
@@ -6,12 +7,15 @@ namespace {{projectNamespace}}.Pages
     public class CalculatorPage : BasePage
     {
         private By ButtonPlus = By.Name("Plus");
+        private By ButtonMinus = By.Name("Minus");
         private By ButtonEquals = By.Name("Equals");
-        private By ResultDisplay = By.AccessibilityId("CalculatorResults");
+        private By ResultDisplay = MobileBy.AccessibilityId("CalculatorResults");
 
         public void ClickNumber(int number) => Click(By.Name(number.ToString()));
         public void ClickPlus() => Click(ButtonPlus);
+        public void ClickMinus() => Click(ButtonMinus);
         public void ClickEquals() => Click(ButtonEquals);
+        public void Clear() => Click(By.Name("Clear"));
         public string GetResult() => GetText(ResultDisplay);
 
         public void Add(int a, int b)
@@ -19,6 +23,15 @@ namespace {{projectNamespace}}.Pages
             Log.Instance.Step($"Calculate: {a} + {b}");
             ClickNumber(a);
             ClickPlus();
+            ClickNumber(b);
+            ClickEquals();
+        }
+
+        public void Subtract(int a, int b)
+        {
+            Log.Instance.Step($"Calculate: {a} - {b}");
+            ClickNumber(a);
+            ClickMinus();
             ClickNumber(b);
             ClickEquals();
         }

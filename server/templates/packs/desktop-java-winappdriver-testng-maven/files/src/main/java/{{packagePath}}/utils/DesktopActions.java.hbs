@@ -32,7 +32,7 @@ public class DesktopActions {
      * Perform keyboard shortcut (e.g., Ctrl+C, Ctrl+V)
      * @param keys Keys to press simultaneously
      */
-    public static void keyboardShortcut(Keys... keys) {
+    public static void keyboardShortcut(CharSequence... keys) {
         try {
             WindowsDriver driver = DriverManager.getDriver();
             Actions actions = new Actions(driver);

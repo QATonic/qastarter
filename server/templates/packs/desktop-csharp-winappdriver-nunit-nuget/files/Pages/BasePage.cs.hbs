@@ -1,4 +1,7 @@
+using System;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using {{projectNamespace}}.Core;
 using {{projectNamespace}}.Utils;
@@ -7,8 +10,20 @@ namespace {{projectNamespace}}.Pages
 {
     public class BasePage
     {
-        protected IWebDriver Driver => WinAppDriverManager.Driver;
-        protected WebDriverWait Wait => new(Driver, TimeSpan.FromSeconds(10));
+        protected WindowsDriver Driver { get; }
+        protected WebDriverWait Wait { get; }
+
+        protected BasePage()
+        {
+            Driver = DriverManager.Driver;
+            Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+        }
+
+        protected BasePage(WindowsDriver driver)
+        {
+            Driver = driver;
+            Wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+        }
 
         protected void Click(By locator)
         {
@@ -16,6 +31,32 @@ namespace {{projectNamespace}}.Pages
             Wait.Until(d => d.FindElement(locator)).Click();
         }
 
+        /// <summary>Click a resolved element (from FindElement) with a human-readable label.</summary>
+        protected void Click(IWebElement element, string elementName = "Element")
+        {
+            Log.Instance.Info($"Click: {elementName}");
+            element.Click();
+        }
+
         protected string GetText(By locator) => Wait.Until(d => d.FindElement(locator)).Text;
+
+        /// <summary>Get text from a resolved element with a human-readable label.</summary>
+        protected string GetText(IWebElement element, string elementName = "Element")
+        {
+            var text = element.Text;
+            Log.Instance.Info($"Got text '{text}' from: {elementName}");
+            return text;
+        }
+
+        /// <summary>Type text into a resolved element with a human-readable label.</summary>
+        protected void SendKeys(IWebElement element, string text, string elementName = "Element")
+        {
+            Log.Instance.Info($"SendKeys '{text}' -> {elementName}");
+            element.Clear();
+            element.SendKeys(text);
+        }
+
+        /// <summary>Shortcut for pages to look up an element directly.</summary>
+        protected IWebElement FindElement(By locator) => Driver.FindElement(locator);
     }
 }

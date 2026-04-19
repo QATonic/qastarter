@@ -1,7 +1,10 @@
+using System.IO;
 using NUnit.Framework;
 using OpenQA.Selenium.Appium;
 using {{projectNamespace}}.Config;
+{{#if utilities.dataProvider}}
 using {{projectNamespace}}.Data;
+{{/if}}
 using {{projectNamespace}}.Tests.Utils;
 
 namespace {{projectNamespace}}.Tests;
@@ -10,7 +13,9 @@ namespace {{projectNamespace}}.Tests;
 public abstract class BaseTest
 {
     protected AppiumDriver Driver = null!;
+{{#if utilities.dataProvider}}
     protected TestDataModel TestData = null!;
+{{/if}}
 
     [OneTimeSetUp]
     public void OneTimeSetUp()
@@ -19,9 +24,11 @@ public abstract class BaseTest
         Directory.CreateDirectory("Screenshots");
         Directory.CreateDirectory("Logs");
         Directory.CreateDirectory("Reports");
-        
+{{#if utilities.dataProvider}}
+
         // Load test data
         TestData = TestDataModel.Load();
+{{/if}}
     }
 
     [SetUp]

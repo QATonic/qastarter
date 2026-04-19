@@ -26,6 +26,15 @@ public class Log {
     }
 
     public static void info(String message) { log("INFO", message); }
+    public static void warn(String message) { log("WARN", message); }
+    public static void debug(String message) { log("DEBUG", message); }
     public static void error(String message) { log("ERROR", message); }
+    public static void error(String message, Throwable t) { log("ERROR", message + " — " + (t != null ? t.toString() : "")); }
     public static void step(String message) { log("STEP", message); }
+    public static void screenshot(String path) { log("SCREEN", "Saved: " + path); }
+    public static void startSuite(String name) { log("SUITE", "START " + name); }
+    public static void endSuite(String name) { log("SUITE", "END " + name); }
+    public static void startTest(String name) { log("TEST", "START " + name); }
+    public static void endTest(String name, String status) { log("TEST", "END " + name + " [" + status + "]"); }
+    public static void performance(String label, long millis) { log("PERF", label + " took " + millis + "ms"); }
 }

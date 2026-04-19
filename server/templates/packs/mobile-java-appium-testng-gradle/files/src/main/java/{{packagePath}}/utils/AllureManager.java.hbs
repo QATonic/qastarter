@@ -71,7 +71,8 @@ public class AllureManager {
      * Add step with lambda to Allure report
      */
     public static void addStep(String stepName, Runnable runnable) {
-        Allure.step(stepName, runnable);
+        // Bridge a plain Runnable into Allure's ThrowableRunnableVoid expected signature.
+        Allure.step(stepName, (Allure.ThrowableRunnableVoid) runnable::run);
     }
 
     /**

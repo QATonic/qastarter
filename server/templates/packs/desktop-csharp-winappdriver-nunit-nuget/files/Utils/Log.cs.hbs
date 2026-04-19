@@ -25,6 +25,9 @@ namespace {{projectNamespace}}.Utils
         }
 
         public void Info(string message) => Write("INFO", message);
+        public void Warn(string message) => Write("WARN", message);
         public void Step(string message) => Write("STEP", message);
+        public void Error(string message) => Write("ERROR", message);
+        public void Error(Exception ex, string message) => Write("ERROR", $"{message} — {ex}");
     }
 }

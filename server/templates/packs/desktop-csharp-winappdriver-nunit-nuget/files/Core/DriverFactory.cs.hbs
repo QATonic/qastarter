@@ -1,3 +1,4 @@
+using System;
 using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using {{projectNamespace}}.Config;
@@ -7,12 +8,12 @@ namespace {{projectNamespace}}.Core;
 
 public static class DriverFactory
 {
-    public static WindowsDriver<WindowsElement> CreateDriver(AppiumOptions options)
+    public static WindowsDriver CreateDriver(AppiumOptions options)
     {
         try
         {
             var serverUrl = new Uri(Settings.WinAppDriverUrl);
-            var driver = new WindowsDriver<WindowsElement>(serverUrl, options);
+            var driver = new WindowsDriver(serverUrl, options);
             
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(Settings.ImplicitWaitSeconds);
             
@@ -26,22 +27,22 @@ public static class DriverFactory
         }
     }
 
-    public static WindowsDriver<WindowsElement> CreateCalculatorDriver()
+    public static WindowsDriver CreateCalculatorDriver()
     {
         return CreateDriver(WinAppDriverConfig.GetCalculatorOptions());
     }
 
-    public static WindowsDriver<WindowsElement> CreateNotepadDriver()
+    public static WindowsDriver CreateNotepadDriver()
     {
         return CreateDriver(WinAppDriverConfig.GetNotepadOptions());
     }
 
-    public static WindowsDriver<WindowsElement> CreateDesktopDriver()
+    public static WindowsDriver CreateDesktopDriver()
     {
         return CreateDriver(WinAppDriverConfig.GetDesktopOptions());
     }
 
-    public static void QuitDriver(WindowsDriver<WindowsElement>? driver)
+    public static void QuitDriver(WindowsDriver? driver)
     {
         if (driver != null)
         {

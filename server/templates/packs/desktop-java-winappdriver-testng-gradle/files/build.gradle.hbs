@@ -12,8 +12,16 @@ repositories {
 
 dependencies {
     implementation 'io.appium:java-client:9.1.0'
-    implementation 'org.seleniumhq.selenium:selenium-java:4.16.0'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.25.0'
     implementation 'org.testng:testng:7.9.0'
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+    // ExtentReports (used by TestListener)
+    implementation 'com.aventstack:extentreports:5.1.1'
+    // File utilities (used by ScreenshotUtils)
+    implementation 'commons-io:commons-io:2.15.1'
+    // Windows native access (used by WindowsUtils)
+    implementation 'net.java.dev.jna:jna:5.14.0'
+    implementation 'net.java.dev.jna:jna-platform:5.14.0'
 {{#if userDependencies.hasMaven}}
 
 // User-picked dependencies (from QAStarter dependency search)

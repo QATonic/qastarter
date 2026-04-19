@@ -21,12 +21,12 @@ namespace {{projectNamespace}}.Utils
                 var filepath = Path.Combine(ScreenshotDir, filename);
 
                 await page.ScreenshotAsync(new() { Path = filepath });
-                Logger.Instance.Info($"Screenshot saved: {filepath}");
+                Logger.Info($"Screenshot saved: {filepath}");
                 return filepath;
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error($"Failed to capture screenshot: {ex.Message}");
+                Logger.Error($"Failed to capture screenshot: {ex.Message}");
                 return null;
             }
         }

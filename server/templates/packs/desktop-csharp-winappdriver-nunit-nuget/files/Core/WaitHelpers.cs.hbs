@@ -1,4 +1,7 @@
+using System;
+using System.Threading;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Appium;
 using OpenQA.Selenium.Appium.Windows;
 using OpenQA.Selenium.Support.UI;
 using {{projectNamespace}}.Config;
@@ -8,8 +11,8 @@ namespace {{projectNamespace}}.Core;
 
 public static class WaitHelpers
 {
-    public static WindowsElement WaitForElement(
-        WindowsDriver<WindowsElement> driver,
+    public static AppiumElement WaitForElement(
+        WindowsDriver driver,
         By locator,
         int timeoutSeconds = -1)
     {
@@ -20,7 +23,7 @@ public static class WaitHelpers
         {
             Logger.Info($"Waiting for element: {locator}");
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
-            var element = wait.Until(drv => drv.FindElement(locator) as WindowsElement);
+            var element = wait.Until(drv => drv.FindElement(locator) as AppiumElement);
             Logger.Info($"Element found: {locator}");
             return element!;
         }
@@ -32,8 +35,8 @@ public static class WaitHelpers
     }
 
     public static bool WaitForElementToBeClickable(
-        WindowsDriver<WindowsElement> driver,
-        WindowsElement element,
+        WindowsDriver driver,
+        AppiumElement element,
         int timeoutSeconds = -1)
     {
         if (timeoutSeconds == -1)
@@ -51,7 +54,7 @@ public static class WaitHelpers
     }
 
     public static bool WaitForElementToDisappear(
-        WindowsDriver<WindowsElement> driver,
+        WindowsDriver driver,
         By locator,
         int timeoutSeconds = -1)
     {

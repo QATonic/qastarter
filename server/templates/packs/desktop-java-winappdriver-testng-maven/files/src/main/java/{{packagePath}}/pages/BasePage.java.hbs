@@ -5,8 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import {{javaPackage}}.core.WinAppDriverManager;
-import {{javaPackage}}.config.ConfigReader;
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.config.ConfigurationReader;
 import {{javaPackage}}.utils.Log;
 
 import java.time.Duration;
@@ -17,8 +17,8 @@ public class BasePage {
     protected WebDriverWait wait;
 
     public BasePage() {
-        this.driver = WinAppDriverManager.getDriver();
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigReader.getImplicitWait()));
+        this.driver = DriverManager.getDriver();
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(ConfigurationReader.getImplicitWait()));
     }
 
     protected void click(By locator) {
@@ -26,12 +26,88 @@ public class BasePage {
         wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
     }
 
+    /** Click returning success; swallow exceptions to let page objects continue their flow. */
+    protected boolean clickElement(By locator) {
+        try {
+            click(locator);
+            return true;
+        } catch (Exception e) {
+            Log.error("clickElement failed for " + locator + ": " + e.getMessage());
+            return false;
+        }
+    }
+
     protected String getText(By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
+    }
+
+    /** Safe wrapper around getText — returns empty string on failure. */
+    protected String getElementText(By locator) {
+        try {
+            return getText(locator);
+        } catch (Exception e) {
+            Log.error("getElementText failed for " + locator + ": " + e.getMessage());
+            return "";
+        }
     }
 
     protected boolean isDisplayed(By locator) {
         try { return driver.findElement(locator).isDisplayed(); }
         catch (Exception e) { return false; }
+    }
+
+    /** Alias of isDisplayed for page-object readability. */
+    protected boolean isElementDisplayed(By locator) {
+        return isDisplayed(locator);
+    }
+
+    /** Current window title via the driver (WindowsDriver). */
+    protected String getCurrentWindowTitle() {
+        try {
+            return driver.getTitle();
+        } catch (Exception e) {
+            Log.error("getCurrentWindowTitle failed: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /** Overridable hook — concrete pages return their own title. */
+    public String getPageTitle() {
+        return getCurrentWindowTitle();
+    }
+
+    /** Overridable hook — concrete pages define their loaded state. */
+    public boolean isPageLoaded() {
+        return driver != null;
+    }
+
+    /** Returns true once isPageLoaded() succeeds or the implicit wait elapses. */
+    protected boolean waitForPageToLoad() {
+        try {
+            long deadline = System.currentTimeMillis() + Duration.ofSeconds(ConfigurationReader.getImplicitWait()).toMillis();
+            while (System.currentTimeMillis() < deadline) {
+                if (isPageLoaded()) return true;
+                Thread.sleep(100);
+            }
+            return isPageLoaded();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    /** Wait until the element at locator contains the expected text (empty expected means just visible). */
+    protected boolean waitForElementText(By locator, String expected, int timeoutInSeconds) {
+        try {
+            WebDriverWait custom = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
+            if (expected == null || expected.isEmpty()) {
+                custom.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            } else {
+                custom.until(ExpectedConditions.textToBePresentInElementLocated(locator, expected));
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

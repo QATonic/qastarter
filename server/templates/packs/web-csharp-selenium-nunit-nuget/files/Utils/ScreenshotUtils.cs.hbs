@@ -27,12 +27,12 @@ namespace {{projectNamespace}}.Utils
                 var screenshot = ((ITakesScreenshot)driver).GetScreenshot();
                 screenshot.SaveAsFile(filepath);
                 
-                Logger.Instance.Info($"Screenshot saved: {filepath}");
+                Logger.Info($"Screenshot saved: {filepath}");
                 return filepath;
             }
             catch (Exception ex)
             {
-                Logger.Instance.Error($"Failed to capture screenshot: {ex.Message}");
+                Logger.Error($"Failed to capture screenshot: {ex.Message}");
                 return null;
             }
         }

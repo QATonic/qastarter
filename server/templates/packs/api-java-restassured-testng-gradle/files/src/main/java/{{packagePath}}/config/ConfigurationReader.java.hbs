@@ -76,6 +76,20 @@ public class ConfigurationReader {
     }
 
     /**
+     * Get the configured API base URL.
+     */
+    public static String getBaseUrl() {
+        return properties.getProperty("base.url", "{{baseUrl}}");
+    }
+
+    /**
+     * Get the default content type for requests.
+     */
+    public static String getContentType() {
+        return properties.getProperty("content.type", "application/json");
+    }
+
+    /**
      * Reload properties (useful for test scenarios)
      */
     public static void reloadProperties() {

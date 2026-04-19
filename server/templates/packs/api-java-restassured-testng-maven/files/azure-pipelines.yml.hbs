@@ -83,7 +83,7 @@ stages:
             condition: always()
           {{/if}}
           
-          {{#if (eq reportingTool "extentreports")}}
+          {{#if (eq reportingTool "extent-reports")}}
           - task: PublishBuildArtifacts@1
             inputs:
               PathtoPublish: 'test-output/extent-reports'

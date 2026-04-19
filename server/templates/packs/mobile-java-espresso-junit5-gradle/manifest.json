@@ -35,6 +35,21 @@
       "description": "App module Gradle build configuration"
     },
     {
+      "path": "gradlew",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Unix)"
+    },
+    {
+      "path": "gradlew.bat",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Windows)"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "isTemplate": false,
+      "description": "Gradle wrapper properties"
+    },
+    {
       "path": ".gitignore",
       "isTemplate": true,
       "description": "Git ignore patterns"

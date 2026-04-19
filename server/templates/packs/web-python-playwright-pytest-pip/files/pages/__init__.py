@@ -1,1 +1,1 @@
-# Package init
+# Pages package

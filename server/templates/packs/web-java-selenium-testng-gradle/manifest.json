@@ -49,6 +49,16 @@
       "isTemplate": true
     },
     {
+      "path": "gradlew",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Unix)"
+    },
+    {
+      "path": "gradlew.bat",
+      "isTemplate": false,
+      "description": "Gradle wrapper (Windows)"
+    },
+    {
       "path": "gradle/wrapper/gradle-wrapper.properties",
       "isTemplate": true
     },

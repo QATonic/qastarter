@@ -18,8 +18,8 @@ version = '1.0.0'
 description = '{{projectName}} - Playwright Test Automation Framework'
 
 java {
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 }
 
 repositories {
@@ -40,8 +40,8 @@ allureVersion = '{{toolVersions.allure}}'
 {{#if (eq testingPattern "bdd")}}
 cucumberVersion = '{{toolVersions.cucumber}}'
 {{/if}}
-jacksonVersion = '2.15.2'
-gsonVersion = '2.10.1'
+jacksonVersion = '{{toolVersions.jackson}}'
+gsonVersion = '{{toolVersions.gson}}'
 commonsCsvVersion = '1.10.0'
 
 // Test configuration

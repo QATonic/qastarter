@@ -9,13 +9,14 @@ namespace {{projectNamespace}}.Pages
         private By ButtonPlus = By.Name("Plus");
         private By ButtonMinus = By.Name("Minus");
         private By ButtonEquals = By.Name("Equals");
+        private By ButtonClear = By.Name("Clear");
         private By ResultDisplay = MobileBy.AccessibilityId("CalculatorResults");
 
         public void ClickNumber(int number) => Click(By.Name(number.ToString()));
         public void ClickPlus() => Click(ButtonPlus);
         public void ClickMinus() => Click(ButtonMinus);
         public void ClickEquals() => Click(ButtonEquals);
-        public void Clear() => Click(By.Name("Clear"));
+        public void Clear() => Click(ButtonClear);
         public string GetResult() => GetText(ResultDisplay);
 
         public void Add(int a, int b)

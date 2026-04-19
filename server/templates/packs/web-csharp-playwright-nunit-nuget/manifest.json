@@ -40,6 +40,10 @@
       "isTemplate": true
     },
     {
+      "path": "appsettings.json",
+      "isTemplate": true
+    },
+    {
       "path": "Config/ConfigReader.cs",
       "isTemplate": true
     },
@@ -201,14 +205,14 @@
       }
     },
     {
-      "path": "config/browserstack.yml",
+      "path": "Config/browserstack.yml",
       "isTemplate": true,
       "conditional": {
         "cloudDeviceFarm": "browserstack"
       }
     },
     {
-      "path": "config/saucelabs.yml",
+      "path": "Config/saucelabs.yml",
       "isTemplate": true,
       "conditional": {
         "cloudDeviceFarm": "saucelabs"

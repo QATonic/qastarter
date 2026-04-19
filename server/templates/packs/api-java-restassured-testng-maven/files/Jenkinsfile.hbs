@@ -108,7 +108,7 @@ pipeline {
             ])
             {{/if}}
             
-            {{#if (eq reportingTool "extentreports")}}
+            {{#if (eq reportingTool "extent-reports")}}
             // Archive ExtentReports
             archiveArtifacts artifacts: 'test-output/extent-reports/**/*', 
                            fingerprint: true, 

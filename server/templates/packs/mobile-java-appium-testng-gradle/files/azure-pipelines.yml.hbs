@@ -13,8 +13,7 @@ pool:
   vmImage: 'macOS-latest'
 
 variables:
-  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  GRADLE_USER_HOME: $(Pipeline.Workspace)/.gradle
 
 strategy:
   matrix:
@@ -32,12 +31,12 @@ steps:
 
 - task: Cache@2
   inputs:
-    key: 'maven | "$(Agent.OS)" | **/pom.xml'
+    key: 'gradle | "$(Agent.OS)" | **/build.gradle'
     restoreKeys: |
-      maven | "$(Agent.OS)"
-      maven
-    path: $(MAVEN_CACHE_FOLDER)
-  displayName: Cache Maven packages
+      gradle | "$(Agent.OS)"
+      gradle
+    path: $(GRADLE_USER_HOME)
+  displayName: Cache Gradle packages
 
 - task: NodeTool@0
   inputs:
@@ -58,28 +57,26 @@ steps:
   displayName: 'Install Allure CLI'
 
 {{/if}}
-- task: Maven@3
+- task: Gradle@3
   inputs:
-    mavenPomFile: 'pom.xml'
-    goals: 'clean test'
+    gradleWrapperFile: 'gradlew'
+    tasks: 'clean test'
     options: '-P$(platformName)'
     publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    testResultsFiles: '**/build/test-results/test/TEST-*.xml'
     javaHomeOption: 'JDKVersion'
-    mavenVersionOption: 'Default'
-    mavenOptions: '$(MAVEN_OPTS)'
   displayName: 'Run mobile tests'
   continueOnError: true
 
 {{#if (eq reportingTool "allure")}}
 - script: |
-    allure generate target/allure-results --clean -o target/allure-report
+    allure generate build/allure-results --clean -o build/allure-report
   displayName: 'Generate Allure report'
   condition: always()
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'target/allure-report'
+    PathtoPublish: 'build/allure-report'
     ArtifactName: 'allure-report-$(platformName)'
   displayName: 'Publish Allure report'
   condition: always()
@@ -104,17 +101,16 @@ steps:
 {{/if}}
 
 {{#if (eq reportingTool "junit-reports")}}
-- task: Maven@3
+- task: Gradle@3
   inputs:
-    mavenPomFile: 'pom.xml'
-    goals: 'surefire-report:report-only'
-    mavenOptions: '$(MAVEN_OPTS)'
+    gradleWrapperFile: 'gradlew'
+    tasks: 'testReport'
   displayName: 'Generate JUnit HTML report'
   condition: always()
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: 'target/site'
+    PathtoPublish: 'build/reports/tests'
     ArtifactName: 'junit-report-$(platformName)'
   displayName: 'Publish JUnit HTML report'
   condition: always()

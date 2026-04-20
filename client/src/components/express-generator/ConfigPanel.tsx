@@ -48,8 +48,9 @@ const testingPatternLabels: Record<string, string> = validationLabels.testingPat
 };
 
 export default function ConfigPanel() {
-  const { config, updateConfig, getFilteredOptions, reset } = useExpressGenerator();
+  const { config, updateConfig, getFilteredOptions, reset, hydrationSource } = useExpressGenerator();
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [hydrationBannerDismissed, setHydrationBannerDismissed] = useState(false);
 
   // Memoize filtered option lists so we only re-run the validation-matrix lookup
   // when an *upstream* choice changes — not on every re-render (e.g. keystrokes
@@ -105,6 +106,8 @@ export default function ConfigPanel() {
       ? 'Pick a Language first'
       : undefined;
 
+  const showHydrationBanner = hydrationSource !== null && !hydrationBannerDismissed;
+
   return (
     <ScrollArea className="h-full">
       <div className="p-6 space-y-5">
@@ -131,6 +134,28 @@ export default function ConfigPanel() {
             <TooltipContent side="left">Clear all selections and start over</TooltipContent>
           </Tooltip>
         </div>
+
+        {/* Hydration breadcrumb — only shown on first render when the form had
+            non-default values injected from the URL or localStorage. Disappears
+            on dismiss and doesn't reappear within the same session. */}
+        {showHydrationBanner && (
+          <div className="flex items-start gap-2 rounded-md border border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-200">
+            <Sparkles className="w-3.5 h-3.5 mt-0.5 shrink-0 text-emerald-500" aria-hidden="true" />
+            <span className="flex-1 leading-relaxed">
+              {hydrationSource === 'url'
+                ? 'Loaded from a shared link. Tweak anything below, then generate.'
+                : 'We restored your previous stack. Hit Reset above if you want to start fresh.'}
+            </span>
+            <button
+              type="button"
+              onClick={() => setHydrationBannerDismissed(true)}
+              className="ml-1 text-emerald-600/80 dark:text-emerald-400/80 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+              aria-label="Dismiss"
+            >
+              <X className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
+          </div>
+        )}
 
         {/* Testing Type */}
         <div className="space-y-1 pb-4 border-b border-border/50">

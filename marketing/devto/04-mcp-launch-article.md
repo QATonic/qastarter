@@ -1,10 +1,10 @@
 ---
 title: "QAStarter now speaks MCP — let your AI scaffold test automation projects"
-published: false
+published: true
 description: "Claude Desktop, Cursor, Claude Code and any other MCP-aware AI client can now scaffold production-ready QA test frameworks directly into your workspace — no browser, no download, no rate limit."
 tags: ai, mcp, testing, devtools
 cover_image:
-canonical_url:
+canonical_url: https://qastarter.qatonic.com/mcp
 series: QAStarter
 ---
 

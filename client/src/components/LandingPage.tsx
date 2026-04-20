@@ -142,6 +142,21 @@ export default function LandingPage() {
         {/* Hero Section */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32 relative">
           <div className="text-center max-w-4xl mx-auto">
+            {/* MCP launch announcement — tappable pill links to the dedicated page.
+                Sized small enough to sit above the H1 without fighting it for attention. */}
+            <button
+              type="button"
+              onClick={() => setLocation('/mcp')}
+              className="group inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-medium hover:bg-emerald-500/15 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+              aria-label="Learn about the new MCP server"
+            >
+              <Rocket className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>
+                NEW \u2014 QAStarter now works inside Claude Desktop, Cursor &amp; Claude Code
+              </span>
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+            </button>
+
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 text-foreground leading-[1.1] tracking-tight text-balance">
               Free QA Automation
               <span className="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 bg-clip-text text-transparent block mt-2">

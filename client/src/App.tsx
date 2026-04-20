@@ -11,6 +11,7 @@ const Home = lazy(() => import('@/pages/Home'));
 const Docs = lazy(() => import('@/pages/Docs'));
 const ApiDocs = lazy(() => import('@/pages/ApiDocs'));
 const ExpressGenerator = lazy(() => import('@/pages/ExpressGenerator'));
+const Mcp = lazy(() => import('@/pages/Mcp'));
 const NotFound = lazy(() => import('@/pages/not-found'));
 
 // Loading fallback component
@@ -40,6 +41,7 @@ function Router() {
         <Route path="/docs" component={Docs} />
         <Route path="/api-docs" component={ApiDocs} />
         <Route path="/express" component={ExpressGenerator} />
+        <Route path="/mcp" component={Mcp} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>

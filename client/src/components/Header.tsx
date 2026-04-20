@@ -1,6 +1,6 @@
 import React, { useState, Suspense } from 'react';
 import { useLocation } from 'wouter';
-import { Info, BarChart3, BookOpen, Menu, Github } from 'lucide-react';
+import { Info, BarChart3, BookOpen, Menu, Github, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import ThemeToggle from './ThemeToggle';
@@ -61,6 +61,30 @@ export default function Header({ onLogoClick }: HeaderProps) {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-2" aria-label="Main navigation">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLocation('/mcp')}
+              className={cn(
+                'gap-1.5 font-medium whitespace-nowrap transition-colors relative',
+                isActive('/mcp')
+                  ? 'text-foreground bg-accent'
+                  : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300'
+              )}
+              aria-current={isActive('/mcp') ? 'page' : undefined}
+              data-testid="nav-mcp"
+            >
+              <Sparkles className="h-4 w-4" />
+              <span>MCP</span>
+              {/* "NEW" pip — small, unobtrusive, but catches the eye */}
+              <span
+                aria-hidden="true"
+                className="ml-0.5 inline-block rounded-full bg-emerald-500 text-[9px] font-bold tracking-wide text-white px-1.5 py-px leading-none"
+              >
+                NEW
+              </span>
+            </Button>
+
             <Button
               variant="ghost"
               size="sm"
@@ -136,6 +160,26 @@ export default function Header({ onLogoClick }: HeaderProps) {
                   </SheetTitle>
                 </SheetHeader>
                 <nav className="flex flex-col gap-4 mt-8" aria-label="Mobile navigation">
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleNavClick(() => setLocation('/mcp'))}
+                    className={cn(
+                      'justify-start gap-3 h-12 text-lg font-medium',
+                      isActive('/mcp')
+                        ? 'bg-accent text-foreground'
+                        : 'text-emerald-600 dark:text-emerald-400'
+                    )}
+                    aria-current={isActive('/mcp') ? 'page' : undefined}
+                  >
+                    <Sparkles className="h-5 w-5" />
+                    MCP
+                    <span
+                      aria-hidden="true"
+                      className="ml-1 inline-block rounded-full bg-emerald-500 text-[10px] font-bold tracking-wide text-white px-2 py-0.5 leading-none"
+                    >
+                      NEW
+                    </span>
+                  </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleNavClick(() => setLocation('/docs'))}

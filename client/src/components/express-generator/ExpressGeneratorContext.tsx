@@ -64,6 +64,13 @@ export interface ExpressGeneratorContextType {
   reset: () => void;
   shareableUrl: string;
   recentStacks: RecentStack[];
+  /**
+   * Whether the initial config was pre-populated from the URL (`?…`), from
+   * localStorage (returning user), or if the user is starting fresh. `null`
+   * until the hydration effect runs. UI can surface a dismissable breadcrumb
+   * to reduce "why are my choices already filled in?" confusion.
+   */
+  hydrationSource: 'url' | 'localStorage' | null;
   recordRecentStack: () => void;
   clearRecentStacks: () => void;
 }
@@ -383,7 +390,13 @@ export function ExpressGeneratorProvider({ children }: { children: React.ReactNo
   const urlUpdateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const storageUpdateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Hydrate from URL or localStorage on mount (once)
+  // Hydrate from URL or localStorage on mount (once).
+  // `hydrationSource` lets the rest of the app show a one-line breadcrumb
+  // ("Restored your previous stack" / "Loaded from shared link") so returning
+  // users aren't confused when they land on the wizard with fields already
+  // filled in.
+  const [hydrationSource, setHydrationSource] = useState<'url' | 'localStorage' | null>(null);
+
   useEffect(() => {
     if (initializedRef.current) return;
     initializedRef.current = true;
@@ -392,11 +405,13 @@ export function ExpressGeneratorProvider({ children }: { children: React.ReactNo
     const urlConfig = readConfigFromUrl();
     if (Object.keys(urlConfig).length > 0) {
       dispatch({ type: 'HYDRATE', config: urlConfig });
+      setHydrationSource('url');
     } else {
       // Priority 2: localStorage (returning user)
       const stored = readConfigFromLocalStorage();
       if (stored && Object.keys(stored).length > 0) {
         dispatch({ type: 'HYDRATE', config: stored });
+        setHydrationSource('localStorage');
       }
     }
 
@@ -542,6 +557,7 @@ export function ExpressGeneratorProvider({ children }: { children: React.ReactNo
       recentStacks,
       recordRecentStack,
       clearRecentStacks,
+      hydrationSource,
     }),
     [
       config,
@@ -554,6 +570,7 @@ export function ExpressGeneratorProvider({ children }: { children: React.ReactNo
       recentStacks,
       recordRecentStack,
       clearRecentStacks,
+      hydrationSource,
     ]
   );
 

@@ -43,6 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Redis caching support
 - Docker multi-stage build for production deployment
 - Comprehensive E2E test suite (Playwright, multi-browser)
-- CLI tool (`@qatonic/qastarter-cli`) for terminal-based generation
+- CLI tool (`@qatonic_innovations/qastarter-cli`) for terminal-based generation
 - Template pack validation and parity checking system
 - Analytics dashboard for tracking generation trends

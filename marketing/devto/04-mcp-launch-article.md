@@ -25,7 +25,7 @@ Add this to your `claude_desktop_config.json` (or equivalent for Cursor / Claude
   "mcpServers": {
     "qastarter": {
       "command": "npx",
-      "args": ["-y", "@qatonic/qastarter-cli", "mcp"]
+      "args": ["-y", "@qatonic_innovations/qastarter-cli", "mcp"]
     }
   }
 }
@@ -73,7 +73,7 @@ With MCP, QAStarter becomes something the AI already knows how to use — just l
 
 ## Under the hood — 412 lines
 
-The MCP server is a thin wrapper in the existing `@qatonic/qastarter-cli` package. It:
+The MCP server is a thin wrapper in the existing `@qatonic_innovations/qastarter-cli` package. It:
 
 1. Reuses the REST API (`POST /v1/generate`, `GET /v1/metadata`, `POST /v1/project-preview`) so the scaffold engine stays canonical.
 2. Runs over **stdio** — the standard MCP transport that every AI client already supports.
@@ -89,13 +89,13 @@ Anonymous, aggregate, no PII — same as always. But now we can see *which combo
 
 ```bash
 # In your IDE config (one-off, no global install):
-npx -y @qatonic/qastarter-cli mcp
+npx -y @qatonic_innovations/qastarter-cli mcp
 
 # Or install globally:
-npm i -g @qatonic/qastarter-cli
+npm i -g @qatonic_innovations/qastarter-cli
 qastarter mcp
 ```
 
-Source: [github.com/QATonic/qastarter](https://github.com/QATonic/qastarter) · CLI: [@qatonic/qastarter-cli](https://www.npmjs.com/package/@qatonic/qastarter-cli) · Web: [qastarter.qatonic.com](https://qastarter.qatonic.com)
+Source: [github.com/QATonic/qastarter](https://github.com/QATonic/qastarter) · CLI: [@qatonic_innovations/qastarter-cli](https://www.npmjs.com/package/@qatonic_innovations/qastarter-cli) · Web: [qastarter.qatonic.com](https://qastarter.qatonic.com)
 
 *Ask your AI: "Scaffold a Playwright TypeScript project in ./tests/e2e."* and tell us what it picked.

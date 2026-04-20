@@ -1,6 +1,6 @@
 # QAStarter CLI
 
-[![npm version](https://badge.fury.io/js/%40qatonic%2Fqastarter-cli.svg)](https://www.npmjs.com/package/@qatonic/qastarter-cli)
+[![npm version](https://badge.fury.io/js/%40qatonic_innovations%2Fqastarter-cli.svg)](https://www.npmjs.com/package/@qatonic_innovations/qastarter-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
@@ -13,7 +13,7 @@ Generate complete, well-structured test automation projects in seconds. Supports
 ### From npm (Recommended)
 
 ```bash
-npm install -g @qatonic/qastarter-cli
+npm install -g @qatonic_innovations/qastarter-cli
 ```
 
 ### From Source
@@ -130,10 +130,10 @@ QAStarter ships a built-in [Model Context Protocol](https://modelcontextprotocol
 
 ```bash
 # Option A — one-off via npx (no global install)
-npx @qatonic/qastarter-cli mcp
+npx @qatonic_innovations/qastarter-cli mcp
 
 # Option B — global install, then run
-npm i -g @qatonic/qastarter-cli
+npm i -g @qatonic_innovations/qastarter-cli
 qastarter mcp
 ```
 
@@ -148,7 +148,7 @@ Add to `claude_desktop_config.json` (macOS/Windows/Linux) or your `mcp` block:
   "mcpServers": {
     "qastarter": {
       "command": "npx",
-      "args": ["-y", "@qatonic/qastarter-cli", "mcp"]
+      "args": ["-y", "@qatonic_innovations/qastarter-cli", "mcp"]
     }
   }
 }

@@ -9,7 +9,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
   type TooltipProps,
 } from 'recharts';
 
@@ -322,52 +321,51 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
                 <CardTitle>Language Distribution</CardTitle>
                 <CardDescription>Preferred ecosystem breakdown</CardDescription>
               </CardHeader>
-              <CardContent className="h-[350px]">
+              <CardContent>
                 {languageData.length > 0 ? (
                   <>
                     <SrDataTable data={languageData} label="Language distribution data" />
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={languageData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={80}
-                          outerRadius={110}
-                          paddingAngle={5}
-                          dataKey="value"
-                          stroke="none"
-                        >
-                          {languageData.map((_entry: ChartDatum, index: number) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                        <Legend
-                          verticalAlign="bottom"
-                          height={36}
-                          iconType="circle"
-                          content={({ payload }) => (
-                            <div className="flex flex-wrap justify-center gap-4 mt-4">
-                              {payload?.map((entry, index: number) => (
-                                <div key={`legend-${index}`} className="flex items-center gap-2">
-                                  <div
-                                    className="w-2.5 h-2.5 rounded-full"
-                                    style={{ backgroundColor: entry.color }}
-                                  />
-                                  <span className="text-sm font-medium text-muted-foreground capitalize">
-                                    {entry.value}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    {/* Split chart and legend into separate blocks so the donut
+                        stays centered inside a fixed-height canvas and the
+                        legend flows naturally below — prevents the chart from
+                        shifting when legend items wrap. */}
+                    <div className="h-[260px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={languageData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={65}
+                            outerRadius={100}
+                            paddingAngle={4}
+                            dataKey="value"
+                            stroke="none"
+                          >
+                            {languageData.map((_entry: ChartDatum, index: number) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip content={<CustomTooltip />} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="mt-3 flex flex-wrap justify-center gap-x-3 gap-y-1.5 px-2">
+                      {languageData.map((entry: ChartDatum, index: number) => (
+                        <div key={`legend-${index}`} className="flex items-center gap-1.5">
+                          <div
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          />
+                          <span className="text-xs font-medium text-muted-foreground capitalize">
+                            {entry.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-center">
+                  <div className="flex flex-col items-center justify-center h-[350px] text-center">
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                       <Code2 className="w-8 h-8 text-primary/50" />
                     </div>

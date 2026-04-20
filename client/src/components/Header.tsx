@@ -69,14 +69,14 @@ export default function Header({ onLogoClick }: HeaderProps) {
                 'gap-1.5 font-medium whitespace-nowrap transition-colors relative',
                 isActive('/mcp')
                   ? 'text-foreground bg-accent'
-                  : 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
               aria-current={isActive('/mcp') ? 'page' : undefined}
               data-testid="nav-mcp"
             >
               <Sparkles className="h-4 w-4" />
               <span>MCP</span>
-              {/* "NEW" pip — small, unobtrusive, but catches the eye */}
+              {/* "NEW" pip — discovery cue; the button itself matches the other nav items */}
               <span
                 aria-hidden="true"
                 className="ml-0.5 inline-block rounded-full bg-emerald-500 text-[9px] font-bold tracking-wide text-white px-1.5 py-px leading-none"
@@ -165,9 +165,7 @@ export default function Header({ onLogoClick }: HeaderProps) {
                     onClick={() => handleNavClick(() => setLocation('/mcp'))}
                     className={cn(
                       'justify-start gap-3 h-12 text-lg font-medium',
-                      isActive('/mcp')
-                        ? 'bg-accent text-foreground'
-                        : 'text-emerald-600 dark:text-emerald-400'
+                      isActive('/mcp') && 'bg-accent text-foreground'
                     )}
                     aria-current={isActive('/mcp') ? 'page' : undefined}
                   >

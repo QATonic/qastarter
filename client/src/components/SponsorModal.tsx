@@ -117,13 +117,30 @@ export default function SponsorModal({ triggerClassName, mobileView = false }: S
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">Scan QR Code or Copy UPI ID</p>
 
-                {/* UPI QR Code */}
+                {/* UPI QR Code — with graceful fallback if the asset is missing
+                    on a particular deployment (older dist bundles, CDN miss). */}
                 <div className="flex justify-center">
                   <img
                     src="/upi-qr.jpg"
                     alt="UPI QR Code for qatonic@ybl"
-                    className="w-32 h-32 rounded-lg border"
+                    className="w-32 h-32 rounded-lg border object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      const img = e.currentTarget as HTMLImageElement;
+                      img.style.display = 'none';
+                      const fallback = img.nextElementSibling as HTMLElement | null;
+                      if (fallback) fallback.classList.remove('hidden');
+                    }}
                   />
+                  <div
+                    className="hidden w-32 h-32 rounded-lg border border-dashed flex-col items-center justify-center text-center text-[11px] text-muted-foreground p-2 leading-snug"
+                    role="img"
+                    aria-label="QR code unavailable, use the UPI ID below"
+                  >
+                    QR code unavailable
+                    <br />
+                    Use the UPI ID below
+                  </div>
                 </div>
 
                 {/* UPI ID Copy */}

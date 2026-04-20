@@ -67,6 +67,12 @@ if (isDevelopment) {
 // permitting null-origin would let any site drive CSRF-like requests that carry
 // our session cookie. Set CORS_ALLOW_NO_ORIGIN=true to re-enable for legitimate
 // machine-to-machine integrations that can't send an Origin header.
+//
+// IMPORTANT: CORS is scoped to `/api` only. Top-level browser navigations to
+// the SPA (`GET /`, `/mcp`, `/docs`, `/assets/*.js`, `/favicon.ico`, etc.) do
+// NOT carry an Origin header and must not be blocked by CORS — doing so breaks
+// every bookmark / direct address-bar visit. CORS is a cross-origin API
+// concern, not a static-file concern.
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     const allowNoOrigin =
@@ -98,7 +104,7 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
-app.use(cors(corsOptions));
+app.use('/api', cors(corsOptions));
 
 // Correlation ID middleware - adds request/correlation IDs for tracing
 // Must be early in the middleware chain for all subsequent logs to include IDs

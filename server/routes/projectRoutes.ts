@@ -19,6 +19,16 @@ import {
 import { createRequestLogger } from '../utils/logger';
 import { mcpConfig, rateLimitConfig } from '../config';
 import { trackEvent, generateSessionId } from '../services/analyticsService';
+import { timingSafeEqual } from 'crypto';
+
+/** Constant-time string equality so attackers can't derive the bypass token via timing. */
+function safeTokenEqual(a: string, b: string): boolean {
+  if (!a || !b) return false;
+  const aBuf = Buffer.from(a, 'utf8');
+  const bBuf = Buffer.from(b, 'utf8');
+  if (aBuf.length !== bBuf.length) return false;
+  return timingSafeEqual(aBuf, bBuf);
+}
 
 const router = Router();
 
@@ -41,7 +51,7 @@ export function detectClientSource(req: Request): ClientSource {
   const client = String(req.headers[mcpConfig.clientHeader] || '').toLowerCase();
   if (client === mcpConfig.clientHeaderValue) {
     const token = String(req.headers[mcpConfig.tokenHeader] || '');
-    if (mcpConfig.bypassToken && token === mcpConfig.bypassToken) {
+    if (mcpConfig.bypassToken && safeTokenEqual(token, mcpConfig.bypassToken)) {
       return 'mcp-trusted';
     }
     return 'mcp';
@@ -81,6 +91,11 @@ const generateProjectLimiter = rateLimit({
     detectClientSource(req as Request) === 'mcp-trusted'
       ? rateLimitConfig.mcpGeneration.max
       : rateLimitConfig.generation.max,
+  // Explicit keyGenerator: `req.ip` already respects `app.set('trust proxy', N)` from
+  // server/index.ts, so this equals the real client IP for the N upstream hops we trust.
+  // If `trust proxy` is misconfigured, fail closed on 'anon' rather than per-request unique
+  // keys (which would effectively disable the limit).
+  keyGenerator: (req) => req.ip || 'anon',
   message: {
     success: false,
     error: {

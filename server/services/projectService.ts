@@ -48,10 +48,19 @@ export class ProjectService {
       });
     });
 
-    // Setup Archive
+    // Setup Archive.
+    // level 6 is the zlib default — within 10-15% of level 9 on final size, but ~2-3×
+    // faster to compress for the small (50-200 KB) scaffold ZIPs we emit.
     const archive = archiver('zip', {
-      zlib: { level: 9 }, // Max compression
+      zlib: { level: 6 },
     });
+
+    // Defence-in-depth caps: prevent an oversized template combination from either OOMing
+    // the server or streaming an abusive payload downstream. If the generator ever
+    // legitimately produces more than these, raise them via env explicitly.
+    const MAX_FILE_COUNT = parseInt(process.env.QASTARTER_MAX_FILE_COUNT || '5000', 10);
+    const MAX_FILE_BYTES = parseInt(process.env.QASTARTER_MAX_FILE_BYTES || String(10 * 1024 * 1024), 10); // 10 MB
+    const MAX_TOTAL_BYTES = parseInt(process.env.QASTARTER_MAX_TOTAL_BYTES || String(100 * 1024 * 1024), 10); // 100 MB
 
     // Set Headers with sanitized filename (RFC 5987 encoding for safety)
     const safeName = sanitizeFilename(config.projectName);
@@ -103,9 +112,25 @@ export class ProjectService {
     try {
       // Consume the generator
       for await (const file of this.templateGenerator.generateProjectStream(config, { strict: true, openApiEndpoints })) {
-        archive.append(file.content, { name: file.path });
+        const fileBytes = Buffer.byteLength(file.content, 'utf8');
+        if (fileBytes > MAX_FILE_BYTES) {
+          throw new Error(
+            `Generated file "${file.path}" is ${fileBytes} bytes — exceeds MAX_FILE_BYTES=${MAX_FILE_BYTES}.`
+          );
+        }
         fileCount++;
-        totalSize += Buffer.byteLength(file.content, 'utf8');
+        if (fileCount > MAX_FILE_COUNT) {
+          throw new Error(
+            `Generation produced more than MAX_FILE_COUNT=${MAX_FILE_COUNT} files — aborting.`
+          );
+        }
+        totalSize += fileBytes;
+        if (totalSize > MAX_TOTAL_BYTES) {
+          throw new Error(
+            `Generation total size ${totalSize} bytes exceeds MAX_TOTAL_BYTES=${MAX_TOTAL_BYTES} — aborting.`
+          );
+        }
+        archive.append(file.content, { name: file.path });
       }
 
       await archive.finalize();

@@ -95,25 +95,43 @@ function toGenerateOptions(args: Record<string, unknown> | undefined): GenerateO
 
 /**
  * Resolve and sanity-check a target directory.
- *  - Relative paths resolve against process.cwd().
+ *  - Relative paths resolve against process.cwd() and must remain strictly inside cwd.
  *  - Absolute paths are rejected unless `allowAbsolute=true`.
- *  - Paths that escape cwd (via `..`) are always rejected.
+ *  - UNC paths (\\server\share\…) and drive-relative paths are always rejected unless allowAbsolute.
+ *  - `.` (cwd itself) is rejected — we'd scaffold on top of the user's working directory.
+ *  - `..`-style traversal is caught on both the raw input (via normalize) and the resolved path
+ *    (via a strict startsWith check with the path separator included).
  */
 function resolveTargetDir(input: string, allowAbsolute: boolean): string {
   if (!input || typeof input !== 'string') {
     throw new Error('targetDir must be a non-empty string');
   }
-  const isAbsolute = path.isAbsolute(input);
+  // Reject UNC and backslashed absolute paths on Windows pre-emptively — they can slip past
+  // `path.isAbsolute` on some Node builds and confuse downstream relative-path math.
+  if (/^(\\\\|\/\/)/.test(input) || /^[a-zA-Z]:[\\\/]/.test(input)) {
+    if (!allowAbsolute) {
+      throw new Error(
+        `targetDir "${input}" is absolute (UNC/drive-rooted); pass allowAbsolute: true to opt in.`
+      );
+    }
+  }
+  const normalized = path.normalize(input);
+  const isAbsolute = path.isAbsolute(normalized);
   if (isAbsolute && !allowAbsolute) {
     throw new Error(
       `targetDir "${input}" is absolute; pass allowAbsolute: true to opt in, or use a relative path.`
     );
   }
-  const resolved = path.resolve(process.cwd(), input);
+  const cwd = path.resolve(process.cwd());
+  const resolved = path.resolve(cwd, normalized);
+  if (resolved === cwd) {
+    throw new Error(`targetDir cannot be the current working directory itself — pick a subdirectory.`);
+  }
   if (!isAbsolute) {
-    // Guard against ../.. traversal even for "relative" inputs.
-    const relFromCwd = path.relative(process.cwd(), resolved);
-    if (relFromCwd.startsWith('..') || path.isAbsolute(relFromCwd)) {
+    // Strict containment check: resolved path must start with cwd + path.sep (not just cwd,
+    // which would allow siblings like "<cwd>_evil").
+    const prefix = cwd.endsWith(path.sep) ? cwd : cwd + path.sep;
+    if (!resolved.startsWith(prefix)) {
       throw new Error(`targetDir "${input}" escapes the current working directory.`);
     }
   }

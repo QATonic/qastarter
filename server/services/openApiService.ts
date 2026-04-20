@@ -59,22 +59,30 @@ function isUrlSafe(url: string): boolean {
       return false;
     }
 
-    // Block private/reserved IPv6 ranges
+    // Block private/reserved IPv6 ranges — regex-driven so IPv4-mapped notation
+    // (::ffff:a.b.c.d) and AWS IMDS (::ffff:169.254.169.254) can't slip past naive startsWith.
     const lowerHost = bareHost.toLowerCase();
-    if (
-      lowerHost === '::1' ||                              // loopback
-      lowerHost === '::' ||                               // unspecified
-      lowerHost.startsWith('fc') ||                       // fc00::/7 unique local
-      lowerHost.startsWith('fd') ||                       // fd00::/8 unique local
-      lowerHost.startsWith('fe80') ||                     // fe80::/10 link-local
-      lowerHost.startsWith('::ffff:127.') ||              // IPv4-mapped loopback
-      lowerHost.startsWith('::ffff:10.') ||               // IPv4-mapped private
-      lowerHost.startsWith('::ffff:192.168.') ||          // IPv4-mapped private
-      lowerHost.startsWith('::ffff:172.16.') ||           // IPv4-mapped private
-      lowerHost.startsWith('::ffff:172.17.') ||
-      lowerHost.startsWith('::ffff:172.18.') ||
-      lowerHost.startsWith('::ffff:172.19.')
-    ) {
+    const ipv6Blocked = [
+      /^::1$/,                                             // loopback
+      /^::$/,                                              // unspecified
+      /^fc[0-9a-f]{2}:/,                                   // fc00::/7 unique local
+      /^fd[0-9a-f]{2}:/,                                   // fd00::/8 unique local
+      /^fe[89ab][0-9a-f]:/,                                // fe80::/10 link-local
+      /^ff[0-9a-f]{2}:/,                                   // ff00::/8 multicast
+      // IPv4-mapped IPv6: ::ffff:<private-ipv4>
+      /^::ffff:127\./,                                     // loopback
+      /^::ffff:10\./,                                      // 10/8
+      /^::ffff:169\.254\./,                                // link-local / cloud metadata (AWS IMDS)
+      /^::ffff:192\.168\./,                                // 192.168/16
+      /^::ffff:172\.(1[6-9]|2\d|3[01])\./,                 // 172.16/12
+      /^::ffff:0\.0\.0\.0$/,                               // unspecified mapped
+    ];
+    if (ipv6Blocked.some((re) => re.test(lowerHost))) {
+      return false;
+    }
+
+    // Block IMDS + link-local IPv4 ranges missed above.
+    if (bareHost.startsWith('169.254.')) {                 // AWS IMDS, GCP, Azure metadata
       return false;
     }
 

@@ -140,8 +140,12 @@ function transformMetadata(raw: RawMetadataResponse): MetadataResponse {
 }
 
 export async function fetchMetadata(): Promise<MetadataResponse> {
+  // 10 s is generous — the metadata endpoint is a cached JSON response. Without a timeout
+  // a slow/stuck backend hangs the MCP `list_combinations` tool indefinitely, which looks
+  // like a dead AI client.
   const response = await fetch(`${getApiUrl()}/api/v1/metadata`, {
     headers: clientHeaders(),
+    signal: AbortSignal.timeout(10_000),
   });
   if (!response.ok) {
     throw new Error(`Failed to fetch metadata: ${response.statusText}`);
@@ -200,6 +204,17 @@ export async function generateProjectBuffer(options: GenerateOptions): Promise<{
     throw new Error(`Failed to generate project (HTTP ${response.status}): ${errorText}`);
   }
 
+  // Defence-in-depth: caller decides the ceiling, default 50 MB. Stops a compromised or
+  // misconfigured backend from returning a 500 MB payload and OOMing this process.
+  const MAX_ZIP_BYTES = parseInt(process.env.QASTARTER_MAX_ZIP_BYTES || '52428800', 10); // 50 MB
+  const declared = parseInt(response.headers.get('content-length') || '0', 10);
+  if (declared && declared > MAX_ZIP_BYTES) {
+    throw new Error(
+      `Generated project is ${declared} bytes — exceeds the ${MAX_ZIP_BYTES} byte safety limit. ` +
+        `Raise QASTARTER_MAX_ZIP_BYTES if this is expected.`
+    );
+  }
+
   const contentDisposition = response.headers.get('content-disposition');
   let filename = `${options.projectName}.zip`;
   if (contentDisposition) {
@@ -208,6 +223,12 @@ export async function generateProjectBuffer(options: GenerateOptions): Promise<{
   }
 
   const buffer = Buffer.from(await response.arrayBuffer());
+  // Secondary check in case Content-Length was missing / lied.
+  if (buffer.length > MAX_ZIP_BYTES) {
+    throw new Error(
+      `Generated project is ${buffer.length} bytes — exceeds the ${MAX_ZIP_BYTES} byte safety limit.`
+    );
+  }
   return { buffer, filename };
 }
 
@@ -221,6 +242,7 @@ export async function previewProject(
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...clientHeaders() },
     body: JSON.stringify(options),
+    signal: AbortSignal.timeout(15_000),
   });
   if (!response.ok) {
     throw new Error(`Failed to preview project (HTTP ${response.status}): ${await response.text()}`);
@@ -239,6 +261,7 @@ export async function getProjectDependencies(
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...clientHeaders() },
     body: JSON.stringify(options),
+    signal: AbortSignal.timeout(10_000),
   });
   if (!response.ok) {
     throw new Error(
@@ -259,6 +282,7 @@ export async function validateConfig(
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...clientHeaders() },
     body: JSON.stringify(options),
+    signal: AbortSignal.timeout(10_000),
   });
   if (!response.ok) {
     const text = await response.text();

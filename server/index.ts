@@ -12,6 +12,14 @@ import { logger } from './utils/logger';
 
 const app = express();
 
+// Trust the N upstream proxies we sit behind (load balancer / CDN / reverse proxy).
+// With this set, `req.ip` and the rate-limiter use the real client IP from the
+// rightmost trusted X-Forwarded-For hop instead of whatever the last proxy's IP is.
+// Default `1` is the common case (one proxy in front). For multi-hop (e.g. CDN -> LB -> app)
+// bump via env. Never set to `true` / `unlimited` — that lets any caller spoof their IP.
+const trustProxyHops = parseInt(process.env.TRUST_PROXY_HOPS || '1', 10);
+app.set('trust proxy', trustProxyHops);
+
 // Detect development mode - check multiple conditions
 const isDevelopment = process.env.NODE_ENV !== 'production';
 

@@ -1,6 +1,6 @@
 {
   "name": "@qatonic_innovations/qastarter-cli",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "CLI tool for generating production-ready QA automation project structures - supports Selenium, Playwright, Cypress, Appium & more",
   "type": "module",
   "author": {

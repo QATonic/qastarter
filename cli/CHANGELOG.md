@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-20
+
+### Added
+- `redactSecrets()` helper — every thrown error now scrubs
+  `QASTARTER_MCP_TOKEN`, Authorization / Bearer / `sk_` / `ghp_` / `npm_`
+  shapes before the text is handed to the MCP client (which may echo it to
+  the user). Closes a token-leak path flagged by the security audit.
+- `rateLimitSuffix()` — 429 responses now surface
+  `(limit: N; remaining: 0; retry in Xs)` in the error message so AI
+  clients and humans know when to retry.
+- `safeBuildFilePath()` in `qastarter update` — refuses to edit symlinked
+  `pom.xml` / `build.gradle` / `package.json` / `requirements.txt` /
+  `*.csproj` / `go.mod`, and any file whose realpath escapes the project
+  directory.
+- MCP `generate_project` schema now uses `enum` for `framework`,
+  `testRunner`, and `buildTool`. AIs pick valid combos first time instead
+  of free-text-guessing.
+- `extractZipSafely` hardened further:
+  - Refuses ZIP entries whose external-attr bits indicate a POSIX symlink
+    (`S_IFLNK`) — AdmZip would otherwise materialise them as regular
+    files containing the target path.
+  - After each write, `fs.realpathSync` re-checks that the path is still
+    inside the resolved `targetDir` (catches parent-dir symlinks).
+- MAX_ZIP_BYTES safety cap in `generateProjectBuffer` (default 50 MB,
+  override via `QASTARTER_MAX_ZIP_BYTES`) — both pre- and post-download.
+- `AbortSignal.timeout` on every REST call (10–15 s depending on endpoint).
+
+### Changed
+- `resolveTargetDir` hardened: rejects UNC (`\\server\share\…`) and
+  drive-rooted (`C:\…`) paths unless `allowAbsolute: true`; strict
+  `startsWith(cwd + path.sep)` containment check; refuses cwd itself
+  as a target.
+- Published tarball drops TypeScript declaration files — `.d.ts` /
+  `.d.ts.map` excluded via `.npmignore` and `declaration:false` in
+  `tsconfig.json`. 13 files → 8 files in the tarball.
+
+### Fixed
+- Timing-attack hygiene: MCP bypass token is no longer in the CLI by
+  default — this is a server-side fix, but the CLI paired with it here
+  because CLI users set `QASTARTER_MCP_TOKEN` to match.
+- pom.xml dependency parser no longer uses one large backtracking regex;
+  splits on `</dependency>` first so malformed input can't hang the CLI.
+
 ## [1.1.0] - 2026-04-20
 
 ### Added

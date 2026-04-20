@@ -1,7 +1,11 @@
 # Source files - only publish compiled output
 src/
 *.ts
-!*.d.ts
+
+# Declaration files — this is a CLI, not a library. Users invoke `qastarter`,
+# they don't `import` from us. Dropping .d.ts shaves ~15% off the tarball.
+*.d.ts
+*.d.ts.map
 
 # Development config
 tsconfig.json

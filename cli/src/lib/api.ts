@@ -99,6 +99,48 @@ export function clientHeaders(): Record<string, string> {
   return out;
 }
 
+/**
+ * Read RFC 7231 `RateLimit-*` headers (set by express-rate-limit in
+ * standardHeaders mode) and return a human-readable suffix like
+ * `(limit: 10/900s; retry in 420s)`. Empty string if the response has none.
+ * Helps users (and AI clients) understand why they got a 429 and when they
+ * can try again, rather than just "too many requests".
+ */
+export function rateLimitSuffix(res: Response): string {
+  const limit = res.headers.get('ratelimit-limit');
+  const remaining = res.headers.get('ratelimit-remaining');
+  const reset = res.headers.get('ratelimit-reset');
+  if (!limit && !remaining && !reset) return '';
+  const parts: string[] = [];
+  if (limit) parts.push(`limit: ${limit}`);
+  if (remaining !== null && remaining !== undefined) parts.push(`remaining: ${remaining}`);
+  if (reset) parts.push(`retry in ${reset}s`);
+  return parts.length ? ` (${parts.join('; ')})` : '';
+}
+
+/**
+ * Scrub anything that looks like a credential before including response bodies
+ * in a thrown error. The MCP server hands thrown errors straight to the AI
+ * client (which may echo them back to the user), and if a downstream error
+ * response happens to quote the request it could carry our bypass token.
+ * Over-redact rather than under-redact — this text is for humans debugging.
+ */
+export function redactSecrets(text: string): string {
+  const tok = process.env.QASTARTER_MCP_TOKEN;
+  let out = text;
+  if (tok) {
+    // Escape regex metacharacters in the token before substituting.
+    const escaped = tok.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    out = out.replace(new RegExp(escaped, 'g'), '[REDACTED_MCP_TOKEN]');
+  }
+  // Strip any header-looking lines that carry our tokens / auth
+  out = out.replace(/(X-QAStarter-Token|Authorization)\s*:\s*[^\r\n]*/gi, '$1: [REDACTED]');
+  // Bearer / sk-… / gh[pso]_… / npm_… — common credential shapes
+  out = out.replace(/\bBearer\s+[A-Za-z0-9._\-]+/g, 'Bearer [REDACTED]');
+  out = out.replace(/\b(sk|ghp|ghs|gho|npm)_[A-Za-z0-9_-]{10,}/g, '[REDACTED_TOKEN]');
+  return out;
+}
+
 function transformMetadata(raw: RawMetadataResponse): MetadataResponse {
   const testingTypeMap = new Map<string, string[]>();
   raw.data.testingTypes.forEach((tt) => {
@@ -148,7 +190,7 @@ export async function fetchMetadata(): Promise<MetadataResponse> {
     signal: AbortSignal.timeout(10_000),
   });
   if (!response.ok) {
-    throw new Error(`Failed to fetch metadata: ${response.statusText}`);
+    throw new Error(`Failed to fetch metadata: ${redactSecrets(response.statusText)}${rateLimitSuffix(response)}`);
   }
   const raw: RawMetadataResponse = await response.json();
   return transformMetadata(raw);
@@ -201,7 +243,7 @@ export async function generateProjectBuffer(options: GenerateOptions): Promise<{
   const response = await fetch(url, { headers: clientHeaders() });
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to generate project (HTTP ${response.status}): ${errorText}`);
+    throw new Error(`Failed to generate project (HTTP ${response.status}): ${redactSecrets(errorText)}${rateLimitSuffix(response)}`);
   }
 
   // Defence-in-depth: caller decides the ceiling, default 50 MB. Stops a compromised or
@@ -245,7 +287,7 @@ export async function previewProject(
     signal: AbortSignal.timeout(15_000),
   });
   if (!response.ok) {
-    throw new Error(`Failed to preview project (HTTP ${response.status}): ${await response.text()}`);
+    throw new Error(`Failed to preview project (HTTP ${response.status}): ${redactSecrets(await response.text())}${rateLimitSuffix(response)}`);
   }
   const body = (await response.json()) as { data?: Record<string, unknown> };
   return body.data ?? {};
@@ -265,7 +307,7 @@ export async function getProjectDependencies(
   });
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch dependencies (HTTP ${response.status}): ${await response.text()}`
+      `Failed to fetch dependencies (HTTP ${response.status}): ${redactSecrets(await response.text())}${rateLimitSuffix(response)}`
     );
   }
   const body = (await response.json()) as { data?: Record<string, unknown> };
@@ -328,7 +370,7 @@ export async function generateProject(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to generate project: ${errorText}`);
+    throw new Error(`Failed to generate project: ${redactSecrets(errorText)}${rateLimitSuffix(response)}`);
   }
 
   const contentDisposition = response.headers.get('content-disposition');

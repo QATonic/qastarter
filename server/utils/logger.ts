@@ -56,9 +56,62 @@ const correlationFormat = winston.format((info) => {
   return info;
 });
 
+/**
+ * Sensitive field names that should never appear in logs. Callers who pass
+ * credentials intentionally (e.g. to /v1/github/push) shouldn't rely on the
+ * logger to remember this — but it's a solid last-line defence when someone
+ * forgets to strip a field before `logger.info('...', body)`.
+ */
+const SENSITIVE_KEYS = new Set([
+  'token', 'accessToken', 'access_token', 'refreshToken', 'refresh_token',
+  'authorization', 'apiKey', 'api_key', 'apikey', 'secret',
+  'password', 'passwd', 'privatekey', 'private_key',
+  'githubToken', 'github_token', 'bypasstoken',
+]);
+const SENSITIVE_HEADER_NAMES = new Set([
+  'authorization', 'cookie', 'x-qastarter-token', 'proxy-authorization',
+]);
+
+/**
+ * Redaction pass over log metadata. Walks the object up to a bounded depth and
+ * replaces values under sensitive keys with a fixed '[REDACTED]' marker.
+ * Also normalises raw header maps (common in middleware logs) and scrubs
+ * token-shaped strings out of free-form log messages.
+ */
+const redactionFormat = winston.format((info) => {
+  const TOKEN_SHAPES = [
+    /\b(sk|ghp|ghs|gho|npm|xoxb|xoxp|AIza)_?[A-Za-z0-9_-]{16,}/g,
+    /\bBearer\s+[A-Za-z0-9._\-]+/gi,
+  ];
+  const redactString = (s: string): string => {
+    let out = s;
+    for (const re of TOKEN_SHAPES) out = out.replace(re, '[REDACTED_TOKEN]');
+    return out;
+  };
+  const visit = (obj: unknown, depth: number): void => {
+    if (depth > 6 || obj === null || typeof obj !== 'object') return;
+    for (const [k, v] of Object.entries(obj)) {
+      const lower = k.toLowerCase();
+      if (SENSITIVE_KEYS.has(lower) || SENSITIVE_HEADER_NAMES.has(lower)) {
+        (obj as Record<string, unknown>)[k] = '[REDACTED]';
+        continue;
+      }
+      if (typeof v === 'string') {
+        (obj as Record<string, unknown>)[k] = redactString(v);
+      } else if (typeof v === 'object' && v !== null) {
+        visit(v, depth + 1);
+      }
+    }
+  };
+  if (typeof info.message === 'string') info.message = redactString(info.message);
+  visit(info, 0);
+  return info;
+});
+
 // Custom format for console (colorized, readable)
 const consoleFormat = winston.format.combine(
   correlationFormat(),
+  redactionFormat(),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.colorize({ all: true }),
   winston.format.printf(
@@ -80,6 +133,7 @@ const consoleFormat = winston.format.combine(
 // Custom format for files (JSON with full context)
 const fileFormat = winston.format.combine(
   correlationFormat(),
+  redactionFormat(),
   winston.format.timestamp(),
   winston.format.json()
 );

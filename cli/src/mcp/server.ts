@@ -236,8 +236,15 @@ const PROJECT_CONFIG_PROPS = {
   },
   framework: {
     type: 'string',
+    enum: [
+      'selenium', 'playwright', 'cypress', 'webdriverio', 'robotframework',
+      'appium', 'espresso', 'xcuitest', 'flutter',
+      'winappdriver', 'pyautogui',
+      'restassured', 'requests', 'supertest', 'restsharp', 'graphql', 'grpc', 'resty',
+      'k6', 'gatling', 'locust',
+    ],
     description:
-      'Automation framework: selenium, playwright, cypress, webdriverio, robotframework, appium, espresso, xcuitest, flutter, winappdriver, pyautogui, restassured, requests, supertest, restsharp, graphql, grpc, resty, k6, gatling, locust.',
+      'Automation framework. Not every framework works with every testingType/language — call validate_combination first if unsure.',
   },
   language: {
     type: 'string',
@@ -246,12 +253,13 @@ const PROJECT_CONFIG_PROPS = {
   },
   testRunner: {
     type: 'string',
-    description:
-      'Optional: testng, junit5, pytest, jest, mocha, cypress, nunit, xctest, testify, flutter-test, robot.',
+    enum: ['testng', 'junit5', 'pytest', 'jest', 'mocha', 'cypress', 'nunit', 'xctest', 'testify', 'flutter-test', 'robot', 'k6', 'locust'],
+    description: 'Optional — defaults to the canonical runner for the picked language/framework.',
   },
   buildTool: {
     type: 'string',
-    description: 'Optional: maven, gradle, npm, pip, nuget, mod, spm, pub.',
+    enum: ['maven', 'gradle', 'npm', 'pip', 'nuget', 'mod', 'spm', 'pub'],
+    description: 'Optional — defaults to the canonical build tool for the picked language.',
   },
   testingPattern: {
     type: 'string',

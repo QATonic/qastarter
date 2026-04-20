@@ -17,9 +17,12 @@ import {
   asyncHandler,
 } from '../errors';
 import { createRequestLogger } from '../utils/logger';
+import { logger } from '../utils/logger';
 import { mcpConfig, rateLimitConfig } from '../config';
 import { trackEvent, generateSessionId } from '../services/analyticsService';
 import { timingSafeEqual } from 'crypto';
+import RedisStore from 'rate-limit-redis';
+import { createClient } from 'redis';
 
 /** Constant-time string equality so attackers can't derive the bypass token via timing. */
 function safeTokenEqual(a: string, b: string): boolean {
@@ -79,6 +82,42 @@ function validateProjectConfigBody(body: unknown, requestId: string): ProjectCon
   return validationResult.data;
 }
 
+/**
+ * Build the rate-limit store. Defaults to in-memory for single-instance deployments
+ * (unit tests, local dev, small Docker runs). If `REDIS_URL` is set we use the
+ * shared Redis so multiple app replicas observe the same counters — without it,
+ * each replica enforces its own copy of the limit (so 3 replicas ⇒ effectively 3×).
+ */
+function buildRateLimitStore(): ReturnType<typeof rateLimit>['store'] | undefined {
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
+    logger.info('Rate limiter using in-memory store (set REDIS_URL for multi-replica accuracy)');
+    return undefined; // express-rate-limit falls back to its built-in memory store
+  }
+  try {
+    const client = createClient({ url: redisUrl });
+    client.on('error', (err) =>
+      logger.warn('Rate-limit Redis client error', { error: (err as Error).message })
+    );
+    // Fire-and-forget connect. express-rate-limit queues commands until ready.
+    void client.connect();
+    logger.info('Rate limiter using Redis store', {
+      url: redisUrl.replace(/\/\/[^:]+:[^@]+@/, '//*****:*****@'),
+    });
+    return new RedisStore({
+      // `sendCommand` is the v4 redis client's low-level command invoker; rate-limit-redis
+      // relies on this signature to remain store-library-version agnostic.
+      sendCommand: (...args: string[]) => client.sendCommand(args),
+      prefix: 'qastarter-rl:',
+    });
+  } catch (err) {
+    logger.warn('Failed to initialise Redis rate-limit store — falling back to in-memory', {
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return undefined;
+  }
+}
+
 // Project generation rate limiter.
 //
 // The `max` is resolved per-request: trusted MCP clients (valid bypass token)
@@ -86,6 +125,7 @@ function validateProjectConfigBody(body: unknown, requestId: string): ProjectCon
 // anonymous cap. This keeps wizard users honest while letting AI assistants
 // iterate quickly during a single session.
 const generateProjectLimiter = rateLimit({
+  store: buildRateLimitStore(),
   windowMs: rateLimitConfig.generation.windowMs,
   max: (req) =>
     detectClientSource(req as Request) === 'mcp-trusted'

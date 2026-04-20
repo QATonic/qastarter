@@ -60,12 +60,20 @@ if (isDevelopment) {
   );
 }
 
-// CORS Configuration - permissive in development
+// CORS Configuration - permissive in development, strict in production.
+//
+// The null-origin case (mobile apps, Postman, server-to-server calls) is only
+// allowed in development. In production, combined with `credentials: true`,
+// permitting null-origin would let any site drive CSRF-like requests that carry
+// our session cookie. Set CORS_ALLOW_NO_ORIGIN=true to re-enable for legitimate
+// machine-to-machine integrations that can't send an Origin header.
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
+    const allowNoOrigin =
+      isDevelopment || process.env.CORS_ALLOW_NO_ORIGIN === 'true';
     if (!origin) {
-      return callback(null, true);
+      if (allowNoOrigin) return callback(null, true);
+      return callback(new Error('Origin header is required in production'));
     }
 
     // In development, allow all origins

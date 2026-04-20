@@ -13,6 +13,35 @@ import ora from 'ora';
 import inquirer from 'inquirer';
 import { fetchBom } from '../lib/api.js';
 
+/**
+ * Resolve a build-file path and refuse it if it — or any parent inside cwd —
+ * is a symlink. `update.ts` rewrites version strings in-place, so a malicious
+ * checkout could plant `pom.xml -> /tmp/attacker.xml` and trick the updater
+ * into editing arbitrary files outside the project.
+ *
+ * Returns the canonical path on success, or `null` if the file doesn't exist.
+ * Throws with a clear message if a symlink is detected.
+ */
+function safeBuildFilePath(filePath: string, cwd: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
+  const stat = fs.lstatSync(filePath);
+  if (stat.isSymbolicLink()) {
+    throw new Error(
+      `Refusing to follow symlink "${filePath}" — qastarter update will not edit the real target for safety.`
+    );
+  }
+  // Ensure the realpath still lives under cwd (catches parent-dir symlinks).
+  const real = fs.realpathSync(filePath);
+  const realCwd = fs.realpathSync(cwd);
+  const prefix = realCwd.endsWith(path.sep) ? realCwd : realCwd + path.sep;
+  if (!real.startsWith(prefix) && real !== realCwd) {
+    throw new Error(
+      `Refusing to edit "${filePath}" — its realpath escapes the project directory.`
+    );
+  }
+  return real;
+}
+
 // ── Bundled BOM fallback (hardcoded subset for offline use) ─────────
 function getBundledBom(): Record<string, Record<string, string>> {
   // Minimal fallback so the CLI can work without a server connection.
@@ -88,17 +117,25 @@ const pomParser: BuildFileParser = {
   language: 'java',
   detect(cwd) {
     const p = path.join(cwd, 'pom.xml');
-    return fs.existsSync(p) ? p : null;
+    return safeBuildFilePath(p, cwd);
   },
   parse(filePath) {
     const content = fs.readFileSync(filePath, 'utf-8');
     const deps: DependencyInfo[] = [];
-    // Match <dependency> blocks
-    const depRegex =
-      /<dependency>\s*<groupId>([^<]+)<\/groupId>\s*<artifactId>([^<]+)<\/artifactId>\s*<version>([^<$]+)<\/version>/g;
-    let m;
-    while ((m = depRegex.exec(content)) !== null) {
-      deps.push({ name: m[2], currentVersion: m[3], latestVersion: null, status: 'unknown' });
+    // Process each <dependency>…</dependency> block in isolation. Splitting
+    // on the closing tag caps regex work at O(total-characters) instead of
+    // letting the scanner backtrack across the whole file when a single
+    // block is malformed. Also tolerates attributes like <dependency scope="test">.
+    const blocks = content.split(/<\/dependency>/);
+    const tagRe = (tag: string) =>
+      new RegExp(`<${tag}\\s*(?:[^>]*)>([^<]+)</${tag}>`, 's');
+    for (const block of blocks) {
+      if (!block.includes('<dependency')) continue;
+      const artifactId = block.match(tagRe('artifactId'))?.[1]?.trim();
+      const version = block.match(tagRe('version'))?.[1]?.trim();
+      if (artifactId && version) {
+        deps.push({ name: artifactId, currentVersion: version, latestVersion: null, status: 'unknown' });
+      }
     }
     return deps;
   },
@@ -121,7 +158,7 @@ const gradleParser: BuildFileParser = {
   language: 'java',
   detect(cwd) {
     const p = path.join(cwd, 'build.gradle');
-    return fs.existsSync(p) ? p : null;
+    return safeBuildFilePath(p, cwd);
   },
   parse(filePath) {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -153,7 +190,7 @@ const packageJsonParser: BuildFileParser = {
   language: 'javascript',
   detect(cwd) {
     const p = path.join(cwd, 'package.json');
-    return fs.existsSync(p) ? p : null;
+    return safeBuildFilePath(p, cwd);
   },
   parse(filePath) {
     const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -190,7 +227,7 @@ const requirementsParser: BuildFileParser = {
   language: 'python',
   detect(cwd) {
     const p = path.join(cwd, 'requirements.txt');
-    return fs.existsSync(p) ? p : null;
+    return safeBuildFilePath(p, cwd);
   },
   parse(filePath) {
     const lines = fs.readFileSync(filePath, 'utf-8').split('\n');
@@ -224,7 +261,9 @@ const csprojParser: BuildFileParser = {
   language: 'csharp',
   detect(cwd) {
     const files = fs.readdirSync(cwd).filter((f) => f.endsWith('.csproj'));
-    return files.length > 0 ? path.join(cwd, files[0]) : null;
+    if (files.length === 0) return null;
+    // Same symlink guard applies — .csproj could be a link to anywhere.
+    return safeBuildFilePath(path.join(cwd, files[0]), cwd);
   },
   parse(filePath) {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -254,7 +293,7 @@ const goModParser: BuildFileParser = {
   language: 'go',
   detect(cwd) {
     const p = path.join(cwd, 'go.mod');
-    return fs.existsSync(p) ? p : null;
+    return safeBuildFilePath(p, cwd);
   },
   parse(filePath) {
     const content = fs.readFileSync(filePath, 'utf-8');

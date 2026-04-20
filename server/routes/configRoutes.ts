@@ -88,6 +88,9 @@ router.get(
  * `update` command can compare against local project dependencies.
  */
 router.get('/v1/bom', (_req, res) => {
+  // BOM changes only when QAStarter ships a new template release.
+  // Browser caches for 5 min; proxies / CDNs may keep it up to an hour.
+  res.set('Cache-Control', 'public, max-age=300, s-maxage=3600');
   res.json({
     success: true,
     data: BOM,
@@ -175,6 +178,9 @@ router.post('/v1/validate-config', (req, res) => {
  * Get metadata for project generation options
  */
 router.get('/v1/metadata', (req, res) => {
+  // Matrix content only changes on template / validation code releases.
+  // Browsers cache 5 min; CDNs can cache longer (we ship a new version on each deploy).
+  res.set('Cache-Control', 'public, max-age=300, s-maxage=3600');
   const metadata = {
     version: '1.0.0',
     testingTypes: validationMatrix.testingTypes.map((type) => ({

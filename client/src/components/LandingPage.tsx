@@ -152,7 +152,7 @@ export default function LandingPage() {
             >
               <Rocket className="h-3.5 w-3.5" aria-hidden="true" />
               <span>
-                NEW \u2014 QAStarter now works inside Claude Desktop, Cursor &amp; Claude Code
+                NEW — QAStarter now works inside Claude Desktop, Cursor &amp; Claude Code
               </span>
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
             </button>

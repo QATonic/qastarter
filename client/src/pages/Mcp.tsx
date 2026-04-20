@@ -110,7 +110,7 @@ export default function Mcp() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-xs font-medium mb-5">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>NEW \u2014 AI-native QA scaffolding</span>
+              <span>NEW — AI-native QA scaffolding</span>
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-5 tracking-tight">
               QAStarter speaks{' '}
@@ -120,7 +120,7 @@ export default function Mcp() {
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Let Claude Desktop, Cursor, Claude Code, Windsurf, and any other MCP-aware AI client
-              scaffold production-ready test automation projects directly into your workspace \u2014
+              scaffold production-ready test automation projects directly into your workspace —
               no browser, no download, no rate-limit mid-session.
             </p>
           </div>
@@ -143,8 +143,8 @@ export default function Mcp() {
                 Restart the client and ask it:
               </p>
               <blockquote className="border-l-2 border-emerald-500/60 pl-4 italic text-foreground/90">
-                \u201cUse qastarter to scaffold a Playwright TypeScript project with Jest into{' '}
-                <code className="not-italic">./tests/e2e</code>.\u201d
+                “Use qastarter to scaffold a Playwright TypeScript project with Jest into{' '}
+                <code className="not-italic">./tests/e2e</code>.”
               </blockquote>
             </CardContent>
           </Card>
@@ -196,7 +196,7 @@ export default function Mcp() {
               <Zap className="h-6 w-6 text-emerald-500 mb-3" />
               <h3 className="font-semibold mb-1">Built for AI iteration</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Authenticated MCP clients get 10\u00d7 the anonymous rate limit. No more "too many requests" mid-session.
+                Authenticated MCP clients get 10× the anonymous rate limit. No more "too many requests" mid-session.
               </p>
             </div>
             <div>

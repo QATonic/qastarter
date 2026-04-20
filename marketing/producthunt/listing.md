@@ -57,7 +57,7 @@ I'd love your feedback — what framework combinations or features would you wan
 ## Links
 - Website: https://qastarter.qatonic.com
 - GitHub: https://github.com/QATonic/qastarter
-- npm: https://www.npmjs.com/package/qastarter
+- npm: https://www.npmjs.com/package/@qatonic_innovations/qastarter-cli
 
 ---
 

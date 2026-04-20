@@ -113,5 +113,5 @@ and download a complete project that compiles and runs immediately.
 
 - Website: https://qastarter.qatonic.com
 - GitHub: https://github.com/QATonic/qastarter
-- npm: https://www.npmjs.com/package/qastarter
+- npm: https://www.npmjs.com/package/@qatonic_innovations/qastarter-cli
 ```

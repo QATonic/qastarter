@@ -17,15 +17,22 @@ export class MemoryCacheProvider implements CacheProvider {
 
   constructor(config: CacheConfig) {
     this.config = config;
+    // Bounded cache: without maxKeys, NodeCache grows forever under sustained load
+    // (manifests + compiled templates for 49 packs × variants × long TTL). A ceiling
+    // of 1000 keeps worst-case memory in the low tens of MB while comfortably covering
+    // the full combo matrix. Override via CACHE_MAX_KEYS if a deployment needs more.
+    const maxKeys = parseInt(process.env.CACHE_MAX_KEYS || '1000', 10);
     this.cache = new NodeCache({
       stdTTL: config.defaultTTL,
       checkperiod: 120, // Check for expired keys every 2 minutes
       useClones: false, // Better performance
+      maxKeys,
     });
 
     logger.info('Memory cache provider initialized', {
       ttl: config.defaultTTL,
       enabled: config.enabled,
+      maxKeys,
     });
   }
 
@@ -56,7 +63,17 @@ export class MemoryCacheProvider implements CacheProvider {
     }
 
     const fullKey = this.getFullKey(key);
-    return this.cache.set(fullKey, value, ttlSeconds || this.config.defaultTTL);
+    try {
+      return this.cache.set(fullKey, value, ttlSeconds || this.config.defaultTTL);
+    } catch (err) {
+      // NodeCache throws ECACHEFULL once maxKeys is hit. Fail-soft: log and skip
+      // caching for this call so hot paths aren't taken down by a full cache.
+      logger.warn('Memory cache set failed (likely capacity)', {
+        error: err instanceof Error ? err.message : String(err),
+        keys: this.cache.keys().length,
+      });
+      return false;
+    }
   }
 
   async del(key: string): Promise<boolean> {

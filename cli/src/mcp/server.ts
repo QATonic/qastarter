@@ -138,25 +138,78 @@ function resolveTargetDir(input: string, allowAbsolute: boolean): string {
   return resolved;
 }
 
-/** Extract a ZIP buffer into a target directory safely. */
+/**
+ * Zip entry mode bits. On POSIX-zipped entries the Unix permission + type bits
+ * sit in the top 16 of `attr`; bit 0xA000 (S_IFLNK) marks a symlink. AdmZip
+ * represents the zip extra field as numeric `attr`, so we can test for it
+ * directly without parsing the raw bytes.
+ */
+const S_IFMT = 0xf000;
+const S_IFLNK = 0xa000;
+
+function isSymlinkEntry(entry: AdmZip.IZipEntry): boolean {
+  // `attr` is (external_file_attributes >>> 0). The top 16 bits are the Unix
+  // mode for POSIX-originated zips. A truthy top-16 with the LNK bits set = symlink.
+  const attr = (entry as unknown as { attr?: number }).attr ?? 0;
+  return ((attr >>> 16) & S_IFMT) === S_IFLNK;
+}
+
+/**
+ * Extract a ZIP buffer into a target directory safely.
+ *
+ * Defences against Zip-Slip and Windows-symlink tricks:
+ *  1. `entryName` is resolved against `targetDir`; anything that `path.relative`
+ *     reports as outside is rejected (cheap pre-check).
+ *  2. Symlink entries (POSIX S_IFLNK in the external attr field) are refused
+ *     outright — AdmZip treats them as regular files, which would otherwise
+ *     write a literal symlink whose target could point outside `targetDir`.
+ *  3. After each write, `fs.realpathSync(written)` re-checks that the path
+ *     the filesystem actually resolves to still starts with `targetDir` —
+ *     catches the case where a parent directory was a pre-existing symlink
+ *     (e.g. the user's `targetDir` itself was a symlink farm).
+ */
 function extractZipSafely(buffer: Buffer, targetDir: string): string[] {
   const zip = new AdmZip(buffer);
   const entries = zip.getEntries();
   const written: string[] = [];
 
+  // Resolve the real path of the target dir once so we can compare against it.
+  const realTargetDir = fs.realpathSync(fs.existsSync(targetDir) ? targetDir : (() => {
+    fs.mkdirSync(targetDir, { recursive: true });
+    return targetDir;
+  })());
+  const prefix = realTargetDir.endsWith(path.sep) ? realTargetDir : realTargetDir + path.sep;
+
   for (const entry of entries) {
-    // Reject any entry that tries to break out of targetDir (ZipSlip guard).
+    // Refuse symlink entries — AdmZip would otherwise materialize them as
+    // regular files containing the target path, or (on systems that honour it)
+    // create an actual symlink pointing anywhere.
+    if (isSymlinkEntry(entry)) {
+      throw new Error(`Unsafe zip entry (symlink): ${entry.entryName}`);
+    }
+
+    // Pre-check: the declared entry path must resolve inside targetDir.
     const entryPath = path.resolve(targetDir, entry.entryName);
     const rel = path.relative(targetDir, entryPath);
     if (rel.startsWith('..') || path.isAbsolute(rel)) {
       throw new Error(`Unsafe zip entry: ${entry.entryName}`);
     }
+
     if (entry.isDirectory) {
       fs.mkdirSync(entryPath, { recursive: true });
       continue;
     }
     fs.mkdirSync(path.dirname(entryPath), { recursive: true });
     fs.writeFileSync(entryPath, entry.getData());
+
+    // Post-check: realpath the written file. If any parent directory turned out
+    // to be a symlink that escapes targetDir, delete the write and abort.
+    const real = fs.realpathSync(entryPath);
+    if (!real.startsWith(prefix) && real !== realTargetDir) {
+      // best-effort cleanup — we've already written the file
+      try { fs.unlinkSync(entryPath); } catch { /* ignore */ }
+      throw new Error(`Unsafe zip entry (resolves outside targetDir after realpath): ${entry.entryName}`);
+    }
     written.push(path.relative(targetDir, entryPath));
   }
   return written;

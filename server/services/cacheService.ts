@@ -21,10 +21,15 @@ const manifestCache = new NodeCache({
   useClones: true, // Safer - prevents mutation of cached objects
 });
 
+// Compiled Handlebars templates are **functions** — NodeCache's default deep-clone
+// path (useClones: true) can't clone functions usefully, and they're immutable
+// anyway. useClones: false returns the same function reference to every caller.
+// maxKeys bounds memory at worst-case: one entry per unique template content hash.
 const templateCache = new NodeCache({
   stdTTL: CACHE_TTL,
   checkperiod: CHECK_PERIOD,
-  useClones: true,
+  useClones: false,
+  maxKeys: parseInt(process.env.TEMPLATE_CACHE_MAX_KEYS || '500', 10),
 });
 
 const metadataCache = new NodeCache({

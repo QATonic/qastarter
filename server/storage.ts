@@ -3,6 +3,19 @@ import pg from 'pg';
 import { desc, count } from 'drizzle-orm';
 import { ProjectConfig, projectGenerations } from '@shared/schema';
 import { Mutex } from 'async-mutex';
+import { createHash } from 'crypto';
+
+/**
+ * Hash a user-supplied project name before persisting to analytics.
+ * Some enterprise users use real project / product codenames, which can be PII
+ * in aggregate. A stable 10-char hex hash keeps aggregate counts meaningful while
+ * dropping the ability to recover the original name from a leaked analytics dump.
+ * Empty / falsy names round-trip as 'anon' so the downstream UI isn't surprised.
+ */
+function hashProjectName(name: string | undefined | null): string {
+  if (!name) return 'anon';
+  return 'pn_' + createHash('sha256').update(name, 'utf8').digest('hex').slice(0, 10);
+}
 
 const { Pool } = pg;
 
@@ -82,7 +95,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .insert(projectGenerations)
       .values({
-        projectName: config.projectName,
+        projectName: hashProjectName(config.projectName),
         testingType: config.testingType,
         framework: config.framework,
         language: config.language,
@@ -165,6 +178,54 @@ export class FileStorage implements IStorage {
   private countByTestingType: Map<string, number> = new Map();
   private countByFramework: Map<string, number> = new Map();
   private countByLanguage: Map<string, number> = new Map();
+
+  // Debounced flush state. `saveProjectGeneration` no longer awaits the disk write
+  // — instead it schedules a flush after FLUSH_DEBOUNCE_MS of quiet, or forces one
+  // once FLUSH_MAX_PENDING writes have accumulated. `dirty` is the "do we owe the
+  // disk a write?" flag. A process SIGTERM / beforeExit listener below guarantees
+  // we flush before exit so we don't lose the tail of the analytics stream.
+  private static readonly FLUSH_DEBOUNCE_MS = parseInt(
+    process.env.ANALYTICS_FLUSH_DEBOUNCE_MS || '500',
+    10
+  );
+  private static readonly FLUSH_MAX_PENDING = parseInt(
+    process.env.ANALYTICS_FLUSH_MAX_PENDING || '50',
+    10
+  );
+  private flushTimer: NodeJS.Timeout | null = null;
+  private pendingWrites = 0;
+  private dirty = false;
+
+  /** Internal: schedule a debounced flush; force one if too many writes have piled up. */
+  private scheduleFlush(): void {
+    this.dirty = true;
+    this.pendingWrites++;
+    if (this.pendingWrites >= FileStorage.FLUSH_MAX_PENDING) {
+      // Force an immediate flush to bound the "unflushed events" window.
+      if (this.flushTimer) {
+        clearTimeout(this.flushTimer);
+        this.flushTimer = null;
+      }
+      void this.flushIfDirty();
+      return;
+    }
+    if (this.flushTimer) return; // already scheduled
+    this.flushTimer = setTimeout(() => {
+      this.flushTimer = null;
+      void this.flushIfDirty();
+    }, FileStorage.FLUSH_DEBOUNCE_MS);
+    // Don't hold the event loop open waiting on the timer.
+    if (typeof this.flushTimer.unref === 'function') this.flushTimer.unref();
+  }
+
+  private async flushIfDirty(): Promise<void> {
+    if (!this.dirty) return;
+    // Reset counters **before** the await so a write arriving while we're on
+    // disk schedules another flush rather than getting lost.
+    this.dirty = false;
+    this.pendingWrites = 0;
+    await this.flush();
+  }
 
   constructor() {
     this.filePath = path.join(process.cwd(), 'server', 'data', 'analytics.json');
@@ -256,6 +317,15 @@ export class FileStorage implements IStorage {
     }
   }
 
+  /** Public: force a flush (used by process-exit handlers below). */
+  public async forceFlush(): Promise<void> {
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+    await this.flushIfDirty();
+  }
+
   async saveProjectGeneration(config: ProjectConfig): Promise<string> {
     await this.ensureInitialized();
     // Use mutex to prevent race conditions on concurrent writes
@@ -263,7 +333,7 @@ export class FileStorage implements IStorage {
       this.idCounter++;
       const record = {
         id: this.idCounter,
-        projectName: config.projectName,
+        projectName: hashProjectName(config.projectName),
         testingType: config.testingType,
         framework: config.framework,
         language: config.language,
@@ -285,7 +355,10 @@ export class FileStorage implements IStorage {
 
       // Update pre-computed count caches (O(1) operation)
       this.incrementCountCache(config);
-      await this.flush();
+      // Schedule a debounced flush instead of awaiting the disk write on the
+      // hot generation path. Under bursty load this collapses N sync writes
+      // per window into 1, removing per-request fs contention.
+      this.scheduleFlush();
 
       return record.id.toString();
     });
@@ -339,6 +412,15 @@ export class ResilientStorage implements IStorage {
     this.fallback = new FileStorage();
   }
 
+  /** Flush any pending analytics writes on process shutdown so we don't lose the tail. */
+  async flushPending(): Promise<void> {
+    try {
+      await this.fallback.forceFlush();
+    } catch {
+      /* best-effort: never throw from a shutdown hook */
+    }
+  }
+
   private get useDatabase(): boolean {
     return hasDatabase;
   }
@@ -379,3 +461,19 @@ export class ResilientStorage implements IStorage {
 }
 
 export const storage = new ResilientStorage();
+
+// Guarantee we flush the debounced analytics buffer on shutdown so the tail of
+// the event stream isn't lost on deploys / SIGTERM / crash. Listeners are
+// idempotent — Node dedupes identical handlers but we explicitly check for
+// `addedOnce` to avoid test-harness duplication.
+const flushOnExit = () => {
+  void storage.flushPending();
+};
+process.once('beforeExit', flushOnExit);
+process.once('SIGTERM', () => {
+  flushOnExit();
+  // Don't call process.exit here — let the caller's handler decide.
+});
+process.once('SIGINT', () => {
+  flushOnExit();
+});

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useExpressGenerator } from './ExpressGeneratorContext';
 import OptionButtonGroup from './OptionButtonGroup';
 import DependencySearch from './DependencySearch';
@@ -50,6 +50,43 @@ const testingPatternLabels: Record<string, string> = validationLabels.testingPat
 export default function ConfigPanel() {
   const { config, updateConfig, getFilteredOptions, reset } = useExpressGenerator();
   const [advancedOpen, setAdvancedOpen] = useState(false);
+
+  // Memoize filtered option lists so we only re-run the validation-matrix lookup
+  // when an *upstream* choice changes — not on every re-render (e.g. keystrokes
+  // in the project name input trigger a full ConfigPanel render without these deps
+  // actually changing).
+  const frameworkOptions = useMemo(
+    () => getFilteredOptions('framework'),
+    [getFilteredOptions, config.testingType]
+  );
+  const languageOptions = useMemo(
+    () => getFilteredOptions('language'),
+    [getFilteredOptions, config.testingType, config.framework]
+  );
+  const testRunnerOptions = useMemo(
+    () => getFilteredOptions('testRunner'),
+    [getFilteredOptions, config.framework, config.language]
+  );
+  const buildToolOptions = useMemo(
+    () => getFilteredOptions('buildTool'),
+    [getFilteredOptions, config.framework, config.language]
+  );
+  const testingPatternOptions = useMemo(
+    () => getFilteredOptions('testingPattern'),
+    [getFilteredOptions, config.framework, config.language]
+  );
+  const cicdToolOptions = useMemo(
+    () => getFilteredOptions('cicdTool'),
+    [getFilteredOptions, config.framework]
+  );
+  const reportingToolOptions = useMemo(
+    () => getFilteredOptions('reportingTool'),
+    [getFilteredOptions, config.framework, config.language]
+  );
+  const cloudDeviceFarmOptions = useMemo(
+    () => ['none', ...getFilteredOptions('cloudDeviceFarm')],
+    [getFilteredOptions, config.testingType, config.framework]
+  );
 
   const isProjectNameValid = (name: string) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(name)) return false;
@@ -122,7 +159,7 @@ export default function ConfigPanel() {
             </Label>
           </div>
           <OptionButtonGroup
-            options={getFilteredOptions('framework')}
+            options={frameworkOptions}
             value={config.framework}
             onChange={(value) => updateConfig('framework', value)}
             labels={validationLabels.frameworks}
@@ -141,7 +178,7 @@ export default function ConfigPanel() {
             </Label>
           </div>
           <OptionButtonGroup
-            options={getFilteredOptions('language')}
+            options={languageOptions}
             value={config.language}
             onChange={(value) => updateConfig('language', value)}
             labels={validationLabels.languages}
@@ -160,7 +197,7 @@ export default function ConfigPanel() {
             </Label>
           </div>
           <OptionButtonGroup
-            options={getFilteredOptions('testRunner')}
+            options={testRunnerOptions}
             value={config.testRunner}
             onChange={(value) => updateConfig('testRunner', value)}
             labels={validationLabels.testRunners}
@@ -179,7 +216,7 @@ export default function ConfigPanel() {
             </Label>
           </div>
           <OptionButtonGroup
-            options={getFilteredOptions('buildTool')}
+            options={buildToolOptions}
             value={config.buildTool}
             onChange={(value) => updateConfig('buildTool', value)}
             labels={validationLabels.buildTools}
@@ -198,7 +235,7 @@ export default function ConfigPanel() {
             </Label>
           </div>
           <OptionButtonGroup
-            options={getFilteredOptions('testingPattern')}
+            options={testingPatternOptions}
             value={config.testingPattern}
             onChange={(value) => updateConfig('testingPattern', value)}
             labels={testingPatternLabels}
@@ -501,7 +538,7 @@ export default function ConfigPanel() {
                 <Label className="text-sm font-medium">CI/CD Tool</Label>
               </div>
               <OptionButtonGroup
-                options={getFilteredOptions('cicdTool')}
+                options={cicdToolOptions}
                 value={config.cicdTool}
                 onChange={(value) => updateConfig('cicdTool', value)}
                 labels={validationLabels.cicdTools}
@@ -515,7 +552,7 @@ export default function ConfigPanel() {
                 <Label className="text-sm font-medium">Reporting Tool</Label>
               </div>
               <OptionButtonGroup
-                options={getFilteredOptions('reportingTool')}
+                options={reportingToolOptions}
                 value={config.reportingTool}
                 onChange={(value) => updateConfig('reportingTool', value)}
                 labels={validationLabels.reportingTools}
@@ -530,7 +567,7 @@ export default function ConfigPanel() {
                   <Label className="text-sm font-medium">Cloud Device Farm</Label>
                 </div>
                 <OptionButtonGroup
-                  options={['none', ...getFilteredOptions('cloudDeviceFarm')]}
+                  options={cloudDeviceFarmOptions}
                   value={config.cloudDeviceFarm || 'none'}
                   onChange={(value) => updateConfig('cloudDeviceFarm', value)}
                   labels={validationLabels.cloudDeviceFarms}

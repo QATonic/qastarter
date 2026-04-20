@@ -14,6 +14,27 @@
  */
 
 import SwaggerParser from '@apidevtools/swagger-parser';
+
+/**
+ * Wall-clock cap on SwaggerParser parsing. A crafted spec with deeply nested $refs
+ * can burn CPU unboundedly even when the payload is under MAX_SPEC_SIZE.
+ * 15 s is generous for legitimate specs; configurable via env.
+ */
+const PARSE_TIMEOUT_MS = parseInt(process.env.OPENAPI_PARSE_TIMEOUT_MS || '15000', 10);
+
+function validateWithTimeout(input: unknown): Promise<any> {
+  return Promise.race([
+    // `circular: false` refuses circular $refs outright — cheaper than letting the
+    // resolver chase them. Legitimate public APIs don't circularly self-reference.
+    SwaggerParser.validate(input as any, { dereference: { circular: false } }),
+    new Promise((_, reject) =>
+      setTimeout(
+        () => reject(new Error(`OpenAPI parse timed out after ${PARSE_TIMEOUT_MS} ms`)),
+        PARSE_TIMEOUT_MS
+      )
+    ),
+  ]);
+}
 import type { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import type {
   OpenApiEndpoint,
@@ -286,7 +307,7 @@ export async function parseOpenApiFromUrl(
       specInput = text;
     }
 
-    const api = await SwaggerParser.validate(specInput);
+    const api = await validateWithTimeout(specInput);
 
     const endpoints = parseOpenApiSpec(api);
 
@@ -321,7 +342,7 @@ export async function parseOpenApiFromString(
 ): Promise<OpenApiEndpoint[] | null> {
   try {
     const parsed = JSON.parse(specContent);
-    const api = await SwaggerParser.validate(parsed);
+    const api = await validateWithTimeout(parsed);
     return parseOpenApiSpec(api);
   } catch (error) {
     logger.warn('Failed to parse OpenAPI string', {

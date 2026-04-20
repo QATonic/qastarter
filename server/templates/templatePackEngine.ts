@@ -1,6 +1,7 @@
 import handlebars from 'handlebars';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { createHash } from 'crypto';
 import { ProjectConfig } from '@shared/schema';
 import { TemplatePackManifest, TemplateContext, TemplatePackFile, TemplateFile } from './types';
 import { fileURLToPath } from 'url';
@@ -346,8 +347,25 @@ export class TemplatePackEngine {
         }
       }
 
-      // Now Handlebars can compile without seeing raw blocks
-      const template = this.hb.compile(processedContent);
+      // Now Handlebars can compile without seeing raw blocks.
+      // Cache the compiled function by SHA-256 of the post-processed content so that
+      // repeat requests for the same template (same pack, same CI/CD-masking result)
+      // skip the parse-and-codegen step — a large win on generation latency because
+      // a 49-pack project easily renders 20-100 templates per request.
+      let template: HandlebarsTemplateDelegate<TemplateContext>;
+      if (isCacheEnabled()) {
+        const contentHash = createHash('sha256').update(processedContent).digest('hex');
+        const cacheKey = `hb:${contentHash}`;
+        const cached = getCachedTemplate<HandlebarsTemplateDelegate<TemplateContext>>(cacheKey);
+        if (cached) {
+          template = cached;
+        } else {
+          template = this.hb.compile(processedContent);
+          setCachedTemplate(cacheKey, template);
+        }
+      } else {
+        template = this.hb.compile(processedContent);
+      }
       let result = template(context);
 
       // Restore raw blocks AFTER Handlebars rendering (if any were extracted)
@@ -377,12 +395,56 @@ export class TemplatePackEngine {
   }
 
   /**
-   * Process template file path
+   * Whitelist of context keys legitimately used in template *file paths* today.
+   * (File **content** templates still use full Handlebars — that's fine because
+   * they're rendered into the body of a file, not joined onto the filesystem.)
+   *
+   * Narrowing to a whitelist closes a defence-in-depth gap: if a malicious
+   * manifest ever made it in, previously `hb.compile(filePath)` would have
+   * executed any Handlebars expression (including helpers, sub-expressions,
+   * partials) against that path. Now only `{{name}}` lookups from this list
+   * are supported.
+   */
+  private static readonly PATH_CONTEXT_KEYS = new Set<string>([
+    'projectName',
+    'groupId',
+    'artifactId',
+    'packageName',
+    'javaPackage',
+    'packagePath',
+    'csharpNamespace',
+    'projectNamespace',
+    'testingType',
+    'framework',
+    'language',
+    'testRunner',
+    'buildTool',
+  ]);
+  private static readonly PATH_PLACEHOLDER = /\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}/g;
+
+  /**
+   * Process template file path — **not** via Handlebars.
+   *
+   * File paths are joined onto the filesystem, so we use a plain, whitelisted
+   * string-replace instead of handing them to `hb.compile()`. That removes the
+   * injection vector entirely (no helpers, no sub-expressions, no partials).
+   * Only the small set of keys in PATH_CONTEXT_KEYS can substitute; anything
+   * else is left untouched (preserves `{{` literals that weren't meant as
+   * placeholders, though these are exceedingly rare in real filenames).
    */
   private processTemplatePath(filePath: string, context: TemplateContext): string {
     try {
-      const template = this.hb.compile(filePath);
-      return template(context);
+      return filePath.replace(
+        TemplatePackEngine.PATH_PLACEHOLDER,
+        (match, key: string) => {
+          if (!TemplatePackEngine.PATH_CONTEXT_KEYS.has(key)) {
+            return match; // unknown — leave literal, let downstream validation catch it
+          }
+          const value = (context as unknown as Record<string, unknown>)[key];
+          if (typeof value !== 'string' && typeof value !== 'number') return match;
+          return String(value);
+        }
+      );
     } catch (error) {
       throw new Error(`Template path processing failed for ${filePath}: ${error}`);
     }

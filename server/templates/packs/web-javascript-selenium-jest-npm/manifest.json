@@ -66,10 +66,6 @@
       "isTemplate": true
     },
     {
-      "path": "utils/DriverManager.js",
-      "isTemplate": true
-    },
-    {
       "path": ".circleci/config.yml",
       "isTemplate": true,
       "conditional": {
@@ -194,15 +190,7 @@
       "isTemplate": true
     },
     {
-      "path": "utils/ScreenshotUtils.js",
-      "isTemplate": true
-    },
-    {
       "path": "utils/waitHelpers.js",
-      "isTemplate": true
-    },
-    {
-      "path": "tests/login.spec.js",
       "isTemplate": true
     },
     {

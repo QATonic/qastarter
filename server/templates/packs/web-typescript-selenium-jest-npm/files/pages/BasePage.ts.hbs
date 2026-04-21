@@ -1,75 +1,88 @@
 /**
-* Base Page - Parent class for all page objects.
-* Uses centralized WaitHelpers for all explicit wait operations.
-*/
-import { WebDriver, By, WebElement } from "selenium-webdriver";
-import { DriverManager } from "../utils/DriverManager";
-import WaitHelpers from "../utils/WaitHelpers";
-import { config } from "../config/ConfigReader";
+ * Base Page — parent class for all Selenium page objects.
+ *
+ * The WebDriver is injected via the constructor. Tests use DriverFactory
+ * to create the driver once per suite and pass it to each page:
+ *
+ *     const driver = await DriverFactory.createDriver();
+ *     const loginPage = new LoginPage(driver);
+ */
+import { By, WebDriver, WebElement, until } from 'selenium-webdriver';
 
 export class BasePage {
-protected driver: WebDriver;
-protected waitHelpers: WaitHelpers;
+  protected readonly driver: WebDriver;
+  protected readonly defaultTimeout: number;
 
-constructor() {
-// Note: Driver should be initialized before page object creation
-}
-
-protected async getDriver(): Promise<WebDriver> {
-  this.driver = await DriverManager.getDriver();
-  this.waitHelpers = new WaitHelpers(this.driver, config.timeout);
-  return this.driver;
+  constructor(driver: WebDriver, defaultTimeout: number = 30000) {
+    this.driver = driver;
+    this.defaultTimeout = defaultTimeout;
   }
 
+  // ─── Waits ───────────────────────────────────────────────────────────
+
+  protected async waitForLocated(locator: By, timeout: number = this.defaultTimeout): Promise<WebElement> {
+    return this.driver.wait(until.elementLocated(locator), timeout);
+  }
+
+  protected async waitForVisible(locator: By, timeout: number = this.defaultTimeout): Promise<WebElement> {
+    const el = await this.waitForLocated(locator, timeout);
+    return this.driver.wait(until.elementIsVisible(el), timeout);
+  }
+
+  protected async waitForClickable(locator: By, timeout: number = this.defaultTimeout): Promise<WebElement> {
+    const el = await this.waitForLocated(locator, timeout);
+    return this.driver.wait(until.elementIsEnabled(el), timeout);
+  }
+
+  // ─── Interactions ────────────────────────────────────────────────────
+
   async click(locator: By): Promise<void> {
-    await this.getDriver();
-    const element = await this.waitHelpers.waitForElementClickable(locator);
-    await element.click();
-    }
+    const el = await this.waitForClickable(locator);
+    await el.click();
+  }
 
-    async type(locator: By, text: string): Promise<void> {
-      await this.getDriver();
-      const element = await this.waitHelpers.waitForElementVisible(locator);
-      await element.clear();
-      await element.sendKeys(text);
+  async type(locator: By, text: string): Promise<void> {
+    const el = await this.waitForVisible(locator);
+    await el.clear();
+    await el.sendKeys(text);
+  }
+
+  async getText(locator: By): Promise<string> {
+    const el = await this.waitForVisible(locator);
+    return el.getText();
+  }
+
+  // ─── Visibility ──────────────────────────────────────────────────────
+
+  async isDisplayed(locator: By): Promise<boolean> {
+    try {
+      const el = await this.driver.findElement(locator);
+      return await el.isDisplayed();
+    } catch (e: unknown) {
+      const name = (e as { name?: string })?.name;
+      if (name === 'NoSuchElementError' || name === 'StaleElementReferenceError') {
+        return false;
       }
+      throw e;
+    }
+  }
 
-      async getText(locator: By): Promise<string> {
-        await this.getDriver();
-        const element = await this.waitHelpers.waitForElementVisible(locator);
-        return await element.getText();
-        }
+  // ─── Navigation ──────────────────────────────────────────────────────
 
-        async isDisplayed(locator: By): Promise<boolean> {
-          try {
-          const driver = await this.getDriver();
-          const element = await driver.findElement(locator);
-          return await element.isDisplayed();
-          } catch (e: any) {
-          if (e.name === 'NoSuchElementError' || e.name === 'StaleElementReferenceError') {
-          return false;
-          }
-          throw e;
-          }
-          }
+  async navigate(url: string): Promise<void> {
+    await this.driver.get(url);
+  }
 
-          async waitForElement(locator: By): Promise<WebElement> {
-            await this.getDriver();
-            return await this.waitHelpers.waitForElementLocated(locator);
-            }
+  /** Alias for navigate() — kept for compatibility with older callers. */
+  async navigateTo(url: string): Promise<void> {
+    await this.navigate(url);
+  }
 
-            async getTitle(): Promise<string> {
-              const driver = await this.getDriver();
-              return await driver.getTitle();
-              }
+  async getCurrentUrl(): Promise<string> {
+    return this.driver.getCurrentUrl();
+  }
 
-              async getCurrentUrl(): Promise<string> {
-                const driver = await this.getDriver();
-                return await driver.getCurrentUrl();
-                }
-
-                async navigateTo(url: string): Promise<void> {
-                  const driver = await this.getDriver();
-                  await driver.get(url);
-                  }
-                  }
+  async getTitle(): Promise<string> {
+    return this.driver.getTitle();
+  }
+}

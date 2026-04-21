@@ -1,19 +1,31 @@
 const fs = require('fs');
 const path = require('path');
-const { parse } = require('csv-parse/sync');
 
+/**
+ * Read JSON / CSV test data from the `data/` folder.
+ */
 class DataReader {
-  static readJSON(filename) {
+  static readJson(filename) {
     const filepath = path.join(process.cwd(), 'data', filename);
-    const data = fs.readFileSync(filepath, 'utf8');
+    const data = fs.readFileSync(filepath, 'utf-8');
     return JSON.parse(data);
   }
 
-  static readCSV(filename) {
+  /** @deprecated Use {@link readJson} — kept for backward compatibility. */
+  static readJSON(filename) {
+    return DataReader.readJson(filename);
+  }
+
+  static readCsv(filename) {
     const filepath = path.join(process.cwd(), 'data', filename);
-    const data = fs.readFileSync(filepath, 'utf8');
-    return parse(data, { columns: true, skip_empty_lines: true });
+    const data = fs.readFileSync(filepath, 'utf-8').trim();
+    return data.split(/\r?\n/).map((line) => line.split(','));
+  }
+
+  /** @deprecated Use {@link readCsv} — kept for backward compatibility. */
+  static readCSV(filename) {
+    return DataReader.readCsv(filename);
   }
 }
 
-module.exports = DataReader;
+module.exports = { DataReader };

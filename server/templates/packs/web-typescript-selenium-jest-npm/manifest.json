@@ -170,10 +170,6 @@
       "isTemplate": true
     },
     {
-      "path": "utils/DriverManager.ts",
-      "isTemplate": true
-    },
-    {
       "path": "utils/DriverFactory.ts",
       "isTemplate": true
     },
@@ -190,10 +186,6 @@
     },
     {
       "path": "utils/ScreenshotHelper.ts",
-      "isTemplate": true
-    },
-    {
-      "path": "utils/ScreenshotUtils.ts",
       "isTemplate": true
     },
     {
@@ -221,10 +213,6 @@
       "conditional": {
         "testingPattern": "bdd"
       }
-    },
-    {
-      "path": "tests/login.spec.ts",
-      "isTemplate": true
     },
     {
       "path": "utils/testDataFactory.ts",

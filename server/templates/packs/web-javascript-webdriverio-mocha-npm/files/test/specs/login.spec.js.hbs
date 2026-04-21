@@ -2,7 +2,9 @@
 * Login Tests using WebDriverIO with Mocha.
 */
 import LoginPage from '../pageobjects/login.page.js';
+{{#if utilities.dataProvider}}
 import DataReader from '../../utils/dataReader.js';
+{{/if}}
 
 describe("Login Tests", () => {
 beforeEach(async () => {

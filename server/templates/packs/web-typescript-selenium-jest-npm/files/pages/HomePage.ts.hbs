@@ -1,13 +1,13 @@
 import { By, WebDriver } from 'selenium-webdriver';
-import BasePage from './BasePage';
+import { BasePage } from './BasePage';
 import envConfig from '../config/env.config';
 
-export default class HomePage extends BasePage {
-  private url: string;
-  private logo = By.css('.logo');
-  private userMenu = By.css('.user-menu');
-  private logoutButton = By.linkText('Logout');
-  private welcomeMessage = By.css('.welcome-message');
+export class HomePage extends BasePage {
+  private readonly url: string;
+  private readonly logo = By.css('.logo');
+  private readonly userMenu = By.css('.user-menu');
+  private readonly logoutButton = By.linkText('Logout');
+  private readonly welcomeMessage = By.css('.welcome-message');
 
   constructor(driver: WebDriver) {
     super(driver);
@@ -19,11 +19,11 @@ export default class HomePage extends BasePage {
   }
 
   async isLoaded(): Promise<boolean> {
-    return await this.isDisplayed(this.logo);
+    return this.isDisplayed(this.logo);
   }
 
   async getWelcomeMessage(): Promise<string> {
-    return await this.getText(this.welcomeMessage);
+    return this.getText(this.welcomeMessage);
   }
 
   async logout(): Promise<void> {
@@ -32,6 +32,6 @@ export default class HomePage extends BasePage {
   }
 
   async isUserLoggedIn(): Promise<boolean> {
-    return await this.isDisplayed(this.userMenu);
+    return this.isDisplayed(this.userMenu);
   }
 }

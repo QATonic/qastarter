@@ -49,3 +49,7 @@ class Logger {
 }
 
 export const log = new Logger();
+
+// Default export so `import log from './Logger'` also works alongside
+// `import { log } from './Logger'`.
+export default log;

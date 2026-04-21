@@ -1,5 +1,5 @@
 const { By } = require('selenium-webdriver');
-const BasePage = require('./BasePage');
+const { BasePage } = require('./BasePage');
 const envConfig = require('../config/env.config');
 
 class HomePage extends BasePage {
@@ -36,4 +36,4 @@ class HomePage extends BasePage {
   }
 }
 
-module.exports = HomePage;
+module.exports = { HomePage };

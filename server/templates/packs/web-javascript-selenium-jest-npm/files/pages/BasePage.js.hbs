@@ -1,52 +1,83 @@
 /**
-* Base Page - Parent class for all page objects.
-*/
-const { By, until } = require("selenium-webdriver");
-const { DriverManager } = require("../utils/DriverManager");
-const { config } = require("../config/ConfigReader");
+ * Base Page — parent class for all Selenium page objects.
+ *
+ * The WebDriver is injected via the constructor. Tests use DriverFactory
+ * to create the driver once per suite and pass it to each page:
+ *
+ *     const driver = await DriverFactory.createDriver();
+ *     const loginPage = new LoginPage(driver);
+ */
+const { until } = require('selenium-webdriver');
 
 class BasePage {
-async getDriver() {
-return await DriverManager.getDriver();
-}
+  constructor(driver, defaultTimeout = 30000) {
+    this.driver = driver;
+    this.defaultTimeout = defaultTimeout;
+  }
 
-async click(locator) {
-const driver = await this.getDriver();
-const element = await driver.wait(until.elementLocated(locator), config.timeout);
-await driver.wait(until.elementIsEnabled(element), config.timeout);
-await element.click();
-}
+  // Waits -------------------------------------------------------------
 
-async type(locator, text) {
-const driver = await this.getDriver();
-const element = await driver.wait(until.elementLocated(locator), config.timeout);
-await element.clear();
-await element.sendKeys(text);
-}
+  async waitForLocated(locator, timeout = this.defaultTimeout) {
+    return this.driver.wait(until.elementLocated(locator), timeout);
+  }
 
-async getText(locator) {
-const driver = await this.getDriver();
-const element = await driver.wait(until.elementLocated(locator), config.timeout);
-return await element.getText();
-}
+  async waitForVisible(locator, timeout = this.defaultTimeout) {
+    const el = await this.waitForLocated(locator, timeout);
+    return this.driver.wait(until.elementIsVisible(el), timeout);
+  }
 
-async isDisplayed(locator) {
-try {
-const driver = await this.getDriver();
-const element = await driver.findElement(locator);
-return await element.isDisplayed();
-} catch (e) {
-if (e.name === 'NoSuchElementError' || e.name === 'StaleElementReferenceError') {
-return false;
-}
-throw e;
-}
-}
+  async waitForClickable(locator, timeout = this.defaultTimeout) {
+    const el = await this.waitForLocated(locator, timeout);
+    return this.driver.wait(until.elementIsEnabled(el), timeout);
+  }
 
-async getCurrentUrl() {
-const driver = await this.getDriver();
-return await driver.getCurrentUrl();
-}
+  // Interactions ------------------------------------------------------
+
+  async click(locator) {
+    const el = await this.waitForClickable(locator);
+    await el.click();
+  }
+
+  async type(locator, text) {
+    const el = await this.waitForVisible(locator);
+    await el.clear();
+    await el.sendKeys(text);
+  }
+
+  async getText(locator) {
+    const el = await this.waitForVisible(locator);
+    return el.getText();
+  }
+
+  async isDisplayed(locator) {
+    try {
+      const el = await this.driver.findElement(locator);
+      return await el.isDisplayed();
+    } catch (e) {
+      if (e && (e.name === 'NoSuchElementError' || e.name === 'StaleElementReferenceError')) {
+        return false;
+      }
+      throw e;
+    }
+  }
+
+  // Navigation --------------------------------------------------------
+
+  async navigate(url) {
+    await this.driver.get(url);
+  }
+
+  async navigateTo(url) {
+    await this.navigate(url);
+  }
+
+  async getCurrentUrl() {
+    return this.driver.getCurrentUrl();
+  }
+
+  async getTitle() {
+    return this.driver.getTitle();
+  }
 }
 
 module.exports = { BasePage };

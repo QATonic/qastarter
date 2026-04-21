@@ -1,32 +1,35 @@
+/**
+ * Jest configuration.
+ *
+ * Uses jest-playwright-preset which exposes `browser`, `context`, `page`
+ * as globals inside every test file and handles browser lifecycle.
+ *
+ * Reporters are mutually exclusive (picked by QAStarter wizard):
+ *   - allure     → jest-allure2-reporter  → run `npm run report` to view
+ *   - jest-html  → jest-html-reporter     → test-results/test-report.html
+ */
 module.exports = {
-preset: 'jest-playwright-preset',
-testMatch: ['**/tests/**/*.test.js'],
-setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  preset: 'jest-playwright-preset',
+  testMatch: ['**/tests/**/*.test.js'],
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   testTimeout: 60000,
   verbose: true,
   collectCoverage: false,
-
-  // Retry failed tests up to 2 times
-  // Requires jest-circus (default in Jest 27+)
-
   reporters: [
-  'default',
-  {{#if (eq reportingTool "jest-html")}}
-  [
-  'jest-html-reporter',
-  {
-  pageTitle: 'Test Report',
-  outputPath: 'test-results/test-report.html',
-  includeFailureMsg: true
-  }
+    'default',{{#if (eq reportingTool "jest-html")}}
+    [
+      'jest-html-reporter',
+      {
+        pageTitle: 'Test Report',
+        outputPath: 'test-results/test-report.html',
+        includeFailureMsg: true,
+      },
+    ],{{/if}}{{#if (eq reportingTool "allure")}}
+    [
+      'jest-allure2-reporter',
+      {
+        resultsDir: 'allure-results',
+      },
+    ],{{/if}}
   ],
-  {{/if}}
-  {{#if (eq reportingTool "allure")}}
-  // Note: 'allure-jest' reporter requires environment configuration which conflicts with 'jest-playwright-preset'.
-  // To use Allure, manual custom environment setup is required.
-  // ['allure-jest', {
-  // resultsDir: 'allure-results'
-  // }],
-  {{/if}}
-  ]
-  };
+};

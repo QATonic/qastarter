@@ -1,19 +1,58 @@
+/**
+ * Login Page — page object for SauceDemo-style login flows.
+ */
 const { BasePage } = require("./BasePage");
+const envConfig = require("../config/env.config");
 
 class LoginPage extends BasePage {
-  usernameField = "#user-name";
-  passwordField = "#password";
-  loginButton = "#login-button";
-  errorMessage = "[data-test='error']";
+  constructor(page) {
+    super(page);
+    this.usernameField = "#user-name";
+    this.passwordField = "#password";
+    this.loginButton = "#login-button";
+    this.errorMessage = "[data-test='error']";
+  }
 
-  async login(username, password) {
+  /** Open the login page using the baseUrl from the active environment config. */
+  async navigateToLogin() {
+    await this.navigate(envConfig.getBaseUrl());
+  }
+
+  async enterUsername(username) {
     await this.type(this.usernameField, username);
+    return this;
+  }
+
+  async enterPassword(password) {
     await this.type(this.passwordField, password);
+    return this;
+  }
+
+  async clickLogin() {
     await this.click(this.loginButton);
   }
 
-  async isErrorDisplayed() { return await this.isDisplayed(this.errorMessage); }
-  async isLoginSuccessful() { return (await this.getCurrentUrl()).includes("inventory"); }
+  async login(username, password) {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLogin();
+  }
+
+  async isUsernameVisible() {
+    return this.isVisible(this.usernameField);
+  }
+
+  async isPasswordVisible() {
+    return this.isVisible(this.passwordField);
+  }
+
+  async isErrorDisplayed() {
+    return this.isVisible(this.errorMessage);
+  }
+
+  async isLoginSuccessful() {
+    return (await this.getCurrentUrl()).includes("inventory");
+  }
 }
 
 module.exports = { LoginPage };

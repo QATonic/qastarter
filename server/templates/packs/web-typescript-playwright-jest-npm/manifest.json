@@ -74,14 +74,6 @@
       "isTemplate": true
     },
     {
-      "path": "utils/PlaywrightManager.ts",
-      "isTemplate": true
-    },
-    {
-      "path": "tests/login.spec.ts",
-      "isTemplate": true
-    },
-    {
       "path": ".circleci/config.yml",
       "isTemplate": true,
       "conditional": {
@@ -119,7 +111,10 @@
     },
     {
       "path": "cucumber.js",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     },
     {
       "path": "data/users.json",
@@ -185,11 +180,17 @@
     },
     {
       "path": "support/hooks.ts",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     },
     {
       "path": "support/world.ts",
-      "isTemplate": true
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     },
     {
       "path": "tests/login.test.ts",
@@ -216,10 +217,6 @@
     },
     {
       "path": "utils/screenshotHelper.ts",
-      "isTemplate": true
-    },
-    {
-      "path": "utils/ScreenshotUtils.ts",
       "isTemplate": true
     },
     {

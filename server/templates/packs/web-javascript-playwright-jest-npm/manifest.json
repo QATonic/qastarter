@@ -58,14 +58,6 @@
       "isTemplate": true
     },
     {
-      "path": "utils/PlaywrightManager.js",
-      "isTemplate": true
-    },
-    {
-      "path": "tests/login.spec.js",
-      "isTemplate": true
-    },
-    {
       "path": ".circleci/config.yml",
       "isTemplate": true,
       "conditional": {
@@ -191,10 +183,6 @@
     },
     {
       "path": "utils/screenshotHelper.js",
-      "isTemplate": true
-    },
-    {
-      "path": "utils/ScreenshotUtils.js",
       "isTemplate": true
     },
     {

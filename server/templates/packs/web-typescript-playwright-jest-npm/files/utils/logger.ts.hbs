@@ -26,3 +26,13 @@ class Logger {
 }
 
 export const log = new Logger();
+
+// Default export so `import log from './logger'` also works. The class
+// instance has `.info/.error/.step` methods — use them directly:
+//
+//     import { log } from './logger';   // preferred (named)
+//     log.info('message');
+//
+//     import log from './logger';       // also supported
+//     log.info('message');
+export default log;

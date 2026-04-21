@@ -1,55 +1,62 @@
 /**
- * Base Page - Parent class for all Playwright page objects.
+ * Base Page — parent class for all Playwright page objects.
+ *
+ * The `page` is injected via the constructor so tests can use the
+ * global `page` that jest-playwright-preset exposes:
+ *
+ *     const loginPage = new LoginPage(page);
  */
-import { Page, Locator } from "playwright";
-import { PlaywrightManager } from "../utils/PlaywrightManager";
-import { config } from "../config/ConfigReader";
+import { Page } from "playwright";
 
 export class BasePage {
-  protected page: Page;
-  protected timeout: number;
+  protected readonly page: Page;
+  protected readonly defaultTimeout = 30000;
 
-  constructor() {
-    // Note: Page should be initialized before page object creation
+  constructor(page: Page) {
+    this.page = page;
   }
 
-  protected async getPage(): Promise<Page> {
-    this.page = await PlaywrightManager.getPage();
-    this.timeout = config.timeout;
-    return this.page;
+  // ─── Navigation ──────────────────────────────────────────────────────
+
+  async navigate(url: string): Promise<void> {
+    await this.page.goto(url, { timeout: this.defaultTimeout });
   }
+
+  /** Alias for {@link navigate} — kept for compatibility with older callers. */
+  async navigateTo(url: string): Promise<void> {
+    await this.navigate(url);
+  }
+
+  async getCurrentUrl(): Promise<string> {
+    return this.page.url();
+  }
+
+  // ─── Interactions ────────────────────────────────────────────────────
 
   async click(selector: string): Promise<void> {
-    const page = await this.getPage();
-    await page.click(selector, { timeout: this.timeout });
+    await this.page.click(selector, { timeout: this.defaultTimeout });
   }
 
   async type(selector: string, text: string): Promise<void> {
-    const page = await this.getPage();
-    await page.fill(selector, text, { timeout: this.timeout });
+    await this.page.fill(selector, text, { timeout: this.defaultTimeout });
   }
 
   async getText(selector: string): Promise<string> {
-    const page = await this.getPage();
-    return (await page.textContent(selector, { timeout: this.timeout })) || "";
+    return (await this.page.textContent(selector, { timeout: this.defaultTimeout })) || "";
   }
 
-  async isDisplayed(selector: string): Promise<boolean> {
+  // ─── Visibility helpers ──────────────────────────────────────────────
+
+  async isVisible(selector: string): Promise<boolean> {
     try {
-      const page = await this.getPage();
-      return await page.isVisible(selector, { timeout: 5000 });
+      return await this.page.isVisible(selector, { timeout: 5000 });
     } catch {
       return false;
     }
   }
 
-  async getCurrentUrl(): Promise<string> {
-    const page = await this.getPage();
-    return page.url();
-  }
-
-  async navigateTo(url: string): Promise<void> {
-    const page = await this.getPage();
-    await page.goto(url);
+  /** Alias for {@link isVisible} — kept for compatibility with older callers. */
+  async isDisplayed(selector: string): Promise<boolean> {
+    return this.isVisible(selector);
   }
 }

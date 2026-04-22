@@ -7,7 +7,7 @@ export default class HomePage extends BasePage {
   readonly userProfile = 'id=com.example.app:id/userProfile';
   readonly logoutButton = 'id=com.example.app:id/logoutButton';
 
-  constructor(driver: Browser<'async'>) {
+  constructor(driver: WebdriverIO.Browser) {
     super(driver);
   }
 

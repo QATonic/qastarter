@@ -2,10 +2,10 @@ import { Browser } from 'webdriverio';
 import settings from '../../config/settings';
 
 export default class BasePage {
-  protected driver: Browser<'async'>;
+  protected driver: WebdriverIO.Browser;
   protected settings: typeof settings;
 
-  constructor(driver: Browser<'async'>) {
+  constructor(driver: WebdriverIO.Browser) {
     this.driver = driver;
     this.settings = settings;
   }

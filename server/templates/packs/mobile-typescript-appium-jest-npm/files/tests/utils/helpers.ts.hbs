@@ -8,7 +8,7 @@ export function loadJsonFile<T = TestData>(filePath: string): T {
   return JSON.parse(data) as T;
 }
 
-export async function saveScreenshot(driver: Browser<'async'>, name: string): Promise<string> {
+export async function saveScreenshot(driver: WebdriverIO.Browser, name: string): Promise<string> {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const screenshotPath = path.join('screenshots', `${name}_${timestamp}.png`);
   

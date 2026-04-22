@@ -1,52 +1,60 @@
 """
-Login Tests - SauceDemo Mobile app.
+Login Tests — SauceDemo mobile app.
 
 Run: pytest tests/ -v
 
-Demonstrates both configuration-based and data-driven testing.
+The `driver` fixture is provided by conftest.py at the project root.
 """
+import json
+from pathlib import Path
 import pytest
-from pages.login_page import LoginPage
-from utils.logger import log
-from utils.data_reader import DataReader
+from tests.pages.login_page import LoginPage
+
+
+_DATA_FILE = Path(__file__).resolve().parent.parent / "data" / "users.json"
+
+
+def _load_users():
+    if not _DATA_FILE.exists():
+        return []
+    return [
+        (u["username"], u["password"], u["expected"])
+        for u in json.loads(_DATA_FILE.read_text())
+    ]
 
 
 class TestLogin:
-VALID_USER = "standard_user"
-VALID_PASS = "secret_sauce"
+    VALID_USER = "standard_user"
+    VALID_PASS = "secret_sauce"
 
-@pytest.mark.smoke
-def test_valid_login(self, driver):
-"""Verify successful login with valid credentials."""
-log.step("Valid login test")
-login_page = LoginPage()
-login_page.login(self.VALID_USER, self.VALID_PASS)
-assert login_page.is_login_successful(), "Should navigate to Products"
-log.info("Valid login test passed")
+    @pytest.mark.smoke
+    def test_valid_login(self, driver):
+        """Verify successful login with valid credentials."""
+        login_page = LoginPage(driver)
+        login_page.login(self.VALID_USER, self.VALID_PASS)
+        assert login_page.is_login_successful(), "Should navigate to Products"
 
-@pytest.mark.regression
-def test_invalid_login(self, driver):
-"""Verify error message with invalid credentials."""
-log.step("Invalid login test")
-login_page = LoginPage()
-login_page.login("invalid_user", "wrong_password")
-assert login_page.is_error_displayed(), "Should show error message"
-log.info("Invalid login test passed")
+    @pytest.mark.regression
+    def test_invalid_login(self, driver):
+        """Verify error message with invalid credentials."""
+        login_page = LoginPage(driver)
+        login_page.login("invalid_user", "wrong_password")
+        assert login_page.is_error_displayed(), "Should show error message"
 
-{{#if utilities.dataProvider}}
-@pytest.mark.regression
-@pytest.mark.parametrize("username,password,expected", DataReader.read_csv("users.csv"))
-def test_login_with_csv_data(self, driver, username, password, expected):
-"""Data-driven login test using CSV file."""
-log.step(f"Data-driven login test for: {username}")
+    {{#if utilities.dataProvider}}
+    @pytest.mark.regression
+    @pytest.mark.parametrize("username,password,expected", _load_users())
+    def test_login_with_data(self, driver, username, password, expected):
+        """Data-driven login test using data/users.json."""
+        login_page = LoginPage(driver)
+        login_page.login(username, password)
 
-login_page = LoginPage()
-login_page.login(username, password)
-
-if expected == "success":
-assert login_page.is_login_successful(), f"Login should succeed for: {username}"
-else:
-assert login_page.is_error_displayed(), f"Error should display for: {username}"
-
-log.info(f"Data-driven test passed for: {username}")
-{{/if}}
+        if expected == "success":
+            assert login_page.is_login_successful(), (
+                f"Login should succeed for: {username}"
+            )
+        else:
+            assert login_page.is_error_displayed(), (
+                f"Error should display for: {username}"
+            )
+    {{/if}}

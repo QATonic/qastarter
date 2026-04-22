@@ -8,7 +8,7 @@ export default class LoginPage extends BasePage {
   readonly loginButton = 'id=com.example.app:id/loginButton';
   readonly errorMessage = 'id=com.example.app:id/errorMessage';
 
-  constructor(driver: Browser<'async'>) {
+  constructor(driver: WebdriverIO.Browser) {
     super(driver);
   }
 

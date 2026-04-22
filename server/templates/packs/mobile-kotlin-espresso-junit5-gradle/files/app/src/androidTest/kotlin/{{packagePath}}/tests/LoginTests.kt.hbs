@@ -6,10 +6,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import {{packageName}}.MainActivity
-import {{packageName}}.pages.LoginPage
+import {{packageName}}.screens.LoginScreen
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withText
 
 @RunWith(AndroidJUnit4::class)
 class LoginTests {
@@ -19,9 +20,9 @@ class LoginTests {
 
     @Test
     fun validLogin_showsProducts() {
-        val loginPage = LoginPage()
-        loginPage.login("standard_user", "secret_sauce")
-        
+        val loginScreen = LoginScreen()
+        loginScreen.login("standard_user", "secret_sauce")
+
         onView(withText("PRODUCTS")).check(matches(isDisplayed()))
     }
 }

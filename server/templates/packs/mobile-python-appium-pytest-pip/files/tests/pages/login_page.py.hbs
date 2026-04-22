@@ -43,3 +43,7 @@ class LoginPage(BasePage):
     def is_login_button_enabled(self):
         """Check if login button is enabled"""
         return self.is_enabled(self.LOGIN_BUTTON)
+
+    def is_login_successful(self):
+        """Heuristic — login succeeded if the login button is no longer visible."""
+        return not self.is_displayed(self.LOGIN_BUTTON, timeout=5)

@@ -1,6 +1,8 @@
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
-import { TestDataReader } from './utils/TestDataReader';
+{{#if utilities.dataProvider}}
+import { loadJsonFile } from './utils/helpers';
+{{/if}}
 
 interface UserTestData {
 username: string;
@@ -52,7 +54,7 @@ throw error;
 * Reads test data from data/users.json
 */
 describe('Data-driven login tests', () => {
-const testData = TestDataReader.readJson('users.json') as UserTestData[];
+const testData = loadJsonFile<UserTestData[]>('data/users.json');
 
 test.each(testData)(
 'should verify login for user: $username',

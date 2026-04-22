@@ -1,4 +1,4 @@
-import { remote, Browser } from 'webdriverio';
+import { remote } from 'webdriverio';
 import * as fs from 'fs';
 import * as path from 'path';
 import capabilities from '../config/capabilities';
@@ -6,49 +6,54 @@ import settings from '../config/settings';
 import { loadJsonFile } from './utils/helpers';
 import { TestData } from './types/testData';
 
-let driver: Browser<'async'>;
-  let testData: TestData;
+// Driver and testData are exposed on globalThis so page objects and tests
+// can access them without threading them through every fixture.
+let driver: WebdriverIO.Browser | undefined;
+let testData: TestData;
 
-  // Create necessary directories
-  beforeAll(() => {
-  ['logs', 'screenshots', 'reports'].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-  fs.mkdirSync(dir, { recursive: true });
+beforeAll(() => {
+  // Create runtime output directories if missing.
+  for (const dir of ['logs', 'screenshots', 'reports']) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
   }
-  });
 
-  // Load test data
+  // Load test data for the active environment.
   const dataFile = path.join('data', `${settings.testEnv}.json`);
   testData = loadJsonFile<TestData>(dataFile);
-    });
+});
 
-    beforeEach(async () => {
-    // Get capabilities based on platform
-    const caps = settings.platform.toLowerCase() === 'android'
-    ? capabilities.getAndroidCapabilities()
-    : capabilities.getIOSCapabilities();
+beforeEach(async () => {
+  // Pick capabilities by platform (android | ios).
+  const caps =
+    settings.platform.toLowerCase() === 'android'
+      ? capabilities.getAndroidCapabilities()
+      : capabilities.getIOSCapabilities();
 
-    // Create driver
-    driver = await remote({
+  const serverUrl = new URL(settings.appiumServer);
+  driver = await remote({
     protocol: 'http',
-    hostname: new URL(settings.appiumServer).hostname,
-    port: parseInt(new URL(settings.appiumServer).port) || 4723,
+    hostname: serverUrl.hostname,
+    port: parseInt(serverUrl.port, 10) || 4723,
     path: '/',
     capabilities: caps,
-    logLevel: 'error'
-    });
+    logLevel: 'error',
+  });
 
-    await driver.setImplicitTimeout(settings.implicitWait);
+  await driver.setImplicitTimeout(settings.implicitWait);
 
-    // Make driver and testData available globally
-    global.driver = driver;
-    global.testData = testData;
-    });
+  // Expose on globalThis for page objects + tests.
+  (global as unknown as { driver: WebdriverIO.Browser; testData: TestData }).driver = driver;
+  (global as unknown as { driver: WebdriverIO.Browser; testData: TestData }).testData = testData;
+});
 
-    if (driver) {
+afterEach(async () => {
+  if (driver) {
     await driver.deleteSession();
-    }
-    });
+    driver = undefined;
+  }
+});
 
-    // Configure retries
-    jest.retryTimes(2);
+// Retry flaky tests once.
+jest.retryTimes(2);

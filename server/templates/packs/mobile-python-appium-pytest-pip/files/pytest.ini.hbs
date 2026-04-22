@@ -4,14 +4,18 @@ python_files = test_*.py
 python_classes = Test*
 python_functions = test_*
 addopts =
--v
---tb=short
---strict-markers
---alluredir=allure-results
+    -v
+    --tb=short
+    --strict-markers
+{{#if (eq reportingTool "allure")}}
+    --alluredir=allure-results
+{{/if}}
 markers =
-regression: Regression tests
-ios: iOS specific tests
-android: Android specific tests
+    smoke: Smoke tests
+    regression: Regression tests
+    ios: iOS specific tests
+    android: Android specific tests
+
 log_cli = true
 log_cli_level = INFO
 log_file = logs/test.log

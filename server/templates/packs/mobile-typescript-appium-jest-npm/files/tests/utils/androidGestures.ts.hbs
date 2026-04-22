@@ -1,9 +1,9 @@
 import { Browser } from 'webdriverio';
 
 export default class AndroidGestures {
-  private driver: Browser<'async'>;
+  private driver: WebdriverIO.Browser;
 
-  constructor(driver: Browser<'async'>) {
+  constructor(driver: WebdriverIO.Browser) {
     this.driver = driver;
   }
 

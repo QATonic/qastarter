@@ -80,6 +80,14 @@ class ConfigurationReader:
     def timeout(self) -> int:
         return self.get_int("timeout", 30)
 
+    @property
+    def username(self) -> str:
+        return self.get("username", "")
+
+    @property
+    def password(self) -> str:
+        return self.get("password", "")
+
 
 # Singleton instance
 config = ConfigurationReader()

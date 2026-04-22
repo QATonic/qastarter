@@ -1,10 +1,15 @@
 """
-Pytest Fixtures for Playwright.
+Pytest fixtures for Playwright.
+
+The `page` fixture is provided by pytest-playwright automatically — each
+test gets a fresh Playwright Page instance with proper lifecycle
+management. This conftest only layers on session logging and a
+failure-screenshot hook.
 """
 import pytest
-from utils.playwright_manager import PlaywrightManager
+from playwright.sync_api import Page
 from utils.logger import log
-from utils.screenshot_utils import ScreenshotUtils
+from utils.screenshot_helper import ScreenshotHelper
 from config.config_reader import config
 {{#if (eq reportingTool "allure")}}
 import allure
@@ -13,7 +18,7 @@ import allure
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_session():
-    """Run once before all tests."""
+    """Session-wide setup / teardown."""
     log.info("=" * 60)
     log.info(" PLAYWRIGHT TEST SESSION STARTED")
     log.info("=" * 60)
@@ -21,23 +26,14 @@ def setup_session():
     log.info(" TEST SESSION COMPLETED")
 
 
-@pytest.fixture(scope="function")
-def page():
-    """Provides Playwright Page for each test."""
-    log.info("--- Test Setup ---")
-    PlaywrightManager.init_browser()
-    page = PlaywrightManager.get_page()
-    
-    # Navigate to base URL
+@pytest.fixture(scope="function", autouse=True)
+def navigate_to_base(page: Page):
+    """Navigate each test to the configured base URL before it runs."""
     base_url = config.base_url
     if base_url:
         page.goto(base_url)
         log.info(f"Navigated to: {base_url}")
-    
-    yield page
-    
-    log.info("--- Test Teardown ---")
-    PlaywrightManager.quit_browser()
+    yield
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -45,11 +41,10 @@ def pytest_runtest_makereport(item, call):
     """Capture screenshot on test failure."""
     outcome = yield
     report = outcome.get_result()
-    
+
     if report.when == "call" and report.failed:
         log.error(f"TEST FAILED: {item.name}")
-        
-        if PlaywrightManager.is_initialized():
-            screenshot_path = ScreenshotUtils.capture(f"FAILED_{item.name}")
-            if screenshot_path:
-                log.info(f"Screenshot saved: {screenshot_path}")
+        # `page` fixture may not be available if the failure is during setup.
+        page = item.funcargs.get("page")
+        if page is not None:
+            ScreenshotHelper.capture_on_failure(page, item.name)

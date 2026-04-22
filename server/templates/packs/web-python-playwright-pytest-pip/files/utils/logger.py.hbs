@@ -89,5 +89,7 @@ class Logger:
         self._logger.info("=" * 60)
 
 
-# Singleton instance
+# Singleton instance — importable as either `log` or `logger` for
+# compatibility with both naming conventions across the framework.
 log = Logger()
+logger = log

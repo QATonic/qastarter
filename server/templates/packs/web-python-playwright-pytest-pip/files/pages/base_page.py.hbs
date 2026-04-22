@@ -1,59 +1,63 @@
 """
 Base Page - Parent class for all Playwright page objects.
+
+The `page` fixture provided by pytest-playwright is injected via the
+constructor, so tests look like:
+
+    login_page = LoginPage(page)
+    login_page.navigate_to_login()
 """
 from playwright.sync_api import Page, Locator
-from utils.playwright_manager import PlaywrightManager
 from utils.logger import log
-from config.config_reader import config
 
 
 class BasePage:
-"""Base class for all page objects."""
+    """Base class for all page objects."""
 
-def __init__(self):
-self.page: Page = PlaywrightManager.get_page()
-self.timeout = config.timeout * 1000 # Playwright uses ms
+    def __init__(self, page: Page, default_timeout: int = 30000):
+        self.page: Page = page
+        self.timeout = default_timeout  # Playwright uses milliseconds
 
-def click(self, selector: str):
-"""Click an element."""
-log.action(f"Click: {selector}")
-self.page.click(selector, timeout=self.timeout)
+    def click(self, selector: str) -> None:
+        """Click an element."""
+        log.action(f"Click: {selector}")
+        self.page.click(selector, timeout=self.timeout)
 
-def type_text(self, selector: str, text: str):
-"""Type text into an element."""
-log.action(f"Type into: {selector}")
-self.page.fill(selector, text, timeout=self.timeout)
+    def type_text(self, selector: str, text: str) -> None:
+        """Type text into an element."""
+        log.action(f"Type into: {selector}")
+        self.page.fill(selector, text, timeout=self.timeout)
 
-def get_text(self, selector: str) -> str:
-"""Get text from an element."""
-return self.page.text_content(selector, timeout=self.timeout) or ""
+    def get_text(self, selector: str) -> str:
+        """Get text from an element."""
+        return self.page.text_content(selector, timeout=self.timeout) or ""
 
-def is_displayed(self, selector: str) -> bool:
-"""Check if element is visible."""
-try:
-return self.page.is_visible(selector, timeout=5000)
-except Exception:
-return False
+    def is_displayed(self, selector: str) -> bool:
+        """Check if element is visible."""
+        try:
+            return self.page.is_visible(selector, timeout=5000)
+        except Exception:
+            return False
 
-def wait_for_element(self, selector: str) -> Locator:
-"""Wait for element to be visible."""
-locator = self.page.locator(selector)
-locator.wait_for(state="visible", timeout=self.timeout)
-return locator
+    def wait_for_element(self, selector: str) -> Locator:
+        """Wait for element to be visible, return locator."""
+        locator = self.page.locator(selector)
+        locator.wait_for(state="visible", timeout=self.timeout)
+        return locator
 
-def get_title(self) -> str:
-"""Get page title."""
-return self.page.title()
+    def get_title(self) -> str:
+        """Get page title."""
+        return self.page.title()
 
-def get_current_url(self) -> str:
-"""Get current URL."""
-return self.page.url
+    def get_current_url(self) -> str:
+        """Get current URL."""
+        return self.page.url
 
-def navigate_to(self, url: str):
-"""Navigate to URL."""
-log.step(f"Navigating to: {url}")
-self.page.goto(url)
+    def navigate_to(self, url: str) -> None:
+        """Navigate to URL."""
+        log.step(f"Navigating to: {url}")
+        self.page.goto(url)
 
-def log_action(self, message: str):
-"""Log a page action."""
-log.step(f"[{self.__class__.__name__}] {message}")
+    def log_action(self, message: str) -> None:
+        """Log a page action."""
+        log.step(f"[{self.__class__.__name__}] {message}")

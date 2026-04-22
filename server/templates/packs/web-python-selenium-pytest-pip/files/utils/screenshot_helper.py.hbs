@@ -1,0 +1,34 @@
+"""
+Screenshot Helper - capture screenshots on demand / on test failure.
+"""
+from pathlib import Path
+from datetime import datetime
+from selenium.webdriver.remote.webdriver import WebDriver
+from utils.logger import log
+
+
+SCREENSHOT_DIR = Path("screenshots")
+
+
+class ScreenshotHelper:
+    """Screenshot capture utilities for Selenium."""
+
+    @staticmethod
+    def capture_screenshot(driver: WebDriver, name: str) -> str:
+        """Capture a screenshot and save to the `screenshots/` folder."""
+        SCREENSHOT_DIR.mkdir(exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_name = "".join(c if c.isalnum() or c in "_-" else "_" for c in name)
+        filepath = SCREENSHOT_DIR / f"{safe_name}_{timestamp}.png"
+        driver.save_screenshot(str(filepath))
+        log.info(f"Screenshot saved: {filepath}")
+        return str(filepath)
+
+    @staticmethod
+    def capture_on_failure(driver: WebDriver, test_name: str) -> str:
+        """Capture a screenshot labelled for a failing test."""
+        try:
+            return ScreenshotHelper.capture_screenshot(driver, f"FAILED_{test_name}")
+        except Exception as e:
+            log.error(f"Failed to capture screenshot: {e}")
+            return ""

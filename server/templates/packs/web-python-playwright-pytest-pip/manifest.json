@@ -86,15 +86,7 @@
       "isTemplate": false
     },
     {
-      "path": "utils/playwright_manager.py",
-      "isTemplate": true
-    },
-    {
       "path": "utils/logger.py",
-      "isTemplate": true
-    },
-    {
-      "path": "utils/screenshot_utils.py",
       "isTemplate": true
     },
     {

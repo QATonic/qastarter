@@ -115,10 +115,6 @@
       "isTemplate": false
     },
     {
-      "path": "config/config.py",
-      "isTemplate": true
-    },
-    {
       "path": "config/config_reader.py",
       "isTemplate": true
     },
@@ -128,10 +124,6 @@
     },
     {
       "path": "config/qa.ini",
-      "isTemplate": true
-    },
-    {
-      "path": "config/settings.py",
       "isTemplate": true
     },
     {
@@ -174,27 +166,7 @@
       "isTemplate": false
     },
     {
-      "path": "utils/driver_manager.py",
-      "isTemplate": true
-    },
-    {
-      "path": "utils/driver_factory.py",
-      "isTemplate": true
-    },
-    {
       "path": "utils/logger.py",
-      "isTemplate": true
-    },
-    {
-      "path": "utils/screenshot_utils.py",
-      "isTemplate": true
-    },
-    {
-      "path": "utils/wait_helpers.py",
-      "isTemplate": true
-    },
-    {
-      "path": "utils/web_actions.py",
       "isTemplate": true
     },
     {
@@ -238,10 +210,6 @@
       }
     },
     {
-      "path": "utils/screenshot_util.py",
-      "isTemplate": true
-    },
-    {
       "path": "utils/test_data_factory.py",
       "isTemplate": true,
       "conditional": {
@@ -261,6 +229,10 @@
       "conditional": {
         "cloudDeviceFarm": "saucelabs"
       }
+    },
+    {
+      "path": "utils/screenshot_helper.py",
+      "isTemplate": true
     }
   ],
   "directories": [

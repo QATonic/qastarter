@@ -9,16 +9,27 @@ HOW TO CUSTOMIZE:
 """
 from selenium.webdriver.common.by import By
 from pages.base_page import BasePage
+from config.config_reader import config
 
 
 class LoginPage(BasePage):
     """Login page object for SauceDemo."""
-    
+
     # Locators (SauceDemo)
     USERNAME_FIELD = (By.ID, "user-name")
     PASSWORD_FIELD = (By.ID, "password")
     LOGIN_BUTTON = (By.ID, "login-button")
     ERROR_MESSAGE = (By.CSS_SELECTOR, "[data-test='error']")
+
+    def navigate_to_login(self) -> None:
+        """Open the login page using the baseUrl from the active config."""
+        self.navigate_to(config.base_url)
+
+    def is_username_visible(self) -> bool:
+        return self.is_displayed(self.USERNAME_FIELD)
+
+    def is_password_visible(self) -> bool:
+        return self.is_displayed(self.PASSWORD_FIELD)
     
     def enter_username(self, username: str) -> "LoginPage":
         """Enter username."""

@@ -30,10 +30,7 @@
   },
   "toolVersions": {
     "java": "11",
-    "gradle": "8.5",
-    "selenium": "4.16.0",
-    "junit5": "5.10.1",
-    "cucumber": "7.15.0"
+    "gradle": "8.5"
   },
   "files": [
     {

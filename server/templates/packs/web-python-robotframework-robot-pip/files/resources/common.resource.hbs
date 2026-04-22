@@ -1,29 +1,45 @@
 *** Settings ***
-Library SeleniumLibrary
-Library Collections
-Library String
+Documentation    Common setup, variables, and keywords shared across all suites.
+Library          SeleniumLibrary
+Library          Collections
+Library          String
 
 *** Variables ***
-${BROWSER} chrome
-${BASE_URL} {{baseUrl}}
-${TIMEOUT} 30s
-${USERNAME} {{testUsername}}
-${PASSWORD} {{testPassword}}
+${BROWSER}           chrome
+${BASE_URL}          {{baseUrl}}
+${TIMEOUT}           30s
+${USERNAME}          {{testUsername}}
+${PASSWORD}          {{testPassword}}
 
-# Locators
-${USERNAME_FIELD} id:user-name
-${PASSWORD_FIELD} id:password
-${LOGIN_BUTTON} id:login-button
-${ERROR_MESSAGE} css:[data-test='error']
+# Locators (SauceDemo defaults — update for your app)
+${USERNAME_FIELD}    id:user-name
+${PASSWORD_FIELD}    id:password
+${LOGIN_BUTTON}      id:login-button
+${ERROR_MESSAGE}     css:[data-test='error']
 
 *** Keywords ***
 Open Browser To Login Page
-Open Browser ${BASE_URL} ${BROWSER}
-Maximize Browser Window
-Set Selenium Implicit Wait ${TIMEOUT}
+    [Documentation]    Open a browser on the configured BASE_URL.
+    Open Browser                    ${BASE_URL}    ${BROWSER}
+    Maximize Browser Window
+    Set Selenium Implicit Wait      ${TIMEOUT}
 
 Close Browser Session
-Close Browser
+    [Documentation]    Close the Selenium browser.
+    Close Browser
 
 Take Screenshot On Failure
-Run Keyword If Test Failed Capture Page Screenshot
+    [Documentation]    Capture a screenshot if the just-finished test failed.
+    Run Keyword If Test Failed      Capture Page Screenshot
+
+Wait And Input Text
+    [Documentation]    Wait for an input to be visible, then type into it.
+    [Arguments]    ${locator}    ${text}
+    Wait Until Element Is Visible    ${locator}    ${TIMEOUT}
+    Input Text                       ${locator}    ${text}
+
+Wait And Click Element
+    [Documentation]    Wait for an element to be visible, then click it.
+    [Arguments]    ${locator}
+    Wait Until Element Is Visible    ${locator}    ${TIMEOUT}
+    Click Element                    ${locator}

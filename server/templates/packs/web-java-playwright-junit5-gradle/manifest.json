@@ -29,10 +29,7 @@
   },
   "toolVersions": {
     "java": "11",
-    "gradle": "8.5",
-    "playwright": "1.40.0",
-    "junit5": "5.10.1",
-    "cucumber": "7.15.0"
+    "gradle": "8.5"
   },
   "files": [
     {

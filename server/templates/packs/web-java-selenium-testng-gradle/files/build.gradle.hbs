@@ -53,8 +53,12 @@ threadCount = project.hasProperty('threadCount') ? project.property('threadCount
 }
 
 dependencies {
-// Selenium WebDriver
-implementation "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
+// Selenium WebDriver — via BOM so transitive devtools-v* artifacts resolve
+// to the matching published version. See build.gradle in the junit5 sibling
+// for why this matters (4.16.0 shipped a devtools-v119 dep that was never
+// published at 4.16.0 — BOM + current Selenium avoids that class of break).
+implementation platform("org.seleniumhq.selenium:selenium-bom:${seleniumVersion}")
+implementation "org.seleniumhq.selenium:selenium-java"
 
 // TestNG — used in src/main/java (BaseTest), must be on the compile classpath.
 implementation "org.testng:testng:${testngVersion}"

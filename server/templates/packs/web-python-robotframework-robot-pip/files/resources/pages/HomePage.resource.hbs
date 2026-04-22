@@ -1,33 +1,36 @@
 *** Settings ***
-Documentation Home Page Keywords
-Resource ../common.resource
+Documentation    Home Page keywords.
+Resource         ../common.resource
 
 *** Variables ***
-${HOME_URL} ${BASE_URL}/
-${NAV_MENU} id=navigation
-${USER_PROFILE} css=.user-profile
-${LOGOUT_BUTTON} id=logout-button
-${SEARCH_INPUT} id=search-input
-${SEARCH_BUTTON} id=search-button
+${HOME_URL}         ${BASE_URL}/
+${NAV_MENU}         id:navigation
+${USER_PROFILE}     css:.user-profile
+${LOGOUT_BUTTON}    id:logout-button
+${SEARCH_INPUT}     id:search-input
+${SEARCH_BUTTON}    id:search-button
 
 *** Keywords ***
 Navigate To Home Page
-Go To ${HOME_URL}
-Wait Until Element Is Visible ${NAV_MENU}
+    [Documentation]    Open the home page and wait for the nav menu.
+    Go To                           ${HOME_URL}
+    Wait Until Element Is Visible    ${NAV_MENU}    ${TIMEOUT}
 
 Verify User Is Logged In
-Wait Until Element Is Visible ${USER_PROFILE}
-Element Should Be Visible ${LOGOUT_BUTTON}
+    [Documentation]    Assert that the user profile + logout button are visible.
+    Wait Until Element Is Visible    ${USER_PROFILE}     ${TIMEOUT}
+    Element Should Be Visible        ${LOGOUT_BUTTON}
 
 Click Logout
-Wait And Click Element ${LOGOUT_BUTTON}
-Wait Until Element Is Not Visible ${USER_PROFILE}
+    [Documentation]    Log the user out and wait for the profile to disappear.
+    Wait And Click Element           ${LOGOUT_BUTTON}
+    Wait Until Element Is Not Visible    ${USER_PROFILE}    ${TIMEOUT}
 
 Search For
-[Arguments] ${search_term}
-Wait And Input Text ${SEARCH_INPUT} ${search_term}
-Wait And Click Element ${SEARCH_BUTTON}
+    [Arguments]    ${search_term}
+    Wait And Input Text    ${SEARCH_INPUT}    ${search_term}
+    Wait And Click Element    ${SEARCH_BUTTON}
 
 Verify Navigation Menu Is Visible
-Wait Until Element Is Visible ${NAV_MENU}
-Element Should Be Visible ${NAV_MENU}
+    Wait Until Element Is Visible    ${NAV_MENU}    ${TIMEOUT}
+    Element Should Be Visible        ${NAV_MENU}

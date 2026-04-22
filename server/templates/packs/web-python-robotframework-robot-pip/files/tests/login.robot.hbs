@@ -1,40 +1,68 @@
 *** Settings ***
-Documentation Login Test Cases for SauceDemo
-... Demonstrates configuration-based and data-driven testing
-Resource ../resources/common.resource
-Test Setup Open Browser To Login Page
-Test Teardown Close Browser Session
+Documentation      Login test suite for {{projectName}}.
+...                Covers smoke + negative + data-driven scenarios.
+Resource           ../resources/common.resource
+Resource           ../resources/pages/LoginPage.resource
+Resource           ../resources/pages/HomePage.resource
+Suite Setup        Open Browser To Login Page
+Suite Teardown     Close Browser Session
+Test Teardown      Take Screenshot On Failure
+
+Force Tags         login
 
 *** Test Cases ***
 Valid Login Should Redirect To Inventory
-[Documentation] Verify successful login with valid credentials
-[Tags] smoke login
-Login With Credentials ${USERNAME} ${PASSWORD}
-Verify Login Success
+    [Documentation]    Happy path — valid credentials land on the inventory page.
+    [Tags]             smoke
+    Navigate To Login Page
+    Login With Credentials    ${USERNAME}    ${PASSWORD}
+    Verify Successful Login
 
 Invalid Login Should Show Error
-[Documentation] Verify error message with invalid credentials
-[Tags] regression login
-Login With Credentials invalid_user wrong_password
-Verify Error Message Displayed
+    [Documentation]    Wrong credentials surface the error banner.
+    [Tags]             regression    negative
+    Navigate To Login Page
+    Login With Credentials    invalid_user    wrong_password
+    Wait Until Element Is Visible    ${ERROR_MESSAGE}    ${TIMEOUT}
+    Element Should Be Visible        ${ERROR_MESSAGE}
 
-Data-Driven Login Test With CSV
-[Documentation] Data-driven test using CSV test data
-[Tags] regression data-driven
-[Template] Verify Login With Test Data
-FOR ${user} IN @{LOGIN_TEST_DATA}
-${user}[username] ${user}[password] ${user}[expected]
-END
+Empty Username Should Show Error
+    [Documentation]    Empty username surfaces the error banner.
+    [Tags]             regression    negative
+    Navigate To Login Page
+    Login With Credentials    ${EMPTY}    ${PASSWORD}
+    Wait Until Element Is Visible    ${ERROR_MESSAGE}    ${TIMEOUT}
+    Element Should Be Visible        ${ERROR_MESSAGE}
+
+Empty Password Should Show Error
+    [Documentation]    Empty password surfaces the error banner.
+    [Tags]             regression    negative
+    Navigate To Login Page
+    Login With Credentials    ${USERNAME}    ${EMPTY}
+    Wait Until Element Is Visible    ${ERROR_MESSAGE}    ${TIMEOUT}
+    Element Should Be Visible        ${ERROR_MESSAGE}
+
+{{#if utilities.dataProvider}}
+Data-Driven Login Scenarios
+    [Documentation]    Drive the login flow from a list of scenarios.
+    [Tags]             regression    data-driven
+    [Template]         Verify Login Outcome
+    ${USERNAME}       ${PASSWORD}         success
+    invalid_user      ${PASSWORD}         failure
+    ${USERNAME}       wrong_password      failure
+    ${EMPTY}          ${PASSWORD}         failure
+    ${USERNAME}       ${EMPTY}            failure
+{{/if}}
 
 *** Keywords ***
-Verify Login With Test Data
-[Documentation] Reusable keyword for data-driven login testing
-[Arguments] ${username} ${password} ${expected}
-Open Browser To Login Page
-Login With Credentials ${username} ${password}
-IF '${expected}' == 'success'
-Verify Login Success
-ELSE
-Verify Error Message Displayed
-END
-Close Browser Session
+Verify Login Outcome
+    [Documentation]    Helper for the Data-Driven scenarios above.
+    [Arguments]    ${username}    ${password}    ${expected}
+    Navigate To Login Page
+    Login With Credentials    ${username}    ${password}
+    IF    '${expected}' == 'success'
+        Verify Successful Login
+    ELSE
+        Wait Until Element Is Visible    ${ERROR_MESSAGE}    ${TIMEOUT}
+        Element Should Be Visible        ${ERROR_MESSAGE}
+    END

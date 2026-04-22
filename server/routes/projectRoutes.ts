@@ -409,9 +409,17 @@ router.get(
       testingPattern = 'page-object-model',
       cicdTool,
       reportingTool,
+      cloudDeviceFarm: cloudDeviceFarmParam,
       includeSampleTests = 'true',
       utilities: utilitiesParam,
     } = req.query as Record<string, string>;
+
+    // Narrow cloudDeviceFarm to the allowed set so a caller can't pass an
+    // unknown value through and have the template engine trip on it later.
+    const validCloudFarms = ['none', 'browserstack', 'saucelabs'] as const;
+    const cloudDeviceFarm = validCloudFarms.includes(cloudDeviceFarmParam as (typeof validCloudFarms)[number])
+      ? cloudDeviceFarmParam
+      : undefined;
 
     const validTestingTypes = ['web', 'mobile', 'api', 'desktop', 'performance'] as const;
     type TestingType = (typeof validTestingTypes)[number];
@@ -451,6 +459,7 @@ router.get(
       testingPattern,
       cicdTool: cicdTool || undefined,
       reportingTool: reportingTool || undefined,
+      cloudDeviceFarm: cloudDeviceFarm || undefined,
       utilities,
       includeSampleTests: includeSampleTests !== 'false',
     };

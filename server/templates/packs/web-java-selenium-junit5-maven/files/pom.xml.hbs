@@ -134,6 +134,19 @@
             <artifactId>commons-csv</artifactId>
             <version>${commons-csv.version}</version>
         </dependency>
+        {{#if (eq cloudDeviceFarm "browserstack")}}
+
+        <!-- BrowserStack SDK — auto-instruments Selenium tests to run on
+             BrowserStack's cloud based on config/browserstack.yml. Set
+             BROWSERSTACK_USERNAME + BROWSERSTACK_ACCESS_KEY before running.
+             No Java code changes required. See README for setup. -->
+        <dependency>
+            <groupId>com.browserstack</groupId>
+            <artifactId>browserstack-java-sdk</artifactId>
+            <version>1.25.0</version>
+            <scope>compile</scope>
+        </dependency>
+        {{/if}}
         {{#if userDependencies.hasMaven}}
 
         <!-- User-picked dependencies (from QAStarter dependency search) -->

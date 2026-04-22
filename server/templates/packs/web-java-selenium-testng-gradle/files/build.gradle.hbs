@@ -94,6 +94,14 @@ implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}
 
 // CSV Processing
 implementation "org.apache.commons:commons-csv:${commonsCsvVersion}"
+{{#if (eq cloudDeviceFarm "browserstack")}}
+
+// BrowserStack SDK — auto-instruments Selenium tests to run on
+// BrowserStack's cloud based on config/browserstack.yml. Set
+// BROWSERSTACK_USERNAME + BROWSERSTACK_ACCESS_KEY env vars before running.
+// No Java code changes required. See README for setup.
+implementation 'com.browserstack:browserstack-java-sdk:1.25.0'
+{{/if}}
 {{#if userDependencies.hasMaven}}
 
 // User-picked dependencies (from QAStarter dependency search)

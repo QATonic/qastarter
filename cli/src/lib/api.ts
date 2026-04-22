@@ -11,6 +11,13 @@ export interface GenerateOptions {
   testingPattern?: string;
   cicdTool?: string;
   reportingTool?: string;
+  /**
+   * Cloud device farm to wire into the generated project. When set to
+   * `browserstack` or `saucelabs` the pack emits its cloud config file +
+   * updates the driver factory. `none` (the default) produces a
+   * purely-local project.
+   */
+  cloudDeviceFarm?: 'none' | 'browserstack' | 'saucelabs';
   utilities?: string[];
   includeSampleTests?: boolean;
 }
@@ -236,6 +243,9 @@ export async function generateProjectBuffer(options: GenerateOptions): Promise<{
   if (options.testingPattern) params.set('testingPattern', options.testingPattern);
   if (options.cicdTool) params.set('cicdTool', options.cicdTool);
   if (options.reportingTool) params.set('reportingTool', options.reportingTool);
+  if (options.cloudDeviceFarm && options.cloudDeviceFarm !== 'none') {
+    params.set('cloudDeviceFarm', options.cloudDeviceFarm);
+  }
   if (options.utilities && options.utilities.length > 0) {
     params.set('utilities', options.utilities.join(','));
   }
@@ -369,6 +379,9 @@ export async function generateProject(
   if (options.testingPattern) params.set('testingPattern', options.testingPattern);
   if (options.cicdTool) params.set('cicdTool', options.cicdTool);
   if (options.reportingTool) params.set('reportingTool', options.reportingTool);
+  if (options.cloudDeviceFarm && options.cloudDeviceFarm !== 'none') {
+    params.set('cloudDeviceFarm', options.cloudDeviceFarm);
+  }
   if (options.utilities && options.utilities.length > 0) {
     params.set('utilities', options.utilities.join(','));
   }

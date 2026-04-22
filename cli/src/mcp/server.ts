@@ -120,6 +120,13 @@ function toGenerateOptions(args: Record<string, unknown> | undefined): GenerateO
     testingPattern: typeof a.testingPattern === 'string' ? a.testingPattern : undefined,
     cicdTool: typeof a.cicdTool === 'string' ? a.cicdTool : undefined,
     reportingTool: typeof a.reportingTool === 'string' ? a.reportingTool : undefined,
+    cloudDeviceFarm:
+      typeof a.cloudDeviceFarm === 'string' &&
+      (['none', 'browserstack', 'saucelabs'] as const).includes(
+        a.cloudDeviceFarm as 'none' | 'browserstack' | 'saucelabs'
+      )
+        ? (a.cloudDeviceFarm as 'none' | 'browserstack' | 'saucelabs')
+        : undefined,
     utilities: Array.isArray(a.utilities) ? (a.utilities as unknown[]).map(String) : undefined,
     includeSampleTests:
       typeof a.includeSampleTests === 'boolean' ? a.includeSampleTests : undefined,
@@ -307,6 +314,15 @@ const PROJECT_CONFIG_PROPS = {
   reportingTool: {
     type: 'string',
     description: 'Optional: allure, extent-reports, mocha-awesome, pytest-html.',
+  },
+  cloudDeviceFarm: {
+    type: 'string',
+    enum: ['none', 'browserstack', 'saucelabs'],
+    description:
+      'Optional cloud device farm to wire into the generated project. ' +
+      '`browserstack` or `saucelabs` emits the provider config file + updates ' +
+      'the driver factory to read BROWSERSTACK_USERNAME / SAUCE_USERNAME etc. ' +
+      'from the environment. Default: `none` (local execution only).',
   },
   utilities: {
     type: 'array',

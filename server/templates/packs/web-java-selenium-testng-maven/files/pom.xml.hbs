@@ -126,6 +126,31 @@
             <artifactId>commons-csv</artifactId>
             <version>${commons-csv.version}</version>
         </dependency>
+        {{#if (eq cloudDeviceFarm "browserstack")}}
+
+        <!-- BrowserStack SDK — auto-instruments Selenium tests to run on
+             BrowserStack's cloud based on config/browserstack.yml. Set
+             BROWSERSTACK_USERNAME + BROWSERSTACK_ACCESS_KEY env vars
+             (or pass via -Dbrowserstack.username / -Dbrowserstack.accessKey)
+             before running. No Java code changes required. -->
+        <dependency>
+            <groupId>com.browserstack</groupId>
+            <artifactId>browserstack-java-sdk</artifactId>
+            <version>1.25.0</version>
+            <scope>compile</scope>
+        </dependency>
+        {{/if}}
+        {{#if (eq cloudDeviceFarm "saucelabs")}}
+
+        <!-- Sauce Labs JUnit5 / TestNG reporting bridge. Tests must use
+             `RemoteWebDriver(new URL("https://ondemand.saucelabs.com/wd/hub"), caps)`
+             with SAUCE_USERNAME + SAUCE_ACCESS_KEY env vars. -->
+        <dependency>
+            <groupId>com.saucelabs</groupId>
+            <artifactId>sauce_testng</artifactId>
+            <version>2.1.25</version>
+        </dependency>
+        {{/if}}
         {{#if userDependencies.hasMaven}}
 
         <!-- User-picked dependencies (from QAStarter dependency search) -->

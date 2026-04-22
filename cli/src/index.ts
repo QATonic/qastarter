@@ -43,6 +43,7 @@ program
   .option('-p, --pattern <pattern>', 'Testing pattern (page-object-model, bdd, fluent)')
   .option('-c, --cicd <tool>', 'CI/CD tool (github-actions, gitlab-ci, azure-devops, etc.)')
   .option('--reporting <tool>', 'Reporting tool (allure, extent-reports, etc.)')
+  .option('--cloud <farm>', 'Cloud device farm (browserstack, saucelabs, none)', 'none')
   .option('-u, --utilities <list>', 'Utilities (comma-separated)')
   .option('--no-samples', 'Exclude sample tests')
   .option('-o, --output <path>', 'Output directory', '.')
@@ -71,6 +72,10 @@ program
           testingPattern: options.pattern || 'page-object-model',
           cicdTool: options.cicd,
           reportingTool: options.reporting,
+          cloudDeviceFarm:
+            options.cloud && ['browserstack', 'saucelabs', 'none'].includes(options.cloud)
+              ? (options.cloud as 'browserstack' | 'saucelabs' | 'none')
+              : undefined,
           utilities: options.utilities ? options.utilities.split(',') : undefined,
           includeSampleTests: options.samples !== false,
         };

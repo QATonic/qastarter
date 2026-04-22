@@ -1,17 +1,36 @@
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from core.winappdriver_manager import WinAppDriverManager
 from utils.logger import log
 
 
 class BasePage:
-    def __init__(self):
-        self.driver = WinAppDriverManager.get_driver()
-        self.wait = WebDriverWait(self.driver, 10)
-    
+    """Parent class for all WinAppDriver page objects.
+
+    The `driver` fixture provided by conftest.py is injected via the
+    constructor — tests instantiate pages as `CalculatorPage(driver)`.
+    """
+
+    def __init__(self, driver, timeout: int = 10):
+        self.driver = driver
+        self.wait = WebDriverWait(driver, timeout)
+
     def click(self, locator):
         log.info(f"Click: {locator}")
         self.wait.until(EC.element_to_be_clickable(locator)).click()
-    
+
     def get_text(self, locator):
         return self.wait.until(EC.visibility_of_element_located(locator)).text
+
+    def send_keys(self, locator, text: str):
+        element = self.wait.until(EC.visibility_of_element_located(locator))
+        element.clear()
+        element.send_keys(text)
+
+    def is_displayed(self, locator, timeout: int = 5) -> bool:
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                EC.visibility_of_element_located(locator)
+            )
+            return True
+        except Exception:
+            return False

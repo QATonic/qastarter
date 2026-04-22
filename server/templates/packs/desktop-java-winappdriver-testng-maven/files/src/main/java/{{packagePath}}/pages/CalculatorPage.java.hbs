@@ -57,4 +57,13 @@ public class CalculatorPage extends BasePage {
         clickEquals();
         return this;
     }
+
+    public CalculatorPage subtract(int a, int b) {
+        Log.step("Calculate: " + a + " - " + b);
+        clickNumber(a);
+        clickMinus();
+        clickNumber(b);
+        clickEquals();
+        return this;
+    }
 }

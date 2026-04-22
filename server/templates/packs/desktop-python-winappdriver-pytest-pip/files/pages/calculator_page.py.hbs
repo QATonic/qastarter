@@ -1,17 +1,20 @@
 from selenium.webdriver.common.by import By
+from appium.webdriver.common.appiumby import AppiumBy
 from pages.base_page import BasePage
 from utils.logger import log
 
 
 class CalculatorPage(BasePage):
+    # WinAppDriver locators. `AppiumBy.ACCESSIBILITY_ID` maps to the UIA
+    # `AutomationId` attribute — Selenium's `By` class does not have it.
     BUTTON_ONE = (By.NAME, "One")
     BUTTON_TWO = (By.NAME, "Two")
     BUTTON_THREE = (By.NAME, "Three")
     BUTTON_PLUS = (By.NAME, "Plus")
-    BUTTON_MINUS = (By.ACCESSIBILITY_ID, "minusButton")
+    BUTTON_MINUS = (AppiumBy.ACCESSIBILITY_ID, "minusButton")
     BUTTON_EQUALS = (By.NAME, "Equals")
-    BUTTON_CLEAR = (By.ACCESSIBILITY_ID, "clearButton")
-    RESULT_DISPLAY = (By.ACCESSIBILITY_ID, "CalculatorResults")
+    BUTTON_CLEAR = (AppiumBy.ACCESSIBILITY_ID, "clearButton")
+    RESULT_DISPLAY = (AppiumBy.ACCESSIBILITY_ID, "CalculatorResults")
 
     def click_number(self, number: int):
         button = (By.NAME, str(number) if number > 3 else ["One", "Two", "Three"][number-1])

@@ -493,4 +493,19 @@ public class NotepadPage extends BasePage {
         Log.info("Cursor position information not available in basic implementation");
         return null;
     }
+
+    /**
+     * Press Escape — typically to dismiss dialogs or close a menu.
+     */
+    public NotepadPage pressEscape() {
+        Log.step("Press Escape");
+        try {
+            {{groupId}}.core.DriverManager.getDriver()
+                .findElement(textEditor)
+                .sendKeys(org.openqa.selenium.Keys.ESCAPE);
+        } catch (Exception e) {
+            Log.warn("pressEscape failed: " + e.getMessage());
+        }
+        return this;
+    }
 }

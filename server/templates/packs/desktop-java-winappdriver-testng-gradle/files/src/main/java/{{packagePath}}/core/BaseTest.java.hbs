@@ -4,20 +4,55 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import {{javaPackage}}.utils.Log;
 
+/**
+ * Base Test - driver lifecycle + convenience log helpers for all subclasses.
+ */
 public class BaseTest {
 
-@BeforeMethod
-public void setup() {
-Log.info("========================================");
-Log.info("Desktop Test Started");
-String appPath = {{javaPackage}}.config.ConfigurationReader.getDefaultApplication();
-DriverManager.initializeDriver(appPath);
-}
+    @BeforeMethod
+    public void setup() {
+        Log.info("========================================");
+        Log.info("Desktop Test Started");
+        String appPath = {{javaPackage}}.config.ConfigurationReader.getDefaultApplication();
+        DriverManager.initializeDriver(appPath);
+    }
 
-@AfterMethod
-public void teardown() {
-DriverManager.quitDriver();
-Log.info("Desktop Test Completed");
-Log.info("========================================");
-}
+    @AfterMethod
+    public void teardown() {
+        DriverManager.quitDriver();
+        Log.info("Desktop Test Completed");
+        Log.info("========================================");
+    }
+
+    // -------------------------------------------------------------------
+    // Log helpers — shadow the common `logXxx` naming used in subclasses
+    // so tests read naturally (`logInfo("step done")`).
+    // -------------------------------------------------------------------
+
+    protected void logInfo(String message) { Log.info(message); }
+    protected void logDebug(String message) { Log.debug(message); }
+    protected void logWarn(String message) { Log.warn(message); }
+    protected void logWarning(String message) { Log.warn(message); }
+    protected void logError(String message) { Log.error(message); }
+    protected void logError(String message, Throwable t) { Log.error(message, t); }
+    protected void logStep(String message) { Log.step(message); }
+    protected void logPass(String message) { Log.info("PASS: " + message); }
+    protected void logFail(String message) { Log.error("FAIL: " + message); }
+
+    /**
+     * Capture a screenshot with the given name — best-effort, swallows
+     * any exceptions so a bad screenshot never fails a test.
+     */
+    /**
+     * Capture a screenshot and return the saved path (or null if it failed —
+     * best-effort, never throws). Returns String so callers can Assert.assertNotNull.
+     */
+    protected String captureScreenshot(String name) {
+        try {
+            return {{javaPackage}}.utils.ScreenshotUtils.captureScreenshot(name);
+        } catch (Throwable t) {
+            Log.warn("captureScreenshot failed for '" + name + "': " + t.getMessage());
+            return null;
+        }
+    }
 }

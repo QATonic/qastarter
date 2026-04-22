@@ -4,56 +4,62 @@ from utils.logger import log
 
 
 class TestCalculator:
-"""Calculator Tests - Windows Calculator app."""
+    """Calculator Tests - Windows Calculator app."""
 
-@pytest.mark.smoke
-def test_addition(self, driver):
-"""Test basic addition: 2 + 3 = 5."""
-log.step("Test addition: 2 + 3 = 5")
-calc = CalculatorPage()
-calc.add(2, 3)
-result = calc.get_result()
-assert "5" in result
+    @pytest.mark.smoke
+    def test_addition(self, driver):
+        """Test basic addition: 2 + 3 = 5."""
+        log.step("Test addition: 2 + 3 = 5")
+        calc = CalculatorPage(driver)
+        calc.add(2, 3)
+        result = calc.get_result()
+        assert "5" in result
 
-@pytest.mark.regression
-def test_subtraction(self, driver):
-"""Test basic subtraction: 5 - 3 = 2."""
-log.step("Test subtraction: 5 - 3 = 2")
-calc = CalculatorPage()
-calc.subtract(5, 3)
-result = calc.get_result()
-assert "2" in result
+    @pytest.mark.regression
+    def test_subtraction(self, driver):
+        """Test basic subtraction: 5 - 3 = 2."""
+        log.step("Test subtraction: 5 - 3 = 2")
+        calc = CalculatorPage(driver)
+        calc.subtract(5, 3)
+        result = calc.get_result()
+        assert "2" in result
 
-# ===== DATA-DRIVEN TESTS =====
+    # ===== DATA-DRIVEN TESTS =====
 
-@pytest.mark.regression
-@pytest.mark.parametrize("num1,num2,expected", [
-(1, 1, 2),
-(5, 5, 10),
-(10, 20, 30),
-(0, 0, 0),
-(99, 1, 100),
-])
-def test_addition_data_driven(self, driver, num1, num2, expected):
-"""Data-driven addition test."""
-log.step(f"Data-driven test: {num1} + {num2} = {expected}")
-calc = CalculatorPage()
-calc.clear()
-calc.add(num1, num2)
-result = calc.get_result()
-assert str(expected) in result
+    @pytest.mark.regression
+    @pytest.mark.parametrize(
+        "num1,num2,expected",
+        [
+            (1, 1, 2),
+            (5, 5, 10),
+            (10, 20, 30),
+            (0, 0, 0),
+            (99, 1, 100),
+        ],
+    )
+    def test_addition_data_driven(self, driver, num1, num2, expected):
+        """Data-driven addition test."""
+        log.step(f"Data-driven test: {num1} + {num2} = {expected}")
+        calc = CalculatorPage(driver)
+        calc.clear()
+        calc.add(num1, num2)
+        result = calc.get_result()
+        assert str(expected) in result
 
-@pytest.mark.regression
-@pytest.mark.parametrize("num1,num2,expected", [
-(5, 3, 2),
-(10, 5, 5),
-(100, 50, 50),
-])
-def test_subtraction_data_driven(self, driver, num1, num2, expected):
-"""Data-driven subtraction test."""
-log.step(f"Data-driven test: {num1} - {num2} = {expected}")
-calc = CalculatorPage()
-calc.clear()
-calc.subtract(num1, num2)
-result = calc.get_result()
-assert str(expected) in result
+    @pytest.mark.regression
+    @pytest.mark.parametrize(
+        "num1,num2,expected",
+        [
+            (5, 3, 2),
+            (10, 5, 5),
+            (100, 50, 50),
+        ],
+    )
+    def test_subtraction_data_driven(self, driver, num1, num2, expected):
+        """Data-driven subtraction test."""
+        log.step(f"Data-driven test: {num1} - {num2} = {expected}")
+        calc = CalculatorPage(driver)
+        calc.clear()
+        calc.subtract(num1, num2)
+        result = calc.get_result()
+        assert str(expected) in result

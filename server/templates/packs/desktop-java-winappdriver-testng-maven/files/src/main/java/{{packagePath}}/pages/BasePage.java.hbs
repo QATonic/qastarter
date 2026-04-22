@@ -82,7 +82,7 @@ public class BasePage {
     }
 
     /** Returns true once isPageLoaded() succeeds or the implicit wait elapses. */
-    protected boolean waitForPageToLoad() {
+    public boolean waitForPageToLoad() {
         try {
             long deadline = System.currentTimeMillis() + Duration.ofSeconds(ConfigurationReader.getImplicitWait()).toMillis();
             while (System.currentTimeMillis() < deadline) {

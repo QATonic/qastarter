@@ -92,11 +92,6 @@
       "description": "Example Calculator page object"
     },
     {
-      "path": "pages/notepad_page.py",
-      "isTemplate": true,
-      "description": "Example Notepad page object"
-    },
-    {
       "path": "pages/__init__.py",
       "isTemplate": true,
       "description": "Package marker"
@@ -110,11 +105,6 @@
       "path": "tests/test_calculator.py",
       "isTemplate": true,
       "description": "Calculator automation tests"
-    },
-    {
-      "path": "tests/test_notepad.py",
-      "isTemplate": true,
-      "description": "Notepad automation tests"
     },
     {
       "path": "tests/__init__.py",

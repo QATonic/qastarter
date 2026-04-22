@@ -4,16 +4,32 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
 import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { fetchMetadata, generateProject, type GenerateOptions } from './lib/api.js';
 import { promptForOptions } from './lib/prompts.js';
 import { runUpdate } from './commands/update.js';
+
+// Source the version from package.json so `qastarter --version` never drifts
+// from the published release. __dirname is `dist/` at runtime; package.json
+// lives one level up in the installed module root.
+function readVersion(): string {
+  try {
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    const pkgPath = path.resolve(here, '..', 'package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+    return typeof pkg?.version === 'string' ? pkg.version : '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
 
 const program = new Command();
 
 program
   .name('qastarter')
   .description('CLI tool for generating QA automation project structures')
-  .version('1.0.0');
+  .version(readVersion());
 
 program
   .command('new')

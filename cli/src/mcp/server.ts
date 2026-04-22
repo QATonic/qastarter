@@ -26,6 +26,7 @@ import {
 import AdmZip from 'adm-zip';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import {
   fetchBom,
   fetchMetadata,
@@ -40,7 +41,24 @@ import {
 // ---------- helpers ----------
 
 const SERVER_NAME = 'qastarter';
-const SERVER_VERSION = '1.0.0';
+
+/**
+ * Read the server version from package.json so `initialize` always reports
+ * the actual installed release. Hard-coding drifts the moment we publish.
+ */
+function readServerVersion(): string {
+  try {
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    // dist/mcp/server.js → ../../package.json at runtime
+    const pkgPath = path.resolve(here, '..', '..', 'package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+    return typeof pkg?.version === 'string' ? pkg.version : '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
+
+const SERVER_VERSION = readServerVersion();
 
 /** Minimum fields the generator requires. */
 interface BaseConfig {
@@ -68,6 +86,14 @@ function asError(message: string): {
   return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
 }
 
+/**
+ * Pattern for project names — matches the server-side rule. Keeps path
+ * separators, NUL, and shell metacharacters out before we hit the backend
+ * so a misbehaving MCP client gets a clear client-side error rather than
+ * an opaque server-side validation failure.
+ */
+const PROJECT_NAME_RE = /^[a-zA-Z0-9][a-zA-Z0-9-_]{0,63}$/;
+
 /** Coerce a caller-supplied args object into a GenerateOptions. */
 function toGenerateOptions(args: Record<string, unknown> | undefined): GenerateOptions {
   const a = args ?? {};
@@ -77,8 +103,15 @@ function toGenerateOptions(args: Record<string, unknown> | undefined): GenerateO
       throw new Error(`Missing required field: ${key}`);
     }
   }
+  const projectName = String(a.projectName);
+  if (!PROJECT_NAME_RE.test(projectName)) {
+    throw new Error(
+      `Invalid projectName "${projectName}" — must be 1–64 characters, start with a letter/digit, ` +
+        `and contain only letters, digits, hyphens, and underscores.`
+    );
+  }
   return {
-    projectName: String(a.projectName),
+    projectName,
     testingType: String(a.testingType),
     framework: String(a.framework),
     language: String(a.language),

@@ -104,7 +104,23 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
-app.use('/api', cors(corsOptions));
+
+// Apply CORS to /api routes. Before handing off to the cors middleware, allow
+// a narrow bypass: non-browser API clients (QAStarter CLI, MCP server, CI
+// scripts) that identify themselves via `X-QAStarter-Client` can proceed even
+// without an Origin header. This is safe because:
+//   1. A browser cannot set custom request headers cross-origin without
+//      triggering a CORS preflight, and that preflight requires an Origin
+//      header — so this bypass is unreachable from a browser CSRF attack.
+//   2. The CLI / MCP server legitimately send no Origin (Node's fetch doesn't
+//      synthesise one), so without this bypass every `qastarter list` /
+//      `generate` call against prod returns 500 instead of the payload.
+app.use('/api', (req, res, next) => {
+  if (!req.headers.origin && req.headers['x-qastarter-client']) {
+    return next();
+  }
+  return cors(corsOptions)(req, res, next);
+});
 
 // Correlation ID middleware - adds request/correlation IDs for tracing
 // Must be early in the middleware chain for all subsequent logs to include IDs

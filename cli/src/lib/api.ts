@@ -92,8 +92,12 @@ export function getApiUrl(): string {
  */
 export function clientHeaders(): Record<string, string> {
   const out: Record<string, string> = {};
-  const client = process.env.QASTARTER_CLIENT;
-  if (client) out['X-QAStarter-Client'] = client;
+  // Default to `cli`; the MCP entry point overrides to `mcp` (or
+  // `mcp-trusted` when paired with a valid bypass token). The server
+  // uses this header to (a) bypass the strict-origin CORS check for
+  // non-browser clients, (b) raise the rate limit for trusted MCP
+  // clients, and (c) tag analytics by source.
+  out['X-QAStarter-Client'] = process.env.QASTARTER_CLIENT || 'cli';
   const token = process.env.QASTARTER_MCP_TOKEN;
   if (token) out['X-QAStarter-Token'] = token;
   return out;
@@ -248,8 +252,15 @@ export async function generateProjectBuffer(options: GenerateOptions): Promise<{
 
   // Defence-in-depth: caller decides the ceiling, default 50 MB. Stops a compromised or
   // misconfigured backend from returning a 500 MB payload and OOMing this process.
-  const MAX_ZIP_BYTES = parseInt(process.env.QASTARTER_MAX_ZIP_BYTES || '52428800', 10); // 50 MB
-  const declared = parseInt(response.headers.get('content-length') || '0', 10);
+  // `parseInt('foo', 10)` returns NaN — if an operator set QASTARTER_MAX_ZIP_BYTES=foo
+  // the comparison `declared > NaN` would always be false and the limit would silently
+  // disappear. Guard with Number.isFinite() and fall back to the hard-coded 50 MB default.
+  const DEFAULT_MAX_ZIP_BYTES = 52428800; // 50 MB
+  const envLimit = parseInt(process.env.QASTARTER_MAX_ZIP_BYTES || '', 10);
+  const MAX_ZIP_BYTES =
+    Number.isFinite(envLimit) && envLimit > 0 ? envLimit : DEFAULT_MAX_ZIP_BYTES;
+  const declaredRaw = parseInt(response.headers.get('content-length') || '0', 10);
+  const declared = Number.isFinite(declaredRaw) && declaredRaw > 0 ? declaredRaw : 0;
   if (declared && declared > MAX_ZIP_BYTES) {
     throw new Error(
       `Generated project is ${declared} bytes — exceeds the ${MAX_ZIP_BYTES} byte safety limit. ` +

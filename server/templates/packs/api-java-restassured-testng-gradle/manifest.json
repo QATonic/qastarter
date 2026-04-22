@@ -116,8 +116,7 @@
       "description": "Jenkins pipeline"
     },
     {
-      "path": "src/main/java/{{packagePath}}/config/ConfigurationReader.java",
-      "template": "src/main/java/{{packagePath}}/config/ConfigurationReader.java.hbs",
+      "path": "src/main/java/{{packagePath}}/config/ConfigReader.java",
       "isTemplate": true,
       "description": "Configuration reader"
     },
@@ -266,8 +265,7 @@
       "description": "Authentication helper utilities"
     },
     {
-      "path": "src/main/java/{{packagePath}}/utils/ExtentManager.java",
-      "template": "src/main/java/{{packagePath}}/utils/ExtentManager.java.hbs",
+      "path": "src/main/java/{{packagePath}}/utils/ExtentReportManager.java",
       "isTemplate": true,
       "conditional": {
         "reportingTool": "extent-reports"

@@ -173,11 +173,6 @@
       "description": "User API tests"
     },
     {
-      "path": "tests/api/users.spec.ts",
-      "isTemplate": true,
-      "description": "Users endpoint tests"
-    },
-    {
       "path": "tests/data/users.ts",
       "isTemplate": true,
       "conditional": {

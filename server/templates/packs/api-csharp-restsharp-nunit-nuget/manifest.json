@@ -12,9 +12,7 @@
     "buildTool": "nuget"
   },
   "toolVersions": {
-    "dotnet": "8.0",
-    "restsharp": "110.2.0",
-    "nunit": "3.14.0"
+    "dotnet": "8.0"
   },
   "files": [
     {

@@ -1,243 +1,106 @@
-package {{packageName}}.utils;
+package {{javaPackage}}.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import {{packageName}}.config.ConfigurationReader;
-{{#if utilities.logger}}
-import {{packageName}}.utils.Log;
-{{/if}}
 
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Test data reader utility for JSON files
- * Provides data-driven testing support for API automation
- */
+* TestDataReader - Utility for reading test data from JSON and CSV files.
+*
+* Provides data-driven testing support for TestNG DataProviders.
+*/
 public class TestDataReader {
 
-    private static final String TEST_DATA_BASE_PATH = ConfigurationReader.getProperty("test.data.base.path", "src/test/resources/testdata");
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+private static final String TEST_DATA_PATH = "src/test/resources/testdata/";
+private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * Read JSON file from resources and return specific node data
-     * 
-     * @param fileName JSON file name in resources
-     * @param nodeName Node name to extract data from
-     * @return Object array for TestNG DataProvider
-     */
-    public static Object[][] readJSONDataFromResources(String fileName, String nodeName) {
-        List<Object[]> data = new ArrayList<>();
-        
-        try {
-            InputStream inputStream = TestDataReader.class.getResourceAsStream("/testdata/" + fileName);
-            if (inputStream == null) {
-                throw new RuntimeException("JSON file not found in resources: " + fileName);
-            }
-            
-            JsonNode rootNode = objectMapper.readTree(inputStream);
-            JsonNode dataNode = rootNode.get(nodeName);
-            
-            if (dataNode == null) {
-                throw new RuntimeException("Node '" + nodeName + "' not found in JSON resource: " + fileName);
-            }
-            
-            if (dataNode.isArray()) {
-                Iterator<JsonNode> elements = dataNode.elements();
-                while (elements.hasNext()) {
-                    JsonNode element = elements.next();
-                    Object[] row = convertJsonNodeToArray(element);
-                    data.add(row);
-                }
-            } else {
-                // Single object, convert to single row
-                Object[] row = convertJsonNodeToArray(dataNode);
-                data.add(row);
-            }
-            
-            {{#if utilities.logger}}
-            Log.info("Read " + data.size() + " rows from JSON resource: " + fileName + ", node: " + nodeName);
-            {{/if}}
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Error reading JSON resource: " + fileName, e);
-            {{/if}}
-            throw new RuntimeException("Failed to read JSON resource: " + fileName, e);
+/**
+* Reads JSON file and returns as JsonNode.
+*
+* @param fileName Name of the JSON file in testdata directory
+* @return JsonNode containing the parsed JSON
+*/
+public static JsonNode readJson(String fileName) {
+try {
+String content = new String(Files.readAllBytes(Paths.get(TEST_DATA_PATH + fileName)));
+return objectMapper.readTree(content);
+} catch (IOException e) {
+Log.error("Failed to read JSON file: " + fileName, e);
+throw new RuntimeException("Failed to read JSON file: " + fileName, e);
+}
+}
+
+/**
+* Reads JSON file and returns as a List of Maps.
+*
+* @param fileName Name of the JSON file in testdata directory
+* @return List of Maps containing the JSON data
+*/
+public static List<Map<String, Object>> readJsonAsList(String fileName) {
+    try {
+    String content = new String(Files.readAllBytes(Paths.get(TEST_DATA_PATH + fileName)));
+    return objectMapper.readValue(content, new TypeReference<List<Map<String, Object>>>() {});
+        } catch (IOException e) {
+        Log.error("Failed to read JSON file: " + fileName, e);
+        throw new RuntimeException("Failed to read JSON file: " + fileName, e);
         }
-        
-        return data.toArray(new Object[0][]);
-    }
-
-    /**
-     * Read entire JSON file as object array
-     * 
-     * @param fileName JSON file name
-     * @return Object array for TestNG DataProvider
-     */
-    public static Object[][] readJSONArray(String fileName) {
-        List<Object[]> data = new ArrayList<>();
-        
-        try {
-            InputStream inputStream = TestDataReader.class.getResourceAsStream("/testdata/" + fileName);
-            if (inputStream == null) {
-                throw new RuntimeException("JSON file not found in resources: " + fileName);
-            }
-            
-            JsonNode rootNode = objectMapper.readTree(inputStream);
-            
-            if (rootNode.isArray()) {
-                Iterator<JsonNode> elements = rootNode.elements();
-                while (elements.hasNext()) {
-                    JsonNode element = elements.next();
-                    Object[] row = convertJsonNodeToArray(element);
-                    data.add(row);
-                }
-            }
-            
-            {{#if utilities.logger}}
-            Log.info("Read " + data.size() + " rows from JSON array: " + fileName);
-            {{/if}}
-            
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.error("Error reading JSON array: " + fileName, e);
-            {{/if}}
-            throw new RuntimeException("Failed to read JSON array: " + fileName, e);
         }
-        
-        return data.toArray(new Object[0][]);
-    }
 
-    /**
-     * Convert JsonNode to Object array
-     * 
-     * @param jsonNode JsonNode to convert
-     * @return Object array
-     */
-    private static Object[] convertJsonNodeToArray(JsonNode jsonNode) {
-        if (jsonNode.isObject()) {
-            // For objects, return the entire object as a single element
-            return new Object[]{jsonNode};
-        } else if (jsonNode.isArray()) {
-            // For arrays, convert each element
-            List<Object> values = new ArrayList<>();
-            Iterator<JsonNode> elements = jsonNode.elements();
-            while (elements.hasNext()) {
-                JsonNode element = elements.next();
-                if (element.isTextual()) {
-                    values.add(element.asText());
-                } else if (element.isNumber()) {
-                    values.add(element.asText());
-                } else if (element.isBoolean()) {
-                    values.add(element.asBoolean());
-                } else {
-                    values.add(element.toString());
-                }
-            }
-            return values.toArray();
-        } else {
-            // For primitive values, return as single element array
-            if (jsonNode.isTextual()) {
-                return new Object[]{jsonNode.asText()};
-            } else if (jsonNode.isNumber()) {
-                return new Object[]{jsonNode.asText()};
-            } else if (jsonNode.isBoolean()) {
-                return new Object[]{jsonNode.asBoolean()};
-            } else {
-                return new Object[]{jsonNode.toString()};
-            }
+        /**
+        * Reads CSV file and returns as List of Maps.
+        * First row is treated as header.
+        *
+        * @param fileName Name of the CSV file in testdata directory
+        * @return List of Maps with column name as key
+        */
+        public static List<Map<String, String>> readCsv(String fileName) {
+            List<Map<String, String>> data = new ArrayList<>();
+                    String filePath = TEST_DATA_PATH + fileName;
+
+                    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+                    String headerLine = br.readLine();
+                    if (headerLine == null) {
+                    return data;
+                    }
+
+                    String[] headers = headerLine.split(",");
+                    String line;
+
+                    while ((line = br.readLine()) != null) {
+                    String[] values = line.split(",");
+                    Map<String, String> row = new HashMap<>();
+
+                            for (int i = 0; i < headers.length && i < values.length; i++) { row.put(headers[i].trim(),
+                                values[i].trim()); } data.add(row); } Log.info("Loaded " + data.size() + " rows from " + fileName);
+        } catch (IOException e) {
+            Log.error(" Failed to read CSV file: " + fileName, e);
+            throw new RuntimeException(" Failed to read CSV file: " + fileName, e);
         }
+
+        return data;
     }
 
-    // TestNG DataProvider methods
-
     /**
-     * DataProvider for user test data
-     * 
-     * @return User test data
+     * Converts List of Maps to Object[][] for TestNG DataProvider.
+     *
+     * @param data List of Maps containing test data
+     * @return Object[][] suitable for TestNG DataProvider
      */
-    @org.testng.annotations.DataProvider(name = "userTestData")
-    public static Object[][] getUserTestData() {
-        try {
-            return readJSONDataFromResources("users.json", "users");
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.warn("Could not read users.json, using default user data");
-            {{/if}}
-            return new Object[][]{
-                {createDefaultUser("testuser1", "test1@example.com")},
-                {createDefaultUser("testuser2", "test2@example.com")}
-            };
+    public static Object[][] toDataProviderArray(List<Map<String, String>> data) {
+        Object[][] result = new Object[data.size()][1];
+        for (int i = 0; i < data.size(); i++) {
+            result[i][0] = data.get(i);
         }
-    }
-
-    /**
-     * DataProvider for API request test data
-     * 
-     * @return API request test data
-     */
-    @org.testng.annotations.DataProvider(name = "apiRequestData")
-    public static Object[][] getApiRequestData() {
-        try {
-            return readJSONDataFromResources("test-requests.json", "requests");
-        } catch (Exception e) {
-            {{#if utilities.logger}}
-            Log.warn("Could not read test-requests.json, using default request data");
-            {{/if}}
-            return new Object[][]{
-                {"/users", "GET", 200},
-                {"/users/1", "GET", 200}
-            };
-        }
-    }
-
-    /**
-     * DataProvider for authentication test data
-     * 
-     * @return Authentication test data
-     */
-    @org.testng.annotations.DataProvider(name = "authTestData")
-    public static Object[][] getAuthTestData() {
-        return new Object[][]{
-            {"validuser", "validpass", 200, true},
-            {"invaliduser", "wrongpass", 401, false},
-            {"", "", 400, false}
-        };
-    }
-
-    /**
-     * DataProvider for negative test cases
-     * 
-     * @return Negative test data
-     */
-    @org.testng.annotations.DataProvider(name = "negativeTestData")
-    public static Object[][] getNegativeTestData() {
-        return new Object[][]{
-            {"/users/99999", "GET", 404},
-            {"/users", "POST", 400},
-            {"/protected", "GET", 401}
-        };
-    }
-
-    /**
-     * Create default user object for fallback
-     * 
-     * @param username Username
-     * @param email Email
-     * @return JsonNode representing user
-     */
-    private static JsonNode createDefaultUser(String username, String email) {
-        try {
-            String userJson = String.format(
-                "{\"username\":\"%s\",\"email\":\"%s\",\"firstName\":\"Test\",\"lastName\":\"User\"}",
-                username, email
-            );
-            return objectMapper.readTree(userJson);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create default user", e);
-        }
+        return result;
     }
 }

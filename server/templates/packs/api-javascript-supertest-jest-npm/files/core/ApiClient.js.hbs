@@ -3,7 +3,7 @@
  */
 const request = require("supertest");
 const { apiConfig } = require("../config/ConfigReader");
-const { log } = require("../utils/Logger");
+const { log } = require("../utils/logger");
 
 class ApiClient {
   constructor() {
@@ -40,4 +40,8 @@ class ApiClient {
   }
 }
 
-module.exports = { ApiClient };
+// Shared instance for tests that want a ready-to-use client.
+const apiClient = new ApiClient();
+
+module.exports = { ApiClient, apiClient };
+module.exports.default = apiClient;

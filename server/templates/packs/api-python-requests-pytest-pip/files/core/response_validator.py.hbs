@@ -1,7 +1,37 @@
 import requests
 import jsonschema
 from typing import Any, Dict, Optional
-from utils.json_utils import JSONUtils
+
+
+def _get_value_by_path(data: Any, path: str) -> Any:
+    """Traverse a dict/list via a dotted/bracketed path.
+
+    Supports `a.b.c`, `a[0].b`, and mixed `a.b[2].c`. Returns None if any
+    segment is missing. Inlined here so validators stay self-contained.
+    """
+    if data is None or not path:
+        return data
+    # Split on `.` then split each segment on `[`
+    current: Any = data
+    for raw in path.split("."):
+        key = raw
+        indices = []
+        if "[" in raw:
+            key, *bracket_parts = raw.replace("]", "").split("[")
+            indices = [int(i) for i in bracket_parts if i]
+        if key:
+            if isinstance(current, dict):
+                current = current.get(key)
+            else:
+                return None
+        for i in indices:
+            if isinstance(current, list) and 0 <= i < len(current):
+                current = current[i]
+            else:
+                return None
+        if current is None:
+            return None
+    return current
 
 
 class ResponseValidator:
@@ -57,7 +87,7 @@ class ResponseValidator:
     def assert_json_path(self, json_path: str, expected_value: Any) -> "ResponseValidator":
         """Assert JSON path has expected value."""
         assert self.json_data is not None, "Response is not JSON"
-        actual = JSONUtils.get_value_by_path(self.json_data, json_path)
+        actual = _get_value_by_path(self.json_data, json_path)
         assert actual == expected_value, \
             f"JSON path '{json_path}': expected '{expected_value}', got '{actual}'"
         return self
@@ -95,4 +125,4 @@ class ResponseValidator:
         """Get value by JSON path."""
         if self.json_data is None:
             return None
-        return JSONUtils.get_value_by_path(self.json_data, json_path)
+        return _get_value_by_path(self.json_data, json_path)

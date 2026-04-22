@@ -51,7 +51,9 @@ public class RequestBuilder
 
     public RequestBuilder WithTimeout(int milliseconds)
     {
-        _request.Timeout = milliseconds;
+        // RestSharp 112+ takes TimeSpan?; earlier versions took int. TimeSpan
+        // is the forward-compatible form.
+        _request.Timeout = TimeSpan.FromMilliseconds(milliseconds);
         return this;
     }
 

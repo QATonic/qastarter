@@ -3,7 +3,7 @@ package {{javaPackage}}.core;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.config.ConfigReader;
 import {{javaPackage}}.utils.Log;
 
 import java.util.Map;
@@ -23,14 +23,14 @@ import static io.restassured.RestAssured.given;
 public class APIClient {
 
     public APIClient() {
-        RestAssured.baseURI = ConfigurationReader.getBaseUrl();
+        RestAssured.baseURI = ConfigReader.getBaseUrl();
         Log.info("API Client initialized with base URL: " + RestAssured.baseURI);
     }
 
     private RequestSpecification getRequestSpec() {
         return given()
-            .contentType(ConfigurationReader.getContentType())
-            .accept(ConfigurationReader.getContentType())
+            .contentType(ConfigReader.getContentType())
+            .accept(ConfigReader.getContentType())
             .log().all();
     }
 

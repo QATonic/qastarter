@@ -70,41 +70,6 @@
       "description": "GraphQL client wrapper"
     },
     {
-      "path": "src/client/graphql-client.ts",
-      "isTemplate": true,
-      "description": "GraphQL client implementation"
-    },
-    {
-      "path": "src/config/environments.ts",
-      "isTemplate": true,
-      "description": "Environment configurations"
-    },
-    {
-      "path": "src/types/graphql.types.ts",
-      "isTemplate": true,
-      "description": "GraphQL type definitions"
-    },
-    {
-      "path": "src/queries/user.queries.ts",
-      "isTemplate": true,
-      "description": "User GraphQL queries"
-    },
-    {
-      "path": "src/mutations/user.mutations.ts",
-      "isTemplate": true,
-      "description": "User GraphQL mutations"
-    },
-    {
-      "path": "src/fragments/user.fragments.ts",
-      "isTemplate": true,
-      "description": "User GraphQL fragments"
-    },
-    {
-      "path": "src/utils/test-helpers.ts",
-      "isTemplate": true,
-      "description": "Test helper utilities"
-    },
-    {
       "path": "queries/SpaceXQueries.ts",
       "isTemplate": true,
       "description": "SpaceX API example queries"
@@ -123,29 +88,6 @@
       "path": "tests/GraphQLTests.spec.ts",
       "isTemplate": true,
       "description": "GraphQL API tests"
-    },
-    {
-      "path": "tests/queries/user.queries.test.ts",
-      "isTemplate": true,
-      "description": "User query tests"
-    },
-    {
-      "path": "tests/mutations/user.mutations.test.ts",
-      "isTemplate": true,
-      "description": "User mutation tests"
-    },
-    {
-      "path": "tests/schema/schema.validation.test.ts",
-      "isTemplate": true,
-      "conditional": {
-        "testingPattern": "schema-validation"
-      },
-      "description": "GraphQL schema validation tests"
-    },
-    {
-      "path": "tests/integration/auth.integration.test.ts",
-      "isTemplate": true,
-      "description": "Authentication integration tests"
     },
     {
       "path": "utils/testDataFactory.ts",

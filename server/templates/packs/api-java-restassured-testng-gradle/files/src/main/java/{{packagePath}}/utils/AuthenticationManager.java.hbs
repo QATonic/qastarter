@@ -1,7 +1,7 @@
 package {{packageName}}.utils;
 
 import io.restassured.response.Response;
-import {{packageName}}.config.ConfigurationReader;
+import {{packageName}}.config.ConfigReader;
 import {{packageName}}.core.APIClient;
 {{#if utilities.logger}}
 import {{packageName}}.utils.Log;
@@ -57,7 +57,7 @@ public class AuthenticationManager {
         Log.info("Authenticating with username: " + username);
         {{/if}}
         
-        String loginEndpoint = ConfigurationReader.getProperty("auth.login.endpoint", "/auth/login");
+        String loginEndpoint = ConfigReader.getProperty("auth.login.endpoint", "/auth/login");
         
         Map<String, String> credentials = new HashMap<>();
         credentials.put("username", username);
@@ -94,7 +94,7 @@ public class AuthenticationManager {
         {{/if}}
         
         // Validate API key if validation endpoint is configured
-        String validationEndpoint = ConfigurationReader.getProperty("auth.apikey.validation.endpoint");
+        String validationEndpoint = ConfigReader.getProperty("auth.apikey.validation.endpoint");
         if (validationEndpoint != null) {
             validateApiKey(apiKey, validationEndpoint);
         }
@@ -114,7 +114,7 @@ public class AuthenticationManager {
         Log.info("Authenticating with OAuth client credentials");
         {{/if}}
         
-        String tokenEndpoint = ConfigurationReader.getProperty("auth.oauth.token.endpoint", "/oauth/token");
+        String tokenEndpoint = ConfigReader.getProperty("auth.oauth.token.endpoint", "/oauth/token");
         
         Map<String, String> oauthRequest = new HashMap<>();
         oauthRequest.put("grant_type", "client_credentials");
@@ -152,21 +152,21 @@ public class AuthenticationManager {
      * @return New authentication token
      */
     private String requestNewToken() {
-        String authMethod = ConfigurationReader.getProperty("auth.method", "credentials");
+        String authMethod = ConfigReader.getProperty("auth.method", "credentials");
         
         switch (authMethod.toLowerCase()) {
             case "credentials":
-                String username = ConfigurationReader.getProperty("auth.username");
-                String password = ConfigurationReader.getProperty("auth.password");
+                String username = ConfigReader.getProperty("auth.username");
+                String password = ConfigReader.getProperty("auth.password");
                 return authenticateWithCredentials(username, password);
                 
             case "oauth":
-                String clientId = ConfigurationReader.getProperty("auth.oauth.client.id");
-                String clientSecret = ConfigurationReader.getProperty("auth.oauth.client.secret");
+                String clientId = ConfigReader.getProperty("auth.oauth.client.id");
+                String clientSecret = ConfigReader.getProperty("auth.oauth.client.secret");
                 return authenticateWithOAuth(clientId, clientSecret);
                 
             case "apikey":
-                return ConfigurationReader.getProperty("auth.api.key");
+                return ConfigReader.getProperty("auth.api.key");
                 
             default:
                 throw new RuntimeException("Unsupported authentication method: " + authMethod);
@@ -180,7 +180,7 @@ public class AuthenticationManager {
      * @return Extracted token
      */
     private String extractTokenFromResponse(Response response) {
-        String tokenField = ConfigurationReader.getProperty("auth.token.field", "token");
+        String tokenField = ConfigReader.getProperty("auth.token.field", "token");
         
         try {
             return response.jsonPath().getString(tokenField);

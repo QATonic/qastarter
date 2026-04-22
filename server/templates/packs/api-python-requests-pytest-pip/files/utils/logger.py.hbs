@@ -42,8 +42,12 @@ class Logger:
         self._logger.addHandler(console_handler)
     
     def info(self, message: str): self._logger.info(message)
+    def debug(self, message: str): self._logger.debug(message)
+    def warning(self, message: str): self._logger.warning(message)
     def error(self, message: str): self._logger.error(message)
     def step(self, message: str): self._logger.info(f"STEP: {message}")
 
 
 log = Logger()
+# Alias so `from utils.logger import logger` also works.
+logger = log

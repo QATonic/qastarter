@@ -31,7 +31,7 @@ export const toolVersions = {
   restassured: '5.4.0',
   requests: '2.31.0',
   supertest: '6.3.4',
-  restsharp: '111.3.0', // Updated from 110.2.0
+  restsharp: '112.1.0', // Bumped past GHSA-4rr6-2v9v-wcpc (SSRF in <112)
   pact: '4.6.4', // Updated from 4.6.3
   apollo: '3.10.0', // Added for GraphQL
   grpc: '1.62.0', // Added for gRPC

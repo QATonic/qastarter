@@ -1,209 +1,223 @@
-package {{packageName}}.tests;
+package {{javaPackage}}.tests;
 
 import io.restassured.response.Response;
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import com.fasterxml.jackson.databind.JsonNode;
-import {{packageName}}.core.BaseTest;
-import {{packageName}}.utils.TestDataReader;
-{{#if utilities.logger}}
-import {{packageName}}.utils.Log;
+import {{javaPackage}}.core.BaseTest;
+import {{javaPackage}}.core.ResponseValidator;
+import {{javaPackage}}.utils.Log;
+{{#if utilities.dataProvider}}
+import {{javaPackage}}.utils.TestDataReader;
 {{/if}}
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Data-driven API test suite
  * Tests using external data sources for comprehensive test coverage
+ *
+ * HOW TO USE THIS TEMPLATE:
+ * 1. Update endpoints to match your API
+ * 2. Add test data in src/test/resources/testdata/
+ * 3. Run: mvn clean test -Dgroups=data-driven
  */
 public class DataDrivenTests extends BaseTest {
 
-    @Test(dataProvider = "userTestData", dataProviderClass = TestDataReader.class, 
-          groups = {"api", "data-driven"}, description = "Create users from test data")
-    public void testCreateUsersFromData(JsonNode userData) {
-        logStep("Creating user from test data");
-        
-        String username = userData.get("username").asText();
-        String email = userData.get("email").asText();
-        
-        {{#if utilities.logger}}
-        Log.info("Creating user: " + username + " with email: " + email);
-        {{/if}}
-        
-        logAction("Sending POST request to create user from data");
-        Response response = apiClient.post("/users", userData);
-        
-        // Validate response
-        apiClient.getResponseValidator().validateStatusCode(response, 201);
-        apiClient.getResponseValidator().validateJsonField(response, "username", username);
-        apiClient.getResponseValidator().validateJsonField(response, "email", email);
-        
-        // Cleanup - delete created user
-        Integer userId = response.jsonPath().getInt("id");
-        apiClient.delete("/users/" + userId);
-        
-        logVerification("User created and cleaned up successfully from test data");
+    {{#if utilities.dataProvider}}
+    /**
+     * DataProvider for user creation test data.
+     * Reads from src/test/resources/testdata/users.csv
+     */
+    @DataProvider(name = "createUserData")
+    public Object[][] getCreateUserData() {
+        List<Map<String, String>> data = TestDataReader.readCsv("users.csv");
+        Object[][] testData = new Object[data.size()][3];
+
+        for (int i = 0; i < data.size(); i++) {
+            testData[i][0] = data.get(i).get("name");
+            testData[i][1] = data.get(i).get("username");
+            testData[i][2] = data.get(i).get("email");
+        }
+
+        return testData;
     }
 
-    @Test(dataProvider = "apiRequestData", dataProviderClass = TestDataReader.class,
+    @Test(dataProvider = "createUserData",
+          groups = {"api", "data-driven"}, description = "Create users from CSV test data")
+    public void testCreateUsersFromData(String name, String username, String email) {
+        Log.step("Creating user from test data: " + username);
+
+        Map<String, String> userData = new HashMap<>();
+        userData.put("name", name);
+        userData.put("username", username);
+        userData.put("email", email);
+
+        Log.info("Sending POST request to create user: " + username);
+        Response response = post(USERS_ENDPOINT, userData);
+
+        // Validate response
+        ResponseValidator.assertStatus(response, 201);
+        ResponseValidator.assertBodyContains(response, username);
+
+        Log.info("User created successfully from test data: " + username);
+    }
+    {{/if}}
+
+    /**
+     * DataProvider for API endpoint testing.
+     */
+    @DataProvider(name = "apiEndpointData")
+    public Object[][] getApiEndpointData() {
+        return new Object[][] {
+            {"/users", "GET", 200},
+            {"/users/1", "GET", 200},
+            {"/users/99999", "GET", 404},
+            {"/posts", "GET", 200},
+            {"/posts/1", "GET", 200}
+        };
+    }
+
+    @Test(dataProvider = "apiEndpointData",
           groups = {"api", "data-driven"}, description = "Test API endpoints from data")
     public void testAPIEndpointsFromData(String endpoint, String method, int expectedStatus) {
-        logStep("Testing API endpoint from data: " + method + " " + endpoint);
-        
-        logAction("Making " + method + " request to " + endpoint);
-        
+        Log.step("Testing API endpoint from data: " + method + " " + endpoint);
+
+        Log.info("Making " + method + " request to " + endpoint);
+
         Response response;
         switch (method.toUpperCase()) {
             case "GET":
-                response = apiClient.get(endpoint);
+                response = get(endpoint);
                 break;
             case "POST":
-                response = apiClient.post(endpoint, "{}");
+                response = post(endpoint, "{}");
                 break;
             case "PUT":
-                response = apiClient.put(endpoint, "{}");
+                response = put(endpoint, 1, "{}");
                 break;
             case "DELETE":
-                response = apiClient.delete(endpoint);
+                response = delete(endpoint, 1);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported HTTP method: " + method);
         }
-        
+
         // Validate expected status
-        apiClient.getResponseValidator().validateStatusCode(response, expectedStatus);
-        
-        logVerification("API endpoint test completed: " + method + " " + endpoint + " returned " + response.getStatusCode());
+        ResponseValidator.assertStatus(response, expectedStatus);
+
+        Log.info("API endpoint test completed: " + method + " " + endpoint + " returned " + response.getStatusCode());
     }
 
-    @Test(dataProvider = "authTestData", dataProviderClass = TestDataReader.class,
+    /**
+     * DataProvider for authentication scenarios.
+     */
+    @DataProvider(name = "authTestData")
+    public Object[][] getAuthTestData() {
+        return new Object[][] {
+            {"testuser", "testpass123", 200, true},
+            {"invaliduser", "wrongpassword", 401, false},
+            {"testuser", "", 400, false},
+            {"", "testpass123", 400, false}
+        };
+    }
+
+    @Test(dataProvider = "authTestData",
           groups = {"auth", "data-driven"}, description = "Test authentication scenarios from data")
     public void testAuthenticationFromData(String username, String password, int expectedStatus, boolean shouldSucceed) {
-        logStep("Testing authentication from data");
-        
+        Log.step("Testing authentication from data for user: " + username);
+
         // Prepare credentials
-        java.util.Map<String, String> credentials = new java.util.HashMap<>();
+        Map<String, String> credentials = new HashMap<>();
         credentials.put("username", username);
         credentials.put("password", password);
-        
-        logAction("Attempting login with username: " + username);
-        Response response = apiClient.post("/auth/login", credentials);
-        
+
+        Log.info("Attempting login with username: " + username);
+        Response response = post("/auth/login", credentials);
+
         // Validate response
-        apiClient.getResponseValidator().validateStatusCode(response, expectedStatus);
-        
+        ResponseValidator.assertStatus(response, expectedStatus);
+
         if (shouldSucceed) {
-            apiClient.getResponseValidator().validateJsonFieldExists(response, "token");
-            logVerification("Authentication successful as expected");
+            ResponseValidator.assertBodyContains(response, "token");
+            Log.info("Authentication successful as expected");
         } else {
-            apiClient.getResponseValidator().validateJsonFieldExists(response, "error");
-            logVerification("Authentication failed as expected");
+            ResponseValidator.assertBodyContains(response, "error");
+            Log.info("Authentication failed as expected");
         }
     }
 
-    @Test(dataProvider = "negativeTestData", dataProviderClass = TestDataReader.class,
+    /**
+     * DataProvider for negative test scenarios.
+     */
+    @DataProvider(name = "negativeTestData")
+    public Object[][] getNegativeTestData() {
+        return new Object[][] {
+            {"/users/0", "GET", 404},
+            {"/users/-1", "GET", 404},
+            {"/nonexistent", "GET", 404}
+        };
+    }
+
+    @Test(dataProvider = "negativeTestData",
           groups = {"negative", "data-driven"}, description = "Test negative scenarios from data")
     public void testNegativeScenariosFromData(String endpoint, String method, int expectedStatus) {
-        logStep("Testing negative scenario from data: " + method + " " + endpoint);
-        
-        logAction("Making " + method + " request to " + endpoint + " (expecting failure)");
-        
+        Log.step("Testing negative scenario from data: " + method + " " + endpoint);
+
+        Log.info("Making " + method + " request to " + endpoint + " (expecting failure)");
+
         Response response;
         switch (method.toUpperCase()) {
             case "GET":
-                response = apiClient.get(endpoint);
+                response = get(endpoint);
                 break;
             case "POST":
-                response = apiClient.post(endpoint, "{}");
-                break;
-            case "PUT":
-                response = apiClient.put(endpoint, "{}");
-                break;
-            case "DELETE":
-                response = apiClient.delete(endpoint);
+                response = post(endpoint, "{}");
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported HTTP method: " + method);
         }
-        
+
         // Validate expected error status
-        apiClient.getResponseValidator().validateStatusCode(response, expectedStatus);
-        
-        logVerification("Negative scenario handled correctly: " + method + " " + endpoint + " returned " + response.getStatusCode());
+        ResponseValidator.assertStatus(response, expectedStatus);
+
+        Log.info("Negative scenario handled correctly: " + method + " " + endpoint + " returned " + response.getStatusCode());
     }
 
-    @Test(groups = {"api", "schema", "data-driven"}, description = "Test multiple user creation and schema validation")
-    public void testBulkUserCreationAndValidation() {
-        logStep("Testing bulk user creation and validation");
-        
-        // Create multiple users for validation
-        String[] usernames = {"bulkuser1", "bulkuser2", "bulkuser3"};
-        String[] emails = {"bulk1@test.com", "bulk2@test.com", "bulk3@test.com"};
-        java.util.List<Integer> createdUserIds = new java.util.ArrayList<>();
-        
-        for (int i = 0; i < usernames.length; i++) {
-            // Prepare user data
-            java.util.Map<String, String> userData = new java.util.HashMap<>();
-            userData.put("username", usernames[i]);
-            userData.put("email", emails[i]);
-            userData.put("firstName", "Bulk");
-            userData.put("lastName", "User" + (i + 1));
-            
-            logAction("Creating bulk user: " + usernames[i]);
-            Response createResponse = apiClient.post("/users", userData);
-            
-            // Validate creation
-            apiClient.getResponseValidator().validateStatusCode(createResponse, 201);
-            apiClient.getResponseValidator().validateJsonField(createResponse, "username", usernames[i]);
-            
-            // Store user ID for cleanup
-            Integer userId = createResponse.jsonPath().getInt("id");
-            createdUserIds.add(userId);
-            
-            // Validate against schema
-            apiClient.getResponseValidator().validateJsonSchema(createResponse, "schemas/user-schema.json");
-        }
-        
-        logVerification("Bulk user creation completed. Created " + createdUserIds.size() + " users");
-        
-        // Cleanup all created users
-        for (Integer userId : createdUserIds) {
-            apiClient.delete("/users/" + userId);
-        }
-        
-        logVerification("Cleanup completed for all bulk created users");
-    }
+    @Test(groups = {"api", "performance", "data-driven"}, description = "Load test with multiple sequential requests")
+    public void testSequentialAPIRequests() {
+        Log.step("Testing sequential API requests performance");
 
-    @Test(groups = {"api", "performance", "data-driven"}, description = "Load test with multiple concurrent requests")
-    public void testConcurrentAPIRequests() {
-        logStep("Testing concurrent API requests");
-        
         int numberOfRequests = 10;
-        java.util.List<Long> responseTimes = new java.util.ArrayList<>();
-        
-        logAction("Making " + numberOfRequests + " concurrent requests");
-        
-        // Execute concurrent requests
+        List<Long> responseTimes = new ArrayList<>();
+
+        Log.info("Making " + numberOfRequests + " sequential requests");
+
+        // Execute sequential requests
         for (int i = 0; i < numberOfRequests; i++) {
             long startTime = System.currentTimeMillis();
-            Response response = apiClient.get("/users");
+            Response response = get(USERS_ENDPOINT);
             long responseTime = System.currentTimeMillis() - startTime;
-            
+
             responseTimes.add(responseTime);
-            apiClient.getResponseValidator().validateStatusCode(response, 200);
+            ResponseValidator.assertStatus(response, 200);
         }
-        
+
         // Calculate performance metrics
         long totalTime = responseTimes.stream().mapToLong(Long::longValue).sum();
         long averageTime = totalTime / numberOfRequests;
         long maxTime = responseTimes.stream().mapToLong(Long::longValue).max().orElse(0);
         long minTime = responseTimes.stream().mapToLong(Long::longValue).min().orElse(0);
-        
-        {{#if utilities.logger}}
+
         Log.info("Performance metrics - Average: " + averageTime + "ms, Max: " + maxTime + "ms, Min: " + minTime + "ms");
-        {{/if}}
-        
+
         // Assert reasonable performance (adjust thresholds as needed)
-        org.testng.Assert.assertTrue(averageTime < 5000, "Average response time should be under 5 seconds");
-        org.testng.Assert.assertTrue(maxTime < 10000, "Maximum response time should be under 10 seconds");
-        
-        logVerification("Concurrent API requests test completed successfully");
+        Assert.assertTrue(averageTime < 5000, "Average response time should be under 5 seconds");
+        Assert.assertTrue(maxTime < 10000, "Maximum response time should be under 10 seconds");
+
+        Log.info("Sequential API requests test completed successfully");
     }
 }

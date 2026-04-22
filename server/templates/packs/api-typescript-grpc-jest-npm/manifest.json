@@ -70,31 +70,6 @@
       "description": "gRPC client wrapper"
     },
     {
-      "path": "src/client/grpc-client.ts",
-      "isTemplate": true,
-      "description": "gRPC client implementation"
-    },
-    {
-      "path": "src/config/environments.ts",
-      "isTemplate": true,
-      "description": "Environment configurations"
-    },
-    {
-      "path": "src/types/grpc.types.ts",
-      "isTemplate": true,
-      "description": "gRPC type definitions"
-    },
-    {
-      "path": "src/services/user-service.ts",
-      "isTemplate": true,
-      "description": "User gRPC service client"
-    },
-    {
-      "path": "src/utils/test-helpers.ts",
-      "isTemplate": true,
-      "description": "Test helper utilities"
-    },
-    {
       "path": "protos/user.proto",
       "isTemplate": true,
       "description": "User protobuf definition"
@@ -118,21 +93,6 @@
       "path": "tests/GrpcTests.spec.ts",
       "isTemplate": true,
       "description": "gRPC API tests"
-    },
-    {
-      "path": "tests/user-service.test.ts",
-      "isTemplate": true,
-      "description": "User service tests"
-    },
-    {
-      "path": "tests/streaming.test.ts",
-      "isTemplate": true,
-      "description": "gRPC streaming tests"
-    },
-    {
-      "path": "tests/error-handling.test.ts",
-      "isTemplate": true,
-      "description": "Error handling tests"
     },
     {
       "path": "utils/testDataFactory.ts",

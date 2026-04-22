@@ -3,7 +3,7 @@
  * 
  * Sample API: SpaceX GraphQL API (https://spacex-production.up.railway.app/)
  */
-import { request, gql } from "graphql-request";
+import { request, gql, Variables } from "graphql-request";
 import { apiConfig } from "../config/ConfigReader";
 import { log } from "../utils/Logger";
 
@@ -15,7 +15,7 @@ export class GraphQLClient {
     log.info(`GraphQL Client initialized: ${this.endpoint}`);
   }
 
-  async query<T>(query: string, variables?: object): Promise<T> {
+  async query<T>(query: string, variables?: Variables): Promise<T> {
     log.info(`GraphQL Query: ${query.substring(0, 50)}...`);
     try {
       const response = await request<T>(this.endpoint, query, variables);
@@ -27,7 +27,7 @@ export class GraphQLClient {
     }
   }
 
-  async mutation<T>(mutation: string, variables?: object): Promise<T> {
+  async mutation<T>(mutation: string, variables?: Variables): Promise<T> {
     log.info(`GraphQL Mutation: ${mutation.substring(0, 50)}...`);
     try {
       const response = await request<T>(this.endpoint, mutation, variables);

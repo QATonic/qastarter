@@ -1,9 +1,21 @@
 import * as dotenv from "dotenv";
 dotenv.config();
 
+const fullHost = process.env.GRPC_HOST || "localhost:50051";
+const [defaultHost, defaultPort] = fullHost.split(":");
+
 export const apiConfig = {
-  grpcHost: process.env.GRPC_HOST || "localhost:50051",
+  grpcHost: fullHost,
   timeout: parseInt(process.env.TIMEOUT || "30") * 1000,
+  // Structured accessor used by the sample tests: `config.grpc.host`, `config.grpc.port`
+  grpc: {
+    host: defaultHost || "localhost",
+    port: parseInt(defaultPort || "50051", 10),
+  },
 };
+
+// Alias so callers using `import { config } from '../config/ConfigReader'`
+// also work — both names refer to the same object.
+export const config = apiConfig;
 
 console.log(`[Config] gRPC Host: ${apiConfig.grpcHost}`);

@@ -14,15 +14,24 @@ class Logger {
     this.logFile = path.join(this.logDir, `api_test_${timestamp}.log`);
   }
 
-  private write(level: string, message: string): void {
-    const logLine = `${new Date().toISOString()} | ${level.padEnd(8)} | ${message}`;
+  private write(level: string, message: string, ...rest: unknown[]): void {
+    const extras = rest.length > 0
+      ? " " + rest.map((x) => (typeof x === "string" ? x : JSON.stringify(x))).join(" ")
+      : "";
+    const logLine = `${new Date().toISOString()} | ${level.padEnd(8)} | ${message}${extras}`;
     console.log(logLine);
     fs.appendFileSync(this.logFile, logLine + "\n");
   }
 
-  info(message: string): void { this.write("INFO", message); }
-  error(message: string): void { this.write("ERROR", message); }
-  step(message: string): void { this.write("STEP", message); }
+  info(message: string, ...rest: unknown[]): void { this.write("INFO", message, ...rest); }
+  debug(message: string, ...rest: unknown[]): void { this.write("DEBUG", message, ...rest); }
+  warn(message: string, ...rest: unknown[]): void { this.write("WARN", message, ...rest); }
+  error(message: string, ...rest: unknown[]): void { this.write("ERROR", message, ...rest); }
+  step(message: string, ...rest: unknown[]): void { this.write("STEP", message, ...rest); }
 }
 
 export const log = new Logger();
+// Alias so existing `import { logger } from './logger'` sites keep working.
+export const logger = log;
+// Default export so `import log from './logger'` works too.
+export default log;

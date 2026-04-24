@@ -135,13 +135,47 @@ export class TemplatePackEngine {
   }
 
   /**
-   * Load template file content
+   * Set of file extensions whose content is known binary and must be
+   * streamed as a Buffer — reading them via `utf-8` replaces every
+   * invalid byte with U+FFFD, corrupting the file. Extend this list
+   * when a new binary asset type enters a pack.
+   */
+  private static readonly BINARY_EXTENSIONS = new Set<string>([
+    '.jar',
+    '.war',
+    '.ear',
+    '.png',
+    '.jpg',
+    '.jpeg',
+    '.gif',
+    '.ico',
+    '.pdf',
+    '.zip',
+    '.tgz',
+    '.gz',
+    '.apk',
+    '.ipa',
+    '.keystore',
+    '.jks',
+    '.p12',
+    '.pfx',
+    '.woff',
+    '.woff2',
+    '.ttf',
+    '.otf',
+  ]);
+
+  /**
+   * Load template file content. Returns a string for text files (all
+   * isTemplate=true files, plus plain-text isTemplate=false entries)
+   * and a Buffer for known-binary isTemplate=false files so UTF-8
+   * re-encoding doesn't corrupt them.
    */
   private async loadTemplateFile(
     packKey: string,
     filePath: string,
     isTemplate: boolean = false
-  ): Promise<string> {
+  ): Promise<string | Buffer> {
     // For template files, append .hbs extension to the file path
     const actualFilePath = isTemplate ? `${filePath}.hbs` : filePath;
     const fullPath = path.resolve(this.packsDirectory, packKey, 'files', actualFilePath);
@@ -154,7 +188,13 @@ export class TemplatePackEngine {
       );
     }
 
+    const ext = path.extname(filePath).toLowerCase();
+    const isBinary = !isTemplate && TemplatePackEngine.BINARY_EXTENSIONS.has(ext);
+
     try {
+      if (isBinary) {
+        return await fs.readFile(fullPath);
+      }
       return await fs.readFile(fullPath, 'utf-8');
     } catch (error) {
       throw new Error(
@@ -547,7 +587,7 @@ export class TemplatePackEngine {
           const processedPath = this.processTemplatePath(fileConfig.path, context);
 
           // Load file content - try with conditional suffix first if file has conditionals
-          let templateContent: string;
+          let templateContent: string | Buffer;
           try {
             templateContent = await this.loadTemplateFile(
               packKey,
@@ -563,9 +603,11 @@ export class TemplatePackEngine {
             continue;
           }
 
-          // Process content if it's a template
-          const processedContent = fileConfig.isTemplate
-            ? this.processTemplate(templateContent, context, fileConfig.path)
+          // Process content if it's a template. Binary files bypass
+          // handlebars rendering and flow through as Buffer so archiver
+          // appends the raw bytes without UTF-8 re-encoding.
+          const processedContent: string | Buffer = fileConfig.isTemplate
+            ? this.processTemplate(templateContent as string, context, fileConfig.path)
             : templateContent;
 
           yield {

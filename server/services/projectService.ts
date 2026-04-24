@@ -112,7 +112,11 @@ export class ProjectService {
     try {
       // Consume the generator
       for await (const file of this.templateGenerator.generateProjectStream(config, { strict: true, openApiEndpoints })) {
-        const fileBytes = Buffer.byteLength(file.content, 'utf8');
+        // Buffer content measures byte length directly; string content
+        // is encoded as UTF-8 to get on-disk size.
+        const fileBytes = Buffer.isBuffer(file.content)
+          ? file.content.length
+          : Buffer.byteLength(file.content, 'utf8');
         if (fileBytes > MAX_FILE_BYTES) {
           throw new Error(
             `Generated file "${file.path}" is ${fileBytes} bytes — exceeds MAX_FILE_BYTES=${MAX_FILE_BYTES}.`
@@ -130,6 +134,7 @@ export class ProjectService {
             `Generation total size ${totalSize} bytes exceeds MAX_TOTAL_BYTES=${MAX_TOTAL_BYTES} — aborting.`
           );
         }
+        // archiver accepts string | Buffer natively — no conversion needed.
         archive.append(file.content, { name: file.path });
       }
 

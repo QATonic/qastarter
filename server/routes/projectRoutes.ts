@@ -280,10 +280,15 @@ router.post(
 
         pathParts.forEach((part: string, index: number) => {
           if (index === pathParts.length - 1) {
+            // Binary file content is not serializable to the UI as text;
+            // substitute a marker so the tree still shows the node.
+            const content = Buffer.isBuffer(file.content)
+              ? `(binary file, ${file.content.length} bytes)`
+              : file.content;
             currentLevel[part] = {
               name: part,
               type: 'file',
-              content: file.content,
+              content,
             };
           } else {
             if (!currentLevel[part]) {
@@ -334,12 +339,22 @@ router.post(
         );
       })
       .slice(0, 8)
-      .map((file) => ({
-        path: file.path,
-        content:
-          file.content.substring(0, 2000) +
-          (file.content.length > 2000 ? '\n\n... (content truncated for preview)' : ''),
-      }));
+      .map((file) => {
+        // Binary files (e.g. gradle-wrapper.jar) can't be inlined as
+        // text; show a size marker instead of a corrupted preview.
+        if (Buffer.isBuffer(file.content)) {
+          return {
+            path: file.path,
+            content: `(binary file, ${file.content.length} bytes)`,
+          };
+        }
+        return {
+          path: file.path,
+          content:
+            file.content.substring(0, 2000) +
+            (file.content.length > 2000 ? '\n\n... (content truncated for preview)' : ''),
+        };
+      });
 
     const estimatedSize = files.reduce((total, file) => {
       return total + (file.content?.length || 0);

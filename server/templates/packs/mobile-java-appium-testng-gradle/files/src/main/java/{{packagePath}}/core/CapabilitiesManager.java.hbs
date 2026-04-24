@@ -27,30 +27,31 @@ UiAutomator2Options options = new UiAutomator2Options();
 String deviceName = ConfigurationReader.getProperty("mobile.android.deviceName", "{{deviceName}}");
 options.setDeviceName(deviceName);
 
-// Platform version (optional)
-String platformVersion = ConfigurationReader.getProperty("mobile.android.platformVersion");
+// Platform version (optional — 2-arg getProperty returns "" if absent
+// rather than throwing, so the isEmpty() guards below stay meaningful)
+String platformVersion = ConfigurationReader.getProperty("mobile.android.platformVersion", "");
 if (platformVersion != null && !platformVersion.isEmpty()) {
 options.setPlatformVersion(platformVersion);
 }
 
 // UDID (optional for device identification)
-String udid = ConfigurationReader.getProperty("mobile.android.udid");
+String udid = ConfigurationReader.getProperty("mobile.android.udid", "");
 if (udid != null && !udid.isEmpty()) {
 options.setUdid(udid);
 }
 
 // App settings
-String app = ConfigurationReader.getProperty("mobile.android.app");
+String app = ConfigurationReader.getProperty("mobile.android.app", "");
 if (app != null && !app.isEmpty()) {
 options.setApp(app);
 }
 
-String appPackage = ConfigurationReader.getProperty("mobile.android.appPackage");
+String appPackage = ConfigurationReader.getProperty("mobile.android.appPackage", "");
 if (appPackage != null && !appPackage.isEmpty()) {
 options.setAppPackage(appPackage);
 }
 
-String appActivity = ConfigurationReader.getProperty("mobile.android.appActivity");
+String appActivity = ConfigurationReader.getProperty("mobile.android.appActivity", "");
 if (appActivity != null && !appActivity.isEmpty()) {
 options.setAppActivity(appActivity);
 }
@@ -82,25 +83,25 @@ XCUITestOptions options = new XCUITestOptions();
 String deviceName = ConfigurationReader.getProperty("mobile.ios.deviceName", "iPhone Simulator");
 options.setDeviceName(deviceName);
 
-// Platform version
-String platformVersion = ConfigurationReader.getProperty("mobile.ios.platformVersion");
+// Platform version (optional — 2-arg getProperty returns "" if absent)
+String platformVersion = ConfigurationReader.getProperty("mobile.ios.platformVersion", "");
 if (platformVersion != null && !platformVersion.isEmpty()) {
 options.setPlatformVersion(platformVersion);
 }
 
 // UDID
-String udid = ConfigurationReader.getProperty("mobile.ios.udid");
+String udid = ConfigurationReader.getProperty("mobile.ios.udid", "");
 if (udid != null && !udid.isEmpty()) {
 options.setUdid(udid);
 }
 
 // App settings
-String app = ConfigurationReader.getProperty("mobile.ios.app");
+String app = ConfigurationReader.getProperty("mobile.ios.app", "");
 if (app != null && !app.isEmpty()) {
 options.setApp(app);
 }
 
-String bundleId = ConfigurationReader.getProperty("mobile.ios.bundleId");
+String bundleId = ConfigurationReader.getProperty("mobile.ios.bundleId", "");
 if (bundleId != null && !bundleId.isEmpty()) {
 options.setBundleId(bundleId);
 }

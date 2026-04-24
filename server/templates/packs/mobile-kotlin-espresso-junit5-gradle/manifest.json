@@ -142,7 +142,14 @@
       "description": "Custom test runner"
     },
     {
-      "path": "config/browserstack.yml",
+      "path": "browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "scripts/run-on-browserstack.sh",
       "isTemplate": true,
       "conditional": {
         "cloudDeviceFarm": "browserstack"

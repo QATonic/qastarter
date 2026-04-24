@@ -1,0 +1,39 @@
+# BrowserStack App Automate — Flutter config for {{projectName}}
+#
+# Flutter integration tests run on BrowserStack's cloud via the App
+# Automate REST API. There is no BS SDK for Flutter — the pipeline is:
+#   1. `flutter build apk --config-only`                (app under test)
+#      `flutter build apk integration_test/app_test.dart \
+#         --target=integration_test/app_test.dart --debug`
+#                                                        (test runner)
+#      For iOS swap `apk` for `ios --config-only` and build the .app.
+#   2. scripts/run-on-browserstack.sh uploads both artifacts and POSTs
+#      to /app-automate/flutter-integration-tests/v2/android/build with
+#      the bs:// urls plus the device matrix below.
+#
+# Prerequisites: Flutter SDK (+ Android SDK for APKs / Xcode for .app).
+# Docs: https://www.browserstack.com/docs/app-automate/flutter/integration-tests
+#
+# This file is informational — values below are consumed by
+# scripts/run-on-browserstack.sh which constructs the JSON request body.
+
+userName: BROWSERSTACK_USERNAME
+accessKey: BROWSERSTACK_ACCESS_KEY
+
+project: "{{projectName}}"
+buildName: "{{projectName}} - Build #1"
+
+android:
+  devices:
+    - "Samsung Galaxy S23-13.0"
+    - "Google Pixel 7-13.0"
+    - "OnePlus 11R-13.0"
+
+ios:
+  devices:
+    - "iPhone 14-16"
+    - "iPhone 15 Pro-17"
+
+# Optional — uncomment to scope the run:
+# deviceLogs: true
+# networkLogs: true

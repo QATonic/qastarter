@@ -158,8 +158,16 @@ junitXml.required = true
 // Fail build on test failures
 ignoreFailures = false
 
-// JVM settings
-jvmArgs = ['-Xmx1024m']
+// JVM settings — attach BrowserStack SDK as a java agent when the pack
+// was generated with cloudDeviceFarm=browserstack so every Selenium
+// session routes to BrowserStack's cloud based on browserstack.yml.
+jvmArgs = ['-Xmx1024m']{{#if (eq cloudDeviceFarm "browserstack")}}
+doFirst {
+    def sdkJar = configurations.testRuntimeClasspath.find { it.name.startsWith('browserstack-java-sdk') }
+    if (sdkJar != null) {
+        jvmArgs += ["-javaagent:${sdkJar.absolutePath}"]
+    }
+}{{/if}}
 
 // Clean reports before test
 doFirst {

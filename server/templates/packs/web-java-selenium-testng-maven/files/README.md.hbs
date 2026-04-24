@@ -300,7 +300,8 @@ BrowserStack's cloud instead of locally:
    export BROWSERSTACK_ACCESS_KEY=your_access_key
    ```
 
-4. (Optional) Edit `config/browserstack.yml` to customise the platform matrix,
+4. (Optional) Edit `browserstack.yml` (at the project root — the SDK hard-codes
+   this path) to customise the platform matrix,
    build name, or enable BrowserStack Local for staging URLs behind a firewall.
 5. Run tests the same way — the SDK intercepts the Selenium driver automatically:
 

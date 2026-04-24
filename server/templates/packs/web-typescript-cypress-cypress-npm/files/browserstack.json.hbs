@@ -1,0 +1,24 @@
+{
+  "auth": {
+    "username": "BROWSERSTACK_USERNAME",
+    "access_key": "BROWSERSTACK_ACCESS_KEY"
+  },
+  "browsers": [
+    { "browser": "chrome",  "os": "Windows 10", "versions": ["latest"] },
+    { "browser": "firefox", "os": "Windows 10", "versions": ["latest"] },
+    { "browser": "edge",    "os": "Windows 10", "versions": ["latest"] }
+  ],
+  "run_settings": {
+    "cypress_config_file": "./cypress.config.{{#if (eq language "typescript")}}ts{{else}}js{{/if}}",
+    "project_name": "{{projectName}}",
+    "build_name": "{{projectName}} - Build #1",
+    "parallels": 3,
+    "cypress_version": "13",
+    "headless": true
+  },
+  "connection_settings": {
+    "local": false,
+    "local_identifier": null
+  },
+  "disable_usage_reporting": false
+}

@@ -3,7 +3,8 @@
 "version": "1.0.0",
 "description": "{{projectName}} - Cypress TypeScript Automation Framework",
 "scripts": {
-"test": "cypress run",
+"test": "{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-cypress run --sync{{else}}cypress run{{/if}}",
+"test:local": "cypress run",
 "test:open": "cypress open",
 "test:headed": "cypress run --headed",
 {{#if (eq reportingTool "allure")}}
@@ -32,6 +33,7 @@
 "mochawesome-merge": "^4.3.0",
 "mochawesome-report-generator": "^6.2.0",
 {{/if}}
-"@types/node": "^20.10.0"
+"@types/node": "^20.10.0"{{#if (eq cloudDeviceFarm "browserstack")}},
+"browserstack-cypress-cli": "^1.34.0"{{/if}}
 }
 }

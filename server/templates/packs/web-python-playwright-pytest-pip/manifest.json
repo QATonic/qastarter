@@ -218,7 +218,7 @@
       }
     },
     {
-      "path": "config/browserstack.yml",
+      "path": "browserstack.yml",
       "isTemplate": true,
       "conditional": {
         "cloudDeviceFarm": "browserstack"

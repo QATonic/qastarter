@@ -41,6 +41,13 @@
     <PackageReference Include="SpecFlow" Version="3.9.74" />
     <PackageReference Include="SpecFlow.NUnit" Version="3.9.74" />
 {{/if}}
+{{#if (eq cloudDeviceFarm "browserstack")}}
+    <!-- BrowserStack SDK — reads browserstack.yml at project root and
+         auto-instruments Selenium to route sessions to BrowserStack's cloud.
+         Set BROWSERSTACK_USERNAME + BROWSERSTACK_ACCESS_KEY env vars before
+         running `dotnet test`. No C# code changes required. -->
+    <PackageReference Include="BrowserStack.TestAdapter" Version="0.28.1" />
+{{/if}}
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +57,11 @@
     <None Update="appsettings.*.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+{{#if (eq cloudDeviceFarm "browserstack")}}
+    <None Update="browserstack.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+{{/if}}
   </ItemGroup>
 
 </Project>

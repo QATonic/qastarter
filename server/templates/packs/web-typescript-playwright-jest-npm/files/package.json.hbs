@@ -3,7 +3,8 @@
 "version": "1.0.0",
 "description": "{{projectName}} - Playwright TypeScript Automation Framework",
 "scripts": {
-"test": "jest",
+"test": "{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-node-sdk jest{{else}}jest{{/if}}",
+"test:local": "jest",
 "test:headed": "HEADLESS=false jest",
 "test:parallel": "jest --maxWorkers=4",
 {{#if (eq reportingTool "allure")}}
@@ -35,6 +36,9 @@
 {{/if}}
 {{#if (eq reportingTool "jest-html")}}
 "jest-html-reporter": "^3.10.2",
+{{/if}}
+{{#if (eq cloudDeviceFarm "browserstack")}}
+"browserstack-node-sdk": "^1.34.15",
 {{/if}}
 "jest-circus": "^29.7.0"
 }

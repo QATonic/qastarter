@@ -120,6 +120,19 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        {{#if (eq cloudDeviceFarm "browserstack")}}
+
+        <!-- BrowserStack SDK — auto-instruments Playwright/Selenium tests to
+             run on BrowserStack's cloud based on browserstack.yml at project
+             root. Set BROWSERSTACK_USERNAME + BROWSERSTACK_ACCESS_KEY env
+             vars before running. No Java code changes required. -->
+        <dependency>
+            <groupId>com.browserstack</groupId>
+            <artifactId>browserstack-java-sdk</artifactId>
+            <version>1.25.0</version>
+            <scope>compile</scope>
+        </dependency>
+        {{/if}}
         {{#if userDependencies.hasMaven}}
 
         <!-- User-picked dependencies (from QAStarter dependency search) -->
@@ -153,6 +166,24 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
+            {{#if (eq cloudDeviceFarm "browserstack")}}
+
+            <!-- Populates ${com.browserstack:browserstack-java-sdk:jar} so
+                 Surefire can attach the BrowserStack SDK as a java agent. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>getClasspathFilenames</id>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            {{/if}}
 
             <!-- Maven Surefire Plugin -->
             <plugin>
@@ -178,7 +209,8 @@
                         {{/if}}
                     </systemPropertyVariables>
                     <argLine>-Dfile.encoding=UTF-8{{#if (eq reportingTool "allure")}}
-                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{/if}}{{#if (eq cloudDeviceFarm "browserstack")}}
+                        -javaagent:"${com.browserstack:browserstack-java-sdk:jar}"{{/if}}
                     </argLine>
                 </configuration>
                 {{#if (eq reportingTool "allure")}}

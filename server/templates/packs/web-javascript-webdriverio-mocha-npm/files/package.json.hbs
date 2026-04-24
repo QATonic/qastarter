@@ -21,5 +21,6 @@
     "eslint-plugin-wdio": "^8.24.0",
     "prettier": "^3.2.4"
     {{#if (eq reportingTool "allure")}},"@wdio/allure-reporter": "^8.27.0"{{/if}}
+    {{#if (eq cloudDeviceFarm "browserstack")}},"@wdio/browserstack-service": "^8.40.3"{{/if}}
   }
 }

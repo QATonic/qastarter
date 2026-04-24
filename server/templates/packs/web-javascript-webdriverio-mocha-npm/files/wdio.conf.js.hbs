@@ -1,10 +1,43 @@
-exports.config = {
+// package.json has "type": "module", so this file must use ESM `export`.
+export const config = {
   runner: "local",
   specs: ["./test/specs/**/*.spec.js"],
   exclude: [],
 
   maxInstances: 5,
 
+{{#if (eq cloudDeviceFarm "browserstack")}}
+  // BrowserStack credentials — set these env vars before running:
+  //   export BROWSERSTACK_USERNAME=your_username
+  //   export BROWSERSTACK_ACCESS_KEY=your_access_key
+  //
+  // We intentionally DO NOT register "@wdio/browserstack-service" here.
+  // The service would try to start Test Observability's daemon on
+  // localhost:5400, which fails on machines where that port is
+  // firewalled or privileged. user+key+hostname are enough to route
+  // sessions through BrowserStack's hub. If you want session names,
+  // video, and text logs in the dashboard, add the service back:
+  //   services: [['browserstack', { testObservability: false }]]
+  user: process.env.BROWSERSTACK_USERNAME,
+  key: process.env.BROWSERSTACK_ACCESS_KEY,
+  hostname: "hub-cloud.browserstack.com",
+  port: 443,
+  path: "/wd/hub",
+  protocol: "https",
+  capabilities: [
+    {
+      browserName: "chrome",
+      "bstack:options": {
+        os: "Windows",
+        osVersion: "11",
+        browserVersion: "latest",
+        projectName: "{{projectName}}",
+        buildName: "{{projectName}} - Build #1",
+        sessionName: "WebdriverIO on BrowserStack",
+      },
+    },
+  ],
+{{else}}
   capabilities: [{
     browserName: "chrome",
     "goog:chromeOptions": {
@@ -13,6 +46,7 @@ exports.config = {
         : []
     }
   }],
+{{/if}}
 
   logLevel: "info",
   bail: 0,

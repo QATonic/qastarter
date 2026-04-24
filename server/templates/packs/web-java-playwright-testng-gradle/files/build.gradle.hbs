@@ -92,6 +92,12 @@ implementation "com.google.code.gson:gson:${gsonVersion}"
 
 // CSV Processing
 implementation "org.apache.commons:commons-csv:${commonsCsvVersion}"
+{{#if (eq cloudDeviceFarm "browserstack")}}
+
+// BrowserStack SDK — auto-instruments Playwright tests to run on
+// BrowserStack's cloud based on browserstack.yml at project root.
+implementation 'com.browserstack:browserstack-java-sdk:1.25.0'
+{{/if}}
 {{#if userDependencies.hasMaven}}
 
 // User-picked dependencies (from QAStarter dependency search)
@@ -138,8 +144,16 @@ junitXml.required = true
 // Fail build on test failures
 ignoreFailures = false
 
-// JVM settings
-jvmArgs = ['-Xmx1024m']
+// JVM settings — attach BrowserStack SDK as a java agent when the pack
+// was generated with cloudDeviceFarm=browserstack so every Playwright
+// session routes to BrowserStack's cloud based on browserstack.yml.
+jvmArgs = ['-Xmx1024m']{{#if (eq cloudDeviceFarm "browserstack")}}
+doFirst {
+    def sdkJar = configurations.testRuntimeClasspath.find { it.name.startsWith('browserstack-java-sdk') }
+    if (sdkJar != null) {
+        jvmArgs += ["-javaagent:${sdkJar.absolutePath}"]
+    }
+}{{/if}}
 
 // Clean reports before test
 doFirst {

@@ -122,6 +122,17 @@
             <artifactId>commons-csv</artifactId>
             <version>${commons-csv.version}</version>
         </dependency>
+        {{#if (eq cloudDeviceFarm "browserstack")}}
+
+        <!-- BrowserStack SDK — auto-instruments Playwright tests to run on
+             BrowserStack's cloud based on browserstack.yml at project root. -->
+        <dependency>
+            <groupId>com.browserstack</groupId>
+            <artifactId>browserstack-java-sdk</artifactId>
+            <version>1.25.0</version>
+            <scope>compile</scope>
+        </dependency>
+        {{/if}}
 
         {{#if (eq testingPattern "bdd")}}
         <!-- Cucumber BDD -->
@@ -176,6 +187,24 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+            {{#if (eq cloudDeviceFarm "browserstack")}}
+
+            <!-- Populates ${com.browserstack:browserstack-java-sdk:jar} so
+                 Surefire can attach the BrowserStack SDK as a java agent. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>getClasspathFilenames</id>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            {{/if}}
 
             <!-- Maven Surefire Plugin for Running Tests -->
             <plugin>
@@ -185,9 +214,12 @@
                 <configuration>
                     {{#if (eq reportingTool "allure")}}
                     <argLine>
-                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{#if (eq cloudDeviceFarm "browserstack")}}
+                        -javaagent:"${com.browserstack:browserstack-java-sdk:jar}"{{/if}}
                     </argLine>
-                    {{/if}}
+                    {{else}}{{#if (eq cloudDeviceFarm "browserstack")}}
+                    <argLine>-javaagent:"${com.browserstack:browserstack-java-sdk:jar}"</argLine>
+                    {{/if}}{{/if}}
                     <systemPropertyVariables>
                         <browser>${browser}</browser>
                         <env>${env}</env>

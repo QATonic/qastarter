@@ -7,6 +7,37 @@ export const config: Options.Testrunner = {
   },
   specs: ["./test/specs/**/*.spec.ts"],
   maxInstances: 5,
+{{#if (eq cloudDeviceFarm "browserstack")}}
+  // BrowserStack credentials — set these env vars before running:
+  //   export BROWSERSTACK_USERNAME=your_username
+  //   export BROWSERSTACK_ACCESS_KEY=your_access_key
+  //
+  // We intentionally do NOT register "@wdio/browserstack-service" here
+  // by default — it tries to start Test Observability's daemon on
+  // localhost:5400 which is firewalled on some machines. user+key+hostname
+  // are enough to route sessions through BrowserStack's hub. To enable
+  // session names + video + text logs in the BS dashboard, add:
+  //   services: [['browserstack', { testObservability: false }]]
+  user: process.env.BROWSERSTACK_USERNAME,
+  key: process.env.BROWSERSTACK_ACCESS_KEY,
+  hostname: "hub-cloud.browserstack.com",
+  port: 443,
+  path: "/wd/hub",
+  protocol: "https",
+  capabilities: [
+    {
+      browserName: "chrome",
+      "bstack:options": {
+        os: "Windows",
+        osVersion: "11",
+        browserVersion: "latest",
+        projectName: "{{projectName}}",
+        buildName: "{{projectName}} - Build #1",
+        sessionName: "WebdriverIO TS on BrowserStack",
+      },
+    },
+  ],
+{{else}}
   capabilities: [
     {
       browserName: "chrome",
@@ -15,6 +46,7 @@ export const config: Options.Testrunner = {
       },
     },
   ],
+{{/if}}
   logLevel: "info",
   bail: 0,
   baseUrl: "{{baseUrl}}",

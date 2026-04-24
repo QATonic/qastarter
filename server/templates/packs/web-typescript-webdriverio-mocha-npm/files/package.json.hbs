@@ -26,6 +26,7 @@
 "allure-commandline": "^2.24.0",
 {{/if}}
 "chromedriver": "^120.0.0",
-"wdio-chromedriver-service": "^8.0.0"
+"wdio-chromedriver-service": "^8.0.0"{{#if (eq cloudDeviceFarm "browserstack")}},
+"@wdio/browserstack-service": "^8.40.3"{{/if}}
 }
 }

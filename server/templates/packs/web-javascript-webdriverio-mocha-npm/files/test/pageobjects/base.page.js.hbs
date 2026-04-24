@@ -5,9 +5,10 @@
 export default class BasePage {
   
   /**
-   * Open a path relative to baseUrl
+   * Open a path relative to baseUrl. Default "/" so `LoginPage.open()`
+   * without args lands on the home route.
    */
-  open(path) {
+  open(path = "/") {
     return browser.url(path);
   }
   

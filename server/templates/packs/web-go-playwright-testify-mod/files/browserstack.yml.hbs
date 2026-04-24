@@ -1,0 +1,37 @@
+# BrowserStack Configuration Reference for {{projectName}} (Go + Playwright)
+#
+# Go has no first-party BrowserStack SDK. Routing is handled in
+# utils/driver.go by connecting to the BrowserStack CDP WebSocket:
+#   wss://cdp.browserstack.com/playwright?caps=<URL-encoded JSON>
+#
+# This file is informational only — the values are hard-coded in
+# buildBrowserStackWSEndpoint() in utils/driver.go. Edit that function if
+# you need a different browser/os matrix.
+#
+# Before running tests:
+#   export BROWSERSTACK_USERNAME=<your username>
+#   export BROWSERSTACK_ACCESS_KEY=<your access key>
+#   go test ./...
+#
+# Docs: https://www.browserstack.com/docs/automate/playwright
+# Supported matrix: https://www.browserstack.com/list-of-browsers-and-platforms/playwright
+
+userName: BROWSERSTACK_USERNAME
+accessKey: BROWSERSTACK_ACCESS_KEY
+
+platforms:
+  - browser: playwright-chromium
+    browserVersion: latest
+    os: osx
+    osVersion: ventura
+  - browser: playwright-firefox
+    browserVersion: latest
+    os: osx
+    osVersion: ventura
+  - browser: playwright-webkit
+    browserVersion: latest
+    os: osx
+    osVersion: ventura
+
+buildName: "{{projectName}} - Build #1"
+projectName: "{{projectName}}"

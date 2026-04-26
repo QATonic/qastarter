@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'
+        jdk 'JDK{{toolVersions.java}}'
+    }
+
+    parameters {
+        choice(name: 'SIMULATION', choices: ['LoadSimulation', 'StressSimulation'], description: 'Gatling simulation to run')
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn clean compile -DskipTests'
+            }
+        }
+
+        stage('Run Gatling Simulation') {
+            steps {
+                sh "mvn gatling:test -Dgatling.simulationClass={{javaPackage}}.simulations.{{raw}}${params.SIMULATION}{{/raw}}"
+            }
+        }
+    }
+
+    post {
+        always {
+            gatlingArchive()
+            archiveArtifacts artifacts: 'target/gatling/**', allowEmptyArchive: true
+        }
+    }
+}

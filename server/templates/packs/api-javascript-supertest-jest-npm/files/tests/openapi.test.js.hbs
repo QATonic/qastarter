@@ -1,0 +1,26 @@
+/**
+ * Auto-generated API tests from OpenAPI specification.
+ * Each test validates a single endpoint's basic contract.
+ */
+
+const request = require('supertest');
+
+const BASE_URL = '{{baseUrl}}';
+
+describe('OpenAPI Endpoints', () => {
+{{#each openApiEndpoints}}
+  test('{{method}} {{path}} — {{summary}}', async () => {
+    const res = await request(BASE_URL)
+      .{{lowerCase method}}('{{path}}')
+{{#if requestBody}}
+      .set('Content-Type', '{{requestBody.contentType}}')
+      .send({})
+{{/if}}
+      ;
+
+    expect(res.status).toBeGreaterThanOrEqual(200);
+    expect(res.status).toBeLessThan(500);
+  });
+
+{{/each}}
+});

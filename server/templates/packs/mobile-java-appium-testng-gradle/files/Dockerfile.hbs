@@ -1,0 +1,42 @@
+# {{projectName}} - Mobile Test Automation with Appium
+# Dockerfile for running Appium tests in containerized environment
+
+FROM gradle:8.5-jdk17 AS build
+WORKDIR /app
+
+# Copy build files and download dependencies
+COPY build.gradle settings.gradle ./
+RUN gradle dependencies --no-daemon
+
+# Copy source code
+COPY src ./src
+
+# Build the project
+RUN gradle compileJava --no-daemon
+
+# Test stage
+FROM gradle:8.5-jdk17 AS test
+WORKDIR /app
+
+# Install Android SDK command line tools
+RUN apt-get update && apt-get install -y \
+    wget \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy built application
+COPY --from=build /app ./
+COPY --from=build /root/.gradle /root/.gradle
+
+# Set environment variables
+ENV TEST_ENV=qa
+ENV PLATFORM=android
+ENV APPIUM_HOST=appium
+ENV APPIUM_PORT=4723
+
+# Create directories for test results
+RUN mkdir -p /app/build/reports/tests /app/build/screenshots
+
+# Default command runs all tests
+ENTRYPOINT ["gradle", "test", "--no-daemon"]
+CMD ["-Dplatform=android", "-Denv=qa"]

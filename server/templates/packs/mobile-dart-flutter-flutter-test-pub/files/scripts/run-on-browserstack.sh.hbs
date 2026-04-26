@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------
+# Run {{projectName}} Flutter integration tests on BrowserStack App Automate.
+#
+# Usage:
+#   export BROWSERSTACK_USERNAME=<your username>
+#   export BROWSERSTACK_ACCESS_KEY=<your access key>
+#   bash scripts/run-on-browserstack.sh
+#
+# Prereqs: Flutter SDK + Android SDK (for APKs). For iOS runs on a Mac,
+# set PLATFORM=ios and keep Xcode installed.
+# Docs: https://www.browserstack.com/docs/app-automate/flutter/integration-tests
+# ------------------------------------------------------------------
+set -euo pipefail
+
+: "${BROWSERSTACK_USERNAME:?BROWSERSTACK_USERNAME not set}"
+: "${BROWSERSTACK_ACCESS_KEY:?BROWSERSTACK_ACCESS_KEY not set}"
+
+PROJECT_NAME="{{projectName}}"
+BUILD_NAME="${BUILD_NAME:-${PROJECT_NAME} - $(date -u +%Y%m%d-%H%M%S)}"
+PLATFORM="${PLATFORM:-android}"   # android | ios
+TEST_ENTRY="${TEST_ENTRY:-integration_test/app_test.dart}"
+
+if [[ "$PLATFORM" == "android" ]]; then
+  DEVICES='["Samsung Galaxy S23-13.0","Google Pixel 7-13.0","OnePlus 11R-13.0"]'
+  APP_ENDPOINT="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/app"
+  TEST_ENDPOINT="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/test-suite"
+  BUILD_ENDPOINT="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/build"
+  STATUS_ENDPOINT="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/android/builds"
+
+  echo "==> Building Android app + test APK"
+  flutter build apk --debug
+  flutter build apk --debug --target="$TEST_ENTRY"
+  APP_ARTIFACT="build/app/outputs/apk/debug/app-debug.apk"
+  TEST_ARTIFACT="build/app/outputs/apk/debug/app-debug-androidTest.apk"
+
+elif [[ "$PLATFORM" == "ios" ]]; then
+  DEVICES='["iPhone 14-16","iPhone 15 Pro-17"]'
+  APP_ENDPOINT="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/ios/app"
+  TEST_ENDPOINT="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/ios/test-suite"
+  BUILD_ENDPOINT="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/ios/build"
+  STATUS_ENDPOINT="https://api-cloud.browserstack.com/app-automate/flutter-integration-tests/v2/ios/builds"
+
+  echo "==> Building iOS app + XCUITest runner (Xcode required)"
+  flutter build ios --config-only
+  # See BrowserStack Flutter iOS docs for the full xcodebuild + zip
+  # sequence; this template captures the final artifact names.
+  APP_ARTIFACT="build/ios_app.zip"
+  TEST_ARTIFACT="build/ios_tests.zip"
+  echo "NOTE: produce $APP_ARTIFACT and $TEST_ARTIFACT per the BS iOS"
+  echo "      Flutter docs before re-running this script."
+  [[ -f "$APP_ARTIFACT" && -f "$TEST_ARTIFACT" ]] || exit 1
+
+else
+  echo "Unknown PLATFORM='$PLATFORM' (expected android or ios)"
+  exit 1
+fi
+
+[[ -f "$APP_ARTIFACT"  ]] || { echo "Missing $APP_ARTIFACT"; exit 1; }
+[[ -f "$TEST_ARTIFACT" ]] || { echo "Missing $TEST_ARTIFACT"; exit 1; }
+
+echo "==> Uploading app artifact"
+APP_RESP=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    -X POST "$APP_ENDPOINT" -F "file=@${APP_ARTIFACT}")
+APP_URL=$(echo "$APP_RESP" | sed -n 's/.*"app_url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+echo "   app_url: $APP_URL"
+
+echo "==> Uploading test suite"
+TEST_RESP=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    -X POST "$TEST_ENDPOINT" -F "file=@${TEST_ARTIFACT}")
+TEST_URL=$(echo "$TEST_RESP" | sed -n 's/.*"test_suite_url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+echo "   test_suite_url: $TEST_URL"
+
+echo "==> Triggering build on ${DEVICES}"
+BUILD_RESP=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    -X POST "$BUILD_ENDPOINT" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"app\":        \"${APP_URL}\",
+        \"testSuite\":  \"${TEST_URL}\",
+        \"devices\":    ${DEVICES},
+        \"project\":    \"${PROJECT_NAME}\",
+        \"buildName\":  \"${BUILD_NAME}\",
+        \"logs\":       true,
+        \"networkLogs\": true,
+        \"deviceLogs\": true
+    }")
+BUILD_ID=$(echo "$BUILD_RESP" | sed -n 's/.*"build_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+echo "   build_id: $BUILD_ID"
+echo "   Follow: https://app-automate.browserstack.com/dashboard/v2/builds/${BUILD_ID}"
+
+echo "==> Polling for completion"
+while :; do
+  sleep 20
+  STATUS=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    "${STATUS_ENDPOINT}/${BUILD_ID}" \
+    | sed -n 's/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  echo "   status: $STATUS"
+  case "$STATUS" in
+    passed|failed|error|timeout|skipped) break ;;
+    running|queued) ;;
+    *) echo "Unexpected status: $STATUS"; break ;;
+  esac
+done
+
+[[ "$STATUS" == "passed" ]] && exit 0 || exit 1

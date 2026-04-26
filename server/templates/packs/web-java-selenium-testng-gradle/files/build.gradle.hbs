@@ -1,0 +1,235 @@
+plugins {
+id 'java'
+id 'jacoco'
+{{#if (eq reportingTool "allure")}}
+id 'io.qameta.allure' version '{{toolVersions.allure}}' apply false
+{{/if}}
+id 'com.diffplug.spotless' version '6.25.0'
+}
+
+spotless {
+java {
+googleJavaFormat('1.17.0').aosp()
+}
+}
+
+group = '{{groupId}}'
+version = '1.0.0'
+description = '{{projectName}}'
+
+java {
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+}
+
+repositories {
+mavenCentral()
+}
+
+ext {
+// Dependency versions
+seleniumVersion = '{{toolVersions.selenium}}'
+testngVersion = '{{toolVersions.testng}}'
+log4jVersion = '{{toolVersions.log4j}}'
+{{#if (eq reportingTool "extent-reports")}}
+extentReportsVersion = '{{toolVersions.extentreports}}'
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+allureVersion = '{{toolVersions.allure}}'
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+cucumberVersion = '{{toolVersions.cucumber}}'
+{{/if}}
+jacksonVersion = '{{toolVersions.jackson}}'
+commonsCsvVersion = '1.10.0'
+
+// Test configuration
+browser = project.hasProperty('browser') ? project.property('browser') : 'chrome'
+headless = project.hasProperty('headless') ? project.property('headless') : 'false'
+env = project.hasProperty('env') ? project.property('env') : 'dev'
+suite = project.hasProperty('suite') ? project.property('suite') : 'testng.xml'
+parallel = project.hasProperty('parallel') ? project.property('parallel') : 'false'
+threadCount = project.hasProperty('threadCount') ? project.property('threadCount') : '1'
+}
+
+dependencies {
+// Selenium WebDriver — via BOM so transitive devtools-v* artifacts resolve
+// to the matching published version. See build.gradle in the junit5 sibling
+// for why this matters (4.16.0 shipped a devtools-v119 dep that was never
+// published at 4.16.0 — BOM + current Selenium avoids that class of break).
+implementation platform("org.seleniumhq.selenium:selenium-bom:${seleniumVersion}")
+implementation "org.seleniumhq.selenium:selenium-java"
+
+// TestNG — used in src/main/java (BaseTest), must be on the compile classpath.
+implementation "org.testng:testng:${testngVersion}"
+{{#if (eq reportingTool "extent-reports")}}
+
+// ExtentReports
+implementation "com.aventstack:extentreports:${extentReportsVersion}"
+{{/if}}
+{{#if (eq reportingTool "allure")}}
+
+// Allure
+testImplementation "io.qameta.allure:allure-testng:${allureVersion}"
+{{#if (eq testingPattern "bdd")}}
+testImplementation "io.qameta.allure:allure-cucumber7-jvm:${allureVersion}"
+{{/if}}
+{{/if}}
+{{#if (eq testingPattern "bdd")}}
+
+// Cucumber BDD
+testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
+testImplementation "io.cucumber:cucumber-testng:${cucumberVersion}"
+{{/if}}
+
+// Log4j2
+implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+
+// JSON Processing
+implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+implementation "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+
+// CSV Processing
+implementation "org.apache.commons:commons-csv:${commonsCsvVersion}"
+{{#if (eq cloudDeviceFarm "browserstack")}}
+
+// BrowserStack SDK — auto-instruments Selenium tests to run on
+// BrowserStack's cloud based on config/browserstack.yml. Set
+// BROWSERSTACK_USERNAME + BROWSERSTACK_ACCESS_KEY env vars before running.
+// No Java code changes required. See README for setup.
+implementation 'com.browserstack:browserstack-java-sdk:1.25.0'
+{{/if}}
+{{#if userDependencies.hasMaven}}
+
+// User-picked dependencies (from QAStarter dependency search)
+{{#each userDependencies.maven}}
+implementation '{{group}}:{{name}}:{{version}}'
+{{/each}}
+{{/if}}
+    {{#if utilities.faker}}
+    // DataFaker — Test data generation
+    implementation 'net.datafaker:datafaker:{{toolVersions.datafaker}}'
+    {{/if}}
+}
+
+// Test task configuration
+test {
+useTestNG() {
+// Use TestNG suite files
+suites "src/test/resources/${suite}"
+
+// Configure parallel execution
+if ((project.findProperty('parallel') ?: 'false') == 'true') {
+parallel = 'methods'
+threadCount = Integer.parseInt(project.findProperty('threadCount') ?: '1')
+}
+
+// System properties for test execution
+systemProperty 'browser', browser
+systemProperty 'headless', headless
+systemProperty 'env', env
+}
+
+// Test output
+testLogging {
+events "passed", "skipped", "failed"
+exceptionFormat "full"
+}
+
+// Generate reports
+reports {
+html.required = true
+junitXml.required = true
+}
+
+// Fail build on test failures
+ignoreFailures = false
+
+// JVM settings — attach BrowserStack SDK as a java agent when the pack
+// was generated with cloudDeviceFarm=browserstack so every Selenium
+// session routes to BrowserStack's cloud based on browserstack.yml.
+jvmArgs = ['-Xmx1024m']{{#if (eq cloudDeviceFarm "browserstack")}}
+doFirst {
+    def sdkJar = configurations.testRuntimeClasspath.find { it.name.startsWith('browserstack-java-sdk') }
+    if (sdkJar != null) {
+        jvmArgs += ["-javaagent:${sdkJar.absolutePath}"]
+    }
+}{{/if}}
+
+// Clean reports before test
+doFirst {
+delete fileTree(dir: "reports", include: "**/*")
+delete fileTree(dir: "test-output", include: "**/*")
+}
+}
+
+// Custom task for running smoke tests
+task smokeTest(type: Test) {
+useTestNG() {
+suites "src/test/resources/smoke.xml"
+systemProperty 'browser', browser
+systemProperty 'headless', headless
+systemProperty 'env', env
+}
+}
+
+// Custom task for running regression tests
+task regressionTest(type: Test) {
+useTestNG() {
+suites "src/test/resources/regression.xml"
+parallel = 'methods'
+threadCount = Integer.parseInt(project.findProperty('threadCount') ?: '3')
+systemProperty 'browser', browser
+systemProperty 'headless', headless
+systemProperty 'env', env
+}
+}
+
+// Remove application plugin if no main class is needed
+// application {
+// mainClass = '{{javaPackage}}.TestRunner'
+// }
+
+// Code coverage with JaCoCo
+jacoco {
+toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+dependsOn test
+reports {
+xml.required = true
+csv.required = false
+html.required = true
+}
+}
+
+// Clean task enhancement
+clean {
+delete "logs"
+delete "reports"
+delete "test-output"
+delete "screenshots"
+}
+
+// Gradle wrapper task
+wrapper {
+gradleVersion = '{{toolVersions.gradle}}'
+distributionType = Wrapper.DistributionType.BIN
+}
+{{#if (eq reportingTool "allure")}}
+
+// Allure configuration
+allure {
+version = '{{toolVersions.allure}}'
+autoconfigure = true
+aspectjweaver = true
+
+useTestNG {
+version = '{{toolVersions.allure}}'
+}
+}
+{{/if}}

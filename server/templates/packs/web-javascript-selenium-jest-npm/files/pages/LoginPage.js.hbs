@@ -1,0 +1,67 @@
+/**
+ * Login Page — page object for SauceDemo login flow.
+ */
+const { By } = require('selenium-webdriver');
+const { BasePage } = require('./BasePage');
+const envConfig = require('../config/env.config');
+
+class LoginPage extends BasePage {
+  constructor(driver) {
+    super(driver);
+    this.usernameField = By.id('user-name');
+    this.passwordField = By.id('password');
+    this.loginButton = By.id('login-button');
+    this.errorMessage = By.css("[data-test='error']");
+  }
+
+  async navigateToLogin() {
+    await this.navigate(envConfig.getBaseUrl());
+  }
+
+  async enterUsername(username) {
+    await this.type(this.usernameField, username);
+    return this;
+  }
+
+  async enterPassword(password) {
+    await this.type(this.passwordField, password);
+    return this;
+  }
+
+  async clickLogin() {
+    await this.click(this.loginButton);
+  }
+
+  async login(username, password) {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLogin();
+  }
+
+  async isUsernameVisible() {
+    return this.isDisplayed(this.usernameField);
+  }
+
+  async isPasswordVisible() {
+    return this.isDisplayed(this.passwordField);
+  }
+
+  async isErrorDisplayed() {
+    return this.isDisplayed(this.errorMessage);
+  }
+
+  async getErrorMessage() {
+    if (!(await this.isErrorDisplayed())) return '';
+    return this.getText(this.errorMessage);
+  }
+
+  async isLoginSuccessful() {
+    return (await this.getCurrentUrl()).includes('inventory');
+  }
+
+  async isLoaded() {
+    return this.isDisplayed(this.loginButton);
+  }
+}
+
+module.exports = { LoginPage };

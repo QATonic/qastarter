@@ -1,0 +1,17 @@
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.pylint.messages_control]
+disable = [
+"C0111", # missing-docstring
+"C0103", # invalid-name (we use custom naming conventions)
+"E1101", # no-member (common in Playwright dynamic attrs)
+]
+max-line-length = 100

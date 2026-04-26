@@ -1,0 +1,43 @@
+"""
+Home Page - landing page after successful login.
+"""
+from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
+from config.config_reader import config
+from utils.logger import log
+
+
+class HomePage(BasePage):
+    """Home page object."""
+
+    # Locators
+    LOGO = (By.CSS_SELECTOR, ".logo")
+    USER_MENU = (By.CSS_SELECTOR, ".user-menu")
+    LOGOUT_BUTTON = (By.LINK_TEXT, "Logout")
+    WELCOME_MESSAGE = (By.CSS_SELECTOR, ".welcome-message")
+    NAVIGATION_MENU = (By.CSS_SELECTOR, ".nav-menu")
+
+    def __init__(self, driver):
+        super().__init__(driver)
+        self.url = f"{config.base_url}/dashboard"
+
+    def navigate_to_home(self) -> None:
+        """Navigate to the home page."""
+        self.navigate_to(self.url)
+
+    def is_loaded(self) -> bool:
+        return self.is_displayed(self.LOGO) and self.is_displayed(self.NAVIGATION_MENU)
+
+    def get_welcome_message(self) -> str:
+        return self.get_text(self.WELCOME_MESSAGE)
+
+    def click_user_menu(self) -> None:
+        self.click(self.USER_MENU)
+
+    def logout(self) -> None:
+        log.info("Logging out")
+        self.click_user_menu()
+        self.click(self.LOGOUT_BUTTON)
+
+    def is_user_logged_in(self) -> bool:
+        return self.is_displayed(self.USER_MENU)

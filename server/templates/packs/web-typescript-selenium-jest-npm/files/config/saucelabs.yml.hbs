@@ -1,0 +1,33 @@
+# Sauce Labs Configuration for {{projectName}}
+# Docs: https://docs.saucelabs.com/web-apps/automated-testing/selenium/
+
+apiVersion: v1alpha
+kind: selenium
+sauce:
+  region: us-west-1
+
+defaults:
+  timeout: 300
+
+suites:
+  - name: "{{projectName}} - Chrome"
+    platformName: "Windows 11"
+    browserName: chrome
+    browserVersion: latest
+    screenResolution: 1920x1080
+
+  - name: "{{projectName}} - Firefox"
+    platformName: "Windows 11"
+    browserName: firefox
+    browserVersion: latest
+    screenResolution: 1920x1080
+
+  - name: "{{projectName}} - Safari"
+    platformName: "macOS 13"
+    browserName: safari
+    browserVersion: latest
+    screenResolution: 1920x1440
+
+# Environment variables — set in CI or locally
+# SAUCE_USERNAME: your-username
+# SAUCE_ACCESS_KEY: your-access-key

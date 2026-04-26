@@ -1,0 +1,65 @@
+name: Mobile Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: {{raw}}${{ matrix.os }}{{/raw}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest]
+        platform: [Android, iOS]
+        dotnet-version: ['8.0.x']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET {{raw}}${{ matrix.dotnet-version }}{{/raw}}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: {{raw}}${{ matrix.dotnet-version }}{{/raw}}
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Set up Android SDK (Android only)
+        if: matrix.platform == 'Android'
+        uses: android-actions/setup-android@v3
+      
+      - name: Install Appium
+        run: |
+          npm install -g appium@2
+          appium driver install uiautomator2
+          appium driver install xcuitest
+      
+      - name: Start Appium Server
+        run: |
+          appium &
+          sleep 5
+      
+      - name: Run tests
+        env:
+          PLATFORM: {{raw}}${{ matrix.platform }}{{/raw}}
+          TEST_ENV: qa
+          APPIUM_SERVER: http://localhost:4723
+        run: |
+          dotnet test --filter "FullyQualifiedName~SmokeTests" --logger "console;verbosity=detailed"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-{{raw}}${{ matrix.platform }}{{/raw}}
+          path: |
+            Reports/
+            Screenshots/
+            Logs/

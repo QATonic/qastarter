@@ -1,0 +1,87 @@
+using System;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Edge;
+using {{projectNamespace}}.Config;
+
+namespace {{projectNamespace}}.Utils
+{
+    /// <summary>
+    /// Driver Manager - Thread-safe WebDriver lifecycle management.
+    /// Selenium 4.16+ uses built-in Selenium Manager - no driver setup needed!
+    /// </summary>
+    public class DriverManager
+    {
+        private static readonly ThreadLocal<IWebDriver> _driver = new();
+        
+        public static IWebDriver Driver
+        {
+            get
+            {
+                if (_driver.Value == null)
+                    throw new InvalidOperationException("Driver not initialized. Call InitDriver() first.");
+                return _driver.Value;
+            }
+        }
+
+        public static IWebDriver InitDriver(string browser = null, bool? headless = null)
+        {
+            browser ??= ConfigReader.Instance.Browser;
+            headless ??= ConfigReader.Instance.Headless;
+
+            Console.WriteLine($"[Driver] Initializing: {browser} | Headless: {headless}");
+
+            _driver.Value = CreateDriver(browser.ToLower(), headless.Value);
+            _driver.Value.Manage().Window.Maximize();
+            _driver.Value.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(ConfigReader.Instance.Timeout);
+
+            Console.WriteLine("[Driver] Browser initialized successfully");
+            return _driver.Value;
+        }
+
+        private static IWebDriver CreateDriver(string browser, bool headless)
+        {
+            switch (browser)
+            {
+                case "firefox":
+                    var ffOptions = new FirefoxOptions();
+                    if (headless) ffOptions.AddArgument("--headless");
+                    return new FirefoxDriver(ffOptions);
+
+                case "edge":
+                    var edgeOptions = new EdgeOptions();
+                    if (headless) edgeOptions.AddArgument("--headless");
+                    return new EdgeDriver(edgeOptions);
+
+                default: // Chrome
+                    var chromeOptions = new ChromeOptions();
+                    if (headless) chromeOptions.AddArgument("--headless=new");
+                    chromeOptions.AddArguments("--no-sandbox", "--disable-dev-shm-usage");
+                    return new ChromeDriver(chromeOptions);
+            }
+        }
+
+        public static void QuitDriver()
+        {
+            if (_driver.Value != null)
+            {
+                try
+                {
+                    _driver.Value.Quit();
+                    Console.WriteLine("[Driver] Browser closed");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Driver] Error closing browser: {ex.Message}");
+                }
+                finally
+                {
+                    _driver.Value = null;
+                }
+            }
+        }
+
+        public static bool IsInitialized => _driver.Value != null;
+    }
+}

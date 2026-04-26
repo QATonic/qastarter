@@ -1,0 +1,184 @@
+import { Browser, Element } from 'webdriverio';
+import logger from './logger';
+
+/**
+ * Wait helper utilities for mobile test automation
+ */
+export class WaitHelpers {
+  private driver: Browser;
+  private defaultTimeout: number;
+
+  constructor(driver: Browser, defaultTimeout: number = 30000) {
+    this.driver = driver;
+    this.defaultTimeout = defaultTimeout;
+  }
+
+  /**
+   * Wait for element to be displayed
+   */
+  async waitForElementDisplayed(
+    selector: string,
+    timeout: number = this.defaultTimeout
+  ): Promise<Element> {
+    logger.debug(`Waiting for element to be displayed: ${selector}`);
+    const element = await this.driver.$(selector);
+    await element.waitForDisplayed({ timeout });
+    return element;
+  }
+
+  /**
+   * Wait for element to be clickable
+   */
+  async waitForElementClickable(
+    selector: string,
+    timeout: number = this.defaultTimeout
+  ): Promise<Element> {
+    logger.debug(`Waiting for element to be clickable: ${selector}`);
+    const element = await this.driver.$(selector);
+    await element.waitForClickable({ timeout });
+    return element;
+  }
+
+  /**
+   * Wait for element to exist in DOM
+   */
+  async waitForElementExist(
+    selector: string,
+    timeout: number = this.defaultTimeout
+  ): Promise<Element> {
+    logger.debug(`Waiting for element to exist: ${selector}`);
+    const element = await this.driver.$(selector);
+    await element.waitForExist({ timeout });
+    return element;
+  }
+
+  /**
+   * Wait for element to disappear
+   */
+  async waitForElementToDisappear(
+    selector: string,
+    timeout: number = this.defaultTimeout
+  ): Promise<boolean> {
+    logger.debug(`Waiting for element to disappear: ${selector}`);
+    try {
+      const element = await this.driver.$(selector);
+      await element.waitForDisplayed({ timeout, reverse: true });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Wait for element to contain specific text
+   */
+  async waitForElementText(
+    selector: string,
+    expectedText: string,
+    timeout: number = this.defaultTimeout
+  ): Promise<boolean> {
+    logger.debug(`Waiting for element text '${expectedText}': ${selector}`);
+    const element = await this.driver.$(selector);
+    
+    try {
+      await this.driver.waitUntil(
+        async () => {
+          const text = await element.getText();
+          return text.includes(expectedText);
+        },
+        { timeout, timeoutMsg: `Element did not contain text: ${expectedText}` }
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Wait for a custom condition
+   */
+  async waitForCondition(
+    condition: () => Promise<boolean>,
+    timeout: number = this.defaultTimeout,
+    message: string = 'Condition not met'
+  ): Promise<boolean> {
+    logger.debug(`Waiting for condition: ${message}`);
+    try {
+      await this.driver.waitUntil(condition, { timeout, timeoutMsg: message });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Wait for app to be ready
+   */
+  async waitForAppReady(timeout: number = this.defaultTimeout): Promise<void> {
+    logger.debug('Waiting for app to be ready...');
+    await this.driver.waitUntil(
+      async () => {
+        const source = await this.driver.getPageSource();
+        return source && source.length > 0;
+      },
+      { timeout, timeoutMsg: 'App did not become ready' }
+    );
+    logger.debug('App is ready');
+  }
+
+  /**
+   * Wait for activity (Android)
+   */
+  async waitForActivity(
+    activity: string,
+    timeout: number = this.defaultTimeout
+  ): Promise<boolean> {
+    logger.debug(`Waiting for activity: ${activity}`);
+    try {
+      await this.driver.waitUntil(
+        async () => {
+          const currentActivity = await (this.driver as any).getCurrentActivity();
+          return currentActivity.includes(activity);
+        },
+        { timeout }
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Simple pause (use sparingly)
+   */
+  async pause(milliseconds: number): Promise<void> {
+    logger.debug(`Pausing for ${milliseconds}ms`);
+    await this.driver.pause(milliseconds);
+  }
+
+  /**
+   * Check if element is displayed without waiting
+   */
+  async isElementDisplayed(selector: string): Promise<boolean> {
+    try {
+      const element = await this.driver.$(selector);
+      return await element.isDisplayed();
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Check if element exists without waiting
+   */
+  async isElementExisting(selector: string): Promise<boolean> {
+    try {
+      const element = await this.driver.$(selector);
+      return await element.isExisting();
+    } catch {
+      return false;
+    }
+  }
+}
+
+export default WaitHelpers;

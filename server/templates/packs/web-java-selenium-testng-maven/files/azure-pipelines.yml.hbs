@@ -1,0 +1,72 @@
+trigger:
+- main
+- master
+
+pool:
+vmImage: 'ubuntu-latest'
+
+variables:
+MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+BROWSER: 'chrome'
+HEADLESS: 'true'
+
+stages:
+- stage: Build
+jobs:
+- job: Build
+steps:
+- task: JavaToolInstaller@0
+inputs:
+versionSpec: '11'
+jdkArchitectureOption: 'x64'
+jdkSourceOption: 'PreInstalled'
+
+- task: Cache@2
+inputs:
+key: 'maven | "$(Agent.OS)" | pom.xml'
+restoreKeys: |
+maven | "$(Agent.OS)"
+path: $(MAVEN_CACHE_FOLDER)
+displayName: Cache Maven packages
+
+- script: mvn clean compile
+displayName: 'Build'
+
+- stage: Test
+dependsOn: Build
+jobs:
+- job: Test
+steps:
+- task: JavaToolInstaller@0
+inputs:
+versionSpec: '11'
+jdkArchitectureOption: 'x64'
+jdkSourceOption: 'PreInstalled'
+
+- script: |
+sudo apt-get update
+sudo apt-get install -y google-chrome-stable
+displayName: 'Install Chrome'
+
+- script: mvn test -Dbrowser=$(BROWSER) -Dheadless=$(HEADLESS)
+displayName: 'Run Tests'
+continueOnError: true
+
+- task: PublishTestResults@2
+inputs:
+testResultsFormat: 'JUnit'
+testResultsFiles: '**/surefire-reports/*.xml'
+condition: always()
+
+- task: PublishBuildArtifacts@1
+inputs:
+PathtoPublish: 'reports'
+ArtifactName: 'test-reports'
+condition: always()
+
+- task: PublishBuildArtifacts@1
+inputs:
+PathtoPublish: 'screenshots'
+ArtifactName: 'screenshots'
+condition: always()

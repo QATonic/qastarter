@@ -1,0 +1,38 @@
+# BrowserStack App Automate — XCUITest config for {{projectName}}
+#
+# XCUITest tests run on BrowserStack's cloud via the App Automate REST
+# API (there is no BS SDK for XCUITest). The build pipeline is:
+#   1. xcodebuild build-for-testing produces
+#        Build/Products/Debug-iphoneos/{{projectName}}.app
+#        Build/Products/Debug-iphoneos/{{projectName}}UITests-Runner.app
+#      plus a *.xctestrun manifest that BrowserStack ingests.
+#   2. scripts/run-on-browserstack.sh zips the Products dir into a .ipa
+#      archive and uploads it as both the app and test suite.
+#   3. curl POSTs to /app-automate/xcuitest/v2/build with bs:// urls plus
+#      the device matrix below.
+#
+# Prerequisites: macOS with Xcode installed (this wiring cannot run from
+# Windows or Linux).
+# Docs: https://www.browserstack.com/docs/app-automate/xcuitest
+#
+# This file is informational — values below are consumed by
+# scripts/run-on-browserstack.sh which constructs the JSON request body.
+
+userName: BROWSERSTACK_USERNAME
+accessKey: BROWSERSTACK_ACCESS_KEY
+
+project: "{{projectName}}"
+buildName: "{{projectName}} - Build #1"
+
+# iOS devices — edit to pick a different matrix. Supported list:
+# https://www.browserstack.com/list-of-browsers-and-platforms/app_automate
+devices:
+  - "iPhone 14-16"
+  - "iPhone 15 Pro-17"
+  - "iPad Air 5-16"
+
+# Optional — uncomment to scope the run:
+# onlyTesting:
+#   - "{{projectName}}UITests/LoginTests"
+# deviceLogs: true
+# networkLogs: true

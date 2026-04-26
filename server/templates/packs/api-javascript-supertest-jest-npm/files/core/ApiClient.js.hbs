@@ -1,0 +1,47 @@
+/**
+ * API Client - HTTP client for REST API testing.
+ */
+const request = require("supertest");
+const { apiConfig } = require("../config/ConfigReader");
+const { log } = require("../utils/logger");
+
+class ApiClient {
+  constructor() {
+    this.baseUrl = apiConfig.baseUrl;
+    log.info(`API Client initialized: ${this.baseUrl}`);
+  }
+
+  async get(endpoint) {
+    log.info(`GET ${endpoint}`);
+    const response = await request(this.baseUrl).get(endpoint).set("Content-Type", apiConfig.contentType);
+    log.info(`Response: ${response.status}`);
+    return response;
+  }
+
+  async post(endpoint, body) {
+    log.info(`POST ${endpoint}`);
+    const response = await request(this.baseUrl).post(endpoint).set("Content-Type", apiConfig.contentType).send(body);
+    log.info(`Response: ${response.status}`);
+    return response;
+  }
+
+  async put(endpoint, body) {
+    log.info(`PUT ${endpoint}`);
+    const response = await request(this.baseUrl).put(endpoint).set("Content-Type", apiConfig.contentType).send(body);
+    log.info(`Response: ${response.status}`);
+    return response;
+  }
+
+  async delete(endpoint) {
+    log.info(`DELETE ${endpoint}`);
+    const response = await request(this.baseUrl).delete(endpoint).set("Content-Type", apiConfig.contentType);
+    log.info(`Response: ${response.status}`);
+    return response;
+  }
+}
+
+// Shared instance for tests that want a ready-to-use client.
+const apiClient = new ApiClient();
+
+module.exports = { ApiClient, apiClient };
+module.exports.default = apiClient;

@@ -1,0 +1,145 @@
+/**
+ * Utility functions for Cypress tests.
+ */
+
+/**
+ * Logger utility for consistent test logging
+ */
+export const Logger = {
+  info: (message: string): void => {
+    cy.log(`ℹ️ INFO: ${message}`);
+  },
+
+  step: (message: string): void => {
+    cy.log(`→ STEP: ${message}`);
+  },
+
+  debug: (message: string): void => {
+    if (Cypress.env('DEBUG')) {
+      cy.log(`🔍 DEBUG: ${message}`);
+    }
+  },
+
+  warn: (message: string): void => {
+    cy.log(`⚠️ WARN: ${message}`);
+  },
+
+  error: (message: string): void => {
+    cy.log(`❌ ERROR: ${message}`);
+  },
+
+  startSection: (sectionName: string): void => {
+    cy.log('========================================');
+    cy.log(sectionName);
+    cy.log('========================================');
+  },
+
+  endSection: (): void => {
+    cy.log('========================================');
+  }
+};
+
+/**
+ * Wait utilities
+ */
+export const WaitUtils = {
+  waitForVisible: (selector: string, timeout = 10000): Cypress.Chainable => {
+    return cy.get(selector, { timeout }).should('be.visible');
+  },
+
+  waitForNotExist: (selector: string, timeout = 10000): Cypress.Chainable => {
+    return cy.get(selector, { timeout }).should('not.exist');
+  },
+
+  waitForUrlContains: (text: string, timeout = 10000): Cypress.Chainable => {
+    return cy.url({ timeout }).should('include', text);
+  },
+
+  waitForPageLoad: (): Cypress.Chainable => {
+    return cy.document().its('readyState').should('eq', 'complete');
+  }
+};
+
+/**
+ * Data utilities
+ */
+export const DataUtils = {
+  randomString: (length = 10): string => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  },
+
+  randomEmail: (domain = 'test.example.com'): string => {
+    const username = DataUtils.randomString(8).toLowerCase();
+    const timestamp = Date.now();
+    return `${username}.${timestamp}@${domain}`;
+  },
+
+  randomNumber: (min = 0, max = 1000): number => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+};
+
+/**
+ * Screenshot utilities
+ */
+export const ScreenshotUtils = {
+  capture: (name: string): void => {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    cy.screenshot(`${name}_${timestamp}`);
+  },
+
+  captureOnFailure: (testName: string): void => {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9]/g, '_');
+    cy.screenshot(`failed_${sanitizedName}`, { capture: 'fullPage' });
+  }
+};
+
+/**
+ * API utilities for Cypress
+ */
+export const ApiUtils = {
+  authenticatedRequest: <T>(
+    method: string,
+    url: string,
+    body: object | null = null,
+    token: string | null = null
+  ): Cypress.Chainable<Cypress.Response<T>> => {
+    const authToken = token || Cypress.env('authToken');
+
+    return cy.request({
+      method,
+      url,
+      body,
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      failOnStatusCode: false
+    });
+  },
+
+  loginViaApi: (username: string, password: string): Cypress.Chainable<string> => {
+    return cy.request({
+      method: 'POST',
+      url: `${Cypress.env('apiUrl')}/auth/login`,
+      body: { username, password }
+    }).then((response) => {
+      const token = response.body.token || response.body.accessToken;
+      Cypress.env('authToken', token);
+      return token;
+    });
+  }
+};
+
+export default {
+  Logger,
+  WaitUtils,
+  DataUtils,
+  ScreenshotUtils,
+  ApiUtils
+};

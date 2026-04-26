@@ -1,0 +1,41 @@
+version: 2.1
+
+executors:
+  macos-executor:
+    macos:
+      xcode: "{{toolVersions.xcode}}"
+    working_directory: ~/repo
+
+jobs:
+  test:
+    executor: macos-executor
+    steps:
+      - checkout
+      
+      - run:
+          name: Run Tests
+          command: |
+            xcodebuild -scheme {{projectName}} \
+              -sdk iphonesimulator \
+              -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+              test
+      {{#if (eq reportingTool "xcresult")}}
+      
+      - store_artifacts:
+          path: DerivedData/Logs/Test
+          destination: test-results
+      {{/if}}
+      
+      - store_artifacts:
+          path: screenshots
+          destination: screenshots
+      
+      - store_artifacts:
+          path: logs
+          destination: logs
+
+workflows:
+  version: 2
+  test-workflow:
+    jobs:
+      - test

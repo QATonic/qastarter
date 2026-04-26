@@ -1,0 +1,44 @@
+/**
+ * Login Page - Page object for SauceDemo.
+ */
+import { BasePage } from "./BasePage";
+
+export class LoginPage extends BasePage {
+  // Selectors
+  private usernameField = "#user-name";
+  private passwordField = "#password";
+  private loginButton = "#login-button";
+  private errorMessage = "[data-test='error']";
+
+  enterUsername(username: string): this {
+    this.type(this.usernameField, username);
+    return this;
+  }
+
+  enterPassword(password: string): this {
+    this.type(this.passwordField, password);
+    return this;
+  }
+
+  clickLogin(): this {
+    this.click(this.loginButton);
+    return this;
+  }
+
+  login(username: string, password: string): this {
+    this.enterUsername(username);
+    this.enterPassword(password);
+    this.clickLogin();
+    return this;
+  }
+
+  verifyErrorDisplayed(): this {
+    this.shouldBeVisible(this.errorMessage);
+    return this;
+  }
+
+  verifyLoginSuccess(): this {
+    cy.url().should("include", "inventory");
+    return this;
+  }
+}

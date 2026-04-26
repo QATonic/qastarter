@@ -1,0 +1,240 @@
+{
+  "id": "web-python-playwright-pytest-pip",
+  "displayName": "Python Playwright pytest Framework",
+  "description": "Production-ready Playwright automation framework with Python and pytest",
+  "version": "2.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "playwright",
+    "language": "python",
+    "testRunner": "pytest",
+    "buildTool": "pip"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "pytest-html"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "python": "3.8+",
+    "playwright": "1.40.0",
+    "pytest": "8.0.0"
+  },
+  "files": [
+    {
+      "path": "requirements.txt",
+      "isTemplate": true
+    },
+    {
+      "path": "pytest.ini",
+      "isTemplate": true
+    },
+    {
+      "path": "pyproject.toml",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true
+    },
+    {
+      "path": "config/__init__.py",
+      "isTemplate": false
+    },
+    {
+      "path": "config/config_reader.py",
+      "isTemplate": true
+    },
+    {
+      "path": "config/dev.ini",
+      "isTemplate": true
+    },
+    {
+      "path": "config/qa.ini",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/__init__.py",
+      "isTemplate": false
+    },
+    {
+      "path": "pages/base_page.py",
+      "isTemplate": true
+    },
+    {
+      "path": "pages/login_page.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/__init__.py",
+      "isTemplate": false
+    },
+    {
+      "path": "utils/logger.py",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/__init__.py",
+      "isTemplate": false
+    },
+    {
+      "path": "tests/conftest.py",
+      "isTemplate": true
+    },
+    {
+      "path": "tests/test_login.py",
+      "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "config/env_config.py",
+      "isTemplate": true
+    },
+    {
+      "path": "config/test_config.py",
+      "isTemplate": true
+    },
+    {
+      "path": "conftest.py",
+      "isTemplate": true
+    },
+    {
+      "path": "data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "pages/home_page.py",
+      "isTemplate": true
+    },
+    {
+      "path": "step_defs/test_login_steps.py",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "utils/data_reader.py",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "utils/wait_helpers.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshot_helper.py",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/test_data_factory.py",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "config/saucelabs.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "saucelabs"
+      }
+    }
+  ],
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
+}

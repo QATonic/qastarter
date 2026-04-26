@@ -1,0 +1,181 @@
+package {{javaPackage}}.steps;
+
+import io.cucumber.java.en.*;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import {{javaPackage}}.config.ConfigReader;
+import {{javaPackage}}.core.ResponseValidator;
+import {{javaPackage}}.utils.Log;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+import static org.testng.Assert.*;
+
+public class AuthenticationSteps {
+
+    private Response response;
+    private Map<String, Object> credentials;
+    private String authToken;
+    private String oldToken;
+
+    @Given("the authentication API is available")
+    public void the_authentication_api_is_available() {
+        RestAssured.baseURI = ConfigReader.getBaseUrl();
+        Log.info("Auth API Base URL: " + RestAssured.baseURI);
+    }
+
+    @Given("I have valid login credentials with username {string} and password {string}")
+    public void i_have_valid_login_credentials(String username, String password) {
+        credentials = new HashMap<>();
+        credentials.put("email", username);
+        credentials.put("password", password);
+        Log.info("Created login credentials for: " + username);
+    }
+
+    @Given("I have login credentials with username {string} and password {string}")
+    public void i_have_login_credentials(String username, String password) {
+        credentials = new HashMap<>();
+        credentials.put("email", username);
+        credentials.put("password", password);
+        Log.info("Created login credentials for: " + username);
+    }
+
+    @Given("I have incomplete login credentials")
+    public void i_have_incomplete_login_credentials() {
+        credentials = new HashMap<>();
+        credentials.put("email", "test@example.com");
+        // Missing password
+        Log.info("Created incomplete login credentials");
+    }
+
+    @Given("I have a valid authentication token")
+    public void i_have_a_valid_authentication_token() {
+        // Perform login to get a valid token
+        Map<String, Object> loginCreds = new HashMap<>();
+        loginCreds.put("email", "testuser@example.com");
+        loginCreds.put("password", "Test@123");
+
+        Response loginResponse = given()
+            .contentType("application/json")
+            .body(loginCreds)
+            .post("/api/auth/login");
+
+        authToken = loginResponse.jsonPath().getString("token");
+        Log.info("Obtained valid authentication token");
+    }
+
+    @Given("I have an invalid authentication token")
+    public void i_have_an_invalid_authentication_token() {
+        authToken = "invalid-token-12345";
+        Log.info("Using invalid authentication token");
+    }
+
+    @Given("I do not have an authentication token")
+    public void i_do_not_have_an_authentication_token() {
+        authToken = null;
+        Log.info("Not setting any authentication token");
+    }
+
+    @Given("I have a valid refresh token")
+    public void i_have_a_valid_refresh_token() {
+        i_have_a_valid_authentication_token();
+        oldToken = authToken;
+        credentials = new HashMap<>();
+        credentials.put("refresh_token", authToken);
+        Log.info("Using valid refresh token");
+    }
+
+    @When("I send a POST request to {string} endpoint")
+    public void i_send_a_post_request_to_endpoint(String endpoint) {
+        Log.info("Sending POST request to: " + endpoint);
+        response = given()
+            .contentType("application/json")
+            .body(credentials)
+            .post(endpoint);
+        Log.info("Response received with status code: " + response.getStatusCode());
+    }
+
+    @When("I send a GET request to {string} endpoint")
+    public void i_send_a_get_request_to_endpoint(String endpoint) {
+        Log.info("Sending GET request to: " + endpoint);
+        response = given()
+            .contentType("application/json")
+            .get(endpoint);
+        Log.info("Response received with status code: " + response.getStatusCode());
+    }
+
+    @When("I send an authenticated GET request to {string} endpoint")
+    public void i_send_an_authenticated_get_request_to_endpoint(String endpoint) {
+        Log.info("Sending authenticated GET request to: " + endpoint);
+        response = given()
+            .contentType("application/json")
+            .header("Authorization", "Bearer " + authToken)
+            .get(endpoint);
+        Log.info("Response received with status code: " + response.getStatusCode());
+    }
+
+    @Then("the response status code should be {int}")
+    public void the_response_status_code_should_be(int expectedStatus) {
+        ResponseValidator.assertStatus(response, expectedStatus);
+    }
+
+    @Then("the response should contain authentication token")
+    public void the_response_should_contain_authentication_token() {
+        Log.info("Validating authentication token exists");
+        authToken = response.jsonPath().getString("token");
+        assertNotNull(authToken, "Response should contain authentication token");
+    }
+
+    @Then("the authentication token should not be empty")
+    public void the_authentication_token_should_not_be_empty() {
+        Log.info("Validating authentication token is not empty");
+        assertNotNull(authToken, "Authentication token should not be null");
+        assertFalse(authToken.isEmpty(), "Authentication token should not be empty");
+    }
+
+    @Then("the response should contain error message {string}")
+    public void the_response_should_contain_error_message(String expectedMessage) {
+        Log.info("Validating error message: " + expectedMessage);
+        String actualMessage = response.jsonPath().getString("error");
+        assertTrue(actualMessage.toLowerCase().contains(expectedMessage.toLowerCase()),
+            "Error message should contain: " + expectedMessage);
+    }
+
+    @Then("the response should contain validation error")
+    public void the_response_should_contain_validation_error() {
+        Log.info("Validating validation error exists");
+        String error = response.jsonPath().getString("error");
+        assertNotNull(error, "Response should contain validation error");
+        assertFalse(error.isEmpty(), "Validation error should not be empty");
+    }
+
+    @Then("the response should contain user profile information")
+    public void the_response_should_contain_user_profile_information() {
+        Log.info("Validating user profile information exists");
+        assertNotNull(response.jsonPath().get("data"), "Response should contain user data");
+    }
+
+    @Then("the response should contain logout confirmation")
+    public void the_response_should_contain_logout_confirmation() {
+        Log.info("Validating logout confirmation");
+        String message = response.jsonPath().getString("message");
+        assertTrue(message.toLowerCase().contains("logout"),
+            "Response should contain logout confirmation");
+    }
+
+    @Then("the response should contain new authentication token")
+    public void the_response_should_contain_new_authentication_token() {
+        Log.info("Validating new authentication token exists");
+        String newToken = response.jsonPath().getString("token");
+        assertNotNull(newToken, "Response should contain new authentication token");
+        authToken = newToken;
+    }
+
+    @Then("the new token should be different from the old token")
+    public void the_new_token_should_be_different_from_the_old_token() {
+        Log.info("Validating new token is different from old token");
+        assertNotEquals(authToken, oldToken, "New token should be different from old token");
+    }
+}

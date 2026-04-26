@@ -1,0 +1,81 @@
+# Dependabot — keeps direct dependencies patched without manual triage.
+# Docs: https://docs.github.com/en/code-security/dependabot
+#
+# Scope: top-level npm package + GitHub Actions workflows.
+# Template-pack dependencies are intentionally NOT auto-updated — they
+# are pinned for reproducibility and bumped manually so each release
+# of a generated project is verifiable.
+
+version: 2
+updates:
+  # Application: client + server share one package.json
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "03:00"
+      timezone: "Asia/Kolkata"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      # Patch + minor of the React / Radix / Tailwind UI surface tend to
+      # land together — group them so we get one PR per ecosystem.
+      ui-dependencies:
+        patterns:
+          - "react*"
+          - "@radix-ui/*"
+          - "tailwindcss*"
+          - "@tailwindcss/*"
+          - "lucide-react"
+        update-types:
+          - "minor"
+          - "patch"
+      build-tooling:
+        patterns:
+          - "vite*"
+          - "@vitejs/*"
+          - "esbuild*"
+          - "typescript"
+          - "ts-*"
+        update-types:
+          - "minor"
+          - "patch"
+      test-tooling:
+        patterns:
+          - "vitest*"
+          - "@vitest/*"
+          - "@playwright/*"
+          - "jest*"
+        update-types:
+          - "minor"
+          - "patch"
+      types:
+        patterns:
+          - "@types/*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Major bumps need maintainer review — Dependabot only opens
+      # patch + minor PRs by default; we explicitly hold majors.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions (in .github/workflows/*.yml)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 3
+    labels:
+      - "ci"
+      - "automated"
+    commit-message:
+      prefix: "ci"

@@ -1,0 +1,279 @@
+package {{packageName}}.utils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.jayway.jsonpath.JsonPath;
+{{#if utilities.logger}}
+import {{packageName}}.utils.Log;
+{{/if}}
+
+import java.io.IOException;
+import java.util.Map;
+
+/**
+ * JSON utility class for API testing
+ * Provides methods for JSON parsing, conversion, and manipulation
+ */
+public class JSONUtils {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+    /**
+     * Convert object to JSON string using Jackson
+     * 
+     * @param object Object to convert
+     * @return JSON string representation
+     */
+    public static String objectToJson(Object object) {
+        try {
+            String json = objectMapper.writeValueAsString(object);
+            {{#if utilities.logger}}
+            Log.debug("Converted object to JSON: " + json);
+            {{/if}}
+            return json;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to convert object to JSON", e);
+            {{/if}}
+            throw new RuntimeException("Failed to convert object to JSON", e);
+        }
+    }
+
+    /**
+     * Convert JSON string to object using Jackson
+     * 
+     * @param json JSON string
+     * @param clazz Target class type
+     * @param <T> Generic type
+     * @return Converted object
+     */
+    public static <T> T jsonToObject(String json, Class<T> clazz) {
+        try {
+            T object = objectMapper.readValue(json, clazz);
+            {{#if utilities.logger}}
+            Log.debug("Converted JSON to object of type: " + clazz.getSimpleName());
+            {{/if}}
+            return object;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to convert JSON to object: " + clazz.getSimpleName(), e);
+            {{/if}}
+            throw new RuntimeException("Failed to convert JSON to object", e);
+        }
+    }
+
+    /**
+     * Convert object to JSON string using Gson
+     * 
+     * @param object Object to convert
+     * @return JSON string representation
+     */
+    public static String objectToJsonGson(Object object) {
+        try {
+            String json = gson.toJson(object);
+            {{#if utilities.logger}}
+            Log.debug("Converted object to JSON using Gson: " + json);
+            {{/if}}
+            return json;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to convert object to JSON using Gson", e);
+            {{/if}}
+            throw new RuntimeException("Failed to convert object to JSON using Gson", e);
+        }
+    }
+
+    /**
+     * Convert JSON string to object using Gson
+     * 
+     * @param json JSON string
+     * @param clazz Target class type
+     * @param <T> Generic type
+     * @return Converted object
+     */
+    public static <T> T jsonToObjectGson(String json, Class<T> clazz) {
+        try {
+            T object = gson.fromJson(json, clazz);
+            {{#if utilities.logger}}
+            Log.debug("Converted JSON to object using Gson: " + clazz.getSimpleName());
+            {{/if}}
+            return object;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to convert JSON to object using Gson: " + clazz.getSimpleName(), e);
+            {{/if}}
+            throw new RuntimeException("Failed to convert JSON to object using Gson", e);
+        }
+    }
+
+    /**
+     * Extract value from JSON using JSONPath
+     * 
+     * @param json JSON string
+     * @param jsonPath JSONPath expression
+     * @param <T> Generic type
+     * @return Extracted value
+     */
+    public static <T> T getValueFromJson(String json, String jsonPath) {
+        try {
+            T value = JsonPath.read(json, jsonPath);
+            {{#if utilities.logger}}
+            Log.debug("Extracted value from JSON using path '" + jsonPath + "': " + value);
+            {{/if}}
+            return value;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to extract value from JSON using path: " + jsonPath, e);
+            {{/if}}
+            throw new RuntimeException("Failed to extract value from JSON", e);
+        }
+    }
+
+    /**
+     * Pretty print JSON string
+     * 
+     * @param json JSON string to format
+     * @return Formatted JSON string
+     */
+    public static String prettyPrintJson(String json) {
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            String prettyJson = gson.toJson(jsonElement);
+            {{#if utilities.logger}}
+            Log.debug("Pretty printed JSON");
+            {{/if}}
+            return prettyJson;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to pretty print JSON", e);
+            {{/if}}
+            return json; // Return original if formatting fails
+        }
+    }
+
+    /**
+     * Validate if string is valid JSON
+     * 
+     * @param json String to validate
+     * @return true if valid JSON, false otherwise
+     */
+    public static boolean isValidJson(String json) {
+        try {
+            JsonParser.parseString(json);
+            {{#if utilities.logger}}
+            Log.debug("JSON validation passed");
+            {{/if}}
+            return true;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.debug("JSON validation failed: " + e.getMessage());
+            {{/if}}
+            return false;
+        }
+    }
+
+    /**
+     * Get JSON node from JSON string
+     * 
+     * @param json JSON string
+     * @return JsonNode object
+     */
+    public static JsonNode getJsonNode(String json) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(json);
+            {{#if utilities.logger}}
+            Log.debug("Created JsonNode from JSON string");
+            {{/if}}
+            return jsonNode;
+        } catch (IOException e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to create JsonNode from JSON string", e);
+            {{/if}}
+            throw new RuntimeException("Failed to create JsonNode", e);
+        }
+    }
+
+    /**
+     * Update JSON field value
+     * 
+     * @param json Original JSON string
+     * @param fieldPath JSONPath to field
+     * @param newValue New value for the field
+     * @return Updated JSON string
+     */
+    public static String updateJsonField(String json, String fieldPath, Object newValue) {
+        try {
+            // Parse JSON to Map for manipulation
+            Map<String, Object> jsonMap = jsonToObject(json, Map.class);
+            
+            // Use JSONPath to update the field
+            String updatedJson = JsonPath.parse(jsonMap).set(fieldPath, newValue).jsonString();
+            
+            {{#if utilities.logger}}
+            Log.debug("Updated JSON field '" + fieldPath + "' with new value: " + newValue);
+            {{/if}}
+            
+            return updatedJson;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to update JSON field: " + fieldPath, e);
+            {{/if}}
+            throw new RuntimeException("Failed to update JSON field", e);
+        }
+    }
+
+    /**
+     * Merge two JSON objects
+     * 
+     * @param json1 First JSON string
+     * @param json2 Second JSON string
+     * @return Merged JSON string
+     */
+    public static String mergeJson(String json1, String json2) {
+        try {
+            Map<String, Object> map1 = jsonToObject(json1, Map.class);
+            Map<String, Object> map2 = jsonToObject(json2, Map.class);
+            
+            // Merge maps (map2 values override map1)
+            map1.putAll(map2);
+            
+            String mergedJson = objectToJson(map1);
+            {{#if utilities.logger}}
+            Log.debug("Merged two JSON objects");
+            {{/if}}
+            return mergedJson;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to merge JSON objects", e);
+            {{/if}}
+            throw new RuntimeException("Failed to merge JSON objects", e);
+        }
+    }
+
+    /**
+     * Remove field from JSON
+     * 
+     * @param json Original JSON string
+     * @param fieldPath JSONPath to field to remove
+     * @return JSON string with field removed
+     */
+    public static String removeJsonField(String json, String fieldPath) {
+        try {
+            String updatedJson = JsonPath.parse(json).delete(fieldPath).jsonString();
+            {{#if utilities.logger}}
+            Log.debug("Removed JSON field: " + fieldPath);
+            {{/if}}
+            return updatedJson;
+        } catch (Exception e) {
+            {{#if utilities.logger}}
+            Log.error("Failed to remove JSON field: " + fieldPath, e);
+            {{/if}}
+            throw new RuntimeException("Failed to remove JSON field", e);
+        }
+    }
+}

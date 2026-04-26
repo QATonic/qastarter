@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Test Results
+test-results/
+logs/
+screenshots/
+playwright-report/
+trace/
+allure-results/
+allure-report/
+
+# Environment
+.env
+*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

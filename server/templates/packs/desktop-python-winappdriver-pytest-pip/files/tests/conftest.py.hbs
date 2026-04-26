@@ -1,0 +1,8 @@
+import pytest
+from core.winappdriver_manager import WinAppDriverManager
+
+@pytest.fixture(scope="function")
+def driver():
+    WinAppDriverManager.init_driver()
+    yield WinAppDriverManager.get_driver()
+    WinAppDriverManager.quit_driver()

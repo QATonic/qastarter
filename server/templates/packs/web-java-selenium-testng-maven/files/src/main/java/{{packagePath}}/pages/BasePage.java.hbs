@@ -1,0 +1,84 @@
+package {{javaPackage}}.pages;
+
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.WaitUtils;
+import org.openqa.selenium.*;
+
+/**
+* Base Page - Extend this in all your page objects.
+*
+* Uses WaitUtils for centralized wait logic.
+*/
+public abstract class BasePage {
+
+protected WebDriver driver;
+
+public BasePage() {
+this.driver = DriverManager.getDriver();
+}
+
+/**
+* Click on element (uses WaitUtils for waits)
+*/
+protected void click(By locator) {
+Log.action("Click: " + locator);
+WaitUtils.waitForClickability(locator).click();
+}
+
+/**
+* Type text into element (uses WaitUtils for waits)
+*/
+protected void type(By locator, String text) {
+Log.action("Type into: " + locator);
+WebElement element = WaitUtils.waitForVisibility(locator);
+element.clear();
+element.sendKeys(text);
+}
+
+/**
+* Get text from element
+*/
+protected String getText(By locator) {
+return WaitUtils.waitForVisibility(locator).getText();
+}
+
+/**
+* Check if element is displayed (no wait)
+*/
+protected boolean isDisplayed(By locator) {
+try {
+return driver.findElement(locator).isDisplayed();
+} catch (NoSuchElementException | StaleElementReferenceException e) {
+return false;
+}
+}
+
+/**
+* Wait for element to be visible
+*/
+protected void waitForElement(By locator) {
+WaitUtils.waitForVisibility(locator);
+}
+
+/**
+* Wait for element to disappear
+*/
+protected void waitForElementToDisappear(By locator) {
+WaitUtils.waitForInvisibility(locator);
+}
+
+public String getPageTitle() {
+return driver.getTitle();
+}
+
+public String getCurrentUrl() {
+return driver.getCurrentUrl();
+}
+
+protected void logAction(String action) {
+Log.step("[" + getClass().getSimpleName() + "] " + action);
+}
+
+public abstract boolean isLoaded();
+}

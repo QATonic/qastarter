@@ -1,0 +1,64 @@
+using System;
+using OpenQA.Selenium.Appium;
+using OpenQA.Selenium.Appium.Windows;
+using {{projectNamespace}}.Config;
+using {{projectNamespace}}.Utils;
+
+namespace {{projectNamespace}}.Core;
+
+public static class DriverFactory
+{
+    public static WindowsDriver? Driver { get; private set; }
+
+    public static WindowsDriver CreateDriver(AppiumOptions options)
+    {
+        try
+        {
+            var serverUrl = new Uri(Settings.WinAppDriverUrl);
+            var driver = new WindowsDriver(serverUrl, options);
+            
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(Settings.ImplicitWaitSeconds);
+            
+            Logger.Info($"WinAppDriver session created for: {options.ToCapabilities().GetCapability("app")}");
+            Driver = driver;
+            return driver;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "Failed to create WinAppDriver session");
+            throw;
+        }
+    }
+
+    public static WindowsDriver CreateCalculatorDriver()
+    {
+        return CreateDriver(WinAppDriverConfig.GetCalculatorOptions());
+    }
+
+    public static WindowsDriver CreateNotepadDriver()
+    {
+        return CreateDriver(WinAppDriverConfig.GetNotepadOptions());
+    }
+
+    public static WindowsDriver CreateDesktopDriver()
+    {
+        return CreateDriver(WinAppDriverConfig.GetDesktopOptions());
+    }
+
+    public static void QuitDriver(WindowsDriver? driver)
+    {
+        if (driver != null)
+        {
+            try
+            {
+                driver.Quit();
+                Driver = null;
+                Logger.Info("WinAppDriver session closed");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error closing WinAppDriver session");
+            }
+        }
+    }
+}

@@ -1,0 +1,126 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  JAVA_HOME: '$(JAVA_HOME_11_X64)'
+  GRADLE_OPTS: '-Xmx1024m'
+  TEST_ENV: 'qa'
+  HEADLESS: 'true'
+
+strategy:
+  matrix:
+    chrome:
+      BROWSER: 'chrome'
+    firefox:
+      BROWSER: 'firefox'
+
+steps:
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '{{toolVersions.java}}'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+    displayName: 'Set up JDK {{toolVersions.java}}'
+
+  - script: |
+      chmod +x gradlew
+      ./gradlew --version
+    displayName: 'Setup Gradle'
+
+  - script: ./gradlew compileJava
+    displayName: 'Compile project'
+
+  - script: |
+      ./gradlew test \
+        -Penv=$(TEST_ENV) \
+        -Pbrowser=$(BROWSER) \
+        -Pheadless=$(HEADLESS) \
+        --continue
+    displayName: 'Run tests'
+    env:
+      TEST_ENV: $(TEST_ENV)
+      BROWSER: $(BROWSER)
+      HEADLESS: $(HEADLESS)
+
+{{#if (eq reportingTool "allure")}}
+  - script: ./gradlew allureReport || true
+    displayName: 'Generate Allure Report'
+    condition: always()
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Allure Results'
+    condition: always()
+    inputs:
+      PathtoPublish: 'build/allure-results'
+      ArtifactName: 'allure-results-$(BROWSER)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Allure Report'
+    condition: always()
+    inputs:
+      PathtoPublish: 'build/reports/allure-report'
+      ArtifactName: 'allure-report-$(BROWSER)'
+{{/if}}
+
+{{#if (eq reportingTool "extent-reports")}}
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Extent Reports'
+    condition: always()
+    inputs:
+      PathtoPublish: 'reports'
+      ArtifactName: 'extent-reports-$(BROWSER)'
+{{/if}}
+
+{{#if (eq reportingTool "testng-reports")}}
+  - task: PublishTestResults@2
+    displayName: 'Publish TestNG Results'
+    condition: always()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'build/test-results/test/*.xml'
+      testRunTitle: 'Selenium Tests - $(BROWSER)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish TestNG Reports'
+    condition: always()
+    inputs:
+      PathtoPublish: 'build/reports/tests'
+      ArtifactName: 'testng-reports-$(BROWSER)'
+{{/if}}
+
+{{#if (eq reportingTool "junit-reports")}}
+  - task: PublishTestResults@2
+    displayName: 'Publish JUnit Test Results'
+    condition: always()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'build/test-results/test/*.xml'
+      testRunTitle: 'Selenium Tests - $(BROWSER)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish JUnit Reports'
+    condition: always()
+    inputs:
+      PathtoPublish: 'build/test-results'
+      ArtifactName: 'junit-reports-$(BROWSER)'
+{{/if}}
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Screenshots'
+    condition: failed()
+    inputs:
+      PathtoPublish: 'reports/screenshots'
+      ArtifactName: 'screenshots-$(BROWSER)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Logs'
+    condition: always()
+    inputs:
+      PathtoPublish: 'logs'
+      ArtifactName: 'logs-$(BROWSER)'

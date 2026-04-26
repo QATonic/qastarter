@@ -1,0 +1,71 @@
+/**
+* Pact Provider Verification
+*
+* Verifies this service against contracts defined by consumers.
+* Runs against the actual provider to ensure contract compliance.
+*/
+
+import { Verifier } from '@pact-foundation/pact';
+import path from 'path';
+
+describe('Provider Verification', () => {
+const providerBaseUrl = process.env.PROVIDER_BASE_URL || 'http://localhost:3000';
+
+it('validates the expectations of the consumer', async () => {
+const options = {
+provider: 'UserService',
+providerBaseUrl,
+
+// Local pact files
+pactUrls: [
+path.resolve(process.cwd(), 'pacts', '{{projectName}}Consumer-UserService.json'),
+],
+
+// Pact Broker configuration (optional)
+{{#if pactBrokerUrl}}
+pactBrokerUrl: '{{pactBrokerUrl}}',
+pactBrokerToken: process.env.PACT_BROKER_TOKEN,
+publishVerificationResult: process.env.CI === 'true',
+providerVersion: process.env.GIT_COMMIT || '1.0.0',
+providerVersionBranch: process.env.GIT_BRANCH || 'main',
+{{/if}}
+
+// State handlers - set up test data for each provider state
+stateHandlers: {
+'users exist': async () => {
+// Set up database with test users
+console.log('Setting up state: users exist');
+return { description: 'Users have been seeded' };
+},
+'user with ID 1 exists': async () => {
+// Ensure user with ID 1 exists
+console.log('Setting up state: user with ID 1 exists');
+return { description: 'User 1 has been created' };
+},
+'user with ID 999 does not exist': async () => {
+// Ensure user 999 does not exist
+console.log('Setting up state: user 999 does not exist');
+return { description: 'User 999 confirmed not to exist' };
+},
+'the user service is available': async () => {
+// General availability check
+console.log('Setting up state: service available');
+return { description: 'Service is ready' };
+},
+},
+
+// Request filters
+requestFilter: (req, res, next) => {
+// Add any required headers for authentication
+// req.headers['Authorization'] = 'Bearer test-token';
+next();
+},
+
+// Logging
+logLevel: 'info',
+};
+
+const verifier = new Verifier(options);
+await verifier.verifyProvider();
+}, 30000); // Extended timeout for provider verification
+});

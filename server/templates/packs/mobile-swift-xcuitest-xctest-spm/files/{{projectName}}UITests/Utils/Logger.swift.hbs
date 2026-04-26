@@ -1,0 +1,105 @@
+import Foundation
+import os.log
+
+/**
+ * Logging utility for test execution.
+ * Provides structured logging with different levels.
+ */
+enum Logger {
+    
+    private static let subsystem = "{{packageName}}"
+    private static let category = "UITests"
+    private static let log = OSLog(subsystem: subsystem, category: category)
+    
+    private static let separator = "========================================"
+    private static let stepPrefix = "  → "
+    
+    // MARK: - Log Levels
+    
+    /// Log info message
+    static func info(_ message: String) {
+        os_log(.info, log: log, "%{public}@", message)
+        print("ℹ️ INFO: \(message)")
+    }
+    
+    /// Log debug message
+    static func debug(_ message: String) {
+        os_log(.debug, log: log, "%{public}@", message)
+        #if DEBUG
+        print("🔍 DEBUG: \(message)")
+        #endif
+    }
+    
+    /// Log warning message
+    static func warning(_ message: String) {
+        os_log(.default, log: log, "%{public}@", message)
+        print("⚠️ WARNING: \(message)")
+    }
+    
+    /// Log error message
+    static func error(_ message: String) {
+        os_log(.error, log: log, "%{public}@", message)
+        print("❌ ERROR: \(message)")
+    }
+    
+    /// Log error with Error object
+    static func error(_ message: String, error: Error) {
+        os_log(.error, log: log, "%{public}@: %{public}@", message, error.localizedDescription)
+        print("❌ ERROR: \(message) - \(error.localizedDescription)")
+    }
+    
+    // MARK: - Test Logging
+    
+    /// Log test step
+    static func step(_ message: String) {
+        os_log(.info, log: log, "%{public}@%{public}@", stepPrefix, message)
+        print("\(stepPrefix)\(message)")
+    }
+    
+    /// Start a new section in logs
+    static func startSection(_ sectionName: String) {
+        print(separator)
+        print(sectionName)
+        print(separator)
+        os_log(.info, log: log, "%{public}@", sectionName)
+    }
+    
+    /// End a section in logs
+    static func endSection() {
+        print(separator)
+    }
+    
+    /// Log test start
+    static func testStart(_ testName: String) {
+        startSection("🧪 TEST START: \(testName)")
+    }
+    
+    /// Log test end with result
+    static func testEnd(_ testName: String, passed: Bool) {
+        let result = passed ? "✅ PASSED" : "❌ FAILED"
+        print("TEST \(result): \(testName)")
+        os_log(.info, log: log, "TEST %{public}@: %{public}@", result, testName)
+        endSection()
+    }
+    
+    /// Log assertion
+    static func assertion(_ description: String) {
+        print("  ✓ ASSERT: \(description)")
+        os_log(.info, log: log, "ASSERT: %{public}@", description)
+    }
+    
+    /// Log data
+    static func data(_ key: String, value: Any) {
+        print("  📊 DATA: \(key) = \(value)")
+        os_log(.debug, log: log, "DATA: %{public}@ = %{public}@", key, String(describing: value))
+    }
+    
+    // MARK: - Performance Logging
+    
+    /// Log performance measurement
+    static func performance(_ operation: String, duration: TimeInterval) {
+        let formattedDuration = String(format: "%.3f", duration)
+        print("⏱️ PERF: \(operation) took \(formattedDuration)s")
+        os_log(.info, log: log, "PERF: %{public}@ took %{public}@s", operation, formattedDuration)
+    }
+}

@@ -1,0 +1,276 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['qa', 'dev', 'staging', 'prod'],
+            description: 'Select test environment'
+        )
+        choice(
+            name: 'BROWSER',
+            choices: ['chrome', 'firefox', 'edge'],
+            description: 'Select browser to run tests'
+        )
+        booleanParam(
+            name: 'HEADLESS',
+            defaultValue: true,
+            description: 'Run tests in headless mode'
+        )
+    }
+    
+    environment {
+        DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+        DOTNET_NOLOGO = 'true'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "Starting {{projectName}} Web Test Pipeline"
+                    echo "Environment: ${params.ENVIRONMENT}"
+                    echo "Browser: ${params.BROWSER}"
+                    echo "Headless: ${params.HEADLESS}"
+                }
+                checkout scm
+                sh 'rm -rf TestResults/ allure-report/ allure-results/ Screenshots/ Logs/'
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                script {
+                    echo "Installing .NET SDK {{toolVersions.dotnet}}"
+                }
+                sh '''
+                    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --version {{toolVersions.dotnet}}
+                    export PATH="$HOME/.dotnet:$PATH"
+                    dotnet --version
+                '''
+            }
+        }
+        
+        stage('Restore') {
+            steps {
+                script {
+                    echo "Restoring NuGet packages"
+                }
+                sh 'dotnet restore'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                script {
+                    echo "Building project"
+                }
+                sh 'dotnet build --configuration Release --no-restore'
+            }
+        }
+        
+        stage('Test - Chrome') {
+            when {
+                expression { params.BROWSER == 'chrome' || params.BROWSER == null }
+            }
+            steps {
+                script {
+                    echo "Running Web Tests with Chrome"
+                }
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh """
+                        dotnet test --configuration Release --no-build \\
+                            --logger "trx;LogFileName=test-results.trx" \\
+                            --logger "html;LogFileName=test-results.html" \\
+                            --results-directory TestResults \\
+                            -e ENVIRONMENT=${params.ENVIRONMENT} \\
+                            -e BROWSER=chrome \\
+                            -e HEADLESS=${params.HEADLESS}
+                    """
+                }
+            }
+            post {
+                always {
+                    mstest testResultsFile: 'TestResults/*.trx', keepLongStdio: true
+{{#if (eq reportingTool "allure")}}
+                    script {
+                        allure([
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: 'allure-results']]
+                        ])
+                    }
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'TestResults/extent-reports',
+                        reportFiles: '*.html',
+                        reportName: 'ExtentReports - Chrome',
+                        reportTitles: ''
+                    ])
+{{/if}}
+{{#if (eq reportingTool "nunit-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'TestResults',
+                        reportFiles: 'test-results.html',
+                        reportName: 'NUnit Reports - Chrome',
+                        reportTitles: ''
+                    ])
+{{/if}}
+                    archiveArtifacts artifacts: 'Screenshots/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'Logs/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+        
+        stage('Test - Firefox') {
+            when {
+                expression { params.BROWSER == 'firefox' }
+            }
+            steps {
+                script {
+                    echo "Running Web Tests with Firefox"
+                }
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh """
+                        dotnet test --configuration Release --no-build \\
+                            --logger "trx;LogFileName=test-results.trx" \\
+                            --logger "html;LogFileName=test-results.html" \\
+                            --results-directory TestResults \\
+                            -e ENVIRONMENT=${params.ENVIRONMENT} \\
+                            -e BROWSER=firefox \\
+                            -e HEADLESS=${params.HEADLESS}
+                    """
+                }
+            }
+            post {
+                always {
+                    mstest testResultsFile: 'TestResults/*.trx', keepLongStdio: true
+{{#if (eq reportingTool "allure")}}
+                    script {
+                        allure([
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: 'allure-results']]
+                        ])
+                    }
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'TestResults/extent-reports',
+                        reportFiles: '*.html',
+                        reportName: 'ExtentReports - Firefox',
+                        reportTitles: ''
+                    ])
+{{/if}}
+{{#if (eq reportingTool "nunit-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'TestResults',
+                        reportFiles: 'test-results.html',
+                        reportName: 'NUnit Reports - Firefox',
+                        reportTitles: ''
+                    ])
+{{/if}}
+                    archiveArtifacts artifacts: 'Screenshots/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'Logs/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+        
+        stage('Test - Edge') {
+            when {
+                expression { params.BROWSER == 'edge' }
+            }
+            steps {
+                script {
+                    echo "Running Web Tests with Edge"
+                }
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    sh """
+                        dotnet test --configuration Release --no-build \\
+                            --logger "trx;LogFileName=test-results.trx" \\
+                            --logger "html;LogFileName=test-results.html" \\
+                            --results-directory TestResults \\
+                            -e ENVIRONMENT=${params.ENVIRONMENT} \\
+                            -e BROWSER=edge \\
+                            -e HEADLESS=${params.HEADLESS}
+                    """
+                }
+            }
+            post {
+                always {
+                    mstest testResultsFile: 'TestResults/*.trx', keepLongStdio: true
+{{#if (eq reportingTool "allure")}}
+                    script {
+                        allure([
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: 'allure-results']]
+                        ])
+                    }
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'TestResults/extent-reports',
+                        reportFiles: '*.html',
+                        reportName: 'ExtentReports - Edge',
+                        reportTitles: ''
+                    ])
+{{/if}}
+{{#if (eq reportingTool "nunit-reports")}}
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'TestResults',
+                        reportFiles: 'test-results.html',
+                        reportName: 'NUnit Reports - Edge',
+                        reportTitles: ''
+                    ])
+{{/if}}
+                    archiveArtifacts artifacts: 'Screenshots/**/*', allowEmptyArchive: true
+                    archiveArtifacts artifacts: 'Logs/**/*', allowEmptyArchive: true
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+        
+        success {
+            script {
+                echo "{{projectName}} Web Tests - SUCCESS"
+            }
+        }
+        
+        failure {
+            script {
+                echo "{{projectName}} Web Tests - FAILURE"
+            }
+        }
+    }
+}

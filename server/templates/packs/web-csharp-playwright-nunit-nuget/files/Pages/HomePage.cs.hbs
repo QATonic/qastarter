@@ -1,0 +1,35 @@
+using Microsoft.Playwright;
+using {{projectNamespace}}.Config;
+
+namespace {{projectNamespace}}.Pages;
+
+public class HomePage : BasePage
+{
+    private const string WelcomeMessage = ".welcome-message, h1";
+    private const string UserProfile = ".user-profile";
+    private const string LogoutButton = "button[data-action='logout'], .logout";
+
+    // BasePage acquires the IPage via PlaywrightManager — no constructor argument needed.
+    public HomePage() { }
+
+    public async Task NavigateToHomeAsync()
+    {
+        await NavigateToAsync(EnvConfig.Instance.BaseUrl);
+    }
+
+    public async Task<string?> GetWelcomeMessageAsync()
+    {
+        return await GetTextAsync(WelcomeMessage);
+    }
+
+    public async Task<bool> IsUserProfileVisibleAsync()
+    {
+        return await IsDisplayedAsync(UserProfile);
+    }
+
+    public async Task LogoutAsync()
+    {
+        await ClickAsync(LogoutButton);
+        await Page.WaitForURLAsync("**/login", new() { Timeout = 5000 });
+    }
+}

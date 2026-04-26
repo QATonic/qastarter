@@ -1,0 +1,188 @@
+/**
+ * Utility functions for Cypress tests.
+ */
+
+/**
+ * Logger utility for consistent test logging
+ */
+export const Logger = {
+  info: (message) => {
+    cy.log(`ℹ️ INFO: ${message}`);
+  },
+  
+  step: (message) => {
+    cy.log(`→ STEP: ${message}`);
+  },
+  
+  debug: (message) => {
+    if (Cypress.env('DEBUG')) {
+      cy.log(`🔍 DEBUG: ${message}`);
+    }
+  },
+  
+  warn: (message) => {
+    cy.log(`⚠️ WARN: ${message}`);
+  },
+  
+  error: (message) => {
+    cy.log(`❌ ERROR: ${message}`);
+  },
+  
+  startSection: (sectionName) => {
+    cy.log('========================================');
+    cy.log(sectionName);
+    cy.log('========================================');
+  },
+  
+  endSection: () => {
+    cy.log('========================================');
+  }
+};
+
+/**
+ * Wait utilities
+ */
+export const WaitUtils = {
+  /**
+   * Wait for element to be visible
+   */
+  waitForVisible: (selector, timeout = 10000) => {
+    return cy.get(selector, { timeout }).should('be.visible');
+  },
+  
+  /**
+   * Wait for element to not exist
+   */
+  waitForNotExist: (selector, timeout = 10000) => {
+    return cy.get(selector, { timeout }).should('not.exist');
+  },
+  
+  /**
+   * Wait for URL to contain text
+   */
+  waitForUrlContains: (text, timeout = 10000) => {
+    return cy.url({ timeout }).should('include', text);
+  },
+  
+  /**
+   * Wait for network idle
+   */
+  waitForNetworkIdle: (timeout = 5000) => {
+    cy.intercept('**/*').as('allRequests');
+    cy.wait(timeout);
+  },
+  
+  /**
+   * Wait for page load
+   */
+  waitForPageLoad: () => {
+    cy.document().its('readyState').should('eq', 'complete');
+  }
+};
+
+/**
+ * Data utilities
+ */
+export const DataUtils = {
+  /**
+   * Generate random string
+   */
+  randomString: (length = 10) => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  },
+  
+  /**
+   * Generate random email
+   */
+  randomEmail: (domain = 'test.example.com') => {
+    const username = DataUtils.randomString(8).toLowerCase();
+    const timestamp = Date.now();
+    return `${username}.${timestamp}@${domain}`;
+  },
+  
+  /**
+   * Generate random number
+   */
+  randomNumber: (min = 0, max = 1000) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+  
+  /**
+   * Load fixture data
+   */
+  loadFixture: (fixtureName) => {
+    return cy.fixture(fixtureName);
+  }
+};
+
+/**
+ * Screenshot utilities
+ */
+export const ScreenshotUtils = {
+  /**
+   * Take screenshot with timestamp
+   */
+  capture: (name) => {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    cy.screenshot(`${name}_${timestamp}`);
+  },
+  
+  /**
+   * Take screenshot on failure
+   */
+  captureOnFailure: (testName) => {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9]/g, '_');
+    cy.screenshot(`failed_${sanitizedName}`, { capture: 'fullPage' });
+  }
+};
+
+/**
+ * API utilities for Cypress
+ */
+export const ApiUtils = {
+  /**
+   * Make authenticated API request
+   */
+  authenticatedRequest: (method, url, body = null, token = null) => {
+    const authToken = token || Cypress.env('authToken');
+    
+    return cy.request({
+      method,
+      url,
+      body,
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      failOnStatusCode: false
+    });
+  },
+  
+  /**
+   * Login via API and store token
+   */
+  loginViaApi: (username, password) => {
+    return cy.request({
+      method: 'POST',
+      url: `${Cypress.env('apiUrl')}/auth/login`,
+      body: { username, password }
+    }).then((response) => {
+      const token = response.body.token || response.body.accessToken;
+      Cypress.env('authToken', token);
+      return token;
+    });
+  }
+};
+
+export default {
+  Logger,
+  WaitUtils,
+  DataUtils,
+  ScreenshotUtils,
+  ApiUtils
+};

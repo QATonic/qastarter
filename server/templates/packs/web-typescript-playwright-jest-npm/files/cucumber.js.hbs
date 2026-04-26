@@ -1,0 +1,24 @@
+module.exports = {
+  default: {
+    paths: ['features/**/*.feature'],
+    require: ['step-definitions/**/*.ts', 'support/**/*.ts'],
+    requireModule: ['ts-node/register'],
+    format: [
+      'progress-bar',
+{{#if (eq reportingTool "allure")}}
+      'allure-cucumberjs/reporter',
+{{else}}
+      'html:test-results/cucumber-report.html',
+      'json:test-results/cucumber-report.json'
+{{/if}}
+    ],
+    formatOptions: {
+      snippetInterface: 'async-await'{{#if (eq reportingTool "allure")}},
+      allureResultsDir: 'allure-results'{{/if}}
+    },
+    parallel: 2,
+    retry: 1,
+    retryTagFilter: '@flaky',
+    tags: 'not @wip and not @skip'
+  }
+};

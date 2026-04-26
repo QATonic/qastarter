@@ -1,0 +1,547 @@
+/**
+ * QAStarter MCP server.
+ *
+ * Exposes the QAStarter scaffold engine to MCP-aware AI clients (Claude Desktop,
+ * Cursor, Claude Code, Windsurf, etc.) over stdio. Under the hood it calls the
+ * QAStarter REST API (default: https://qastarter.qatonic.com) — override with
+ * the QASTARTER_API_URL environment variable to target a local dev server.
+ *
+ * Design principles:
+ *   - Discovery first. `list_combinations` + `validate_combination` let the AI
+ *     choose sensible defaults before it asks to generate anything.
+ *   - Preview before write. `preview_project` returns the file tree and key
+ *     files so the AI (and the user) can sanity-check before files land on disk.
+ *   - Safe file writes. `generate_project` refuses absolute paths unless
+ *     explicitly allowed, refuses non-empty target directories unless `force`
+ *     is set, and never writes outside the resolved target dir.
+ */
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import {
+  CallToolRequestSchema,
+  ListResourcesRequestSchema,
+  ListToolsRequestSchema,
+  ReadResourceRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
+import AdmZip from 'adm-zip';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import {
+  fetchBom,
+  fetchMetadata,
+  generateProjectBuffer,
+  getApiUrl,
+  getProjectDependencies,
+  previewProject,
+  validateConfig,
+  type GenerateOptions,
+} from '../lib/api.js';
+
+// ---------- helpers ----------
+
+const SERVER_NAME = 'qastarter';
+
+/**
+ * Read the server version from package.json so `initialize` always reports
+ * the actual installed release. Hard-coding drifts the moment we publish.
+ */
+function readServerVersion(): string {
+  try {
+    const here = path.dirname(fileURLToPath(import.meta.url));
+    // dist/mcp/server.js → ../../package.json at runtime
+    const pkgPath = path.resolve(here, '..', '..', 'package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+    return typeof pkg?.version === 'string' ? pkg.version : '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
+
+const SERVER_VERSION = readServerVersion();
+
+/** Minimum fields the generator requires. */
+interface BaseConfig {
+  projectName: string;
+  testingType: string;
+  framework: string;
+  language: string;
+}
+
+function asText(payload: unknown): { content: Array<{ type: 'text'; text: string }> } {
+  return {
+    content: [
+      {
+        type: 'text',
+        text: typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2),
+      },
+    ],
+  };
+}
+
+function asError(message: string): {
+  content: Array<{ type: 'text'; text: string }>;
+  isError: true;
+} {
+  return { content: [{ type: 'text', text: `Error: ${message}` }], isError: true };
+}
+
+/**
+ * Pattern for project names — matches the server-side rule. Keeps path
+ * separators, NUL, and shell metacharacters out before we hit the backend
+ * so a misbehaving MCP client gets a clear client-side error rather than
+ * an opaque server-side validation failure.
+ */
+const PROJECT_NAME_RE = /^[a-zA-Z0-9][a-zA-Z0-9-_]{0,63}$/;
+
+/** Coerce a caller-supplied args object into a GenerateOptions. */
+function toGenerateOptions(args: Record<string, unknown> | undefined): GenerateOptions {
+  const a = args ?? {};
+  const required = ['projectName', 'testingType', 'framework', 'language'] as const;
+  for (const key of required) {
+    if (typeof a[key] !== 'string' || !a[key]) {
+      throw new Error(`Missing required field: ${key}`);
+    }
+  }
+  const projectName = String(a.projectName);
+  if (!PROJECT_NAME_RE.test(projectName)) {
+    throw new Error(
+      `Invalid projectName "${projectName}" — must be 1–64 characters, start with a letter/digit, ` +
+        `and contain only letters, digits, hyphens, and underscores.`
+    );
+  }
+  return {
+    projectName,
+    testingType: String(a.testingType),
+    framework: String(a.framework),
+    language: String(a.language),
+    testRunner: typeof a.testRunner === 'string' ? a.testRunner : undefined,
+    buildTool: typeof a.buildTool === 'string' ? a.buildTool : undefined,
+    testingPattern: typeof a.testingPattern === 'string' ? a.testingPattern : undefined,
+    cicdTool: typeof a.cicdTool === 'string' ? a.cicdTool : undefined,
+    reportingTool: typeof a.reportingTool === 'string' ? a.reportingTool : undefined,
+    cloudDeviceFarm:
+      typeof a.cloudDeviceFarm === 'string' &&
+      (['none', 'browserstack', 'saucelabs'] as const).includes(
+        a.cloudDeviceFarm as 'none' | 'browserstack' | 'saucelabs'
+      )
+        ? (a.cloudDeviceFarm as 'none' | 'browserstack' | 'saucelabs')
+        : undefined,
+    utilities: Array.isArray(a.utilities) ? (a.utilities as unknown[]).map(String) : undefined,
+    includeSampleTests:
+      typeof a.includeSampleTests === 'boolean' ? a.includeSampleTests : undefined,
+  };
+}
+
+/**
+ * Resolve and sanity-check a target directory.
+ *  - Relative paths resolve against process.cwd() and must remain strictly inside cwd.
+ *  - Absolute paths are rejected unless `allowAbsolute=true`.
+ *  - UNC paths (\\server\share\…) and drive-relative paths are always rejected unless allowAbsolute.
+ *  - `.` (cwd itself) is rejected — we'd scaffold on top of the user's working directory.
+ *  - `..`-style traversal is caught on both the raw input (via normalize) and the resolved path
+ *    (via a strict startsWith check with the path separator included).
+ */
+function resolveTargetDir(input: string, allowAbsolute: boolean): string {
+  if (!input || typeof input !== 'string') {
+    throw new Error('targetDir must be a non-empty string');
+  }
+  // Reject UNC and backslashed absolute paths on Windows pre-emptively — they can slip past
+  // `path.isAbsolute` on some Node builds and confuse downstream relative-path math.
+  if (/^(\\\\|\/\/)/.test(input) || /^[a-zA-Z]:[\\\/]/.test(input)) {
+    if (!allowAbsolute) {
+      throw new Error(
+        `targetDir "${input}" is absolute (UNC/drive-rooted); pass allowAbsolute: true to opt in.`
+      );
+    }
+  }
+  const normalized = path.normalize(input);
+  const isAbsolute = path.isAbsolute(normalized);
+  if (isAbsolute && !allowAbsolute) {
+    throw new Error(
+      `targetDir "${input}" is absolute; pass allowAbsolute: true to opt in, or use a relative path.`
+    );
+  }
+  const cwd = path.resolve(process.cwd());
+  const resolved = path.resolve(cwd, normalized);
+  if (resolved === cwd) {
+    throw new Error(`targetDir cannot be the current working directory itself — pick a subdirectory.`);
+  }
+  if (!isAbsolute) {
+    // Strict containment check: resolved path must start with cwd + path.sep (not just cwd,
+    // which would allow siblings like "<cwd>_evil").
+    const prefix = cwd.endsWith(path.sep) ? cwd : cwd + path.sep;
+    if (!resolved.startsWith(prefix)) {
+      throw new Error(`targetDir "${input}" escapes the current working directory.`);
+    }
+  }
+  return resolved;
+}
+
+/**
+ * Zip entry mode bits. On POSIX-zipped entries the Unix permission + type bits
+ * sit in the top 16 of `attr`; bit 0xA000 (S_IFLNK) marks a symlink. AdmZip
+ * represents the zip extra field as numeric `attr`, so we can test for it
+ * directly without parsing the raw bytes.
+ */
+const S_IFMT = 0xf000;
+const S_IFLNK = 0xa000;
+
+function isSymlinkEntry(entry: AdmZip.IZipEntry): boolean {
+  // `attr` is (external_file_attributes >>> 0). The top 16 bits are the Unix
+  // mode for POSIX-originated zips. A truthy top-16 with the LNK bits set = symlink.
+  const attr = (entry as unknown as { attr?: number }).attr ?? 0;
+  return ((attr >>> 16) & S_IFMT) === S_IFLNK;
+}
+
+/**
+ * Extract a ZIP buffer into a target directory safely.
+ *
+ * Defences against Zip-Slip and Windows-symlink tricks:
+ *  1. `entryName` is resolved against `targetDir`; anything that `path.relative`
+ *     reports as outside is rejected (cheap pre-check).
+ *  2. Symlink entries (POSIX S_IFLNK in the external attr field) are refused
+ *     outright — AdmZip treats them as regular files, which would otherwise
+ *     write a literal symlink whose target could point outside `targetDir`.
+ *  3. After each write, `fs.realpathSync(written)` re-checks that the path
+ *     the filesystem actually resolves to still starts with `targetDir` —
+ *     catches the case where a parent directory was a pre-existing symlink
+ *     (e.g. the user's `targetDir` itself was a symlink farm).
+ */
+function extractZipSafely(buffer: Buffer, targetDir: string): string[] {
+  const zip = new AdmZip(buffer);
+  const entries = zip.getEntries();
+  const written: string[] = [];
+
+  // Resolve the real path of the target dir once so we can compare against it.
+  const realTargetDir = fs.realpathSync(fs.existsSync(targetDir) ? targetDir : (() => {
+    fs.mkdirSync(targetDir, { recursive: true });
+    return targetDir;
+  })());
+  const prefix = realTargetDir.endsWith(path.sep) ? realTargetDir : realTargetDir + path.sep;
+
+  for (const entry of entries) {
+    // Refuse symlink entries — AdmZip would otherwise materialize them as
+    // regular files containing the target path, or (on systems that honour it)
+    // create an actual symlink pointing anywhere.
+    if (isSymlinkEntry(entry)) {
+      throw new Error(`Unsafe zip entry (symlink): ${entry.entryName}`);
+    }
+
+    // Pre-check: the declared entry path must resolve inside targetDir.
+    const entryPath = path.resolve(targetDir, entry.entryName);
+    const rel = path.relative(targetDir, entryPath);
+    if (rel.startsWith('..') || path.isAbsolute(rel)) {
+      throw new Error(`Unsafe zip entry: ${entry.entryName}`);
+    }
+
+    if (entry.isDirectory) {
+      fs.mkdirSync(entryPath, { recursive: true });
+      continue;
+    }
+    fs.mkdirSync(path.dirname(entryPath), { recursive: true });
+    fs.writeFileSync(entryPath, entry.getData());
+
+    // Post-check: realpath the written file. If any parent directory turned out
+    // to be a symlink that escapes targetDir, delete the write and abort.
+    const real = fs.realpathSync(entryPath);
+    if (!real.startsWith(prefix) && real !== realTargetDir) {
+      // best-effort cleanup — we've already written the file
+      try { fs.unlinkSync(entryPath); } catch { /* ignore */ }
+      throw new Error(`Unsafe zip entry (resolves outside targetDir after realpath): ${entry.entryName}`);
+    }
+    written.push(path.relative(targetDir, entryPath));
+  }
+  return written;
+}
+
+// ---------- tool registry ----------
+
+interface ToolDef {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  handler: (args: Record<string, unknown> | undefined) => Promise<ReturnType<typeof asText>>;
+}
+
+const PROJECT_CONFIG_PROPS = {
+  projectName: {
+    type: 'string',
+    description: 'Project / output folder name (will be sanitised — letters, digits, hyphen).',
+  },
+  testingType: {
+    type: 'string',
+    enum: ['web', 'mobile', 'api', 'desktop', 'performance'],
+    description: 'Which layer of the stack you are testing.',
+  },
+  framework: {
+    type: 'string',
+    enum: [
+      'selenium', 'playwright', 'cypress', 'webdriverio', 'robotframework',
+      'appium', 'espresso', 'xcuitest', 'flutter',
+      'winappdriver', 'pyautogui',
+      'restassured', 'requests', 'supertest', 'restsharp', 'graphql', 'grpc', 'resty',
+      'k6', 'gatling', 'locust',
+    ],
+    description:
+      'Automation framework. Not every framework works with every testingType/language — call validate_combination first if unsure.',
+  },
+  language: {
+    type: 'string',
+    enum: ['java', 'python', 'csharp', 'javascript', 'typescript', 'go', 'kotlin', 'swift', 'dart'],
+    description: 'Programming language for the generated project.',
+  },
+  testRunner: {
+    type: 'string',
+    enum: ['testng', 'junit5', 'pytest', 'jest', 'mocha', 'cypress', 'nunit', 'xctest', 'testify', 'flutter-test', 'robot', 'k6', 'locust'],
+    description: 'Optional — defaults to the canonical runner for the picked language/framework.',
+  },
+  buildTool: {
+    type: 'string',
+    enum: ['maven', 'gradle', 'npm', 'pip', 'nuget', 'mod', 'spm', 'pub'],
+    description: 'Optional — defaults to the canonical build tool for the picked language.',
+  },
+  testingPattern: {
+    type: 'string',
+    enum: ['page-object-model', 'bdd', 'fluent'],
+    description: 'Structural pattern. Default: page-object-model.',
+  },
+  cicdTool: {
+    type: 'string',
+    description:
+      'Optional: github-actions, gitlab-ci, jenkins, azure-devops, circleci. Drops a pipeline file.',
+  },
+  reportingTool: {
+    type: 'string',
+    description: 'Optional: allure, extent-reports, mocha-awesome, pytest-html.',
+  },
+  cloudDeviceFarm: {
+    type: 'string',
+    enum: ['none', 'browserstack', 'saucelabs'],
+    description:
+      'Optional cloud device farm to wire into the generated project. ' +
+      '`browserstack` or `saucelabs` emits the provider config file + updates ' +
+      'the driver factory to read BROWSERSTACK_USERNAME / SAUCE_USERNAME etc. ' +
+      'from the environment. Default: `none` (local execution only).',
+  },
+  utilities: {
+    type: 'array',
+    items: { type: 'string' },
+    description:
+      'Optional utilities: configReader, jsonReader, screenshotUtility, logger, dataProvider.',
+  },
+  includeSampleTests: {
+    type: 'boolean',
+    description: 'Include sample test files (default true).',
+  },
+} as const;
+
+const TOOLS: ToolDef[] = [
+  {
+    name: 'list_combinations',
+    description:
+      'List every testing type, framework, language, runner, build tool and utility QAStarter supports. Call this FIRST before picking a combo — the result tells you what values are valid for `generate_project` and the other tools.',
+    inputSchema: { type: 'object', properties: {} },
+    handler: async () => {
+      const metadata = await fetchMetadata();
+      return asText({
+        apiUrl: getApiUrl(),
+        ...metadata,
+      });
+    },
+  },
+  {
+    name: 'validate_combination',
+    description:
+      'Check whether a (testingType, framework, language, runner, buildTool) combination is supported. Returns `{ valid: true }` or `{ valid: false, errors: [...] }`. Use this before calling `generate_project` to avoid 400 errors.',
+    inputSchema: {
+      type: 'object',
+      required: ['projectName', 'testingType', 'framework', 'language'],
+      properties: PROJECT_CONFIG_PROPS,
+    },
+    handler: async (args) => {
+      const options = toGenerateOptions(args);
+      const result = await validateConfig(options);
+      return asText(result);
+    },
+  },
+  {
+    name: 'get_bom',
+    description:
+      'Return the QAStarter Bill-of-Materials: pinned library/tool versions per language so you can compare with a project already on disk before suggesting an upgrade.',
+    inputSchema: { type: 'object', properties: {} },
+    handler: async () => {
+      const bom = await fetchBom();
+      return asText(bom ?? { error: 'BOM service unavailable' });
+    },
+  },
+  {
+    name: 'get_dependencies',
+    description:
+      'Resolve the exact dependency map (with versions) that would be added to the generated project, given a full config. Useful when the user wants to know "what will this add to my classpath / package.json / requirements.txt".',
+    inputSchema: {
+      type: 'object',
+      required: ['projectName', 'testingType', 'framework', 'language'],
+      properties: PROJECT_CONFIG_PROPS,
+    },
+    handler: async (args) => {
+      const options = toGenerateOptions(args);
+      const deps = await getProjectDependencies(options);
+      return asText(deps);
+    },
+  },
+  {
+    name: 'preview_project',
+    description:
+      'Dry-run: generate the project structure server-side and return a file tree, key-file contents and stats, WITHOUT writing anything to disk. Use this to show the user what they would get before calling `generate_project`.',
+    inputSchema: {
+      type: 'object',
+      required: ['projectName', 'testingType', 'framework', 'language'],
+      properties: PROJECT_CONFIG_PROPS,
+    },
+    handler: async (args) => {
+      const options = toGenerateOptions(args);
+      const preview = await previewProject(options);
+      return asText(preview);
+    },
+  },
+  {
+    name: 'generate_project',
+    description:
+      'Generate a full project and write the files directly into `targetDir`. By default the targetDir must be inside the current working directory and must not exist (or be empty). Returns the list of files written. For a dry run without touching disk, use `preview_project` instead.',
+    inputSchema: {
+      type: 'object',
+      required: ['projectName', 'testingType', 'framework', 'language', 'targetDir'],
+      properties: {
+        ...PROJECT_CONFIG_PROPS,
+        targetDir: {
+          type: 'string',
+          description:
+            'Directory to create the project in. Relative paths are resolved against the current working directory.',
+        },
+        force: {
+          type: 'boolean',
+          description: 'Overwrite files if targetDir already exists and is non-empty.',
+        },
+        allowAbsolute: {
+          type: 'boolean',
+          description:
+            'Permit absolute targetDir paths (default false — only cwd-relative paths allowed).',
+        },
+      },
+    },
+    handler: async (args) => {
+      const a = args ?? {};
+      const options = toGenerateOptions(a);
+      const targetDirInput = typeof a.targetDir === 'string' ? a.targetDir : '';
+      const allowAbsolute = a.allowAbsolute === true;
+      const force = a.force === true;
+      const targetDir = resolveTargetDir(targetDirInput, allowAbsolute);
+
+      if (fs.existsSync(targetDir)) {
+        const contents = fs.readdirSync(targetDir);
+        if (contents.length > 0 && !force) {
+          return asError(
+            `targetDir "${targetDir}" is not empty. Pass force: true to overwrite, or pick an empty directory.`
+          );
+        }
+      } else {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+
+      const { buffer, filename } = await generateProjectBuffer(options);
+      const files = extractZipSafely(buffer, targetDir);
+
+      return asText({
+        ok: true,
+        targetDir,
+        filenameHint: filename,
+        fileCount: files.length,
+        files: files.slice(0, 100),
+        truncated: files.length > 100,
+        nextSteps: [
+          `cd "${targetDir}"`,
+          'open README.md for language-specific setup instructions',
+        ],
+      });
+    },
+  },
+];
+
+// ---------- server wiring ----------
+
+export async function runMcpServer(): Promise<void> {
+  // Tag every downstream REST call with the MCP client header so the
+  // backend can (a) apply the relaxed MCP rate limit and (b) separate
+  // AI vs human combo picks in analytics. Explicit user override wins.
+  if (!process.env.QASTARTER_CLIENT) {
+    process.env.QASTARTER_CLIENT = 'mcp';
+  }
+
+  const server = new Server(
+    { name: SERVER_NAME, version: SERVER_VERSION },
+    { capabilities: { tools: {}, resources: {} } }
+  );
+
+  server.setRequestHandler(ListToolsRequestSchema, async () => ({
+    tools: TOOLS.map(({ name, description, inputSchema }) => ({ name, description, inputSchema })),
+  }));
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const tool = TOOLS.find((t) => t.name === request.params.name);
+    if (!tool) {
+      return asError(`Unknown tool: ${request.params.name}`);
+    }
+    try {
+      return await tool.handler(request.params.arguments as Record<string, unknown> | undefined);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return asError(message);
+    }
+  });
+
+  // Resources: expose metadata + BOM as read-only resources.
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: [
+      {
+        uri: 'qastarter://compatibility-matrix',
+        name: 'Compatibility matrix',
+        description: 'Every supported (testingType, framework, language, runner, buildTool) combo.',
+        mimeType: 'application/json',
+      },
+      {
+        uri: 'qastarter://bom',
+        name: 'Bill of Materials',
+        description: 'Pinned library and tool versions per language.',
+        mimeType: 'application/json',
+      },
+    ],
+  }));
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    const { uri } = request.params;
+    if (uri === 'qastarter://compatibility-matrix') {
+      const metadata = await fetchMetadata();
+      return {
+        contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(metadata, null, 2) }],
+      };
+    }
+    if (uri === 'qastarter://bom') {
+      const bom = await fetchBom();
+      return {
+        contents: [
+          { uri, mimeType: 'application/json', text: JSON.stringify(bom ?? {}, null, 2) },
+        ],
+      };
+    }
+    throw new Error(`Unknown resource: ${uri}`);
+  });
+
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+
+  // stdio is our transport — log via stderr only, stdout is protocol-owned.
+  process.stderr.write(
+    `[qastarter-mcp] ready — ${TOOLS.length} tools, API=${getApiUrl()}\n`
+  );
+}

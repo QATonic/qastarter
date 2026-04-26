@@ -1,0 +1,37 @@
+# {{projectName}} - Windows Desktop Test Automation
+# NOTE: WinAppDriver requires Windows containers or Windows host
+# This Dockerfile is for Windows Server Core containers
+
+# escape=`
+FROM mcr.microsoft.com/windows/servercore:ltsc2022
+
+# Install Chocolatey
+RUN powershell -Command `
+    Set-ExecutionPolicy Bypass -Scope Process -Force; `
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+    iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+# Install Java and Maven
+RUN choco install -y openjdk17 maven
+
+# Set working directory
+WORKDIR C:\app
+
+# Copy pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src src
+
+# Set environment variables
+ENV TEST_ENV=qa
+ENV WINAPPDRIVER_URL=http://localhost:4723
+
+# Create directories for test results
+RUN mkdir C:\app\target\surefire-reports C:\app\target\screenshots
+
+# Note: WinAppDriver must be running on the host
+# Default command runs all tests
+ENTRYPOINT ["mvn", "test"]
+CMD ["-Denv=qa"]

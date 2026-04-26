@@ -1,0 +1,93 @@
+/**
+ * TestDataFactory — Generates realistic test data using @faker-js/faker.
+ * Use this factory in your tests to avoid hard-coded values.
+ *
+ * @example
+ *   import { TestDataFactory } from './utils/testDataFactory';
+ *   const email = TestDataFactory.randomEmail();
+ *   const name  = TestDataFactory.randomFullName();
+ */
+
+import { faker } from '@faker-js/faker';
+
+export class TestDataFactory {
+  // ── User Data ──────────────────────────────────────────────────
+
+  static randomFirstName(): string {
+    return faker.person.firstName();
+  }
+
+  static randomLastName(): string {
+    return faker.person.lastName();
+  }
+
+  static randomFullName(): string {
+    return faker.person.fullName();
+  }
+
+  static randomEmail(): string {
+    return faker.internet.email();
+  }
+
+  static randomUsername(): string {
+    return faker.internet.username();
+  }
+
+  static randomPassword(): string {
+    return faker.internet.password({ length: 12 });
+  }
+
+  static randomPhoneNumber(): string {
+    return faker.phone.number();
+  }
+
+  // ── Address Data ───────────────────────────────────────────────
+
+  static randomStreetAddress(): string {
+    return faker.location.streetAddress();
+  }
+
+  static randomCity(): string {
+    return faker.location.city();
+  }
+
+  static randomState(): string {
+    return faker.location.state();
+  }
+
+  static randomZipCode(): string {
+    return faker.location.zipCode();
+  }
+
+  static randomCountry(): string {
+    return faker.location.country();
+  }
+
+  // ── Business Data ──────────────────────────────────────────────
+
+  static randomCompanyName(): string {
+    return faker.company.name();
+  }
+
+  static randomJobTitle(): string {
+    return faker.person.jobTitle();
+  }
+
+  // ── Text & Numbers ─────────────────────────────────────────────
+
+  static randomSentence(): string {
+    return faker.lorem.sentence();
+  }
+
+  static randomParagraph(): string {
+    return faker.lorem.paragraph();
+  }
+
+  static randomInt(min = 0, max = 1000): number {
+    return faker.number.int({ min, max });
+  }
+
+  static randomUUID(): string {
+    return faker.string.uuid();
+  }
+}

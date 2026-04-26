@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'TEST_TYPE', choices: ['load', 'stress', 'spike', 'soak'], description: 'Performance test type')
+    }
+
+    stages {
+        stage('Install k6') {
+            steps {
+                sh 'which k6 || (curl -sL https://github.com/grafana/k6/releases/download/v{{toolVersions.k6}}/k6-v{{toolVersions.k6}}-linux-amd64.tar.gz | tar xz && mv k6-v{{toolVersions.k6}}-linux-amd64/k6 /usr/local/bin/)'
+            }
+        }
+
+        stage('Run Performance Test') {
+            steps {
+                sh "k6 run scripts/{{raw}}${params.TEST_TYPE}{{/raw}}-test.js --out json=results/output.json"
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'results/**', allowEmptyArchive: true
+        }
+    }
+}

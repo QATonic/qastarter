@@ -1,0 +1,122 @@
+import { apiClient } from '../core/ApiClient.js';
+import logger from './logger.js';
+
+/**
+ * Authentication helper for API testing.
+ * Handles token management and authentication flows.
+ */
+class AuthHelper {
+  
+  static tokens = new Map();
+  
+  /**
+   * Get authentication token for a user
+   * @param {Object} credentials - User credentials
+   * @param {string} credentials.username - Username
+   * @param {string} credentials.password - Password
+   * @returns {Promise<string>} - Authentication token
+   */
+  static async getToken(credentials) {
+    const cacheKey = credentials.username;
+    
+    // Return cached token if available
+    if (AuthHelper.tokens.has(cacheKey)) {
+      const cached = AuthHelper.tokens.get(cacheKey);
+      if (cached.expiresAt > Date.now()) {
+        logger.debug(`Using cached token for ${cacheKey}`);
+        return cached.token;
+      }
+    }
+    
+    logger.info(`Fetching new token for ${credentials.username}`);
+    
+    // TODO: Update this endpoint to match your API
+    const response = await apiClient.post('/auth/login', {
+      username: credentials.username,
+      password: credentials.password
+    });
+    
+    if (response.status !== 200) {
+      throw new Error(`Authentication failed: ${response.status}`);
+    }
+    
+    const token = response.body.token || response.body.accessToken;
+    const expiresIn = response.body.expiresIn || 3600; // Default 1 hour
+    
+    // Cache the token
+    AuthHelper.tokens.set(cacheKey, {
+      token,
+      expiresAt: Date.now() + (expiresIn * 1000) - 60000 // Expire 1 min early
+    });
+    
+    return token;
+  }
+  
+  /**
+   * Get Bearer token header value
+   * @param {Object} credentials - User credentials
+   * @returns {Promise<string>} - Bearer token string
+   */
+  static async getBearerToken(credentials) {
+    const token = await AuthHelper.getToken(credentials);
+    return `Bearer ${token}`;
+  }
+  
+  /**
+   * Get authorization headers
+   * @param {Object} credentials - User credentials
+   * @returns {Promise<Object>} - Headers object with Authorization
+   */
+  static async getAuthHeaders(credentials) {
+    const token = await AuthHelper.getToken(credentials);
+    return {
+      'Authorization': `Bearer ${token}`
+    };
+  }
+  
+  /**
+   * Clear cached token for a user
+   * @param {string} username - Username to clear
+   */
+  static clearToken(username) {
+    AuthHelper.tokens.delete(username);
+    logger.debug(`Cleared token for ${username}`);
+  }
+  
+  /**
+   * Clear all cached tokens
+   */
+  static clearAllTokens() {
+    AuthHelper.tokens.clear();
+    logger.debug('Cleared all cached tokens');
+  }
+  
+  /**
+   * Refresh token for a user
+   * @param {Object} credentials - User credentials
+   * @returns {Promise<string>} - New authentication token
+   */
+  static async refreshToken(credentials) {
+    AuthHelper.clearToken(credentials.username);
+    return AuthHelper.getToken(credentials);
+  }
+  
+  /**
+   * Check if token is valid
+   * @param {string} token - Token to validate
+   * @returns {Promise<boolean>} - True if token is valid
+   */
+  static async isTokenValid(token) {
+    try {
+      // TODO: Update this endpoint to match your API
+      const response = await apiClient.get('/auth/validate', {
+        'Authorization': `Bearer ${token}`
+      });
+      return response.status === 200;
+    } catch (error) {
+      return false;
+    }
+  }
+}
+
+export default AuthHelper;

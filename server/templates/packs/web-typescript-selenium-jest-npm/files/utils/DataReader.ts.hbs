@@ -1,0 +1,26 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
+/**
+ * Read JSON / CSV test data from the `data/` folder.
+ */
+export class DataReader {
+  static readJson<T = unknown>(filename: string): T {
+    const filepath = path.join(process.cwd(), 'data', filename);
+    const data = fs.readFileSync(filepath, 'utf-8');
+    return JSON.parse(data) as T;
+  }
+
+  static readCsv(filename: string): string[][] {
+    const filepath = path.join(process.cwd(), 'data', filename);
+    const data = fs.readFileSync(filepath, 'utf-8').trim();
+    return data.split(/\r?\n/).map((line) => line.split(','));
+  }
+
+  /** @deprecated Use {@link readJson} — kept for backward compatibility. */
+  static readJSON<T = unknown>(filename: string): T {
+    return DataReader.readJson<T>(filename);
+  }
+}
+
+export default DataReader;

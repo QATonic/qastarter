@@ -1,0 +1,30 @@
+"""
+Auto-generated API tests from OpenAPI specification.
+Each test validates a single endpoint's basic contract.
+"""
+
+import pytest
+import requests
+
+BASE_URL = "{{baseUrl}}"
+
+
+{{#each openApiEndpoints}}
+def test_{{operationId}}():
+    """{{method}} {{path}} — {{summary}}"""
+    url = f"{BASE_URL}{{path}}"
+{{#if requestBody}}
+    response = requests.{{lowerCase method}}(
+        url,
+        json={},
+        headers={"Content-Type": "{{requestBody.contentType}}"},
+    )
+{{else}}
+    response = requests.{{lowerCase method}}(url)
+{{/if}}
+    assert 200 <= response.status_code < 500, (
+        f"Expected success/client status but got {response.status_code}"
+    )
+
+
+{{/each}}

@@ -1,0 +1,56 @@
+/**
+ * GraphQL API Tests - SpaceX GraphQL API.
+ * 
+ * Run: npm test
+ */
+import { GraphQLClient } from "../core/GraphQLClient";
+import { GET_COMPANY, GET_ROCKETS, GET_ROCKET_BY_ID, GET_LAUNCHES } from "../queries/SpaceXQueries";
+import { log } from "../utils/Logger";
+
+describe("SpaceX GraphQL API Tests", () => {
+  let client: GraphQLClient;
+
+  beforeAll(() => {
+    client = new GraphQLClient();
+  });
+
+  test("Query company info returns data", async () => {
+    log.step("Query company info");
+    
+    const data = await client.query<{ company: any }>(GET_COMPANY);
+    
+    expect(data.company).toBeDefined();
+    expect(data.company.name).toBe("SpaceX");
+    log.info(`Company: ${data.company.name}, Founder: ${data.company.founder}`);
+  });
+
+  test("Query rockets returns list", async () => {
+    log.step("Query all rockets");
+    
+    const data = await client.query<{ rockets: any[] }>(GET_ROCKETS);
+    
+    expect(data.rockets).toBeDefined();
+    expect(data.rockets.length).toBeGreaterThan(0);
+    log.info(`Found ${data.rockets.length} rockets`);
+  });
+
+  test("Query rocket by ID returns rocket data", async () => {
+    log.step("Query rocket by ID");
+    
+    const data = await client.query<{ rocket: any }>(GET_ROCKET_BY_ID, { id: "falcon9" });
+    
+    expect(data.rocket).toBeDefined();
+    expect(data.rocket.name).toContain("Falcon");
+    log.info(`Rocket: ${data.rocket.name}`);
+  });
+
+  test("Query launches with limit returns launches", async () => {
+    log.step("Query launches with limit");
+    
+    const data = await client.query<{ launches: any[] }>(GET_LAUNCHES, { limit: 5 });
+    
+    expect(data.launches).toBeDefined();
+    expect(data.launches.length).toBeLessThanOrEqual(5);
+    log.info(`Found ${data.launches.length} launches`);
+  });
+});

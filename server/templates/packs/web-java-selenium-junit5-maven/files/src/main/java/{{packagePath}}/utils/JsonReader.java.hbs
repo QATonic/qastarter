@@ -1,0 +1,70 @@
+package {{javaPackage}}.utils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.InputStream;
+
+/**
+ * JSON Reader - Simple JSON file reading utility.
+ * 
+ * Files location: src/main/resources/
+ * 
+ * Usage:
+ *   JsonNode data = JsonReader.read("testdata/config.json");
+ *   String value = data.get("key").asText();
+ */
+public class JsonReader {
+
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    private JsonReader() {
+        // Private constructor
+    }
+
+    /**
+     * Read JSON file from resources
+     */
+    public static JsonNode read(String filePath) {
+        try (InputStream is = JsonReader.class.getClassLoader().getResourceAsStream(filePath)) {
+            if (is == null) {
+                Log.error("JSON file not found: " + filePath);
+                return null;
+            }
+            return mapper.readTree(is);
+        } catch (Exception e) {
+            Log.error("Failed to read JSON: " + filePath, e);
+            return null;
+        }
+    }
+
+    /**
+     * Get string value from JSON
+     */
+    public static String getString(JsonNode node, String key) {
+        if (node != null && node.has(key)) {
+            return node.get(key).asText();
+        }
+        return null;
+    }
+
+    /**
+     * Get int value from JSON
+     */
+    public static int getInt(JsonNode node, String key, int defaultValue) {
+        if (node != null && node.has(key)) {
+            return node.get(key).asInt(defaultValue);
+        }
+        return defaultValue;
+    }
+
+    /**
+     * Get boolean value from JSON
+     */
+    public static boolean getBoolean(JsonNode node, String key, boolean defaultValue) {
+        if (node != null && node.has(key)) {
+            return node.get(key).asBoolean(defaultValue);
+        }
+        return defaultValue;
+    }
+}

@@ -1,0 +1,3544 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ProjectTemplateGenerator Snapshots > should match snapshot for Java + Selenium + Maven 1`] = `
+[
+  {
+    "content": "# Build
+target/
+build/
+out/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+*.swp
+*~
+
+# Test outputs
+screenshots/
+logs/
+reports/
+allure-results/
+test-output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+*.log
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Environment
+.env",
+    "isTemplate": false,
+    "mode": undefined,
+    "path": ".gitignore",
+  },
+  {
+    "content": "<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>demo-java-selenium</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>demo-java-selenium</name>
+    <description>UI Automation Framework using Selenium WebDriver, TestNG, and Maven</description>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Dependency Versions -->
+        <selenium.version>4.16.0</selenium.version>
+        <testng.version>7.8.0</testng.version>
+        <log4j.version>2.23.0</log4j.version>
+        <jackson.version>2.15.2</jackson.version>
+        <commons-csv.version>1.10.0</commons-csv.version>
+
+        <!-- Plugin Versions -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
+
+        <!-- Test Configuration -->
+        <suite>testng.xml</suite>
+        <browser>chrome</browser>
+        <headless>false</headless>
+        <env>dev</env>
+    </properties>
+
+    <dependencies>
+        <!-- Selenium WebDriver -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>\${selenium.version}</version>
+        </dependency>
+
+        <!-- TestNG -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>\${testng.version}</version>
+        </dependency>
+
+
+        <!-- Log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>\${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>\${log4j.version}</version>
+        </dependency>
+
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>\${jackson.version}</version>
+        </dependency>
+
+        <!-- CSV Processing -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>\${commons-csv.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>\${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>\${maven.compiler.source}</source>
+                    <target>\${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire Plugin for Test Execution -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>\${maven-surefire-plugin.version}</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/\${suite}</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <systemPropertyVariables>
+                        <browser>\${browser}</browser>
+                        <headless>\${headless}</headless>
+                        <env>\${env}</env>
+                    </systemPropertyVariables>
+                    <useSystemClassLoader>false</useSystemClassLoader>
+                    <argLine>-Dfile.encoding=UTF-8
+                    </argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat>
+                            <version>1.17.0</version>
+                            <style>
+                                AOSP
+                            </style>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Development Environment -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <env>dev</env>
+            </properties>
+        </profile>
+
+        <!-- QA Environment -->
+        <profile>
+            <id>qa</id>
+            <properties>
+                <env>qa</env>
+            </properties>
+        </profile>
+
+        <!-- Staging Environment -->
+        <profile>
+            <id>stg</id>
+            <properties>
+                <env>stg</env>
+            </properties>
+        </profile>
+
+        <!-- Production Environment -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <env>prod</env>
+            </properties>
+        </profile>
+
+        <!-- Headless Execution -->
+        <profile>
+            <id>headless</id>
+            <properties>
+                <headless>true</headless>
+            </properties>
+        </profile>
+
+        <!-- Different Browser Profiles -->
+        <profile>
+            <id>chrome</id>
+            <properties>
+                <browser>chrome</browser>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>firefox</id>
+            <properties>
+                <browser>firefox</browser>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>edge</id>
+            <properties>
+                <browser>edge</browser>
+            </properties>
+        </profile>
+    </profiles>
+</project>",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pom.xml",
+  },
+  {
+    "content": "# demo-java-selenium
+
+A production-ready **Selenium WebDriver** test automation
+framework using **TestNG** and **Maven**.
+
+## 🚀 Quick Start
+
+\`\`\`bash
+# Run all tests
+mvn clean test
+
+# Run with specific browser
+mvn test -Dbrowser=firefox
+
+# Run headless
+mvn test -Dheadless=true
+
+# Run specific environment
+mvn test -Denv=qa
+\`\`\`
+
+## 📁 Project Structure
+
+\`\`\`
+src/
+├── main/java/com.example/
+│ ├── config/ # Configuration management
+│ ├── core/ # BaseTest, DriverManager
+│ ├── pages/ # Page Objects (LoginPage, etc.)
+│ ├── listeners/ # TestNG listeners
+│ └── utils/ # Log, Screenshot, 
+├── main/resources/
+│ └── config/ # dev.properties, qa.properties
+└── test/
+├── java/com.example/
+│ └── tests/ # Test classes
+└── resources/
+└── testng.xml # TestNG suite configuration
+\`\`\`
+
+## ⚙️ Configuration
+
+Edit \`src/main/resources/config/dev.properties\`:
+
+\`\`\`properties
+base.url=https://www.saucedemo.com
+browser=chrome
+headless=false
+username=standard_user
+password=secret_sauce
+timeout.default=30
+\`\`\`
+
+## 🧪 Writing Tests
+
+### Page Object
+\`\`\`java
+public class LoginPage extends BasePage {
+public void login(String username, String password) {
+enterUsername(username);
+enterPassword(password);
+clickLogin();
+}
+}
+\`\`\`
+
+### Test Class
+\`\`\`java
+public class LoginTests extends BaseTest {
+@Test
+public void testValidLogin() {
+LoginPage loginPage = new LoginPage();
+loginPage.login("standard_user", "secret_sauce");
+Assert.assertTrue(loginPage.isLoginSuccessful());
+}
+}
+\`\`\`
+
+### Data-Driven Testing (CSV)
+
+Test data location: \`src/main/resources/testdata/users.csv\`
+
+\`\`\`csv
+username,password,expected
+standard_user,secret_sauce,success
+locked_out_user,secret_sauce,error
+\`\`\`
+
+\`\`\`java
+@DataProvider(name = "loginData")
+public Object[][] getLoginData() {
+List<Map<String, String>> data = TestDataReader.readCsv("users.csv");
+    return data.stream()
+    .map(row -> new Object[]{row.get("username"), row.get("password"), row.get("expected")})
+    .toArray(Object[][]::new);
+    }
+
+    @Test(dataProvider = "loginData")
+    public void testLoginWithCSV(String username, String password, String expected) {
+    new LoginPage().login(username, password);
+    if ("success".equals(expected)) {
+    Assert.assertTrue(loginPage.isLoginSuccessful());
+    } else {
+    Assert.assertTrue(loginPage.isErrorDisplayed());
+    }
+    }
+    \`\`\`
+
+    ## 📊 Reports
+
+
+    ## 🖥️ Browsers
+
+    | Browser | Config Value |
+    |---------|--------------|
+    | Chrome | \`chrome\` |
+    | Firefox | \`firefox\` |
+    | Edge | \`edge\` |
+
+    ## 📸 Screenshots
+
+    Screenshots are automatically captured on test failure:
+    - Location: \`screenshots/\`
+    - Format: \`FAILED_{TestName}_{timestamp}.png\`
+
+    ## 🔧 Prerequisites
+
+    | Requirement | Version | Verify Command |
+    |-------------|---------|----------------|
+    | Java | 17+ | \`java -version\` |
+    | Maven | 3.9+ | \`mvn -version\` |
+    | Chrome/Firefox/Edge | Latest | Browser Settings |
+
+    ## 🛠️ Troubleshooting
+
+    ### Common Issues
+
+    <details>
+        <summary><strong>❌ WebDriverException: Cannot find driver</strong></summary>
+
+        **Solution**: Selenium Manager handles driver downloads automatically in Selenium 4.11+.
+        If still failing, ensure Chrome/Firefox is installed and accessible in PATH.
+
+        \`\`\`bash
+        # Verify browser installation
+        google-chrome --version # or firefox --version
+        \`\`\`
+    </details>
+
+    <details>
+        <summary><strong>❌ Tests timeout or fail intermittently</strong></summary>
+
+        **Solution**: Increase wait timeouts in config:
+
+        \`\`\`properties
+        # In dev.properties
+        implicit.wait=15
+        explicit.wait=20
+        \`\`\`
+
+        Or run with retry enabled:
+        \`\`\`bash
+        mvn test -DretryCount=2
+        \`\`\`
+    </details>
+
+    <details>
+        <summary><strong>❌ Element not found / StaleElementReferenceException</strong></summary>
+
+        **Solution**: Use explicit waits in your page objects:
+
+        \`\`\`java
+        // Use WaitUtils for reliable element interaction
+        WaitUtils.waitForElement(driver, By.id("element-id"), 10);
+        \`\`\`
+    </details>
+
+    <details>
+        <summary><strong>❌ CI/CD tests fail but local tests pass</strong></summary>
+
+        **Solution**: Always run headless in CI:
+
+        \`\`\`bash
+        mvn test -Dheadless=true -Dbrowser=chrome
+        \`\`\`
+    </details>
+
+    ### Getting Help
+
+    - 📖 [Documentation](https://qatonic.com/docs)
+    - 🐛 [Report Issue](https://github.com/qatonic/qastarter/issues)
+
+    ---
+    Generated by [QAStarter](https://qatonic.com)",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "README.md",
+  },
+  {
+    "content": "package com.example.config;
+
+import java.io.InputStream;
+import java.util.Properties;
+
+/**
+ * Configuration Reader - Loads environment-specific properties.
+ * 
+ * Usage:
+ *   -Denv=qa (defaults to "dev")
+ *   -Dbrowser=firefox (defaults to value in properties)
+ *   -Dheadless=true
+ * 
+ * Config files: src/main/resources/config/{env}.properties
+ */
+public class ConfigurationReader {
+
+    private static final Properties properties = new Properties();
+    private static String currentEnvironment;
+
+    static {
+        String env = System.getProperty("env", "dev");
+        currentEnvironment = (env == null || env.isEmpty()) ? "dev" : env;
+        loadConfig();
+    }
+
+    private static void loadConfig() {
+        String configFile = "config/" + currentEnvironment + ".properties";
+        try (InputStream input = ConfigurationReader.class.getClassLoader().getResourceAsStream(configFile)) {
+            if (input != null) {
+                properties.load(input);
+                System.out.println("[CONFIG] Loaded: " + configFile);
+            } else {
+                System.err.println("[CONFIG] File not found: " + configFile);
+            }
+        } catch (Exception e) {
+            System.err.println("[CONFIG] Error loading: " + e.getMessage());
+        }
+    }
+
+    public static String getProperty(String key) {
+        return System.getProperty(key, properties.getProperty(key));
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        String value = getProperty(key);
+        return value != null ? value : defaultValue;
+    }
+
+    public static String getBaseUrl() {
+        return getProperty("base.url");
+    }
+
+    public static String getBrowser() {
+        return getProperty("browser", "chrome");
+    }
+
+    public static boolean isHeadless() {
+        return Boolean.parseBoolean(getProperty("headless", "false"));
+    }
+
+    public static int getTimeout() {
+        return Integer.parseInt(getProperty("timeout.default", "30"));
+    }
+
+    public static String getCurrentEnvironment() {
+        return currentEnvironment;
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/config/ConfigurationReader.java",
+  },
+  {
+    "content": "package com.example.config;
+
+/**
+ * Environment enumeration for configuration.
+ */
+public enum Environment {
+    DEV("dev"),
+    QA("qa"),
+    STG("stg"),
+    PROD("prod");
+
+    private final String name;
+
+    Environment(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static Environment fromString(String env) {
+        for (Environment e : values()) {
+            if (e.name.equalsIgnoreCase(env)) {
+                return e;
+            }
+        }
+        return DEV;
+    }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/config/Environment.java",
+  },
+  {
+    "content": "package com.example.core;
+
+import com.example.config.ConfigurationReader;
+import com.example.listeners.TestListener;
+import com.example.utils.Log;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Listeners;
+
+/**
+ * Base Test - Extend this in all your test classes.
+ * 
+ * Handles browser lifecycle automatically.
+ */
+@Listeners({TestListener.class})
+public class BaseTest {
+
+    @BeforeSuite(alwaysRun = true)
+    public void beforeSuite() {
+        Log.info("========================================");
+        Log.info(" TEST SUITE STARTED");
+        Log.info("========================================");
+        Log.info("Environment: " + ConfigurationReader.getCurrentEnvironment());
+        Log.info("Browser: " + ConfigurationReader.getBrowser());
+        Log.info("Headless: " + ConfigurationReader.isHeadless());
+        Log.info("Base URL: " + ConfigurationReader.getBaseUrl());
+    }
+
+    @AfterSuite(alwaysRun = true)
+    public void afterSuite() {
+        Log.info("========================================");
+        Log.info(" TEST SUITE COMPLETED");
+        Log.info("========================================");
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void setUp() {
+        Log.info("--- Test Setup Started ---");
+        DriverManager.initializeDriver();
+
+        String baseUrl = ConfigurationReader.getBaseUrl();
+        if (baseUrl != null && !baseUrl.isEmpty()) {
+            getDriver().get(baseUrl);
+            Log.info("Navigated to: " + baseUrl);
+        }
+        Log.info("--- Test Setup Completed ---");
+    }
+
+    @AfterMethod(alwaysRun = true)
+    public void tearDown() {
+        Log.info("--- Test Teardown Started ---");
+        DriverManager.quitDriver();
+        Log.info("--- Test Teardown Completed ---");
+    }
+
+    protected WebDriver getDriver() {
+        return DriverManager.getDriver();
+    }
+
+    protected void navigateTo(String url) {
+        Log.step("Navigating to: " + url);
+        getDriver().get(url);
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/core/BaseTest.java",
+  },
+  {
+    "content": "package com.example.core;
+
+import com.example.utils.Log;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.safari.SafariDriver;
+
+/**
+* Browser Factory - Creates WebDriver instances.
+*
+* Selenium 4.16+ uses built-in Selenium Manager for automatic driver management.
+* No external driver setup required!
+*
+* Supported browsers: chrome, firefox, edge, safari
+*/
+public class BrowserFactory {
+
+private BrowserFactory() {}
+
+public static WebDriver createDriver(String browser, boolean headless) {
+WebDriver driver;
+
+switch (browser.toLowerCase()) {
+case "firefox":
+FirefoxOptions firefoxOptions = new FirefoxOptions();
+if (headless) {
+firefoxOptions.addArguments("--headless");
+}
+firefoxOptions.addArguments("--width=1920");
+firefoxOptions.addArguments("--height=1080");
+driver = new FirefoxDriver(firefoxOptions);
+break;
+
+case "edge":
+EdgeOptions edgeOptions = new EdgeOptions();
+if (headless) {
+edgeOptions.addArguments("--headless=new");
+}
+edgeOptions.addArguments("--window-size=1920,1080");
+edgeOptions.addArguments("--no-sandbox");
+edgeOptions.addArguments("--disable-dev-shm-usage");
+edgeOptions.addArguments("--disable-extensions");
+driver = new EdgeDriver(edgeOptions);
+break;
+
+case "safari":
+// Safari does not support headless mode
+if (headless) {
+Log.warn("Safari does not support headless mode - running in normal mode");
+}
+driver = new SafariDriver();
+break;
+
+case "chrome":
+default:
+ChromeOptions chromeOptions = new ChromeOptions();
+if (headless) {
+chromeOptions.addArguments("--headless=new");
+}
+// Stability options for CI/CD environments
+chromeOptions.addArguments("--window-size=1920,1080");
+chromeOptions.addArguments("--no-sandbox");
+chromeOptions.addArguments("--disable-dev-shm-usage");
+chromeOptions.addArguments("--disable-gpu");
+chromeOptions.addArguments("--disable-extensions");
+chromeOptions.addArguments("--disable-infobars");
+chromeOptions.addArguments("--ignore-certificate-errors");
+chromeOptions.addArguments("--remote-allow-origins=*");
+driver = new ChromeDriver(chromeOptions);
+break;
+}
+
+Log.info("Created " + browser + " driver (Selenium Manager)");
+return driver;
+}
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/core/BrowserFactory.java",
+  },
+  {
+    "content": "package com.example.core;
+
+import com.example.config.ConfigurationReader;
+import com.example.utils.Log;
+import org.openqa.selenium.WebDriver;
+
+/**
+ * Driver Manager - Thread-safe WebDriver lifecycle management.
+ * 
+ * Supports parallel test execution via ThreadLocal.
+ */
+public class DriverManager {
+
+    private static final ThreadLocal<WebDriver> driverThreadLocal = new ThreadLocal<>();
+
+    private DriverManager() {}
+
+    public static WebDriver getDriver() {
+        WebDriver driver = driverThreadLocal.get();
+        if (driver == null) {
+            throw new IllegalStateException("Driver not initialized. Call initializeDriver() first.");
+        }
+        return driver;
+    }
+
+    public static void initializeDriver() {
+        if (driverThreadLocal.get() != null) {
+            Log.warn("Driver already exists. Cleaning up...");
+            quitDriver();
+        }
+
+        String browser = ConfigurationReader.getBrowser();
+        boolean headless = ConfigurationReader.isHeadless();
+
+        Log.info("Initializing browser: " + browser + " | Headless: " + headless);
+
+        WebDriver driver = BrowserFactory.createDriver(browser, headless);
+        driverThreadLocal.set(driver);
+
+        int timeout = ConfigurationReader.getTimeout();
+        driver.manage().window().maximize();
+
+        Log.info("Browser initialized successfully");
+    }
+
+    public static void quitDriver() {
+        WebDriver driver = driverThreadLocal.get();
+        if (driver != null) {
+            try {
+                driver.quit();
+                Log.info("Browser closed");
+            } catch (Exception e) {
+                Log.error("Error closing browser: " + e.getMessage());
+            } finally {
+                driverThreadLocal.remove();
+            }
+        }
+    }
+
+    public static boolean isDriverInitialized() {
+        return driverThreadLocal.get() != null;
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/core/DriverManager.java",
+  },
+  {
+    "content": "package com.example.listeners;
+
+import org.testng.IRetryAnalyzer;
+import org.testng.ITestResult;
+
+/**
+ * Retry failed tests automatically.
+ * 
+ * Usage:
+ *   @Test(retryAnalyzer = RetryAnalyzer.class)
+ */
+public class RetryAnalyzer implements IRetryAnalyzer {
+
+    private int retryCount = 0;
+    private static final int MAX_RETRIES = 2;
+
+    @Override
+    public boolean retry(ITestResult result) {
+        if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            System.out.println("Retrying test: " + result.getName() + " (Attempt " + retryCount + ")");
+            return true;
+        }
+        return false;
+    }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/listeners/RetryAnalyzer.java",
+  },
+  {
+    "content": "package com.example.listeners;
+
+import com.example.utils.Log;
+import com.example.utils.ScreenshotUtils;
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+
+import java.io.File;
+import java.util.Base64;
+import java.nio.file.Files;
+
+/**
+ * TestNG Listener - Handles test events, logging, and reporting.
+ */
+public class TestListener implements ITestListener {
+
+    @Override
+    public void onStart(ITestContext context) {
+        Log.info("TEST SUITE: " + context.getName());
+    }
+
+    @Override
+    public void onFinish(ITestContext context) {
+        Log.info("Suite finished: " + context.getName());
+    }
+
+    @Override
+    public void onTestStart(ITestResult result) {
+        Log.testStart(getTestName(result));
+    }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        Log.testEnd(getTestName(result), "PASSED");
+    }
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        Log.error("TEST FAILED: " + getTestName(result));
+        Log.error("Reason: " + result.getThrowable().getMessage());
+
+        String screenshotPath = ScreenshotUtils.capture("FAILED_" + getTestName(result));
+
+    }
+
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        Log.warn("TEST SKIPPED: " + getTestName(result));
+    }
+
+    private String getTestName(ITestResult result) {
+        return result.getTestClass().getRealClass().getSimpleName() + "." + result.getMethod().getMethodName();
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/listeners/TestListener.java",
+  },
+  {
+    "content": "package com.example.pages;
+
+import com.example.core.DriverManager;
+import com.example.utils.Log;
+import com.example.utils.WaitUtils;
+import org.openqa.selenium.*;
+
+/**
+* Base Page - Extend this in all your page objects.
+*
+* Uses WaitUtils for centralized wait logic.
+*/
+public abstract class BasePage {
+
+protected WebDriver driver;
+
+public BasePage() {
+this.driver = DriverManager.getDriver();
+}
+
+/**
+* Click on element (uses WaitUtils for waits)
+*/
+protected void click(By locator) {
+Log.action("Click: " + locator);
+WaitUtils.waitForClickability(locator).click();
+}
+
+/**
+* Type text into element (uses WaitUtils for waits)
+*/
+protected void type(By locator, String text) {
+Log.action("Type into: " + locator);
+WebElement element = WaitUtils.waitForVisibility(locator);
+element.clear();
+element.sendKeys(text);
+}
+
+/**
+* Get text from element
+*/
+protected String getText(By locator) {
+return WaitUtils.waitForVisibility(locator).getText();
+}
+
+/**
+* Check if element is displayed (no wait)
+*/
+protected boolean isDisplayed(By locator) {
+try {
+return driver.findElement(locator).isDisplayed();
+} catch (NoSuchElementException | StaleElementReferenceException e) {
+return false;
+}
+}
+
+/**
+* Wait for element to be visible
+*/
+protected void waitForElement(By locator) {
+WaitUtils.waitForVisibility(locator);
+}
+
+/**
+* Wait for element to disappear
+*/
+protected void waitForElementToDisappear(By locator) {
+WaitUtils.waitForInvisibility(locator);
+}
+
+public String getPageTitle() {
+return driver.getTitle();
+}
+
+public String getCurrentUrl() {
+return driver.getCurrentUrl();
+}
+
+protected void logAction(String action) {
+Log.step("[" + getClass().getSimpleName() + "] " + action);
+}
+
+public abstract boolean isLoaded();
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/pages/BasePage.java",
+  },
+  {
+    "content": "package com.example.pages;
+
+import org.openqa.selenium.By;
+
+/**
+ * Login Page Object for SauceDemo
+ * URL: https://www.saucedemo.com
+ * 
+ * HOW TO CUSTOMIZE:
+ *   1. Update locators below for your app
+ *   2. Update credentials in: src/main/resources/config/dev.properties
+ */
+public class LoginPage extends BasePage {
+
+    // SauceDemo locators
+    private final By usernameField = By.id("user-name");
+    private final By passwordField = By.id("password");
+    private final By loginButton = By.id("login-button");
+    private final By errorMessage = By.cssSelector("[data-test='error']");
+
+    @Override
+    public boolean isLoaded() {
+        return isDisplayed(loginButton);
+    }
+
+    public LoginPage enterUsername(String username) {
+        logAction("Entering username: " + username);
+        type(usernameField, username);
+        return this;
+    }
+
+    public LoginPage enterPassword(String password) {
+        logAction("Entering password");
+        type(passwordField, password);
+        return this;
+    }
+
+    public void clickLogin() {
+        logAction("Clicking login button");
+        click(loginButton);
+    }
+
+    public void login(String username, String password) {
+        enterUsername(username);
+        enterPassword(password);
+        clickLogin();
+    }
+
+    public String getErrorMessage() {
+        return isDisplayed(errorMessage) ? getText(errorMessage) : "";
+    }
+
+    public boolean isErrorDisplayed() {
+        return isDisplayed(errorMessage);
+    }
+
+    public boolean isLoginSuccessful() {
+        return getCurrentUrl().contains("inventory");
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/pages/LoginPage.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+/**
+ * Logger Utility - Consistent logging across the framework.
+ * 
+ * Uses Log4j2. Logs go to: logs/test_latest.log
+ */
+public class Log {
+
+    private static final Logger logger = LogManager.getLogger(Log.class);
+
+    private Log() {}
+
+    public static void info(String message) {
+        logger.info(message);
+    }
+
+    public static void debug(String message) {
+        logger.debug(message);
+    }
+
+    public static void warn(String message) {
+        logger.warn(message);
+    }
+
+    public static void error(String message) {
+        logger.error(message);
+    }
+
+    public static void error(String message, Throwable throwable) {
+        logger.error(message, throwable);
+    }
+
+    /**
+     * Log a test step
+     */
+    public static void step(String stepDescription) {
+        logger.info("STEP: " + stepDescription);
+    }
+
+    /**
+     * Log an action (click, type, etc.)
+     */
+    public static void action(String actionDescription) {
+        logger.info("ACTION: " + actionDescription);
+    }
+
+    /**
+     * Log wait operation
+     */
+    public static void logWait(String waitDescription) {
+        logger.debug("WAIT: " + waitDescription);
+    }
+
+    /**
+     * Log assertion
+     */
+    public static void assertion(String assertionDescription) {
+        logger.info("ASSERT: " + assertionDescription);
+    }
+
+    /**
+     * Log test start
+     */
+    public static void testStart(String testName) {
+        logger.info("========================================");
+        logger.info("TEST START: " + testName);
+        logger.info("========================================");
+    }
+
+    /**
+     * Log test end
+     */
+    public static void testEnd(String testName, String status) {
+        logger.info("TEST END: " + testName + " - " + status);
+        logger.info("========================================");
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/Log.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import com.example.core.DriverManager;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * Screenshot Utilities - Capture screenshots on demand.
+ * 
+ * Screenshots saved to: screenshots/
+ */
+public class ScreenshotUtils {
+
+    private static final String SCREENSHOT_DIR = "screenshots";
+
+    private ScreenshotUtils() {}
+
+    public static String capture(String testName) {
+        try {
+            WebDriver driver = DriverManager.getDriver();
+            if (driver == null) {
+                Log.error("Cannot capture screenshot - driver is null");
+                return null;
+            }
+
+            Path dir = Paths.get(SCREENSHOT_DIR);
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String sanitizedName = testName.replaceAll("[^a-zA-Z0-9_-]", "_");
+            String fileName = sanitizedName + "_" + timestamp + ".png";
+            Path filePath = dir.resolve(fileName);
+
+            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            Files.copy(screenshot.toPath(), filePath);
+
+            Log.info("Screenshot saved: " + filePath);
+            return filePath.toString();
+
+        } catch (Exception e) {
+            Log.error("Failed to capture screenshot: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static byte[] captureAsBytes() {
+        try {
+            WebDriver driver = DriverManager.getDriver();
+            if (driver == null) return null;
+            return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+        } catch (Exception e) {
+            Log.error("Failed to capture screenshot bytes: " + e.getMessage());
+            return null;
+        }
+    }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/ScreenshotUtils.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import com.example.config.ConfigurationReader;
+import com.example.core.DriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+
+/**
+* Wait Utilities - Explicit wait helpers.
+*
+* Timeout configured in: src/main/resources/config/{env}.properties
+*/
+public class WaitUtils {
+
+private WaitUtils() {
+// Private constructor
+}
+
+private static WebDriverWait getWait() {
+int timeout = ConfigurationReader.getTimeout();
+return new WebDriverWait(DriverManager.getDriver(), Duration.ofSeconds(timeout));
+}
+
+/**
+* Wait for element to be visible
+*/
+public static WebElement waitForVisibility(By locator) {
+Log.logWait("Waiting for visibility: " + locator);
+return getWait().until(ExpectedConditions.visibilityOfElementLocated(locator));
+}
+
+/**
+* Wait for element to be clickable
+*/
+public static WebElement waitForClickability(By locator) {
+Log.logWait("Waiting for clickability: " + locator);
+return getWait().until(ExpectedConditions.elementToBeClickable(locator));
+}
+
+/**
+* Wait for element to be present in DOM
+*/
+public static WebElement waitForPresence(By locator) {
+Log.logWait("Waiting for presence: " + locator);
+return getWait().until(ExpectedConditions.presenceOfElementLocated(locator));
+}
+
+/**
+* Wait for element to disappear
+*/
+public static boolean waitForInvisibility(By locator) {
+Log.logWait("Waiting for invisibility: " + locator);
+return getWait().until(ExpectedConditions.invisibilityOfElementLocated(locator));
+}
+
+/**
+* Wait for text to be present in element
+*/
+public static boolean waitForTextPresent(By locator, String text) {
+Log.logWait("Waiting for text '" + text + "' in: " + locator);
+return getWait().until(ExpectedConditions.textToBePresentInElementLocated(locator, text));
+}
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/WaitUtils.java",
+  },
+  {
+    "content": "package com.example.utils;
+
+import com.example.core.DriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
+
+/**
+ * Web Actions - Common web interaction utilities.
+ * 
+ * All methods include logging and error handling.
+ */
+public class WebActions {
+
+    private WebActions() {
+        // Private constructor
+    }
+
+    private static WebDriver getDriver() {
+        return DriverManager.getDriver();
+    }
+
+    /**
+     * Click on element
+     */
+    public static void click(By locator) {
+        Log.action("Click: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator);
+        element.click();
+    }
+
+    /**
+     * Type text into element
+     */
+    public static void type(By locator, String text) {
+        String maskedText = maskSensitiveData(text);
+        Log.action("Type '" + maskedText + "' into: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        element.clear();
+        element.sendKeys(text);
+    }
+
+    /**
+     * Get text from element
+     */
+    public static String getText(By locator) {
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        return element.getText();
+    }
+
+    /**
+     * Check if element is displayed
+     */
+    public static boolean isDisplayed(By locator) {
+        try {
+            return getDriver().findElement(locator).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if element is enabled
+     */
+    public static boolean isEnabled(By locator) {
+        try {
+            return getDriver().findElement(locator).isEnabled();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Select option by visible text
+     */
+    public static void selectByText(By locator, String text) {
+        Log.action("Select '" + text + "' from: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        new Select(element).selectByVisibleText(text);
+    }
+
+    /**
+     * Scroll to element
+     */
+    public static void scrollToElement(By locator) {
+        Log.action("Scroll to: " + locator);
+        WebElement element = getDriver().findElement(locator);
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+    }
+
+    /**
+     * Hover over element
+     */
+    public static void hover(By locator) {
+        Log.action("Hover: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        new Actions(getDriver()).moveToElement(element).perform();
+    }
+
+    /**
+     * JavaScript click (for stubborn elements)
+     */
+    public static void jsClick(By locator) {
+        Log.action("JS Click: " + locator);
+        WebElement element = getDriver().findElement(locator);
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", element);
+    }
+
+    /**
+     * Mask sensitive data for logging
+     */
+    private static String maskSensitiveData(String text) {
+        if (text == null || text.length() <= 2) {
+            return "****";
+        }
+        return text.substring(0, 2) + "****";
+    }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/java/com/example/utils/WebActions.java",
+  },
+  {
+    "content": "# demo-java-selenium - Development Configuration
+# ============================================
+# Practice Site: SauceDemo (https://www.saucedemo.com)
+# ============================================
+
+# Application URL
+base.url=https://www.saucedemo.com
+
+# Browser Configuration
+browser=chrome
+headless=false
+
+# Test Credentials (SauceDemo defaults)
+username=standard_user
+password=secret_sauce
+
+# Timeouts (seconds)
+timeout.default=30",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/config/dev.properties",
+  },
+  {
+    "content": "# QA Environment
+base.url=https://www.saucedemo.com
+browser=chrome
+headless=true
+username=standard_user
+password=secret_sauce
+timeout.default=30",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/config/prod.properties",
+  },
+  {
+    "content": "# QA Environment
+base.url=https://www.saucedemo.com
+browser=chrome
+headless=true
+username=standard_user
+password=secret_sauce
+timeout.default=30",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/config/qa.properties",
+  },
+  {
+    "content": "<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <Property name="LOG_DIR">logs</Property>
+        <Property name="LOG_PATTERN">%d{HH:mm:ss} %-5level - %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="\${LOG_PATTERN}" />
+        </Console>
+
+        <RollingFile name="File" fileName="\${LOG_DIR}/test_\${date:yyyy-MM-dd_HH-mm-ss}.log"
+            filePattern="\${LOG_DIR}/test_%d{yyyy-MM-dd_HH-mm-ss}_%i.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n" />
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="20" />
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.example" level="info" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
+        </Logger>
+
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="File" />
+        </Root>
+    </Loggers>
+</Configuration>",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/log4j2.xml",
+  },
+  {
+    "content": "# ============================================================
+#                    QUICK SETUP GUIDE
+# ============================================================
+# 
+# STEP 1: Update the values below with your website details
+# STEP 2: Run: mvn clean test
+# STEP 3: View reports in target/surefire-reports/ folder
+#
+# ============================================================
+
+# ========== CHANGE THESE VALUES ==========
+
+# Your website URL (e.g., https://mywebsite.com)
+BASE_URL=https://www.saucedemo.com
+
+# Login credentials for testing
+TEST_USERNAME=standard_user
+TEST_PASSWORD=secret_sauce
+
+# ==========================================
+
+# Browser settings (chrome, firefox, edge)
+BROWSER=chrome
+
+# Run tests without opening browser window (true/false)
+HEADLESS=false
+
+# Environment (dev, qa, prod)
+ENVIRONMENT=dev
+
+# Wait timeout in seconds
+TIMEOUT=10
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/main/resources/setup.properties",
+  },
+  {
+    "content": "package com.example.tests;
+
+import com.example.config.ConfigurationReader;
+import com.example.core.BaseTest;
+import com.example.pages.LoginPage;
+import com.example.utils.Log;
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+/**
+* Login Tests - Example test class for SauceDemo.
+*
+* Demonstrates:
+* - Simple tests using ConfigurationReader (properties file)
+* - Data-driven tests using TestDataReader (CSV file)
+*/
+public class LoginTests extends BaseTest {
+
+// ===========================================
+// SIMPLE TESTS (using properties file)
+// ===========================================
+
+@Test(priority = 1, description = "Verify successful login with valid credentials")
+public void testValidLogin() {
+Log.step("Testing valid login from properties file");
+LoginPage loginPage = new LoginPage();
+
+// Get credentials from dev.properties
+String username = ConfigurationReader.getProperty("username");
+String password = ConfigurationReader.getProperty("password");
+
+loginPage.login(username, password);
+
+Assert.assertTrue(loginPage.isLoginSuccessful(), "Login should be successful");
+Log.info("Valid login test passed");
+}
+
+@Test(priority = 2, description = "Verify error message with invalid credentials")
+public void testInvalidLogin() {
+Log.step("Testing invalid login");
+LoginPage loginPage = new LoginPage();
+
+loginPage.login("invalid_user", "wrong_password");
+
+Assert.assertTrue(loginPage.isErrorDisplayed(), "Error message should be displayed");
+Log.info("Invalid login test passed - error displayed as expected");
+}
+
+    // ===========================================
+    // DATA-DRIVEN TESTS (using CSV file)
+    // ===========================================
+
+    }",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/java/com/example/tests/LoginTests.java",
+  },
+  {
+    "content": "<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Regression Test Suite" parallel="methods" thread-count="3">
+    <test name="Regression Tests">
+        <groups>
+            <run>
+                <include name="regression"/>
+                <include name="functional"/>
+                <include name="data-driven"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.example.tests"/>
+        </packages>
+    </test>
+</suite>",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/resources/regression.xml",
+  },
+  {
+    "content": "{
+  "testEnvironments": [
+    {
+      "name": "dev",
+      "baseUrl": "https://dev.example.com",
+      "apiUrl": "https://dev-api.example.com",
+      "database": {
+        "host": "dev-db.example.com",
+        "port": 3306,
+        "name": "dev_testdb"
+      }
+    },
+    {
+      "name": "qa",
+      "baseUrl": "https://qa.example.com",
+      "apiUrl": "https://qa-api.example.com",
+      "database": {
+        "host": "qa-db.example.com",
+        "port": 3306,
+        "name": "qa_testdb"
+      }
+    },
+    {
+      "name": "staging",
+      "baseUrl": "https://staging.example.com",
+      "apiUrl": "https://staging-api.example.com",
+      "database": {
+        "host": "staging-db.example.com",
+        "port": 3306,
+        "name": "staging_testdb"
+      }
+    }
+  ],
+  
+  "testUsers": [
+    {
+      "role": "admin",
+      "username": "admin",
+      "password": "password123",
+      "email": "admin@example.com",
+      "firstName": "Admin",
+      "lastName": "User",
+      "permissions": ["read", "write", "delete", "admin"]
+    },
+    {
+      "role": "user",
+      "username": "testuser",
+      "password": "testpass123",
+      "email": "testuser@example.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "permissions": ["read", "write"]
+    },
+    {
+      "role": "readonly",
+      "username": "readonly",
+      "password": "readonly123",
+      "email": "readonly@example.com",
+      "firstName": "Read",
+      "lastName": "Only",
+      "permissions": ["read"]
+    }
+  ],
+  
+  "testData": {
+    "validCredentials": [
+      {"username": "admin", "password": "password123"},
+      {"username": "testuser", "password": "testpass123"},
+      {"username": "manager", "password": "manager123"}
+    ],
+    
+    "invalidCredentials": [
+      {"username": "invalid", "password": "wrongpass"},
+      {"username": "admin", "password": "wrongpassword"},
+      {"username": "", "password": "password123"},
+      {"username": "admin", "password": ""}
+    ],
+    
+    "searchTerms": [
+      "automation",
+      "testing",
+      "selenium",
+      "framework",
+      "invalid_search_term_12345"
+    ],
+    
+    "navigationMenus": [
+      "Home",
+      "Dashboard",
+      "Profile",
+      "Settings",
+      "Reports",
+      "Help"
+    ]
+  },
+  
+  "browserConfigurations": [
+    {
+      "browser": "chrome",
+      "version": "latest",
+      "platform": "Windows 10",
+      "headless": false
+    },
+    {
+      "browser": "firefox",
+      "version": "latest",
+      "platform": "Windows 10",
+      "headless": false
+    },
+    {
+      "browser": "chrome",
+      "version": "latest",
+      "platform": "macOS",
+      "headless": true
+    }
+  ],
+  
+  "timeouts": {
+    "implicit": 10,
+    "explicit": 20,
+    "pageLoad": 30,
+    "script": 30
+  },
+  
+  "retryConfiguration": {
+    "maxRetries": 2,
+    "retryInterval": 1000
+  },
+  
+  "reportConfiguration": {
+    "screenshotOnFailure": true,
+    "screenshotOnPass": false,
+    "videoRecording": false,
+    "logLevel": "INFO"
+  },
+  
+  "testSuites": [
+    {
+      "name": "smoke",
+      "description": "Critical path smoke tests",
+      "tests": [
+        "testApplicationLoads",
+        "testUserCanLogin",
+        "testUserCanLogout",
+        "testCriticalUIElements"
+      ]
+    },
+    {
+      "name": "regression",
+      "description": "Full regression test suite",
+      "tests": [
+        "testValidLogin",
+        "testInvalidLogin",
+        "testLoginPageValidation",
+        "testNegativeLoginScenarios"
+      ]
+    },
+    {
+      "name": "performance",
+      "description": "Performance and load tests",
+      "tests": [
+        "testApplicationPerformance",
+        "testPageLoadTimes"
+      ]
+    }
+  ],
+  
+  "applicationMetadata": {
+    "name": "demo-java-selenium",
+    "version": "1.0.0",
+    "environment": "test",
+    "buildDate": "2024-01-01",
+    "testFramework": "Selenium + TestNG + Maven"
+  }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/resources/testdata/sample.json",
+  },
+  {
+    "content": "username,password,expectedResult,description
+admin,password123,success,Valid admin user
+testuser,testpass123,success,Valid test user
+qa_user,qa_password,success,Valid QA user
+manager,manager123,success,Valid manager user
+developer,dev_password,success,Valid developer user
+invaliduser,wrongpass,failure,Invalid username
+admin,wrongpassword,failure,Valid user with invalid password
+,password123,failure,Empty username
+admin,,failure,Empty password
+,,failure,Both fields empty
+user_with_spaces, password123 ,failure,Username with spaces
+admin,PASSWORD123,failure,Case sensitive password
+ADMIN,password123,failure,Case sensitive username
+admin123,password123,failure,Non-existent user
+test@user,password123,failure,Special characters in username
+admin,pass,failure,Password too short
+locked_user,password123,failure,Account locked/disabled
+expired_user,password123,failure,Expired account
+temp_user,temp_pass,success,Temporary user account
+guest,guest123,success,Guest user account",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/resources/testdata/users.csv",
+  },
+  {
+    "content": "<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="demo-java-selenium Test Suite" parallel="methods" thread-count="2">
+
+    <listeners>
+        <listener class-name="com.example.listeners.TestListener" />
+    </listeners>
+
+    <test name="Login Tests">
+        <classes>
+            <class name="com.example.tests.LoginTests" />
+        </classes>
+    </test>
+
+</suite>",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "src/test/resources/testng.xml",
+  },
+]
+`;
+
+exports[`ProjectTemplateGenerator Snapshots > should match snapshot for Python + Playwright + Pytest 1`] = `
+[
+  {
+    "content": "__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.log
+logs/
+screenshots/
+test-results/
+.env
+.pytest_cache/
+htmlcov/
+.coverage
+*.egg-info/
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": ".gitignore",
+  },
+  {
+    "content": "# Config package
+",
+    "isTemplate": false,
+    "mode": undefined,
+    "path": "config/__init__.py",
+  },
+  {
+    "content": """"
+Configuration Reader - Load environment-specific settings.
+
+Usage:
+    from config.config_reader import config
+    
+    base_url = config.get("base_url")
+    browser = config.get("browser", "chrome")
+
+Environment selection:
+    Set ENV=qa in .env file or environment variable
+"""
+import os
+from configparser import ConfigParser
+from pathlib import Path
+
+class ConfigurationReader:
+    """Thread-safe configuration reader."""
+    
+    _instance = None
+    _config = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._load_config()
+        return cls._instance
+    
+    def _load_config(self):
+        """Load configuration from INI file based on environment."""
+        env = os.getenv("ENV", "dev")
+        config_path = Path(__file__).parent / f"{env}.ini"
+        
+        if not config_path.exists():
+            config_path = Path(__file__).parent / "dev.ini"
+            print(f"[Config] {env}.ini not found, using dev.ini")
+        
+        self._config = ConfigParser()
+        self._config.read(config_path)
+        print(f"[Config] Loaded: {config_path}")
+    
+    def get(self, key: str, default: str = None, section: str = "settings") -> str:
+        """Get configuration value."""
+        # Check environment variable first
+        env_value = os.getenv(key.upper())
+        if env_value:
+            return env_value
+        
+        # Then check config file
+        try:
+            return self._config.get(section, key)
+        except:
+            return default
+    
+    def get_bool(self, key: str, default: bool = False, section: str = "settings") -> bool:
+        """Get boolean configuration value."""
+        value = self.get(key, str(default), section)
+        return value.lower() in ("true", "1", "yes", "on")
+    
+    def get_int(self, key: str, default: int = 0, section: str = "settings") -> int:
+        """Get integer configuration value."""
+        try:
+            return int(self.get(key, str(default), section))
+        except:
+            return default
+    
+    @property
+    def base_url(self) -> str:
+        return self.get("base_url")
+    
+    @property
+    def browser(self) -> str:
+        return self.get("browser", "chrome")
+    
+    @property
+    def headless(self) -> bool:
+        return self.get_bool("headless", False)
+    
+    @property
+    def timeout(self) -> int:
+        return self.get_int("timeout", 30)
+
+
+# Singleton instance
+config = ConfigurationReader()",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "config/config_reader.py",
+  },
+  {
+    "content": "[settings]
+# Environment Configuration - Development
+base_url = https://www.saucedemo.com
+browser = chrome
+headless = false
+timeout = 30
+
+# Test Credentials (SauceDemo)
+username = standard_user
+password = secret_sauce
+
+# Parallel execution
+parallel = false
+workers = auto",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "config/dev.ini",
+  },
+  {
+    "content": "import os
+import json
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class EnvConfig:
+    def __init__(self):
+        self.environment = os.getenv('TEST_ENV', 'dev')
+        self.env_data = self._load_environment_data()
+
+    def _load_environment_data(self):
+        data_path = Path(__file__).parent.parent / 'data' / f'{self.environment}.json'
+        with open(data_path, 'r') as file:
+            return json.load(file)
+
+    def get_base_url(self) -> str:
+        return self.env_data['baseUrl']
+
+    def get_credentials(self, user_type: str = 'validUser') -> dict:
+        return self.env_data['credentials'].get(user_type, self.env_data['credentials']['validUser'])
+
+    def get_timeout(self) -> int:
+        return self.env_data.get('timeout', 30000)
+
+    def get_environment(self) -> str:
+        return self.environment
+
+env_config = EnvConfig()
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "config/env_config.py",
+  },
+  {
+    "content": "[settings]
+# Environment Configuration - QA
+base_url = https://www.saucedemo.com
+browser = chrome
+headless = true
+timeout = 30
+
+# Test Credentials
+username = standard_user
+password = secret_sauce
+
+# Parallel execution
+parallel = true
+workers = 4",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "config/qa.ini",
+  },
+  {
+    "content": "import os
+
+class TestConfig:
+    DEFAULT_TIMEOUT = 60000
+    BROWSER_OPTIONS = {
+        'headless': os.getenv('HEADLESS', 'true').lower() == 'true',
+        'slow_mo': int(os.getenv('SLOWMO', '0'))
+    }
+    SCREENSHOT_ON_FAILURE = True
+    RETRY_FAILED_TESTS = 1
+
+test_config = TestConfig()
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "config/test_config.py",
+  },
+  {
+    "content": "import pytest
+import os
+from pathlib import Path
+from playwright.sync_api import Page, Browser
+from config.test_config import TestConfig
+from utils.screenshot_helper import ScreenshotHelper
+from utils.logger import logger
+
+# Create directories
+for directory in ['logs', 'screenshots', 'test-results']:
+    Path(directory).mkdir(exist_ok=True)
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    return {
+        **browser_context_args,
+        "viewport": {"width": 1920, "height": 1080},
+        "ignore_https_errors": True
+    }
+
+@pytest.fixture(scope="function", autouse=True)
+def capture_screenshot_on_failure(request, page: Page):
+    yield
+    if request.node.rep_call.failed if hasattr(request.node, 'rep_call') else False:
+        test_name = request.node.name
+        ScreenshotHelper.capture_on_failure(page, test_name)
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+    setattr(item, f"rep_{rep.when}", rep)
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "conftest.py",
+  },
+  {
+    "content": "{
+  "_comment": "UPDATE THESE VALUES FOR YOUR APPLICATION",
+  "baseUrl": "https://your-app-url.com",
+  "credentials": {
+    "validUser": {
+      "username": "your-test-user@email.com",
+      "password": "YourTestPassword123"
+    },
+    "adminUser": {
+      "username": "your-admin@email.com",
+      "password": "YourAdminPassword123"
+    }
+  },
+  "timeout": 30000
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "data/dev.json",
+  },
+  {
+    "content": "{
+  "baseUrl": "https://qa.example.com",
+  "credentials": {
+    "validUser": {
+      "username": "qauser@example.com",
+      "password": "QA@123"
+    },
+    "adminUser": {
+      "username": "qadmin@example.com",
+      "password": "QAAdmin@123"
+    }
+  },
+  "timeout": 30000
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "data/qa.json",
+  },
+  {
+    "content": "# Pages package
+",
+    "isTemplate": false,
+    "mode": undefined,
+    "path": "pages/__init__.py",
+  },
+  {
+    "content": """"
+Base Page - Parent class for all Playwright page objects.
+"""
+from playwright.sync_api import Page, Locator
+from utils.playwright_manager import PlaywrightManager
+from utils.logger import log
+from config.config_reader import config
+
+
+class BasePage:
+"""Base class for all page objects."""
+
+def __init__(self):
+self.page: Page = PlaywrightManager.get_page()
+self.timeout = config.timeout * 1000 # Playwright uses ms
+
+def click(self, selector: str):
+"""Click an element."""
+log.action(f"Click: {selector}")
+self.page.click(selector, timeout=self.timeout)
+
+def type_text(self, selector: str, text: str):
+"""Type text into an element."""
+log.action(f"Type into: {selector}")
+self.page.fill(selector, text, timeout=self.timeout)
+
+def get_text(self, selector: str) -> str:
+"""Get text from an element."""
+return self.page.text_content(selector, timeout=self.timeout) or ""
+
+def is_displayed(self, selector: str) -> bool:
+"""Check if element is visible."""
+try:
+return self.page.is_visible(selector, timeout=5000)
+except Exception:
+return False
+
+def wait_for_element(self, selector: str) -> Locator:
+"""Wait for element to be visible."""
+locator = self.page.locator(selector)
+locator.wait_for(state="visible", timeout=self.timeout)
+return locator
+
+def get_title(self) -> str:
+"""Get page title."""
+return self.page.title()
+
+def get_current_url(self) -> str:
+"""Get current URL."""
+return self.page.url
+
+def navigate_to(self, url: str):
+"""Navigate to URL."""
+log.step(f"Navigating to: {url}")
+self.page.goto(url)
+
+def log_action(self, message: str):
+"""Log a page action."""
+log.step(f"[{self.__class__.__name__}] {message}")",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pages/base_page.py",
+  },
+  {
+    "content": "from playwright.sync_api import Page
+from pages.base_page import BasePage
+from config.env_config import env_config
+
+class HomePage(BasePage):
+    def __init__(self, page: Page):
+        super().__init__(page)
+        self.selectors = {
+            'welcome_message': '.welcome-message, h1',
+            'user_profile': '.user-profile',
+            'logout_button': 'button[data-action="logout"], .logout'
+        }
+
+    def navigate_to_home(self) -> None:
+        self.navigate(env_config.get_base_url())
+
+    def get_welcome_message(self) -> str:
+        return self.get_text(self.selectors['welcome_message'])
+
+    def is_user_profile_visible(self) -> bool:
+        return self.is_visible(self.selectors['user_profile'])
+
+    def logout(self) -> None:
+        self.click(self.selectors['logout_button'])
+        self.page.wait_for_url('**/login', timeout=5000)
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pages/home_page.py",
+  },
+  {
+    "content": """"
+Login Page - Page object for SauceDemo login.
+"""
+from pages.base_page import BasePage
+
+
+class LoginPage(BasePage):
+    """Login page object for SauceDemo."""
+    
+    # Selectors (SauceDemo)
+    USERNAME_FIELD = "#user-name"
+    PASSWORD_FIELD = "#password"
+    LOGIN_BUTTON = "#login-button"
+    ERROR_MESSAGE = "[data-test='error']"
+    
+    def enter_username(self, username: str) -> "LoginPage":
+        """Enter username."""
+        self.log_action(f"Entering username: {username}")
+        self.type_text(self.USERNAME_FIELD, username)
+        return self
+    
+    def enter_password(self, password: str) -> "LoginPage":
+        """Enter password."""
+        self.log_action("Entering password")
+        self.type_text(self.PASSWORD_FIELD, password)
+        return self
+    
+    def click_login(self):
+        """Click login button."""
+        self.log_action("Clicking login button")
+        self.click(self.LOGIN_BUTTON)
+    
+    def login(self, username: str, password: str):
+        """Perform complete login."""
+        self.enter_username(username)
+        self.enter_password(password)
+        self.click_login()
+    
+    def get_error_message(self) -> str:
+        """Get error message text."""
+        return self.get_text(self.ERROR_MESSAGE) if self.is_error_displayed() else ""
+    
+    def is_error_displayed(self) -> bool:
+        """Check if error message is displayed."""
+        return self.is_displayed(self.ERROR_MESSAGE)
+    
+    def is_login_successful(self) -> bool:
+        """Check if login was successful."""
+        return "inventory" in self.get_current_url()",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pages/login_page.py",
+  },
+  {
+    "content": "[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.pylint.messages_control]
+disable = [
+"C0111", # missing-docstring
+"C0103", # invalid-name (we use custom naming conventions)
+"E1101", # no-member (common in Playwright dynamic attrs)
+]
+max-line-length = 100",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pyproject.toml",
+  },
+  {
+    "content": "[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts =
+--html=test-results/report.html
+--self-contained-html
+-v
+--tb=short
+markers =
+regression: Regression tests
+critical: Critical path tests",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "pytest.ini",
+  },
+  {
+    "content": "# demo-python-playwright
+
+Playwright test automation framework with Python and Pytest.
+
+## Features
+
+- **Playwright 1.40.0**: Modern browser automation with multi-browser support
+- **Python 3.8+**: Clean, readable test automation
+- **Pytest 8.0.0**: Powerful test framework with rich plugins
+- **Page Object Model**: Maintainable test structure
+- **Docker Support**: Containerized test execution
+- **HTML Reporting**: Beautiful test reports
+
+## Prerequisites
+
+- Python 3.11+
+- pip
+
+## Installation
+
+\`\`\`bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Install Playwright browsers
+playwright install
+\`\`\`
+
+## Running Tests
+
+\`\`\`bash
+# Run all tests
+pytest
+
+# Run tests in headed mode
+HEADLESS=false pytest
+
+# Run tests in parallel
+pytest -n auto
+
+# View HTML report
+open test-results/report.html
+\`\`\`
+
+## Environment Configuration
+
+Update test data in:
+- \`data/dev.json\` - Development environment
+- \`data/qa.json\` - QA environment
+
+Set environment with \`TEST_ENV=qa pytest\`
+
+## Page Objects
+
+All page objects extend \`BasePage\` and are located in the \`pages/\` directory:
+- \`login_page.py\` - Login page interactions
+- \`home_page.py\` - Home page interactions
+
+## Test Structure
+
+\`\`\`
+tests/
+├── test_login.py # Login functionality tests
+└── test_smoke.py # Smoke tests
+\`\`\`
+
+## Docker
+
+\`\`\`bash
+docker build -t demo-python-playwright .
+docker run demo-python-playwright
+\`\`\`
+
+## CI/CD
+
+CI/CD pipeline configuration is included for automated testing.
+
+## Utilities
+
+- **Logger**: Python logging (\`utils/logger.py\`)
+- **Screenshots**: Auto-capture on failure (\`utils/screenshot_helper.py\`)
+- **Wait Helpers**: Custom wait utilities (\`utils/wait_helpers.py\`)
+- **Data Reader**: Test data utilities (\`utils/data_reader.py\`)",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "README.md",
+  },
+  {
+    "content": "# ==================================================
+# demo-python-playwright - Playwright Requirements
+# ==================================================
+
+# Core
+playwright>=1.41.0
+pytest>=7.4.0
+pytest-xdist>=3.5.0
+pytest-playwright>=0.4.0
+pytest-rerunfailures>=12.0
+
+# Reporting
+
+# BDD
+
+# Utilities
+python-dotenv>=1.0.0
+Pillow>=10.1.0
+PyYAML>=6.0.1
+
+# Logging
+# Logging
+colorlog>=6.8.0
+
+# Linting & Formatting
+black>=24.1.0
+isort>=5.13.0
+pylint>=3.0.0
+
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "requirements.txt",
+  },
+  {
+    "content": "# Tests package
+",
+    "isTemplate": false,
+    "mode": undefined,
+    "path": "tests/__init__.py",
+  },
+  {
+    "content": """"
+Pytest Fixtures for Playwright.
+"""
+import pytest
+from utils.playwright_manager import PlaywrightManager
+from utils.logger import log
+from utils.screenshot_utils import ScreenshotUtils
+from config.config_reader import config
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_session():
+    """Run once before all tests."""
+    log.info("=" * 60)
+    log.info(" PLAYWRIGHT TEST SESSION STARTED")
+    log.info("=" * 60)
+    yield
+    log.info(" TEST SESSION COMPLETED")
+
+
+@pytest.fixture(scope="function")
+def page():
+    """Provides Playwright Page for each test."""
+    log.info("--- Test Setup ---")
+    PlaywrightManager.init_browser()
+    page = PlaywrightManager.get_page()
+    
+    # Navigate to base URL
+    base_url = config.base_url
+    if base_url:
+        page.goto(base_url)
+        log.info(f"Navigated to: {base_url}")
+    
+    yield page
+    
+    log.info("--- Test Teardown ---")
+    PlaywrightManager.quit_browser()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Capture screenshot on test failure."""
+    outcome = yield
+    report = outcome.get_result()
+    
+    if report.when == "call" and report.failed:
+        log.error(f"TEST FAILED: {item.name}")
+        
+        if PlaywrightManager.is_initialized():
+            screenshot_path = ScreenshotUtils.capture(f"FAILED_{item.name}")
+            if screenshot_path:
+                log.info(f"Screenshot saved: {screenshot_path}")",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "tests/conftest.py",
+  },
+  {
+    "content": """"
+Login Tests for SauceDemo using Playwright.
+
+Run with: pytest tests/test_login.py -v
+Demonstrates both configuration-based and data-driven testing.
+"""
+import pytest
+from pages.login_page import LoginPage
+from utils.logger import log
+from utils.data_reader import DataReader
+from config.config_reader import config
+class TestLogin:
+"""Login test cases."""
+
+@pytest.mark.smoke
+def test_valid_login(self, page):
+"""Verify successful login with valid credentials."""
+log.step("Testing valid login")
+
+login_page = LoginPage()
+login_page.login(config.username, config.password)
+
+assert login_page.is_login_successful(), "Login should be successful"
+log.info("Valid login test passed")
+
+@pytest.mark.regression
+def test_invalid_login(self, page):
+"""Verify error message with invalid credentials."""
+log.step("Testing invalid login")
+
+login_page = LoginPage()
+login_page.login("invalid_user", "wrong_password")
+
+assert login_page.is_error_displayed(), "Error message should be displayed"
+log.info("Invalid login test passed")
+
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "tests/test_login.py",
+  },
+  {
+    "content": "# Utils package
+",
+    "isTemplate": false,
+    "mode": undefined,
+    "path": "utils/__init__.py",
+  },
+  {
+    "content": """"
+Logger - Consistent logging across the framework.
+
+Usage:
+    from utils.logger import log
+    
+    log.info("Message")
+    log.step("Test step description")
+    log.error("Error occurred")
+"""
+import logging
+import os
+from datetime import datetime
+from pathlib import Path
+
+
+class Logger:
+    """Custom logger with test-focused methods."""
+    
+    _instance = None
+    _logger = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._setup_logger()
+        return cls._instance
+    
+    def _setup_logger(self):
+        """Configure logger with file and console handlers."""
+        self._logger = logging.getLogger("TestFramework")
+        self._logger.setLevel(logging.DEBUG)
+        
+        # Clear existing handlers
+        self._logger.handlers.clear()
+        
+        # Create logs directory
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
+        
+        # File handler
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_handler = logging.FileHandler(logs_dir / f"test_{timestamp}.log")
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | %(message)s"
+        ))
+        
+        # Console handler
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(logging.Formatter(
+            "%(asctime)s | %(levelname)-8s | %(message)s",
+            datefmt="%H:%M:%S"
+        ))
+        
+        self._logger.addHandler(file_handler)
+        self._logger.addHandler(console_handler)
+    
+    def info(self, message: str):
+        self._logger.info(message)
+    
+    def debug(self, message: str):
+        self._logger.debug(message)
+    
+    def warning(self, message: str):
+        self._logger.warning(message)
+    
+    def error(self, message: str):
+        self._logger.error(message)
+    
+    def step(self, message: str):
+        """Log a test step."""
+        self._logger.info(f"STEP: {message}")
+    
+    def action(self, message: str):
+        """Log an action (click, type, etc.)."""
+        self._logger.info(f"ACTION: {message}")
+    
+    def test_start(self, test_name: str):
+        """Log test start."""
+        self._logger.info("=" * 60)
+        self._logger.info(f"TEST START: {test_name}")
+        self._logger.info("=" * 60)
+    
+    def test_end(self, test_name: str, status: str):
+        """Log test end."""
+        self._logger.info(f"TEST END: {test_name} - {status}")
+        self._logger.info("=" * 60)
+
+
+# Singleton instance
+log = Logger()",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/logger.py",
+  },
+  {
+    "content": """"
+Playwright Manager - Thread-safe browser lifecycle management.
+
+Usage:
+    from utils.playwright_manager import PlaywrightManager
+    
+    PlaywrightManager.init_browser()
+    page = PlaywrightManager.get_page()
+    PlaywrightManager.quit_browser()
+
+Supports: Chromium, Firefox, WebKit
+"""
+import threading
+from playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
+from config.config_reader import config
+from utils.logger import log
+
+
+class PlaywrightManager:
+    """Thread-safe Playwright browser manager."""
+    
+    _local = threading.local()
+    _playwright = None
+    
+    @classmethod
+    def get_page(cls) -> Page:
+        """Get Page for current thread."""
+        page = getattr(cls._local, "page", None)
+        if page is None:
+            raise RuntimeError("Browser not initialized. Call init_browser() first.")
+        return page
+    
+    @classmethod
+    def get_context(cls) -> BrowserContext:
+        """Get BrowserContext for current thread."""
+        return getattr(cls._local, "context", None)
+    
+    @classmethod
+    def init_browser(cls, browser: str = None, headless: bool = None) -> Page:
+        """Initialize browser for current thread."""
+        if getattr(cls._local, "page", None) is not None:
+            log.warning("Browser already exists. Closing existing browser.")
+            cls.quit_browser()
+        
+        browser = browser or config.browser
+        headless = headless if headless is not None else config.headless
+        
+        log.info(f"Initializing Playwright: {browser} | Headless: {headless}")
+        
+        # Initialize playwright
+        cls._playwright = sync_playwright().start()
+        
+        # Launch browser
+        browser_instance = cls._launch_browser(browser, headless)
+        cls._local.browser = browser_instance
+        
+        # Create context and page
+        context = browser_instance.new_context(
+            viewport={"width": 1920, "height": 1080}
+        )
+        cls._local.context = context
+        
+        page = context.new_page()
+        cls._local.page = page
+        
+        log.info("Playwright browser initialized successfully")
+        return page
+    
+    @classmethod
+    def _launch_browser(cls, browser: str, headless: bool) -> Browser:
+        """Launch browser based on type."""
+        if browser.lower() == "firefox":
+            return cls._playwright.firefox.launch(headless=headless)
+        elif browser.lower() in ("webkit", "safari"):
+            return cls._playwright.webkit.launch(headless=headless)
+        else:  # chromium (default)
+            return cls._playwright.chromium.launch(headless=headless)
+    
+    @classmethod
+    def quit_browser(cls):
+        """Close browser for current thread."""
+        try:
+            if hasattr(cls._local, "context") and cls._local.context:
+                cls._local.context.close()
+            if hasattr(cls._local, "browser") and cls._local.browser:
+                cls._local.browser.close()
+            if cls._playwright:
+                cls._playwright.stop()
+                cls._playwright = None
+            log.info("Playwright browser closed")
+        except Exception as e:
+            log.error(f"Error closing browser: {e}")
+        finally:
+            cls._local.page = None
+            cls._local.context = None
+            cls._local.browser = None
+    
+    @classmethod
+    def is_initialized(cls) -> bool:
+        """Check if browser is initialized."""
+        return getattr(cls._local, "page", None) is not None",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/playwright_manager.py",
+  },
+  {
+    "content": "from playwright.sync_api import Page
+from pathlib import Path
+from datetime import datetime
+from utils.logger import logger
+
+class ScreenshotHelper:
+    @staticmethod
+    def capture_screenshot(page: Page, name: str) -> str:
+        timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+        filename = f"{name}-{timestamp}.png"
+        filepath = Path('screenshots') / filename
+        
+        page.screenshot(path=str(filepath), full_page=True)
+        logger.info(f"Screenshot saved: {filepath}")
+        return str(filepath)
+
+    @staticmethod
+    def capture_on_failure(page: Page, test_name: str) -> None:
+        try:
+            ScreenshotHelper.capture_screenshot(page, f"FAILED-{test_name}")
+        except Exception as e:
+            logger.error(f"Failed to capture screenshot: {e}")
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/screenshot_helper.py",
+  },
+  {
+    "content": """"
+Screenshot Utilities for Playwright.
+"""
+from datetime import datetime
+from pathlib import Path
+from utils.playwright_manager import PlaywrightManager
+from utils.logger import log
+
+
+class ScreenshotUtils:
+    """Screenshot capture utilities for Playwright."""
+    
+    SCREENSHOT_DIR = "screenshots"
+    
+    @classmethod
+    def capture(cls, name: str) -> str:
+        """Capture screenshot and save to file."""
+        try:
+            page = PlaywrightManager.get_page()
+            if page is None:
+                log.error("Cannot capture screenshot - page is None")
+                return None
+            
+            screenshots_dir = Path(cls.SCREENSHOT_DIR)
+            screenshots_dir.mkdir(exist_ok=True)
+            
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            sanitized_name = "".join(c if c.isalnum() or c in "_-" else "_" for c in name)
+            filename = f"{sanitized_name}_{timestamp}.png"
+            filepath = screenshots_dir / filename
+            
+            page.screenshot(path=str(filepath))
+            log.info(f"Screenshot saved: {filepath}")
+            
+            return str(filepath)
+            
+        except Exception as e:
+            log.error(f"Failed to capture screenshot: {e}")
+            return None
+    
+    @classmethod
+    def capture_as_bytes(cls) -> bytes:
+        """Capture screenshot as bytes."""
+        try:
+            page = PlaywrightManager.get_page()
+            if page is None:
+                return None
+            return page.screenshot()
+        except Exception as e:
+            log.error(f"Failed to capture screenshot bytes: {e}")
+            return None",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/screenshot_utils.py",
+  },
+  {
+    "content": "from playwright.sync_api import Page
+import time
+
+class WaitHelpers:
+    @staticmethod
+    def wait_for_element(page: Page, selector: str, timeout: int = 30000) -> None:
+        page.wait_for_selector(selector, timeout=timeout, state='visible')
+
+    @staticmethod
+    def wait_for_url(page: Page, url_pattern: str, timeout: int = 30000) -> None:
+        page.wait_for_url(url_pattern, timeout=timeout)
+
+    @staticmethod
+    def wait_for_text(page: Page, selector: str, text: str, timeout: int = 30000) -> None:
+        page.wait_for_function(
+            f"""
+            () => {{
+                const element = document.querySelector('{selector}');
+                return element && element.textContent.includes('{text}');
+            }}
+            """,
+            timeout=timeout
+        )
+
+    @staticmethod
+    def sleep(seconds: float) -> None:
+        time.sleep(seconds)
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "utils/wait_helpers.py",
+  },
+]
+`;
+
+exports[`ProjectTemplateGenerator Snapshots > should match snapshot for TypeScript + Cypress 1`] = `
+[
+  {
+    "content": "node_modules/
+cypress/screenshots/
+cypress/videos/
+cypress/results/
+.DS_Store
+*.log
+npm-debug.log*
+.env
+*.js
+*.js.map
+!cypress.config.js
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": ".gitignore",
+  },
+  {
+    "content": "{
+"semi": true,
+"trailingComma": "es5",
+"singleQuote": true,
+"printWidth": 100,
+"tabWidth": 2,
+"endOfLine": "auto"
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": ".prettierrc",
+  },
+  {
+    "content": "import { defineConfig } from "cypress";
+
+export default defineConfig({
+  e2e: {
+    baseUrl: "https://www.saucedemo.com",
+    specPattern: "cypress/e2e/**/*.cy.ts",
+    supportFile: "cypress/support/e2e.ts",
+    video: true,
+    screenshotOnRunFailure: true,
+    viewportWidth: 1920,
+    viewportHeight: 1080,
+    defaultCommandTimeout: 10000,
+    pageLoadTimeout: 30000,
+    env: {
+      username: "standard_user",
+      password: "secret_sauce"
+    },
+    setupNodeEvents(on, config) {
+      return config;
+    },
+  },
+});",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress.config.ts",
+  },
+  {
+    "content": "/**
+* Login Tests using Cypress with TypeScript.
+* Demonstrates both configuration-based and data-driven testing.
+*/
+import { LoginPage } from "../pages/LoginPage";
+
+interface UserData {
+username: string;
+password: string;
+expected: string;
+}
+
+describe("Login Tests", () => {
+const loginPage = new LoginPage();
+const username = Cypress.env("username");
+const password = Cypress.env("password");
+
+beforeEach(() => {
+loginPage.visit("/");
+});
+
+it("should login successfully with valid credentials", () => {
+loginPage.login(username, password);
+loginPage.verifyLoginSuccess();
+});
+
+it("should show error with invalid credentials", () => {
+loginPage.login("invalid_user", "wrong_password");
+loginPage.verifyErrorDisplayed();
+});
+
+});",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/e2e/login.cy.ts",
+  },
+  {
+    "content": "{
+  "baseUrl": "https://dev.example.com",
+  "environments": {
+    "dev": {
+      "url": "https://dev.example.com",
+      "apiUrl": "https://api-dev.example.com"
+    },
+    "qa": {
+      "url": "https://qa.example.com",
+      "apiUrl": "https://api-qa.example.com"
+    },
+    "staging": {
+      "url": "https://staging.example.com",
+      "apiUrl": "https://api-staging.example.com"
+    }
+  }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/fixtures/config.json",
+  },
+  {
+    "content": "{
+  "dev": {
+    "baseUrl": "https://dev.example.com",
+    "apiUrl": "https://api.dev.example.com",
+    "timeout": 30000
+  },
+  "qa": {
+    "baseUrl": "https://qa.example.com",
+    "apiUrl": "https://api.qa.example.com",
+    "timeout": 30000
+  },
+  "staging": {
+    "baseUrl": "https://staging.example.com",
+    "apiUrl": "https://api.staging.example.com",
+    "timeout": 30000
+  },
+  "prod": {
+    "baseUrl": "https://www.example.com",
+    "apiUrl": "https://api.example.com",
+    "timeout": 30000
+  }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/fixtures/environments.json",
+  },
+  {
+    "content": "/**
+ * Base Page - Parent class for Cypress page objects.
+ */
+export class BasePage {
+  visit(path: string = "/"): this {
+    cy.visit(path);
+    return this;
+  }
+
+  click(selector: string): this {
+    cy.get(selector).click();
+    return this;
+  }
+
+  type(selector: string, text: string): this {
+    cy.get(selector).clear().type(text);
+    return this;
+  }
+
+  getText(selector: string): Cypress.Chainable<string> {
+    return cy.get(selector).invoke("text");
+  }
+
+  shouldBeVisible(selector: string): this {
+    cy.get(selector).should("be.visible");
+    return this;
+  }
+
+  shouldNotExist(selector: string): this {
+    cy.get(selector).should("not.exist");
+    return this;
+  }
+
+  getUrl(): Cypress.Chainable<string> {
+    return cy.url();
+  }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/pages/BasePage.ts",
+  },
+  {
+    "content": "import BasePage from './BasePage';
+
+class HomePage extends BasePage {
+  private readonly welcomeMessage = '.welcome-message, h1';
+  private readonly userProfile = '.user-profile';
+  private readonly logoutButton = 'button[data-action="logout"], .logout';
+
+  visitHomePage(baseUrl: string): void {
+    this.visit(baseUrl);
+  }
+
+  getWelcomeMessage(): Cypress.Chainable<string> {
+    return this.getText(this.welcomeMessage);
+  }
+
+  verifyUserProfileVisible(): void {
+    cy.get(this.userProfile).should('be.visible');
+  }
+
+  logout(): void {
+    this.click(this.logoutButton);
+    cy.url().should('include', '/login');
+  }
+}
+
+export default HomePage;
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/pages/HomePage.ts",
+  },
+  {
+    "content": "/**
+ * Login Page - Page object for SauceDemo.
+ */
+import { BasePage } from "./BasePage";
+
+export class LoginPage extends BasePage {
+  // Selectors
+  private usernameField = "#user-name";
+  private passwordField = "#password";
+  private loginButton = "#login-button";
+  private errorMessage = "[data-test='error']";
+
+  enterUsername(username: string): this {
+    this.type(this.usernameField, username);
+    return this;
+  }
+
+  enterPassword(password: string): this {
+    this.type(this.passwordField, password);
+    return this;
+  }
+
+  clickLogin(): this {
+    this.click(this.loginButton);
+    return this;
+  }
+
+  login(username: string, password: string): this {
+    this.enterUsername(username);
+    this.enterPassword(password);
+    this.clickLogin();
+    return this;
+  }
+
+  verifyErrorDisplayed(): this {
+    this.shouldBeVisible(this.errorMessage);
+    return this;
+  }
+
+  verifyLoginSuccess(): this {
+    cy.url().should("include", "inventory");
+    return this;
+  }
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/pages/LoginPage.ts",
+  },
+  {
+    "content": "///
+<reference types="cypress" />
+
+// Custom command for login
+Cypress.Commands.add('login', (username: string, password: string) => {
+cy.get('#user-name').type(username);
+cy.get('#password').type(password);
+cy.get('#login-button').click();
+});
+
+});
+
+// Custom command to check if element exists
+Cypress.Commands.add('elementExists', (selector: string) => {
+return cy.get('body').then(($body) => {
+return cy.wrap($body.find(selector).length > 0);
+});
+});
+
+// Custom command for waiting with custom timeout
+Cypress.Commands.add('waitForElement', (selector: string, timeout: number = 10000) => {
+cy.get(selector, { timeout }).should('be.visible');
+});
+
+// Custom command for taking full page screenshot
+Cypress.Commands.add('fullScreenshot', (filename: string) => {
+cy.screenshot(filename, { capture: 'fullPage' });
+});",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/support/commands.ts",
+  },
+  {
+    "content": "/**
+* Cypress E2E Support File.
+*/
+
+// Import commands.ts
+import './commands';",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/support/e2e.ts",
+  },
+  {
+    "content": "/// <reference types="cypress" />
+
+declare namespace Cypress {
+  interface Chainable {
+    /**
+     * Custom command to login with username and password
+     * @example cy.login('user@example.com', 'password123')
+     */
+    login(username: string, password: string): Chainable<void>;
+
+    /**
+     * Custom command to logout
+     * @example cy.logout()
+     */
+    logout(): Chainable<void>;
+
+    /**
+     * Custom command to check if element exists
+     * @example cy.elementExists('.my-selector')
+     */
+    elementExists(selector: string): Chainable<boolean>;
+
+    /**
+     * Custom command for waiting with custom timeout
+     * @example cy.waitForElement('.my-selector', 5000)
+     */
+    waitForElement(selector: string, timeout?: number): Chainable<void>;
+
+    /**
+     * Custom command for taking full page screenshot
+     * @example cy.fullScreenshot('my-screenshot')
+     */
+    fullScreenshot(filename: string): Chainable<void>;
+  }
+}
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/support/index.d.ts",
+  },
+  {
+    "content": "/**
+ * Utility functions for Cypress tests.
+ */
+
+/**
+ * Logger utility for consistent test logging
+ */
+export const Logger = {
+  info: (message: string): void => {
+    cy.log(\`ℹ️ INFO: \${message}\`);
+  },
+
+  step: (message: string): void => {
+    cy.log(\`→ STEP: \${message}\`);
+  },
+
+  debug: (message: string): void => {
+    if (Cypress.env('DEBUG')) {
+      cy.log(\`🔍 DEBUG: \${message}\`);
+    }
+  },
+
+  warn: (message: string): void => {
+    cy.log(\`⚠️ WARN: \${message}\`);
+  },
+
+  error: (message: string): void => {
+    cy.log(\`❌ ERROR: \${message}\`);
+  },
+
+  startSection: (sectionName: string): void => {
+    cy.log('========================================');
+    cy.log(sectionName);
+    cy.log('========================================');
+  },
+
+  endSection: (): void => {
+    cy.log('========================================');
+  }
+};
+
+/**
+ * Wait utilities
+ */
+export const WaitUtils = {
+  waitForVisible: (selector: string, timeout = 10000): Cypress.Chainable => {
+    return cy.get(selector, { timeout }).should('be.visible');
+  },
+
+  waitForNotExist: (selector: string, timeout = 10000): Cypress.Chainable => {
+    return cy.get(selector, { timeout }).should('not.exist');
+  },
+
+  waitForUrlContains: (text: string, timeout = 10000): Cypress.Chainable => {
+    return cy.url({ timeout }).should('include', text);
+  },
+
+  waitForPageLoad: (): Cypress.Chainable => {
+    return cy.document().its('readyState').should('eq', 'complete');
+  }
+};
+
+/**
+ * Data utilities
+ */
+export const DataUtils = {
+  randomString: (length = 10): string => {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  },
+
+  randomEmail: (domain = 'test.example.com'): string => {
+    const username = DataUtils.randomString(8).toLowerCase();
+    const timestamp = Date.now();
+    return \`\${username}.\${timestamp}@\${domain}\`;
+  },
+
+  randomNumber: (min = 0, max = 1000): number => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+};
+
+/**
+ * Screenshot utilities
+ */
+export const ScreenshotUtils = {
+  capture: (name: string): void => {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    cy.screenshot(\`\${name}_\${timestamp}\`);
+  },
+
+  captureOnFailure: (testName: string): void => {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9]/g, '_');
+    cy.screenshot(\`failed_\${sanitizedName}\`, { capture: 'fullPage' });
+  }
+};
+
+/**
+ * API utilities for Cypress
+ */
+export const ApiUtils = {
+  authenticatedRequest: <T>(
+    method: string,
+    url: string,
+    body: object | null = null,
+    token: string | null = null
+  ): Cypress.Chainable<Cypress.Response<T>> => {
+    const authToken = token || Cypress.env('authToken');
+
+    return cy.request({
+      method,
+      url,
+      body,
+      headers: {
+        'Authorization': \`Bearer \${authToken}\`,
+        'Content-Type': 'application/json'
+      },
+      failOnStatusCode: false
+    });
+  },
+
+  loginViaApi: (username: string, password: string): Cypress.Chainable<string> => {
+    return cy.request({
+      method: 'POST',
+      url: \`\${Cypress.env('apiUrl')}/auth/login\`,
+      body: { username, password }
+    }).then((response) => {
+      const token = response.body.token || response.body.accessToken;
+      Cypress.env('authToken', token);
+      return token;
+    });
+  }
+};
+
+export default {
+  Logger,
+  WaitUtils,
+  DataUtils,
+  ScreenshotUtils,
+  ApiUtils
+};
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "cypress/support/utils.ts",
+  },
+  {
+    "content": "{
+"name": "demo-ts-cypress",
+"version": "1.0.0",
+"description": "demo-ts-cypress - Cypress TypeScript Automation Framework",
+"scripts": {
+"test": "cypress run",
+"test:open": "cypress open",
+"test:headed": "cypress run --headed",
+"lint": "eslint .",
+"lint:fix": "eslint . --fix",
+"format": "prettier --write ."
+},
+"devDependencies": { 
+"cypress": "^13.6.0",
+"eslint": "^8.56.0",
+"eslint-plugin-cypress": "^2.15.1",
+"prettier": "^3.2.4",
+"typescript": "^5.3.0",
+"@types/node": "^20.10.0"
+}
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "package.json",
+  },
+  {
+    "content": "# demo-ts-cypress
+
+Cypress test automation framework with TypeScript and npm.
+
+## Features
+
+- **Cypress 13.6.0**: Modern end-to-end testing framework
+- **TypeScript**: Type-safe test automation
+- **npm**: Package management
+- **Page Object Model**: Maintainable test structure
+- **Docker Support**: Containerized test execution
+- **Mochawesome Reports**: Beautiful HTML test reports
+- **Multi-Browser**: Chrome, Firefox support
+- **Type Definitions**: Custom command type safety
+
+## Prerequisites
+
+- Node.js 18+ and npm
+
+## Installation
+
+\`\`\`bash
+npm install
+\`\`\`
+
+## Running Tests
+
+\`\`\`bash
+# Run all tests (headless)
+npm test
+
+# Run tests in headed mode
+npm run test:headed
+
+# Run tests in specific browser
+npm run test:chrome
+npm run test:firefox
+
+# Open Cypress Test Runner
+npm run open
+
+# Type check
+npm run type-check
+
+# Clean test artifacts
+npm run clean
+\`\`\`
+
+## Configuration
+
+Update test data in:
+- \`cypress/fixtures/config.json\` - Environment URLs
+- \`cypress/fixtures/users.json\` - User credentials
+
+Set base URL with environment variable:
+\`\`\`bash
+BASE_URL=https://qa.example.com npm test
+\`\`\`
+
+## Page Objects
+
+All page objects extend \`BasePage\` and are located in \`cypress/pages/\`:
+- \`LoginPage.ts\` - Login page interactions
+- \`HomePage.ts\` - Home page interactions
+
+## Test Structure
+
+\`\`\`
+cypress/
+  ├── e2e/
+  │   ├── login.cy.ts     # Login functionality tests
+  │   └── smoke.cy.ts     # Smoke tests
+  ├── pages/
+  │   ├── BasePage.ts     # Base page class
+  │   ├── LoginPage.ts    # Login page object
+  │   └── HomePage.ts     # Home page object
+  ├── fixtures/
+  │   ├── config.json     # Environment config
+  │   └── users.json      # Test user data
+  └── support/
+      ├── e2e.ts          # Global setup
+      ├── commands.ts     # Custom commands
+      └── index.d.ts      # TypeScript definitions
+\`\`\`
+
+## Custom Commands
+
+Custom Cypress commands with TypeScript support:
+- \`cy.login(username, password)\` - Login helper
+- \`cy.logout()\` - Logout helper
+- \`cy.waitForElement(selector)\` - Wait for element
+- \`cy.elementExists(selector)\` - Check element existence
+- \`cy.fullScreenshot(filename)\` - Full page screenshot
+
+All commands have full TypeScript IntelliSense support.
+
+## TypeScript
+
+The project uses TypeScript with strict mode enabled. Path aliases are configured:
+- \`@pages/*\` - Maps to \`cypress/pages/*\`
+- \`@fixtures/*\` - Maps to \`cypress/fixtures/*\`
+
+## Docker
+
+\`\`\`bash
+docker build -t demo-ts-cypress .
+docker run demo-ts-cypress
+\`\`\`
+
+## CI/CD
+
+CI/CD pipeline configuration is included for automated testing.
+
+## Reports
+
+Mochawesome HTML reports are generated in \`cypress/results/\` after test execution.
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "README.md",
+  },
+  {
+    "content": "{
+  "compilerOptions": {
+    "target": "ES2021",
+    "module": "CommonJS",
+    "lib": ["ES2021", "DOM"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "types": ["cypress", "node"]
+  },
+  "include": ["cypress/**/*.ts"]
+}",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "tsconfig.json",
+  },
+]
+`;

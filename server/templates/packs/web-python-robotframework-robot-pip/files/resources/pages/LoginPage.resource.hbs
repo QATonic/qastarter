@@ -1,0 +1,42 @@
+*** Settings ***
+Documentation    Login Page keywords.
+Resource         ../common.resource
+
+*** Variables ***
+${LOGIN_URL}         ${BASE_URL}/
+${WELCOME_MESSAGE}   id:inventory_container
+
+*** Keywords ***
+Navigate To Login Page
+    [Documentation]    Open the login page and wait for it to be ready.
+    Go To                           ${LOGIN_URL}
+    Wait Until Element Is Visible    ${USERNAME_FIELD}    ${TIMEOUT}
+
+Enter Username
+    [Arguments]    ${username}
+    Wait And Input Text    ${USERNAME_FIELD}    ${username}
+
+Enter Password
+    [Arguments]    ${password}
+    Wait And Input Text    ${PASSWORD_FIELD}    ${password}
+
+Click Login Button
+    Wait And Click Element    ${LOGIN_BUTTON}
+
+Login With Credentials
+    [Documentation]    Fill both fields and click Login.
+    [Arguments]    ${username}    ${password}
+    Enter Username         ${username}
+    Enter Password         ${password}
+    Click Login Button
+
+Verify Login Error Message
+    [Documentation]    Assert that the error banner contains ${expected_message}.
+    [Arguments]    ${expected_message}
+    Wait Until Element Is Visible    ${ERROR_MESSAGE}    ${TIMEOUT}
+    Element Should Contain           ${ERROR_MESSAGE}    ${expected_message}
+
+Verify Successful Login
+    [Documentation]    Assert that we were routed to the post-login page.
+    Wait Until Element Is Visible    ${WELCOME_MESSAGE}    ${TIMEOUT}
+    Element Should Be Visible        ${WELCOME_MESSAGE}

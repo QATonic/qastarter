@@ -1,0 +1,77 @@
+/**
+ * Login Test Suite
+ *
+ * BEFORE RUNNING:
+ *   1. Update credentials in: data/dev.json
+ *   2. Update selectors in:   pages/LoginPage.js
+ *   3. Run:                   npm test
+ */
+const DriverFactory = require('../utils/driverFactory');
+const { LoginPage } = require('../pages/LoginPage');
+const ScreenshotHelper = require('../utils/screenshotHelper');
+const envConfig = require('../config/env.config');
+{{#if utilities.dataProvider}}
+const { DataReader } = require('../utils/dataReader');
+{{/if}}
+
+describe('Login Tests', () => {
+  let driver;
+  let loginPage;
+  let screenshot;
+
+  beforeAll(async () => {
+    driver = await DriverFactory.createDriver();
+    loginPage = new LoginPage(driver);
+    screenshot = new ScreenshotHelper(driver);
+  });
+
+  afterAll(async () => {
+    if (driver) {
+      await driver.quit();
+    }
+  });
+
+  test('should login with valid credentials', async () => {
+    const credentials = envConfig.getCredentials('validUser');
+
+    await loginPage.navigateToLogin();
+    await loginPage.login(credentials.username, credentials.password);
+
+    const isLoggedIn = await loginPage.isLoginSuccessful();
+    if (!isLoggedIn) {
+      await screenshot.capture('login-failure');
+    }
+    expect(isLoggedIn).toBe(true);
+  });
+
+  test('should display login page elements', async () => {
+    await loginPage.navigateToLogin();
+    expect(await loginPage.isUsernameVisible()).toBe(true);
+    expect(await loginPage.isPasswordVisible()).toBe(true);
+  });
+
+  {{#if utilities.dataProvider}}
+  /**
+   * Data-driven tests — reads from data/users.json.
+   */
+  describe('Data-driven login tests', () => {
+    const testData = DataReader.readJson('users.json') || [];
+
+    test.each(testData.map((u) => [u.username, u.password, u.expected]))(
+      'should verify login for user: %s',
+      async (username, password, expected) => {
+        await loginPage.navigateToLogin();
+        await loginPage.login(username, password);
+
+        if (expected === 'success') {
+          const isLoggedIn = await loginPage.isLoginSuccessful();
+          expect(isLoggedIn).toBe(true);
+        } else {
+          const hasError = await loginPage.isErrorDisplayed();
+          expect(hasError).toBe(true);
+        }
+      }
+    );
+  });
+  {{/if}}
+});

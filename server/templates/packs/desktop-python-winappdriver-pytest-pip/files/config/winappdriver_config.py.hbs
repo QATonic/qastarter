@@ -1,0 +1,35 @@
+from appium.options.windows import WindowsOptions
+from config.settings import Settings
+
+class WinAppDriverConfig:
+    @staticmethod
+    def get_calculator_options():
+        options = WindowsOptions()
+        options.app = Settings.CALCULATOR_APP_ID
+        options.platform_name = "Windows"
+        options.device_name = "WindowsPC"
+        return options
+    
+    @staticmethod
+    def get_notepad_options():
+        options = WindowsOptions()
+        options.app = Settings.NOTEPAD_PATH
+        options.platform_name = "Windows"
+        options.device_name = "WindowsPC"
+        return options
+    
+    @staticmethod
+    def get_desktop_options():
+        options = WindowsOptions()
+        options.app = "Root"
+        options.platform_name = "Windows"
+        options.device_name = "WindowsPC"
+        return options
+    
+    @staticmethod
+    def get_custom_app_options(app_path):
+        options = WindowsOptions()
+        options.app = app_path
+        options.platform_name = "Windows"
+        options.device_name = "WindowsPC"
+        return options

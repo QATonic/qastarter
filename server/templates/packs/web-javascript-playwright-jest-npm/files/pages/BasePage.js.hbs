@@ -1,0 +1,60 @@
+/**
+ * Base Page — parent class for all Playwright page objects.
+ *
+ * The `page` is injected via the constructor so tests can use the
+ * global `page` that jest-playwright-preset exposes:
+ *
+ *     const loginPage = new LoginPage(page);
+ */
+class BasePage {
+  constructor(page) {
+    this.page = page;
+    this.defaultTimeout = 30000;
+  }
+
+  // Navigation ----------------------------------------------------------
+
+  async navigate(url) {
+    await this.page.goto(url, { timeout: this.defaultTimeout });
+  }
+
+  /** Alias for navigate() — kept for compatibility with older callers. */
+  async navigateTo(url) {
+    await this.navigate(url);
+  }
+
+  async getCurrentUrl() {
+    return this.page.url();
+  }
+
+  // Interactions --------------------------------------------------------
+
+  async click(selector) {
+    await this.page.click(selector, { timeout: this.defaultTimeout });
+  }
+
+  async type(selector, text) {
+    await this.page.fill(selector, text, { timeout: this.defaultTimeout });
+  }
+
+  async getText(selector) {
+    return (await this.page.textContent(selector, { timeout: this.defaultTimeout })) || "";
+  }
+
+  // Visibility ----------------------------------------------------------
+
+  async isVisible(selector) {
+    try {
+      return await this.page.isVisible(selector, { timeout: 5000 });
+    } catch {
+      return false;
+    }
+  }
+
+  /** Alias for isVisible() — kept for compatibility with older callers. */
+  async isDisplayed(selector) {
+    return this.isVisible(selector);
+  }
+}
+
+module.exports = { BasePage };

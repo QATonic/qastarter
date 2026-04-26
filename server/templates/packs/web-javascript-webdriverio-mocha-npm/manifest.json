@@ -1,0 +1,190 @@
+{
+  "id": "web-javascript-webdriverio-mocha-npm",
+  "displayName": "JavaScript WebdriverIO Mocha Framework",
+  "version": "2.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "webdriverio",
+    "language": "javascript",
+    "testRunner": "mocha",
+    "buildTool": "npm"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
+      "path": ".nvmrc",
+      "isTemplate": false
+    },
+    {
+      "path": "wdio.conf.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/specs/login.spec.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/data/users.js",
+      "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitignore",
+      "template": ".gitignore.hbs",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": "step-definitions/loginSteps.js",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "test/data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "test/pageobjects/base.page.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pageobjects/home.page.js",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pageobjects/login.page.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/dataReader.js",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "utils/logger.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshotHelper.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/waitHelpers.js",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/testDataFactory.js",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "config/browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "config/saucelabs.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "saucelabs"
+      }
+    }
+  ],
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ],
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "bdd"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+package tests
+
+import (
+"os"
+"testing"
+"{{projectName}}/utils"
+)
+
+func TestMain(m *testing.M) {
+// Setup
+utils.InitLogger()
+utils.LoadConfig()
+utils.Log.Info("Starting Test Suite")
+
+// Run Tests
+code := m.Run()
+
+// Teardown
+utils.Log.Info("Finished Test Suite")
+os.Exit(code)
+}

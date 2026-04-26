@@ -1,0 +1,88 @@
+{
+  "id": "performance-java-gatling-maven-maven",
+  "displayName": "Gatling Performance Test Suite",
+  "description": "Performance testing with Gatling using Java and Maven",
+  "version": "1.0.0",
+  "supportedCombination": {
+    "testingType": "performance",
+    "framework": "gatling",
+    "language": "java",
+    "testRunner": "maven",
+    "buildTool": "maven"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "gatling-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions"
+    ],
+    "testingPatterns": [
+      "load-test",
+      "stress-test",
+      "spike-test",
+      "soak-test"
+    ]
+  },
+  "toolVersions": {
+    "java": "11",
+    "gatling": "3.10.3",
+    "maven": "3.9+"
+  },
+  "files": [
+    {
+      "path": "pom.xml",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/simulations/LoadSimulation.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/java/{{packagePath}}/simulations/StressSimulation.java",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/gatling.conf",
+      "isTemplate": true
+    },
+    {
+      "path": "src/test/resources/logback-test.xml",
+      "isTemplate": false
+    },
+    {
+      "path": ".github/workflows/performance.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "src/main/java/{{packagePath}}/utils/TestDataFactory.java",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    }
+  ],
+  "directories": [
+    "target",
+    "results"
+  ]
+}

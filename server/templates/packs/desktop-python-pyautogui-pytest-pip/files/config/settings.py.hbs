@@ -1,0 +1,52 @@
+import os
+import platform
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Settings:
+    # Platform Detection
+    PLATFORM = platform.system()  # Windows, Darwin (macOS), or Linux
+    IS_WINDOWS = PLATFORM == "Windows"
+    IS_MACOS = PLATFORM == "Darwin"
+    IS_LINUX = PLATFORM == "Linux"
+    
+    # Automation Settings
+    PAUSE_DURATION = float(os.getenv("PAUSE_DURATION", "0.5"))  # Pause between actions
+    FAILSAFE = os.getenv("FAILSAFE", "true").lower() == "true"  # Move mouse to corner to abort
+    
+    # Timeouts (in seconds)
+    DEFAULT_TIMEOUT = int(os.getenv("DEFAULT_TIMEOUT", "30"))
+    CLICK_DELAY = float(os.getenv("CLICK_DELAY", "0.1"))
+    TYPE_INTERVAL = float(os.getenv("TYPE_INTERVAL", "0.05"))
+    
+    # Image Recognition
+    CONFIDENCE_THRESHOLD = float(os.getenv("CONFIDENCE_THRESHOLD", "0.8"))
+    IMAGES_PATH = os.getenv("IMAGES_PATH", "images")
+    
+    # Logging
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+    LOG_FILE = os.getenv("LOG_FILE", "logs/test-run.log")
+    
+    # Screenshots
+    SCREENSHOT_PATH = os.getenv("SCREENSHOT_PATH", "screenshots")
+    SCREENSHOT_ON_FAILURE = os.getenv("SCREENSHOT_ON_FAILURE", "true").lower() == "true"
+    
+    # Application Paths (platform-specific)
+    @classmethod
+    def get_calculator_command(cls):
+        if cls.IS_WINDOWS:
+            return "calc.exe"
+        elif cls.IS_MACOS:
+            return "open -a Calculator"
+        else:  # Linux
+            return "gnome-calculator"  # or "kcalc" for KDE
+    
+    @classmethod
+    def get_notepad_command(cls):
+        if cls.IS_WINDOWS:
+            return "notepad.exe"
+        elif cls.IS_MACOS:
+            return "open -a TextEdit"
+        else:  # Linux
+            return "gedit"  # or "kate" for KDE

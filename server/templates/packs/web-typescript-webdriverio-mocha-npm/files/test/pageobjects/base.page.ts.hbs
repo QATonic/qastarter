@@ -1,0 +1,45 @@
+/**
+ * Base Page Object class — all page objects should extend this class.
+ *
+ * WebdriverIO v8+ returns `ChainablePromiseElement` from `$(...)`. The
+ * chainable is Promise-like and forwards element methods, so helpers
+ * below accept it directly.
+ */
+
+/** Element returned from `$(selector)` — Promise-like, chainable. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ChainableElement = any;
+
+export default class BasePage {
+  /** Open a path relative to the baseUrl. */
+  public async open(path: string = '/'): Promise<void> {
+    await browser.url(path);
+  }
+
+  public async waitForDisplayed(element: ChainableElement, timeout: number = 10000): Promise<void> {
+    await element.waitForDisplayed({ timeout });
+  }
+
+  public async clickElement(element: ChainableElement): Promise<void> {
+    await this.waitForDisplayed(element);
+    await element.click();
+  }
+
+  public async setValue(element: ChainableElement, value: string): Promise<void> {
+    await this.waitForDisplayed(element);
+    await element.setValue(value);
+  }
+
+  public async getText(element: ChainableElement): Promise<string> {
+    await this.waitForDisplayed(element);
+    return element.getText();
+  }
+
+  public async isDisplayed(element: ChainableElement): Promise<boolean> {
+    try {
+      return await element.isDisplayed();
+    } catch {
+      return false;
+    }
+  }
+}

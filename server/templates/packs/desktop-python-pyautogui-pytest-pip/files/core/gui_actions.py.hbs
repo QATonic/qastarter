@@ -1,0 +1,54 @@
+import pyautogui
+import time
+from config.settings import Settings
+from utils.logger import Logger
+
+# Configure PyAutoGUI
+pyautogui.PAUSE = Settings.PAUSE_DURATION
+pyautogui.FAILSAFE = Settings.FAILSAFE
+
+class GUIActions:
+    @staticmethod
+    def launch_application(command: str, wait_time: float = 2.0):
+        """Launch an application using system command"""
+        import subprocess
+        try:
+            Logger.info(f"Launching application: {command}")
+            subprocess.Popen(command, shell=True)
+            time.sleep(wait_time)
+        except Exception as e:
+            Logger.error(f"Failed to launch application: {str(e)}")
+            raise
+    
+    @staticmethod
+    def close_application(hotkey: str = "alt", key: str = "f4"):
+        """Close active application using keyboard shortcut"""
+        try:
+            Logger.info(f"Closing application with {hotkey}+{key}")
+            pyautogui.hotkey(hotkey, key)
+            time.sleep(0.5)
+        except Exception as e:
+            Logger.error(f"Failed to close application: {str(e)}")
+            raise
+    
+    @staticmethod
+    def get_screen_size():
+        """Get screen resolution"""
+        return pyautogui.size()
+    
+    @staticmethod
+    def take_screenshot(filename: str = "screenshot.png"):
+        """Take a screenshot of the entire screen"""
+        try:
+            screenshot = pyautogui.screenshot()
+            screenshot.save(filename)
+            Logger.info(f"Screenshot saved: {filename}")
+            return filename
+        except Exception as e:
+            Logger.error(f"Failed to take screenshot: {str(e)}")
+            raise
+    
+    @staticmethod
+    def wait(seconds: float):
+        """Wait for specified seconds"""
+        time.sleep(seconds)

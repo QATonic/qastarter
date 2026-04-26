@@ -1,0 +1,38 @@
+/**
+ * Jest setup — runs once per worker before every test file.
+ *
+ * jest-playwright-preset (configured in jest.config.js and
+ * jest-playwright.config.js) handles browser lifecycle automatically and
+ * exposes `browser`, `context`, `page` as globals. This file only wires
+ * up directories, default timeouts, and the screenshot-on-failure hook.
+ */
+import * as fs from "fs";
+import testConfig from "../config/test.config";
+import { ScreenshotHelper } from "../utils/screenshotHelper";
+
+// Create directories used by reports / screenshots / traces
+const dirs = ["logs", "screenshots", "test-results", "playwright-report", "trace"];
+for (const dir of dirs) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
+
+// Global default timeout
+jest.setTimeout(testConfig.defaultTimeout);
+
+// Screenshot on test failure (opt-in via config/test.config.ts)
+if (testConfig.screenshotOnFailure) {
+  afterEach(async () => {
+    const testName = expect.getState().currentTestName || "unknown";
+    const testFailed = (expect.getState() as unknown as { suppressedErrors?: unknown[] })
+      .suppressedErrors?.length ?? 0;
+
+    if (testFailed > 0 && typeof page !== "undefined") {
+      await ScreenshotHelper.captureOnFailure(page, testName);
+    }
+  });
+}
+
+// Retry flaky tests on first failure
+jest.retryTimes(testConfig.retryFailedTests ?? 1);

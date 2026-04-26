@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>{{groupId}}</groupId>
+    <artifactId>{{artifactId}}</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>{{projectName}}</name>
+    <description>Web UI Test Automation Framework using Java, Playwright, JUnit5, and Maven</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>{{toolVersions.java}}</java.version>
+        <maven.compiler.source>{{toolVersions.java}}</maven.compiler.source>
+        <maven.compiler.target>{{toolVersions.java}}</maven.compiler.target>
+
+        <!-- Playwright Configuration -->
+        <playwright.version>{{toolVersions.playwright}}</playwright.version>
+
+        <!-- JUnit 5 Configuration -->
+        <junit.jupiter.version>5.10.1</junit.jupiter.version>
+        <junit.platform.version>1.10.1</junit.platform.version>
+
+        <!-- Logging -->
+        <log4j.version>2.22.0</log4j.version>
+
+        {{#if (eq reportingTool "allure")}}
+        <!-- Allure Reporting -->
+        <allure.version>2.25.0</allure.version>
+        <aspectj.version>1.9.21</aspectj.version>
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
+        <!-- ExtentReports -->
+        <extentreports.version>5.1.1</extentreports.version>
+        {{/if}}
+
+        <!-- Utilities -->
+        <jackson.version>2.16.0</jackson.version>
+        <commons-csv.version>1.10.0</commons-csv.version>
+
+        <!-- Maven Plugins -->
+        <maven.surefire.plugin.version>3.2.3</maven.surefire.plugin.version>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        {{#if (eq reportingTool "allure")}}
+        <allure.maven.version>2.12.0</allure.maven.version>
+        {{/if}}
+    </properties>
+
+    <dependencies>
+        <!-- Playwright -->
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>${playwright.version}</version>
+        </dependency>
+
+        <!-- JUnit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.jupiter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.jupiter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.jupiter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+            <version>${junit.platform.version}</version>
+        </dependency>
+
+        <!-- Log4j2 for Logging -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        {{#if (eq reportingTool "allure")}}
+        <!-- Allure JUnit 5 Integration -->
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit5</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+        {{/if}}
+        {{#if (eq reportingTool "extent-reports")}}
+        <!-- ExtentReports -->
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>${extentreports.version}</version>
+        </dependency>
+        {{/if}}
+
+        <!-- Jackson for JSON Processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- Apache Commons CSV -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>${commons-csv.version}</version>
+        </dependency>
+        {{#if (eq cloudDeviceFarm "browserstack")}}
+
+        <!-- BrowserStack SDK — auto-instruments Playwright tests to run on
+             BrowserStack's cloud based on browserstack.yml at project root. -->
+        <dependency>
+            <groupId>com.browserstack</groupId>
+            <artifactId>browserstack-java-sdk</artifactId>
+            <version>1.25.0</version>
+            <scope>compile</scope>
+        </dependency>
+        {{/if}}
+
+        {{#if (eq testingPattern "bdd")}}
+        <!-- Cucumber BDD -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>7.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <version>7.15.0</version>
+        </dependency>
+        {{#if (eq reportingTool "allure")}}
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-cucumber7-jvm</artifactId>
+            <version>${allure.version}</version>
+        </dependency>
+        {{/if}}
+        {{/if}}
+        {{#if userDependencies.hasMaven}}
+
+        <!-- User-picked dependencies (from QAStarter dependency search) -->
+        {{#each userDependencies.maven}}
+        <dependency>
+            <groupId>{{group}}</groupId>
+            <artifactId>{{name}}</artifactId>
+            <version>{{version}}</version>
+        </dependency>
+        {{/each}}
+        {{/if}}
+        {{#if utilities.faker}}
+        <!-- DataFaker — Test data generation -->
+        <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>{{toolVersions.datafaker}}</version>
+        </dependency>
+        {{/if}}
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Maven Compiler Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            {{#if (eq cloudDeviceFarm "browserstack")}}
+
+            <!-- Populates ${com.browserstack:browserstack-java-sdk:jar} so
+                 Surefire can attach the BrowserStack SDK as a java agent. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>getClasspathFilenames</id>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            {{/if}}
+
+            <!-- Maven Surefire Plugin for Running Tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    {{#if (eq reportingTool "allure")}}
+                    <argLine>
+                        -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"{{#if (eq cloudDeviceFarm "browserstack")}}
+                        -javaagent:"${com.browserstack:browserstack-java-sdk:jar}"{{/if}}
+                    </argLine>
+                    {{else}}{{#if (eq cloudDeviceFarm "browserstack")}}
+                    <argLine>-javaagent:"${com.browserstack:browserstack-java-sdk:jar}"</argLine>
+                    {{/if}}{{/if}}
+                    <systemPropertyVariables>
+                        <browser>${browser}</browser>
+                        <env>${env}</env>
+                        <headless>${headless}</headless>
+                        {{#if (eq reportingTool "allure")}}
+                        <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+                        {{/if}}
+                    </systemPropertyVariables>
+                    <includes>
+                        <include>**/*Test*.java</include>
+                        <include>**/*Tests.java</include>
+                        <include>**/*Suite.java</include>
+                    </includes>
+                    <properties>
+                        <configurationParameters>
+                            junit.jupiter.execution.parallel.enabled = ${parallel.execution}
+                            junit.jupiter.execution.parallel.mode.default = ${parallel.mode}
+                            junit.jupiter.execution.parallel.config.strategy = fixed
+                            junit.jupiter.execution.parallel.config.fixed.parallelism = ${thread.count}
+                        </configurationParameters>
+                    </properties>
+                </configuration>
+                {{#if (eq reportingTool "allure")}}
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
+                {{/if}}
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat>
+                            <version>1.17.0</version>
+                            <style>
+                                AOSP
+                            </style>
+                        </googleJavaFormat>
+                    </java>
+                </configuration>
+            </plugin>
+            {{#if (eq reportingTool "allure")}}
+            <!-- Allure Maven Plugin -->
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>${allure.maven.version}</version>
+                <configuration>
+                    <reportVersion>${allure.version}</reportVersion>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+                </configuration>
+            </plugin>
+            {{/if}}
+        </plugins>
+    </build>
+
+</project>

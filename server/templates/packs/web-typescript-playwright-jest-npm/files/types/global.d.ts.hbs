@@ -1,0 +1,17 @@
+import type { Page, Browser, BrowserContext } from 'playwright';
+
+declare global {
+  const page: Page;
+  const browser: Browser;
+  const context: BrowserContext;
+  
+  namespace NodeJS {
+    interface Global {
+      page: Page;
+      browser: Browser;
+      context: BrowserContext;
+    }
+  }
+}
+
+export {};

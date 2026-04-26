@@ -1,0 +1,23 @@
+const { BasePage } = require("./BasePage");
+
+class LoginPage extends BasePage {
+  usernameField = "#user-name";
+  passwordField = "#password";
+  loginButton = "#login-button";
+  errorMessage = "[data-test='error']";
+
+  enterUsername(username) { this.type(this.usernameField, username); return this; }
+  enterPassword(password) { this.type(this.passwordField, password); return this; }
+  clickLogin() { this.click(this.loginButton); return this; }
+
+  login(username, password) {
+    this.enterUsername(username);
+    this.enterPassword(password);
+    this.clickLogin();
+    return this;
+  }
+
+  verifyErrorDisplayed() { this.shouldBeVisible(this.errorMessage); return this; }
+  verifyLoginSuccess() { cy.url().should("include", "inventory"); return this; }
+}
+module.exports = { LoginPage };

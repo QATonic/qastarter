@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User",
+  "description": "User object schema for API validation",
+  "type": "object",
+  "required": ["id", "email"],
+  "properties": {
+    "id": {
+      "type": ["string", "integer"],
+      "description": "Unique user identifier"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "User email address"
+    },
+    "username": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 50,
+      "description": "User username"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "User first name"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "User last name"
+    },
+    "phone": {
+      "type": "string",
+      "description": "User phone number"
+    },
+    "role": {
+      "type": "string",
+      "enum": ["admin", "user", "guest"],
+      "description": "User role"
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "Whether user is active"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "User creation timestamp"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "User last update timestamp"
+    }
+  },
+  "additionalProperties": true
+}

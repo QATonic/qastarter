@@ -1,0 +1,54 @@
+package tests
+
+import (
+"encoding/json"
+"testing"
+
+"{{projectName}}/client"
+"{{projectName}}/models"
+
+"github.com/stretchr/testify/assert"
+"github.com/stretchr/testify/suite"
+)
+
+type UsersTestSuite struct {
+suite.Suite
+API *client.APIClient
+}
+
+func (suite *UsersTestSuite) SetupSuite() {
+suite.API = client.NewAPIClient()
+}
+
+func (suite *UsersTestSuite) TestGetUser() {
+resp, err := suite.API.GetUser("2")
+assert.NoError(suite.T(), err)
+assert.Equal(suite.T(), 200, resp.StatusCode())
+
+var result models.UserResponse
+json.Unmarshal(resp.Body(), &result)
+
+assert.Equal(suite.T(), 2, result.Data.ID)
+assert.NotEmpty(suite.T(), result.Data.Email)
+}
+
+func (suite *UsersTestSuite) TestCreateUser() {
+req := models.CreateUserRequest{
+Name: "Morpheus",
+Job: "Leader",
+}
+
+resp, err := suite.API.CreateUser(req)
+assert.NoError(suite.T(), err)
+assert.Equal(suite.T(), 201, resp.StatusCode())
+
+var result models.CreateUserResponse
+json.Unmarshal(resp.Body(), &result)
+
+assert.Equal(suite.T(), "Morpheus", result.Name)
+assert.NotEmpty(suite.T(), result.ID)
+}
+
+func TestUsersSuite(t *testing.T) {
+suite.Run(t, new(UsersTestSuite))
+}

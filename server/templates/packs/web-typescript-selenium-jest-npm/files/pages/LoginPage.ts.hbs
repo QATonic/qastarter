@@ -1,0 +1,68 @@
+/**
+ * Login Page — page object for SauceDemo login flow.
+ */
+import { By, WebDriver } from 'selenium-webdriver';
+import { BasePage } from './BasePage';
+import envConfig from '../config/env.config';
+
+export class LoginPage extends BasePage {
+  private readonly usernameField = By.id('user-name');
+  private readonly passwordField = By.id('password');
+  private readonly loginButton = By.id('login-button');
+  private readonly errorMessage = By.css("[data-test='error']");
+
+  constructor(driver: WebDriver) {
+    super(driver);
+  }
+
+  /** Open the login page using the baseUrl from the active environment config. */
+  async navigateToLogin(): Promise<void> {
+    await this.navigate(envConfig.getBaseUrl());
+  }
+
+  async enterUsername(username: string): Promise<this> {
+    await this.type(this.usernameField, username);
+    return this;
+  }
+
+  async enterPassword(password: string): Promise<this> {
+    await this.type(this.passwordField, password);
+    return this;
+  }
+
+  async clickLogin(): Promise<void> {
+    await this.click(this.loginButton);
+  }
+
+  async login(username: string, password: string): Promise<void> {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLogin();
+  }
+
+  async isUsernameVisible(): Promise<boolean> {
+    return this.isDisplayed(this.usernameField);
+  }
+
+  async isPasswordVisible(): Promise<boolean> {
+    return this.isDisplayed(this.passwordField);
+  }
+
+  async isErrorDisplayed(): Promise<boolean> {
+    return this.isDisplayed(this.errorMessage);
+  }
+
+  async getErrorMessage(): Promise<string> {
+    if (!(await this.isErrorDisplayed())) return '';
+    return this.getText(this.errorMessage);
+  }
+
+  async isLoginSuccessful(): Promise<boolean> {
+    const url = await this.getCurrentUrl();
+    return url.includes('inventory');
+  }
+
+  async isLoaded(): Promise<boolean> {
+    return this.isDisplayed(this.loginButton);
+  }
+}

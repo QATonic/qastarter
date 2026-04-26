@@ -1,0 +1,31 @@
+using System;
+using OpenQA.Selenium.Appium.Windows;
+
+namespace {{projectNamespace}}.Core;
+
+/// <summary>
+/// Thin static wrapper over <see cref="DriverFactory"/> giving page objects a single, ambient <see cref="Driver"/>.
+/// Set the driver from your test [SetUp] via <see cref="InitDriver"/> or assign <see cref="Driver"/> directly.
+/// </summary>
+public static class DriverManager
+{
+    private static WindowsDriver? _driver;
+
+    public static WindowsDriver Driver
+    {
+        get => _driver ?? throw new InvalidOperationException(
+            "DriverManager.Driver is not initialised. Call DriverManager.InitDriver(...) first.");
+        set => _driver = value;
+    }
+
+    public static void InitDriver(WindowsDriver driver) => _driver = driver;
+
+    /// <summary>Convenience: initialise using the calculator driver via <see cref="DriverFactory"/>.</summary>
+    public static void InitDriver() => _driver = DriverFactory.CreateCalculatorDriver();
+
+    public static void QuitDriver()
+    {
+        DriverFactory.QuitDriver(_driver);
+        _driver = null;
+    }
+}

@@ -1,0 +1,64 @@
+/**
+ * Login Page — page object for SauceDemo-style login flows.
+ *
+ * Usage:
+ *     const loginPage = new LoginPage(page);
+ *     await loginPage.navigateToLogin();
+ *     await loginPage.login(user, pass);
+ */
+import { Page } from "playwright";
+import { BasePage } from "./BasePage";
+import envConfig from "../config/env.config";
+
+export class LoginPage extends BasePage {
+  private readonly usernameField = "#user-name";
+  private readonly passwordField = "#password";
+  private readonly loginButton = "#login-button";
+  private readonly errorMessage = "[data-test='error']";
+
+  constructor(page: Page) {
+    super(page);
+  }
+
+  /** Open the login page using the baseUrl from the active environment config. */
+  async navigateToLogin(): Promise<void> {
+    await this.navigate(envConfig.getBaseUrl());
+  }
+
+  async enterUsername(username: string): Promise<this> {
+    await this.type(this.usernameField, username);
+    return this;
+  }
+
+  async enterPassword(password: string): Promise<this> {
+    await this.type(this.passwordField, password);
+    return this;
+  }
+
+  async clickLogin(): Promise<void> {
+    await this.click(this.loginButton);
+  }
+
+  async login(username: string, password: string): Promise<void> {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLogin();
+  }
+
+  async isUsernameVisible(): Promise<boolean> {
+    return this.isVisible(this.usernameField);
+  }
+
+  async isPasswordVisible(): Promise<boolean> {
+    return this.isVisible(this.passwordField);
+  }
+
+  async isErrorDisplayed(): Promise<boolean> {
+    return this.isVisible(this.errorMessage);
+  }
+
+  async isLoginSuccessful(): Promise<boolean> {
+    const url = await this.getCurrentUrl();
+    return url.includes("inventory");
+  }
+}

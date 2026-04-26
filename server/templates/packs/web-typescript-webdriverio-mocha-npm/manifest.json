@@ -1,0 +1,201 @@
+{
+  "id": "web-typescript-webdriverio-mocha-npm",
+  "displayName": "TypeScript WebdriverIO Mocha Framework",
+  "description": "Production-ready WebdriverIO automation framework with TypeScript and Mocha",
+  "version": "2.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "webdriverio",
+    "language": "typescript",
+    "testRunner": "mocha",
+    "buildTool": "npm"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "spec"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "node": "18+",
+    "webdriverio": "8.24.0",
+    "mocha": "10.2.0"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "isTemplate": true
+    },
+    {
+      "path": ".prettierrc",
+      "isTemplate": true
+    },
+    {
+      "path": "tsconfig.json",
+      "isTemplate": true
+    },
+    {
+      "path": "wdio.conf.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": true
+    },
+    {
+      "path": "test/specs/login.spec.ts",
+      "isTemplate": true
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": "config/environments.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "config/wdio.config.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "docker-compose.yml",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDockerCompose": true
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "features/login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": "step-definitions/loginSteps.ts",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "test/data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "test/data/users.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pageobjects/base.page.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pageobjects/home.page.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "test/pageobjects/login.page.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "types/global.d.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/logger.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/screenshotHelper.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/waitHelpers.ts",
+      "isTemplate": true
+    },
+    {
+      "path": "utils/testDataFactory.ts",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "config/browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "config/saucelabs.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "saucelabs"
+      }
+    }
+  ],
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
+}

@@ -1,0 +1,26 @@
+export interface EnvData {
+  baseUrl: string;
+  credentials: {
+    [key: string]: {
+      username: string;
+      password: string;
+    };
+  };
+  timeout: number;
+}
+
+export interface UserData {
+  username: string;
+  password: string;
+  expectedResult: 'success' | 'failure';
+}
+
+export interface BrowserConfig {
+  browser: string;
+  headless: boolean;
+  implicitWait: number;
+  pageLoadTimeout: number;
+  scriptTimeout: number;
+  chromeOptions: string[];
+  firefoxOptions: string[];
+}

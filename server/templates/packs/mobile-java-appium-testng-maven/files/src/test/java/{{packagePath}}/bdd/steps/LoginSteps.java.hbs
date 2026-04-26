@@ -1,0 +1,127 @@
+package {{javaPackage}}.bdd.steps;
+
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.pages.LoginPage;
+import {{javaPackage}}.pages.HomePage;
+import {{javaPackage}}.utils.Log;
+{{#if (eq reportingTool "allure")}}
+import {{javaPackage}}.utils.AllureManager;
+import io.qameta.allure.Step;
+{{/if}}
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+{{/if}}
+import org.testng.Assert;
+
+/**
+ * Cucumber Step Definitions for Mobile Login Scenarios
+ */
+public class LoginSteps {
+    
+    private LoginPage loginPage;
+    private HomePage homePage;
+
+    @Given("the user is on the login screen")
+    {{#if (eq reportingTool "allure")}}
+    @Step("Navigate to login screen")
+    {{/if}}
+    public void userIsOnLoginScreen() {
+        loginPage = new LoginPage(DriverManager.getDriver());
+        Assert.assertTrue(loginPage.isLoginPageDisplayed(), "Login page should be displayed");
+        
+        Log.info("User is on the login screen");
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logInfo("User is on the login screen");
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Verified login screen is displayed");
+        {{/if}}
+    }
+
+    @When("the user enters username {string} and password {string}")
+    {{#if (eq reportingTool "allure")}}
+    @Step("Enter credentials: {0} / {1}")
+    {{/if}}
+    public void userEntersCredentials(String username, String password) {
+        loginPage.enterUsername(username);
+        loginPage.enterPassword(password);
+        
+        Log.info("Entered username: " + username);
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logInfo("Entered credentials for user: " + username);
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Entered username: " + username);
+        {{/if}}
+    }
+
+    @When("the user clicks the login button")
+    {{#if (eq reportingTool "allure")}}
+    @Step("Click login button")
+    {{/if}}
+    public void userClicksLoginButton() {
+        loginPage.clickLoginButton();
+        
+        Log.info("Clicked login button");
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logInfo("Clicked login button");
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Clicked login button");
+        {{/if}}
+    }
+
+    @Then("the user should be redirected to the home screen")
+    {{#if (eq reportingTool "allure")}}
+    @Step("Verify successful login")
+    {{/if}}
+    public void userShouldBeRedirectedToHomeScreen() {
+        homePage = new HomePage(DriverManager.getDriver());
+        Assert.assertTrue(homePage.isHomePageDisplayed(), "Home page should be displayed after login");
+        
+        Log.info("User successfully logged in and redirected to home screen");
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logPass("User successfully logged in");
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Verified successful redirect to home screen");
+        {{/if}}
+    }
+
+    @Then("an error message {string} should be displayed")
+    {{#if (eq reportingTool "allure")}}
+    @Step("Verify error message: {0}")
+    {{/if}}
+    public void errorMessageShouldBeDisplayed(String expectedError) {
+        String actualError = loginPage.getErrorMessage();
+        Assert.assertTrue(actualError.contains(expectedError), 
+                "Expected error message to contain: " + expectedError + ", but got: " + actualError);
+        
+        Log.info("Error message displayed: " + actualError);
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logInfo("Verified error message: " + actualError);
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Verified error message: " + actualError);
+        {{/if}}
+    }
+
+    @Then("the login button should be disabled")
+    {{#if (eq reportingTool "allure")}}
+    @Step("Verify login button is disabled")
+    {{/if}}
+    public void loginButtonShouldBeDisabled() {
+        Assert.assertFalse(loginPage.isLoginButtonEnabled(), "Login button should be disabled");
+        
+        Log.info("Login button is disabled as expected");
+        {{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.logInfo("Verified login button is disabled");
+        {{/if}}
+        {{#if (eq reportingTool "allure")}}
+        AllureManager.addStep("Verified login button is disabled");
+        {{/if}}
+    }
+}

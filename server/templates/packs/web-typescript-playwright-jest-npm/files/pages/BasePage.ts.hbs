@@ -1,0 +1,62 @@
+/**
+ * Base Page — parent class for all Playwright page objects.
+ *
+ * The `page` is injected via the constructor so tests can use the
+ * global `page` that jest-playwright-preset exposes:
+ *
+ *     const loginPage = new LoginPage(page);
+ */
+import { Page } from "playwright";
+
+export class BasePage {
+  protected readonly page: Page;
+  protected readonly defaultTimeout = 30000;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  // ─── Navigation ──────────────────────────────────────────────────────
+
+  async navigate(url: string): Promise<void> {
+    await this.page.goto(url, { timeout: this.defaultTimeout });
+  }
+
+  /** Alias for {@link navigate} — kept for compatibility with older callers. */
+  async navigateTo(url: string): Promise<void> {
+    await this.navigate(url);
+  }
+
+  async getCurrentUrl(): Promise<string> {
+    return this.page.url();
+  }
+
+  // ─── Interactions ────────────────────────────────────────────────────
+
+  async click(selector: string): Promise<void> {
+    await this.page.click(selector, { timeout: this.defaultTimeout });
+  }
+
+  async type(selector: string, text: string): Promise<void> {
+    await this.page.fill(selector, text, { timeout: this.defaultTimeout });
+  }
+
+  async getText(selector: string): Promise<string> {
+    return (await this.page.textContent(selector, { timeout: this.defaultTimeout })) || "";
+  }
+
+  // ─── Visibility helpers ──────────────────────────────────────────────
+
+  async isVisible(selector: string): Promise<boolean> {
+    try {
+      return await this.page.isVisible(selector, { timeout: 5000 });
+    } catch {
+      return false;
+    }
+  }
+
+  /** Alias for {@link isVisible} — kept for compatibility with older callers. */
+  async isDisplayed(selector: string): Promise<boolean> {
+    return this.isVisible(selector);
+  }
+}

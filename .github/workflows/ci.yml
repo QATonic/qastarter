@@ -1,0 +1,374 @@
+# QAStarter CI/CD Pipeline
+# Runs on push to main and all pull requests
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Quality checks (non-blocking — informational only)
+  quality:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint --if-present
+        continue-on-error: true
+
+      - name: TypeScript type check
+        run: npm run check --if-present
+        continue-on-error: true
+
+  # Unit tests
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Validate template manifests
+        run: npm run validate:templates
+        continue-on-error: true
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+  # Build + Docker + Deploy — the critical path
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: dist/
+          retention-days: 7
+
+  # E2E tests (run in parallel with build, non-blocking for deploy)
+  e2e:
+    name: E2E Tests (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    needs: [test]
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - browser: chromium
+            projects: 'api chromium'
+          - browser: firefox
+            projects: firefox
+          - browser: webkit
+            projects: webkit
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start server
+        run: npm run start > server.log 2>&1 &
+        env:
+          NODE_ENV: production
+          PORT: 5000
+          ALLOWED_ORIGINS: http://localhost:5000
+
+      - name: Wait for server
+        run: npx wait-on http://localhost:5000/api/v1/metadata --timeout 60000
+
+      - name: Print server logs on failure
+        if: failure()
+        run: cat server.log
+
+      - name: Run E2E tests
+        run: |
+          for proj in ${{ matrix.projects }}; do
+            args="$args --project=$proj"
+          done
+          npx playwright test $args
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:5000
+
+      - name: Upload E2E test report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 30
+
+  # Run-level template verification — scaffold 5 popular combos via the
+  # public /api/v1/generate endpoint and run an install + compile / collect
+  # step inside each generated project. Catches template regressions that
+  # manifest checks miss (broken pom.xml, missing sample test, bad imports).
+  template-run-verify:
+    name: Template Verify (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    needs: [test]
+    continue-on-error: true
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: web-js-playwright-jest
+            testingType: web
+            framework: playwright
+            language: javascript
+            testRunner: jest
+            buildTool: npm
+            setupPython: 'false'
+            setupJava: 'false'
+            verify: |
+              npm install --no-audit --no-fund --prefer-offline
+              npx jest --listTests
+          - name: web-ts-playwright-jest
+            testingType: web
+            framework: playwright
+            language: typescript
+            testRunner: jest
+            buildTool: npm
+            setupPython: 'false'
+            setupJava: 'false'
+            verify: |
+              npm install --no-audit --no-fund --prefer-offline
+              npx tsc --noEmit
+          - name: api-python-requests-pytest
+            testingType: api
+            framework: requests
+            language: python
+            testRunner: pytest
+            buildTool: pip
+            setupPython: 'true'
+            setupJava: 'false'
+            verify: |
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+              pytest --collect-only -q
+          - name: api-java-restassured-maven
+            testingType: api
+            framework: restassured
+            language: java
+            testRunner: testng
+            buildTool: maven
+            setupPython: 'false'
+            setupJava: 'true'
+            verify: |
+              mvn -B -q test-compile
+          - name: web-js-webdriverio-mocha
+            testingType: web
+            framework: webdriverio
+            language: javascript
+            testRunner: mocha
+            buildTool: npm
+            setupPython: 'false'
+            setupJava: 'false'
+            verify: |
+              npm install --no-audit --no-fund --prefer-offline
+              # WebdriverIO projects ship with a wdio.conf — just verify deps resolve
+              node -e "require('@wdio/cli/package.json')"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Python
+        if: matrix.setupPython == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Setup Java (Temurin 17)
+        if: matrix.setupJava == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Install server dependencies
+        run: npm ci
+
+      - name: Build server
+        run: npm run build
+
+      - name: Start QAStarter server
+        run: npm run start > server.log 2>&1 &
+        env:
+          NODE_ENV: production
+          PORT: 5000
+          ALLOWED_ORIGINS: http://localhost:5000
+
+      - name: Wait for server
+        run: npx wait-on http://localhost:5000/api/v1/metadata --timeout 60000
+
+      - name: Download generated project
+        run: |
+          mkdir -p verify-out
+          URL="http://localhost:5000/api/v1/generate?testingType=${{ matrix.testingType }}&framework=${{ matrix.framework }}&language=${{ matrix.language }}&testRunner=${{ matrix.testRunner }}&buildTool=${{ matrix.buildTool }}&projectName=qa-${{ matrix.name }}"
+          echo "GET $URL"
+          HTTP=$(curl -sS -w "%{http_code}" -o "verify-out/${{ matrix.name }}.zip" "$URL")
+          echo "HTTP status: $HTTP"
+          if [ "$HTTP" != "200" ]; then
+            echo "::error::Generate endpoint returned $HTTP for ${{ matrix.name }}"
+            exit 1
+          fi
+          SIZE=$(stat -c%s "verify-out/${{ matrix.name }}.zip")
+          echo "ZIP size: $SIZE bytes"
+          if [ "$SIZE" -lt 1024 ]; then
+            echo "::error::ZIP for ${{ matrix.name }} is suspiciously small ($SIZE bytes)"
+            exit 1
+          fi
+
+      - name: Extract project
+        run: |
+          mkdir -p "verify-out/${{ matrix.name }}-project"
+          unzip -q "verify-out/${{ matrix.name }}.zip" -d "verify-out/${{ matrix.name }}-project"
+          ls -la "verify-out/${{ matrix.name }}-project"
+
+      - name: Scan for unrendered Handlebars markers
+        run: |
+          cd "verify-out/${{ matrix.name }}-project"
+          # Binary files (images, jars) may contain `{{` by chance — exclude common ones
+          if grep -rIn --exclude-dir=node_modules --exclude-dir=.git --exclude='*.png' --exclude='*.jpg' --exclude='*.jar' '{{[a-zA-Z_]' . ; then
+            echo "::error::Unrendered Handlebars markers found in ${{ matrix.name }}"
+            exit 1
+          fi
+          echo "No unrendered markers found."
+
+      - name: Verify (install + compile / collect)
+        working-directory: verify-out/${{ matrix.name }}-project
+        run: ${{ matrix.verify }}
+
+      - name: Print server logs on failure
+        if: failure()
+        run: cat server.log || true
+
+      - name: Upload generated project on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-failure-${{ matrix.name }}
+          path: verify-out/${{ matrix.name }}-project/
+          retention-days: 7
+
+  # Docker build (on main only)
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: qastarter:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Deploy to Easypanel via Webhook
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [docker]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Trigger Easypanel Deploy
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "::warning::EASYPANEL_WEBHOOK_URL secret is not configured. Skipping deploy."
+            echo "To enable auto-deploy, add EASYPANEL_WEBHOOK_URL to GitHub repo secrets."
+            exit 0
+          fi
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$WEBHOOK_URL")
+          echo "Deploy webhook returned HTTP $HTTP_CODE"
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "::error::Deploy webhook failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
+        env:
+          WEBHOOK_URL: ${{ secrets.EASYPANEL_WEBHOOK_URL }}

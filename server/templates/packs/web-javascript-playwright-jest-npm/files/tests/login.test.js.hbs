@@ -1,0 +1,67 @@
+/**
+ * Login Test Suite
+ *
+ * BEFORE RUNNING:
+ *   1. Update credentials in: data/dev.json
+ *   2. Update selectors in:   pages/LoginPage.js
+ *   3. Run:                   npm test
+ *
+ * The `page` global is provided by jest-playwright-preset — no manual
+ * browser initialization is required.
+ */
+const { LoginPage } = require('../pages/LoginPage');
+const envConfig = require('../config/env.config');
+{{#if utilities.dataProvider}}
+const { TestDataReader } = require('../utils/dataReader');
+{{/if}}
+
+describe('Login Tests', () => {
+  let loginPage;
+
+  beforeEach(() => {
+    loginPage = new LoginPage(page);
+  });
+
+  test('should login with valid credentials', async () => {
+    const credentials = envConfig.getCredentials('validUser');
+
+    await loginPage.navigateToLogin();
+    await loginPage.login(credentials.username, credentials.password);
+
+    const isLoggedIn = await loginPage.isLoginSuccessful();
+    expect(isLoggedIn).toBe(true);
+  });
+
+  test('should display login page elements', async () => {
+    await loginPage.navigateToLogin();
+
+    expect(await loginPage.isUsernameVisible()).toBe(true);
+    expect(await loginPage.isPasswordVisible()).toBe(true);
+  });
+
+  {{#if utilities.dataProvider}}
+  /**
+   * Data-driven tests using test.each — reads from data/users.json.
+   * Add more rows to users.json and they will be picked up automatically.
+   */
+  describe('Data-driven login tests', () => {
+    const testData = TestDataReader.readJson('users.json') || [];
+
+    test.each(testData.map((u) => [u.username, u.password, u.expected]))(
+      'should verify login for user: %s',
+      async (username, password, expected) => {
+        await loginPage.navigateToLogin();
+        await loginPage.login(username, password);
+
+        if (expected === 'success') {
+          const isLoggedIn = await loginPage.isLoginSuccessful();
+          expect(isLoggedIn).toBe(true);
+        } else {
+          const hasError = await loginPage.isErrorDisplayed();
+          expect(hasError).toBe(true);
+        }
+      }
+    );
+  });
+  {{/if}}
+});

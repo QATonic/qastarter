@@ -1,0 +1,79 @@
+# {{projectName}}
+
+Android UI automation framework built with Espresso, JUnit 5, and Java.
+
+## Overview
+
+Production-ready Android UI testing framework using Espresso for native Android app testing with Page Object Model pattern.
+
+## Features
+
+- ✅ Espresso {{toolVersions.espresso}} for Android UI testing
+- ✅ JUnit 5 test runner
+- ✅ Page Object Model pattern
+- ✅ Gradle build system
+- ✅ AndroidX Test libraries
+{{#if cicdTool}}
+- ✅ {{cicdTool}} integration
+{{/if}}
+- ✅ Support for Android API 24+
+
+## Prerequisites
+
+- Android Studio Arctic Fox or later
+- JDK 17+
+- Android SDK (API 34)
+- Gradle 8.0+
+
+## Setup
+
+1. Open project in Android Studio
+2. Sync Gradle files
+3. Connect Android device or start emulator
+
+## Running Tests
+
+```bash
+# Run all instrumented tests
+./gradlew connectedAndroidTest
+
+# Run specific test class
+./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.app.tests.SampleTest
+```
+
+## Project Structure
+
+```
+{{projectName}}/
+├── app/src/
+│   ├── main/java/          # App source code
+│   └── androidTest/java/   # Espresso tests
+│       ├── pages/          # Page Objects
+│       ├── tests/          # Test classes
+│       └── utils/          # Helper utilities
+└── build.gradle            # Dependencies
+```
+
+## Writing Tests
+
+```java
+@RunWith(AndroidJUnit4.class)
+public class LoginTest {
+    
+    @Rule
+    public ActivityScenarioRule<LoginActivity> activityRule =
+        new ActivityScenarioRule<>(LoginActivity.class);
+    
+    @Test
+    public void testSuccessfulLogin() {
+        onView(withId(R.id.username)).perform(typeText("user"));
+        onView(withId(R.id.password)).perform(typeText("pass"));
+        onView(withId(R.id.loginButton)).perform(click());
+        onView(withText("Welcome")).check(matches(isDisplayed()));
+    }
+}
+```
+
+## License
+
+MIT

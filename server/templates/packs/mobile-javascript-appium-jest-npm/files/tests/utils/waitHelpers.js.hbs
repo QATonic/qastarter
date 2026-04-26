@@ -1,0 +1,114 @@
+import Logger from './logger.js';
+
+/**
+ * Wait helper utilities for Appium tests.
+ */
+class WaitHelpers {
+  static DEFAULT_TIMEOUT = 10000;
+  static SHORT_TIMEOUT = 5000;
+  static LONG_TIMEOUT = 30000;
+
+  /**
+   * Wait for element to be displayed
+   */
+  static async waitForDisplayed(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to be displayed`);
+    await element.waitForDisplayed({ timeout });
+  }
+
+  /**
+   * Wait for element to exist
+   */
+  static async waitForExist(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to exist`);
+    await element.waitForExist({ timeout });
+  }
+
+  /**
+   * Wait for element to be clickable
+   */
+  static async waitForClickable(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to be clickable`);
+    await element.waitForClickable({ timeout });
+  }
+
+  /**
+   * Wait for element to be enabled
+   */
+  static async waitForEnabled(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to be enabled`);
+    await element.waitForEnabled({ timeout });
+  }
+
+  /**
+   * Wait for element to disappear
+   */
+  static async waitForNotDisplayed(element, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for element to disappear`);
+    await element.waitForDisplayed({ timeout, reverse: true });
+  }
+
+  /**
+   * Wait for text to be present in element
+   */
+  static async waitForText(element, expectedText, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for text: ${expectedText}`);
+    await driver.waitUntil(
+      async () => {
+        const text = await element.getText();
+        return text.includes(expectedText);
+      },
+      { timeout, timeoutMsg: `Text "${expectedText}" not found within ${timeout}ms` }
+    );
+  }
+
+  /**
+   * Wait for activity (Android)
+   */
+  static async waitForActivity(activityName, timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for activity: ${activityName}`);
+    await driver.waitUntil(
+      async () => {
+        const currentActivity = await driver.getCurrentActivity();
+        return currentActivity.includes(activityName);
+      },
+      { timeout, timeoutMsg: `Activity "${activityName}" not found within ${timeout}ms` }
+    );
+  }
+
+  /**
+   * Wait for alert to be present
+   */
+  static async waitForAlert(timeout = WaitHelpers.DEFAULT_TIMEOUT) {
+    Logger.debug(`Waiting for alert`);
+    await driver.waitUntil(
+      async () => {
+        try {
+          await driver.getAlertText();
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      { timeout, timeoutMsg: `Alert not found within ${timeout}ms` }
+    );
+  }
+
+  /**
+   * Wait for custom condition
+   */
+  static async waitForCondition(condition, timeout = WaitHelpers.DEFAULT_TIMEOUT, message = 'Condition not met') {
+    Logger.debug(`Waiting for custom condition`);
+    await driver.waitUntil(condition, { timeout, timeoutMsg: `${message} within ${timeout}ms` });
+  }
+
+  /**
+   * Hard wait (use sparingly)
+   */
+  static async hardWait(milliseconds) {
+    Logger.debug(`Hard wait for ${milliseconds}ms`);
+    await driver.pause(milliseconds);
+  }
+}
+
+export default WaitHelpers;

@@ -1,0 +1,71 @@
+# {{projectName}} - Docker Compose for Appium Mobile Testing
+# Provides containerized mobile test execution environment
+
+version: '3.8'
+
+services:
+  # Appium Server
+  appium:
+    image: appium/appium:v2.4.1-p0
+    ports:
+      - "4723:4723"
+    environment:
+      - APPIUM_LOG_LEVEL=info
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - ./apps:/app/apps
+    privileged: true
+    networks:
+      - appium-network
+
+  # Android Emulator (for CI environments)
+  android-emulator:
+    image: budtmo/docker-android:emulator_13.0
+    privileged: true
+    ports:
+      - "6080:6080"
+      - "5554:5554"
+      - "5555:5555"
+    environment:
+      - EMULATOR_DEVICE=Samsung Galaxy S10
+      - WEB_VNC=true
+      - APPIUM=true
+      - APPIUM_HOST=appium
+      - APPIUM_PORT=4723
+    depends_on:
+      - appium
+    networks:
+      - appium-network
+    profiles:
+      - emulator
+
+  # Test Runner
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - appium
+    environment:
+      - APPIUM_HOST=appium
+      - APPIUM_PORT=4723
+      - PLATFORM=android
+      - TEST_ENV=qa
+    volumes:
+      - ./reports:/app/reports
+      - ./screenshots:/app/screenshots
+      - ./apps:/app/apps
+    networks:
+      - appium-network
+    profiles:
+      - test
+
+networks:
+  appium-network:
+    driver: bridge
+
+# Usage:
+# Start Appium server: docker-compose up -d appium
+# Start with emulator: docker-compose --profile emulator up -d
+# Run tests: docker-compose --profile test up tests
+# View emulator VNC: http://localhost:6080

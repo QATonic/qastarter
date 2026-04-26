@@ -1,0 +1,32 @@
+package {{groupId}}.utils
+
+import android.os.SystemClock
+import androidx.test.espresso.ViewInteraction
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+
+/**
+* Wait helper for Espresso tests.
+* Provides idling resource-free wait mechanisms.
+*/
+object WaitHelper {
+
+private const val DEFAULT_TIMEOUT_MS = 10000L
+private const val CHECK_INTERVAL_MS = 100L
+
+/**
+* Wait for a view to be displayed.
+*/
+fun waitForView(viewInteraction: ViewInteraction, timeoutMs: Long = DEFAULT_TIMEOUT_MS) {
+val startTime = SystemClock.elapsedRealtime()
+
+while (SystemClock.elapsedRealtime() - startTime < timeoutMs) { try { viewInteraction.check(matches(isDisplayed()))
+    return } catch (e: Exception) { SystemClock.sleep(CHECK_INTERVAL_MS) } } // Final check - will throw assertion error
+    if view not displayed viewInteraction.check(matches(isDisplayed())) } /** * Wait for a condition to be true. */ fun
+    waitForCondition( timeoutMs: Long=DEFAULT_TIMEOUT_MS, condition: () -> Boolean
+    ): Boolean {
+    val startTime = SystemClock.elapsedRealtime()
+
+    while (SystemClock.elapsedRealtime() - startTime < timeoutMs) { if (condition()) { return true }
+        SystemClock.sleep(CHECK_INTERVAL_MS) } return condition() } /** * Simple delay. */ fun delay(milliseconds: Long)
+        { SystemClock.sleep(milliseconds) } }

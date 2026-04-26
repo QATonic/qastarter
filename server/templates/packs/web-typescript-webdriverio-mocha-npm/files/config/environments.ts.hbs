@@ -1,0 +1,70 @@
+/**
+ * Environment Configuration
+ * 
+ * ============================================
+ * UPDATE THESE VALUES FOR YOUR APPLICATION
+ * ============================================
+ * Replace the URLs with your actual environment URLs.
+ * Consider using environment variables for sensitive data.
+ */
+
+interface EnvironmentConfig {
+  baseUrl: string;
+  apiUrl: string;
+  timeout: number;
+  retries: number;
+}
+
+interface Environments {
+  [key: string]: EnvironmentConfig;
+}
+
+const environments: Environments = {
+  dev: {
+    baseUrl: process.env.DEV_BASE_URL || 'https://your-dev-app-url.com',
+    apiUrl: process.env.DEV_API_URL || 'https://api.your-dev-app-url.com',
+    timeout: 30000,
+    retries: 2
+  },
+  
+  qa: {
+    baseUrl: process.env.QA_BASE_URL || 'https://your-qa-app-url.com',
+    apiUrl: process.env.QA_API_URL || 'https://api.your-qa-app-url.com',
+    timeout: 30000,
+    retries: 2
+  },
+  
+  staging: {
+    baseUrl: process.env.STAGING_BASE_URL || 'https://your-staging-app-url.com',
+    apiUrl: process.env.STAGING_API_URL || 'https://api.your-staging-app-url.com',
+    timeout: 30000,
+    retries: 1
+  },
+  
+  prod: {
+    baseUrl: process.env.PROD_BASE_URL || 'https://your-prod-app-url.com',
+    apiUrl: process.env.PROD_API_URL || 'https://api.your-prod-app-url.com',
+    timeout: 30000,
+    retries: 0
+  }
+};
+
+export function getEnvironment(): EnvironmentConfig {
+  const env = process.env.TEST_ENV || 'dev';
+  
+  if (!environments[env]) {
+    throw new Error(`Unknown environment: ${env}. Available: ${Object.keys(environments).join(', ')}`);
+  }
+  
+  return environments[env];
+}
+
+export function getBaseUrl(): string {
+  return getEnvironment().baseUrl;
+}
+
+export function getApiUrl(): string {
+  return getEnvironment().apiUrl;
+}
+
+export default environments;

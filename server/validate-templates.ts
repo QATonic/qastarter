@@ -1,0 +1,290 @@
+#!/usr/bin/env node
+/**
+ * Template Validation Script
+ *
+ * Validates all template packs for:
+ * - Valid manifest.json structure (using Zod schema)
+ * - Handlebars syntax in .hbs files
+ * - Required files exist
+ * - Template context variables are valid
+ *
+ * Usage: npm run validate:templates
+ */
+
+import { promises as fs } from 'fs';
+import path from 'path';
+import handlebars from 'handlebars';
+import { fileURLToPath } from 'url';
+import { z } from 'zod';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PACKS_DIR = path.join(__dirname, 'templates', 'packs');
+
+interface ValidationResult {
+  packName: string;
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  filesValidated: number;
+}
+
+// Zod schema for manifest validation (mirrors manifest.schema.json)
+const manifestFileSchema = z.object({
+  path: z.string().min(1),
+  template: z.string().optional(),
+  isTemplate: z.boolean(),
+  mode: z.string().optional(),
+  conditional: z.record(z.any()).optional(),
+});
+
+const manifestSchema = z.object({
+  id: z
+    .string()
+    .regex(
+      /^[a-z0-9]+-[a-z0-9]+-[a-z0-9-]+-[a-z0-9-]+-[a-z0-9-]+$/,
+      'ID must follow format: testingType-language-framework-testRunner-buildTool'
+    ),
+  displayName: z.string().min(1),
+  description: z.string().optional(),
+  version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semantic (x.y.z)'),
+  supportsDynamic: z.boolean().optional().default(true),
+  supportedCombination: z.object({
+    testingType: z.enum(['web', 'mobile', 'api', 'desktop']),
+    framework: z.string().min(1),
+    language: z.string().min(1),
+    testRunner: z.string().min(1),
+    buildTool: z.string().min(1),
+  }),
+  dynamicSupport: z
+    .object({
+      reportingTools: z.array(z.string()).optional(),
+      cicdTools: z.array(z.string()).optional(),
+      testingPatterns: z.array(z.string()).optional(),
+    })
+    .optional(),
+  toolVersions: z.record(z.string()).optional(),
+  sampleTestPatterns: z.array(z.string()).optional(),
+  files: z.array(manifestFileSchema).min(1),
+  directories: z.array(z.string()).optional(),
+});
+
+type Manifest = z.infer<typeof manifestSchema>;
+type ManifestFile = z.infer<typeof manifestFileSchema>;
+
+// Use an isolated Handlebars instance (like the engine does) to avoid
+// polluting the global handlebars registry.
+const hb = handlebars.create();
+
+// Register Handlebars helpers (same as templatePackEngine)
+function registerHelpers(): void {
+  hb.registerHelper('eq', (a: any, b: any) => a === b);
+  hb.registerHelper('or', (...args: any[]) => {
+    args.pop();
+    return args.some(Boolean);
+  });
+  hb.registerHelper('includes', (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val));
+  hb.registerHelper('lowerCase', (str: string) => str?.toLowerCase() || '');
+  hb.registerHelper('upperCase', (str: string) => str?.toUpperCase() || '');
+  hb.registerHelper('pascalCase', (str: string) => {
+    if (!str) return '';
+    return str.replace(/(?:^|[-_])([a-z])/g, (_, char) => char.toUpperCase());
+  });
+  hb.registerHelper('packageToPath', (packageName: string) => {
+    if (!packageName) return '';
+    return packageName.replace(/\./g, '/');
+  });
+  hb.registerHelper('escapeXml', (str: string) => {
+    if (!str) return '';
+    return str.replace(/[<>&'"]/g, (char) => {
+      const entities: Record<string, string> = {
+        '<': '&lt;',
+        '>': '&gt;',
+        '&': '&amp;',
+        "'": '&apos;',
+        '"': '&quot;',
+      };
+      return entities[char] || char;
+    });
+  });
+  hb.registerHelper('json', (obj: any) => JSON.stringify(obj, null, 2));
+  hb.registerHelper('join', (arr: string[], separator: unknown) =>
+    Array.isArray(arr) ? arr.join(typeof separator === 'string' ? separator : ', ') : ''
+  );
+  hb.registerHelper('ternary', (condition: any, trueVal: any, falseVal: any) =>
+    condition ? trueVal : falseVal
+  );
+}
+
+async function validateManifest(
+  packPath: string
+): Promise<{ manifest: Manifest | null; errors: string[] }> {
+  const manifestPath = path.join(packPath, 'manifest.json');
+  const errors: string[] = [];
+
+  try {
+    const content = await fs.readFile(manifestPath, 'utf-8');
+    const rawManifest = JSON.parse(content);
+
+    // Use Zod schema validation for comprehensive checking
+    const result = manifestSchema.safeParse(rawManifest);
+
+    if (!result.success) {
+      // Extract detailed error messages from Zod
+      result.error.issues.forEach((issue) => {
+        const path = issue.path.join('.');
+        errors.push(`${path || 'root'}: ${issue.message}`);
+      });
+      return { manifest: null, errors };
+    }
+
+    return { manifest: result.data, errors: [] };
+  } catch (error) {
+    if ((error as Error & { code?: string }).code === 'ENOENT') {
+      errors.push('manifest.json not found');
+    } else if (error instanceof SyntaxError) {
+      errors.push(`Invalid JSON: ${error.message}`);
+    } else {
+      errors.push(`Error reading manifest: ${error}`);
+    }
+    return { manifest: null, errors };
+  }
+}
+
+async function validateHandlebarsFile(filePath: string): Promise<string[]> {
+  const errors: string[] = [];
+
+  try {
+    const content = await fs.readFile(filePath, 'utf-8');
+
+    // Try to compile the template
+    try {
+      hb.compile(content);
+    } catch (compileError) {
+      errors.push(`Handlebars syntax error: ${(compileError as Error).message}`);
+    }
+  } catch (error) {
+    errors.push(`Error reading file: ${error}`);
+  }
+
+  return errors;
+}
+
+async function validateTemplatePack(packPath: string): Promise<ValidationResult> {
+  const packName = path.basename(packPath);
+  const result: ValidationResult = {
+    packName,
+    valid: true,
+    errors: [],
+    warnings: [],
+    filesValidated: 0,
+  };
+
+  // Validate manifest
+  const { manifest, errors: manifestErrors } = await validateManifest(packPath);
+  result.errors.push(...manifestErrors);
+
+  if (!manifest) {
+    result.valid = false;
+    return result;
+  }
+
+  // Check if files directory exists
+  const filesDir = path.join(packPath, 'files');
+  try {
+    await fs.access(filesDir);
+  } catch {
+    result.errors.push('files/ directory not found');
+    result.valid = false;
+    return result;
+  }
+
+  // Validate each template file
+  for (const fileConfig of manifest.files) {
+    if (fileConfig.isTemplate) {
+      const templatePath = path.join(filesDir, `${fileConfig.path}.hbs`);
+
+      try {
+        await fs.access(templatePath);
+        const fileErrors = await validateHandlebarsFile(templatePath);
+        if (fileErrors.length > 0) {
+          result.errors.push(...fileErrors.map((e) => `${fileConfig.path}: ${e}`));
+        }
+        result.filesValidated++;
+      } catch {
+        result.warnings.push(`Template file not found: ${fileConfig.path}.hbs`);
+      }
+    } else {
+      // Check if non-template file exists
+      const filePath = path.join(filesDir, fileConfig.path);
+      try {
+        await fs.access(filePath);
+        result.filesValidated++;
+      } catch {
+        result.warnings.push(`Static file not found: ${fileConfig.path}`);
+      }
+    }
+  }
+
+  result.valid = result.errors.length === 0;
+  return result;
+}
+
+async function main(): Promise<void> {
+  console.log('🔍 QAStarter Template Validation\n');
+  console.log('='.repeat(50));
+
+  registerHelpers();
+
+  // Get all template pack directories
+  let packDirs: string[];
+  try {
+    const entries = await fs.readdir(PACKS_DIR, { withFileTypes: true });
+    packDirs = entries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => path.join(PACKS_DIR, entry.name));
+  } catch (error) {
+    console.error(`❌ Error reading packs directory: ${error}`);
+    process.exit(1);
+  }
+
+  console.log(`\nFound ${packDirs.length} template packs\n`);
+
+  let validCount = 0;
+  let invalidCount = 0;
+  const results: ValidationResult[] = [];
+
+  for (const packDir of packDirs) {
+    const result = await validateTemplatePack(packDir);
+    results.push(result);
+
+    if (result.valid) {
+      validCount++;
+      console.log(`✅ ${result.packName} (${result.filesValidated} files)`);
+    } else {
+      invalidCount++;
+      console.log(`❌ ${result.packName}`);
+      result.errors.forEach((err) => console.log(`   Error: ${err}`));
+    }
+
+    if (result.warnings.length > 0) {
+      result.warnings.forEach((warn) => console.log(`   ⚠️  ${warn}`));
+    }
+  }
+
+  // Summary
+  console.log('\n' + '='.repeat(50));
+  console.log('\n📊 Summary:');
+  console.log(`   ✅ Valid: ${validCount}`);
+  console.log(`   ❌ Invalid: ${invalidCount}`);
+  console.log(`   📁 Total: ${packDirs.length}`);
+
+  if (invalidCount > 0) {
+    console.log('\n⚠️  Some template packs have errors. Please fix them before deployment.\n');
+    process.exit(1);
+  } else {
+    console.log('\n✅ All template packs are valid!\n');
+    process.exit(0);
+  }
+}
+
+main().catch(console.error);

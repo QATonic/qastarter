@@ -1,0 +1,9 @@
+import { Browser } from 'webdriverio';
+import { TestData } from './testData';
+
+declare global {
+  var driver: WebdriverIO.Browser;
+  var testData: TestData;
+}
+
+export {};

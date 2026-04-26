@@ -1,0 +1,36 @@
+# BrowserStack App Automate — Espresso config for {{projectName}}
+#
+# Espresso tests run on BrowserStack's cloud via the App Automate REST
+# API (there is no BS SDK for Espresso). The build pipeline is:
+#   1. Gradle produces app/build/outputs/apk/debug/app-debug.apk
+#      and                app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+#   2. curl uploads both to /app-automate/espresso/v2/app and /test-suite
+#   3. curl POSTs to /app-automate/espresso/v2/build with the bs:// urls
+#      plus the device matrix below.
+#
+# Use scripts/run-on-browserstack.sh to execute the whole flow in one go.
+# Docs: https://www.browserstack.com/docs/app-automate/espresso
+#
+# This file is informational — values below are consumed by
+# scripts/run-on-browserstack.sh which constructs the JSON request body.
+
+userName: BROWSERSTACK_USERNAME
+accessKey: BROWSERSTACK_ACCESS_KEY
+
+project: "{{projectName}}"
+buildName: "{{projectName}} - Build #1"
+
+# Android devices — edit to pick a different matrix. Supported list:
+# https://www.browserstack.com/list-of-browsers-and-platforms/app_automate
+devices:
+  - "Samsung Galaxy S23-13.0"
+  - "Google Pixel 7-13.0"
+  - "OnePlus 11R-13.0"
+
+# Optional — uncomment and set to run a specific class or method:
+# class:
+#   - "com.example.LoginTest"
+# onlyTestRunnerClasses: false
+# logs: true
+# networkLogs: true
+# deviceLogs: true

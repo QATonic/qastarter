@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+reports/
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db

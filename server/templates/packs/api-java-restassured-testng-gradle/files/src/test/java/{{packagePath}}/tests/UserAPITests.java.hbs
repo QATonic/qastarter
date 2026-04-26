@@ -1,0 +1,102 @@
+package {{javaPackage}}.tests;
+
+import io.restassured.response.Response;
+import org.testng.annotations.Test;
+import {{javaPackage}}.core.BaseTest;
+import {{javaPackage}}.core.ResponseValidator;
+import {{javaPackage}}.models.User;
+import {{javaPackage}}.utils.Log;
+
+/**
+ * Sample API Test
+ *
+ * HOW TO USE THIS TEMPLATE:
+ * 1. Update the API_ENDPOINT below with your API URL
+ * 2. Update the test data to match your API requirements
+ * 3. Run: mvn clean test
+ *
+ * This is a simple positive API test to verify your framework setup.
+ * Add more test cases as needed for your project.
+ */
+public class UserAPITests extends BaseTest {
+
+    // ========== UPDATE THESE VALUES ==========
+    private static final String API_ENDPOINT = "/YOUR_API_ENDPOINT_HERE";
+    // ==========================================
+
+    @Test(groups = {"api", "smoke"},
+          description = "Verify GET endpoint returns successful response")
+    public void testGetEndpoint() {
+        Log.step("Testing GET API endpoint");
+
+        // Step 1: Send GET request to API
+        Log.info("Sending GET request to: " + API_ENDPOINT);
+        Response response = get(API_ENDPOINT);
+
+        // Step 2: Validate response status
+        ResponseValidator.assertStatus(response, 200);
+
+        // Step 3: Verify response is received
+        ResponseValidator.assertBodyNotEmpty(response);
+
+        Log.info("API responded successfully");
+    }
+
+    @Test(groups = {"api", "smoke"},
+          description = "Verify POST endpoint creates a resource")
+    public void testPostEndpoint() {
+        Log.step("Testing POST API endpoint");
+
+        User newUser = new User("Test User", "testuser", "test@example.com");
+
+        Log.info("Sending POST request to: " + API_ENDPOINT);
+        Response response = post(API_ENDPOINT, newUser);
+
+        ResponseValidator.assertStatus(response, 201);
+
+        int createdId = ResponseValidator.extractIntValue(response, "id");
+        Log.info("Created resource with ID: " + createdId);
+    }
+
+    @Test(groups = {"api", "regression"},
+          description = "Verify PUT endpoint updates a resource")
+    public void testPutEndpoint() {
+        Log.step("Testing PUT API endpoint");
+
+        User updatedUser = new User("Updated User", "updateduser", "updated@example.com");
+
+        Log.info("Sending PUT request to: " + API_ENDPOINT + "/1");
+        Response response = put(API_ENDPOINT, 1, updatedUser);
+
+        ResponseValidator.assertStatus(response, 200);
+        ResponseValidator.assertBodyContains(response, "updateduser");
+
+        Log.info("Resource updated successfully");
+    }
+
+    @Test(groups = {"api", "regression"},
+          description = "Verify DELETE endpoint removes a resource")
+    public void testDeleteEndpoint() {
+        Log.step("Testing DELETE API endpoint");
+
+        Log.info("Sending DELETE request to: " + API_ENDPOINT + "/1");
+        Response response = delete(API_ENDPOINT, 1);
+
+        ResponseValidator.assertStatus(response, 200);
+
+        Log.info("Resource deleted successfully");
+    }
+
+    @Test(groups = {"api", "negative"},
+          description = "Verify GET with invalid ID returns 404")
+    public void testGetInvalidId() {
+        Log.step("Testing GET with invalid resource ID");
+
+        Log.info("Sending GET request for non-existent resource");
+        Response response = get(API_ENDPOINT, 99999);
+
+        ResponseValidator.assertStatus(response, 404);
+
+        Log.info("Non-existent resource correctly returned 404");
+    }
+}

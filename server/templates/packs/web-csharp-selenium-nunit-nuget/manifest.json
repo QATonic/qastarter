@@ -1,0 +1,232 @@
+{
+  "id": "web-csharp-selenium-nunit-nuget",
+  "displayName": "C# Selenium NUnit Framework",
+  "description": "Production-ready Selenium automation framework with C# and NUnit",
+  "version": "2.0.0",
+  "supportsDynamic": true,
+  "supportedCombination": {
+    "testingType": "web",
+    "framework": "selenium",
+    "language": "csharp",
+    "testRunner": "nunit",
+    "buildTool": "nuget"
+  },
+  "dynamicSupport": {
+    "reportingTools": [
+      "allure",
+      "extent-reports"
+    ],
+    "cicdTools": [
+      "jenkins",
+      "github-actions",
+      "gitlab-ci",
+      "azure-devops",
+      "circleci"
+    ],
+    "testingPatterns": [
+      "bdd"
+    ]
+  },
+  "toolVersions": {
+    "dotnet": "8.0",
+    "selenium": "4.16.0",
+    "nunit": "3.14.0"
+  },
+  "files": [
+    {
+      "path": "{{projectName}}.csproj",
+      "isTemplate": true
+    },
+    {
+      "path": "appsettings.json",
+      "isTemplate": true
+    },
+    {
+      "path": ".editorconfig",
+      "isTemplate": true
+    },
+    {
+      "path": "README.md",
+      "isTemplate": true
+    },
+    {
+      "path": ".gitignore",
+      "isTemplate": false
+    },
+    {
+      "path": "Jenkinsfile",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "jenkins"
+      }
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "github-actions"
+      }
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "gitlab-ci"
+      }
+    },
+    {
+      "path": "azure-pipelines.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "azure-devops"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
+      }
+    },
+    {
+      "path": "Dockerfile",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.includeDocker": true
+      }
+    },
+    {
+      "path": "Config/ConfigReader.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Pages/BasePage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Pages/LoginPage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/DriverManager.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Tests/LoginTests.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Features/Login.feature",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "StepDefinitions/LoginSteps.cs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
+    },
+    {
+      "path": "Config/BrowserConfig.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Config/EnvConfig.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/dev.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/qa.json",
+      "isTemplate": true
+    },
+    {
+      "path": "Data/users.csv",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "Data/users.json",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "Pages/HomePage.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Tests/BaseTest.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/DataReader.cs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
+      }
+    },
+    {
+      "path": "Utils/DriverFactory.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/Logger.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/ScreenshotHelper.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/WaitHelpers.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/RetryHelper.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/TestDataReader.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/ScreenshotUtils.cs",
+      "isTemplate": true
+    },
+    {
+      "path": "Utils/TestDataFactory.cs",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.faker": true
+      }
+    },
+    {
+      "path": "browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "Config/saucelabs.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "saucelabs"
+      }
+    }
+  ],
+  "directories": [
+    "logs",
+    "screenshots",
+    "reports"
+  ]
+}

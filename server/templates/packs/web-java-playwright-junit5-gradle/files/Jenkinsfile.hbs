@@ -1,0 +1,82 @@
+pipeline {
+    agent any
+    
+    tools {
+        jdk 'JDK17'
+{{#if (eq buildTool "maven")}}
+        maven 'Maven3'
+{{else}}
+        gradle 'Gradle8'
+{{/if}}
+    }
+    
+    environment {
+        HEADLESS = 'true'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+{{#if (eq buildTool "maven")}}
+                sh 'mvn clean compile'
+{{else}}
+                sh './gradlew clean classes'
+{{/if}}
+            }
+        }
+{{#if (eq framework "playwright")}}
+        
+        stage('Install Browsers') {
+            steps {
+{{#if (eq buildTool "maven")}}
+                sh 'mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"'
+{{else}}
+                sh './gradlew playwright install'
+{{/if}}
+            }
+        }
+{{/if}}
+        
+        stage('Test') {
+            steps {
+{{#if (eq buildTool "maven")}}
+                sh 'mvn test -Dheadless=${HEADLESS}'
+{{else}}
+                sh './gradlew test -Dheadless=${HEADLESS}'
+{{/if}}
+            }
+            post {
+                always {
+{{#if (eq testRunner "testng")}}
+                    testResultsPublisher(testResultsPattern: '**/target/surefire-reports/*.xml')
+{{else}}
+                    junit '**/target/surefire-reports/*.xml'
+{{/if}}
+                }
+            }
+        }
+{{#if (eq reportingTool "allure")}}
+        
+        stage('Allure Report') {
+            steps {
+                allure includeProperties: false, jdk: '', results: [[path: 'target/allure-results']]
+            }
+        }
+{{/if}}
+    }
+    
+    post {
+        failure {
+            archiveArtifacts artifacts: 'screenshots/**', allowEmptyArchive: true
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

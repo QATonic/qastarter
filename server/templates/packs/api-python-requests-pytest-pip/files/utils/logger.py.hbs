@@ -1,0 +1,53 @@
+"""
+Logger - Consistent logging with timestamps.
+Logs saved to: logs/api_test_{timestamp}.log
+"""
+import logging
+import os
+from datetime import datetime
+from pathlib import Path
+
+
+class Logger:
+    _instance = None
+    _logger = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._setup_logger()
+        return cls._instance
+    
+    def _setup_logger(self):
+        self._logger = logging.getLogger("APITest")
+        self._logger.setLevel(logging.DEBUG)
+        self._logger.handlers.clear()
+        
+        # Create logs directory
+        logs_dir = Path("logs")
+        logs_dir.mkdir(exist_ok=True)
+        
+        # File handler with timestamp
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_handler = logging.FileHandler(logs_dir / f"api_test_{timestamp}.log")
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s"))
+        
+        # Console handler
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_handler.setFormatter(logging.Formatter("%(asctime)s | %(levelname)-8s | %(message)s", datefmt="%H:%M:%S"))
+        
+        self._logger.addHandler(file_handler)
+        self._logger.addHandler(console_handler)
+    
+    def info(self, message: str): self._logger.info(message)
+    def debug(self, message: str): self._logger.debug(message)
+    def warning(self, message: str): self._logger.warning(message)
+    def error(self, message: str): self._logger.error(message)
+    def step(self, message: str): self._logger.info(f"STEP: {message}")
+
+
+log = Logger()
+# Alias so `from utils.logger import logger` also works.
+logger = log

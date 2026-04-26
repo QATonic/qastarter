@@ -1,0 +1,358 @@
+package {{groupId}}.tests;
+
+import {{groupId}}.core.BaseTest;
+import {{groupId}}.core.DesktopDriverFactory;
+import {{groupId}}.utils.WindowsUtils;
+import {{groupId}}.utils.DesktopActions;
+import {{groupId}}.listeners.RetryAnalyzer;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+/**
+ * Integration tests for Windows desktop functionality
+ * Tests system-level interactions and multiple application scenarios
+ */
+public class WindowsIntegrationTests extends BaseTest {
+
+    @Test(description = "Verify Windows process management utilities",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"integration", "windows", "process"})
+    public void testProcessManagement() {
+        logInfo("Testing Windows process management utilities");
+        
+        // Check if Calculator is running
+        boolean calcRunning = WindowsUtils.isProcessRunning("Calculator.exe");
+        logInfo("Calculator process running: " + calcRunning);
+        
+        // Launch Calculator if not running
+        if (!calcRunning) {
+            boolean launched = WindowsUtils.launchApplication(DesktopDriverFactory.CALCULATOR);
+            Assert.assertTrue(launched, "Should launch Calculator successfully");
+            
+            // Wait a moment for application to start
+            DesktopActions.wait(2000);
+            
+            // Verify Calculator is now running
+            Assert.assertTrue(WindowsUtils.isProcessRunning("Calculator.exe"), 
+                             "Calculator should be running after launch");
+        }
+        
+        // Get list of running processes
+        var processes = WindowsUtils.getRunningProcesses();
+        Assert.assertFalse(processes.isEmpty(), "Should retrieve list of running processes");
+        logInfo("Found " + processes.size() + " running processes");
+        
+        // Verify some common Windows processes exist
+        boolean foundExplorer = processes.stream()
+                .anyMatch(process -> process.toLowerCase().contains("explorer"));
+        Assert.assertTrue(foundExplorer, "Windows Explorer process should be running");
+        
+        logPass("Process management utilities test completed successfully");
+    }
+
+    @Test(description = "Verify window management utilities",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"integration", "windows", "window-management"})
+    public void testWindowManagement() {
+        logInfo("Testing window management utilities");
+        
+        // Get active window title
+        String activeWindow = WindowsUtils.getActiveWindowTitle();
+        logInfo("Active window: " + activeWindow);
+        Assert.assertNotNull(activeWindow, "Should get active window title");
+        
+        // Find Calculator window (assuming it's running from previous test)
+        String calculatorTitle = "Calculator";
+        boolean windowFound = WindowsUtils.getWindowByTitle(calculatorTitle) != null;
+        
+        if (windowFound) {
+            logInfo("Calculator window found");
+            
+            // Test window visibility
+            boolean visible = WindowsUtils.isWindowVisible(calculatorTitle);
+            logInfo("Calculator window visible: " + visible);
+            
+            // Test bringing window to foreground
+            boolean foreground = WindowsUtils.bringWindowToForeground(calculatorTitle);
+            Assert.assertTrue(foreground, "Should bring Calculator to foreground");
+            
+            // Test window manipulation
+            boolean maximized = WindowsUtils.maximizeWindow(calculatorTitle);
+            if (maximized) {
+                logInfo("Calculator window maximized");
+                DesktopActions.wait(1000);
+                
+                // Test minimize
+                boolean minimized = WindowsUtils.minimizeWindow(calculatorTitle);
+                if (minimized) {
+                    logInfo("Calculator window minimized");
+                    DesktopActions.wait(1000);
+                }
+            }
+            
+            // Get window dimensions
+            int[] dimensions = WindowsUtils.getWindowDimensions(calculatorTitle);
+            if (dimensions != null) {
+                logInfo("Calculator window dimensions: " + dimensions[0] + "x" + dimensions[1]);
+            }
+            
+        } else {
+            logWarning("Calculator window not found - some window management tests skipped");
+        }
+        
+        logPass("Window management utilities test completed successfully");
+    }
+
+    @Test(description = "Verify keyboard shortcuts and system interactions",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"integration", "windows", "keyboard"})
+    public void testKeyboardShortcuts() {
+        logInfo("Testing keyboard shortcuts and system interactions");
+        
+        // Test Windows key combinations
+        logInfo("Testing Windows key + R (Run dialog)");
+        DesktopActions.windowsKey(java.awt.event.KeyEvent.VK_R);
+        DesktopActions.wait(1000);
+        
+        // Cancel the Run dialog by pressing Escape
+        DesktopActions.pressEscape();
+        DesktopActions.wait(500);
+        
+        // Test Alt+Tab (window switching)
+        logInfo("Testing Alt+Tab window switching");
+        DesktopActions.altTab();
+        DesktopActions.wait(1000);
+        
+        // Press Escape to cancel Alt+Tab
+        DesktopActions.pressEscape();
+        DesktopActions.wait(500);
+        
+        // Test clipboard operations with Robot
+        logInfo("Testing clipboard operations");
+        
+        // Type some text and copy it
+        DesktopActions.robotTypeText("Test clipboard text");
+        DesktopActions.wait(500);
+        DesktopActions.selectAll();
+        DesktopActions.copy();
+        DesktopActions.wait(500);
+        
+        // Clear and paste
+        DesktopActions.selectAll();
+        DesktopActions.robotTypeText(""); // Clear by typing nothing over selection
+        DesktopActions.paste();
+        DesktopActions.wait(500);
+        
+        logPass("Keyboard shortcuts and system interactions test completed successfully");
+    }
+
+    @Test(description = "Verify multi-application workflow",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"integration", "workflow", "multi-app"})
+    public void testMultiApplicationWorkflow() {
+        logInfo("Testing multi-application workflow");
+        
+        // Step 1: Launch Calculator and perform a calculation
+        logInfo("Step 1: Calculator calculation");
+        
+        // Ensure Calculator is available
+        if (!WindowsUtils.isProcessRunning("Calculator.exe")) {
+            WindowsUtils.launchApplication(DesktopDriverFactory.CALCULATOR);
+            DesktopActions.wait(3000);
+        }
+        
+        // Switch to Calculator and perform calculation
+        if (WindowsUtils.bringWindowToForeground("Calculator")) {
+            DesktopActions.wait(1000);
+            
+            // Perform calculation using keyboard shortcuts
+            DesktopActions.robotTypeText("25+75");
+            DesktopActions.pressEnter();
+            DesktopActions.wait(1000);
+            
+            // Copy result
+            DesktopActions.copy();
+            logInfo("Calculated result and copied to clipboard");
+        }
+        
+        // Step 2: Launch Notepad and paste the result
+        logInfo("Step 2: Notepad text operations");
+        
+        if (!WindowsUtils.isProcessRunning("notepad.exe")) {
+            WindowsUtils.launchApplication(DesktopDriverFactory.NOTEPAD);
+            DesktopActions.wait(3000);
+        }
+        
+        // Switch to Notepad
+        if (WindowsUtils.bringWindowToForeground("Notepad") || 
+            WindowsUtils.bringWindowToForeground("Untitled - Notepad")) {
+            DesktopActions.wait(1000);
+            
+            // Type header and paste calculation result
+            DesktopActions.robotTypeText("Calculation Result: ");
+            DesktopActions.paste();
+            DesktopActions.robotTypeText("\nThis was calculated using Windows Calculator.");
+            
+            logInfo("Added calculation result to Notepad");
+        }
+        
+        // Step 3: Test application switching
+        logInfo("Step 3: Application switching");
+        
+        // Switch between applications using Alt+Tab
+        DesktopActions.altTab();
+        DesktopActions.wait(1000);
+        DesktopActions.pressEscape(); // Cancel Alt+Tab
+        
+        // Test direct window switching
+        WindowsUtils.bringWindowToForeground("Calculator");
+        DesktopActions.wait(1000);
+        
+        WindowsUtils.bringWindowToForeground("Notepad");
+        DesktopActions.wait(1000);
+        
+        logPass("Multi-application workflow test completed successfully");
+    }
+
+    @Test(description = "Verify desktop screenshot and interaction",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"integration", "desktop", "screenshot"})
+    public void testDesktopScreenshotAndInteraction() {
+        logInfo("Testing desktop screenshot and interaction capabilities");
+        
+        // Take full desktop screenshot
+        String desktopScreenshot = captureScreenshot("desktop_integration_test");
+        Assert.assertNotNull(desktopScreenshot, "Should capture desktop screenshot");
+        logInfo("Desktop screenshot captured: " + desktopScreenshot);
+        
+        // Take screenshot of specific window if available
+        String calculatorTitle = "Calculator";
+        if (WindowsUtils.getWindowByTitle(calculatorTitle) != null) {
+            boolean windowScreenshot = WindowsUtils.takeWindowScreenshot(calculatorTitle, 
+                "screenshots/calculator_window.png");
+            
+            if (windowScreenshot) {
+                logInfo("Calculator window screenshot captured");
+            }
+        }
+        
+        // Test desktop click at specific coordinates (center of screen)
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        int centerX = screenSize.width / 2;
+        int centerY = screenSize.height / 2;
+        
+        logInfo("Testing desktop click at center coordinates: " + centerX + ", " + centerY);
+        DesktopActions.robotClickAt(centerX, centerY);
+        DesktopActions.wait(1000);
+        
+        logPass("Desktop screenshot and interaction test completed successfully");
+    }
+
+    @Test(description = "Verify system information and environment",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"integration", "system", "environment"})
+    public void testSystemInformation() {
+        logInfo("Testing system information and environment");
+        
+        // Log system properties
+        logInfo("Operating System: " + System.getProperty("os.name"));
+        logInfo("OS Version: " + System.getProperty("os.version"));
+        logInfo("OS Architecture: " + System.getProperty("os.arch"));
+        logInfo("Java Version: " + System.getProperty("java.version"));
+        logInfo("User Name: " + System.getProperty("user.name"));
+        logInfo("User Home: " + System.getProperty("user.home"));
+        logInfo("Working Directory: " + System.getProperty("user.dir"));
+        
+        // Test environment variables
+        String pathEnv = System.getenv("PATH");
+        Assert.assertNotNull(pathEnv, "PATH environment variable should be available");
+        logInfo("PATH environment variable length: " + pathEnv.length());
+        
+        String windowsDir = System.getenv("WINDIR");
+        if (windowsDir != null) {
+            logInfo("Windows Directory: " + windowsDir);
+        }
+        
+        String programFiles = System.getenv("ProgramFiles");
+        if (programFiles != null) {
+            logInfo("Program Files Directory: " + programFiles);
+        }
+        
+        // Test screen resolution
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        logInfo("Screen Resolution: " + screenSize.width + "x" + screenSize.height);
+        
+        logPass("System information and environment test completed successfully");
+    }
+
+    @Test(description = "Verify error handling and recovery",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"integration", "error-handling"})
+    public void testErrorHandlingAndRecovery() {
+        logInfo("Testing error handling and recovery scenarios");
+        
+        // Test handling of non-existent process
+        boolean nonExistentProcess = WindowsUtils.isProcessRunning("NonExistentProcess12345.exe");
+        Assert.assertFalse(nonExistentProcess, "Non-existent process should return false");
+        
+        // Test handling of invalid window title
+        boolean invalidWindow = WindowsUtils.isWindowVisible("NonExistentWindow12345");
+        Assert.assertFalse(invalidWindow, "Invalid window should return false");
+        
+        // Test handling of invalid application launch
+        boolean invalidLaunch = WindowsUtils.launchApplication("C:\\NonExistent\\Path\\App.exe");
+        Assert.assertFalse(invalidLaunch, "Invalid application path should return false");
+        
+        // Test recovery after invalid operations
+        logInfo("Testing recovery after error scenarios");
+        
+        // Verify we can still perform valid operations after errors
+        String activeWindow = WindowsUtils.getActiveWindowTitle();
+        Assert.assertNotNull(activeWindow, "Should still get active window after error scenarios");
+        
+        var processes = WindowsUtils.getRunningProcesses();
+        Assert.assertFalse(processes.isEmpty(), "Should still get process list after error scenarios");
+        
+        logPass("Error handling and recovery test completed successfully");
+    }
+
+    @Test(description = "Performance test for Windows utilities",
+          retryAnalyzer = RetryAnalyzer.class,
+          groups = {"integration", "performance"})
+    public void testWindowsUtilitiesPerformance() {
+        logInfo("Testing Windows utilities performance");
+        
+        int iterations = 10;
+        
+        // Test process checking performance
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            WindowsUtils.isProcessRunning("explorer.exe");
+        }
+        long processCheckTime = System.currentTimeMillis() - startTime;
+        logInfo("Process checking (" + iterations + " iterations): " + processCheckTime + "ms");
+        
+        // Test window title retrieval performance
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            WindowsUtils.getActiveWindowTitle();
+        }
+        long windowTitleTime = System.currentTimeMillis() - startTime;
+        logInfo("Window title retrieval (" + iterations + " iterations): " + windowTitleTime + "ms");
+        
+        // Test running processes retrieval performance
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < 3; i++) { // Fewer iterations as this is more expensive
+            WindowsUtils.getRunningProcesses();
+        }
+        long processListTime = System.currentTimeMillis() - startTime;
+        logInfo("Process list retrieval (3 iterations): " + processListTime + "ms");
+        
+        // Verify reasonable performance (these are rough benchmarks)
+        Assert.assertTrue(processCheckTime < 5000, "Process checking should be reasonably fast");
+        Assert.assertTrue(windowTitleTime < 2000, "Window title retrieval should be reasonably fast");
+        Assert.assertTrue(processListTime < 10000, "Process list retrieval should complete within reasonable time");
+        
+        logPass("Windows utilities performance test completed successfully");
+    }
+}

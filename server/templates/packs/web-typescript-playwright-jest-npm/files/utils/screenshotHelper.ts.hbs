@@ -1,0 +1,35 @@
+/**
+ * Screenshot Helper — capture screenshots on test failure.
+ */
+import { Page } from "playwright";
+import * as fs from "fs";
+import * as path from "path";
+import { log } from "./logger";
+
+const SCREENSHOT_DIR = "screenshots";
+
+export class ScreenshotHelper {
+  public static async captureScreenshot(page: Page, name: string): Promise<string> {
+    if (!fs.existsSync(SCREENSHOT_DIR)) {
+      fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+    }
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const safeName = name.replace(/[^a-zA-Z0-9_-]/g, "_");
+    const filename = `${safeName}-${timestamp}.png`;
+    const filepath = path.join(SCREENSHOT_DIR, filename);
+
+    await page.screenshot({ path: filepath, fullPage: true });
+    log.info(`Screenshot saved: ${filepath}`);
+    return filepath;
+  }
+
+  public static async captureOnFailure(page: Page, testName: string): Promise<void> {
+    try {
+      await this.captureScreenshot(page, `FAILED-${testName}`);
+    } catch (error: unknown) {
+      log.error(`Failed to capture screenshot: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+}
+
+export default ScreenshotHelper;

@@ -1,0 +1,66 @@
+import json
+import jsonschema
+from typing import Any, Dict
+from pathlib import Path
+
+
+class JSONUtils:
+    """Utilities for working with JSON data."""
+    
+    @staticmethod
+    def load_file(file_path: str) -> Dict[str, Any]:
+        """Load JSON from file."""
+        with open(file_path, 'r') as f:
+            return json.load(f)
+    
+    @staticmethod
+    def save_file(data: Dict[str, Any], file_path: str):
+        """Save JSON to file."""
+        Path(file_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+    
+    @staticmethod
+    def load_schema(schema_name: str) -> Dict[str, Any]:
+        """Load JSON schema."""
+        schema_path = Path("schemas") / f"{schema_name}.json"
+        return JSONUtils.load_file(str(schema_path))
+    
+    @staticmethod
+    def validate_schema(data: Dict[str, Any], schema: Dict[str, Any]):
+        """Validate JSON against schema."""
+        jsonschema.validate(instance=data, schema=schema)
+    
+    @staticmethod
+    def get_value_by_path(data: Dict[str, Any], path: str) -> Any:
+        """Get value from nested dict by dot-notation path."""
+        keys = path.split('.')
+        value = data
+        
+        for key in keys:
+            if isinstance(value, dict):
+                value = value.get(key)
+            elif isinstance(value, list) and key.isdigit():
+                value = value[int(key)]
+            else:
+                return None
+        
+        return value
+    
+    @staticmethod
+    def set_value_by_path(data: Dict[str, Any], path: str, value: Any):
+        """Set value in nested dict by dot-notation path."""
+        keys = path.split('.')
+        current = data
+        
+        for key in keys[:-1]:
+            if key not in current:
+                current[key] = {}
+            current = current[key]
+        
+        current[keys[-1]] = value
+    
+    @staticmethod
+    def pretty_print(data: Any):
+        """Pretty print JSON data."""
+        print(json.dumps(data, indent=2))

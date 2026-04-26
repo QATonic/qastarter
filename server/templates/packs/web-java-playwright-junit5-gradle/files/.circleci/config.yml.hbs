@@ -1,0 +1,69 @@
+version: 2.1
+
+orbs:
+  browser-tools: circleci/browser-tools@1.4
+
+executors:
+  playwright-executor:
+    docker:
+      - image: mcr.microsoft.com/playwright/java:v{{toolVersions.playwright}}-jammy
+    working_directory: ~/project
+
+jobs:
+  test:
+    executor: playwright-executor
+    parameters:
+      browser:
+        type: string
+        default: "chromium"
+      environment:
+        type: string
+        default: "qa"
+    steps:
+      - checkout
+      
+      - restore_cache:
+          keys:
+            - gradle-cache-v1-{{ checksum "build.gradle" }}
+            - gradle-cache-v1-
+      
+      - run:
+          name: Make gradlew executable
+          command: chmod +x gradlew
+      
+      - run:
+          name: Install Playwright Browsers
+          command: ./gradlew installPlaywrightBrowsers --no-daemon
+      
+      - run:
+          name: Run Tests
+          command: |
+            ./gradlew test \
+              -Pbrowser=<< parameters.browser >> \
+              -Pheadless=true \
+              -Penv=<< parameters.environment >> \
+              --no-daemon
+      
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: gradle-cache-v1-{{ checksum "build.gradle" }}
+      
+      - store_test_results:
+          path: build/test-results
+      
+      - store_artifacts:
+          path: build/reports
+          destination: test-reports
+      
+      - store_artifacts:
+          path: screenshots
+          destination: screenshots
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test:
+          browser: "chromium"
+          environment: "qa"

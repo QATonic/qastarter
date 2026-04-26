@@ -1,0 +1,13 @@
+import pytest
+import pyautogui
+from pages.notepad_page import NotepadPage
+from utils.logger import log
+
+class TestNotepad:
+    @pytest.mark.smoke
+    def test_type_text(self, notepad):
+        log.step("Test typing in Notepad")
+        pyautogui.sleep(0.5)
+        pyautogui.typewrite("Hello from PyAutoGUI!", interval=0.02)
+        # Visual verification - text should appear in Notepad
+        log.info("Text typed successfully")

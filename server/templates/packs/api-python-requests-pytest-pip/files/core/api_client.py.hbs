@@ -1,0 +1,56 @@
+"""
+API Client - HTTP client for REST API testing.
+
+Target API: {{baseUrl}}
+
+Usage:
+    from core.api_client import APIClient
+    api = APIClient()
+    response = api.get("/users")
+"""
+import requests
+from config.config_reader import config
+from utils.logger import log
+
+
+class APIClient:
+    """Simplified API client for REST operations."""
+    
+    def __init__(self):
+        self.base_url = config.base_url
+        self.timeout = config.timeout
+        self.headers = {"Content-Type": config.content_type}
+        log.info(f"API Client initialized: {self.base_url}")
+    
+    def _url(self, endpoint: str) -> str:
+        return f"{self.base_url}{endpoint}"
+    
+    def get(self, endpoint: str, params: dict = None) -> requests.Response:
+        log.info(f"GET {endpoint}")
+        response = requests.get(self._url(endpoint), headers=self.headers, params=params, timeout=self.timeout)
+        log.info(f"Response: {response.status_code}")
+        return response
+    
+    def post(self, endpoint: str, body: dict) -> requests.Response:
+        log.info(f"POST {endpoint}")
+        response = requests.post(self._url(endpoint), headers=self.headers, json=body, timeout=self.timeout)
+        log.info(f"Response: {response.status_code}")
+        return response
+    
+    def put(self, endpoint: str, body: dict) -> requests.Response:
+        log.info(f"PUT {endpoint}")
+        response = requests.put(self._url(endpoint), headers=self.headers, json=body, timeout=self.timeout)
+        log.info(f"Response: {response.status_code}")
+        return response
+    
+    def patch(self, endpoint: str, body: dict) -> requests.Response:
+        log.info(f"PATCH {endpoint}")
+        response = requests.patch(self._url(endpoint), headers=self.headers, json=body, timeout=self.timeout)
+        log.info(f"Response: {response.status_code}")
+        return response
+    
+    def delete(self, endpoint: str) -> requests.Response:
+        log.info(f"DELETE {endpoint}")
+        response = requests.delete(self._url(endpoint), headers=self.headers, timeout=self.timeout)
+        log.info(f"Response: {response.status_code}")
+        return response

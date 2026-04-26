@@ -1,0 +1,130 @@
+# {{projectName}}
+
+iOS UI automation framework built with XCUITest, XCTest, and Swift.
+
+## 5-Minute Quick Start
+
+### Step 1: Open the project
+```bash
+open Package.swift  # Opens in Xcode
+```
+
+### Step 2: Update your test configuration
+
+1. **Edit `{{projectName}}UITests/TestData.swift`** - Add your login credentials:
+   ```swift
+   static let validUser = User(
+       username: "your_actual_username",
+       password: "your_actual_password"
+   )
+   ```
+
+2. **Edit `{{projectName}}UITests/SampleUITest.swift`** - Update element identifiers:
+   ```swift
+   private let usernameFieldId = "your_username_field_id"
+   private let passwordFieldId = "your_password_field_id"
+   private let loginButtonId = "your_login_button_id"
+   private let welcomeTextId = "your_welcome_text_id"
+   ```
+
+### Step 3: Run your first test
+Press **Cmd+U** in Xcode to run all tests
+
+---
+
+## Features
+
+- ✅ XCUITest for iOS UI testing
+- ✅ XCTest framework
+- ✅ Screen Object pattern
+- ✅ Swift Package Manager
+- ✅ Reusable base screen class
+{{#if cicdTool}}
+- ✅ {{cicdTool}} integration
+{{/if}}
+- ✅ Support for iOS 15+
+
+## Prerequisites
+
+- Xcode 14+ 
+- macOS Monterey or later
+- iOS Simulator or physical device
+- Swift 5.9+
+
+## Running Tests
+
+### From Xcode
+- Press Cmd+U to run all tests
+- Or use Test Navigator (Cmd+6) to run individual tests
+
+### From Command Line
+```bash
+# Run all UI tests
+xcodebuild test \
+  -scheme {{projectName}} \
+  -destination 'platform=iOS Simulator,name=iPhone 15'
+
+# Run specific test
+xcodebuild test \
+  -scheme {{projectName}} \
+  -destination 'platform=iOS Simulator,name=iPhone 15' \
+  -only-testing:{{projectName}}UITests/SampleUITest/testSuccessfulLogin
+```
+
+## Project Structure
+
+```
+{{projectName}}/
+├── Package.swift              # SPM configuration
+└── {{projectName}}UITests/    # UI tests
+    ├── BaseScreen.swift       # Base screen object
+    ├── SampleUITest.swift     # Sample login test
+    └── TestData.swift         # Test credentials
+```
+
+## Writing More Tests
+
+```swift
+import XCTest
+
+final class YourTest: XCTestCase {
+    var app: XCUIApplication!
+    
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launch()
+    }
+    
+    func testYourFeature() throws {
+        // Step 1: Navigate
+        let element = app.buttons["your_button_id"]
+        XCTAssertTrue(element.waitForExistence(timeout: 5))
+        element.tap()
+        
+        // Step 2: Verify
+        let result = app.staticTexts["expected_text_id"]
+        XCTAssertTrue(result.exists, "Expected result should be visible")
+    }
+}
+```
+
+## CI/CD Integration
+
+{{#if (eq cicdTool "github-actions")}}
+This project is configured for GitHub Actions. Check `.github/workflows/tests.yml` for pipeline configuration.
+{{else if (eq cicdTool "jenkins")}}
+This project is configured for Jenkins. Check `Jenkinsfile` for pipeline configuration.
+{{else if (eq cicdTool "gitlab-ci")}}
+This project is configured for GitLab CI. Check `.gitlab-ci.yml` for pipeline configuration.
+{{else if (eq cicdTool "azure-devops")}}
+This project is configured for Azure DevOps. Check `azure-pipelines.yml` for pipeline configuration.
+{{else if (eq cicdTool "circleci")}}
+This project is configured for CircleCI. Check `.circleci/config.yml` for pipeline configuration.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## License
+
+MIT

@@ -1,0 +1,22 @@
+# {{projectName}}
+
+Web Automation Framework using Go, Playwright, and Testify.
+
+## 🚀 Features
+- **Language**: Go (Golang)
+- **Browser Automation**: [Playwright Go](https://github.com/playwright-community/playwright-go)
+- **Assertions**: [Testify](https://github.com/stretchr/testify)
+- **Pattern**: Page Object Model (POM)
+
+## 🛠️ Setup
+1. Install Go (v1.21+)
+2. Install dependencies:
+```bash
+go mod download
+go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
+```
+
+## 🏃‍♂️ Running Tests
+```bash
+go test ./tests/... -v
+```

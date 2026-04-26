@@ -1,0 +1,85 @@
+/**
+ * Logger utility for test execution.
+ */
+enum LogLevel {
+  DEBUG = 0,
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3
+}
+
+class Logger {
+  private static currentLevel: LogLevel = LogLevel.INFO;
+  private static readonly separator = '========================================';
+  private static readonly stepPrefix = '  → ';
+  
+  static setLevel(level: LogLevel): void {
+    Logger.currentLevel = level;
+  }
+  
+  private static getTimestamp(): string {
+    return new Date().toISOString();
+  }
+  
+  static debug(message: string): void {
+    if (Logger.currentLevel <= LogLevel.DEBUG) {
+      console.log(`[${Logger.getTimestamp()}] 🔍 DEBUG: ${message}`);
+    }
+  }
+  
+  static info(message: string): void {
+    if (Logger.currentLevel <= LogLevel.INFO) {
+      console.log(`[${Logger.getTimestamp()}] ℹ️  INFO: ${message}`);
+    }
+  }
+  
+  static warn(message: string): void {
+    if (Logger.currentLevel <= LogLevel.WARN) {
+      console.warn(`[${Logger.getTimestamp()}] ⚠️  WARN: ${message}`);
+    }
+  }
+  
+  static error(message: string, error?: Error): void {
+    if (Logger.currentLevel <= LogLevel.ERROR) {
+      console.error(`[${Logger.getTimestamp()}] ❌ ERROR: ${message}`);
+      if (error) {
+        console.error(error);
+      }
+    }
+  }
+  
+  static step(message: string): void {
+    console.log(`${Logger.stepPrefix}${message}`);
+  }
+  
+  static startSection(sectionName: string): void {
+    console.log(Logger.separator);
+    console.log(sectionName);
+    console.log(Logger.separator);
+  }
+  
+  static endSection(): void {
+    console.log(Logger.separator);
+  }
+  
+  static testStart(testName: string): void {
+    Logger.startSection(`🧪 TEST START: ${testName}`);
+  }
+  
+  static testEnd(testName: string, passed: boolean): void {
+    const result = passed ? '✅ PASSED' : '❌ FAILED';
+    console.log(`TEST ${result}: ${testName}`);
+    Logger.endSection();
+  }
+  
+  static assertion(description: string): void {
+    console.log(`  ✓ ASSERT: ${description}`);
+  }
+  
+  static data(key: string, value: unknown): void {
+    console.log(`  📊 DATA: ${key} = ${JSON.stringify(value)}`);
+  }
+}
+
+export default Logger;
+export { LogLevel };

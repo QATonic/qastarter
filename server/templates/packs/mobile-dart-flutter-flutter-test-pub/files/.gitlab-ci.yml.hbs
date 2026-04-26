@@ -1,0 +1,11 @@
+image: ghcr.io/cirruslabs/flutter:3.16.0
+
+stages:
+- test
+
+test:
+stage: test
+script:
+- flutter pub get
+- flutter analyze
+- flutter test

@@ -1,0 +1,49 @@
+package {{packageName}}.config;
+
+/**
+ * Environment enumeration for mobile testing
+ * Defines different test environments and their properties
+ */
+public enum Environment {
+    
+    DEV("dev", "Development Environment"),
+    QA("qa", "Quality Assurance Environment"),
+    STAGING("staging", "Staging Environment"),
+    PROD("prod", "Production Environment");
+
+    private final String name;
+    private final String description;
+
+    Environment(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Get environment by name
+     * 
+     * @param name Environment name
+     * @return Environment enum
+     */
+    public static Environment fromString(String name) {
+        for (Environment env : Environment.values()) {
+            if (env.name.equalsIgnoreCase(name)) {
+                return env;
+            }
+        }
+        throw new IllegalArgumentException("Unknown environment: " + name);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}

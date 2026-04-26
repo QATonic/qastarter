@@ -1,0 +1,163 @@
+import XCTest
+
+/**
+ * Wait helper utilities for XCUITest.
+ * Provides explicit wait functionality for async operations.
+ */
+enum WaitHelpers {
+    
+    /// Default timeout for waits
+    static let defaultTimeout: TimeInterval = 10.0
+    
+    /// Short timeout for quick operations
+    static let shortTimeout: TimeInterval = 5.0
+    
+    /// Long timeout for slow operations
+    static let longTimeout: TimeInterval = 30.0
+    
+    // MARK: - Element Waits
+    
+    /// Wait for element to exist
+    @discardableResult
+    static func waitForExistence(
+        _ element: XCUIElement,
+        timeout: TimeInterval = defaultTimeout,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) -> Bool {
+        Logger.debug("Waiting for element to exist: \(element.identifier)")
+        let exists = element.waitForExistence(timeout: timeout)
+        if !exists {
+            Logger.warning("Element did not appear within \(timeout)s: \(element.identifier)")
+        }
+        return exists
+    }
+    
+    /// Wait for element to be hittable (visible and enabled)
+    @discardableResult
+    static func waitForHittable(
+        _ element: XCUIElement,
+        timeout: TimeInterval = defaultTimeout
+    ) -> Bool {
+        Logger.debug("Waiting for element to be hittable: \(element.identifier)")
+        
+        let predicate = NSPredicate(format: "isHittable == true")
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+        
+        let result = XCTWaiter.wait(for: [expectation], timeout: timeout)
+        return result == .completed
+    }
+    
+    /// Wait for element to disappear
+    @discardableResult
+    static func waitForDisappearance(
+        _ element: XCUIElement,
+        timeout: TimeInterval = defaultTimeout
+    ) -> Bool {
+        Logger.debug("Waiting for element to disappear: \(element.identifier)")
+        
+        let predicate = NSPredicate(format: "exists == false")
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+        
+        let result = XCTWaiter.wait(for: [expectation], timeout: timeout)
+        return result == .completed
+    }
+    
+    /// Wait for element to have specific value
+    @discardableResult
+    static func waitForValue(
+        _ element: XCUIElement,
+        value: String,
+        timeout: TimeInterval = defaultTimeout
+    ) -> Bool {
+        Logger.debug("Waiting for element value: \(value)")
+        
+        let predicate = NSPredicate(format: "value == %@", value)
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+        
+        let result = XCTWaiter.wait(for: [expectation], timeout: timeout)
+        return result == .completed
+    }
+    
+    /// Wait for element to have specific label
+    @discardableResult
+    static func waitForLabel(
+        _ element: XCUIElement,
+        label: String,
+        timeout: TimeInterval = defaultTimeout
+    ) -> Bool {
+        Logger.debug("Waiting for element label: \(label)")
+        
+        let predicate = NSPredicate(format: "label == %@", label)
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+        
+        let result = XCTWaiter.wait(for: [expectation], timeout: timeout)
+        return result == .completed
+    }
+    
+    // MARK: - Condition Waits
+    
+    /// Wait for a custom condition
+    @discardableResult
+    static func waitForCondition(
+        timeout: TimeInterval = defaultTimeout,
+        pollInterval: TimeInterval = 0.5,
+        condition: () -> Bool
+    ) -> Bool {
+        Logger.debug("Waiting for custom condition")
+        
+        let startTime = Date()
+        let endTime = startTime.addingTimeInterval(timeout)
+        
+        while Date() < endTime {
+            if condition() {
+                let elapsed = Date().timeIntervalSince(startTime)
+                Logger.debug("Condition satisfied after \(String(format: "%.2f", elapsed))s")
+                return true
+            }
+            Thread.sleep(forTimeInterval: pollInterval)
+        }
+        
+        Logger.warning("Condition not satisfied within \(timeout)s")
+        return false
+    }
+    
+    /// Wait for element count
+    @discardableResult
+    static func waitForElementCount(
+        _ query: XCUIElementQuery,
+        count: Int,
+        timeout: TimeInterval = defaultTimeout
+    ) -> Bool {
+        Logger.debug("Waiting for element count: \(count)")
+        
+        return waitForCondition(timeout: timeout) {
+            query.count == count
+        }
+    }
+    
+    // MARK: - App State Waits
+    
+    /// Wait for app to be in foreground
+    @discardableResult
+    static func waitForAppForeground(
+        _ app: XCUIApplication,
+        timeout: TimeInterval = defaultTimeout
+    ) -> Bool {
+        Logger.debug("Waiting for app to be in foreground")
+        
+        let predicate = NSPredicate(format: "state == %d", XCUIApplication.State.runningForeground.rawValue)
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: app)
+        
+        let result = XCTWaiter.wait(for: [expectation], timeout: timeout)
+        return result == .completed
+    }
+    
+    // MARK: - Hard Wait
+    
+    /// Hard wait (use sparingly)
+    static func hardWait(_ seconds: TimeInterval) {
+        Logger.debug("Hard wait for \(seconds)s")
+        Thread.sleep(forTimeInterval: seconds)
+    }
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <!-- Report theme: standard, dark -->
+        <theme>standard</theme>
+        
+        <!-- Document encoding -->
+        <encoding>UTF-8</encoding>
+        
+        <!-- Protocol for script and stylesheets: https, http -->
+        <protocol>https</protocol>
+        
+        <!-- Title of the document -->
+        <documentTitle>{{projectName}} - Mobile Automation Report</documentTitle>
+        
+        <!-- Report name: displayed at top-nav -->
+        <reportName>Mobile Test Automation Report</reportName>
+        
+        <!-- Global date format override -->
+        <dateFormat>MMM dd, yyyy HH:mm:ss</dateFormat>
+        
+        <!-- Global time format override -->
+        <timeFormat>HH:mm:ss</timeFormat>
+        
+        <!-- Charts visibility: true, false -->
+        <charts>true</charts>
+        
+        <!-- Enable timeline: true, false -->
+        <timelineEnabled>true</timelineEnabled>
+        
+        <!-- Custom JavaScript -->
+        <scripts>
+            <![CDATA[
+                $(document).ready(function() {
+                    // Custom JavaScript for mobile test reports
+                    $('.test-content').on('click', function() {
+                        $(this).find('.screenshot').toggle();
+                    });
+                });
+            ]]>
+        </scripts>
+        
+        <!-- Custom CSS -->
+        <styles>
+            <![CDATA[
+                .badge-primary { 
+                    background-color: #007bff; 
+                    color: white; 
+                }
+                .badge-success { 
+                    background-color: #28a745; 
+                    color: white; 
+                }
+                .badge-danger { 
+                    background-color: #dc3545; 
+                    color: white; 
+                }
+                .badge-warning { 
+                    background-color: #ffc107; 
+                    color: #212529; 
+                }
+                .mobile-test-header {
+                    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin-bottom: 15px;
+                }
+                .screenshot {
+                    max-width: 300px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    margin: 10px 0;
+                }
+            ]]>
+        </styles>
+    </configuration>
+</extentreports>

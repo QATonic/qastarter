@@ -1,0 +1,69 @@
+package {{groupId}}.contracts;
+
+import au.com.dius.pact.provider.junit5.HttpTestTarget;
+import au.com.dius.pact.provider.junit5.PactVerificationContext;
+import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
+import au.com.dius.pact.provider.junitsupport.Provider;
+import au.com.dius.pact.provider.junitsupport.State;
+import au.com.dius.pact.provider.junitsupport.loader.PactFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+/**
+* Pact Provider Verification
+*
+* Verifies this service against contracts defined by consumers.
+* Runs against the actual provider to ensure contract compliance.
+*/
+@Provider("UserService")
+@PactFolder("pacts")
+public class ProviderVerificationTest {
+
+private static final String PROVIDER_BASE_URL =
+System.getProperty("provider.base.url", "http://localhost:8080");
+
+@BeforeEach
+void setUp(PactVerificationContext context) {
+String[] urlParts = PROVIDER_BASE_URL.replace("http://", "").split(":");
+String host = urlParts[0];
+int port = urlParts.length > 1 ? Integer.parseInt(urlParts[1]) : 8080;
+
+context.setTarget(new HttpTestTarget(host, port));
+}
+
+@TestTemplate
+@ExtendWith(PactVerificationInvocationContextProvider.class)
+void verifyPact(PactVerificationContext context) {
+context.verifyInteraction();
+}
+
+// State handlers - set up test data for each provider state
+
+@State("users exist")
+void usersExist() {
+System.out.println("Setting up state: users exist");
+// Set up database with test users
+// userRepository.save(new User(1L, "John Doe", "john@example.com"));
+}
+
+@State("user with ID 1 exists")
+void userWithId1Exists() {
+System.out.println("Setting up state: user with ID 1 exists");
+// Ensure user with ID 1 exists
+// userRepository.save(new User(1L, "John Doe", "john@example.com"));
+}
+
+@State("user with ID 999 does not exist")
+void userWithId999DoesNotExist() {
+System.out.println("Setting up state: user 999 does not exist");
+// Ensure user 999 does not exist
+// userRepository.deleteById(999L);
+}
+
+@State("the user service is available")
+void serviceAvailable() {
+System.out.println("Setting up state: service available");
+// General availability check
+}
+}

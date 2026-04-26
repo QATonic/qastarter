@@ -1,0 +1,139 @@
+"""
+Pact Consumer Contract Tests - User Service
+
+Contract tests for the User API from the consumer perspective.
+These tests define the expected interactions with the provider.
+"""
+
+import pytest
+from pact import Consumer, Provider, Like, EachLike, Format
+import requests
+import json
+import os
+
+
+# Configure the Pact provider
+PACT_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'pacts')
+os.makedirs(PACT_DIR, exist_ok=True)
+
+pact = Consumer('{{projectName}}Consumer').has_pact_with(
+Provider('UserService'),
+pact_dir=PACT_DIR,
+log_dir=os.path.join(PACT_DIR, 'logs'),
+)
+
+
+class TestUserConsumerPact:
+"""Pact consumer contract tests for User API."""
+
+def test_get_all_users(self, pact):
+"""Test: GET /users returns a list of users."""
+expected_body = EachLike({
+'id': Like(1),
+'name': Like('John Doe'),
+'email': Format().regex(r'^[\w\.-]+@[\w\.-]+\.\w+$', 'john@example.com'),
+'createdAt': Like('2024-01-01T00:00:00Z'),
+})
+
+(pact
+.given('users exist')
+.upon_receiving('a request for all users')
+.with_request('GET', '/users', headers={'Accept': 'application/json'})
+.will_respond_with(200, body=expected_body, headers={'Content-Type': 'application/json'}))
+
+with pact:
+response = requests.get(f"{pact.uri}/users", headers={'Accept': 'application/json'})
+
+assert response.status_code == 200
+users = response.json()
+assert isinstance(users, list)
+assert len(users) > 0
+assert 'id' in users[0]
+assert 'name' in users[0]
+assert 'email' in users[0]
+
+def test_get_user_by_id(self, pact):
+"""Test: GET /users/1 returns a single user."""
+expected_body = {
+'id': Like(1),
+'name': Like('John Doe'),
+'email': Format().regex(r'^[\w\.-]+@[\w\.-]+\.\w+$', 'john@example.com'),
+'createdAt': Like('2024-01-01T00:00:00Z'),
+}
+
+(pact
+.given('user with ID 1 exists')
+.upon_receiving('a request for user 1')
+.with_request('GET', '/users/1', headers={'Accept': 'application/json'})
+.will_respond_with(200, body=expected_body, headers={'Content-Type': 'application/json'}))
+
+with pact:
+response = requests.get(f"{pact.uri}/users/1", headers={'Accept': 'application/json'})
+
+assert response.status_code == 200
+user = response.json()
+assert user['id'] == 1
+
+def test_user_not_found(self, pact):
+"""Test: GET /users/999 returns 404."""
+expected_body = {
+'error': Like('User not found'),
+'code': Like('NOT_FOUND'),
+}
+
+(pact
+.given('user with ID 999 does not exist')
+.upon_receiving('a request for non-existent user')
+.with_request('GET', '/users/999', headers={'Accept': 'application/json'})
+.will_respond_with(404, body=expected_body, headers={'Content-Type': 'application/json'}))
+
+with pact:
+response = requests.get(f"{pact.uri}/users/999", headers={'Accept': 'application/json'})
+
+assert response.status_code == 404
+error = response.json()
+assert error['code'] == 'NOT_FOUND'
+
+def test_create_user(self, pact):
+"""Test: POST /users creates a new user."""
+new_user = {
+'name': 'Jane Doe',
+'email': 'jane@example.com',
+}
+
+expected_body = {
+'id': Like(2),
+'name': Like(new_user['name']),
+'email': Like(new_user['email']),
+'createdAt': Like('2024-01-01T00:00:00Z'),
+}
+
+(pact
+.given('the user service is available')
+.upon_receiving('a request to create a user')
+.with_request('POST', '/users',
+headers={'Content-Type': 'application/json', 'Accept': 'application/json'},
+body=new_user)
+.will_respond_with(201, body=expected_body, headers={'Content-Type': 'application/json'}))
+
+with pact:
+response = requests.post(
+f"{pact.uri}/users",
+json=new_user,
+headers={'Accept': 'application/json', 'Content-Type': 'application/json'}
+)
+
+assert response.status_code == 201
+created_user = response.json()
+assert created_user['name'] == new_user['name']
+assert created_user['email'] == new_user['email']
+assert 'id' in created_user
+
+
+@pytest.fixture
+def pact():
+"""Pact fixture that manages the mock server lifecycle."""
+pact.start_service()
+yield pact
+pact.stop_service()
+pact.verify()

@@ -1,0 +1,26 @@
+"""
+Stress Test — pushes the system beyond normal capacity.
+
+Run: locust -f tests/stress_test.py --host={{baseUrl}} --headless -u 200 -r 20 --run-time 10m
+"""
+
+from locust import HttpUser, task, between
+
+
+class StressTestUser(HttpUser):
+    """Stress test: high concurrency to find breaking points."""
+
+    wait_time = between(0.5, 1)
+
+    @task(5)
+    def homepage(self):
+        self.client.get("/", name="GET /")
+
+    @task(3)
+    def api_endpoint(self):
+        self.client.get("/api/health", name="GET /api/health")
+
+    @task(1)
+    def heavy_endpoint(self):
+        """Simulate a resource-intensive request."""
+        self.client.get("/", name="GET / (heavy)", headers={"Accept": "application/json"})

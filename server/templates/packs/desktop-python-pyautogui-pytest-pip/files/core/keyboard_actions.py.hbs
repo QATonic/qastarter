@@ -1,0 +1,83 @@
+import pyautogui
+from config.settings import Settings
+from utils.logger import Logger
+
+class KeyboardActions:
+    @staticmethod
+    def type_text(text: str, interval: float = None):
+        """Type text with optional interval between characters"""
+        if interval is None:
+            interval = Settings.TYPE_INTERVAL
+        
+        try:
+            Logger.info(f"Typing text: {text}")
+            pyautogui.write(text, interval=interval)
+        except Exception as e:
+            Logger.error(f"Failed to type text: {str(e)}")
+            raise
+    
+    @staticmethod
+    def press_key(key: str):
+        """Press a single key"""
+        try:
+            Logger.info(f"Pressing key: {key}")
+            pyautogui.press(key)
+        except Exception as e:
+            Logger.error(f"Failed to press key: {str(e)}")
+            raise
+    
+    @staticmethod
+    def hotkey(*keys):
+        """Press multiple keys simultaneously (e.g., ctrl+c)"""
+        try:
+            Logger.info(f"Pressing hotkey: {'+'.join(keys)}")
+            pyautogui.hotkey(*keys)
+        except Exception as e:
+            Logger.error(f"Failed to press hotkey: {str(e)}")
+            raise
+    
+    @staticmethod
+    def press_enter():
+        """Press Enter key"""
+        KeyboardActions.press_key('enter')
+    
+    @staticmethod
+    def press_tab():
+        """Press Tab key"""
+        KeyboardActions.press_key('tab')
+    
+    @staticmethod
+    def press_backspace(count: int = 1):
+        """Press Backspace key"""
+        for _ in range(count):
+            KeyboardActions.press_key('backspace')
+    
+    @staticmethod
+    def press_delete(count: int = 1):
+        """Press Delete key"""
+        for _ in range(count):
+            KeyboardActions.press_key('delete')
+    
+    @staticmethod
+    def select_all():
+        """Select all text (Ctrl+A on Windows/Linux, Cmd+A on macOS)"""
+        if Settings.IS_MACOS:
+            KeyboardActions.hotkey('command', 'a')
+        else:
+            KeyboardActions.hotkey('ctrl', 'a')
+    
+    @staticmethod
+    def copy():
+        """Copy to clipboard (Ctrl+C on Windows/Linux, Cmd+C on macOS)"""
+        if Settings.IS_MACOS:
+            KeyboardActions.hotkey('command', 'c')
+        else:
+            KeyboardActions.hotkey('ctrl', 'c')
+    
+    @staticmethod
+    def paste():
+        """Paste from clipboard (Ctrl+V on Windows/Linux, Cmd+V on macOS)"""
+        if Settings.IS_MACOS:
+            KeyboardActions.hotkey('command', 'v')
+        else:
+            KeyboardActions.hotkey('ctrl', 'v')

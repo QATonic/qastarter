@@ -1,0 +1,30 @@
+const BasePage = require('./BasePage');
+
+class HomePage extends BasePage {
+  constructor(driver) {
+    super(driver);
+    
+    // Locators - Update these based on your app
+    this.welcomeMessage = 'id=com.example.app:id/welcomeMessage';
+    this.userProfile = 'id=com.example.app:id/userProfile';
+    this.logoutButton = 'id=com.example.app:id/logoutButton';
+  }
+
+  async getWelcomeMessage() {
+    return await this.getText(this.welcomeMessage);
+  }
+
+  async isHomePageDisplayed() {
+    return await this.isDisplayed(this.welcomeMessage);
+  }
+
+  async isUserProfileDisplayed() {
+    return await this.isDisplayed(this.userProfile);
+  }
+
+  async clickLogout() {
+    await this.click(this.logoutButton);
+  }
+}
+
+module.exports = HomePage;

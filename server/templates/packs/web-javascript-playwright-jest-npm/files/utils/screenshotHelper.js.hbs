@@ -1,0 +1,21 @@
+const fs = require('fs');
+const path = require('path');
+
+class ScreenshotHelper {
+  constructor(page) {
+    this.page = page;
+    this.screenshotDir = path.join(process.cwd(), 'screenshots');
+    
+    if (!fs.existsSync(this.screenshotDir)) {
+      fs.mkdirSync(this.screenshotDir, { recursive: true });
+    }
+  }
+
+  async capture(name = `screenshot_${Date.now()}`) {
+    const filepath = path.join(this.screenshotDir, `${name}.png`);
+    await this.page.screenshot({ path: filepath, fullPage: true });
+    return filepath;
+  }
+}
+
+module.exports = ScreenshotHelper;

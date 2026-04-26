@@ -1,0 +1,41 @@
+@smoke @login
+Feature: User Login
+  As a user
+  I want to log into the application
+  So that I can access my account
+
+  Background:
+    Given I navigate to the login page
+
+  @positive
+  Scenario: Successful login with valid credentials
+    When I enter username "testuser@example.com" and password "Test@123"
+    And I click the login button
+    Then I should be redirected to the home page
+    And I should see a welcome message
+
+  @negative
+  Scenario: Failed login with invalid username
+    When I enter username "invalid@example.com" and password "Test@123"
+    And I click the login button
+    Then I should see an error message "Invalid credentials"
+    And I should remain on the login page
+
+  @negative
+  Scenario: Failed login with invalid password
+    When I enter username "testuser@example.com" and password "wrongpass"
+    And I click the login button
+    Then I should see an error message "Invalid credentials"
+    And I should remain on the login page
+
+  @negative  
+  Scenario Outline: Failed login with empty credentials
+    When I enter username "<username>" and password "<password>"
+    And I click the login button
+    Then I should see an error message "<error>"
+
+    Examples:
+      | username                | password | error                    |
+      |                         | Test@123 | Username is required     |
+      | testuser@example.com    |          | Password is required     |
+      |                         |          | Username is required     |

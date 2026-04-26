@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+group = '{{groupId}}'
+version = '1.0.0'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.appium:java-client:{{toolVersions.appium}}'
+    implementation 'org.seleniumhq.selenium:selenium-java:{{toolVersions.selenium}}'
+    implementation 'org.testng:testng:{{toolVersions.testng}}'
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+    // ExtentReports (used by TestListener)
+    implementation 'com.aventstack:extentreports:5.1.1'
+    // File utilities (used by ScreenshotUtils)
+    implementation 'commons-io:commons-io:2.15.1'
+    // Windows native access (used by WindowsUtils)
+    implementation 'net.java.dev.jna:jna:5.14.0'
+    implementation 'net.java.dev.jna:jna-platform:5.14.0'
+{{#if userDependencies.hasMaven}}
+
+// User-picked dependencies (from QAStarter dependency search)
+{{#each userDependencies.maven}}
+implementation '{{group}}:{{name}}:{{version}}'
+{{/each}}
+{{/if}}
+    {{#if utilities.faker}}
+    // DataFaker — Test data generation
+    implementation 'net.datafaker:datafaker:{{toolVersions.datafaker}}'
+    {{/if}}
+}
+
+test {
+    useTestNG()
+}

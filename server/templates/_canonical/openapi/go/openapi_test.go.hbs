@@ -1,0 +1,30 @@
+package tests
+
+import (
+	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+// Auto-generated API tests from OpenAPI specification.
+// Each test validates a single endpoint's basic contract.
+
+const baseURL = "{{baseUrl}}"
+
+{{#each openApiEndpoints}}
+func Test_{{operationId}}(t *testing.T) {
+	// {{method}} {{path}} — {{summary}}
+	req, err := http.NewRequest("{{method}}", baseURL+"{{path}}", nil)
+	assert.NoError(t, err)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	assert.NoError(t, err)
+	defer resp.Body.Close()
+
+	assert.GreaterOrEqual(t, resp.StatusCode, 200)
+	assert.Less(t, resp.StatusCode, 500)
+}
+
+{{/each}}

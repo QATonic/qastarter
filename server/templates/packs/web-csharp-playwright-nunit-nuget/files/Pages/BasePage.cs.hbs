@@ -1,0 +1,23 @@
+using Microsoft.Playwright;
+using {{projectNamespace}}.Utils;
+using {{projectNamespace}}.Config;
+
+namespace {{projectNamespace}}.Pages
+{
+    public abstract class BasePage
+    {
+        protected IPage Page => PlaywrightManager.Page;
+        protected int Timeout => ConfigReader.Instance.Timeout * 1000;
+
+        protected async Task ClickAsync(string selector) => await Page.ClickAsync(selector, new() { Timeout = Timeout });
+        protected async Task TypeAsync(string selector, string text) => await Page.FillAsync(selector, text, new() { Timeout = Timeout });
+        protected async Task<string> GetTextAsync(string selector) => await Page.TextContentAsync(selector) ?? "";
+        protected async Task<bool> IsDisplayedAsync(string selector)
+        {
+            try { return await Page.IsVisibleAsync(selector, new() { Timeout = 5000 }); }
+            catch { return false; }
+        }
+        public string CurrentUrl => Page.Url;
+        public async Task NavigateToAsync(string url) => await Page.GotoAsync(url);
+    }
+}

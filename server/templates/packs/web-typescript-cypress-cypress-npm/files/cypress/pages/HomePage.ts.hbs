@@ -1,0 +1,25 @@
+import { BasePage } from './BasePage';
+
+export class HomePage extends BasePage {
+  private readonly welcomeMessage = '.welcome-message, h1';
+  private readonly userProfile = '.user-profile';
+  private readonly logoutButton = 'button[data-action="logout"], .logout';
+
+  visitHomePage(baseUrl: string): this {
+    return this.visit(baseUrl);
+  }
+
+  getWelcomeMessage(): Cypress.Chainable<string> {
+    return this.getText(this.welcomeMessage);
+  }
+
+  verifyUserProfileVisible(): this {
+    return this.shouldBeVisible(this.userProfile);
+  }
+
+  logout(): this {
+    this.click(this.logoutButton);
+    cy.url().should('include', '/login');
+    return this;
+  }
+}

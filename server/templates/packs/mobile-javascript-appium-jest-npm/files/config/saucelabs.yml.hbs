@@ -1,0 +1,28 @@
+# Sauce Labs Real Device Configuration for {{projectName}}
+# Docs: https://docs.saucelabs.com/mobile-apps/automated-testing/appium/
+
+apiVersion: v1alpha
+kind: appium
+sauce:
+  region: us-west-1
+
+app: storage:YOUR_APP_ID
+
+suites:
+  - name: "{{projectName}} - Android"
+    devices:
+      - name: Samsung Galaxy S23
+        platformVersion: "13"
+      - name: Google Pixel 7
+        platformVersion: "13"
+
+  - name: "{{projectName}} - iOS"
+    devices:
+      - name: iPhone 14
+        platformVersion: "16"
+      - name: iPhone 13
+        platformVersion: "15"
+
+# Environment variables — set in CI or locally
+# SAUCE_USERNAME: your-username
+# SAUCE_ACCESS_KEY: your-access-key

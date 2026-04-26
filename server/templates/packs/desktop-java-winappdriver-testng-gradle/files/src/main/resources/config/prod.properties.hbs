@@ -1,0 +1,96 @@
+# Production Environment Configuration for Desktop Testing
+# {{projectName}} - Desktop Automation Framework
+
+# Environment Settings
+environment=prod
+environment.name=Production
+
+# WinAppDriver Configuration
+winappdriver.url=http://prod-winappdriver:4723
+session.timeout=900
+implicit.wait=20
+explicit.wait=60
+
+# Default Applications
+default.application=calculator
+app.calculator.path=Microsoft.WindowsCalculator_8wekyb3d8bbwe!App
+app.notepad.path=C:\\Windows\\System32\\notepad.exe
+app.explorer.path=C:\\Windows\\explorer.exe
+app.paint.path=C:\\Windows\\System32\\mspaint.exe
+
+# Test Configuration
+headless.mode=false
+screenshot.on.failure=true
+video.recording.enabled=false
+max.retry.count=0
+parallel.execution.enabled=false
+parallel.thread.count=1
+
+# Directory Configuration
+screenshot.directory=screenshots
+reports.directory=reports
+test.data.directory=src/test/resources/testdata
+
+# Logging Configuration
+log.level=WARN
+log.to.console=false
+log.to.file=true
+
+# ExtentReports Configuration
+extent.reports.enabled=true
+extent.reports.theme=STANDARD
+extent.report.name={{projectName}} Production Validation Report
+extent.report.document.title=Production Desktop Automation Results
+
+# Cleanup Configuration
+cleanup.enabled=true
+cleanup.age.days=30
+
+# Production Specific Settings
+debug.mode=false
+wait.after.action=100
+take.screenshots.on.pass=false
+take.screenshots.on.fail=true
+
+# Test Data Configuration
+test.data.calculator.numbers=1,10,100,1000
+test.data.notepad.sample.text=Production validation text.
+test.data.notepad.large.text.lines=25
+
+# Performance Settings
+page.load.timeout=60
+element.timeout=30
+action.timeout=20
+
+# Application Settings
+app.startup.wait=10000
+app.cleanup.wait=5000
+
+# Integration Settings
+integration.tests.enabled=false
+stress.tests.enabled=false
+performance.tests.enabled=false
+
+# Production Specific Test Settings
+regression.tests.enabled=false
+smoke.tests.enabled=true
+boundary.tests.enabled=false
+
+# Reporting Configuration
+report.include.environment.info=true
+report.include.system.info=true
+report.include.test.steps=false
+
+# Error Handling
+continue.on.failure=false
+take.screenshot.on.error=true
+log.full.stack.trace=false
+
+# Security Settings
+mask.sensitive.data=true
+log.credentials=false
+
+# Monitoring and Alerts
+alert.on.failure=true
+alert.email.enabled=false
+alert.teams.enabled=false

@@ -1,0 +1,71 @@
+package {{javaPackage}}.stepdefinitions;
+
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.utils.Log;
+import {{javaPackage}}.utils.ScreenshotUtils;
+{{#if (eq reportingTool "extent-reports")}}
+import {{javaPackage}}.utils.ExtentManager;
+import com.aventstack.extentreports.Status;
+import java.io.File;
+import java.util.Base64;
+import java.nio.file.Files;
+{{/if}}
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+
+/**
+ * Cucumber Hooks - Setup and teardown for BDD scenarios.
+ */
+public class Hooks {
+
+    @Before
+    public void setUp(Scenario scenario) {
+        Log.info("================================================================================");
+        Log.info("SCENARIO: " + scenario.getName());
+        Log.info("================================================================================");
+{{#if (eq reportingTool "extent-reports")}}
+        ExtentManager.getInstance();
+        ExtentManager.createTest(scenario.getName(), String.join(", ", scenario.getSourceTagNames()));
+{{/if}}
+        DriverManager.initializeDriver();
+        Log.info("Browser initialized for scenario");
+    }
+
+    @After
+    public void tearDown(Scenario scenario) {
+        try {
+            if (scenario.isFailed()) {
+                Log.error("Scenario FAILED: " + scenario.getName());
+
+                if (DriverManager.isDriverInitialized()) {
+                    byte[] screenshot = ScreenshotUtils.captureAsBytes();
+                    if (screenshot != null) {
+                        scenario.attach(screenshot, "image/png", "Screenshot on Failure");
+{{#if (eq reportingTool "extent-reports")}}
+                        if (ExtentManager.getTest() != null) {
+                            String base64 = Base64.getEncoder().encodeToString(screenshot);
+                            ExtentManager.getTest().log(Status.FAIL, "Scenario failed");
+                            ExtentManager.getTest().addScreenCaptureFromBase64String(base64, "Screenshot");
+                        }
+{{/if}}
+                    }
+                    ScreenshotUtils.capture("FAILED_" + scenario.getName().replaceAll(" ", "_"));
+                }
+            } else {
+                Log.info("Scenario PASSED: " + scenario.getName());
+{{#if (eq reportingTool "extent-reports")}}
+                if (ExtentManager.getTest() != null) {
+                    ExtentManager.getTest().log(Status.PASS, "Scenario passed");
+                }
+{{/if}}
+            }
+        } finally {
+            DriverManager.quitDriver();
+{{#if (eq reportingTool "extent-reports")}}
+            ExtentManager.flush();
+{{/if}}
+            Log.info("Browser closed");
+        }
+    }
+}

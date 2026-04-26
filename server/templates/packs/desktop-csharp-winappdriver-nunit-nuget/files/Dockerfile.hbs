@@ -1,0 +1,31 @@
+# {{projectName}} - Windows Desktop Test Automation
+# NOTE: WinAppDriver requires Windows containers or Windows host
+# This Dockerfile is for Windows Server Core containers
+
+# escape=`
+FROM mcr.microsoft.com/dotnet/sdk:8.0-windowsservercore-ltsc2022
+
+# Set working directory
+WORKDIR C:\app
+
+# Copy project file and restore dependencies
+COPY *.csproj ./
+RUN dotnet restore
+
+# Copy source code
+COPY . ./
+
+# Build the project
+RUN dotnet build -c Release --no-restore
+
+# Set environment variables
+ENV TEST_ENV=qa
+ENV WINAPPDRIVER_URL=http://localhost:4723
+
+# Create directories for test results
+RUN mkdir C:\app\TestResults C:\app\Screenshots
+
+# Note: WinAppDriver must be running on the host or accessible via network
+# Default command runs all tests
+ENTRYPOINT ["dotnet", "test", "--no-build", "-c", "Release"]
+CMD ["--logger:trx", "--results-directory:C:\\app\\TestResults"]

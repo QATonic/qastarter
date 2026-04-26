@@ -1,0 +1,17 @@
+require('dotenv').config();
+
+class Settings {
+  constructor() {
+    this.appiumServer = process.env.APPIUM_SERVER || 'http://localhost:4723';
+    this.platform = process.env.PLATFORM || 'Android';
+    this.testEnv = process.env.TEST_ENV || 'dev';
+    this.implicitWait = parseInt(process.env.IMPLICIT_WAIT) || 10000;
+    this.explicitWait = parseInt(process.env.EXPLICIT_WAIT) || 30000;
+  }
+
+  toString() {
+    return `Settings(appiumServer=${this.appiumServer}, platform=${this.platform}, testEnv=${this.testEnv})`;
+  }
+}
+
+module.exports = new Settings();

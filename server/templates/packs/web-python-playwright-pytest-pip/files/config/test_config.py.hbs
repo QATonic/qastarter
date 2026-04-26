@@ -1,0 +1,12 @@
+import os
+
+class TestConfig:
+    DEFAULT_TIMEOUT = 60000
+    BROWSER_OPTIONS = {
+        'headless': os.getenv('HEADLESS', 'true').lower() == 'true',
+        'slow_mo': int(os.getenv('SLOWMO', '0'))
+    }
+    SCREENSHOT_ON_FAILURE = True
+    RETRY_FAILED_TESTS = 1
+
+test_config = TestConfig()

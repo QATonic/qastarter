@@ -1,0 +1,170 @@
+package {{packageName}}.utils;
+
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Test data reader utility.
+ * Reads test data from JSON files in assets folder.
+ */
+public class TestDataReader {
+
+    private static final String TAG = "TestDataReader";
+
+    /**
+     * Read JSON file from assets
+     */
+    public static JSONObject readJsonFromAssets(String fileName) {
+        try {
+            Context context = InstrumentationRegistry.getInstrumentation().getContext();
+            InputStream is = context.getAssets().open(fileName);
+            String jsonString = readInputStream(is);
+            return new JSONObject(jsonString);
+        } catch (IOException | JSONException e) {
+            Log.error("Failed to read JSON file: " + fileName, e);
+            throw new RuntimeException("Failed to read test data: " + fileName, e);
+        }
+    }
+
+    /**
+     * Read JSON array from assets
+     */
+    public static JSONArray readJsonArrayFromAssets(String fileName) {
+        try {
+            Context context = InstrumentationRegistry.getInstrumentation().getContext();
+            InputStream is = context.getAssets().open(fileName);
+            String jsonString = readInputStream(is);
+            return new JSONArray(jsonString);
+        } catch (IOException | JSONException e) {
+            Log.error("Failed to read JSON array file: " + fileName, e);
+            throw new RuntimeException("Failed to read test data: " + fileName, e);
+        }
+    }
+
+    /**
+     * Get string value from JSON
+     */
+    public static String getString(JSONObject json, String key) {
+        try {
+            return json.getString(key);
+        } catch (JSONException e) {
+            Log.warn("Key not found in JSON: " + key);
+            return null;
+        }
+    }
+
+    /**
+     * Get int value from JSON
+     */
+    public static int getInt(JSONObject json, String key, int defaultValue) {
+        try {
+            return json.getInt(key);
+        } catch (JSONException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Get boolean value from JSON
+     */
+    public static boolean getBoolean(JSONObject json, String key, boolean defaultValue) {
+        try {
+            return json.getBoolean(key);
+        } catch (JSONException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Convert JSON object to Map
+     */
+    public static Map<String, Object> jsonToMap(JSONObject json) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            Iterator<String> keys = json.keys();
+            while (keys.hasNext()) {
+                String key = keys.next();
+                Object value = json.get(key);
+                if (value instanceof JSONObject) {
+                    value = jsonToMap((JSONObject) value);
+                } else if (value instanceof JSONArray) {
+                    value = jsonArrayToList((JSONArray) value);
+                }
+                map.put(key, value);
+            }
+        } catch (JSONException e) {
+            Log.error("Failed to convert JSON to Map", e);
+        }
+        return map;
+    }
+
+    /**
+     * Convert JSON array to List
+     */
+    public static List<Object> jsonArrayToList(JSONArray array) {
+        List<Object> list = new ArrayList<>();
+        try {
+            for (int i = 0; i < array.length(); i++) {
+                Object value = array.get(i);
+                if (value instanceof JSONObject) {
+                    value = jsonToMap((JSONObject) value);
+                } else if (value instanceof JSONArray) {
+                    value = jsonArrayToList((JSONArray) value);
+                }
+                list.add(value);
+            }
+        } catch (JSONException e) {
+            Log.error("Failed to convert JSON array to List", e);
+        }
+        return list;
+    }
+
+    /**
+     * Read input stream to string
+     */
+    private static String readInputStream(InputStream is) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
+    /**
+     * Get test user credentials
+     */
+    public static Map<String, String> getTestUser(String userType) {
+        try {
+            JSONObject users = readJsonFromAssets("testdata/users.json");
+            JSONObject user = users.getJSONObject(userType);
+            
+            Map<String, String> credentials = new HashMap<>();
+            credentials.put("username", user.getString("username"));
+            credentials.put("password", user.getString("password"));
+            
+            Log.data("Loaded test user", userType);
+            return credentials;
+        } catch (JSONException e) {
+            Log.error("Failed to get test user: " + userType, e);
+            throw new RuntimeException("Test user not found: " + userType, e);
+        }
+    }
+}

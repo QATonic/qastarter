@@ -1,0 +1,73 @@
+"""
+Login Step Definitions - BDD steps for login feature.
+
+Uses pytest-bdd for Gherkin step matching.
+"""
+import pytest
+from pytest_bdd import scenarios, given, when, then, parsers
+from pages.login_page import LoginPage
+from utils.driver_manager import DriverManager
+from utils.logger import log
+from config.config_reader import config
+
+# Load feature file
+scenarios("../features/login.feature")
+
+
+@pytest.fixture
+def login_page(driver):
+    """Provide LoginPage instance."""
+    return LoginPage()
+
+
+@given("I am on the login page")
+def navigate_to_login(driver):
+    """Navigate to login page."""
+    log.step("Navigating to login page")
+    driver.get(config.base_url)
+
+
+@when("I enter valid username")
+def enter_valid_username(login_page):
+    """Enter valid username."""
+    username = config.get("username")
+    login_page.enter_username(username)
+
+
+@when("I enter valid password")
+def enter_valid_password(login_page):
+    """Enter valid password."""
+    password = config.get("password")
+    login_page.enter_password(password)
+
+
+@when("I enter invalid username")
+def enter_invalid_username(login_page):
+    """Enter invalid username."""
+    login_page.enter_username("invalid_user")
+
+
+@when("I enter invalid password")
+def enter_invalid_password(login_page):
+    """Enter invalid password."""
+    login_page.enter_password("wrong_password")
+
+
+@when("I click the login button")
+def click_login(login_page):
+    """Click login button."""
+    login_page.click_login()
+
+
+@then("I should be redirected to the inventory page")
+def verify_inventory_page(login_page):
+    """Verify redirect to inventory."""
+    assert login_page.is_login_successful(), "Should be on inventory page"
+    log.info("Successfully logged in")
+
+
+@then("I should see an error message")
+def verify_error_message(login_page):
+    """Verify error message displayed."""
+    assert login_page.is_error_displayed(), "Error message should be displayed"
+    log.info("Error message displayed as expected")

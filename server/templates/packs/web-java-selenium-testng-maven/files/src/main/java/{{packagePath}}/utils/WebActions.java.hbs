@@ -1,0 +1,121 @@
+package {{javaPackage}}.utils;
+
+import {{javaPackage}}.core.DriverManager;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.Select;
+
+/**
+ * Web Actions - Common web interaction utilities.
+ * 
+ * All methods include logging and error handling.
+ */
+public class WebActions {
+
+    private WebActions() {
+        // Private constructor
+    }
+
+    private static WebDriver getDriver() {
+        return DriverManager.getDriver();
+    }
+
+    /**
+     * Click on element
+     */
+    public static void click(By locator) {
+        Log.action("Click: " + locator);
+        WebElement element = WaitUtils.waitForClickability(locator);
+        element.click();
+    }
+
+    /**
+     * Type text into element
+     */
+    public static void type(By locator, String text) {
+        String maskedText = maskSensitiveData(text);
+        Log.action("Type '" + maskedText + "' into: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        element.clear();
+        element.sendKeys(text);
+    }
+
+    /**
+     * Get text from element
+     */
+    public static String getText(By locator) {
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        return element.getText();
+    }
+
+    /**
+     * Check if element is displayed
+     */
+    public static boolean isDisplayed(By locator) {
+        try {
+            return getDriver().findElement(locator).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if element is enabled
+     */
+    public static boolean isEnabled(By locator) {
+        try {
+            return getDriver().findElement(locator).isEnabled();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Select option by visible text
+     */
+    public static void selectByText(By locator, String text) {
+        Log.action("Select '" + text + "' from: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        new Select(element).selectByVisibleText(text);
+    }
+
+    /**
+     * Scroll to element
+     */
+    public static void scrollToElement(By locator) {
+        Log.action("Scroll to: " + locator);
+        WebElement element = getDriver().findElement(locator);
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].scrollIntoView(true);", element);
+    }
+
+    /**
+     * Hover over element
+     */
+    public static void hover(By locator) {
+        Log.action("Hover: " + locator);
+        WebElement element = WaitUtils.waitForVisibility(locator);
+        new Actions(getDriver()).moveToElement(element).perform();
+    }
+
+    /**
+     * JavaScript click (for stubborn elements)
+     */
+    public static void jsClick(By locator) {
+        Log.action("JS Click: " + locator);
+        WebElement element = getDriver().findElement(locator);
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", element);
+    }
+
+    /**
+     * Mask sensitive data for logging
+     */
+    private static String maskSensitiveData(String text) {
+        if (text == null || text.length() <= 2) {
+            return "****";
+        }
+        return text.substring(0, 2) + "****";
+    }
+}

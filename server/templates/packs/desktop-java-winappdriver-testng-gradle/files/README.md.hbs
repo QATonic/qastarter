@@ -1,0 +1,370 @@
+# {{projectName}} - Desktop Automation Framework
+
+A comprehensive Windows desktop application testing framework built with **WinAppDriver + Java + TestNG + Maven**. This framework provides robust automation capabilities for Windows desktop applications with built-in reporting, screenshot capture, and comprehensive utilities.
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- **Windows 10/11** (WinAppDriver requirement)
+- **Java 11+** installed and configured
+- **Maven 3.6+** installed
+- **WinAppDriver** installed and running
+- **Visual Studio Code** or **IntelliJ IDEA** (recommended)
+
+### WinAppDriver Setup
+
+1. **Download WinAppDriver** from [Microsoft GitHub Repository](https://github.com/Microsoft/WinAppDriver/releases)
+2. **Install WinAppDriver** with administrator privileges
+3. **Enable Developer Mode** on Windows:
+   - Go to Settings → Update & Security → For developers
+   - Select "Developer mode"
+4. **Start WinAppDriver** before running tests:
+   ```cmd
+   WinAppDriver.exe
+   ```
+
+### Running Tests
+
+```bash
+# Run smoke tests
+mvn test -Dsurefire.suiteXmlFiles=src/test/resources/testng.xml
+
+# Run all calculator tests
+mvn test -Dtest="CalculatorTests"
+
+# Run tests with specific environment
+mvn test -Denvironment=qa
+
+# Run tests in parallel
+mvn test -Dparallel.execution.enabled=true -Dparallel.thread.count=2
+
+# Run regression tests
+mvn test -Dsurefire.suiteXmlFiles=src/test/resources/regression-tests.xml
+```
+
+## 📁 Project Structure
+
+```
+{{artifactId}}/
+├── src/
+│   ├── main/java/{{packagePath}}/
+│   │   ├── core/                    # Core framework components
+│   │   │   ├── DriverManager.java   # WinAppDriver lifecycle management
+│   │   │   ├── DesktopDriverFactory.java # Driver factory for applications
+│   │   │   ├── BaseTest.java        # Base test class with setup/teardown
+│   │   │   └── CapabilitiesManager.java # Desktop capabilities configuration
+│   │   ├── pages/                   # Page Object Model classes
+│   │   │   ├── BasePage.java        # Base page with common functionality
+│   │   │   ├── CalculatorPage.java  # Calculator application POM
+│   │   │   └── NotepadPage.java     # Notepad application POM
+│   │   ├── utils/                   # Utility classes
+│   │   │   ├── WindowsUtils.java    # Windows-specific operations
+│   │   │   ├── ElementWaitUtils.java # Desktop element waiting
+│   │   │   ├── DesktopActions.java  # Desktop interactions & shortcuts
+│   │   │   ├── ScreenshotUtils.java # Screenshot capture utilities
+│   │   │   ├── Log.java             # Logging wrapper
+│   │   │   └── ExtentManager.java   # ExtentReports management
+│   │   ├── config/                  # Configuration management
+│   │   │   ├── ConfigurationReader.java # Properties file reader
+│   │   │   └── Environment.java     # Environment enumeration
+│   │   └── listeners/               # TestNG listeners
+│   │       ├── TestListener.java    # Test lifecycle listener
+│   │       └── RetryAnalyzer.java   # Automatic retry for flaky tests
+│   ├── main/resources/
+│   │   ├── config/                  # Environment configurations
+│   │   │   ├── dev.properties       # Development environment
+│   │   │   ├── qa.properties        # QA environment
+│   │   │   └── prod.properties      # Production environment
+│   │   ├── log4j2.xml              # Logging configuration
+│   │   └── extent-config.xml       # ExtentReports styling
+│   ├── test/java/{{packagePath}}/
+│   │   └── tests/                   # Test classes
+│   │       ├── CalculatorTests.java # Calculator application tests
+│   │       ├── NotepadTests.java    # Notepad application tests
+│   │       └── WindowsIntegrationTests.java # System integration tests
+│   └── test/resources/
+│       ├── testng.xml              # Default test suite
+│       ├── desktop-tests.xml       # Full desktop test suite
+│       └── regression-tests.xml    # Regression test suite
+├── screenshots/                     # Test screenshots (auto-generated)
+├── reports/                        # ExtentReports (auto-generated)
+├── logs/                           # Application logs (auto-generated)
+├── Jenkinsfile                     # CI/CD pipeline configuration
+└── README.md                       # This file
+```
+
+## 🧪 Test Examples
+
+### Calculator Tests
+```java
+@Test(description = "Verify basic addition calculation")
+public void testBasicAddition() {
+    // Perform calculation: 5 + 3 = 8
+    String result = calculatorPage.performCalculation(5, "+", 3);
+    Assert.assertTrue(calculatorPage.verifyResult("8"), 
+                     "Addition result should be 8");
+}
+```
+
+### Notepad Tests
+```java
+@Test(description = "Verify basic text typing functionality")
+public void testBasicTextTyping() {
+    // Type and verify text
+    Assert.assertTrue(notepadPage.typeText("Sample text"), 
+                     "Should type sample text successfully");
+    Assert.assertTrue(notepadPage.verifyTextContains("Sample text"), 
+                     "Notepad should contain the typed text");
+}
+```
+
+### Integration Tests
+```java
+@Test(description = "Verify Windows process management utilities")
+public void testProcessManagement() {
+    // Check running processes
+    boolean calcRunning = WindowsUtils.isProcessRunning("Calculator.exe");
+    var processes = WindowsUtils.getRunningProcesses();
+    Assert.assertFalse(processes.isEmpty(), "Should retrieve running processes");
+}
+```
+
+## ⚙️ Configuration
+
+### Environment Configuration
+Configure different environments in `src/main/resources/config/`:
+
+```properties
+# dev.properties
+environment=dev
+winappdriver.url=http://127.0.0.1:4723
+implicit.wait=10
+screenshot.on.failure=true
+parallel.execution.enabled=false
+```
+
+### Application Paths
+Configure application paths for different environments:
+
+```properties
+# Application configurations
+app.calculator.path=Microsoft.WindowsCalculator_8wekyb3d8bbwe!App
+app.notepad.path=C:\\Windows\\System32\\notepad.exe
+app.paint.path=C:\\Windows\\System32\\mspaint.exe
+```
+
+### TestNG Configuration
+Customize test execution in TestNG XML files:
+
+```xml
+<suite name="Desktop Tests" parallel="false" thread-count="1">
+    <test name="Calculator Tests">
+        <classes>
+            <class name="{{groupId}}.tests.CalculatorTests"/>
+        </classes>
+    </test>
+</suite>
+```
+
+## 📊 Reporting
+
+### ExtentReports
+- **Automatic generation** during test execution
+- **Rich HTML reports** with screenshots and logs
+- **Custom styling** with dark theme
+- **Test step logging** with pass/fail status
+
+### Screenshot Capture
+- **Automatic screenshots** on test failures
+- **Manual screenshots** during test execution
+- **Desktop screenshots** using Robot class
+- **Window-specific screenshots** for applications
+
+### Logging
+- **Log4j2 configuration** with multiple appenders
+- **Separate log files** for different components
+- **Performance logging** for timing analysis
+- **Error-specific logging** with stack traces
+
+## 🔧 Advanced Features
+
+### Page Object Model (POM)
+```java
+public class CalculatorPage extends BasePage {
+    private final By buttonAdd = By.name("Plus");
+    
+    public boolean clickAdd() {
+        return clickElement(buttonAdd);
+    }
+    
+    public String performCalculation(int first, String op, int second) {
+        // Implementation with proper error handling
+    }
+}
+```
+
+### Robust Element Waiting
+```java
+// Wait for element to be clickable
+WebElement element = ElementWaitUtils.waitForElementClickable(locator, 30);
+
+// Wait for text to appear
+boolean textAppeared = ElementWaitUtils.waitForElementText(locator, "Expected", 15);
+
+// Custom wait conditions
+Result result = ElementWaitUtils.waitForCustomCondition(driver -> {
+    // Custom logic
+    return someCondition() ? result : null;
+}, 20);
+```
+
+### Windows-Specific Utilities
+```java
+// Process management
+boolean isRunning = WindowsUtils.isProcessRunning("notepad.exe");
+WindowsUtils.launchApplication("C:\\Windows\\System32\\calc.exe");
+
+// Window management
+WindowsUtils.bringWindowToForeground("Calculator");
+WindowsUtils.maximizeWindow("Notepad");
+int[] dimensions = WindowsUtils.getWindowDimensions("Calculator");
+
+// Screenshot utilities
+String path = WindowsUtils.takeWindowScreenshot("Calculator", "calc.png");
+```
+
+### Desktop Actions & Shortcuts
+```java
+// Keyboard shortcuts
+DesktopActions.copy();
+DesktopActions.paste();
+DesktopActions.keyboardShortcut(Keys.CONTROL, Keys.chord("s"));
+
+// Robot class actions
+DesktopActions.robotClickAt(100, 200);
+DesktopActions.robotTypeText("Hello World");
+DesktopActions.altTab();
+```
+
+## 🚀 CI/CD Integration
+
+### Jenkins Pipeline
+The included `Jenkinsfile` provides:
+- **Multi-environment support** (dev, qa, staging)
+- **Parallel test execution** options
+- **Automatic report generation** and archiving
+- **Screenshot and log collection**
+- **Teams/Slack notifications**
+- **Performance analysis**
+
+### Running in CI/CD
+```bash
+# Jenkins pipeline parameters
+ENVIRONMENT=qa
+TEST_SUITE=regression
+PARALLEL_EXECUTION=true
+GENERATE_REPORTS=true
+```
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+1. **WinAppDriver Not Running**
+   ```
+   Error: Unable to connect to WinAppDriver
+   Solution: Start WinAppDriver.exe before running tests
+   ```
+
+2. **Element Not Found**
+   ```
+   Error: NoSuchElementException
+   Solution: Check element locators and wait conditions
+   ```
+
+3. **Permission Issues**
+   ```
+   Error: Access denied
+   Solution: Run as Administrator or check Windows permissions
+   ```
+
+4. **Application Launch Failed**
+   ```
+   Error: Application not found
+   Solution: Verify application paths in configuration
+   ```
+
+### Debug Mode
+Enable debug logging:
+```properties
+log.level=DEBUG
+debug.mode=true
+take.screenshots.on.pass=true
+```
+
+### Performance Tuning
+```properties
+# Reduce wait times for faster execution
+implicit.wait=5
+explicit.wait=15
+wait.after.action=100
+
+# Enable parallel execution
+parallel.execution.enabled=true
+parallel.thread.count=2
+```
+
+## 🤝 Contributing
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Add** tests for new functionality
+4. **Commit** changes (`git commit -m 'Add amazing feature'`)
+5. **Push** to branch (`git push origin feature/amazing-feature`)
+6. **Open** a Pull Request
+
+### Code Standards
+- Follow **Java naming conventions**
+- Add **JavaDoc comments** for public methods
+- Include **unit tests** for utilities
+- Use **meaningful test descriptions**
+- Follow **Page Object Model** patterns
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙋‍♂️ Support
+
+For questions and support:
+- **Create an issue** in the repository
+- **Check existing documentation** and examples
+- **Review logs** in the `logs/` directory
+- **Examine screenshots** in the `screenshots/` directory
+
+## 🏆 Best Practices
+
+### Test Design
+- **Independent tests** that can run in any order
+- **Descriptive test names** and documentation
+- **Proper setup and cleanup** in each test
+- **Assertion messages** for clear failure analysis
+
+### Framework Usage
+- **Inherit from BaseTest** for common functionality
+- **Use Page Object Model** for maintainable tests
+- **Leverage utility classes** for common operations
+- **Configure environments** properly for different stages
+
+### Maintenance
+- **Regular screenshot cleanup** (automated in CI/CD)
+- **Log file rotation** (configured in log4j2.xml)
+- **Dependency updates** for security and features
+- **Test review and refactoring** for maintainability
+
+---
+
+**Happy Testing! 🎉**
+
+Generated by {{projectName}} Desktop Automation Framework

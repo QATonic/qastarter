@@ -1,0 +1,8 @@
+import pytest
+from core.pyautogui_manager import PyAutoGUIManager
+
+@pytest.fixture(scope="function")
+def notepad():
+    PyAutoGUIManager.launch_app("notepad.exe")
+    yield
+    PyAutoGUIManager.close_app()

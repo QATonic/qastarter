@@ -1,0 +1,38 @@
+using System;
+
+namespace {{projectNamespace}}.Config;
+
+public static class TestSettings
+{
+    public static bool Headless
+    {
+        get
+        {
+            var headlessEnv = Environment.GetEnvironmentVariable("HEADLESS");
+            if (headlessEnv == null) return true; // Default to headless
+            return headlessEnv.ToLower() == "true";
+        }
+    }
+
+    public static string Browser =>
+        Environment.GetEnvironmentVariable("BROWSER")?.ToLower() ?? "chromium";
+
+    public static int DefaultTimeout => 30000;
+
+    public static bool ScreenshotOnFailure => true;
+
+    public static int SlowMo =>
+        int.TryParse(Environment.GetEnvironmentVariable("SLOW_MO"), out var slowMo) ? slowMo : 0;
+
+    // Browser viewport + video recording (used by BrowserFactory).
+    public static int ViewportWidth =>
+        int.TryParse(Environment.GetEnvironmentVariable("VIEWPORT_WIDTH"), out var w) ? w : 1920;
+
+    public static int ViewportHeight =>
+        int.TryParse(Environment.GetEnvironmentVariable("VIEWPORT_HEIGHT"), out var h) ? h : 1080;
+
+    public static bool RecordVideo =>
+        string.Equals(Environment.GetEnvironmentVariable("RECORD_VIDEO"), "true", StringComparison.OrdinalIgnoreCase);
+
+    public static int NavigationTimeout => DefaultTimeout;
+}

@@ -1,0 +1,76 @@
+image: gradle:{{toolVersions.gradle}}-jdk{{toolVersions.java}}
+
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  ENVIRONMENT: "qa"
+
+cache:
+  paths:
+    - .gradle/
+
+stages:
+  - test
+  - report
+
+test:chrome:
+  stage: test
+  script:
+    - apt-get update && apt-get install -y wget gnupg2
+    - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list
+    - apt-get update && apt-get install -y google-chrome-stable
+    - chmod +x gradlew
+    - ./gradlew test -Dbrowser=chrome
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - build/allure-results
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "testng-reports")}}
+      - build/reports/tests/test
+      {{/if}}
+      - reports/screenshots
+      - logs
+    expire_in: 7 days
+
+test:firefox:
+  stage: test
+  script:
+    - apt-get update && apt-get install -y firefox-esr
+    - chmod +x gradlew
+    - ./gradlew test -Dbrowser=firefox
+  artifacts:
+    when: always
+    paths:
+      {{#if (eq reportingTool "allure")}}
+      - build/allure-results
+      {{/if}}
+      {{#if (eq reportingTool "extent-reports")}}
+      - reports/extent-report.html
+      {{/if}}
+      {{#if (eq reportingTool "testng-reports")}}
+      - build/reports/tests/test
+      {{/if}}
+      - reports/screenshots
+      - logs
+    expire_in: 7 days
+
+{{#if (eq reportingTool "allure")}}
+allure:report:
+  stage: report
+  script:
+    - chmod +x gradlew
+    - ./gradlew allureReport
+  dependencies:
+    - test:chrome
+    - test:firefox
+  artifacts:
+    paths:
+      - build/reports/allure-report
+    expire_in: 30 days
+  when: always
+{{/if}}

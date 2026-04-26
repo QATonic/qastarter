@@ -1,0 +1,83 @@
+import XCTest
+
+/**
+ * Base Screen class
+ * Provides common methods for all screen objects
+ */
+class BaseScreen {
+    let app: XCUIApplication
+    
+    init(app: XCUIApplication) {
+        self.app = app
+    }
+    
+    /// Wait for element to exist
+    func waitForElement(_ element: XCUIElement, timeout: TimeInterval = 5) -> Bool {
+        return element.waitForExistence(timeout: timeout)
+    }
+    
+    /// Tap an element
+    func tapElement(_ element: XCUIElement) {
+        XCTAssertTrue(waitForElement(element), "Element should exist")
+        element.tap()
+    }
+    
+    /// Enter text into a field
+    func enterText(_ element: XCUIElement, text: String) {
+        XCTAssertTrue(waitForElement(element), "Element should exist")
+        element.tap()
+        element.typeText(text)
+    }
+    
+    /// Clear and enter text
+    func clearAndEnterText(_ element: XCUIElement, text: String) {
+        XCTAssertTrue(waitForElement(element), "Element should exist")
+        element.tap()
+        
+        // Clear existing text
+        if let currentValue = element.value as? String, !currentValue.isEmpty {
+            element.press(forDuration: 1.0)
+            app.menuItems["Select All"].tap()
+            app.keys["delete"].tap()
+        }
+        
+        element.typeText(text)
+    }
+    
+    /// Verify element is visible
+    func verifyElementVisible(_ element: XCUIElement) {
+        XCTAssertTrue(waitForElement(element), "Element should be visible")
+        XCTAssertTrue(element.isHittable, "Element should be hittable")
+    }
+    
+    /// Verify text
+    func verifyText(_ element: XCUIElement, expectedText: String) {
+        XCTAssertTrue(waitForElement(element), "Element should exist")
+        
+        let actualText: String
+        if let label = element.label as String? {
+            actualText = label
+        } else if let value = element.value as? String {
+            actualText = value
+        } else {
+            actualText = ""
+        }
+        
+        XCTAssertEqual(actualText, expectedText, "Text should match")
+    }
+    
+    /// Scroll to element
+    func scrollToElement(_ element: XCUIElement, in scrollView: XCUIElement? = nil) {
+        let targetScrollView = scrollView ?? app.scrollViews.firstMatch
+        
+        var attempts = 0
+        let maxAttempts = 10
+        
+        while !element.isHittable && attempts < maxAttempts {
+            targetScrollView.swipeUp()
+            attempts += 1
+        }
+        
+        XCTAssertTrue(element.isHittable, "Element should be visible after scrolling")
+    }
+}

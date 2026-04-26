@@ -1,0 +1,23 @@
+# Project Information
+group={{groupId}}
+version=1.0.0
+
+# JVM Settings
+org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
+
+# Gradle Settings
+org.gradle.parallel=true
+org.gradle.caching=true
+org.gradle.configureondemand=true
+
+# Test Configuration
+browser=chrome
+headless=false
+env=dev
+suite=testng.xml
+parallel=false
+threadCount=1
+
+# Reporting
+reports.dir=reports
+test.output.dir=test-output

@@ -1,0 +1,133 @@
+pipeline {
+    agent {
+        label 'mac'
+    }
+    
+    parameters {
+        choice(
+            name: 'DEVICE',
+            choices: ['iPhone 15 Pro', 'iPhone 15', 'iPhone 14 Pro', 'iPad Pro (12.9-inch) (6th generation)'],
+            description: 'iOS Simulator device to run tests on'
+        )
+        choice(
+            name: 'IOS_VERSION',
+            choices: ['17.2', '17.0', '16.4'],
+            description: 'iOS version'
+        )
+        string(
+            name: 'SCHEME',
+            defaultValue: '{{projectName}}UITests',
+            description: 'Xcode scheme to test'
+        )
+    }
+    
+    environment {
+        DEVELOPER_DIR = '/Applications/Xcode.app/Contents/Developer'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Setup') {
+            steps {
+                echo "Setting up build environment..."
+                sh 'xcodebuild -version'
+                sh 'swift --version'
+                sh 'xcrun simctl list devices available'
+            }
+        }
+        
+        stage('Boot Simulator') {
+            steps {
+                script {
+                    def deviceId = sh(
+                        script: """xcrun simctl list devices available | grep '${params.DEVICE} (${params.IOS_VERSION})' | head -1 | grep -oE '[A-F0-9\\-]{36}'""",
+                        returnStdout: true
+                    ).trim()
+                    
+                    if (deviceId) {
+                        sh "xcrun simctl boot ${deviceId} || true"
+                        env.SIMULATOR_UDID = deviceId
+                    } else {
+                        error "Could not find simulator for ${params.DEVICE} (${params.IOS_VERSION})"
+                    }
+                }
+            }
+        }
+        
+        stage('Build for Testing') {
+            steps {
+                echo "Building project for testing..."
+                sh '''
+                    xcodebuild build-for-testing \
+                        -scheme ${SCHEME} \
+                        -destination "platform=iOS Simulator,id=${SIMULATOR_UDID}" \
+                        -derivedDataPath build \
+                        | xcpretty
+                '''
+            }
+        }
+        
+        stage('Run XCUITests') {
+            steps {
+                echo "Running XCUITests..."
+                sh '''
+                    xcodebuild test-without-building \
+                        -scheme ${SCHEME} \
+                        -destination "platform=iOS Simulator,id=${SIMULATOR_UDID}" \
+                        -derivedDataPath build \
+                        -resultBundlePath TestResults.xcresult \
+                        | xcpretty --report junit --output test-results/junit-results.xml
+                '''
+            }
+            post {
+                always {
+                    junit(
+                        testResults: 'test-results/junit-results.xml',
+                        allowEmptyResults: true
+                    )
+                    archiveArtifacts(
+                        artifacts: 'TestResults.xcresult/**/*',
+                        allowEmptyArchive: true
+                    )
+                    archiveArtifacts(
+                        artifacts: 'test-results/**/*',
+                        allowEmptyArchive: true
+                    )
+                }
+                failure {
+                    script {
+                        sh '''
+                            xcrun xcresulttool get --path TestResults.xcresult --format json > test-summary.json || true
+                        '''
+                    }
+                    archiveArtifacts(
+                        artifacts: 'test-summary.json',
+                        allowEmptyArchive: true
+                    )
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                if (env.SIMULATOR_UDID) {
+                    sh "xcrun simctl shutdown ${SIMULATOR_UDID} || true"
+                }
+            }
+            cleanWs()
+        }
+        success {
+            echo "XCUITests completed successfully!"
+        }
+        failure {
+            echo "XCUITests failed!"
+        }
+    }
+}

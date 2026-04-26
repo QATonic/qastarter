@@ -1,0 +1,26 @@
+package {{javaPackage}}.listeners;
+
+import org.testng.IRetryAnalyzer;
+import org.testng.ITestResult;
+
+/**
+ * Retry failed tests automatically.
+ * 
+ * Usage:
+ *   @Test(retryAnalyzer = RetryAnalyzer.class)
+ */
+public class RetryAnalyzer implements IRetryAnalyzer {
+
+    private int retryCount = 0;
+    private static final int MAX_RETRIES = 2;
+
+    @Override
+    public boolean retry(ITestResult result) {
+        if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            System.out.println("Retrying test: " + result.getName() + " (Attempt " + retryCount + ")");
+            return true;
+        }
+        return false;
+    }
+}

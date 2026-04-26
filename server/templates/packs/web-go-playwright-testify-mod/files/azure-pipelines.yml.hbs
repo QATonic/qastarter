@@ -1,0 +1,19 @@
+trigger:
+- main
+
+pool:
+vmImage: 'ubuntu-latest'
+
+variables:
+GO_VERSION: '1.21'
+
+steps:
+- task: GoTool@0
+inputs:
+version: '$(GO_VERSION)'
+
+- script: |
+go mod download
+go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
+go test ./tests/... -v
+displayName: 'Run Tests'

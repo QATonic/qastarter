@@ -1,0 +1,97 @@
+package {{javaPackage}}.pages;
+
+import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import {{javaPackage}}.core.DriverManager;
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.utils.Log;
+
+import java.time.Duration;
+
+/**
+* Base Page - Common mobile actions for all pages.
+*/
+public class BasePage {
+
+protected AppiumDriver driver;
+protected WebDriverWait wait;
+
+public BasePage() {
+this.driver = DriverManager.getDriver();
+this.wait = new WebDriverWait(driver, Duration.ofSeconds(Long.parseLong(ConfigurationReader.getProperty("mobile.implicit.wait",
+"10"))));
+}
+
+protected void tap(By locator) {
+Log.info("Tap: " + locator);
+wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+}
+
+protected void type(By locator, String text) {
+Log.info("Type: " + text + " into " + locator);
+WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+element.clear();
+element.sendKeys(text);
+}
+
+protected String getText(By locator) {
+return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
+}
+
+protected boolean isDisplayed(By locator) {
+try {
+return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).isDisplayed();
+} catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException |
+org.openqa.selenium.StaleElementReferenceException e) {
+return false;
+}
+}
+
+protected void waitForElement(By locator) {
+wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+}
+
+/** Safe wrapper around tap — returns success instead of throwing. */
+protected boolean clickElement(By locator) {
+try { tap(locator); return true; }
+catch (Exception e) { Log.error("clickElement failed for " + locator + ": " + e.getMessage()); return false; }
+}
+
+/** WebElement overload for PageFactory (@AndroidFindBy / @iOSXCUITFindBy) fields. */
+protected boolean clickElement(WebElement element) {
+try { element.click(); return true; }
+catch (Exception e) { Log.error("clickElement(WebElement) failed: " + e.getMessage()); return false; }
+}
+
+/** Safe wrapper around getText — returns empty string on failure. */
+protected String getElementText(By locator) {
+try { return getText(locator); }
+catch (Exception e) { Log.error("getElementText failed for " + locator + ": " + e.getMessage()); return ""; }
+}
+
+/** WebElement overload for PageFactory fields. */
+protected String getElementText(WebElement element) {
+try { return element.getText(); }
+catch (Exception e) { Log.error("getElementText(WebElement) failed: " + e.getMessage()); return ""; }
+}
+
+/** Alias of isDisplayed for page-object readability. */
+protected boolean isElementDisplayed(By locator) { return isDisplayed(locator); }
+
+/** WebElement overload for PageFactory fields. */
+protected boolean isElementDisplayed(WebElement element) {
+try { return element != null && element.isDisplayed(); }
+catch (Exception e) { return false; }
+}
+
+/** Overridable hook — concrete pages return their own title. */
+public String getPageTitle() {
+try { return driver.getTitle(); } catch (Exception e) { return null; }
+}
+
+/** Overridable hook — concrete pages define their loaded state. */
+public boolean isPageLoaded() { return driver != null; }
+}

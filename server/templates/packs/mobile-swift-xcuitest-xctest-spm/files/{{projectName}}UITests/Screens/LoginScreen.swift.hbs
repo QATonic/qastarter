@@ -1,0 +1,142 @@
+import XCTest
+
+/**
+ * Login Screen Page Object
+ * 
+ * ========== IMPORTANT: UPDATE THESE VALUES ==========
+ * Replace the accessibility identifiers below with your actual identifiers.
+ * These are placeholder values that need to match your app's UI elements.
+ * =====================================================
+ */
+class LoginScreen: BaseScreen {
+    
+    // MARK: - Element Identifiers
+    // ========== UPDATE THESE IDENTIFIERS ==========
+    private enum Identifiers {
+        static let usernameField = "usernameTextField"
+        static let passwordField = "passwordTextField"
+        static let loginButton = "loginButton"
+        static let errorLabel = "errorLabel"
+        static let forgotPasswordButton = "forgotPasswordButton"
+        static let signUpButton = "signUpButton"
+    }
+    // ===============================================
+    
+    // MARK: - Elements
+    var usernameField: XCUIElement {
+        app.textFields[Identifiers.usernameField]
+    }
+    
+    var passwordField: XCUIElement {
+        app.secureTextFields[Identifiers.passwordField]
+    }
+    
+    var loginButton: XCUIElement {
+        app.buttons[Identifiers.loginButton]
+    }
+    
+    var errorLabel: XCUIElement {
+        app.staticTexts[Identifiers.errorLabel]
+    }
+    
+    var forgotPasswordButton: XCUIElement {
+        app.buttons[Identifiers.forgotPasswordButton]
+    }
+    
+    var signUpButton: XCUIElement {
+        app.buttons[Identifiers.signUpButton]
+    }
+    
+    // MARK: - Actions
+    
+    /// Enter username
+    @discardableResult
+    func enterUsername(_ username: String) -> LoginScreen {
+        Logger.step("Entering username: \(username)")
+        clearAndEnterText(usernameField, text: username)
+        return self
+    }
+    
+    /// Enter password
+    @discardableResult
+    func enterPassword(_ password: String) -> LoginScreen {
+        Logger.step("Entering password: ****")
+        clearAndEnterText(passwordField, text: password)
+        return self
+    }
+    
+    /// Tap login button
+    @discardableResult
+    func tapLoginButton() -> HomeScreen {
+        Logger.step("Tapping login button")
+        tapElement(loginButton)
+        return HomeScreen(app: app)
+    }
+    
+    /// Perform complete login
+    @discardableResult
+    func login(username: String, password: String) -> HomeScreen {
+        Logger.startSection("Performing login")
+        enterUsername(username)
+        enterPassword(password)
+        let homeScreen = tapLoginButton()
+        Logger.endSection()
+        return homeScreen
+    }
+    
+    /// Tap forgot password
+    func tapForgotPassword() {
+        Logger.step("Tapping forgot password")
+        tapElement(forgotPasswordButton)
+    }
+    
+    /// Tap sign up
+    func tapSignUp() {
+        Logger.step("Tapping sign up")
+        tapElement(signUpButton)
+    }
+    
+    /// Clear login form
+    @discardableResult
+    func clearForm() -> LoginScreen {
+        Logger.step("Clearing login form")
+        clearAndEnterText(usernameField, text: "")
+        clearAndEnterText(passwordField, text: "")
+        return self
+    }
+    
+    // MARK: - Verifications
+    
+    /// Verify login screen is displayed
+    @discardableResult
+    func verifyScreenDisplayed() -> LoginScreen {
+        Logger.step("Verifying login screen is displayed")
+        verifyElementVisible(usernameField)
+        verifyElementVisible(passwordField)
+        verifyElementVisible(loginButton)
+        return self
+    }
+    
+    /// Verify error message is displayed
+    @discardableResult
+    func verifyErrorDisplayed() -> LoginScreen {
+        Logger.step("Verifying error is displayed")
+        verifyElementVisible(errorLabel)
+        return self
+    }
+    
+    /// Verify error message text
+    @discardableResult
+    func verifyErrorMessage(_ expectedMessage: String) -> LoginScreen {
+        Logger.step("Verifying error message: \(expectedMessage)")
+        verifyText(errorLabel, expectedText: expectedMessage)
+        return self
+    }
+    
+    /// Check if screen is loaded
+    func isLoaded() -> Bool {
+        return waitForElement(usernameField) && 
+               waitForElement(passwordField) && 
+               waitForElement(loginButton)
+    }
+}

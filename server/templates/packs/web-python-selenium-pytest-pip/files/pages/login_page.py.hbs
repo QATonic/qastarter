@@ -1,0 +1,71 @@
+"""
+Login Page - Page object for SauceDemo login page.
+
+URL: {{baseUrl}}
+
+HOW TO CUSTOMIZE:
+  1. Update locators below for your app
+  2. Update credentials in: config/dev.ini
+"""
+from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
+from config.config_reader import config
+
+
+class LoginPage(BasePage):
+    """Login page object for SauceDemo."""
+
+    # Locators (SauceDemo)
+    USERNAME_FIELD = (By.ID, "user-name")
+    PASSWORD_FIELD = (By.ID, "password")
+    LOGIN_BUTTON = (By.ID, "login-button")
+    ERROR_MESSAGE = (By.CSS_SELECTOR, "[data-test='error']")
+
+    def navigate_to_login(self) -> None:
+        """Open the login page using the baseUrl from the active config."""
+        self.navigate_to(config.base_url)
+
+    def is_username_visible(self) -> bool:
+        return self.is_displayed(self.USERNAME_FIELD)
+
+    def is_password_visible(self) -> bool:
+        return self.is_displayed(self.PASSWORD_FIELD)
+    
+    def enter_username(self, username: str) -> "LoginPage":
+        """Enter username."""
+        self.log_action(f"Entering username: {username}")
+        self.type_text(self.USERNAME_FIELD, username)
+        return self
+    
+    def enter_password(self, password: str) -> "LoginPage":
+        """Enter password."""
+        self.log_action("Entering password")
+        self.type_text(self.PASSWORD_FIELD, password)
+        return self
+    
+    def click_login(self):
+        """Click login button."""
+        self.log_action("Clicking login button")
+        self.click(self.LOGIN_BUTTON)
+    
+    def login(self, username: str, password: str):
+        """Perform complete login."""
+        self.enter_username(username)
+        self.enter_password(password)
+        self.click_login()
+    
+    def get_error_message(self) -> str:
+        """Get error message text."""
+        return self.get_text(self.ERROR_MESSAGE) if self.is_error_displayed() else ""
+    
+    def is_error_displayed(self) -> bool:
+        """Check if error message is displayed."""
+        return self.is_displayed(self.ERROR_MESSAGE)
+    
+    def is_login_successful(self) -> bool:
+        """Check if login was successful (redirected to inventory)."""
+        return "inventory" in self.get_current_url()
+    
+    def is_loaded(self) -> bool:
+        """Check if login page is loaded."""
+        return self.is_displayed(self.LOGIN_BUTTON)

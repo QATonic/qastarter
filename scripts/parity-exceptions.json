@@ -1,0 +1,52 @@
+[
+  {
+    "pair": "api-java-restassured-testng-gradle|api-java-restassured-testng-maven",
+    "reason": "Gradle adds 6 build files vs 1 pom.xml (+5 structural). Remaining diff: ConfigurationReader (Gradle) vs ConfigReader (Maven) naming + Gradle log4j2.xml. Shape: onlyInGradle=9, onlyInMaven=2.",
+    "allowedDelta": 11
+  },
+  {
+    "pair": "desktop-java-winappdriver-testng-gradle|desktop-java-winappdriver-testng-maven",
+    "reason": "Pure Gradle/Maven structural difference: 6 build files vs 1 pom.xml = net +5.",
+    "allowedDelta": 7
+  },
+  {
+    "pair": "mobile-java-appium-testng-gradle|mobile-java-appium-testng-maven",
+    "reason": "Pure Gradle/Maven structural difference: 6 build files vs 1 pom.xml = net +5.",
+    "allowedDelta": 7
+  },
+  {
+    "pair": "web-java-playwright-junit5-gradle|web-java-playwright-junit5-maven",
+    "reason": "Gradle/Maven structural difference (+4 build files). Maven has setup.properties not in Gradle.",
+    "allowedDelta": 5
+  },
+  {
+    "pair": "web-java-playwright-testng-gradle|web-java-playwright-testng-maven",
+    "reason": "Gradle/Maven structural difference (+4 build files). Gradle has TestDataReader not yet in Maven.",
+    "allowedDelta": 5
+  },
+  {
+    "pair": "web-java-selenium-junit5-gradle|web-java-selenium-junit5-maven",
+    "reason": "Pure Gradle/Maven structural difference after file alignment. 4 build files + gradlew pair.",
+    "allowedDelta": 5
+  },
+  {
+    "pair": "web-java-selenium-testng-gradle|web-java-selenium-testng-maven",
+    "reason": "Pure Gradle/Maven structural difference after file alignment. 4 build files + gradlew pair.",
+    "allowedDelta": 5
+  },
+  {
+    "pair": "api-javascript-supertest-jest-npm|api-typescript-supertest-jest-npm",
+    "reason": "JS/TS extension-paired files (ConfigReader.js/ts, ApiClient.js/ts, etc.) show as unique in parity check. TS has extra qa.json, tsconfig.json, types/api.types.ts, ResponseValidator. JS has extra auth/health test files and schema.",
+    "allowedDelta": 5
+  },
+  {
+    "pair": "web-javascript-playwright-jest-npm|web-typescript-playwright-jest-npm",
+    "reason": "JS/TS extension-paired files show as unique. TS pack includes full BDD infrastructure (hooks, world, cucumber.js), type definitions, ESLint config, and jest-playwright config that JS pack doesn't have.",
+    "allowedDelta": 10
+  },
+  {
+    "pair": "web-javascript-selenium-jest-npm|web-typescript-selenium-jest-npm",
+    "reason": "JS/TS extension-paired files show as unique. TS has extra .env.example, dev.json, qa.json, tsconfig.json, types/index.d.ts.",
+    "allowedDelta": 6
+  }
+]

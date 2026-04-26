@@ -1,0 +1,69 @@
+package {{javaPackage}}.pages;
+
+import org.openqa.selenium.By;
+import io.appium.java_client.AppiumBy;
+import {{javaPackage}}.utils.Log;
+
+/**
+ * Calculator Page - Windows Calculator app.
+ */
+public class CalculatorPage extends BasePage {
+
+    // Number buttons
+    private By buttonOne = By.name("One");
+    private By buttonTwo = By.name("Two");
+    private By buttonThree = By.name("Three");
+    private By buttonFour = By.name("Four");
+    private By buttonFive = By.name("Five");
+
+    // Operators
+    private By buttonPlus = By.name("Plus");
+    private By buttonMinus = By.name("Minus");
+    private By buttonEquals = By.name("Equals");
+    private By buttonClear = By.name("Clear");
+
+    // Result
+    private By resultDisplay = AppiumBy.accessibilityId("CalculatorResults");
+
+    public CalculatorPage clickNumber(int number) {
+        By button = switch (number) {
+            case 1 -> buttonOne;
+            case 2 -> buttonTwo;
+            case 3 -> buttonThree;
+            case 4 -> buttonFour;
+            case 5 -> buttonFive;
+            default -> By.name(String.valueOf(number));
+        };
+        click(button);
+        return this;
+    }
+
+    public CalculatorPage clickPlus() { click(buttonPlus); return this; }
+    public CalculatorPage clickMinus() { click(buttonMinus); return this; }
+    public CalculatorPage clickEquals() { click(buttonEquals); return this; }
+    public CalculatorPage clear() { click(buttonClear); return this; }
+
+    public String getResult() {
+        String result = getText(resultDisplay);
+        Log.info("Result: " + result);
+        return result;
+    }
+
+    public CalculatorPage add(int a, int b) {
+        Log.step("Calculate: " + a + " + " + b);
+        clickNumber(a);
+        clickPlus();
+        clickNumber(b);
+        clickEquals();
+        return this;
+    }
+
+    public CalculatorPage subtract(int a, int b) {
+        Log.step("Calculate: " + a + " - " + b);
+        clickNumber(a);
+        clickMinus();
+        clickNumber(b);
+        clickEquals();
+        return this;
+    }
+}

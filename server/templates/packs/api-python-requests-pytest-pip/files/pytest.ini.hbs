@@ -1,0 +1,21 @@
+[pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+markers =
+    smoke: Smoke tests
+    regression: Regression tests
+    auth: Authentication tests
+    users: User API tests
+    slow: Slow running tests
+addopts = 
+    -v
+    --strict-markers
+    --tb=short
+    --html=reports/report.html
+    --self-contained-html
+log_cli = true
+log_cli_level = INFO
+log_cli_format = %(asctime)s [%(levelname)s] %(message)s
+log_cli_date_format = %Y-%m-%d %H:%M:%S

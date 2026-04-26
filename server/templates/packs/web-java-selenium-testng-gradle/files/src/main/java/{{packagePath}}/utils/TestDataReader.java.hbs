@@ -1,0 +1,87 @@
+package {{javaPackage}}.utils;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Test Data Reader - Load test data from JSON and CSV files.
+ * 
+ * Files are loaded from classpath: src/main/resources/testdata/
+ */
+public class TestDataReader {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    private TestDataReader() {}
+
+    /**
+     * Read JSON file and return as JsonNode
+     */
+    public static JsonNode readJson(String fileName) {
+        try (InputStream is = getResourceStream("testdata/" + fileName)) {
+            if (is == null) {
+                Log.error("JSON file not found: " + fileName);
+                return null;
+            }
+            return objectMapper.readTree(is);
+        } catch (Exception e) {
+            Log.error("Error reading JSON: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Read JSON file and map to object
+     */
+    public static <T> T readJson(String fileName, Class<T> clazz) {
+        try (InputStream is = getResourceStream("testdata/" + fileName)) {
+            if (is == null) {
+                Log.error("JSON file not found: " + fileName);
+                return null;
+            }
+            return objectMapper.readValue(is, clazz);
+        } catch (Exception e) {
+            Log.error("Error reading JSON: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Read CSV file and return as List of Maps
+     */
+    public static List<Map<String, String>> readCsv(String fileName) {
+        List<Map<String, String>> data = new ArrayList<>();
+        try (InputStream is = getResourceStream("testdata/" + fileName);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            
+            String headerLine = reader.readLine();
+            if (headerLine == null) return data;
+            
+            String[] headers = headerLine.split(",");
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] values = line.split(",");
+                Map<String, String> row = new HashMap<>();
+                for (int i = 0; i < headers.length && i < values.length; i++) {
+                    row.put(headers[i].trim(), values[i].trim());
+                }
+                data.add(row);
+            }
+        } catch (Exception e) {
+            Log.error("Error reading CSV: " + e.getMessage());
+        }
+        return data;
+    }
+
+    private static InputStream getResourceStream(String path) {
+        return TestDataReader.class.getClassLoader().getResourceAsStream(path);
+    }
+}

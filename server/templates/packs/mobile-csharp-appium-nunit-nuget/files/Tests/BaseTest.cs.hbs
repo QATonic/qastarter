@@ -1,0 +1,51 @@
+using System.IO;
+using NUnit.Framework;
+using OpenQA.Selenium.Appium;
+using {{projectNamespace}}.Config;
+{{#if utilities.dataProvider}}
+using {{projectNamespace}}.Data;
+{{/if}}
+using {{projectNamespace}}.Tests.Utils;
+
+namespace {{projectNamespace}}.Tests;
+
+[TestFixture]
+public abstract class BaseTest
+{
+    protected AppiumDriver Driver = null!;
+{{#if utilities.dataProvider}}
+    protected TestDataModel TestData = null!;
+{{/if}}
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        // Create necessary directories
+        Directory.CreateDirectory("Screenshots");
+        Directory.CreateDirectory("Logs");
+        Directory.CreateDirectory("Reports");
+{{#if utilities.dataProvider}}
+
+        // Load test data
+        TestData = TestDataModel.Load();
+{{/if}}
+    }
+
+    [SetUp]
+    public void SetUp()
+    {
+        Driver = DriverManager.GetDriver();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        if (TestContext.CurrentContext.Result.Outcome.Status == NUnit.Framework.Interfaces.TestStatus.Failed)
+        {
+            var testName = TestContext.CurrentContext.Test.Name;
+            ScreenshotHelper.TakeScreenshot(Driver, $"FAILED-{testName}");
+        }
+
+        DriverManager.QuitDriver();
+    }
+}

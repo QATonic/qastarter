@@ -1,0 +1,81 @@
+import { apiClient } from '../core/ApiClient';
+import logger from './logger';
+
+interface Credentials {
+  username: string;
+  password: string;
+}
+
+interface CachedToken {
+  token: string;
+  expiresAt: number;
+}
+
+/**
+ * Authentication helper for API testing.
+ */
+class AuthHelper {
+  private static tokens: Map<string, CachedToken> = new Map();
+
+  static async getToken(credentials: Credentials): Promise<string> {
+    const cacheKey = credentials.username;
+
+    if (AuthHelper.tokens.has(cacheKey)) {
+      const cached = AuthHelper.tokens.get(cacheKey)!;
+      if (cached.expiresAt > Date.now()) {
+        logger.debug(`Using cached token for ${cacheKey}`);
+        return cached.token;
+      }
+    }
+
+    logger.info(`Fetching new token for ${credentials.username}`);
+
+    const response = await apiClient.post('/auth/login', {
+      username: credentials.username,
+      password: credentials.password
+    });
+
+    if (response.status !== 200) {
+      throw new Error(`Authentication failed: ${response.status}`);
+    }
+
+    const token = response.body.token || response.body.accessToken;
+    const expiresIn = response.body.expiresIn || 3600;
+
+    AuthHelper.tokens.set(cacheKey, {
+      token,
+      expiresAt: Date.now() + (expiresIn * 1000) - 60000
+    });
+
+    return token;
+  }
+
+  static async getBearerToken(credentials: Credentials): Promise<string> {
+    const token = await AuthHelper.getToken(credentials);
+    return `Bearer ${token}`;
+  }
+
+  static async getAuthHeaders(credentials: Credentials): Promise<Record<string, string>> {
+    const token = await AuthHelper.getToken(credentials);
+    return {
+      'Authorization': `Bearer ${token}`
+    };
+  }
+
+  static clearToken(username: string): void {
+    AuthHelper.tokens.delete(username);
+    logger.debug(`Cleared token for ${username}`);
+  }
+
+  static clearAllTokens(): void {
+    AuthHelper.tokens.clear();
+    logger.debug('Cleared all cached tokens');
+  }
+
+  static async refreshToken(credentials: Credentials): Promise<string> {
+    AuthHelper.clearToken(credentials.username);
+    return AuthHelper.getToken(credentials);
+  }
+}
+
+export default AuthHelper;

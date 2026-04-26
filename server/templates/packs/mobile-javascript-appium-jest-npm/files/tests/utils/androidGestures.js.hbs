@@ -1,0 +1,78 @@
+class AndroidGestures {
+  constructor(driver) {
+    this.driver = driver;
+  }
+
+  async swipe(startX, startY, endX, endY, duration = 1000) {
+    await this.driver.performActions([{
+      type: 'pointer',
+      id: 'finger1',
+      parameters: { pointerType: 'touch' },
+      actions: [
+        { type: 'pointerMove', duration: 0, x: startX, y: startY },
+        { type: 'pointerDown', button: 0 },
+        { type: 'pause', duration },
+        { type: 'pointerMove', duration, x: endX, y: endY },
+        { type: 'pointerUp', button: 0 }
+      ]
+    }]);
+  }
+
+  async swipeUp() {
+    const size = await this.driver.getWindowSize();
+    const startX = size.width / 2;
+    const startY = size.height * 0.8;
+    const endX = size.width / 2;
+    const endY = size.height * 0.2;
+    await this.swipe(startX, startY, endX, endY);
+  }
+
+  async swipeDown() {
+    const size = await this.driver.getWindowSize();
+    const startX = size.width / 2;
+    const startY = size.height * 0.2;
+    const endX = size.width / 2;
+    const endY = size.height * 0.8;
+    await this.swipe(startX, startY, endX, endY);
+  }
+
+  async swipeLeft() {
+    const size = await this.driver.getWindowSize();
+    const startX = size.width * 0.8;
+    const startY = size.height / 2;
+    const endX = size.width * 0.2;
+    const endY = size.height / 2;
+    await this.swipe(startX, startY, endX, endY);
+  }
+
+  async swipeRight() {
+    const size = await this.driver.getWindowSize();
+    const startX = size.width * 0.2;
+    const startY = size.height / 2;
+    const endX = size.width * 0.8;
+    const endY = size.height / 2;
+    await this.swipe(startX, startY, endX, endY);
+  }
+
+  async scrollToText(text) {
+    const element = await this.driver.$(`android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("${text}"))`);
+    return element;
+  }
+
+  async longPress(locator, duration = 2000) {
+    const element = await this.driver.$(locator);
+    await this.driver.performActions([{
+      type: 'pointer',
+      id: 'finger1',
+      parameters: { pointerType: 'touch' },
+      actions: [
+        { type: 'pointerMove', duration: 0, origin: element },
+        { type: 'pointerDown', button: 0 },
+        { type: 'pause', duration },
+        { type: 'pointerUp', button: 0 }
+      ]
+    }]);
+  }
+}
+
+module.exports = AndroidGestures;

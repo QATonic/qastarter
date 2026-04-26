@@ -1,0 +1,33 @@
+version: 2.1
+
+orbs:
+python: circleci/python@2.1
+browser-tools: circleci/browser-tools@1.4
+
+jobs:
+test:
+docker:
+- image: cimg/python:{{toolVersions.python}}-browsers
+steps:
+- checkout
+- browser-tools/install-chrome
+- browser-tools/install-chromedriver
+
+- python/install-packages:
+pkg-manager: pip
+
+- run:
+name: Run Robot Framework tests
+command: robot --variable HEADLESS:true --outputdir results tests/
+
+- store_test_results:
+path: results
+
+- store_artifacts:
+path: results
+destination: robot-results
+
+workflows:
+test-workflow:
+jobs:
+- test

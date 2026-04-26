@@ -1,0 +1,62 @@
+package {{javaPackage}}.pages;
+
+import {{javaPackage}}.core.PlaywrightManager;
+import {{javaPackage}}.utils.Log;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+
+/**
+ * Base Page - Extend this in all your page objects.
+ */
+public abstract class BasePage {
+
+    protected Page page;
+
+    public BasePage() {
+        this.page = PlaywrightManager.getPage();
+    }
+
+    protected void click(String selector) {
+        Log.action("Click: " + selector);
+        page.locator(selector).click();
+    }
+
+    protected void type(String selector, String text) {
+        Log.action("Type into: " + selector);
+        page.locator(selector).fill(text);
+    }
+
+    protected String getText(String selector) {
+        return page.locator(selector).textContent();
+    }
+
+    protected boolean isDisplayed(String selector) {
+        try {
+            return page.locator(selector).isVisible();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    protected void waitForElement(String selector) {
+        page.locator(selector).waitFor();
+    }
+
+    protected Locator locator(String selector) {
+        return page.locator(selector);
+    }
+
+    public String getPageTitle() {
+        return page.title();
+    }
+
+    public String getCurrentUrl() {
+        return page.url();
+    }
+
+    protected void logAction(String action) {
+        Log.step("[" + getClass().getSimpleName() + "] " + action);
+    }
+
+    public abstract boolean isLoaded();
+}

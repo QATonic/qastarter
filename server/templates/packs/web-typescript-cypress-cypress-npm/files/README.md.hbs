@@ -1,0 +1,151 @@
+# {{projectName}}
+
+Cypress test automation framework with TypeScript and npm.
+
+## Features
+
+- **Cypress {{toolVersions.cypress}}**: Modern end-to-end testing framework
+- **TypeScript**: Type-safe test automation
+- **npm**: Package management
+- **Page Object Model**: Maintainable test structure
+{{#if cicdTool}}
+{{#if (eq cicdTool "github-actions")}}
+- **GitHub Actions CI/CD**: Automated test execution workflow
+{{else if (eq cicdTool "jenkins")}}
+- **Jenkins CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "gitlab-ci")}}
+- **GitLab CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "azure-devops")}}
+- **Azure DevOps CI/CD**: Pipeline configuration included
+{{else if (eq cicdTool "circleci")}}
+- **CircleCI CI/CD**: Workflow configuration included
+{{/if}}
+{{/if}}
+- **Docker Support**: Containerized test execution
+{{#if (eq reportingTool "allure")}}
+- **Allure Reports**: Rich test reporting with history
+{{else if (eq reportingTool "mochawesome")}}
+- **Mochawesome Reports**: Beautiful HTML test reports
+{{else}}
+- **Mochawesome Reports**: Beautiful HTML test reports
+{{/if}}
+- **Multi-Browser**: Chrome, Firefox support
+- **Type Definitions**: Custom command type safety
+
+## Prerequisites
+
+- Node.js 18+ and npm
+
+## Installation
+
+```bash
+npm install
+```
+
+## Running Tests
+
+```bash
+# Run all tests (headless)
+npm test
+
+# Run tests in headed mode
+npm run test:headed
+
+# Run tests in specific browser
+npm run test:chrome
+npm run test:firefox
+
+# Open Cypress Test Runner
+npm run open
+
+# Type check
+npm run type-check
+
+# Clean test artifacts
+npm run clean
+```
+
+## Configuration
+
+Update test data in:
+- `cypress/fixtures/config.json` - Environment URLs
+- `cypress/fixtures/users.json` - User credentials
+
+Set base URL with environment variable:
+```bash
+BASE_URL=https://qa.example.com npm test
+```
+
+## Page Objects
+
+All page objects extend `BasePage` and are located in `cypress/pages/`:
+- `LoginPage.ts` - Login page interactions
+- `HomePage.ts` - Home page interactions
+
+## Test Structure
+
+```
+cypress/
+  ├── e2e/
+  │   ├── login.cy.ts     # Login functionality tests
+  │   └── smoke.cy.ts     # Smoke tests
+  ├── pages/
+  │   ├── BasePage.ts     # Base page class
+  │   ├── LoginPage.ts    # Login page object
+  │   └── HomePage.ts     # Home page object
+  ├── fixtures/
+  │   ├── config.json     # Environment config
+  │   └── users.json      # Test user data
+  └── support/
+      ├── e2e.ts          # Global setup
+      ├── commands.ts     # Custom commands
+      └── index.d.ts      # TypeScript definitions
+```
+
+## Custom Commands
+
+Custom Cypress commands with TypeScript support:
+- `cy.login(username, password)` - Login helper
+- `cy.logout()` - Logout helper
+- `cy.waitForElement(selector)` - Wait for element
+- `cy.elementExists(selector)` - Check element existence
+- `cy.fullScreenshot(filename)` - Full page screenshot
+
+All commands have full TypeScript IntelliSense support.
+
+## TypeScript
+
+The project uses TypeScript with strict mode enabled. Path aliases are configured:
+- `@pages/*` - Maps to `cypress/pages/*`
+- `@fixtures/*` - Maps to `cypress/fixtures/*`
+
+## Docker
+
+```bash
+docker build -t {{projectName}} .
+docker run {{projectName}}
+```
+
+## CI/CD
+
+{{#if (eq cicdTool "github-actions")}}
+GitHub Actions workflow automatically runs tests on push/PR with multi-browser matrix (Chrome, Firefox) and includes TypeScript type checking.
+{{else if (eq cicdTool "jenkins")}}
+Jenkins pipeline (`Jenkinsfile`) is included for CI/CD integration.
+{{else if (eq cicdTool "gitlab-ci")}}
+GitLab CI (`.gitlab-ci.yml`) is configured for automated testing.
+{{else if (eq cicdTool "azure-devops")}}
+Azure DevOps (`azure-pipelines.yml`) is configured for automated testing.
+{{else if (eq cicdTool "circleci")}}
+CircleCI (`.circleci/config.yml`) is configured for automated testing.
+{{else}}
+CI/CD pipeline configuration is included for automated testing.
+{{/if}}
+
+## Reports
+
+{{#if (eq reportingTool "allure")}}
+Allure reports are generated in `allure-results/` after test execution.
+{{else}}
+Mochawesome HTML reports are generated in `cypress/results/` after test execution.
+{{/if}}

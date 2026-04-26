@@ -1,0 +1,102 @@
+# {{projectName}} - GitHub Actions Workflow
+# REST API Test Automation with REST Assured, TestNG, and Maven
+
+name: API Tests
+
+on:
+push:
+branches: [main, develop]
+pull_request:
+branches: [main]
+workflow_dispatch:
+inputs:
+environment:
+description: 'Test environment'
+required: true
+default: 'qa'
+type: choice
+options:
+- dev
+- qa
+- staging
+
+env:
+JAVA_VERSION: '17'
+MAVEN_OPTS: '-Xmx1024m'
+
+jobs:
+api-tests:
+runs-on: ubuntu-latest
+strategy:
+matrix:
+environment: [qa]
+
+steps:
+- name: Checkout code
+uses: actions/checkout@v4
+
+- name: Set up JDK ${{{{raw}}}}{{ env.JAVA_VERSION }}{{{{/raw}}}}
+uses: actions/setup-java@v4
+with:
+java-version: ${{{{raw}}}}{{ env.JAVA_VERSION }}{{{{/raw}}}}
+distribution: 'temurin'
+cache: maven
+
+- name: Cache Maven packages
+uses: actions/cache@v3
+with:
+path: ~/.m2/repository
+key: ${{{{raw}}}}{{ runner.os }}{{{{/raw}}}}-maven-${{{{raw}}}}{{ hashFiles('**/pom.xml') }}{{{{/raw}}}}
+restore-keys: |
+${{{{raw}}}}{{ runner.os }}{{{{/raw}}}}-maven-
+
+- name: Run API Tests
+run: |
+{{#if (eq testingPattern "bdd")}}
+mvn clean test -Dincludes="**/runners/*TestRunner.java"
+{{else}}
+mvn clean test -Denvironment=${{{{raw}}}}{{ matrix.environment }}{{{{/raw}}}}
+{{/if}}
+continue-on-error: true
+
+{{#if (eq reportingTool "allure")}}
+- name: Generate Allure Report
+uses: simple-elf/allure-report-action@master
+if: always()
+with:
+allure_results: target/allure-results
+allure_report: allure-report
+allure_history: allure-history
+
+- name: Upload Allure Report
+uses: actions/upload-artifact@v4
+if: always()
+with:
+name: allure-report
+path: allure-report/
+retention-days: 30
+{{/if}}
+
+{{#if (eq reportingTool "extent-reports")}}
+- name: Upload ExtentReports
+uses: actions/upload-artifact@v4
+if: always()
+with:
+name: extent-reports
+path: reports/extent-reports/
+retention-days: 30
+{{/if}}
+
+- name: Upload Test Results
+uses: actions/upload-artifact@v4
+if: always()
+with:
+name: test-results
+path: target/surefire-reports/
+retention-days: 14
+
+- name: Publish Test Results
+uses: EnricoMi/publish-unit-test-result-action@v2
+if: always()
+with:
+files: target/surefire-reports/TEST-*.xml

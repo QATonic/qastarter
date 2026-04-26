@@ -1,0 +1,111 @@
+package {{javaPackage}}.core;
+
+import {{javaPackage}}.config.ConfigurationReader;
+import {{javaPackage}}.utils.Log;
+import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.BrowserContext;
+import com.microsoft.playwright.BrowserType;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.Playwright;
+
+/**
+ * Playwright Manager - Thread-safe Playwright lifecycle management.
+ * 
+ * Supports parallel test execution via ThreadLocal.
+ */
+public class PlaywrightManager {
+
+    private static final ThreadLocal<Playwright> playwrightThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<Browser> browserThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<BrowserContext> contextThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<Page> pageThreadLocal = new ThreadLocal<>();
+
+    private PlaywrightManager() {}
+
+    public static Page getPage() {
+        Page page = pageThreadLocal.get();
+        if (page == null) {
+            throw new IllegalStateException("Page not initialized. Call initializeBrowser() first.");
+        }
+        return page;
+    }
+
+    public static void initializeBrowser() {
+        if (pageThreadLocal.get() != null) {
+            Log.warn("Browser already exists. Cleaning up...");
+            closeBrowser();
+        }
+
+        String browserName = ConfigurationReader.getBrowser();
+        boolean headless = ConfigurationReader.isHeadless();
+
+        Log.info("Initializing Playwright: " + browserName + " | Headless: " + headless);
+
+        try {
+            Playwright playwright = Playwright.create();
+            playwrightThreadLocal.set(playwright);
+
+            BrowserType.LaunchOptions options = new BrowserType.LaunchOptions()
+                .setHeadless(headless);
+
+            Browser browser;
+            switch (browserName.toLowerCase()) {
+                case "firefox":
+                    browser = playwright.firefox().launch(options);
+                    break;
+                case "webkit":
+                case "safari":
+                    browser = playwright.webkit().launch(options);
+                    break;
+                case "chromium":
+                case "chrome":
+                default:
+                    browser = playwright.chromium().launch(options);
+                    break;
+            }
+            browserThreadLocal.set(browser);
+
+            BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+                .setViewportSize(1920, 1080));
+            contextThreadLocal.set(context);
+
+            Page page = context.newPage();
+            pageThreadLocal.set(page);
+
+            Log.info("Playwright browser initialized successfully");
+
+        } catch (Exception e) {
+            Log.error("Failed to initialize Playwright: " + e.getMessage());
+            throw new RuntimeException("Playwright initialization failed", e);
+        }
+    }
+
+    public static void closeBrowser() {
+        try {
+            Page page = pageThreadLocal.get();
+            if (page != null) page.close();
+
+            BrowserContext context = contextThreadLocal.get();
+            if (context != null) context.close();
+
+            Browser browser = browserThreadLocal.get();
+            if (browser != null) browser.close();
+
+            Playwright playwright = playwrightThreadLocal.get();
+            if (playwright != null) playwright.close();
+
+            Log.info("Playwright browser closed");
+        } catch (Exception e) {
+            Log.error("Error closing Playwright: " + e.getMessage());
+        } finally {
+            pageThreadLocal.remove();
+            contextThreadLocal.remove();
+            browserThreadLocal.remove();
+            playwrightThreadLocal.remove();
+        }
+    }
+
+    public static boolean isInitialized() {
+        return pageThreadLocal.get() != null;
+    }
+}

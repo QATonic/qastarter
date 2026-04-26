@@ -1,0 +1,130 @@
+package {{packageName}}.base;
+
+import android.content.Context;
+import android.content.Intent;
+
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.idling.CountingIdlingResource;
+import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import {{packageName}}.utils.Log;
+import {{packageName}}.utils.ScreenshotUtils;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
+
+/**
+ * Base test class for all Espresso tests.
+ * Provides common setup, teardown, and utility methods.
+ */
+public abstract class BaseTest {
+
+    @Rule
+    public TestName testName = new TestName();
+
+    @Rule
+    public TestWatcher testWatcher = new TestWatcher() {
+        @Override
+        protected void failed(Throwable e, Description description) {
+            Log.error("Test FAILED: " + description.getMethodName());
+            ScreenshotUtils.captureScreenshot(description.getMethodName() + "_failed");
+        }
+
+        @Override
+        protected void succeeded(Description description) {
+            Log.info("Test PASSED: " + description.getMethodName());
+        }
+    };
+
+    protected Context context;
+    protected CountingIdlingResource idlingResource;
+
+    @Before
+    public void baseSetUp() {
+        Log.startSection("TEST SETUP: " + testName.getMethodName());
+        context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        
+        // Register idling resource for async operations
+        idlingResource = new CountingIdlingResource("AsyncOperations");
+        IdlingRegistry.getInstance().register(idlingResource);
+        
+        Log.info("Test context initialized");
+    }
+
+    @After
+    public void baseTearDown() {
+        Log.startSection("TEST TEARDOWN: " + testName.getMethodName());
+        
+        // Unregister idling resource
+        if (idlingResource != null) {
+            IdlingRegistry.getInstance().unregister(idlingResource);
+        }
+        
+        Log.endSection();
+    }
+
+    /**
+     * Get application context
+     */
+    protected Context getContext() {
+        return context;
+    }
+
+    /**
+     * Get instrumentation context
+     */
+    protected Context getInstrumentationContext() {
+        return InstrumentationRegistry.getInstrumentation().getContext();
+    }
+
+    /**
+     * Launch activity with intent
+     */
+    protected <T> ActivityScenario<T> launchActivity(Class<T> activityClass) {
+        Log.info("Launching activity: " + activityClass.getSimpleName());
+        return ActivityScenario.launch(activityClass);
+    }
+
+    /**
+     * Launch activity with custom intent
+     */
+    protected <T> ActivityScenario<T> launchActivityWithIntent(Intent intent) {
+        Log.info("Launching activity with intent: " + intent.getComponent());
+        return ActivityScenario.launch(intent);
+    }
+
+    /**
+     * Increment idling resource (call before async operation)
+     */
+    protected void incrementIdling() {
+        if (idlingResource != null) {
+            idlingResource.increment();
+        }
+    }
+
+    /**
+     * Decrement idling resource (call after async operation completes)
+     */
+    protected void decrementIdling() {
+        if (idlingResource != null && !idlingResource.isIdleNow()) {
+            idlingResource.decrement();
+        }
+    }
+
+    /**
+     * Wait for a specified duration (use sparingly)
+     */
+    protected void waitFor(long milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+}

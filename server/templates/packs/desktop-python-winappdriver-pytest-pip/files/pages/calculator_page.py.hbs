@@ -1,0 +1,49 @@
+from selenium.webdriver.common.by import By
+from appium.webdriver.common.appiumby import AppiumBy
+from pages.base_page import BasePage
+from utils.logger import log
+
+
+class CalculatorPage(BasePage):
+    # WinAppDriver locators. `AppiumBy.ACCESSIBILITY_ID` maps to the UIA
+    # `AutomationId` attribute — Selenium's `By` class does not have it.
+    BUTTON_ONE = (By.NAME, "One")
+    BUTTON_TWO = (By.NAME, "Two")
+    BUTTON_THREE = (By.NAME, "Three")
+    BUTTON_PLUS = (By.NAME, "Plus")
+    BUTTON_MINUS = (AppiumBy.ACCESSIBILITY_ID, "minusButton")
+    BUTTON_EQUALS = (By.NAME, "Equals")
+    BUTTON_CLEAR = (AppiumBy.ACCESSIBILITY_ID, "clearButton")
+    RESULT_DISPLAY = (AppiumBy.ACCESSIBILITY_ID, "CalculatorResults")
+
+    def click_number(self, number: int):
+        button = (By.NAME, str(number) if number > 3 else ["One", "Two", "Three"][number-1])
+        self.click(button)
+        return self
+
+    def click_plus(self): self.click(self.BUTTON_PLUS); return self
+    def click_minus(self): self.click(self.BUTTON_MINUS); return self
+    def click_equals(self): self.click(self.BUTTON_EQUALS); return self
+    def click_clear(self): self.click(self.BUTTON_CLEAR); return self
+    def get_result(self): return self.get_text(self.RESULT_DISPLAY)
+
+    def add(self, a: int, b: int):
+        log.step(f"Calculate: {a} + {b}")
+        self.click((By.NAME, ["One", "Two", "Three", "Four", "Five"][a-1]))
+        self.click_plus()
+        self.click((By.NAME, ["One", "Two", "Three", "Four", "Five"][b-1]))
+        self.click_equals()
+        return self
+
+    def subtract(self, a: int, b: int):
+        log.step(f"Calculate: {a} - {b}")
+        self.click((By.NAME, ["One", "Two", "Three", "Four", "Five"][a-1]))
+        self.click_minus()
+        self.click((By.NAME, ["One", "Two", "Three", "Four", "Five"][b-1]))
+        self.click_equals()
+        return self
+
+    def clear(self):
+        log.step("Clear calculator")
+        self.click_clear()
+        return self

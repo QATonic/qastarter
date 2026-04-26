@@ -1,0 +1,33 @@
+"""
+Config Reader - Load WinAppDriver settings.
+"""
+import os
+from configparser import ConfigParser
+from pathlib import Path
+
+
+class ConfigReader:
+    def __init__(self):
+        self.env = os.getenv("ENV", "dev")
+        self._config = ConfigParser()
+        self._load_config()
+    
+    def _load_config(self):
+        config_file = Path(__file__).parent / f"{self.env}.ini"
+        if config_file.exists():
+            self._config.read(config_file)
+    
+    def get(self, key: str, default: str = "") -> str:
+        try: return self._config.get("winappdriver", key)
+        except: return default
+    
+    @property
+    def winappdriver_url(self) -> str:
+        return self.get("winappdriver_url", "http://127.0.0.1:4723")
+    
+    @property
+    def app_path(self) -> str:
+        return self.get("app_path", "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App")
+
+
+config = ConfigReader()

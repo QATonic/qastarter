@@ -1,0 +1,27 @@
+from playwright.sync_api import Page
+import time
+
+class WaitHelpers:
+    @staticmethod
+    def wait_for_element(page: Page, selector: str, timeout: int = 30000) -> None:
+        page.wait_for_selector(selector, timeout=timeout, state='visible')
+
+    @staticmethod
+    def wait_for_url(page: Page, url_pattern: str, timeout: int = 30000) -> None:
+        page.wait_for_url(url_pattern, timeout=timeout)
+
+    @staticmethod
+    def wait_for_text(page: Page, selector: str, text: str, timeout: int = 30000) -> None:
+        page.wait_for_function(
+            {{raw}}f"""
+            () => {{
+                const element = document.querySelector('{selector}');
+                return element && element.textContent.includes('{text}');
+            }}
+            """{{/raw}},
+            timeout=timeout
+        )
+
+    @staticmethod
+    def sleep(seconds: float) -> None:
+        time.sleep(seconds)

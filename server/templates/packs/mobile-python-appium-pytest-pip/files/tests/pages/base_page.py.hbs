@@ -1,0 +1,81 @@
+from appium.webdriver.common.appiumby import AppiumBy
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from config.settings import Settings
+
+class BasePage:
+    """Base page class with common functionality"""
+    
+    def __init__(self, driver):
+        self.driver = driver
+        self.settings = Settings()
+        self.wait = WebDriverWait(driver, self.settings.explicit_wait)
+    
+    def find_element(self, locator):
+        """Find element with explicit wait"""
+        try:
+            return self.wait.until(EC.presence_of_element_located(locator))
+        except TimeoutException:
+            raise AssertionError(f"Element not found: {locator}")
+    
+    def find_elements(self, locator):
+        """Find multiple elements"""
+        return self.driver.find_elements(*locator)
+    
+    def click(self, locator):
+        """Click on element"""
+        element = self.wait.until(EC.element_to_be_clickable(locator))
+        element.click()
+    
+    def send_keys(self, locator, text):
+        """Send keys to element"""
+        element = self.find_element(locator)
+        element.clear()
+        element.send_keys(text)
+    
+    def get_text(self, locator):
+        """Get text from element"""
+        element = self.find_element(locator)
+        return element.text
+    
+    def is_displayed(self, locator, timeout=None):
+        """Check if element is displayed"""
+        try:
+            wait = WebDriverWait(self.driver, timeout or self.settings.explicit_wait)
+            wait.until(EC.visibility_of_element_located(locator))
+            return True
+        except TimeoutException:
+            return False
+    
+    def is_enabled(self, locator):
+        """Check if element is enabled"""
+        element = self.find_element(locator)
+        return element.is_enabled()
+    
+    def wait_for_element(self, locator, timeout=None):
+        """Wait for element to be visible"""
+        wait = WebDriverWait(self.driver, timeout or self.settings.explicit_wait)
+        return wait.until(EC.visibility_of_element_located(locator))
+    
+    def wait_for_element_to_disappear(self, locator, timeout=None):
+        """Wait for element to disappear"""
+        wait = WebDriverWait(self.driver, timeout or self.settings.explicit_wait)
+        return wait.until(EC.invisibility_of_element_located(locator))
+    
+    def scroll_to_element(self, locator):
+        """Scroll to element"""
+        element = self.find_element(locator)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+    
+    def get_attribute(self, locator, attribute):
+        """Get attribute value from element"""
+        element = self.find_element(locator)
+        return element.get_attribute(attribute)
+    
+    def hide_keyboard(self):
+        """Hide mobile keyboard"""
+        try:
+            self.driver.hide_keyboard()
+        except:
+            pass

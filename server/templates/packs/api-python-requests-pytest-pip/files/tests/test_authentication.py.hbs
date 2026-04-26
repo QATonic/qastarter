@@ -1,0 +1,63 @@
+import pytest
+from core.api_client import APIClient
+from core.response_validator import ResponseValidator
+from utils.auth_manager import AuthManager
+
+
+@pytest.mark.auth
+class TestAuthentication:
+    """Authentication test suite."""
+    
+    def test_request_without_auth(self, clean_client: APIClient):
+        """Test making request without authentication."""
+        response = clean_client.get("/users")
+        
+        # JSONPlaceholder doesn't require auth, but this demonstrates the pattern
+        validator = ResponseValidator(response)
+        validator.assert_status_in(200, 401, 403)
+    
+    def test_bearer_token_auth(self, clean_client: APIClient):
+        """Test Bearer token authentication."""
+        clean_client.set_auth_token("test-token-12345")
+        
+        response = clean_client.get("/users")
+        
+        # Verify token was sent in request
+        assert "Authorization" in clean_client.session.headers
+        assert clean_client.session.headers["Authorization"].startswith("Bearer ")
+    
+    def test_api_key_auth(self, clean_client: APIClient):
+        """Test API key authentication."""
+        clean_client.set_api_key("test-api-key-12345")
+        
+        response = clean_client.get("/users")
+        
+        # Verify API key was sent in request
+        assert "X-API-Key" in clean_client.session.headers
+    
+    def test_basic_auth(self, clean_client: APIClient):
+        """Test basic authentication."""
+        clean_client.set_basic_auth("username", "password")
+        
+        response = clean_client.get("/users")
+        
+        # Verify basic auth was set
+        assert clean_client.session.auth is not None
+    
+    def test_custom_header_auth(self, clean_client: APIClient):
+        """Test custom header authentication."""
+        clean_client.set_header("X-Custom-Auth", "custom-value")
+        
+        response = clean_client.get("/users")
+        
+        # Verify custom header was sent
+        assert "X-Custom-Auth" in clean_client.session.headers
+    
+    def test_clear_authentication(self, clean_client: APIClient):
+        """Test clearing authentication."""
+        clean_client.set_auth_token("test-token")
+        assert "Authorization" in clean_client.session.headers
+        
+        clean_client.clear_auth()
+        assert "Authorization" not in clean_client.session.headers
+        assert clean_client.session.auth is None

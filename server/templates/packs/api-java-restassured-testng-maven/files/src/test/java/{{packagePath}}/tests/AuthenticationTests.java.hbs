@@ -1,0 +1,157 @@
+package {{javaPackage}}.tests;
+
+import io.restassured.response.Response;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import {{javaPackage}}.core.BaseTest;
+import {{javaPackage}}.core.ResponseValidator;
+import {{javaPackage}}.utils.Log;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Authentication API test suite
+ * Tests for authentication endpoints and token management
+ *
+ * HOW TO USE THIS TEMPLATE:
+ * 1. Update the endpoint constants below to match your auth API
+ * 2. Update test credentials as appropriate
+ * 3. Run: mvn clean test -Dgroups=auth
+ */
+public class AuthenticationTests extends BaseTest {
+
+    private static final String LOGIN_ENDPOINT = "/auth/login";
+    private static final String LOGOUT_ENDPOINT = "/auth/logout";
+    private static final String PROFILE_ENDPOINT = "/auth/profile";
+    private static final String REFRESH_TOKEN_ENDPOINT = "/auth/refresh";
+
+    @Test(groups = {"auth", "smoke"}, description = "Test successful login with valid credentials")
+    public void testValidLogin() {
+        Log.step("Testing valid user login");
+
+        // Prepare login credentials
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("username", "testuser");
+        credentials.put("password", "testpass123");
+
+        Log.info("Sending login request with valid credentials");
+        Response response = post(LOGIN_ENDPOINT, credentials);
+
+        // Validate successful login response
+        ResponseValidator.assertStatus(response, 200);
+        ResponseValidator.assertBodyContains(response, "token");
+
+        // Validate token format
+        String token = response.jsonPath().getString("token");
+        Assert.assertNotNull(token, "Token should not be null");
+        Assert.assertTrue(token.contains("."), "Token should be in JWT format");
+
+        Log.info("Valid login successful, token received");
+    }
+
+    @Test(groups = {"auth", "negative"}, description = "Test login with invalid credentials")
+    public void testInvalidLogin() {
+        Log.step("Testing login with invalid credentials");
+
+        // Prepare invalid credentials
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("username", "invaliduser");
+        credentials.put("password", "wrongpassword");
+
+        Log.info("Sending login request with invalid credentials");
+        Response response = post(LOGIN_ENDPOINT, credentials);
+
+        // Validate error response
+        ResponseValidator.assertStatus(response, 401);
+        ResponseValidator.assertBodyContains(response, "error");
+
+        Log.info("Invalid login correctly rejected");
+    }
+
+    @Test(groups = {"auth", "negative"}, description = "Test login with missing credentials")
+    public void testLoginWithMissingCredentials() {
+        Log.step("Testing login with missing credentials");
+
+        // Test with missing password
+        Map<String, String> incompleteCredentials = new HashMap<>();
+        incompleteCredentials.put("username", "testuser");
+
+        Log.info("Sending login request with missing password");
+        Response response = post(LOGIN_ENDPOINT, incompleteCredentials);
+
+        // Validate error response
+        ResponseValidator.assertStatus(response, 400);
+        ResponseValidator.assertBodyContains(response, "error");
+
+        Log.info("Missing credentials correctly handled");
+    }
+
+    @Test(groups = {"auth", "security"}, description = "Test password security requirements")
+    public void testPasswordSecurityRequirements() {
+        Log.step("Testing password security requirements");
+
+        // Test weak password
+        Map<String, String> weakPasswordCredentials = new HashMap<>();
+        weakPasswordCredentials.put("username", "newuser");
+        weakPasswordCredentials.put("password", "123"); // Too weak
+        weakPasswordCredentials.put("email", "newuser@example.com");
+
+        Log.info("Attempting to create user with weak password");
+        Response response = post("/auth/register", weakPasswordCredentials);
+
+        // Should reject weak password
+        ResponseValidator.assertStatus(response, 400);
+        ResponseValidator.assertBodyContains(response, "error");
+
+        Log.info("Weak password correctly rejected");
+    }
+
+    @Test(groups = {"auth", "security"}, description = "Test rate limiting on login endpoint")
+    public void testLoginRateLimit() {
+        Log.step("Testing rate limiting on login endpoint");
+
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("username", "testuser");
+        credentials.put("password", "wrongpassword");
+
+        Log.info("Making multiple rapid login attempts");
+
+        Response lastResponse = null;
+        // Make multiple rapid requests to trigger rate limiting
+        for (int i = 0; i < 10; i++) {
+            lastResponse = post(LOGIN_ENDPOINT, credentials);
+            if (lastResponse.getStatusCode() == 429) {
+                break; // Rate limit hit
+            }
+        }
+
+        // Validate rate limiting (either 429 or consistent 401s)
+        Assert.assertTrue(
+            lastResponse.getStatusCode() == 429 || lastResponse.getStatusCode() == 401,
+            "Rate limiting should be in effect"
+        );
+
+        Log.info("Rate limiting working correctly");
+    }
+
+    @Test(groups = {"auth", "performance"}, description = "Test authentication performance")
+    public void testAuthenticationPerformance() {
+        Log.step("Testing authentication performance");
+
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("username", "testuser");
+        credentials.put("password", "testpass123");
+
+        Log.info("Measuring authentication response time");
+        long startTime = System.currentTimeMillis();
+        Response response = post(LOGIN_ENDPOINT, credentials);
+        long authTime = System.currentTimeMillis() - startTime;
+
+        // Validate performance
+        ResponseValidator.assertStatus(response, 200);
+        Assert.assertTrue(authTime < 2000, "Authentication should complete under 2 seconds, took: " + authTime + "ms");
+
+        Log.info("Authentication took: " + authTime + "ms");
+    }
+}

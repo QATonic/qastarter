@@ -1,0 +1,12 @@
+module {{projectName}}
+
+go 1.21
+
+require (
+{{#if utilities.faker}}
+	github.com/brianvoe/gofakeit/v6 v{{toolVersions.gofakeit}}
+{{/if}}
+github.com/playwright-community/playwright-go v0.5101.0
+github.com/stretchr/testify v1.8.4
+github.com/sirupsen/logrus v1.9.3
+)

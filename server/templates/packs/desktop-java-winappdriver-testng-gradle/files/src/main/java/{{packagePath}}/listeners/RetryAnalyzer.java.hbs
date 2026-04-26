@@ -1,0 +1,295 @@
+package {{groupId}}.listeners;
+
+import {{groupId}}.config.ConfigurationReader;
+import {{groupId}}.utils.Log;
+import org.testng.IRetryAnalyzer;
+import org.testng.ITestResult;
+
+/**
+ * TestNG retry analyzer for handling flaky desktop tests
+ * Automatically retries failed tests based on configuration
+ */
+public class RetryAnalyzer implements IRetryAnalyzer {
+
+    private int retryCount = 0;
+    private int maxRetryCount;
+    
+    /**
+     * Constructor - initializes max retry count from configuration
+     */
+    public RetryAnalyzer() {
+        this.maxRetryCount = ConfigurationReader.getMaxRetryCount();
+        Log.info("RetryAnalyzer initialized with max retry count: " + maxRetryCount);
+    }
+
+    /**
+     * Determine if test should be retried
+     * @param result Test result
+     * @return true if test should be retried
+     */
+    @Override
+    public boolean retry(ITestResult result) {
+        String testName = result.getMethod().getMethodName();
+        String className = result.getTestClass().getName();
+        
+        if (retryCount < maxRetryCount) {
+            retryCount++;
+            
+            Log.warn("Test failed - Retry attempt " + retryCount + "/" + maxRetryCount + 
+                    " for " + className + "." + testName);
+            
+            // Log failure reason for retry decision
+            Throwable throwable = result.getThrowable();
+            if (throwable != null) {
+                String errorMessage = throwable.getMessage();
+                Log.warn("Retry reason: " + errorMessage);
+                
+                // Check if this is a retryable failure
+                if (isRetryableFailure(throwable)) {
+                    Log.info("Failure is retryable - proceeding with retry");
+                    
+                    // Clean up before retry
+                    performCleanupBeforeRetry();
+                    
+                    return true;
+                } else {
+                    Log.info("Failure is not retryable - skipping retry");
+                    return false;
+                }
+            }
+            
+            Log.info("Retrying test: " + testName);
+            performCleanupBeforeRetry();
+            return true;
+        }
+        
+        Log.error("Maximum retry count (" + maxRetryCount + ") reached for test: " + testName);
+        return false;
+    }
+
+    /**
+     * Check if the failure is retryable
+     * @param throwable Exception that caused the failure
+     * @return true if failure should be retried
+     */
+    private boolean isRetryableFailure(Throwable throwable) {
+        if (throwable == null) {
+            return true; // Default to retryable if no specific error
+        }
+        
+        String errorMessage = throwable.getMessage();
+        String exceptionClass = throwable.getClass().getSimpleName();
+        
+        // Don't retry assertion failures - these are likely real test failures
+        if (isAssertionFailure(throwable)) {
+            Log.info("Assertion failure detected - not retrying");
+            return false;
+        }
+        
+        // Don't retry configuration errors
+        if (isConfigurationError(throwable)) {
+            Log.info("Configuration error detected - not retrying");
+            return false;
+        }
+        
+        // Retry connection/timeout related failures
+        if (isConnectionOrTimeoutError(throwable)) {
+            Log.info("Connection/timeout error detected - retrying");
+            return true;
+        }
+        
+        // Retry element not found errors (might be timing issues)
+        if (isElementNotFoundError(throwable)) {
+            Log.info("Element not found error detected - retrying");
+            return true;
+        }
+        
+        // Retry stale element reference errors
+        if (isStaleElementError(throwable)) {
+            Log.info("Stale element error detected - retrying");
+            return true;
+        }
+        
+        // Don't retry unknown errors by default
+        Log.info("Unknown error type (" + exceptionClass + ") - not retrying by default");
+        return false;
+    }
+
+    /**
+     * Check if throwable is an assertion failure
+     * @param throwable Exception to check
+     * @return true if assertion failure
+     */
+    private boolean isAssertionFailure(Throwable throwable) {
+        String className = throwable.getClass().getName();
+        return className.contains("AssertionError") || 
+               className.contains("AssertionFailedError") ||
+               className.contains("ComparisonFailure");
+    }
+
+    /**
+     * Check if throwable is a configuration error
+     * @param throwable Exception to check
+     * @return true if configuration error
+     */
+    private boolean isConfigurationError(Throwable throwable) {
+        String message = throwable.getMessage();
+        if (message == null) {
+            return false;
+        }
+        
+        message = message.toLowerCase();
+        return message.contains("configuration") ||
+               message.contains("invalid property") ||
+               message.contains("missing property") ||
+               message.contains("file not found") ||
+               message.contains("class not found");
+    }
+
+    /**
+     * Check if throwable is a connection or timeout error
+     * @param throwable Exception to check
+     * @return true if connection/timeout error
+     */
+    private boolean isConnectionOrTimeoutError(Throwable throwable) {
+        String className = throwable.getClass().getName();
+        String message = throwable.getMessage();
+        
+        // Check class name
+        if (className.contains("TimeoutException") ||
+            className.contains("ConnectException") ||
+            className.contains("SocketTimeoutException") ||
+            className.contains("UnreachableDriverException")) {
+            return true;
+        }
+        
+        // Check error message
+        if (message != null) {
+            message = message.toLowerCase();
+            return message.contains("timeout") ||
+                   message.contains("connection") ||
+                   message.contains("unreachable") ||
+                   message.contains("session not created") ||
+                   message.contains("session deleted") ||
+                   message.contains("winappdriver");
+        }
+        
+        return false;
+    }
+
+    /**
+     * Check if throwable is an element not found error
+     * @param throwable Exception to check
+     * @return true if element not found error
+     */
+    private boolean isElementNotFoundError(Throwable throwable) {
+        String className = throwable.getClass().getName();
+        String message = throwable.getMessage();
+        
+        if (className.contains("NoSuchElementException") ||
+            className.contains("ElementNotFoundException")) {
+            return true;
+        }
+        
+        if (message != null) {
+            message = message.toLowerCase();
+            return message.contains("no such element") ||
+                   message.contains("element not found") ||
+                   message.contains("unable to locate element");
+        }
+        
+        return false;
+    }
+
+    /**
+     * Check if throwable is a stale element error
+     * @param throwable Exception to check
+     * @return true if stale element error
+     */
+    private boolean isStaleElementError(Throwable throwable) {
+        String className = throwable.getClass().getName();
+        String message = throwable.getMessage();
+        
+        if (className.contains("StaleElementReferenceException")) {
+            return true;
+        }
+        
+        if (message != null) {
+            message = message.toLowerCase();
+            return message.contains("stale element") ||
+                   message.contains("element is no longer attached");
+        }
+        
+        return false;
+    }
+
+    /**
+     * Perform cleanup before retry
+     */
+    private void performCleanupBeforeRetry() {
+        try {
+            Log.info("Performing cleanup before retry");
+            
+            // Add small delay to allow system to stabilize
+            Thread.sleep(2000);
+            
+            // Additional cleanup can be added here if needed
+            // For example: clearing driver state, resetting application state, etc.
+            
+        } catch (InterruptedException e) {
+            Log.warn("Cleanup interrupted: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            Log.error("Error during cleanup before retry: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get current retry count
+     * @return Current retry count
+     */
+    public int getCurrentRetryCount() {
+        return retryCount;
+    }
+
+    /**
+     * Get maximum retry count
+     * @return Maximum retry count
+     */
+    public int getMaxRetryCount() {
+        return maxRetryCount;
+    }
+
+    /**
+     * Reset retry count (useful for test data providers)
+     */
+    public void resetRetryCount() {
+        Log.debug("Resetting retry count from " + retryCount + " to 0");
+        retryCount = 0;
+    }
+
+    /**
+     * Set maximum retry count programmatically
+     * @param maxRetryCount New maximum retry count
+     */
+    public void setMaxRetryCount(int maxRetryCount) {
+        Log.info("Changing max retry count from " + this.maxRetryCount + " to " + maxRetryCount);
+        this.maxRetryCount = maxRetryCount;
+    }
+
+    /**
+     * Check if retries are enabled
+     * @return true if retries are enabled (maxRetryCount > 0)
+     */
+    public boolean isRetryEnabled() {
+        return maxRetryCount > 0;
+    }
+
+    /**
+     * Get retry statistics as formatted string
+     * @return Retry statistics
+     */
+    public String getRetryStatistics() {
+        return String.format("Retry Statistics: %d/%d attempts used", retryCount, maxRetryCount);
+    }
+}

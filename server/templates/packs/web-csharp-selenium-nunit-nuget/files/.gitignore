@@ -1,0 +1,31 @@
+# Build results
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Test Results
+TestResults/
+Logs/
+Screenshots/
+Reports/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

@@ -1,0 +1,35 @@
+"""
+WinAppDriver Manager - Windows desktop driver lifecycle.
+
+Sample App: Windows Calculator
+"""
+from appium import webdriver
+from appium.options.windows import WindowsOptions
+from config.config_reader import config
+from utils.logger import log
+
+
+class WinAppDriverManager:
+    _driver = None
+
+    @classmethod
+    def get_driver(cls):
+        return cls._driver
+
+    @classmethod
+    def init_driver(cls):
+        log.info("Initializing WinAppDriver")
+        
+        options = WindowsOptions()
+        options.app = config.app_path
+        
+        cls._driver = webdriver.Remote(config.winappdriver_url, options=options)
+        log.info("WinAppDriver initialized")
+        return cls._driver
+
+    @classmethod
+    def quit_driver(cls):
+        if cls._driver:
+            cls._driver.quit()
+            cls._driver = None
+            log.info("WinAppDriver closed")

@@ -1,0 +1,62 @@
+from selenium.webdriver.remote.webelement import WebElement
+from utils.logger import Logger
+
+class ElementActions:
+    @staticmethod
+    def click(element: WebElement, element_name: str = "Element"):
+        try:
+            Logger.info(f"Clicking on: {element_name}")
+            element.click()
+        except Exception as e:
+            Logger.error(f"Failed to click on {element_name}: {str(e)}")
+            raise
+    
+    @staticmethod
+    def send_keys(element: WebElement, text: str, element_name: str = "Element"):
+        try:
+            Logger.info(f"Sending keys '{text}' to: {element_name}")
+            element.clear()
+            element.send_keys(text)
+        except Exception as e:
+            Logger.error(f"Failed to send keys to {element_name}: {str(e)}")
+            raise
+    
+    @staticmethod
+    def get_text(element: WebElement, element_name: str = "Element") -> str:
+        try:
+            text = element.text
+            Logger.info(f"Got text '{text}' from: {element_name}")
+            return text
+        except Exception as e:
+            Logger.error(f"Failed to get text from {element_name}: {str(e)}")
+            raise
+    
+    @staticmethod
+    def get_attribute(element: WebElement, attribute_name: str, element_name: str = "Element") -> str:
+        try:
+            value = element.get_attribute(attribute_name)
+            Logger.info(f"Got attribute '{attribute_name}' = '{value}' from: {element_name}")
+            return value
+        except Exception as e:
+            Logger.error(f"Failed to get attribute from {element_name}: {str(e)}")
+            raise
+    
+    @staticmethod
+    def is_displayed(element: WebElement, element_name: str = "Element") -> bool:
+        try:
+            displayed = element.is_displayed()
+            Logger.info(f"Element '{element_name}' displayed: {displayed}")
+            return displayed
+        except Exception as e:
+            Logger.error(f"Failed to check if element is displayed: {element_name}")
+            return False
+    
+    @staticmethod
+    def is_enabled(element: WebElement, element_name: str = "Element") -> bool:
+        try:
+            enabled = element.is_enabled()
+            Logger.info(f"Element '{element_name}' enabled: {enabled}")
+            return enabled
+        except Exception as e:
+            Logger.error(f"Failed to check if element is enabled: {element_name}")
+            return False

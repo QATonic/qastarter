@@ -1,0 +1,38 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Regression Tests Suite" 
+       verbose="1" 
+       parallel="methods" 
+       thread-count="2"
+       preserve-order="false">
+    
+    <!-- Suite Parameters -->
+    <parameter name="environment" value="qa"/>
+    
+    <!-- Listeners -->
+    <listeners>
+        <listener class-name="{{groupId}}.listeners.TestListener"/>
+    </listeners>
+    
+    <!-- Regression Test Groups -->
+    <groups>
+        <run>
+            <include name="regression"/>
+            <include name="calculator"/>
+            <include name="notepad"/>
+            <include name="integration"/>
+            <include name="stress"/>
+        </run>
+    </groups>
+    
+    <!-- Full Regression Test Suite -->
+    <test name="Desktop Regression Tests" 
+          group-by-instances="true"
+          preserve-order="false">
+        <classes>
+            <class name="{{groupId}}.tests.CalculatorTests"/>
+            <class name="{{groupId}}.tests.NotepadTests"/>
+            <class name="{{groupId}}.tests.WindowsIntegrationTests"/>
+        </classes>
+    </test>
+    
+</suite>

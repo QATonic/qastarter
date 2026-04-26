@@ -1,0 +1,59 @@
+import { remote } from 'webdriverio';
+import * as fs from 'fs';
+import * as path from 'path';
+import capabilities from '../config/capabilities';
+import settings from '../config/settings';
+import { loadJsonFile } from './utils/helpers';
+import { TestData } from './types/testData';
+
+// Driver and testData are exposed on globalThis so page objects and tests
+// can access them without threading them through every fixture.
+let driver: WebdriverIO.Browser | undefined;
+let testData: TestData;
+
+beforeAll(() => {
+  // Create runtime output directories if missing.
+  for (const dir of ['logs', 'screenshots', 'reports']) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  }
+
+  // Load test data for the active environment.
+  const dataFile = path.join('data', `${settings.testEnv}.json`);
+  testData = loadJsonFile<TestData>(dataFile);
+});
+
+beforeEach(async () => {
+  // Pick capabilities by platform (android | ios).
+  const caps =
+    settings.platform.toLowerCase() === 'android'
+      ? capabilities.getAndroidCapabilities()
+      : capabilities.getIOSCapabilities();
+
+  const serverUrl = new URL(settings.appiumServer);
+  driver = await remote({
+    protocol: 'http',
+    hostname: serverUrl.hostname,
+    port: parseInt(serverUrl.port, 10) || 4723,
+    path: '/',
+    capabilities: caps,
+    logLevel: 'error',
+  });
+
+  await driver.setImplicitTimeout(settings.implicitWait);
+
+  // Expose on globalThis for page objects + tests.
+  (global as unknown as { driver: WebdriverIO.Browser; testData: TestData }).driver = driver;
+  (global as unknown as { driver: WebdriverIO.Browser; testData: TestData }).testData = testData;
+});
+
+afterEach(async () => {
+  if (driver) {
+    await driver.deleteSession();
+    driver = undefined;
+  }
+});
+
+// Retry flaky tests once.
+jest.retryTimes(2);

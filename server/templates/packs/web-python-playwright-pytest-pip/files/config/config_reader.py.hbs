@@ -1,0 +1,85 @@
+"""
+Configuration Reader - Load environment-specific settings.
+
+Usage:
+    from config.config_reader import config
+    
+    base_url = config.get("base_url")
+    browser = config.get("browser", "chrome")
+
+Environment selection:
+    Set ENV=qa in .env file or environment variable
+"""
+import os
+from configparser import ConfigParser
+from pathlib import Path
+
+class ConfigurationReader:
+    """Thread-safe configuration reader."""
+    
+    _instance = None
+    _config = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._load_config()
+        return cls._instance
+    
+    def _load_config(self):
+        """Load configuration from INI file based on environment."""
+        env = os.getenv("ENV", "dev")
+        config_path = Path(__file__).parent / f"{env}.ini"
+        
+        if not config_path.exists():
+            config_path = Path(__file__).parent / "dev.ini"
+            print(f"[Config] {env}.ini not found, using dev.ini")
+        
+        self._config = ConfigParser()
+        self._config.read(config_path)
+        print(f"[Config] Loaded: {config_path}")
+    
+    def get(self, key: str, default: str = None, section: str = "settings") -> str:
+        """Get configuration value."""
+        # Check environment variable first
+        env_value = os.getenv(key.upper())
+        if env_value:
+            return env_value
+        
+        # Then check config file
+        try:
+            return self._config.get(section, key)
+        except:
+            return default
+    
+    def get_bool(self, key: str, default: bool = False, section: str = "settings") -> bool:
+        """Get boolean configuration value."""
+        value = self.get(key, str(default), section)
+        return value.lower() in ("true", "1", "yes", "on")
+    
+    def get_int(self, key: str, default: int = 0, section: str = "settings") -> int:
+        """Get integer configuration value."""
+        try:
+            return int(self.get(key, str(default), section))
+        except:
+            return default
+    
+    @property
+    def base_url(self) -> str:
+        return self.get("base_url")
+    
+    @property
+    def browser(self) -> str:
+        return self.get("browser", "chrome")
+    
+    @property
+    def headless(self) -> bool:
+        return self.get_bool("headless", False)
+    
+    @property
+    def timeout(self) -> int:
+        return self.get_int("timeout", 30)
+
+
+# Singleton instance
+config = ConfigurationReader()

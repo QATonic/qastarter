@@ -182,7 +182,7 @@
     "baseline-browser-mapping": "^2.9.17",
     "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.8",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
@@ -197,7 +197,7 @@
     "supertest": "^7.1.4",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
-    "typescript": "5.6.3",
+    "typescript": "5.9.3",
     "vite": "^6.4.1",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^3.2.3"

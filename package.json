@@ -152,7 +152,7 @@
     "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.57.0",
+    "@playwright/test": "^1.59.1",
     "@replit/vite-plugin-cartographer": "^0.4.3",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/typography": "^0.5.15",

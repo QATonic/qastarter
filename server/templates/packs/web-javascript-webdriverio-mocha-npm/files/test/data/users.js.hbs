@@ -1,0 +1,19 @@
+/**
+ * Test data for user authentication.
+ *
+ * Edit this file (or use environment variables in your CI) to point the
+ * suite at a different account — the spec only consumes these exports,
+ * so no edits are needed in test/specs/*.
+ */
+
+export const validUser = {
+  username: '{{testUsername}}',
+  password: '{{testPassword}}',
+};
+
+export const invalidUser = {
+  username: 'invalid_user',
+  password: 'wrong_password',
+};
+
+export default { validUser, invalidUser };

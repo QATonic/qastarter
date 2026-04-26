@@ -1,7 +1,14 @@
 /**
 * Login Tests using WebDriverIO with Mocha.
+*
+* Credentials live in test/data/users.js — edit that file to point the
+* suite at a different account. Locators live in
+* test/pageobjects/login.page.js — edit that file when the UI changes.
+* This spec consumes both and shouldn't need edits to switch
+* environments.
 */
 import LoginPage from '../pageobjects/login.page.js';
+import { validUser, invalidUser } from '../data/users.js';
 {{#if utilities.dataProvider}}
 import DataReader from '../../utils/dataReader.js';
 {{/if}}
@@ -12,13 +19,13 @@ await LoginPage.open();
 });
 
 it("should login successfully", async () => {
-await LoginPage.login("{{testUsername}}", "{{testPassword}}");
+await LoginPage.login(validUser.username, validUser.password);
 // SauceDemo successful login goes to inventory, no flash message usually, or we check URL
 await expect(browser).toHaveUrlContaining('inventory');
 });
 
 it("should show error with invalid credentials", async () => {
-await LoginPage.login("invalid", "wrong");
+await LoginPage.login(invalidUser.username, invalidUser.password);
 await expect(LoginPage.flashMessage).toBeDisplayed();
 await expect(LoginPage.flashMessage).toHaveTextContaining('Epic sadface');
 });

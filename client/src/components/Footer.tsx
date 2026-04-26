@@ -1,4 +1,4 @@
-import { Linkedin, Twitter, Youtube, Instagram, Heart, BookOpen, Code, Zap } from 'lucide-react';
+import { Linkedin, Twitter, Youtube, Instagram, Heart, BookOpen, Code, Zap, LifeBuoy } from 'lucide-react';
 import QAStarterLogo from './QAStarterLogo';
 import { Link } from 'wouter';
 
@@ -80,6 +80,16 @@ export default function Footer() {
                 <Code className="h-3.5 w-3.5" />
                 API
               </Link>
+              <a
+                href="https://github.com/QATonic/qastarter/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground transition-colors flex items-center gap-1"
+                aria-label="Get help — open a GitHub issue"
+              >
+                <LifeBuoy className="h-3.5 w-3.5" />
+                Support
+              </a>
             </nav>
 
             {/* Separator */}

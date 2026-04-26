@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------
+# Run {{projectName}} XCUITest tests on BrowserStack App Automate.
+#
+# Usage (macOS only — requires Xcode):
+#   export BROWSERSTACK_USERNAME=<your username>
+#   export BROWSERSTACK_ACCESS_KEY=<your access key>
+#   bash scripts/run-on-browserstack.sh
+#
+# Docs: https://www.browserstack.com/docs/app-automate/xcuitest
+# ------------------------------------------------------------------
+set -euo pipefail
+
+: "${BROWSERSTACK_USERNAME:?BROWSERSTACK_USERNAME not set}"
+: "${BROWSERSTACK_ACCESS_KEY:?BROWSERSTACK_ACCESS_KEY not set}"
+
+PROJECT_NAME="{{projectName}}"
+BUILD_NAME="${BUILD_NAME:-${PROJECT_NAME} - $(date -u +%Y%m%d-%H%M%S)}"
+DEVICES='["iPhone 14-16","iPhone 15 Pro-17","iPad Air 5-16"]'
+
+DERIVED="build"
+SCHEME="${SCHEME:-${PROJECT_NAME}}"
+
+echo "==> Building for testing (iphoneos, Debug)"
+xcodebuild -scheme "$SCHEME" \
+  -destination "generic/platform=iOS" \
+  -configuration Debug \
+  -derivedDataPath "$DERIVED" \
+  build-for-testing
+
+PRODUCTS="$DERIVED/Build/Products"
+[[ -d "$PRODUCTS" ]] || { echo "Expected $PRODUCTS, not found"; exit 1; }
+
+echo "==> Packaging Products into .ipa"
+IPA="$PRODUCTS/${PROJECT_NAME}.ipa"
+(cd "$PRODUCTS" && zip -qry "${PROJECT_NAME}.ipa" ./Debug-iphoneos)
+[[ -f "$IPA" ]] || { echo "Failed to build $IPA"; exit 1; }
+
+echo "==> Uploading archive to BrowserStack"
+APP_RESP=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    -X POST "https://api-cloud.browserstack.com/app-automate/xcuitest/v2/app" \
+    -F "file=@${IPA}")
+APP_URL=$(echo "$APP_RESP" | sed -n 's/.*"app_url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+echo "   app_url: $APP_URL"
+
+echo "==> Triggering build on ${DEVICES}"
+BUILD_RESP=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    -X POST "https://api-cloud.browserstack.com/app-automate/xcuitest/v2/build" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"app\":        \"${APP_URL}\",
+        \"devices\":    ${DEVICES},
+        \"project\":    \"${PROJECT_NAME}\",
+        \"buildName\":  \"${BUILD_NAME}\",
+        \"logs\":       true,
+        \"networkLogs\": true,
+        \"deviceLogs\": true
+    }")
+BUILD_ID=$(echo "$BUILD_RESP" | sed -n 's/.*"build_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+echo "   build_id: $BUILD_ID"
+echo "   Follow: https://app-automate.browserstack.com/dashboard/v2/builds/${BUILD_ID}"
+
+echo "==> Polling for completion"
+while :; do
+  sleep 20
+  STATUS=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    "https://api-cloud.browserstack.com/app-automate/xcuitest/v2/builds/${BUILD_ID}" \
+    | sed -n 's/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  echo "   status: $STATUS"
+  case "$STATUS" in
+    passed|failed|error|timeout|skipped) break ;;
+    running|queued) ;;
+    *) echo "Unexpected status: $STATUS"; break ;;
+  esac
+done
+
+[[ "$STATUS" == "passed" ]] && exit 0 || exit 1

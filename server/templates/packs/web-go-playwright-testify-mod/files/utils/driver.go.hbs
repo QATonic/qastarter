@@ -1,54 +1,107 @@
 package utils
 
 import (
-"log"
+	"log"
+{{#if (eq cloudDeviceFarm "browserstack")}}
+	"encoding/json"
+	"net/url"
+	"os"
+{{/if}}
 
-"github.com/playwright-community/playwright-go"
+	"github.com/playwright-community/playwright-go"
 )
 
 type Driver struct {
-PW *playwright.Playwright
-Browser playwright.Browser
-Context playwright.BrowserContext
-Page playwright.Page
+	PW      *playwright.Playwright
+	Browser playwright.Browser
+	Context playwright.BrowserContext
+	Page    playwright.Page
 }
+
+{{#if (eq cloudDeviceFarm "browserstack")}}
+// Playwright client version — must match the playwright-go version so
+// BrowserStack spins up a compatible remote server. Keep in sync with
+// go.mod (playwright-community/playwright-go pulls this Playwright core).
+const playwrightClientVersion = "1.42.0"
+
+// buildBrowserStackWSEndpoint assembles the CDP WebSocket URL that routes
+// all Playwright sessions to BrowserStack's cloud. Credentials come from
+// BROWSERSTACK_USERNAME / BROWSERSTACK_ACCESS_KEY env vars; browser/OS
+// and build metadata are hard-coded here — edit this function (or lift
+// it into env vars) if you need a different matrix.
+func buildBrowserStackWSEndpoint() string {
+	username := os.Getenv("BROWSERSTACK_USERNAME")
+	accessKey := os.Getenv("BROWSERSTACK_ACCESS_KEY")
+	if username == "" || accessKey == "" {
+		log.Fatalf("BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY must be set when cloudDeviceFarm=browserstack")
+	}
+
+	caps := map[string]interface{}{
+		"browser":                        "playwright-chromium",
+		"browser_version":                "latest",
+		"os":                             "osx",
+		"os_version":                     "ventura",
+		"name":                           "{{projectName}} Test",
+		"build":                          "{{projectName}} - Build #1",
+		"browserstack.username":          username,
+		"browserstack.accessKey":         accessKey,
+		"browserstack.playwrightVersion": playwrightClientVersion,
+		"client.playwrightVersion":       playwrightClientVersion,
+	}
+	capsJSON, err := json.Marshal(caps)
+	if err != nil {
+		log.Fatalf("could not marshal BrowserStack caps: %v", err)
+	}
+	return "wss://cdp.browserstack.com/playwright?caps=" + url.QueryEscape(string(capsJSON))
+}
+{{/if}}
 
 func InitDriver() *Driver {
-pw, err := playwright.Run()
-if err != nil {
-log.Fatalf("could not start playwright: %v", err)
-}
+	pw, err := playwright.Run()
+	if err != nil {
+		log.Fatalf("could not start playwright: %v", err)
+	}
 
-browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
-Headless: playwright.Bool(false),
-})
-if err != nil {
-log.Fatalf("could not launch browser: %v", err)
-}
+{{#if (eq cloudDeviceFarm "browserstack")}}
+	// BrowserStack routing — connect via CDP WebSocket so every session
+	// runs on BrowserStack's cloud instead of a local browser.
+	wsEndpoint := buildBrowserStackWSEndpoint()
+	browser, err := pw.Chromium.Connect(wsEndpoint)
+	if err != nil {
+		log.Fatalf("could not connect to BrowserStack: %v", err)
+	}
+{{else}}
+	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
+		Headless: playwright.Bool(false),
+	})
+	if err != nil {
+		log.Fatalf("could not launch browser: %v", err)
+	}
+{{/if}}
 
-context, err := browser.NewContext()
-if err != nil {
-log.Fatalf("could not create context: %v", err)
-}
+	context, err := browser.NewContext()
+	if err != nil {
+		log.Fatalf("could not create context: %v", err)
+	}
 
-page, err := context.NewPage()
-if err != nil {
-log.Fatalf("could not create page: %v", err)
-}
+	page, err := context.NewPage()
+	if err != nil {
+		log.Fatalf("could not create page: %v", err)
+	}
 
-return &Driver{
-PW: pw,
-Browser: browser,
-Context: context,
-Page: page,
-}
+	return &Driver{
+		PW:      pw,
+		Browser: browser,
+		Context: context,
+		Page:    page,
+	}
 }
 
 func (d *Driver) Close() {
-if d.Browser != nil {
-d.Browser.Close()
-}
-if d.PW != nil {
-d.PW.Stop()
-}
+	if d.Browser != nil {
+		d.Browser.Close()
+	}
+	if d.PW != nil {
+		d.PW.Stop()
+	}
 }

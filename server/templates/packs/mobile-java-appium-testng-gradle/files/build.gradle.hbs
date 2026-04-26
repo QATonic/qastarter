@@ -40,6 +40,17 @@ implementation '{{group}}:{{name}}:{{version}}'
     // DataFaker — Test data generation
     implementation 'net.datafaker:datafaker:{{toolVersions.datafaker}}'
     {{/if}}
+{{#if (eq cloudDeviceFarm "browserstack")}}
+
+    // BrowserStack SDK — auto-instruments Appium sessions to route to
+    // BrowserStack's App Automate cloud based on browserstack.yml at project root.
+    // Upload your .apk / .ipa first with:
+    //   curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    //        -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
+    //        -F "file=@/path/to/app.apk"
+    // then paste the returned app_url into browserstack.yml (bs://...).
+    implementation 'com.browserstack:browserstack-java-sdk:1.25.0'
+{{/if}}
 }
 
 test {
@@ -47,4 +58,15 @@ test {
     testLogging {
         events "passed", "skipped", "failed"
     }
+{{#if (eq cloudDeviceFarm "browserstack")}}
+
+    // Attach BrowserStack SDK as a java agent so every Appium session
+    // routes to BrowserStack based on browserstack.yml.
+    doFirst {
+        def sdkJar = configurations.testRuntimeClasspath.find { it.name.startsWith('browserstack-java-sdk') }
+        if (sdkJar != null) {
+            jvmArgs += ["-javaagent:${sdkJar.absolutePath}"]
+        }
+    }
+{{/if}}
 }

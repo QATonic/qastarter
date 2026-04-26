@@ -10,3 +10,10 @@ webdriver-manager>=4.0.0
 # Test Data Generation
 faker>={{toolVersions.faker}}
 {{/if}}
+{{#if (eq cloudDeviceFarm "browserstack")}}
+# BrowserStack SDK — reads browserstack.yml at project root and routes
+# every Selenium session to BrowserStack's cloud. Run tests via:
+#   browserstack-sdk robot tests/
+# after setting BROWSERSTACK_USERNAME + BROWSERSTACK_ACCESS_KEY env vars.
+browserstack-sdk>=1.22.0
+{{/if}}

@@ -538,10 +538,12 @@ export const validationMatrix: ValidationMatrix = {
   },
 
   // Testing Type -> Available Cloud Device Farms
-  // Only applicable to web and mobile testing types
+  // Only applicable to web and mobile testing types.
+  // BrowserStack is fully wired today; saucelabs + testmu are listed for
+  // discoverability and rendered as "Coming Soon" in the wizard UI.
   cloudDeviceFarms: {
-    web: ['browserstack', 'saucelabs'],
-    mobile: ['browserstack', 'saucelabs'],
+    web: ['browserstack', 'saucelabs', 'testmu'],
+    mobile: ['browserstack', 'saucelabs', 'testmu'],
     api: [],
     desktop: [],
     performance: [],
@@ -987,5 +989,6 @@ export const validationLabels = {
     none: 'None (Local)',
     browserstack: 'BrowserStack',
     saucelabs: 'Sauce Labs',
+    testmu: 'TestMu AI',
   },
 };

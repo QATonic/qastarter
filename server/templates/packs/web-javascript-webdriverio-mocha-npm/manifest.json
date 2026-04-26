@@ -32,6 +32,10 @@
       "isTemplate": true
     },
     {
+      "path": "test/data/users.js",
+      "isTemplate": true
+    },
+    {
       "path": ".circleci/config.yml",
       "isTemplate": true,
       "conditional": {
@@ -63,10 +67,6 @@
       "conditional": {
         "cicdTool": "azure-devops"
       }
-    },
-    {
-      "path": "config/environments.js",
-      "isTemplate": true
     },
     {
       "path": "docker-compose.yml",

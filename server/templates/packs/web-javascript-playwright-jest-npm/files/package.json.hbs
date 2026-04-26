@@ -2,7 +2,8 @@
 "name": "{{artifactId}}",
 "version": "1.0.0",
 "scripts": {
-"test": "jest",
+"test": "{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-node-sdk jest{{else}}jest{{/if}}",
+"test:local": "jest",
 "lint": "eslint .",
 "format": "prettier --write ."
 },
@@ -20,6 +21,9 @@
 {{/if}}
 {{#if (eq reportingTool "jest-html")}}
 "jest-html-reporter": "^3.10.2",
+{{/if}}
+{{#if (eq cloudDeviceFarm "browserstack")}}
+"browserstack-node-sdk": "^1.34.15",
 {{/if}}
 "jest-circus": "^29.7.0"
 }

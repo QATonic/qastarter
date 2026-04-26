@@ -63,6 +63,11 @@
       "description": "Gradle wrapper properties"
     },
     {
+      "path": "gradle/wrapper/gradle-wrapper.jar",
+      "isTemplate": false,
+      "description": "Gradle wrapper binary (required for ./gradlew bootstrap)"
+    },
+    {
       "path": "README.md",
       "isTemplate": true,
       "description": "Project documentation"
@@ -142,7 +147,14 @@
       "description": "Custom test runner"
     },
     {
-      "path": "config/browserstack.yml",
+      "path": "browserstack.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cloudDeviceFarm": "browserstack"
+      }
+    },
+    {
+      "path": "scripts/run-on-browserstack.sh",
       "isTemplate": true,
       "conditional": {
         "cloudDeviceFarm": "browserstack"

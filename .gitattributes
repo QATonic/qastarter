@@ -1,0 +1,93 @@
+# Normalise line endings and mark binaries so Windows/Linux checkouts
+# stay byte-identical and CRLF-mangled scripts can't break tooling.
+# Especially important for the gradle-wrapper.jar binaries we ship with
+# the Java/Kotlin Gradle template packs (Phase 4).
+
+# Default: let Git auto-detect text files, normalise to LF in the repo
+* text=auto eol=lf
+
+# Source / config — explicit text + LF (cross-platform)
+*.ts        text eol=lf
+*.tsx       text eol=lf
+*.js        text eol=lf
+*.jsx       text eol=lf
+*.mjs       text eol=lf
+*.cjs       text eol=lf
+*.json      text eol=lf
+*.md        text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.toml      text eol=lf
+*.html      text eol=lf
+*.css       text eol=lf
+*.scss      text eol=lf
+*.svg       text eol=lf
+*.xml       text eol=lf
+*.gradle    text eol=lf
+*.kt        text eol=lf
+*.kts       text eol=lf
+*.java      text eol=lf
+*.py        text eol=lf
+*.go        text eol=lf
+*.rs        text eol=lf
+*.cs        text eol=lf
+*.swift     text eol=lf
+*.dart      text eol=lf
+*.proto     text eol=lf
+*.feature   text eol=lf
+*.robot     text eol=lf
+*.scala     text eol=lf
+*.properties text eol=lf
+*.ini       text eol=lf
+*.csv       text eol=lf
+*.tsv       text eol=lf
+*.hbs       text eol=lf
+Dockerfile  text eol=lf
+Jenkinsfile text eol=lf
+
+# Shell scripts and gradlew — MUST be LF (run on Linux containers)
+*.sh        text eol=lf
+*.bash      text eol=lf
+gradlew     text eol=lf
+
+# Windows batch files — MUST be CRLF
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+gradlew.bat text eol=crlf
+
+# Binaries — never touch
+*.jar       binary
+*.war       binary
+*.ear       binary
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.zip       binary
+*.tgz       binary
+*.gz        binary
+*.apk       binary
+*.ipa       binary
+*.keystore  binary
+*.jks       binary
+*.p12       binary
+*.pfx       binary
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.otf       binary
+*.mp3       binary
+*.mp4       binary
+*.webm      binary
+
+# Lock files — text but kept verbatim, no diff noise
+package-lock.json   linguist-generated=true
+yarn.lock           linguist-generated=true
+pnpm-lock.yaml      linguist-generated=true
+
+# Generated rendered audit output / build artifacts shouldn't pollute
+# language stats on GitHub.
+dist/**             linguist-generated=true
+.audit-rendered/**  linguist-generated=true

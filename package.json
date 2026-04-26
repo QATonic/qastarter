@@ -114,7 +114,7 @@
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
-    "drizzle-orm": "^0.39.1",
+    "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.6.0",
     "express": "^4.21.2",
@@ -142,9 +142,8 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "tw-animate-css": "^1.2.5",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "vaul": "^1.1.2",
-    "vite-plugin-pwa": "^1.1.0",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
     "wouter": "^3.3.5",
@@ -193,16 +192,23 @@
     "globals": "^17.0.0",
     "husky": "^9.1.7",
     "jsdom": "^27.4.0",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.10",
     "prettier": "^3.7.4",
     "supertest": "^7.1.4",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
     "typescript": "5.6.3",
     "vite": "^6.4.1",
+    "vite-plugin-pwa": "^1.2.0",
     "vitest": "^3.2.3"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.5",
+    "fast-xml-parser": "^5.7.0",
+    "@tootallnate/once": "^3.0.1",
+    "uuid": "^14.0.0"
   }
 }

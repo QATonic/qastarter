@@ -181,10 +181,15 @@ async function pushFilesToRepo(
       const batch = files.slice(i, i + BATCH_SIZE);
       const blobResults = await Promise.all(
         batch.map(async (file) => {
+          // Buffer content (binary assets like gradle-wrapper.jar) is
+          // base64-encoded directly; text content is first UTF-8 encoded.
+          const contentBase64 = Buffer.isBuffer(file.content)
+            ? file.content.toString('base64')
+            : Buffer.from(file.content, 'utf-8').toString('base64');
           const { data: blobData } = await octokit.git.createBlob({
             owner,
             repo,
-            content: Buffer.from(file.content, 'utf-8').toString('base64'),
+            content: contentBase64,
             encoding: 'base64',
           });
 

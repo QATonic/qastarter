@@ -2,7 +2,7 @@ const { Builder } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const firefox = require('selenium-webdriver/firefox');
 const browserConfig = require('../config/browser.config');
-const logger = require('./logger');
+const { log: logger } = require('./logger');
 
 class DriverFactory {
   static async createDriver(browserType = browserConfig.browser) {

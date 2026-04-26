@@ -1,6 +1,6 @@
 import React, { useState, Suspense } from 'react';
 import { useLocation } from 'wouter';
-import { Info, BarChart3, BookOpen, Menu, Github, Sparkles } from 'lucide-react';
+import { Info, BarChart3, BookOpen, Menu, Github, Sparkles, LifeBuoy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import ThemeToggle from './ThemeToggle';
@@ -116,6 +116,22 @@ export default function Header({ onLogoClick }: HeaderProps) {
               <span>Star</span>
             </a>
 
+            <a
+              href="https://github.com/QATonic/qastarter/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Get help — open a GitHub issue"
+              className={cn(
+                'inline-flex items-center justify-center gap-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors',
+                'text-muted-foreground hover:text-foreground hover:bg-accent',
+                'h-9 px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+              )}
+              data-testid="nav-support"
+            >
+              <LifeBuoy className="h-4 w-4" aria-hidden="true" />
+              <span>Support</span>
+            </a>
+
             <Button
               variant="ghost"
               size="sm"
@@ -200,6 +216,17 @@ export default function Header({ onLogoClick }: HeaderProps) {
                   >
                     <Github className="h-5 w-5" />
                     Star on GitHub
+                  </a>
+
+                  <a
+                    href="https://github.com/QATonic/qastarter/issues"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-3 h-12 px-4 text-lg font-medium rounded-md hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <LifeBuoy className="h-5 w-5" />
+                    Support
                   </a>
 
                   <Button

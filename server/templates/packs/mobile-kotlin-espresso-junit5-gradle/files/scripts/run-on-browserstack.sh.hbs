@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# ------------------------------------------------------------------
+# Run {{projectName}} Espresso tests on BrowserStack App Automate.
+#
+# Usage:
+#   export BROWSERSTACK_USERNAME=<your username>
+#   export BROWSERSTACK_ACCESS_KEY=<your access key>
+#   bash scripts/run-on-browserstack.sh
+#
+# Prereqs: Android SDK + Java 11+ (same toolchain as `./gradlew` build).
+# Docs: https://www.browserstack.com/docs/app-automate/espresso
+# ------------------------------------------------------------------
+set -euo pipefail
+
+: "${BROWSERSTACK_USERNAME:?BROWSERSTACK_USERNAME not set}"
+: "${BROWSERSTACK_ACCESS_KEY:?BROWSERSTACK_ACCESS_KEY not set}"
+
+PROJECT_NAME="{{projectName}}"
+BUILD_NAME="${BUILD_NAME:-${PROJECT_NAME} - $(date -u +%Y%m%d-%H%M%S)}"
+DEVICES='["Samsung Galaxy S23-13.0","Google Pixel 7-13.0","OnePlus 11R-13.0"]'
+
+echo "==> Building debug + androidTest APKs"
+./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+
+APP_APK="app/build/outputs/apk/debug/app-debug.apk"
+TEST_APK="app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
+[[ -f "$APP_APK"  ]] || { echo "Missing $APP_APK"; exit 1; }
+[[ -f "$TEST_APK" ]] || { echo "Missing $TEST_APK"; exit 1; }
+
+echo "==> Uploading app APK to BrowserStack"
+APP_RESP=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    -X POST "https://api-cloud.browserstack.com/app-automate/espresso/v2/app" \
+    -F "file=@${APP_APK}")
+APP_URL=$(echo "$APP_RESP" | sed -n 's/.*"app_url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+echo "   app_url:       $APP_URL"
+
+echo "==> Uploading test APK to BrowserStack"
+TEST_RESP=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    -X POST "https://api-cloud.browserstack.com/app-automate/espresso/v2/test-suite" \
+    -F "file=@${TEST_APK}")
+TEST_URL=$(echo "$TEST_RESP" | sed -n 's/.*"test_suite_url"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+echo "   test_suite_url: $TEST_URL"
+
+echo "==> Triggering build on ${DEVICES}"
+BUILD_RESP=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    -X POST "https://api-cloud.browserstack.com/app-automate/espresso/v2/build" \
+    -H "Content-Type: application/json" \
+    -d "{
+        \"app\":        \"${APP_URL}\",
+        \"testSuite\":  \"${TEST_URL}\",
+        \"devices\":    ${DEVICES},
+        \"project\":    \"${PROJECT_NAME}\",
+        \"buildName\":  \"${BUILD_NAME}\",
+        \"logs\":       true,
+        \"networkLogs\": true,
+        \"deviceLogs\": true
+    }")
+BUILD_ID=$(echo "$BUILD_RESP" | sed -n 's/.*"build_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+echo "   build_id: $BUILD_ID"
+echo "   Follow: https://app-automate.browserstack.com/dashboard/v2/builds/${BUILD_ID}"
+
+echo "==> Polling for completion"
+while :; do
+  sleep 20
+  STATUS=$(curl -fsS -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+    "https://api-cloud.browserstack.com/app-automate/espresso/v2/builds/${BUILD_ID}" \
+    | sed -n 's/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+  echo "   status: $STATUS"
+  case "$STATUS" in
+    passed|failed|error|timeout|skipped) break ;;
+    running|queued) ;;
+    *) echo "Unexpected status: $STATUS"; break ;;
+  esac
+done
+
+[[ "$STATUS" == "passed" ]] && exit 0 || exit 1

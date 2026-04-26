@@ -17,5 +17,25 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
+{{#if (eq cloudDeviceFarm "browserstack")}}
+    <!-- BrowserStack SDK — reads browserstack.yml at project root and
+         auto-instruments Appium sessions to route to BrowserStack's App
+         Automate cloud. Upload your .apk / .ipa first with:
+           curl -u "$BROWSERSTACK_USERNAME:$BROWSERSTACK_ACCESS_KEY" \
+                -X POST "https://api-cloud.browserstack.com/app-automate/upload" \
+                -F "file=@/path/to/app.apk"
+         then paste the returned app_url into browserstack.yml (bs://...).
+         Set BROWSERSTACK_USERNAME + BROWSERSTACK_ACCESS_KEY env vars before
+         running `dotnet test`. No C# code changes required. -->
+    <PackageReference Include="BrowserStack.TestAdapter" Version="0.28.1" />
+{{/if}}
   </ItemGroup>
+{{#if (eq cloudDeviceFarm "browserstack")}}
+
+  <ItemGroup>
+    <None Update="browserstack.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+{{/if}}
 </Project>

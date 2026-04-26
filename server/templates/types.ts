@@ -109,7 +109,13 @@ export interface TemplateContext extends ProjectConfig {
 
 export interface TemplateFile {
   path: string;
-  content: string;
+  /**
+   * File content. String for text files (all isTemplate:true files plus
+   * plain-text isTemplate:false entries). Buffer for binary files
+   * (gradle-wrapper.jar, images, etc.) so that UTF-8 re-encoding doesn't
+   * corrupt non-UTF-8 byte sequences.
+   */
+  content: string | Buffer;
   isTemplate: boolean;
   mode?: string;
 }

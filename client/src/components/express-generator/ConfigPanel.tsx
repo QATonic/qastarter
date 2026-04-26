@@ -596,6 +596,10 @@ export default function ConfigPanel() {
                   value={config.cloudDeviceFarm || 'none'}
                   onChange={(value) => updateConfig('cloudDeviceFarm', value)}
                   labels={validationLabels.cloudDeviceFarms}
+                  disabledOptions={{
+                    saucelabs: 'Coming Soon',
+                    testmu: 'Coming Soon',
+                  }}
                 />
               </div>
             )}

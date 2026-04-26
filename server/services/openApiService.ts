@@ -107,10 +107,77 @@ function isUrlSafe(url: string): boolean {
       return false;
     }
 
+    // Block alternate IPv4 numeric forms that bypass startsWith() checks.
+    // RFC 6943 / inet_aton accepts decimal (2130706433), octal (0177.0.0.1)
+    // and hex (0x7f000001) shorthand — all collapse to a real IPv4 at
+    // resolution time. Re-stringify any pure-numeric host as dotted-quad
+    // and re-check the private ranges.
+    const dottedQuad = toDottedQuadIPv4(bareHost);
+    if (dottedQuad) {
+      const [a, b] = dottedQuad.split('.').map(Number);
+      if (
+        a === 127 ||                            // loopback
+        a === 10 ||                             // 10/8
+        a === 0 ||                              // "this network"
+        (a === 169 && b === 254) ||             // link-local / IMDS
+        (a === 172 && b >= 16 && b <= 31) ||    // 172.16/12
+        (a === 192 && b === 168) ||             // 192.168/16
+        a >= 224                                // multicast / reserved
+      ) {
+        return false;
+      }
+    }
+
     return true;
   } catch {
     return false;
   }
+}
+
+/**
+ * Best-effort coercion of a hostname into dotted-quad IPv4 ("a.b.c.d")
+ * or null if the host isn't a numeric IPv4 form. Handles:
+ *   - decimal     2130706433   → 127.0.0.1
+ *   - hex         0x7f000001   → 127.0.0.1
+ *   - octal       0177.0.0.1   → 127.0.0.1
+ *   - 3-part      127.1        → 127.0.0.1   (rare but legal)
+ *   - dotted-quad 127.0.0.1    → 127.0.0.1   (passthrough)
+ * Returns null for DNS hostnames so downstream resolution still applies.
+ */
+function toDottedQuadIPv4(host: string): string | null {
+  // DNS-style hostname — bail.
+  if (/[a-z]/i.test(host) && !/^0x/i.test(host)) return null;
+
+  const parts = host.split('.');
+  if (parts.length === 0 || parts.length > 4) return null;
+
+  const parseSeg = (s: string): number => {
+    if (/^0x[0-9a-f]+$/i.test(s)) return parseInt(s, 16);
+    if (/^0[0-7]+$/.test(s)) return parseInt(s, 8);
+    if (/^\d+$/.test(s)) return parseInt(s, 10);
+    return NaN;
+  };
+
+  const nums = parts.map(parseSeg);
+  if (nums.some((n) => Number.isNaN(n) || n < 0)) return null;
+
+  let n: number;
+  if (nums.length === 1) {
+    if (nums[0] > 0xffffffff) return null;
+    n = nums[0];
+  } else if (nums.length === 2) {
+    if (nums[0] > 0xff || nums[1] > 0xffffff) return null;
+    n = (nums[0] << 24) | nums[1];
+  } else if (nums.length === 3) {
+    if (nums[0] > 0xff || nums[1] > 0xff || nums[2] > 0xffff) return null;
+    n = (nums[0] << 24) | (nums[1] << 16) | nums[2];
+  } else {
+    if (nums.some((x) => x > 0xff)) return null;
+    n = (nums[0] << 24) | (nums[1] << 16) | (nums[2] << 8) | nums[3];
+  }
+  // Coerce to unsigned 32-bit
+  n = n >>> 0;
+  return `${(n >>> 24) & 0xff}.${(n >>> 16) & 0xff}.${(n >>> 8) & 0xff}.${n & 0xff}`;
 }
 
 // ── Schema Helpers ──────────────────────────────────────────────────

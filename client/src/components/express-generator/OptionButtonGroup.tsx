@@ -17,6 +17,11 @@ export interface OptionButtonGroupProps {
   descriptions?: Record<string, string>;
   /** A11y label for the radiogroup (screen readers announce this) */
   groupLabel?: string;
+  /**
+   * Per-option short badges (e.g. "Coming Soon"). Options listed here
+   * are rendered as disabled — clicks and arrow-key selection skip them.
+   */
+  disabledOptions?: Record<string, string>;
 }
 
 /**
@@ -40,6 +45,7 @@ export default function OptionButtonGroup({
   lockedHint,
   descriptions,
   groupLabel,
+  disabledOptions,
 }: OptionButtonGroupProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +66,20 @@ export default function OptionButtonGroup({
     }
   }, []);
 
+  // Walk the options list to find the next non-disabled index, wrapping
+  // around. Returns null if every option is disabled (degenerate case).
+  const findEnabled = useCallback(
+    (start: number, step: 1 | -1): number | null => {
+      const n = options.length;
+      for (let i = 1; i <= n; i++) {
+        const idx = (start + step * i + n) % n;
+        if (!disabledOptions || !disabledOptions[options[idx]]) return idx;
+      }
+      return null;
+    },
+    [options, disabledOptions]
+  );
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
       let nextIndex: number | null = null;
@@ -67,17 +87,17 @@ export default function OptionButtonGroup({
       switch (e.key) {
         case 'ArrowRight':
         case 'ArrowDown':
-          nextIndex = (index + 1) % options.length;
+          nextIndex = findEnabled(index, 1);
           break;
         case 'ArrowLeft':
         case 'ArrowUp':
-          nextIndex = (index - 1 + options.length) % options.length;
+          nextIndex = findEnabled(index, -1);
           break;
         case 'Home':
-          nextIndex = 0;
+          nextIndex = findEnabled(-1, 1);
           break;
         case 'End':
-          nextIndex = options.length - 1;
+          nextIndex = findEnabled(options.length, -1);
           break;
       }
 
@@ -88,7 +108,7 @@ export default function OptionButtonGroup({
         onChange(options[nextIndex]);
       }
     },
-    [moveFocus, options.length]
+    [moveFocus, findEnabled, options]
   );
 
   return (
@@ -129,7 +149,9 @@ export default function OptionButtonGroup({
             const isSelected = opt === value;
             const displayLabel = labels[opt] ?? opt;
             const description = descriptions?.[opt];
-            const isFocusable = index === focusedIndex;
+            const disabledBadge = disabledOptions?.[opt];
+            const isDisabled = !!disabledBadge;
+            const isFocusable = !isDisabled && index === focusedIndex;
 
             const button = (
               <button
@@ -137,20 +159,33 @@ export default function OptionButtonGroup({
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
+                aria-disabled={isDisabled}
+                disabled={isDisabled}
                 tabIndex={isFocusable ? 0 : -1}
                 data-option-button
-                onClick={() => onChange(opt)}
+                onClick={() => {
+                  if (isDisabled) return;
+                  onChange(opt);
+                }}
                 onKeyDown={(e) => handleKeyDown(e, index)}
+                title={isDisabled ? `${displayLabel} — ${disabledBadge}` : undefined}
                 className={cn(
-                  'inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-all',
+                  'relative inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-all',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                   isSelected
                     ? 'bg-primary/10 border-primary/40 text-primary font-semibold'
-                    : 'bg-card border-border hover:bg-muted/50 text-foreground'
+                    : isDisabled
+                      ? 'bg-muted/20 border-border text-muted-foreground/60 cursor-not-allowed opacity-70'
+                      : 'bg-card border-border hover:bg-muted/50 text-foreground'
                 )}
               >
                 {isSelected && <Check className="size-3.5 shrink-0" />}
                 {displayLabel}
+                {isDisabled && (
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                    {disabledBadge}
+                  </span>
+                )}
               </button>
             );
 

@@ -431,7 +431,10 @@ router.get(
 
     // Narrow cloudDeviceFarm to the allowed set so a caller can't pass an
     // unknown value through and have the template engine trip on it later.
-    const validCloudFarms = ['none', 'browserstack', 'saucelabs'] as const;
+    // browserstack is fully wired; saucelabs and testmu are accepted at
+    // the API surface but flagged as "Coming Soon" in the wizard UI —
+    // the template engine has yml placeholders only.
+    const validCloudFarms = ['none', 'browserstack', 'saucelabs', 'testmu'] as const;
     const cloudDeviceFarm = validCloudFarms.includes(cloudDeviceFarmParam as (typeof validCloudFarms)[number])
       ? cloudDeviceFarmParam
       : undefined;

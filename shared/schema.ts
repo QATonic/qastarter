@@ -114,7 +114,7 @@ export const projectConfigSchema = z.object({
   /** Mobile platform OS version (e.g., "13.0", "16.0") */
   platformVersion: z.string().max(50).optional(),
   /** Cloud device farm provider for web and mobile testing */
-  cloudDeviceFarm: z.enum(['none', 'browserstack', 'saucelabs']).optional().default('none'),
+  cloudDeviceFarm: z.enum(['none', 'browserstack', 'saucelabs', 'testmu']).optional().default('none'),
   /** OpenAPI/Swagger spec URL for API schema-driven test generation */
   openApiSpecUrl: z
     .string()

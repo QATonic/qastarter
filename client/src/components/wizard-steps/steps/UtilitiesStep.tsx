@@ -225,31 +225,58 @@ export default function UtilitiesStep() {
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Cloud Device Farm (Optional)
             </h3>
-            <div className="grid grid-cols-3 gap-3">
-              {['none', 'browserstack', 'saucelabs'].map((farm) => {
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {(['none', 'browserstack', 'saucelabs', 'testmu'] as const).map((farm) => {
+                // Only BrowserStack is fully wired today. The other
+                // providers are kept on the panel as discoverability
+                // signals and disabled with a "Coming Soon" badge.
+                const comingSoon = farm === 'saucelabs' || farm === 'testmu';
                 const isSelected = (config.cloudDeviceFarm || 'none') === farm;
                 const label =
                   farm === 'none'
                     ? 'None (Local)'
                     : (validationLabels.cloudDeviceFarms as Record<string, string>)[farm] || farm;
+                const subLabel = farm === 'testmu' ? 'formerly LambdaTest' : null;
                 return (
                   <button
                     key={farm}
                     type="button"
+                    disabled={comingSoon}
+                    aria-disabled={comingSoon}
+                    title={comingSoon ? 'Coming soon — only BrowserStack is supported today' : undefined}
                     className={`
-                      flex items-center justify-center gap-2 p-3 rounded-lg border text-sm font-medium transition-all
-                      ${isSelected ? 'bg-purple-500/10 border-purple-500/40 text-purple-700 dark:text-purple-300' : 'bg-card hover:bg-muted/30 border-border text-muted-foreground'}
+                      relative flex flex-col items-center justify-center gap-1 p-3 rounded-lg border text-sm font-medium transition-all
+                      ${isSelected
+                        ? 'bg-purple-500/10 border-purple-500/40 text-purple-700 dark:text-purple-300'
+                        : comingSoon
+                          ? 'bg-muted/20 border-border text-muted-foreground/60 cursor-not-allowed opacity-60'
+                          : 'bg-card hover:bg-muted/30 border-border text-muted-foreground'}
                     `}
-                    onClick={() => updateConfig('cloudDeviceFarm', farm)}
+                    onClick={() => {
+                      if (comingSoon) return;
+                      updateConfig('cloudDeviceFarm', farm);
+                    }}
                   >
-                    <Cloud className={`w-4 h-4 ${isSelected ? 'text-purple-500' : ''}`} />
-                    {label}
+                    {comingSoon && (
+                      <span className="absolute -top-2 right-2 px-1.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                        Coming Soon
+                      </span>
+                    )}
+                    <span className="flex items-center gap-2">
+                      <Cloud className={`w-4 h-4 ${isSelected ? 'text-purple-500' : ''}`} />
+                      {label}
+                    </span>
+                    {subLabel && (
+                      <span className="text-[10px] text-muted-foreground/70 normal-case">
+                        {subLabel}
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
             <p className="text-xs text-muted-foreground">
-              Run tests on BrowserStack or Sauce Labs cloud infrastructure instead of local browsers.
+              Run tests on BrowserStack cloud infrastructure instead of local browsers. Sauce Labs and TestMu AI (formerly LambdaTest) are coming soon.
             </p>
           </div>
         )}

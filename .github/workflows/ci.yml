@@ -65,7 +65,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
@@ -94,7 +94,7 @@ jobs:
         run: npm run build
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-output
           path: dist/
@@ -159,7 +159,7 @@ jobs:
           PLAYWRIGHT_BASE_URL: http://localhost:5000
 
       - name: Upload E2E test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report-${{ matrix.browser }}
@@ -321,7 +321,7 @@ jobs:
 
       - name: Upload generated project on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: verify-failure-${{ matrix.name }}
           path: verify-out/${{ matrix.name }}-project/

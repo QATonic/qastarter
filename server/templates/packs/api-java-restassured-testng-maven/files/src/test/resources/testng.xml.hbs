@@ -6,10 +6,10 @@
         <listener class-name="{{javaPackage}}.listeners.TestListener"/>
     </listeners>
     
-    <test name="User API Tests">
-        <classes>
-            <class name="{{javaPackage}}.tests.UserTests"/>
-        </classes>
+    <test name="API Tests">
+        <packages>
+            <package name="{{javaPackage}}.tests"/>
+        </packages>
     </test>
     
 </suite>

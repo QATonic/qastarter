@@ -2,15 +2,15 @@
 * Login Tests using WebdriverIO with TypeScript.
 */
 import LoginPage from "../pageobjects/login.page";
-import { validUser, invalidUser } from "../data/users";
+import { validUser, invalidUser } from "../data/credentials";
 {{#if utilities.dataProvider}}
-import DataReader from "../utils/dataReader";
+import DataReader from "../../utils/dataReader";
 
 /**
 * Data-driven tests using JSON test data
 */
 describe("Data-driven login tests", () => {
-const testData = DataReader.getUsers(); // Returns object with keys
+const testData = DataReader.getUsers<Record<string, { username: string; password: string }>>(); // Returns object with keys
 const users = Object.values(testData);
 
 users.forEach((user: any) => {

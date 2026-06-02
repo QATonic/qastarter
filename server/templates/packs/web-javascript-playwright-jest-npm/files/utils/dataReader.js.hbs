@@ -2,10 +2,15 @@ const fs = require('fs');
 const path = require('path');
 
 class DataReader {
-static readJSON(filename) {
+static readJson(filename) {
 const filepath = path.join(process.cwd(), 'data', filename);
 const data = fs.readFileSync(filepath, 'utf8');
 return JSON.parse(data);
+}
+
+/** @deprecated Use readJson — kept for backward compatibility. */
+static readJSON(filename) {
+return DataReader.readJson(filename);
 }
 
 static readCsv(filename) {

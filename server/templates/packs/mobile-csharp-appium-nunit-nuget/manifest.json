@@ -1,5 +1,6 @@
 {
   "id": "mobile-csharp-appium-nunit-nuget",
+  "version": "2.0.0",
   "displayName": "Mobile Automation Framework",
   "supportsDynamic": true,
   "name": "Mobile Automation Framework",
@@ -212,6 +213,10 @@
       "conditional": {
         "utilities.faker": true
       }
+    },
+    {
+      "path": "Tests/Utils/TestDataReader.cs",
+      "isTemplate": true
     },
     {
       "path": "browserstack.yml",

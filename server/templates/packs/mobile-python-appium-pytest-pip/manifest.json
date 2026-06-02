@@ -1,5 +1,6 @@
 {
   "id": "mobile-python-appium-pytest-pip",
+  "version": "2.0.0",
   "displayName": "Mobile Automation Framework",
   "supportsDynamic": true,
   "name": "Mobile Automation Framework",

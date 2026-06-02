@@ -52,7 +52,8 @@
                         "web",
                         "mobile",
                         "api",
-                        "desktop"
+                        "desktop",
+                        "performance"
                     ]
                 },
                 "framework": {

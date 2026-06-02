@@ -19,13 +19,15 @@ describe('Login Tests', () => {
   let loginPage;
   let screenshot;
 
-  beforeAll(async () => {
+  // A fresh browser session per test keeps tests independent and avoids
+  // one test's state (or a crashed session) leaking into the next.
+  beforeEach(async () => {
     driver = await DriverFactory.createDriver();
     loginPage = new LoginPage(driver);
     screenshot = new ScreenshotHelper(driver);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     if (driver) {
       await driver.quit();
     }

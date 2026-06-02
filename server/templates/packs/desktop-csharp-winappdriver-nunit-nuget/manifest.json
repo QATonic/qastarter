@@ -1,5 +1,6 @@
 {
   "id": "desktop-csharp-winappdriver-nunit-nuget",
+  "version": "2.0.0",
   "displayName": "Desktop Automation Framework",
   "supportsDynamic": true,
   "name": "Desktop Automation Framework",

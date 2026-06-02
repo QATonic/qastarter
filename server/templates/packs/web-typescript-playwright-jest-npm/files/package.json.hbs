@@ -3,6 +3,7 @@
 "version": "1.0.0",
 "description": "{{projectName}} - Playwright TypeScript Automation Framework",
 "scripts": {
+"postinstall": "playwright install chromium",
 "test": "{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-node-sdk jest{{else}}jest{{/if}}",
 "test:local": "jest",
 "test:headed": "HEADLESS=false jest",

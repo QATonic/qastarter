@@ -1,5 +1,6 @@
 {
   "id": "mobile-typescript-appium-jest-npm",
+  "version": "2.0.0",
   "displayName": "Mobile Automation Framework",
   "supportsDynamic": true,
   "name": "Mobile Automation Framework",

@@ -34,6 +34,9 @@ dependencies {
 
     // Logging
     implementation 'org.slf4j:slf4j-simple:2.0.9'
+    // Log4j2 (used by Log utility / log4j2.xml)
+    implementation 'org.apache.logging.log4j:log4j-core:2.22.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.22.0'
 {{#if userDependencies.hasMaven}}
 
 // User-picked dependencies (from QAStarter dependency search)

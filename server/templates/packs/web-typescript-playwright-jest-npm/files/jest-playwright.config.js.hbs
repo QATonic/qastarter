@@ -1,5 +1,8 @@
 module.exports = {
-  browsers: ['chromium', 'firefox', 'webkit'],
+  // Chromium by default so `npm test` works right after `npm install`
+  // (the postinstall hook installs only Chromium). To run cross-browser,
+  // run `npx playwright install firefox webkit` and add them here.
+  browsers: ['chromium'],
   launchOptions: {
     headless: process.env.HEADLESS !== 'false'
   },

@@ -13,8 +13,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Test data reader utility for CSV and JSON files
@@ -24,6 +26,39 @@ public class TestDataReader {
 
     private static final String TEST_DATA_BASE_PATH = ConfigurationReader.getProperty("test.data.base.path", "src/test/resources/testdata");
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Read a CSV file (with a header row) into a list of row maps keyed by column name.
+     *
+     * @param fileName CSV file name under the test-data base path
+     * @return one map per data row, keyed by the header columns
+     */
+    public static List<Map<String, String>> readCsv(String fileName) {
+        List<Map<String, String>> rows = new ArrayList<>();
+        String filePath = TEST_DATA_BASE_PATH + "/" + fileName;
+
+        try (CSVReader reader = new CSVReader(new FileReader(filePath))) {
+            String[] header = reader.readNext();
+            if (header == null) {
+                return rows;
+            }
+            String[] line;
+            while ((line = reader.readNext()) != null) {
+                Map<String, String> row = new HashMap<>();
+                for (int i = 0; i < header.length && i < line.length; i++) {
+                    row.put(header[i].trim(), line[i].trim());
+                }
+                rows.add(row);
+            }
+        } catch (IOException | CsvException e) {
+            {{#if utilities.logger}}
+            Log.error("Error reading CSV file: " + fileName, e);
+            {{/if}}
+            throw new RuntimeException("Failed to read CSV file: " + fileName, e);
+        }
+
+        return rows;
+    }
 
     /**
      * Read CSV file and return data as Object array for TestNG DataProvider

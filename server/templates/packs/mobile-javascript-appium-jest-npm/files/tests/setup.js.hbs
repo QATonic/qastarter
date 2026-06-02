@@ -44,6 +44,7 @@ global.driver = driver;
 global.testData = testData;
 });
 
+afterEach(async () => {
 if (driver) {
 await driver.deleteSession();
 }

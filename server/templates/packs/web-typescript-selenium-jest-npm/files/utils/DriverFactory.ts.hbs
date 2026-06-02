@@ -40,7 +40,12 @@ export default class DriverFactory {
       script: browserConfig.scriptTimeout
     });
     
-    await driver.manage().window().maximize();
+    // In headless mode the window size is already fixed via --window-size /
+    // --width/--height above; calling maximize() there is redundant and can
+    // destabilise the headless session, so only maximize for headed runs.
+    if (!browserConfig.headless) {
+      await driver.manage().window().maximize();
+    }
     return driver;
   }
 }

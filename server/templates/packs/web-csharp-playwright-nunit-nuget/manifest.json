@@ -178,6 +178,10 @@
       }
     },
     {
+      "path": "Utils/TestDataReader.cs",
+      "isTemplate": true
+    },
+    {
       "path": "Utils/Logger.cs",
       "isTemplate": true
     },

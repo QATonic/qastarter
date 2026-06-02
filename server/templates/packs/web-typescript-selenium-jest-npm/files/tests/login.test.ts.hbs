@@ -20,13 +20,15 @@ describe('Login Tests', () => {
   let loginPage: LoginPage;
   let screenshot: ScreenshotHelper;
 
-  beforeAll(async () => {
+  // A fresh browser session per test keeps tests independent and avoids
+  // one test's state (or a crashed session) leaking into the next.
+  beforeEach(async () => {
     driver = await DriverFactory.createDriver();
     loginPage = new LoginPage(driver);
     screenshot = new ScreenshotHelper(driver);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     if (driver) {
       await driver.quit();
     }
@@ -56,13 +58,12 @@ describe('Login Tests', () => {
    * Data-driven tests using DataReader — reads from data/users.json.
    */
   describe('Data-driven login tests', () => {
-    const testData = DataReader.readJson('users.json') || [];
+    const testData =
+      DataReader.readJson<Array<{ username: string; password: string; expected: string }>>(
+        'users.json'
+      ) || [];
 
-    test.each(
-      testData.map((u: { username: string; password: string; expected: string }) =>
-        [u.username, u.password, u.expected] as const
-      )
-    )(
+    test.each(testData.map((u) => [u.username, u.password, u.expected] as const))(
       'should verify login for user: %s',
       async (username, password, expected) => {
         await loginPage.navigateToLogin();

@@ -49,7 +49,7 @@ const manifestSchema = z.object({
   version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semantic (x.y.z)'),
   supportsDynamic: z.boolean().optional().default(true),
   supportedCombination: z.object({
-    testingType: z.enum(['web', 'mobile', 'api', 'desktop']),
+    testingType: z.enum(['web', 'mobile', 'api', 'desktop', 'performance']),
     framework: z.string().min(1),
     language: z.string().min(1),
     testRunner: z.string().min(1),

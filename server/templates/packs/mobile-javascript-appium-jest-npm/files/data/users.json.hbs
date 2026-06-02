@@ -1,17 +1,17 @@
-{
-  "validUser": {
-    "username": "testuser@example.com",
-    "password": "TestPassword123!",
-    "displayName": "Test User"
+[
+  {
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "expected": "success"
   },
-  "invalidUser": {
-    "username": "invalid@example.com",
-    "password": "WrongPassword",
-    "displayName": "Invalid User"
+  {
+    "username": "locked_out_user",
+    "password": "secret_sauce",
+    "expected": "error"
   },
-  "adminUser": {
-    "username": "admin@example.com",
-    "password": "AdminPassword123!",
-    "displayName": "Admin User"
+  {
+    "username": "invalid_user",
+    "password": "wrong_password",
+    "expected": "error"
   }
-}
+]

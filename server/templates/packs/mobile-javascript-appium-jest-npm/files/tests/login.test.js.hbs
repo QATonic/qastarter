@@ -1,6 +1,5 @@
 const LoginPage = require('./pages/LoginPage');
 const HomePage = require('./pages/HomePage');
-const TestDataReader = require('./utils/TestDataReader');
 
 const TEST_USERNAME = 'standard_user';
 const TEST_PASSWORD = 'secret_sauce';
@@ -41,6 +40,8 @@ throw error;
 * Data-driven tests using test.each
 * Reads test data from data/users.json
 */
+const TestDataReader = require('./utils/TestDataReader');
+
 describe('Data-driven login tests', () => {
 const testData = TestDataReader.readJson('users.json');
 

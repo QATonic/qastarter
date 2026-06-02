@@ -29,6 +29,9 @@ dependencies {
     implementation 'io.qameta.allure:allure-testng:2.24.0'
     // File utilities (used by ScreenshotUtils)
     implementation 'commons-io:commons-io:2.15.1'
+    // JSON / CSV test-data parsing (used by TestDataReader)
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    implementation 'com.opencsv:opencsv:5.8'
 {{#if userDependencies.hasMaven}}
 
 // User-picked dependencies (from QAStarter dependency search)

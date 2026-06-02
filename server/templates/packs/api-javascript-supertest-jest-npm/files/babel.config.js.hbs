@@ -1,0 +1,5 @@
+// Lets Jest transform ES module `import`/`export` syntax (used in the test
+// and model files) into CommonJS so it runs under Node without `type: module`.
+module.exports = {
+  presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+};

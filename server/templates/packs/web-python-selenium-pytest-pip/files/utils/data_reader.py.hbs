@@ -1,15 +1,21 @@
 """
 CSV and JSON test data reader utility
 """
+import os
 import csv
 import json
 from pathlib import Path
 from typing import List, Dict, Any
-from config.config import Config
+
+# Test-data directory, resolved relative to the project root (utils/ -> ../data).
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
 
 class DataReader:
     """Data reader utility for CSV and JSON"""
-    
+
+    DATA_DIR = DATA_DIR
+
     @staticmethod
     def read_csv(filename: str) -> List[Dict[str, str]]:
         """
@@ -21,7 +27,7 @@ class DataReader:
         Returns:
             List of dictionaries
         """
-        file_path = Config.DATA_DIR / filename
+        file_path = DataReader.DATA_DIR / filename
         with open(file_path, 'r') as csvfile:
             reader = csv.DictReader(csvfile)
             return list(reader)
@@ -37,7 +43,7 @@ class DataReader:
         Returns:
             Dictionary from JSON
         """
-        file_path = Config.DATA_DIR / filename
+        file_path = DataReader.DATA_DIR / filename
         with open(file_path, 'r') as jsonfile:
             return json.load(jsonfile)
     
@@ -52,5 +58,7 @@ class DataReader:
         Returns:
             Test data value
         """
-        env_data = Config.load_env_data()
+        env = os.getenv("TEST_ENV", "dev")
+        env_file = DataReader.DATA_DIR / f"{env}.json"
+        env_data = DataReader.read_json(f"{env}.json") if env_file.exists() else {}
         return env_data.get(key)

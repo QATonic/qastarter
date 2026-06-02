@@ -221,13 +221,7 @@ function parseOpenApiSpec(api: OpenAPI.Document): OpenApiEndpoint[] {
 
   if (!spec.paths) return endpoints;
 
-  const methods: (keyof OpenAPIV3.PathItemObject)[] = [
-    'get',
-    'post',
-    'put',
-    'delete',
-    'patch',
-  ];
+  const methods = ['get', 'post', 'put', 'delete', 'patch'] as const;
 
   for (const [pathStr, pathItem] of Object.entries(spec.paths)) {
     if (!pathItem) continue;

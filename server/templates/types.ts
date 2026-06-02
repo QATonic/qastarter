@@ -83,7 +83,7 @@ export interface TemplateContext extends ProjectConfig {
   /** Mobile platform OS version */
   platformVersion: string;
   /** Cloud device farm provider (browserstack, saucelabs, or none) */
-  cloudDeviceFarm: string;
+  cloudDeviceFarm: 'none' | 'browserstack' | 'saucelabs' | 'testmu';
   /** API auth type */
   apiAuthType: 'none' | 'bearer' | 'basic' | 'api-key';
   /** API auth token/key value */

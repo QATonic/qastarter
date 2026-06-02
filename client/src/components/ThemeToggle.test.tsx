@@ -48,7 +48,8 @@ describe('ThemeToggle', () => {
 
   it('has accessible screen reader text', () => {
     renderWithProvider();
-    expect(screen.getByText(/switch to (light|dark) mode/i)).toBeInTheDocument();
+    // The button exposes its accessible name via aria-label, so query by label.
+    expect(screen.getByLabelText(/switch to (light|dark) mode/i)).toBeInTheDocument();
   });
 
   it('toggles theme when clicked', async () => {

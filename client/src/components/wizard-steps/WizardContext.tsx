@@ -172,7 +172,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
         web: 'https://www.saucedemo.com/',
         api: 'https://jsonplaceholder.typicode.com',
       };
-      newConfig.baseUrl = urlDefaults[value] || '';
+      newConfig.baseUrl = urlDefaults[value as string] || '';
 
       // Web: pre-fill SauceDemo credentials
       if (value === 'web') {
@@ -204,7 +204,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
 
     // When baseUrl changes for web, auto-switch credentials
     if (key === 'baseUrl' && config.testingType === 'web') {
-      const isSauceDemo = /saucedemo\.com/i.test(value);
+      const isSauceDemo = /saucedemo\.com/i.test(value as string);
       if (isSauceDemo) {
         newConfig.testUsername = 'standard_user';
         newConfig.testPassword = 'secret_sauce';
@@ -231,7 +231,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
       newConfig.language === 'java' &&
       (newConfig.buildTool === 'maven' || newConfig.buildTool === 'gradle')
     ) {
-      newConfig.artifactId = value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      newConfig.artifactId = (value as string).toLowerCase().replace(/[^a-z0-9-]/g, '-');
     }
 
     const validatedConfig = WizardValidator.resetInvalidSelections(newConfig);

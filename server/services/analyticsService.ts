@@ -166,6 +166,7 @@ export async function trackProjectGeneration(
       testingPattern: 'page-object-model', // Default implicitly
       cicdTool: config.cicdTool,
       reportingTool: config.reportingTool,
+      cloudDeviceFarm: 'none',
       includeSampleTests: true,
       utilities: config.utilities,
     };

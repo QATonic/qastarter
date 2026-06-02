@@ -154,7 +154,7 @@ export class RedisCacheProvider implements CacheProvider {
 
     try {
       // Use SCAN instead of KEYS to avoid blocking Redis
-      let cursor = 0;
+      let cursor = '0';
       let totalDeleted = 0;
       do {
         const result = await this.client.scan(cursor, {
@@ -166,7 +166,7 @@ export class RedisCacheProvider implements CacheProvider {
           await this.client.del(result.keys);
           totalDeleted += result.keys.length;
         }
-      } while (cursor !== 0);
+      } while (cursor !== '0');
       this.hits = 0;
       this.misses = 0;
       logger.info('Redis cache flushed', { keysDeleted: totalDeleted });
@@ -196,7 +196,7 @@ export class RedisCacheProvider implements CacheProvider {
     if (this.connected) {
       try {
         // Use SCAN instead of KEYS to avoid blocking Redis
-        let cursor = 0;
+        let cursor = '0';
         do {
           const result = await this.client.scan(cursor, {
             MATCH: `${this.config.keyPrefix}*`,
@@ -204,7 +204,7 @@ export class RedisCacheProvider implements CacheProvider {
           });
           cursor = result.cursor;
           keys += result.keys.length;
-        } while (cursor !== 0);
+        } while (cursor !== '0');
       } catch {
         // Ignore errors in stats collection
       }

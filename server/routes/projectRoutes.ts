@@ -4,7 +4,7 @@
  */
 
 import { Router, Request } from 'express';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { type Store } from 'express-rate-limit';
 import { projectConfigSchema, type ProjectConfig } from '@shared/schema';
 import { projectService } from '../services/projectService';
 import { WizardValidator } from '@shared/validationMatrix';
@@ -88,7 +88,7 @@ function validateProjectConfigBody(body: unknown, requestId: string): ProjectCon
  * shared Redis so multiple app replicas observe the same counters — without it,
  * each replica enforces its own copy of the limit (so 3 replicas ⇒ effectively 3×).
  */
-function buildRateLimitStore(): ReturnType<typeof rateLimit>['store'] | undefined {
+function buildRateLimitStore(): Store | undefined {
   const redisUrl = process.env.REDIS_URL;
   if (!redisUrl) {
     logger.info('Rate limiter using in-memory store (set REDIS_URL for multi-replica accuracy)');
@@ -477,7 +477,7 @@ router.get(
       testingPattern,
       cicdTool: cicdTool || undefined,
       reportingTool: reportingTool || undefined,
-      cloudDeviceFarm: cloudDeviceFarm || undefined,
+      cloudDeviceFarm: (cloudDeviceFarm ?? 'none') as ProjectConfig['cloudDeviceFarm'],
       utilities,
       includeSampleTests: includeSampleTests !== 'false',
     };

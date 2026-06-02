@@ -7,5 +7,17 @@ from core.api_client import APIClient
 
 @pytest.fixture(scope="session")
 def api():
-    """API Client fixture."""
+    """Shared API Client fixture (session-scoped)."""
+    return APIClient()
+
+
+@pytest.fixture
+def clean_client():
+    """A fresh, unauthenticated API client, recreated for each test so auth
+    state set in one test never leaks into the next."""
+    return APIClient()
+
+@pytest.fixture
+def api_client():
+    """Alias for the API client, function-scoped, used by data-driven tests."""
     return APIClient()

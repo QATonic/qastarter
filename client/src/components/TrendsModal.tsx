@@ -142,7 +142,7 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
     const COLORS = getChartColors();
     const axisColor = getAxisColor();
 
-    const stats = data?.data || {};
+    const stats = data?.data ?? ({} as StatsResponse['data']);
     const totalGenerations = stats.totalGenerated || 0;
 
     const frameworkData: ChartDatum[] =
@@ -171,7 +171,7 @@ export default function TrendsModal({ open, onOpenChange }: TrendsModalProps) {
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-primary" />
               <p className="text-sm font-medium text-muted-foreground">
-                {formatNumber(payload[0].value)} Projects
+                {formatNumber(payload[0].value ?? 0)} Projects
               </p>
             </div>
           </div>

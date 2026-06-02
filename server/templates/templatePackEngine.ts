@@ -278,8 +278,11 @@ export class TemplatePackEngine {
     const apiAuthType = (config.apiAuthType || 'none') as 'none' | 'bearer' | 'basic' | 'api-key';
     const apiAuthToken = (config.apiAuthToken && config.apiAuthToken.trim()) || '';
 
-    // Cloud device farm config — guard against undefined/null config value.
-    const cloudDeviceFarm = (config.cloudDeviceFarm ? String(config.cloudDeviceFarm).trim() : '') || 'none';
+    // Cloud device farm config — guard against undefined/null config value
+    // and trim stray whitespace before falling back to 'none'.
+    const cloudDeviceFarm = ((config.cloudDeviceFarm
+      ? String(config.cloudDeviceFarm).trim()
+      : '') || 'none') as TemplateContext['cloudDeviceFarm'];
 
     return {
       ...config,

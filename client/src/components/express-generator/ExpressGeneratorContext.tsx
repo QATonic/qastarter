@@ -183,35 +183,36 @@ function reducer(state: WizardConfig, action: Action): WizardConfig {
       if (fieldsToClear) {
         for (const f of fieldsToClear) {
           if (typeof updated[f] === 'string') {
-            (updated as Record<string, string>)[f] = '';
+            (updated as unknown as Record<string, string>)[f] = '';
           }
         }
       }
 
       // Auto-switch defaults when testingType changes
       if (action.key === 'testingType') {
+        const value = action.value as string;
         const urlDefaults: Record<string, string> = {
           web: 'https://www.saucedemo.com/',
           api: 'https://jsonplaceholder.typicode.com',
         };
-        updated.baseUrl = urlDefaults[action.value] || '';
-        updated.testUsername = action.value === 'web' ? 'standard_user' : '';
-        updated.testPassword = action.value === 'web' ? 'secret_sauce' : '';
+        updated.baseUrl = urlDefaults[value] || '';
+        updated.testUsername = value === 'web' ? 'standard_user' : '';
+        updated.testPassword = value === 'web' ? 'secret_sauce' : '';
         updated.appPath =
-          action.value === 'desktop' ? 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App' : '';
+          value === 'desktop' ? 'Microsoft.WindowsCalculator_8wekyb3d8bbwe!App' : '';
         updated.deviceName = '';
         updated.platformVersion = '';
         updated.apiAuthType = 'none';
         updated.apiAuthToken = '';
         // Reset cloud device farm when switching to types that don't support it
-        if (action.value !== 'web' && action.value !== 'mobile') {
+        if (value !== 'web' && value !== 'mobile') {
           updated.cloudDeviceFarm = 'none';
         }
       }
 
       // When baseUrl changes for web, auto-switch credentials
       if (action.key === 'baseUrl' && state.testingType === 'web') {
-        const isSauceDemo = /saucedemo\.com/i.test(action.value);
+        const isSauceDemo = /saucedemo\.com/i.test(action.value as string);
         if (isSauceDemo) {
           updated.testUsername = 'standard_user';
           updated.testPassword = 'secret_sauce';

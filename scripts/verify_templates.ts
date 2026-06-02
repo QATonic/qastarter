@@ -70,7 +70,7 @@ async function verifyTemplates() {
             // Create Project Config
             const config: ProjectConfig = {
               projectName: 'verify-project',
-              testingType: type,
+              testingType: type as ProjectConfig['testingType'],
               framework: framework,
               language: language,
               testingPattern: 'pom', // Default to POM
@@ -78,6 +78,8 @@ async function verifyTemplates() {
               buildTool: buildTool,
               cicdTool: 'github-actions', // Default
               reportingTool: 'allure', // Default
+              cloudDeviceFarm: 'none',
+              includeSampleTests: true,
               utilities: {
                 configReader: true,
                 jsonReader: true,

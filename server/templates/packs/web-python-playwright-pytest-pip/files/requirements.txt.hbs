@@ -10,9 +10,8 @@ pytest-playwright>=0.4.0
 pytest-rerunfailures>=12.0
 
 # Reporting
-{{#if (eq reportingTool "pytest-html")}}
+# Always installed — pytest.ini's addopts unconditionally writes an --html report.
 pytest-html>=4.1.0
-{{/if}}
 {{#if (eq reportingTool "allure")}}
 allure-pytest>=2.13.0
 {{/if}}

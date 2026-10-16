@@ -48,7 +48,7 @@ export default function Footer() {
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <span className="hidden sm:inline">Made with</span>
               <Heart className="h-3 w-3 text-red-500" />
-              <span className="hidden sm:inline">by QATonic Innovations</span>
+              <a href="https://qatonic.com/" className="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">by QATonic</a>
             </div>
           </div>
 

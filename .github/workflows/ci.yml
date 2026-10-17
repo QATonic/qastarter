@@ -282,16 +282,16 @@ jobs:
         if: matrix.setupPython == 'true'
         uses: actions/setup-python@v5
         with:
+          # The dependency manifest is generated later in this job.
           python-version: '3.11'
-          cache: 'pip'
 
       - name: Setup Java (Temurin 17)
         if: matrix.setupJava == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
+          # The POM is generated later in this job.
           java-version: '17'
-          cache: 'maven'
 
       - name: Install server dependencies
         run: npm ci

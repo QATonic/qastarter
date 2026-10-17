@@ -107,7 +107,7 @@ describe('Validation Matrix — cloudDeviceFarms', () => {
   });
 
   describe('getFilteredOptions — cloudDeviceFarm', () => {
-    it("should return browserstack, saucelabs and testmu for testingType 'web'", () => {
+    it("should return browserstack, saucelabs, and testmu for testingType 'web'", () => {
       const options = WizardValidator.getFilteredOptions('cloudDeviceFarm', {
         testingType: 'web',
       });
@@ -117,7 +117,7 @@ describe('Validation Matrix — cloudDeviceFarms', () => {
       expect(options.length).toBe(3);
     });
 
-    it("should return browserstack, saucelabs and testmu for testingType 'mobile'", () => {
+    it("should return browserstack, saucelabs, and testmu for testingType 'mobile'", () => {
       const options = WizardValidator.getFilteredOptions('cloudDeviceFarm', {
         testingType: 'mobile',
       });

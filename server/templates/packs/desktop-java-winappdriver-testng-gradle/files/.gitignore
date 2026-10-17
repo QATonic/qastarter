@@ -92,3 +92,6 @@ desktop-screenshots/
 # Windows specific
 Thumbs.db
 Desktop.ini
+
+# Commit the Gradle wrapper so clean clones can build.
+!gradle/wrapper/gradle-wrapper.jar

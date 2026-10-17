@@ -87,3 +87,6 @@ local.properties
 # API credentials and sensitive data
 credentials.properties
 secrets.properties
+
+# Commit the Gradle wrapper so clean clones can build.
+!gradle/wrapper/gradle-wrapper.jar

@@ -77,3 +77,6 @@ node_modules/
 # Device logs
 device.log
 simulator.log
+
+# Commit the Gradle wrapper so clean clones can build.
+!gradle/wrapper/gradle-wrapper.jar

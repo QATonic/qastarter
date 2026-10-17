@@ -109,7 +109,7 @@ export class MemoryCacheProvider implements CacheProvider {
     logger.info('Memory cache provider closed');
   }
 
-  getClient(): any {
+  getClient(): null {
     return null;
   }
 }

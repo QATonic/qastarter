@@ -16,15 +16,15 @@ namespace {{csharpNamespace}}.Tests
         [SetUp]
         public void Setup()
         {
-            _client = new RestClient("{{baseUrl}}");
+            _client = new RestClient("{{string baseUrl "double" "cs"}}");
         }
 
 {{#each openApiEndpoints}}
-        /// <summary>{{method}} {{path}} — {{summary}}</summary>
+        /// <summary>{{comment method}} {{comment path}} — {{comment summary}}</summary>
         [Test]
         public async Task Test_{{operationId}}()
         {
-            var request = new RestRequest("{{path}}", Method.{{method}});
+            var request = new RestRequest("{{string path "double" "cs"}}", Method.{{method}});
 {{#if requestBody}}
             request.AddJsonBody(new { });
 {{/if}}

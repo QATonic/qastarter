@@ -43,7 +43,7 @@ it(`should verify login for user: ${user.username}`, async () => {
 await LoginPage.open();
 await LoginPage.login(user.username, user.password);
 
-if (user.username === "{{testUsername}}") {
+if (user.username === "{{string testUsername "double" "js"}}") {
 await expect(browser).toHaveUrlContaining('inventory');
 } else {
 await expect(LoginPage.flashMessage).toBeDisplayed();

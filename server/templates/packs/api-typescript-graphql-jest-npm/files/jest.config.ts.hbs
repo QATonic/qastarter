@@ -18,7 +18,7 @@ roots: ['<rootDir>/tests'],
         reporters: [
         'default'{{#if (eq reportingTool "jest-html")}},
         ['jest-html-reporter', {
-        pageTitle: '{{projectName}} Test Report',
+        pageTitle: '{{string projectName "single" "ts"}} Test Report',
         outputPath: 'reports/test-report.html',
         includeFailureMsg: true,
         includeSuiteFailure: true

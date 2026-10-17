@@ -26,12 +26,12 @@ test.describe('Express Generator — Dependency Search', () => {
   test.beforeEach(async ({ page, context }) => {
     // Clear persisted state from any previous run
     await context.clearCookies();
-    await page.goto('/express');
+    await page.goto('/express', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
       localStorage.clear();
       sessionStorage.clear();
     });
-    await page.reload();
+    await page.goto('/express', { waitUntil: 'domcontentloaded' });
   });
 
   test('searches npm, adds a package, and shows it in the preview panel', async ({ page }) => {

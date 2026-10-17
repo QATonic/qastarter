@@ -20,7 +20,7 @@ explicit.wait=30
 # For UWP apps: Use the App ID (e.g., Microsoft.WindowsCalculator_8wekyb3d8bbwe!App)
 # For Win32 apps: Use the full path (e.g., C:\\Program Files\\YourApp\\app.exe)
 default.application=your-app
-app.your-app.path={{appPath}}
+app.your-app.path={{properties appPath}}
 app.calculator.path=Microsoft.WindowsCalculator_8wekyb3d8bbwe!App
 app.notepad.path=C:\\Windows\\System32\\notepad.exe
 
@@ -45,7 +45,7 @@ log.to.file=true
 # ExtentReports Configuration
 extent.reports.enabled=true
 extent.reports.theme=DARK
-extent.report.name={{projectName}} Desktop Test Report - Development
+extent.report.name={{properties projectName}} Desktop Test Report - Development
 extent.report.document.title=Desktop Automation Test Results
 
 # Cleanup Configuration

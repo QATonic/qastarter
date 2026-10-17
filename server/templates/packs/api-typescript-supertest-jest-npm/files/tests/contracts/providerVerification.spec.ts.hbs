@@ -18,12 +18,12 @@ providerBaseUrl,
 
 // Local pact files
 pactUrls: [
-path.resolve(process.cwd(), 'pacts', '{{projectName}}Consumer-UserService.json'),
+path.resolve(process.cwd(), 'pacts', '{{string projectName "single" "ts"}}Consumer-UserService.json'),
 ],
 
 // Pact Broker configuration (optional)
 {{#if pactBrokerUrl}}
-pactBrokerUrl: '{{pactBrokerUrl}}',
+pactBrokerUrl: '{{string pactBrokerUrl "single" "ts"}}',
 pactBrokerToken: process.env.PACT_BROKER_TOKEN,
 publishVerificationResult: process.env.CI === 'true',
 providerVersion: process.env.GIT_COMMIT || '1.0.0',

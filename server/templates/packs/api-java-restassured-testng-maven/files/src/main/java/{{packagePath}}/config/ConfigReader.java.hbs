@@ -32,13 +32,13 @@ setDefaults();
 }
 
 private static void setDefaults() {
-properties.setProperty("base.url", "{{baseUrl}}");
+properties.setProperty("base.url", "{{string baseUrl "double" "java"}}");
 properties.setProperty("timeout", "30");
 properties.setProperty("test.retry.count", "2");
 }
 
 public static String getBaseUrl() {
-return properties.getProperty("base.url", "{{baseUrl}}");
+return properties.getProperty("base.url", "{{string baseUrl "double" "java"}}");
 }
 
 public static int getTimeout() {

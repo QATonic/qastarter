@@ -1,4 +1,4 @@
-import React, { JSX } from 'react';
+import React from 'react';
 
 interface HelpContent {
   [key: string]: string | React.ReactNode;
@@ -124,7 +124,7 @@ export const helpContent: HelpContent = {
   requests: (
     <div>
       <p className="font-medium mb-1">Requests + Pytest</p>
-      <p className="text-xs">Python's HTTP library combined with pytest for API testing.</p>
+      <p className="text-xs">Python&apos;s HTTP library combined with pytest for API testing.</p>
       <p className="text-xs mt-1">✓ Simple and intuitive API</p>
       <p className="text-xs">✓ Session management</p>
       <p className="text-xs">✓ JSON handling</p>
@@ -151,7 +151,7 @@ export const helpContent: HelpContent = {
   winappdriver: (
     <div>
       <p className="font-medium mb-1">WinAppDriver</p>
-      <p className="text-xs">Microsoft's UI automation driver for Windows applications.</p>
+      <p className="text-xs">Microsoft&apos;s UI automation driver for Windows applications.</p>
       <p className="text-xs mt-1">✓ UWP and Win32 apps</p>
       <p className="text-xs">✓ WebDriver protocol</p>
       <p className="text-xs">✓ Appium compatible</p>
@@ -169,7 +169,7 @@ export const helpContent: HelpContent = {
   espresso: (
     <div>
       <p className="font-medium mb-1">Espresso</p>
-      <p className="text-xs">Google's native Android UI testing framework.</p>
+      <p className="text-xs">Google&apos;s native Android UI testing framework.</p>
       <p className="text-xs mt-1">✓ Fast and reliable</p>
       <p className="text-xs">✓ Automatic synchronization</p>
       <p className="text-xs">✓ Android Studio integration</p>
@@ -178,7 +178,7 @@ export const helpContent: HelpContent = {
   xcuitest: (
     <div>
       <p className="font-medium mb-1">XCUITest</p>
-      <p className="text-xs">Apple's native iOS UI testing framework.</p>
+      <p className="text-xs">Apple&apos;s native iOS UI testing framework.</p>
       <p className="text-xs mt-1">✓ Swift and Objective-C</p>
       <p className="text-xs">✓ Xcode integration</p>
       <p className="text-xs">✓ Accessibility testing</p>
@@ -227,7 +227,9 @@ export const helpContent: HelpContent = {
   flutter: (
     <div>
       <p className="font-medium mb-1">Flutter</p>
-      <p className="text-xs">Google's UI toolkit for building natively compiled applications.</p>
+      <p className="text-xs">
+        Google&apos;s UI toolkit for building natively compiled applications.
+      </p>
       <p className="text-xs mt-1">✓ Single codebase for Mobile, Web, Desktop</p>
       <p className="text-xs">✓ Integration Tests with Flutter Driver</p>
       <p className="text-xs">✓ Widget Testing</p>
@@ -259,7 +261,7 @@ export const helpContent: HelpContent = {
   javascript: (
     <div>
       <p className="font-medium mb-1">JavaScript</p>
-      <p className="text-xs">Web's native language with async/await support.</p>
+      <p className="text-xs">Web&apos;s native language with async/await support.</p>
       <p className="text-xs mt-1">✓ Same language as web apps</p>
       <p className="text-xs">✓ Jest and Mocha frameworks</p>
       <p className="text-xs">✓ npm ecosystem</p>
@@ -279,7 +281,7 @@ export const helpContent: HelpContent = {
   csharp: (
     <div>
       <p className="font-medium mb-1">C#</p>
-      <p className="text-xs">Microsoft's language with excellent .NET integration.</p>
+      <p className="text-xs">Microsoft&apos;s language with excellent .NET integration.</p>
       <p className="text-xs mt-1">✓ Visual Studio support</p>
       <p className="text-xs">✓ NUnit and xUnit frameworks</p>
       <p className="text-xs">✓ Strong typing</p>
@@ -289,7 +291,7 @@ export const helpContent: HelpContent = {
   swift: (
     <div>
       <p className="font-medium mb-1">Swift</p>
-      <p className="text-xs">Apple's modern language for iOS/macOS development.</p>
+      <p className="text-xs">Apple&apos;s modern language for iOS/macOS development.</p>
       <p className="text-xs mt-1">✓ Native iOS testing</p>
       <p className="text-xs">✓ XCTest framework</p>
       <p className="text-xs">✓ Xcode integration</p>
@@ -457,7 +459,7 @@ export const helpContent: HelpContent = {
   pytest: (
     <div>
       <p className="font-medium mb-1">pytest</p>
-      <p className="text-xs">Python's most popular testing framework with simple syntax.</p>
+      <p className="text-xs">Python&apos;s most popular testing framework with simple syntax.</p>
       <p className="text-xs mt-1">✓ Simple assert statements</p>
       <p className="text-xs">✓ Powerful fixtures</p>
       <p className="text-xs">✓ Rich plugin ecosystem</p>
@@ -496,7 +498,7 @@ export const helpContent: HelpContent = {
   xctest: (
     <div>
       <p className="font-medium mb-1">XCTest</p>
-      <p className="text-xs">Apple's native testing framework for iOS/macOS.</p>
+      <p className="text-xs">Apple&apos;s native testing framework for iOS/macOS.</p>
       <p className="text-xs mt-1">✓ UI and unit testing</p>
       <p className="text-xs">✓ Performance testing</p>
       <p className="text-xs">✓ Xcode integration</p>
@@ -537,7 +539,7 @@ export const helpContent: HelpContent = {
   maven: (
     <div>
       <p className="font-medium mb-1">Maven</p>
-      <p className="text-xs">Java's standard build tool with convention over configuration.</p>
+      <p className="text-xs">Java&apos;s standard build tool with convention over configuration.</p>
       <p className="text-xs mt-1">✓ Standardized project structure</p>
       <p className="text-xs">✓ Dependency management via pom.xml</p>
       <p className="text-xs">✓ Extensive plugin ecosystem</p>
@@ -550,7 +552,7 @@ export const helpContent: HelpContent = {
       <p className="text-xs">Modern build tool with Groovy/Kotlin DSL support.</p>
       <p className="text-xs mt-1">✓ Faster than Maven (incremental builds)</p>
       <p className="text-xs">✓ Flexible configuration</p>
-      <p className="text-xs">✓ Android's default build tool</p>
+      <p className="text-xs">✓ Android&apos;s default build tool</p>
       <p className="text-xs mt-1 italic">Growing in popularity</p>
     </div>
   ),
@@ -567,7 +569,7 @@ export const helpContent: HelpContent = {
   pip: (
     <div>
       <p className="font-medium mb-1">pip</p>
-      <p className="text-xs">Python's package installer for managing dependencies.</p>
+      <p className="text-xs">Python&apos;s package installer for managing dependencies.</p>
       <p className="text-xs mt-1">✓ requirements.txt support</p>
       <p className="text-xs">✓ Virtual environment compatible</p>
       <p className="text-xs">✓ PyPI package registry</p>
@@ -577,7 +579,7 @@ export const helpContent: HelpContent = {
   nuget: (
     <div>
       <p className="font-medium mb-1">NuGet</p>
-      <p className="text-xs">.NET's package manager for libraries and tools.</p>
+      <p className="text-xs">.NET&apos;s package manager for libraries and tools.</p>
       <p className="text-xs mt-1">✓ Visual Studio integration</p>
       <p className="text-xs">✓ .csproj configuration</p>
       <p className="text-xs">✓ Package restore</p>
@@ -587,7 +589,7 @@ export const helpContent: HelpContent = {
   spm: (
     <div>
       <p className="font-medium mb-1">Swift Package Manager</p>
-      <p className="text-xs">Apple's native dependency manager for Swift.</p>
+      <p className="text-xs">Apple&apos;s native dependency manager for Swift.</p>
       <p className="text-xs mt-1">✓ Package.swift configuration</p>
       <p className="text-xs">✓ Xcode integration</p>
       <p className="text-xs">✓ Cross-platform support</p>
@@ -649,7 +651,7 @@ export const helpContent: HelpContent = {
   'azure-devops': (
     <div>
       <p className="font-medium mb-1">Azure DevOps</p>
-      <p className="text-xs">Microsoft's comprehensive DevOps platform.</p>
+      <p className="text-xs">Microsoft&apos;s comprehensive DevOps platform.</p>
       <p className="text-xs mt-1">✓ Azure Pipelines for CI/CD</p>
       <p className="text-xs">✓ Boards for project management</p>
       <p className="text-xs">✓ Artifact management</p>

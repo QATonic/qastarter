@@ -243,14 +243,18 @@ export default function UtilitiesStep() {
                     type="button"
                     disabled={comingSoon}
                     aria-disabled={comingSoon}
-                    title={comingSoon ? 'Coming soon — only BrowserStack is supported today' : undefined}
+                    title={
+                      comingSoon ? 'Coming soon — only BrowserStack is supported today' : undefined
+                    }
                     className={`
                       relative flex flex-col items-center justify-center gap-1 p-3 rounded-lg border text-sm font-medium transition-all
-                      ${isSelected
-                        ? 'bg-purple-500/10 border-purple-500/40 text-purple-700 dark:text-purple-300'
-                        : comingSoon
-                          ? 'bg-muted/20 border-border text-muted-foreground/60 cursor-not-allowed opacity-60'
-                          : 'bg-card hover:bg-muted/30 border-border text-muted-foreground'}
+                      ${
+                        isSelected
+                          ? 'bg-purple-500/10 border-purple-500/40 text-purple-700 dark:text-purple-300'
+                          : comingSoon
+                            ? 'bg-muted/20 border-border text-muted-foreground/60 cursor-not-allowed opacity-60'
+                            : 'bg-card hover:bg-muted/30 border-border text-muted-foreground'
+                      }
                     `}
                     onClick={() => {
                       if (comingSoon) return;
@@ -276,7 +280,8 @@ export default function UtilitiesStep() {
               })}
             </div>
             <p className="text-xs text-muted-foreground">
-              Run tests on BrowserStack cloud infrastructure instead of local browsers. Sauce Labs and TestMu AI (formerly LambdaTest) are coming soon.
+              Run tests on BrowserStack cloud infrastructure instead of local browsers. Sauce Labs
+              and TestMu AI (formerly LambdaTest) are coming soon.
             </p>
           </div>
         )}
@@ -294,7 +299,9 @@ export default function UtilitiesStep() {
           )}
           {config.cloudDeviceFarm && config.cloudDeviceFarm !== 'none' && (
             <p className="text-sm text-purple-600">
-              {(validationLabels.cloudDeviceFarms as Record<string, string>)[config.cloudDeviceFarm] || config.cloudDeviceFarm}
+              {(validationLabels.cloudDeviceFarms as Record<string, string>)[
+                config.cloudDeviceFarm
+              ] || config.cloudDeviceFarm}
             </p>
           )}
         </div>

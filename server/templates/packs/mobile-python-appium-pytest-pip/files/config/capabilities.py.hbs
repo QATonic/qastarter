@@ -24,9 +24,9 @@ class CapabilitiesManager:
         caps = {
             "platformName": "Android",
             "appium:automationName": "UiAutomator2",
-            "appium:deviceName": os.getenv("DEVICE_NAME", "{{deviceName}}"),
-            "appium:platformVersion": os.getenv("PLATFORM_VERSION", "{{platformVersion}}"),
-            "appium:app": os.getenv("APP_PATH", "{{appPath}}"),
+            "appium:deviceName": os.getenv("DEVICE_NAME", "{{string deviceName "double" "py"}}"),
+            "appium:platformVersion": os.getenv("PLATFORM_VERSION", "{{string platformVersion "double" "py"}}"),
+            "appium:app": os.getenv("APP_PATH", "{{string appPath "double" "py"}}"),
             "appium:appPackage": os.getenv("APP_PACKAGE", "com.your.app.package"),
             "appium:appActivity": os.getenv("APP_ACTIVITY", ".MainActivity"),
             "appium:noReset": False,
@@ -83,7 +83,7 @@ class CapabilitiesManager:
             "bstack:options": {
                 "userName": os.getenv("BROWSERSTACK_USERNAME"),
                 "accessKey": os.getenv("BROWSERSTACK_ACCESS_KEY"),
-                "projectName": "{{projectName}}",
+                "projectName": "{{string projectName "double" "py"}}",
                 "buildName": "Android Build",
                 "debug": True,
                 "networkLogs": True
@@ -96,7 +96,7 @@ class CapabilitiesManager:
             "bstack:options": {
                 "userName": os.getenv("BROWSERSTACK_USERNAME"),
                 "accessKey": os.getenv("BROWSERSTACK_ACCESS_KEY"),
-                "projectName": "{{projectName}}",
+                "projectName": "{{string projectName "double" "py"}}",
                 "buildName": "iOS Build",
                 "debug": True,
                 "networkLogs": True
@@ -110,7 +110,7 @@ class CapabilitiesManager:
                 "username": os.getenv("SAUCE_USERNAME"),
                 "accessKey": os.getenv("SAUCE_ACCESS_KEY"),
                 "build": "Android Build",
-                "name": "{{projectName}}"
+                "name": "{{string projectName "double" "py"}}"
             }
         }
     
@@ -121,6 +121,6 @@ class CapabilitiesManager:
                 "username": os.getenv("SAUCE_USERNAME"),
                 "accessKey": os.getenv("SAUCE_ACCESS_KEY"),
                 "build": "iOS Build",
-                "name": "{{projectName}}"
+                "name": "{{string projectName "double" "py"}}"
             }
         }

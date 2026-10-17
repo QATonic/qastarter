@@ -48,11 +48,7 @@ interface PushResult {
   defaultBranch: string;
 }
 
-export default function GitHubPushDialog({
-  open,
-  onOpenChange,
-  config,
-}: GitHubPushDialogProps) {
+export default function GitHubPushDialog({ open, onOpenChange, config }: GitHubPushDialogProps) {
   const [token, setToken] = useState('');
   const [repoName, setRepoName] = useState(config.projectName || 'my-qa-project');
   const [isPrivate, setIsPrivate] = useState(false);
@@ -63,7 +59,8 @@ export default function GitHubPushDialog({
   const [errorMessage, setErrorMessage] = useState('');
   const [copied, setCopied] = useState(false);
 
-  const isValidRepoName = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(repoName) && repoName.length > 0 && repoName.length <= 100;
+  const isValidRepoName =
+    /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/.test(repoName) && repoName.length > 0 && repoName.length <= 100;
   const canPush = token.length > 0 && isValidRepoName && pushState !== 'pushing';
 
   const handlePush = useCallback(async () => {
@@ -101,9 +98,7 @@ export default function GitHubPushDialog({
       setPushState('success');
     } catch (err) {
       const msg =
-        err instanceof Error
-          ? err.message
-          : 'Network error. Please check your connection.';
+        err instanceof Error ? err.message : 'Network error. Please check your connection.';
       setErrorMessage(msg);
       setPushState('error');
     }
@@ -228,11 +223,7 @@ export default function GitHubPushDialog({
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground"
                   tabIndex={-1}
                 >
-                  {showToken ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
+                  {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -261,15 +252,14 @@ export default function GitHubPushDialog({
                 onChange={(e) => setRepoName(e.target.value)}
                 maxLength={100}
                 className={
-                  repoName && !isValidRepoName
-                    ? 'border-red-400 focus-visible:ring-red-400'
-                    : ''
+                  repoName && !isValidRepoName ? 'border-red-400 focus-visible:ring-red-400' : ''
                 }
                 disabled={pushState === 'pushing'}
               />
               {repoName && !isValidRepoName && (
                 <p className="text-xs text-red-500">
-                  Must start with a letter or number. Only letters, numbers, hyphens, underscores, and dots allowed (max 100 chars).
+                  Must start with a letter or number. Only letters, numbers, hyphens, underscores,
+                  and dots allowed (max 100 chars).
                 </p>
               )}
             </div>
@@ -326,11 +316,7 @@ export default function GitHubPushDialog({
               >
                 Cancel
               </Button>
-              <Button
-                onClick={handlePush}
-                disabled={!canPush}
-                className="gap-2"
-              >
+              <Button onClick={handlePush} disabled={!canPush} className="gap-2">
                 {pushState === 'pushing' ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />

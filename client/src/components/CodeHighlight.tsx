@@ -131,10 +131,7 @@ export default function CodeHighlight({ code, filename }: CodeHighlightProps) {
       return result.value;
     } catch {
       // If highlighting fails, return escaped plaintext
-      return code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+      return code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
   }, [code, filename]);
 

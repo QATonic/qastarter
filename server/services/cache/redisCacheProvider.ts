@@ -68,9 +68,7 @@ export class RedisCacheProvider implements CacheProvider {
     this.connectionPromise = this.client
       .connect()
       .then(() => {
-        logger.info('Redis cache provider initialized', {
-          url: this.config.redisUrl?.replace(/\/\/[^:]+:[^@]+@/, '//*****:*****@'), // Redact credentials
-        });
+        logger.info('Redis cache provider initialized');
       })
       .catch((err) => {
         logger.error('Redis connection failed', { error: err.message });

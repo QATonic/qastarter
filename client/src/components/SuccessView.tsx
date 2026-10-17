@@ -211,9 +211,7 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
       name: 'VS Code',
       extensions: [
         fw === 'playwright' ? 'Playwright Test for VSCode' : '',
-        fw === 'cypress'
-          ? 'Cypress Helper extension'
-          : '',
+        fw === 'cypress' ? 'Cypress Helper extension' : '',
         'ESLint extension',
         'Prettier extension',
         fw === 'webdriverio' ? 'WebdriverIO snippets' : '',
@@ -263,7 +261,9 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
     const tips: string[] = [];
 
     // Universal tips
-    tips.push('Make sure all prerequisites (runtime, build tool, browser) are installed before running tests.');
+    tips.push(
+      'Make sure all prerequisites (runtime, build tool, browser) are installed before running tests.'
+    );
 
     if (lang === 'java' || lang === 'kotlin') {
       tips.push('If Maven/Gradle build fails, check that JAVA_HOME is set correctly.');
@@ -272,11 +272,13 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
 
     if (lang === 'python') {
       tips.push('Use a virtual environment (venv) to avoid dependency conflicts.');
-      tips.push("If pip install fails, try: pip install --upgrade pip");
+      tips.push('If pip install fails, try: pip install --upgrade pip');
     }
 
     if (lang === 'typescript' || lang === 'javascript') {
-      tips.push('If npm install fails, try deleting node_modules and package-lock.json, then run npm install again.');
+      tips.push(
+        'If npm install fails, try deleting node_modules and package-lock.json, then run npm install again.'
+      );
     }
 
     if (fw === 'selenium' || fw === 'appium') {
@@ -298,25 +300,35 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
 
     // Cloud Device Farm tips
     if (config.cloudDeviceFarm === 'browserstack') {
-      tips.push('Set BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY environment variables before running tests.');
+      tips.push(
+        'Set BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY environment variables before running tests.'
+      );
       tips.push('Update browserstack.yml with your desired browser/OS combinations.');
     }
     if (config.cloudDeviceFarm === 'saucelabs') {
-      tips.push('Set SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables before running tests.');
+      tips.push(
+        'Set SAUCE_USERNAME and SAUCE_ACCESS_KEY environment variables before running tests.'
+      );
       tips.push('Update saucelabs.yml with your desired platform configurations.');
     }
 
     // Faker test data tips
     if (config.utilities?.faker) {
-      tips.push('The TestDataFactory class provides realistic test data. Import and use it in your tests for dynamic data generation.');
+      tips.push(
+        'The TestDataFactory class provides realistic test data. Import and use it in your tests for dynamic data generation.'
+      );
     }
 
     // OpenAPI tips
     if (config.openApiSpecUrl) {
-      tips.push('OpenAPI-generated test stubs are in the tests directory. Review and customize assertions for your specific API responses.');
+      tips.push(
+        'OpenAPI-generated test stubs are in the tests directory. Review and customize assertions for your specific API responses.'
+      );
     }
 
-    tips.push('Check the README.md in your generated project for framework-specific setup details.');
+    tips.push(
+      'Check the README.md in your generated project for framework-specific setup details.'
+    );
 
     return tips;
   };
@@ -429,8 +441,14 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
                   </p>
                   <ul className="space-y-1.5">
                     {ide.extensions.map((ext, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
-                        <CheckCircle2 className="w-3 h-3 text-primary mt-0.5 shrink-0" aria-hidden="true" />
+                      <li
+                        key={idx}
+                        className="flex items-start gap-2 text-xs text-muted-foreground"
+                      >
+                        <CheckCircle2
+                          className="w-3 h-3 text-primary mt-0.5 shrink-0"
+                          aria-hidden="true"
+                        />
                         <span>{ext}</span>
                       </li>
                     ))}
@@ -444,10 +462,7 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
                       </p>
                       <div className="space-y-1.5">
                         {envChecks.map((check, idx) => (
-                          <div
-                            key={idx}
-                            className="group flex items-center gap-2 text-xs"
-                          >
+                          <div key={idx} className="group flex items-center gap-2 text-xs">
                             <code className="font-mono bg-background/80 px-2 py-1 rounded border border-border/60 text-primary">
                               {check.command}
                             </code>
@@ -456,9 +471,7 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
                                 variant="ghost"
                                 size="icon"
                                 className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() =>
-                                  copyToClipboard(check.command!, 100 + idx)
-                                }
+                                onClick={() => copyToClipboard(check.command!, 100 + idx)}
                                 aria-label={`Copy: ${check.command}`}
                               >
                                 {copiedIndex === 100 + idx ? (
@@ -500,7 +513,10 @@ export default function SuccessView({ config, onGenerateAnother }: SuccessViewPr
                         key={idx}
                         className="flex items-start gap-2 text-xs text-muted-foreground"
                       >
-                        <Lightbulb className="w-3 h-3 text-amber-500 mt-0.5 shrink-0" aria-hidden="true" />
+                        <Lightbulb
+                          className="w-3 h-3 text-amber-500 mt-0.5 shrink-0"
+                          aria-hidden="true"
+                        />
                         <span>{tip}</span>
                       </li>
                     ))}

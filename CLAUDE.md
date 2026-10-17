@@ -19,7 +19,7 @@ npm run format         # Prettier write; format:check to verify
 # Tests
 npm test               # Server + shared unit tests (vitest, node env) — server/**/*.test.ts, shared/**/*.test.ts
 npm run test:client    # Client tests (separate config: client/vitest.config.ts, jsdom env)
-npm run test:all       # Both of the above
+npm run test:all       # Server/shared + client + CLI tests
 npm test -- server/services/projectService.test.ts   # Run a single test file
 npm run test:watch     # Watch mode
 npm run test:e2e       # Playwright E2E (also :ui, :headed, :firefox, :webkit, :api project variants)
@@ -55,7 +55,7 @@ The single source of truth for which combinations are valid (testing types → f
 
 ### Server (`server/`)
 
-Express app (`server/index.ts`) with environment-split security: helmet CSP and CORS are permissive in development, strict in production. CORS is scoped to `/api` only (top-level SPA navigations carry no Origin and must not be blocked); non-browser clients identify via the `X-QAStarter-Client` header to bypass the no-Origin rejection. Routes are modular under `server/routes/` (health, analytics, config, project, dependency, github), registered in `server/routes.ts`, all under `/api/v1/` — `server/middleware/apiVersionRedirect.ts` rewrites legacy unversioned paths. Centralized error handling in `server/errors.ts` (`ErrorCode` enum, `errorHandler`, `notFoundHandler`). Correlation IDs added early via `server/middleware/correlationMiddleware.ts`. Swagger docs served via `server/swagger.ts`. Logging is Winston-based (`server/utils/logger.ts`).
+Express app (`server/index.ts`) with environment-split security: helmet CSP and CORS are permissive in development, strict in production. CSP upgrades apply to secure requests, including trusted HTTPS proxy traffic. CORS is scoped to `/api` only (top-level SPA navigations carry no Origin and must not be blocked); originless requests proceed without CORS response headers so same-origin GETs and readiness probes work. The `X-QAStarter-Client` header identifies CLI/MCP clients for analytics and rate-limit classification. Routes are modular under `server/routes/` (health, analytics, config, project, dependency, github), registered in `server/routes.ts`, all under `/api/v1/` — `server/middleware/apiVersionRedirect.ts` rewrites legacy unversioned paths. Centralized error handling in `server/errors.ts` (`ErrorCode` enum, `errorHandler`, `notFoundHandler`). Correlation IDs added early via `server/middleware/correlationMiddleware.ts`. Swagger docs served via `server/swagger.ts`. Logging is Winston-based (`server/utils/logger.ts`).
 
 ### Client (`client/`)
 

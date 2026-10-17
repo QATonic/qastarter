@@ -16,7 +16,7 @@ import os
 PACT_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'pacts')
 os.makedirs(PACT_DIR, exist_ok=True)
 
-pact = Consumer('{{projectName}}Consumer').has_pact_with(
+pact = Consumer('{{string projectName "single" "py"}}Consumer').has_pact_with(
 Provider('UserService'),
 pact_dir=PACT_DIR,
 log_dir=os.path.join(PACT_DIR, 'logs'),

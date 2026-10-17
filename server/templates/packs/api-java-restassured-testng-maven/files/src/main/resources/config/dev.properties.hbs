@@ -5,7 +5,7 @@
 # Replace the placeholder values below with your actual API details.
 
 # API Base Configuration - UPDATE THESE
-api.base.url={{baseUrl}}
+api.base.url={{properties baseUrl}}
 api.version=v1
 api.timeout=30000
 api.content.type=application/json
@@ -25,11 +25,11 @@ auth.token.field=access_token
 
 # OAuth Configuration (if applicable) - UPDATE IF USING OAUTH
 auth.oauth.token.endpoint=/oauth/token
-auth.oauth.client.id={{apiAuthToken}}
+auth.oauth.client.id={{properties apiAuthToken}}
 auth.oauth.client.secret=your-client-secret
 
 # API Key Configuration (if applicable) - UPDATE IF USING API KEY
-auth.api.key={{apiAuthToken}}
+auth.api.key={{properties apiAuthToken}}
 auth.apikey.validation.endpoint=/auth/validate
 
 # Logging Configuration

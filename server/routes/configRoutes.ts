@@ -5,16 +5,13 @@
 
 import { Router } from 'express';
 import { Octokit } from '@octokit/rest';
-import { projectConfigSchema, type ProjectConfig } from '@shared/schema';
 import { BOM } from '@shared/bom';
-import { WizardValidator, validationMatrix, validationLabels } from '@shared/validationMatrix';
-import {
-  asyncHandler,
-  ValidationError,
-  IncompatibleCombinationError,
-  generateRequestId,
-} from '../errors';
+import { validationMatrix, validationLabels } from '@shared/validationMatrix';
+import { asyncHandler, generateRequestId } from '../errors';
 import { storage } from '../storage';
+import { parseProjectConfiguration } from '../services/configurationService';
+import { AppError } from '../errors';
+import type { ConfigValidationResult } from '@shared/projectRequest';
 
 // ── GitHub stars cache (1-hour TTL) ──────────────────────────────────
 let githubStarsCache: { stars: number; forks: number; updatedAt: number } | null = null;
@@ -145,34 +142,32 @@ router.get('/v1/config/options', (req, res) => {
 /**
  * Validate project configuration
  */
-router.post('/v1/validate-config', (req, res) => {
-  const validationResult = projectConfigSchema.safeParse(req.body);
-
-  if (!validationResult.success) {
-    return res.json({
-      isValid: false,
-      message: 'Invalid configuration',
-      errors: validationResult.error.errors.map((e) => ({
-        field: e.path.join('.'),
-        message: e.message,
-      })),
+router.post(
+  '/v1/validate-config',
+  asyncHandler(async (req, res) => {
+    let data: ConfigValidationResult;
+    try {
+      await parseProjectConfiguration(req.body);
+      data = { valid: true };
+    } catch (error) {
+      if (!(error instanceof AppError) || error.statusCode !== 400) throw error;
+      data = {
+        valid: false,
+        errors: (
+          error.details as { errors?: Array<{ field: string; message: string }> } | undefined
+        )?.errors ?? [{ field: 'combination', message: error.message }],
+      };
+    }
+    res.json({
+      success: true,
+      data,
+      // Preserve the legacy fields for existing web/API consumers.
+      isValid: data.valid,
+      message: data.valid ? 'Configuration is valid' : 'Invalid configuration',
+      ...(data.errors ? { errors: data.errors } : {}),
     });
-  }
-
-  const config: ProjectConfig = validationResult.data;
-  const isValid = WizardValidator.isCompatible(
-    config.testingType,
-    config.framework,
-    config.language
-  );
-
-  res.json({
-    isValid,
-    message: isValid
-      ? 'Configuration is valid'
-      : 'Invalid combination of testing type, framework, and language',
-  });
-});
+  })
+);
 
 /**
  * Get metadata for project generation options

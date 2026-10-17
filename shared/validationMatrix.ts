@@ -1,3 +1,18 @@
+type StackSelection = Partial<
+  Record<
+    | 'testingType'
+    | 'framework'
+    | 'language'
+    | 'testRunner'
+    | 'buildTool'
+    | 'cicdTool'
+    | 'reportingTool'
+    | 'testingPattern'
+    | 'cloudDeviceFarm',
+    string
+  >
+>;
+
 // Comprehensive validation matrix for QAStarter wizard steps
 // Defines compatibility between testing types, frameworks, languages, and tools
 // Updated: January 2026 - Aligned with actual template inventory (46 templates)
@@ -714,7 +729,7 @@ export class WizardValidator {
   /**
    * Get filtered options based on current selections
    */
-  static getFilteredOptions(step: string, config: any): string[] {
+  static getFilteredOptions(step: string, config: StackSelection): string[] {
     switch (step) {
       case 'framework':
         return config.testingType ? this.getAvailableFrameworks(config.testingType) : [];
@@ -766,7 +781,7 @@ export class WizardValidator {
   /**
    * Reset invalid selections when dependencies change
    */
-  static resetInvalidSelections(config: any): any {
+  static resetInvalidSelections<T extends StackSelection>(config: T): T & StackSelection {
     const newConfig = { ...config };
 
     // If testing type changed, reset framework and downstream selections
@@ -784,7 +799,7 @@ export class WizardValidator {
 
     // If framework changed, reset language and downstream selections
     if (config.framework && config.language) {
-      if (!this.isCompatible(config.testingType, config.framework, config.language)) {
+      if (!this.isCompatible(config.testingType || '', config.framework, config.language)) {
         newConfig.language = '';
         newConfig.testRunner = '';
         newConfig.buildTool = '';

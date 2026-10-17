@@ -293,7 +293,8 @@ function hasReadme(files: TemplateFile[]): boolean {
 function hasTestFiles(files: TemplateFile[]): boolean {
   return files.some((f) => {
     const normalized = f.path.replace(/\\/g, '/').toLowerCase();
-    return TEST_DIR_PREFIXES.some((prefix) => normalized.includes(prefix));
+    return TEST_DIR_PREFIXES.some((prefix) => normalized.includes(prefix)) ||
+      /^scripts\/(load|stress|spike|soak)-test\.js$/.test(normalized);
   });
 }
 
@@ -360,7 +361,7 @@ async function validateAllPacks() {
     let files: TemplateFile[];
     try {
       files = [];
-      for await (const file of engine.generateProjectStream(config, { strict: false })) {
+      for await (const file of engine.generateProjectStream(config, { strict: true })) {
         files.push(file);
       }
     } catch (err: any) {

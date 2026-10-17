@@ -108,7 +108,7 @@ export default function OptionButtonGroup({
         onChange(options[nextIndex]);
       }
     },
-    [moveFocus, findEnabled, options]
+    [moveFocus, findEnabled, options, onChange]
   );
 
   return (

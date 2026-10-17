@@ -8,19 +8,22 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import {
-  parseOpenApiFromString,
-  parseOpenApiFromUrl,
-  clearOpenApiCache,
-} from './openApiService';
+import { parseOpenApiFromString, parseOpenApiFromUrl, clearOpenApiCache } from './openApiService';
+
+import { fetchOpenApiSpec } from './openApiFetch';
+
+vi.mock('./openApiFetch', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./openApiFetch')>()),
+  fetchOpenApiSpec: vi.fn(),
+}));
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
 /** Build a minimal valid OpenAPI 3.0 spec as an object. */
 function makeSpec(
-  paths: Record<string, any>,
-  extra?: Record<string, any>,
-): Record<string, any> {
+  paths: Record<string, unknown>,
+  extra?: Record<string, unknown>
+): Record<string, unknown> {
   return {
     openapi: '3.0.3',
     info: { title: 'Test', version: '1.0.0' },
@@ -30,22 +33,7 @@ function makeSpec(
 }
 
 /** Stringify helper. */
-const json = (obj: any) => JSON.stringify(obj);
-
-/** Create a mock Response. */
-function mockResponse(
-  body: string,
-  opts?: { status?: number; headers?: Record<string, string> },
-): Response {
-  const status = opts?.status ?? 200;
-  const headers = new Headers(opts?.headers ?? {});
-  return {
-    ok: status >= 200 && status < 300,
-    status,
-    headers,
-    text: () => Promise.resolve(body),
-  } as unknown as Response;
-}
+const json = (obj: unknown) => JSON.stringify(obj);
 
 // ── Spec Fixtures ──────────────────────────────────────────────────────
 
@@ -197,15 +185,17 @@ const SPEC_MULTIPLE_RESPONSES = makeSpec({
   },
 });
 
-const VALID_SPEC_STR = json(makeSpec({
-  '/ping': {
-    get: {
-      operationId: 'ping',
-      summary: 'Ping',
-      responses: { '200': { description: 'pong' } },
+const VALID_SPEC_STR = json(
+  makeSpec({
+    '/ping': {
+      get: {
+        operationId: 'ping',
+        summary: 'Ping',
+        responses: { '200': { description: 'pong' } },
+      },
     },
-  },
-}));
+  })
+);
 
 // ────────────────────────────────────────────────────────────────────────
 // Tests
@@ -215,6 +205,7 @@ describe('OpenApiService — comprehensive', () => {
   beforeEach(() => {
     clearOpenApiCache();
     vi.restoreAllMocks();
+    vi.resetAllMocks();
     vi.unstubAllGlobals();
   });
 
@@ -229,13 +220,7 @@ describe('OpenApiService — comprehensive', () => {
     it('should parse all five HTTP methods', async () => {
       const endpoints = await parseOpenApiFromString(json(SPEC_ALL_METHODS));
       expect(endpoints).not.toBeNull();
-      expect(endpoints!.map((e) => e.method)).toEqual([
-        'GET',
-        'POST',
-        'PUT',
-        'DELETE',
-        'PATCH',
-      ]);
+      expect(endpoints!.map((e) => e.method)).toEqual(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']);
     });
 
     it('should auto-generate operationId when missing', async () => {
@@ -326,7 +311,7 @@ describe('OpenApiService — comprehensive', () => {
     });
 
     it('should truncate at 50 endpoints', async () => {
-      const paths: Record<string, any> = {};
+      const paths: Record<string, unknown> = {};
       for (let i = 0; i < 55; i++) {
         paths[`/resource-${i}`] = {
           get: {
@@ -533,171 +518,61 @@ describe('OpenApiService — comprehensive', () => {
     });
   });
 
-  // ── parseOpenApiFromUrl — fetch behaviour ────────────────────────────
+  describe('downloads and caching', () => {
+    const download = vi.mocked(fetchOpenApiSpec);
 
-  describe('parseOpenApiFromUrl — fetch behaviour', () => {
-    let mockFetch: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
-      clearOpenApiCache();
-      mockFetch = vi.fn();
-      vi.stubGlobal('fetch', mockFetch);
+    it('parses a downloaded standalone JSON document', async () => {
+      download.mockResolvedValue(VALID_SPEC_STR);
+      expect(await parseOpenApiFromUrl('https://api.example.com/spec.json')).toMatchObject([
+        { operationId: 'ping' },
+      ]);
     });
 
-    it('should parse a successfully fetched JSON spec', async () => {
-      mockFetch.mockResolvedValueOnce(mockResponse(VALID_SPEC_STR));
-      const result = await parseOpenApiFromUrl('https://api.example.com/openapi.json');
-      expect(result).not.toBeNull();
-      expect(result!.length).toBe(1);
-      expect(result![0].operationId).toBe('ping');
+    it('parses a downloaded YAML document', async () => {
+      download.mockResolvedValue('openapi: 3.0.3\ninfo: {title: Test, version: 1.0.0}\npaths: {}');
+      expect(await parseOpenApiFromUrl('https://api.example.com/spec.yaml')).toEqual([]);
     });
 
-    it('should send Accept header including yaml', async () => {
-      mockFetch.mockResolvedValueOnce(mockResponse(VALID_SPEC_STR));
-      await parseOpenApiFromUrl('https://api.example.com/openapi.json');
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-      const callArgs = mockFetch.mock.calls[0];
-      const headers = callArgs[1]?.headers;
-      expect(headers?.Accept).toContain('yaml');
+    it('does not attempt to download unsafe URLs', async () => {
+      expect(await parseOpenApiFromUrl('https://[::ffff:127.0.0.1]/spec.json')).toBeNull();
+      expect(download).not.toHaveBeenCalled();
     });
 
-    it('should return null when response is not OK (404)', async () => {
-      mockFetch.mockResolvedValueOnce(mockResponse('Not Found', { status: 404 }));
-      const result = await parseOpenApiFromUrl('https://api.example.com/spec.json');
-      expect(result).toBeNull();
+    it('does not cache failed downloads', async () => {
+      download.mockRejectedValueOnce(new Error('HTTP 404')).mockResolvedValueOnce(VALID_SPEC_STR);
+      const url = 'https://api.example.com/retry.json';
+      expect(await parseOpenApiFromUrl(url)).toBeNull();
+      expect(await parseOpenApiFromUrl(url)).not.toBeNull();
+      expect(download).toHaveBeenCalledTimes(2);
     });
 
-    it('should return null when response is not OK (500)', async () => {
-      mockFetch.mockResolvedValueOnce(
-        mockResponse('Internal Server Error', { status: 500 }),
-      );
-      const result = await parseOpenApiFromUrl('https://api.example.com/spec.json');
-      expect(result).toBeNull();
+    it('does not cache invalid documents', async () => {
+      download.mockResolvedValueOnce('<<<invalid>>>').mockResolvedValueOnce(VALID_SPEC_STR);
+      const url = 'https://api.example.com/retry.json';
+      expect(await parseOpenApiFromUrl(url)).toBeNull();
+      expect(await parseOpenApiFromUrl(url)).not.toBeNull();
+      expect(download).toHaveBeenCalledTimes(2);
     });
 
-    it('should return null when Content-Length exceeds 5 MB', async () => {
-      const sixMB = (6 * 1024 * 1024).toString();
-      mockFetch.mockResolvedValueOnce(
-        mockResponse('{}', { headers: { 'content-length': sixMB } }),
-      );
-      const result = await parseOpenApiFromUrl('https://api.example.com/spec.json');
-      expect(result).toBeNull();
-    });
-
-    it('should return null when response body exceeds 5 MB', async () => {
-      // No content-length header but body is huge
-      const hugeBody = 'x'.repeat(5 * 1024 * 1024 + 1);
-      mockFetch.mockResolvedValueOnce(mockResponse(hugeBody));
-      const result = await parseOpenApiFromUrl('https://api.example.com/spec.json');
-      expect(result).toBeNull();
-    });
-
-    it('should return null when response body is invalid JSON/YAML', async () => {
-      mockFetch.mockResolvedValueOnce(mockResponse('<<<not valid>>>'));
-      const result = await parseOpenApiFromUrl('https://api.example.com/spec.json');
-      expect(result).toBeNull();
-    });
-
-    it('should return null on network/fetch error', async () => {
-      mockFetch.mockRejectedValueOnce(new TypeError('fetch failed'));
-      const result = await parseOpenApiFromUrl('https://api.example.com/spec.json');
-      expect(result).toBeNull();
-    });
-
-    it('should return null on abort (timeout simulation)', async () => {
-      const abortError = new DOMException('The operation was aborted', 'AbortError');
-      // Replace the name property since DOMException constructor sets it
-      mockFetch.mockRejectedValueOnce(abortError);
-      const result = await parseOpenApiFromUrl('https://api.example.com/spec.json');
-      expect(result).toBeNull();
-    });
-
-    it('should pass an AbortSignal to fetch', async () => {
-      mockFetch.mockResolvedValueOnce(mockResponse(VALID_SPEC_STR));
-      await parseOpenApiFromUrl('https://api.example.com/openapi.json');
-      const callArgs = mockFetch.mock.calls[0];
-      expect(callArgs[1]).toHaveProperty('signal');
-      expect(callArgs[1].signal).toBeInstanceOf(AbortSignal);
-    });
-  });
-
-  // ── Caching ──────────────────────────────────────────────────────────
-
-  describe('parseOpenApiFromUrl — caching', () => {
-    let mockFetch: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
-      clearOpenApiCache();
-      mockFetch = vi.fn();
-      vi.stubGlobal('fetch', mockFetch);
-    });
-
-    it('should return cached result on second call (no re-fetch)', async () => {
-      mockFetch.mockResolvedValue(mockResponse(VALID_SPEC_STR));
-
-      const url = 'https://api.example.com/cached-spec.json';
+    it('reuses cached endpoints until expiry', async () => {
+      download.mockResolvedValue(VALID_SPEC_STR);
+      const url = 'https://api.example.com/cached.json';
       const first = await parseOpenApiFromUrl(url);
-      const second = await parseOpenApiFromUrl(url);
-
-      expect(first).toEqual(second);
-      // fetch should only have been called once
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-    });
-
-    it('should re-fetch after cache expiry', async () => {
-      vi.useFakeTimers();
-      mockFetch.mockResolvedValue(mockResponse(VALID_SPEC_STR));
-
-      const url = 'https://api.example.com/expiring-spec.json';
+      expect(await parseOpenApiFromUrl(url)).toEqual(first);
+      expect(download).toHaveBeenCalledTimes(1);
+      const now = Date.now();
+      vi.spyOn(Date, 'now').mockReturnValue(now + 5 * 60 * 1000 + 1);
       await parseOpenApiFromUrl(url);
-      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(download).toHaveBeenCalledTimes(2);
+    });
 
-      // Advance past the 5-minute TTL
-      vi.advanceTimersByTime(5 * 60 * 1000 + 1);
-
+    it('clears cached endpoints explicitly', async () => {
+      download.mockResolvedValue(VALID_SPEC_STR);
+      const url = 'https://api.example.com/clear.json';
       await parseOpenApiFromUrl(url);
-      expect(mockFetch).toHaveBeenCalledTimes(2);
-
-      vi.useRealTimers();
-    });
-
-    it('should not cache failed requests', async () => {
-      mockFetch
-        .mockResolvedValueOnce(mockResponse('Not Found', { status: 404 }))
-        .mockResolvedValueOnce(mockResponse(VALID_SPEC_STR));
-
-      const url = 'https://api.example.com/retry-spec.json';
-      const first = await parseOpenApiFromUrl(url);
-      expect(first).toBeNull();
-
-      const second = await parseOpenApiFromUrl(url);
-      expect(second).not.toBeNull();
-      expect(mockFetch).toHaveBeenCalledTimes(2);
-    });
-  });
-
-  // ── clearOpenApiCache ────────────────────────────────────────────────
-
-  describe('clearOpenApiCache', () => {
-    let mockFetch: ReturnType<typeof vi.fn>;
-
-    beforeEach(() => {
       clearOpenApiCache();
-      mockFetch = vi.fn();
-      vi.stubGlobal('fetch', mockFetch);
-    });
-
-    it('should force re-fetch after cache is cleared', async () => {
-      mockFetch.mockResolvedValue(mockResponse(VALID_SPEC_STR));
-
-      const url = 'https://api.example.com/cleared-spec.json';
       await parseOpenApiFromUrl(url);
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-
-      clearOpenApiCache();
-
-      await parseOpenApiFromUrl(url);
-      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(download).toHaveBeenCalledTimes(2);
     });
   });
 });

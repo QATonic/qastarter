@@ -104,7 +104,6 @@ const MAVEN_VERSIONS_URL = 'https://search.maven.org/solrsearch/select';
 const NUGET_SEARCH_URL = 'https://azuresearch-usnc.nuget.org/query';
 const NUGET_VERSIONS_URL = 'https://api.nuget.org/v3-flatcontainer';
 const PYPI_SEARCH_URL = 'https://pypi.org/pypi';
-const PYPI_SIMPLE_URL = 'https://pypi.org/simple';
 
 // ---------- Helpers ----------
 

@@ -1,11 +1,11 @@
 plugins {
     id 'java'
 {{#if (eq reportingTool "allure")}}
-    id 'io.qameta.allure' version '{{toolVersions.allure}}'
+    id 'io.qameta.allure' version '{{string toolVersions.allure "single" "gradle"}}'
 {{/if}}
 }
 
-group = '{{groupId}}'
+group = '{{string groupId "single" "gradle"}}'
 version = '1.0.0'
 sourceCompatibility = '17'
 
@@ -15,21 +15,21 @@ repositories {
 
 dependencies {
     // RestAssured
-    implementation 'io.rest-assured:rest-assured:{{toolVersions.restassured}}'
-    implementation 'io.rest-assured:json-path:{{toolVersions.restassured}}'
-    implementation 'io.rest-assured:json-schema-validator:{{toolVersions.restassured}}'
+    implementation 'io.rest-assured:rest-assured:{{string toolVersions.restassured "single" "gradle"}}'
+    implementation 'io.rest-assured:json-path:{{string toolVersions.restassured "single" "gradle"}}'
+    implementation 'io.rest-assured:json-schema-validator:{{string toolVersions.restassured "single" "gradle"}}'
     
     // TestNG
-    implementation 'org.testng:testng:{{toolVersions.testng}}'
+    implementation 'org.testng:testng:{{string toolVersions.testng "single" "gradle"}}'
     
     // JSON
-    implementation 'com.google.code.gson:gson:{{toolVersions.gson}}'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:{{toolVersions.jackson}}'
+    implementation 'com.google.code.gson:gson:{{string toolVersions.gson "single" "gradle"}}'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:{{string toolVersions.jackson "single" "gradle"}}'
     implementation 'com.jayway.jsonpath:json-path:2.9.0'
     
 {{#if (eq reportingTool "allure")}}
     // Allure
-    implementation 'io.qameta.allure:allure-testng:{{toolVersions.allure}}'
+    implementation 'io.qameta.allure:allure-testng:{{string toolVersions.allure "single" "gradle"}}'
 {{/if}}
 
     // Logging
@@ -41,12 +41,12 @@ dependencies {
 
 // User-picked dependencies (from QAStarter dependency search)
 {{#each userDependencies.maven}}
-implementation '{{group}}:{{name}}:{{version}}'
+implementation '{{string group "single" "gradle"}}:{{string name "single" "gradle"}}:{{string version "single" "gradle"}}'
 {{/each}}
 {{/if}}
     {{#if utilities.faker}}
     // DataFaker — Test data generation
-    implementation 'net.datafaker:datafaker:{{toolVersions.datafaker}}'
+    implementation 'net.datafaker:datafaker:{{string toolVersions.datafaker "single" "gradle"}}'
     {{/if}}
 }
 

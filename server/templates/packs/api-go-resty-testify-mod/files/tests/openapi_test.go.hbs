@@ -10,12 +10,12 @@ import (
 // Auto-generated API tests from OpenAPI specification.
 // Each test validates a single endpoint's basic contract.
 
-const baseURL = "{{baseUrl}}"
+const baseURL = "{{string baseUrl "double" "go"}}"
 
 {{#each openApiEndpoints}}
 func Test_{{operationId}}(t *testing.T) {
-	// {{method}} {{path}} — {{summary}}
-	req, err := http.NewRequest("{{method}}", baseURL+"{{path}}", nil)
+	// {{comment method}} {{comment path}} — {{comment summary}}
+	req, err := http.NewRequest("{{string method "double" "go"}}", baseURL+"{{string path "double" "go"}}", nil)
 	assert.NoError(t, err)
 
 	client := &http.Client{}

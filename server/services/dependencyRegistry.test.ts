@@ -92,12 +92,12 @@ const npmPackagePayload = {
 };
 
 describe('dependencyRegistry', () => {
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let fetchSpy: import('vitest').MockInstance<typeof globalThis.fetch>;
 
   beforeEach(() => {
     __resetDependencyCache();
     // Default: every fetch returns an empty success — individual tests override.
-    fetchSpy = vi.spyOn(globalThis, 'fetch' as any);
+    fetchSpy = vi.spyOn(globalThis, 'fetch');
   });
 
   afterEach(() => {

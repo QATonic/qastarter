@@ -5,15 +5,15 @@
 
 import request from 'supertest';
 
-const BASE_URL = '{{baseUrl}}';
+const BASE_URL = '{{string baseUrl "single" "ts"}}';
 
 describe('OpenAPI Endpoints', () => {
 {{#each openApiEndpoints}}
-  test('{{method}} {{path}} — {{summary}}', async () => {
+  test('{{string method "single" "ts"}} {{string path "single" "ts"}} — {{string summary "single" "ts"}}', async () => {
     const res = await request(BASE_URL)
-      .{{lowerCase method}}('{{path}}')
+      .{{lowerCase method}}('{{string path "single" "ts"}}')
 {{#if requestBody}}
-      .set('Content-Type', '{{requestBody.contentType}}')
+      .set('Content-Type', '{{string requestBody.contentType "single" "ts"}}')
       .send({})
 {{/if}}
       ;

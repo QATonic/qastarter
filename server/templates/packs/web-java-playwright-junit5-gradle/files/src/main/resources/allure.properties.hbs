@@ -1,10 +1,10 @@
-# Allure Configuration for {{projectName}}
+# Allure Configuration for {{properties projectName}}
 
 # Results directory
 allure.results.directory=target/allure-results
 
 # Link patterns for issues and test management systems
-allure.link.issue.pattern=https://github.com/{{#if organization}}{{organization}}{{else}}yourorg{{/if}}/{{projectName}}/issues/{}
+allure.link.issue.pattern=https://github.com/{{#if organization}}{{properties organization}}{{else}}yourorg{{/if}}/{{properties projectName}}/issues/{}
 allure.link.tms.pattern=https://yourtracker.example.com/test/{}
 
 # Clean results before test run

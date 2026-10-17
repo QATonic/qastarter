@@ -46,7 +46,8 @@ async function validateToken(octokit: Octokit): Promise<{ login: string }> {
   try {
     const { data } = await octokit.users.getAuthenticated();
     return { login: data.login };
-  } catch (error: any) {
+  } catch (caught: unknown) {
+    const error = normalizeGitHubError(caught);
     if (error.status === 401) {
       throw new GitHubServiceError(
         'Invalid GitHub token. Please check your Personal Access Token.',
@@ -59,10 +60,7 @@ async function validateToken(octokit: Octokit): Promise<{ login: string }> {
         'INSUFFICIENT_SCOPE'
       );
     }
-    throw new GitHubServiceError(
-      `GitHub authentication failed: ${error.message}`,
-      'AUTH_FAILED'
-    );
+    throw new GitHubServiceError(`GitHub authentication failed: ${error.message}`, 'AUTH_FAILED');
   }
 }
 
@@ -74,7 +72,13 @@ async function createRepository(
   repoName: string,
   isPrivate: boolean,
   description?: string
-): Promise<{ owner: string; repo: string; htmlUrl: string; cloneUrl: string; defaultBranch: string }> {
+): Promise<{
+  owner: string;
+  repo: string;
+  htmlUrl: string;
+  cloneUrl: string;
+  defaultBranch: string;
+}> {
   try {
     const { data } = await octokit.repos.createForAuthenticatedUser({
       name: repoName,
@@ -91,7 +95,8 @@ async function createRepository(
       cloneUrl: data.clone_url,
       defaultBranch: data.default_branch,
     };
-  } catch (error: any) {
+  } catch (caught: unknown) {
+    const error = normalizeGitHubError(caught);
     if (error.status === 422) {
       // Repository already exists or name is invalid
       const message = error.response?.data?.errors?.[0]?.message || error.message;
@@ -101,10 +106,7 @@ async function createRepository(
           'REPO_EXISTS'
         );
       }
-      throw new GitHubServiceError(
-        `Invalid repository name: ${message}`,
-        'INVALID_REPO_NAME'
-      );
+      throw new GitHubServiceError(`Invalid repository name: ${message}`, 'INVALID_REPO_NAME');
     }
     throw new GitHubServiceError(
       `Failed to create repository: ${error.message}`,
@@ -195,9 +197,7 @@ async function pushFilesToRepo(
 
           // Determine file mode (executable for shell scripts and gradlew)
           const isExecutable =
-            file.path.endsWith('.sh') ||
-            file.path === 'gradlew' ||
-            file.path.endsWith('/gradlew');
+            file.path.endsWith('.sh') || file.path === 'gradlew' || file.path.endsWith('/gradlew');
 
           return {
             path: file.path,
@@ -236,7 +236,8 @@ async function pushFilesToRepo(
     });
 
     return files.length;
-  } catch (error: any) {
+  } catch (caught: unknown) {
+    const error = normalizeGitHubError(caught);
     // Wrap raw Octokit/network errors with meaningful context
     if (error instanceof GitHubServiceError) throw error;
 
@@ -251,9 +252,7 @@ async function pushFilesToRepo(
 /**
  * Main entry point: generates the project and pushes it to a new GitHub repo.
  */
-export async function pushProjectToGitHub(
-  options: GitHubPushOptions
-): Promise<GitHubPushResult> {
+export async function pushProjectToGitHub(options: GitHubPushOptions): Promise<GitHubPushResult> {
   const octokit = new Octokit({ auth: options.token });
 
   // 1. Validate token
@@ -261,16 +260,7 @@ export async function pushProjectToGitHub(
   const { login } = await validateToken(octokit);
   logger.info(`Authenticated as GitHub user: ${login}`);
 
-  // 2. Create repository
-  logger.info(`Creating repository: ${options.repoName}`);
-  const repoInfo = await createRepository(
-    octokit,
-    options.repoName,
-    options.isPrivate,
-    options.description
-  );
-
-  // 3. Generate project files using the template engine
+  // 2. Generate project files using the template engine
   logger.info('Generating project files...');
   const templatesPath = path.join(process.cwd(), 'server', 'templates', 'packs');
   const generator = new ProjectTemplateGenerator(templatesPath);
@@ -282,6 +272,15 @@ export async function pushProjectToGitHub(
       'NO_FILES_GENERATED'
     );
   }
+
+  // 3. Create the repository only after generation succeeds
+  logger.info(`Creating repository: ${options.repoName}`);
+  const repoInfo = await createRepository(
+    octokit,
+    options.repoName,
+    options.isPrivate,
+    options.description
+  );
 
   logger.info(`Generated ${files.length} files, pushing to GitHub...`);
 
@@ -316,4 +315,18 @@ export class GitHubServiceError extends Error {
     this.name = 'GitHubServiceError';
     this.errorCode = errorCode;
   }
+}
+
+function normalizeGitHubError(error: unknown): {
+  message: string;
+  status?: number;
+  response?: { data?: { errors?: Array<{ message?: string }> } };
+} {
+  if (!error || typeof error !== 'object') return { message: String(error) };
+  const value = error as Record<string, unknown>;
+  return {
+    message: typeof value.message === 'string' ? value.message : String(error),
+    status: typeof value.status === 'number' ? value.status : undefined,
+    response: value.response as { data?: { errors?: Array<{ message?: string }> } } | undefined,
+  };
 }

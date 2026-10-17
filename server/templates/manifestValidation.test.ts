@@ -60,12 +60,15 @@ const manifestSchema = z.object({
 // Register Handlebars helpers to match the engine
 function createHandlebarsInstance(): typeof handlebars {
   const hb = handlebars.create();
-  hb.registerHelper('eq', (a: any, b: any) => a === b);
-  hb.registerHelper('or', (...args: any[]) => {
+  hb.registerHelper('eq', (a: unknown, b: unknown) => a === b);
+  hb.registerHelper('or', (...args: unknown[]) => {
     args.pop();
     return args.some(Boolean);
   });
-  hb.registerHelper('includes', (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val));
+  hb.registerHelper(
+    'includes',
+    (arr: unknown[], val: unknown) => Array.isArray(arr) && arr.includes(val)
+  );
   hb.registerHelper('lowerCase', (str: string) => str?.toLowerCase() || '');
   hb.registerHelper('upperCase', (str: string) => str?.toUpperCase() || '');
   hb.registerHelper('pascalCase', (str: string) => {
@@ -86,11 +89,11 @@ function createHandlebarsInstance(): typeof handlebars {
       return e[c] || c;
     });
   });
-  hb.registerHelper('json', (obj: any) => JSON.stringify(obj, null, 2));
+  hb.registerHelper('json', (obj: unknown) => JSON.stringify(obj, null, 2));
   hb.registerHelper('join', (arr: string[], sep: string = ', ') =>
     Array.isArray(arr) ? arr.join(typeof sep === 'string' ? sep : ', ') : ''
   );
-  hb.registerHelper('ternary', (cond: any, t: any, f: any) => (cond ? t : f));
+  hb.registerHelper('ternary', (cond: unknown, t: unknown, f: unknown) => (cond ? t : f));
   return hb;
 }
 

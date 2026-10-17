@@ -82,7 +82,7 @@ describe('ValidationError', () => {
 
     expect(error.code).toBe(ErrorCode.VALIDATION_ERROR);
     expect(error.statusCode).toBe(400);
-    expect(error.details?.errors).toEqual(errors);
+    expect(error.details).toEqual({ errors });
   });
 
   it('should include requestId', () => {
@@ -115,7 +115,7 @@ describe('IncompatibleCombinationError', () => {
 
     expect(error.code).toBe(ErrorCode.INCOMPATIBLE_COMBINATION);
     expect(error.statusCode).toBe(400);
-    expect(error.details?.hint).toContain('/api/v1/metadata');
+    expect(error.details).toMatchObject({ hint: expect.stringContaining('/api/v1/metadata') });
   });
 });
 
@@ -146,8 +146,12 @@ describe('logError', () => {
 
   beforeEach(async () => {
     const loggerModule = await import('./utils/logger');
-    loggerWarnSpy = vi.spyOn(loggerModule.logger, 'warn').mockImplementation(() => loggerModule.logger);
-    loggerErrorSpy = vi.spyOn(loggerModule.logger, 'error').mockImplementation(() => loggerModule.logger);
+    loggerWarnSpy = vi
+      .spyOn(loggerModule.logger, 'warn')
+      .mockImplementation(() => loggerModule.logger);
+    loggerErrorSpy = vi
+      .spyOn(loggerModule.logger, 'error')
+      .mockImplementation(() => loggerModule.logger);
   });
 
   it('should log client errors with warn', () => {

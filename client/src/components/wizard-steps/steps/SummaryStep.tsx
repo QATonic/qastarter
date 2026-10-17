@@ -65,11 +65,14 @@ export default function SummaryStep() {
       ? [{ label: 'Reporting Tool', value: getLabel('reportingTools', config.reportingTool) }]
       : []),
     ...(config.cloudDeviceFarm && config.cloudDeviceFarm !== 'none'
-      ? [{ label: 'Cloud Device Farm', value: getLabel('cloudDeviceFarms', config.cloudDeviceFarm) }]
+      ? [
+          {
+            label: 'Cloud Device Farm',
+            value: getLabel('cloudDeviceFarms', config.cloudDeviceFarm),
+          },
+        ]
       : []),
-    ...(config.openApiSpecUrl
-      ? [{ label: 'OpenAPI Spec', value: config.openApiSpecUrl }]
-      : []),
+    ...(config.openApiSpecUrl ? [{ label: 'OpenAPI Spec', value: config.openApiSpecUrl }] : []),
     ...(config.environments && config.environments.length > 0
       ? [{ label: 'Environments', value: config.environments.map((e) => e.name).join(', ') }]
       : []),

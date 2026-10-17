@@ -70,6 +70,7 @@ describe('TemplateEngine — integration', () => {
     // Warm-up the generator once so the first real test doesn't absorb
     // the handlebars compile cost.
     return generator.generateProject({
+      cloudDeviceFarm: 'none' as const,
       testingType: 'web',
       framework: 'selenium',
       language: 'java',
@@ -86,6 +87,7 @@ describe('TemplateEngine — integration', () => {
   // -----------------------------------------------------------------
   describe('minimal configuration', () => {
     const baseConfig: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       testingType: 'web',
       framework: 'selenium',
       language: 'java',
@@ -126,6 +128,7 @@ describe('TemplateEngine — integration', () => {
   // -----------------------------------------------------------------
   describe('maximal configuration', () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       testingType: 'web',
       framework: 'selenium',
       language: 'java',
@@ -160,6 +163,7 @@ describe('TemplateEngine — integration', () => {
   // -----------------------------------------------------------------
   describe('CI/CD tool variations', () => {
     const base: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       testingType: 'web',
       framework: 'selenium',
       language: 'java',
@@ -207,6 +211,7 @@ describe('TemplateEngine — integration', () => {
   // -----------------------------------------------------------------
   describe('reporting tool variations', () => {
     const base: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       testingType: 'web',
       framework: 'selenium',
       language: 'java',
@@ -258,6 +263,7 @@ describe('TemplateEngine — integration', () => {
   // -----------------------------------------------------------------
   describe('API pack with ExtentReports', () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       testingType: 'api',
       framework: 'restassured',
       language: 'java',
@@ -286,6 +292,7 @@ describe('TemplateEngine — integration', () => {
   // -----------------------------------------------------------------
   describe('Playwright Java JUnit5 pack', () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       testingType: 'web',
       framework: 'playwright',
       language: 'java',
@@ -319,6 +326,7 @@ describe('TemplateEngine — integration', () => {
   // -----------------------------------------------------------------
   describe('Python Selenium pack with pytest-html', () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       testingType: 'web',
       framework: 'selenium',
       language: 'python',
@@ -343,6 +351,7 @@ describe('TemplateEngine — integration', () => {
   // -----------------------------------------------------------------
   describe('Desktop WinAppDriver pack', () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       testingType: 'desktop',
       framework: 'winappdriver',
       language: 'java',

@@ -1,7 +1,7 @@
-// Top-level build file for {{projectName}}
+// Top-level build file for {{comment projectName}}
 plugins {
-id("com.android.application") version "{{toolVersions.androidGradlePlugin}}" apply false
-id("org.jetbrains.kotlin.android") version "{{toolVersions.kotlin}}" apply false
+id("com.android.application") version "{{string toolVersions.androidGradlePlugin "double" "kts"}}" apply false
+id("org.jetbrains.kotlin.android") version "{{string toolVersions.kotlin "double" "kts"}}" apply false
 }
 
 tasks.register("clean", Delete::class) {

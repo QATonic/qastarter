@@ -11,7 +11,7 @@
  * - Dependency filtering
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { TemplatePackEngine } from './templatePackEngine';
 import { ProjectConfig } from '@shared/schema';
 import path from 'path';
@@ -56,6 +56,7 @@ function createConfig(overrides: Partial<ProjectConfig> = {}): ProjectConfig {
     testRunner: 'testng',
     buildTool: 'maven',
     testingPattern: 'page-object-model',
+    cloudDeviceFarm: 'none',
     includeSampleTests: true,
     ...overrides,
   };
@@ -73,13 +74,13 @@ describe('TemplatePackEngine', () => {
   describe('getTemplatePackKey', () => {
     it('should generate correct pack key format', () => {
       const config = createConfig();
-      const key = (engine as any).getTemplatePackKey(config);
+      const key = engine['getTemplatePackKey'](config);
       expect(key).toBe('web-java-selenium-testng-maven');
     });
 
     it('should handle different testing types', () => {
       const config = createConfig({ testingType: 'api', framework: 'restassured' });
-      const key = (engine as any).getTemplatePackKey(config);
+      const key = engine['getTemplatePackKey'](config);
       expect(key).toBe('api-java-restassured-testng-maven');
     });
 
@@ -91,7 +92,7 @@ describe('TemplatePackEngine', () => {
         testRunner: 'pytest',
         buildTool: 'pip',
       });
-      const key = (engine as any).getTemplatePackKey(config);
+      const key = engine['getTemplatePackKey'](config);
       expect(key).toBe('mobile-python-appium-pytest-pip');
     });
 
@@ -103,7 +104,7 @@ describe('TemplatePackEngine', () => {
         testRunner: 'nunit',
         buildTool: 'nuget',
       });
-      const key = (engine as any).getTemplatePackKey(config);
+      const key = engine['getTemplatePackKey'](config);
       expect(key).toBe('desktop-csharp-winappdriver-nunit-nuget');
     });
   });
@@ -111,7 +112,7 @@ describe('TemplatePackEngine', () => {
   describe('createTemplateContext', () => {
     it('should create context with computed Java fields', () => {
       const config = createConfig({ groupId: 'com.example.qa', artifactId: 'my-tests' });
-      const context = (engine as any).createTemplateContext(config, { java: '17' });
+      const context = engine['createTemplateContext'](config, { java: '17' });
 
       expect(context.javaPackage).toBe('com.example.qa');
       expect(context.packageName).toBe('com.example.qa');
@@ -123,7 +124,7 @@ describe('TemplatePackEngine', () => {
 
     it('should use default groupId when not provided', () => {
       const config = createConfig();
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.javaPackage).toBe('com.example');
       expect(context.packagePath).toBe('com/example');
@@ -131,14 +132,14 @@ describe('TemplatePackEngine', () => {
 
     it('should derive artifactId from projectName when not provided', () => {
       const config = createConfig({ projectName: 'My Cool Project' });
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.safeArtifactId).toBe('my-cool-project');
     });
 
     it('should create C# namespace from project name', () => {
       const config = createConfig({ projectName: 'my-test-project' });
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.projectNamespace).toBe('MyTestProject');
       expect(context.csharpNamespace).toBe('MyTestProject');
@@ -146,7 +147,7 @@ describe('TemplatePackEngine', () => {
 
     it('should sanitize path components (remove ..)', () => {
       const config = createConfig({ groupId: 'com..example../test' });
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.packagePath).not.toContain('..');
       expect(context.safeGroupId).not.toContain('..');
@@ -154,14 +155,14 @@ describe('TemplatePackEngine', () => {
 
     it('should sanitize leading slashes from paths', () => {
       const config = createConfig({ groupId: '/com.example' });
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.packagePath).not.toMatch(/^\//);
     });
 
     it('should include envs array', () => {
       const config = createConfig();
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.envs).toEqual(['dev', 'qa', 'prod']);
     });
@@ -169,14 +170,14 @@ describe('TemplatePackEngine', () => {
     it('should include tool versions', () => {
       const config = createConfig();
       const toolVersions = { java: '17', selenium: '4.27.0' };
-      const context = (engine as any).createTemplateContext(config, toolVersions);
+      const context = engine['createTemplateContext'](config, toolVersions);
 
       expect(context.toolVersions).toEqual(toolVersions);
     });
 
     it('should include timestamp', () => {
       const config = createConfig();
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.timestamp).toBeDefined();
       expect(typeof context.timestamp).toBe('string');
@@ -184,7 +185,7 @@ describe('TemplatePackEngine', () => {
 
     it('should spread original config into context', () => {
       const config = createConfig({ cicdTool: 'github-actions', reportingTool: 'allure' });
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.projectName).toBe('test-project');
       expect(context.testingType).toBe('web');
@@ -201,7 +202,7 @@ describe('TemplatePackEngine', () => {
 
     it('should build empty userDependencies buckets when no deps are selected', () => {
       const config = createConfig();
-      const context = (engine as any).createTemplateContext(config, {});
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.userDependencies).toBeDefined();
       expect(context.userDependencies.all).toEqual([]);
@@ -230,8 +231,8 @@ describe('TemplatePackEngine', () => {
             version: '2.16.0',
           },
         ],
-      } as any);
-      const context = (engine as any).createTemplateContext(config, {});
+      });
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.userDependencies.all).toHaveLength(2);
       expect(context.userDependencies.maven).toHaveLength(2);
@@ -244,8 +245,8 @@ describe('TemplatePackEngine', () => {
     it('should bucket npm-only user dependencies', () => {
       const config = createConfig({
         dependencies: [{ id: 'axios', registry: 'npm', name: 'axios', version: '1.6.2' }],
-      } as any);
-      const context = (engine as any).createTemplateContext(config, {});
+      });
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.userDependencies.all).toHaveLength(1);
       expect(context.userDependencies.maven).toHaveLength(0);
@@ -267,8 +268,8 @@ describe('TemplatePackEngine', () => {
           { id: 'axios', registry: 'npm', name: 'axios', version: '1.6.2' },
           { id: 'lodash', registry: 'npm', name: 'lodash', version: '4.17.21' },
         ],
-      } as any);
-      const context = (engine as any).createTemplateContext(config, {});
+      });
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.userDependencies.all).toHaveLength(3);
       expect(context.userDependencies.maven).toHaveLength(1);
@@ -277,12 +278,12 @@ describe('TemplatePackEngine', () => {
       expect(context.userDependencies.hasMaven).toBe(true);
       expect(context.userDependencies.hasNpm).toBe(true);
       expect(context.userDependencies.maven[0].name).toBe('okhttp');
-      expect(context.userDependencies.npm.map((d: any) => d.name)).toEqual(['axios', 'lodash']);
+      expect(context.userDependencies.npm.map((d) => d.name)).toEqual(['axios', 'lodash']);
     });
 
     it('should handle a non-array dependencies field gracefully', () => {
-      const config = createConfig({ dependencies: undefined } as any);
-      const context = (engine as any).createTemplateContext(config, {});
+      const config = createConfig({ dependencies: undefined });
+      const context = engine['createTemplateContext'](config, {});
 
       expect(context.userDependencies.all).toEqual([]);
       expect(context.userDependencies.hasAny).toBe(false);
@@ -291,8 +292,8 @@ describe('TemplatePackEngine', () => {
 
   describe('Handlebars helpers', () => {
     // Access the isolated Handlebars instance to test helpers
-    function compileAndRender(template: string, context: Record<string, any> = {}): string {
-      const hb = (engine as any).hb;
+    function compileAndRender(template: string, context: Record<string, unknown> = {}): string {
+      const hb = engine['hb'];
       return hb.compile(template)(context);
     }
 
@@ -403,7 +404,7 @@ describe('TemplatePackEngine', () => {
     it('should include files without conditionals', () => {
       const fileConfig = { path: 'README.md', isTemplate: true };
       const config = createConfig();
-      expect((engine as any).shouldIncludeFile(fileConfig, config)).toBe(true);
+      expect(engine['shouldIncludeFile'](fileConfig, config)).toBe(true);
     });
 
     it('should include files when conditional matches', () => {
@@ -413,7 +414,7 @@ describe('TemplatePackEngine', () => {
         conditional: { cicdTool: 'jenkins' },
       };
       const config = createConfig({ cicdTool: 'jenkins' });
-      expect((engine as any).shouldIncludeFile(fileConfig, config)).toBe(true);
+      expect(engine['shouldIncludeFile'](fileConfig, config)).toBe(true);
     });
 
     it('should exclude files when conditional does not match', () => {
@@ -423,7 +424,7 @@ describe('TemplatePackEngine', () => {
         conditional: { cicdTool: 'jenkins' },
       };
       const config = createConfig({ cicdTool: 'github-actions' });
-      expect((engine as any).shouldIncludeFile(fileConfig, config)).toBe(false);
+      expect(engine['shouldIncludeFile'](fileConfig, config)).toBe(false);
     });
 
     it('should handle nested conditionals (utilities.logger)', () => {
@@ -441,7 +442,7 @@ describe('TemplatePackEngine', () => {
           dataProvider: false,
         },
       });
-      expect((engine as any).shouldIncludeFile(fileConfig, config)).toBe(true);
+      expect(engine['shouldIncludeFile'](fileConfig, config)).toBe(true);
     });
 
     it('should exclude nested conditional when value does not match', () => {
@@ -459,7 +460,7 @@ describe('TemplatePackEngine', () => {
           dataProvider: false,
         },
       });
-      expect((engine as any).shouldIncludeFile(fileConfig, config)).toBe(false);
+      expect(engine['shouldIncludeFile'](fileConfig, config)).toBe(false);
     });
 
     it('should exclude sample test files when includeSampleTests is false', () => {
@@ -468,7 +469,7 @@ describe('TemplatePackEngine', () => {
         isTemplate: true,
       };
       const config = createConfig({ includeSampleTests: false });
-      expect((engine as any).shouldIncludeFile(fileConfig, config)).toBe(false);
+      expect(engine['shouldIncludeFile'](fileConfig, config)).toBe(false);
     });
 
     it('should include sample test files when includeSampleTests is true', () => {
@@ -477,7 +478,7 @@ describe('TemplatePackEngine', () => {
         isTemplate: true,
       };
       const config = createConfig({ includeSampleTests: true });
-      expect((engine as any).shouldIncludeFile(fileConfig, config)).toBe(true);
+      expect(engine['shouldIncludeFile'](fileConfig, config)).toBe(true);
     });
 
     it('should require all conditions to match (AND logic)', () => {
@@ -489,86 +490,72 @@ describe('TemplatePackEngine', () => {
       const configBothMatch = createConfig({ cicdTool: 'jenkins', reportingTool: 'allure' });
       const configOnlyOne = createConfig({ cicdTool: 'jenkins', reportingTool: 'extent-reports' });
 
-      expect((engine as any).shouldIncludeFile(fileConfig, configBothMatch)).toBe(true);
-      expect((engine as any).shouldIncludeFile(fileConfig, configOnlyOne)).toBe(false);
+      expect(engine['shouldIncludeFile'](fileConfig, configBothMatch)).toBe(true);
+      expect(engine['shouldIncludeFile'](fileConfig, configOnlyOne)).toBe(false);
     });
   });
 
   describe('processTemplate', () => {
     it('should substitute basic Handlebars variables', () => {
-      const context = (engine as any).createTemplateContext(createConfig(), { java: '17' });
-      const result = (engine as any).processTemplate(
-        'Project: {{projectName}}',
-        context,
-        'test.txt'
-      );
+      const context = engine['createTemplateContext'](createConfig(), { java: '17' });
+      const result = engine['processTemplate']('Project: {{projectName}}', context, 'test.txt');
       expect(result).toBe('Project: test-project');
     });
 
     it('should handle if/else blocks', () => {
-      const context = (engine as any).createTemplateContext(
-        createConfig({ cicdTool: 'jenkins' }),
-        {}
-      );
+      const context = engine['createTemplateContext'](createConfig({ cicdTool: 'jenkins' }), {});
       const template = '{{#if cicdTool}}Has CI{{else}}No CI{{/if}}';
-      const result = (engine as any).processTemplate(template, context, 'test.txt');
+      const result = engine['processTemplate'](template, context, 'test.txt');
       expect(result).toBe('Has CI');
     });
 
     it('should mask Jenkins expressions in workflow files', () => {
-      const context = (engine as any).createTemplateContext(createConfig(), {});
+      const context = engine['createTemplateContext'](createConfig(), {});
       const template = 'echo ${BUILD_NUMBER}';
-      const result = (engine as any).processTemplate(template, context, 'Jenkinsfile');
+      const result = engine['processTemplate'](template, context, 'Jenkinsfile');
       expect(result).toBe('echo ${BUILD_NUMBER}');
     });
 
     it('should mask GitHub Actions expressions in workflow files', () => {
-      const context = (engine as any).createTemplateContext(createConfig(), {});
+      const context = engine['createTemplateContext'](createConfig(), {});
       const template = 'uses: actions/checkout@${{github.sha}}';
-      const result = (engine as any).processTemplate(
-        template,
-        context,
-        '.github/workflows/tests.yml'
-      );
+      const result = engine['processTemplate'](template, context, '.github/workflows/tests.yml');
       expect(result).toContain('${{');
     });
 
     it('should not mask CI expressions in non-workflow files', () => {
-      const context = (engine as any).createTemplateContext(createConfig(), {});
+      const context = engine['createTemplateContext'](createConfig(), {});
       const template = 'Project: {{projectName}}';
-      const result = (engine as any).processTemplate(template, context, 'README.md');
+      const result = engine['processTemplate'](template, context, 'README.md');
       expect(result).toBe('Project: test-project');
     });
 
     it('should handle raw blocks (4 braces)', () => {
-      const context = (engine as any).createTemplateContext(createConfig(), {});
+      const context = engine['createTemplateContext'](createConfig(), {});
       const template = '{{{{raw}}}}{{literal}}{{{{/raw}}}}';
-      const result = (engine as any).processTemplate(template, context, 'test.txt');
+      const result = engine['processTemplate'](template, context, 'test.txt');
       expect(result).toBe('{{literal}}');
     });
 
     it('should handle raw blocks (2 braces)', () => {
-      const context = (engine as any).createTemplateContext(createConfig(), {});
+      const context = engine['createTemplateContext'](createConfig(), {});
       const template = '{{raw}}{{literal}}{{/raw}}';
-      const result = (engine as any).processTemplate(template, context, 'test.txt');
+      const result = engine['processTemplate'](template, context, 'test.txt');
       expect(result).toBe('{{literal}}');
     });
 
     it('should throw on invalid Handlebars syntax', () => {
-      const context = (engine as any).createTemplateContext(createConfig(), {});
+      const context = engine['createTemplateContext'](createConfig(), {});
       expect(() => {
-        (engine as any).processTemplate('{{#if}}no closing', context, 'bad.txt');
+        engine['processTemplate']('{{#if}}no closing', context, 'bad.txt');
       }).toThrow();
     });
   });
 
   describe('processTemplatePath', () => {
     it('should process path with Handlebars expressions', () => {
-      const context = (engine as any).createTemplateContext(
-        createConfig({ groupId: 'com.example' }),
-        {}
-      );
-      const result = (engine as any).processTemplatePath(
+      const context = engine['createTemplateContext'](createConfig({ groupId: 'com.example' }), {});
+      const result = engine['processTemplatePath'](
         'src/main/java/{{packagePath}}/Test.java',
         context
       );
@@ -576,8 +563,8 @@ describe('TemplatePackEngine', () => {
     });
 
     it('should pass through static paths unchanged', () => {
-      const context = (engine as any).createTemplateContext(createConfig(), {});
-      const result = (engine as any).processTemplatePath('README.md', context);
+      const context = engine['createTemplateContext'](createConfig(), {});
+      const result = engine['processTemplatePath']('README.md', context);
       expect(result).toBe('README.md');
     });
   });
@@ -625,7 +612,7 @@ describe('TemplatePackEngine', () => {
 
     it('should stream files via generateProjectStream', async () => {
       const config = createConfig();
-      const files: any[] = [];
+      const files: import('./types').TemplateFile[] = [];
 
       for await (const file of realEngine.generateProjectStream(config)) {
         files.push(file);

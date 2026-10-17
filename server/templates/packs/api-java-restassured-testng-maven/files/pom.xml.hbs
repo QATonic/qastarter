@@ -4,12 +4,12 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>{{groupId}}</groupId>
-    <artifactId>{{artifactId}}</artifactId>
+    <groupId>{{escapeXml groupId}}</groupId>
+    <artifactId>{{escapeXml artifactId}}</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>{{projectName}}</name>
+    <name>{{escapeXml projectName}}</name>
     <description>API Test Automation Framework using REST Assured, TestNG, and Maven</description>
 
     <properties>
@@ -163,9 +163,9 @@
         <!-- User-picked dependencies (from QAStarter dependency search) -->
         {{#each userDependencies.maven}}
         <dependency>
-            <groupId>{{group}}</groupId>
-            <artifactId>{{name}}</artifactId>
-            <version>{{version}}</version>
+            <groupId>{{escapeXml group}}</groupId>
+            <artifactId>{{escapeXml name}}</artifactId>
+            <version>{{escapeXml version}}</version>
         </dependency>
         {{/each}}
         {{/if}}
@@ -174,7 +174,7 @@
         <dependency>
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
-            <version>{{toolVersions.datafaker}}</version>
+            <version>{{escapeXml toolVersions.datafaker}}</version>
         </dependency>
         {{/if}}
     </dependencies>

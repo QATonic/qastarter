@@ -53,7 +53,7 @@ class ConfigurationReader {
   }
 
   get baseUrl(): string {
-    return this.get("BASE_URL", "{{baseUrl}}");
+    return this.get("BASE_URL", "{{string baseUrl "double" "ts"}}");
   }
 
   get browser(): string {
@@ -69,11 +69,11 @@ class ConfigurationReader {
   }
 
   get username(): string {
-    return this.get("USERNAME", "{{testUsername}}");
+    return this.get("USERNAME", "{{string testUsername "double" "ts"}}");
   }
 
   get password(): string {
-    return this.get("PASSWORD", "{{testPassword}}");
+    return this.get("PASSWORD", "{{string testPassword "double" "ts"}}");
   }
 }
 

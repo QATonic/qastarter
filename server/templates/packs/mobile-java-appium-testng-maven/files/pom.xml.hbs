@@ -4,36 +4,36 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>{{groupId}}</groupId>
-    <artifactId>{{artifactId}}</artifactId>
+    <groupId>{{escapeXml groupId}}</groupId>
+    <artifactId>{{escapeXml artifactId}}</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>{{projectName}}</name>
+    <name>{{escapeXml projectName}}</name>
     <description>Mobile automation framework built with Appium, Java, TestNG, and Maven</description>
 
     <properties>
-        <maven.compiler.source>{{toolVersions.java}}</maven.compiler.source>
-        <maven.compiler.target>{{toolVersions.java}}</maven.compiler.target>
+        <maven.compiler.source>{{escapeXml toolVersions.java}}</maven.compiler.source>
+        <maven.compiler.target>{{escapeXml toolVersions.java}}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Appium and Mobile Testing Dependencies -->
-        <appium.version>{{toolVersions.appium}}</appium.version>
+        <appium.version>{{escapeXml toolVersions.appium}}</appium.version>
         <selenium.version>4.16.0</selenium.version>
-        <testng.version>{{toolVersions.testng}}</testng.version>
+        <testng.version>{{escapeXml toolVersions.testng}}</testng.version>
 
         <!-- Reporting Dependencies -->
         {{#if (eq reportingTool "allure")}}
-        <allure.version>{{toolVersions.allure}}</allure.version>
+        <allure.version>{{escapeXml toolVersions.allure}}</allure.version>
         <aspectj.version>1.9.20.1</aspectj.version>
         {{/if}}
         <!-- ExtentReports (used by TestListener regardless of reporting tool selection) -->
-        <extent.version>{{toolVersions.extentreports}}</extent.version>
-        <log4j.version>{{toolVersions.log4j}}</log4j.version>
+        <extent.version>{{escapeXml toolVersions.extentreports}}</extent.version>
+        <log4j.version>{{escapeXml toolVersions.log4j}}</log4j.version>
 
         <!-- BDD Dependencies -->
         {{#if (eq testingPattern "bdd")}}
-        <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
+        <cucumber.version>{{escapeXml toolVersions.cucumber}}</cucumber.version>
         {{/if}}
 
         <!-- Utility Dependencies -->
@@ -142,9 +142,9 @@
         <!-- User-picked dependencies (from QAStarter dependency search) -->
         {{#each userDependencies.maven}}
         <dependency>
-            <groupId>{{group}}</groupId>
-            <artifactId>{{name}}</artifactId>
-            <version>{{version}}</version>
+            <groupId>{{escapeXml group}}</groupId>
+            <artifactId>{{escapeXml name}}</artifactId>
+            <version>{{escapeXml version}}</version>
         </dependency>
         {{/each}}
         {{/if}}
@@ -153,7 +153,7 @@
         <dependency>
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
-            <version>{{toolVersions.datafaker}}</version>
+            <version>{{escapeXml toolVersions.datafaker}}</version>
         </dependency>
         {{/if}}
         {{#if (eq cloudDeviceFarm "browserstack")}}
@@ -182,8 +182,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.version}</version>
                 <configuration>
-                    <source>{{toolVersions.java}}</source>
-                    <target>{{toolVersions.java}}</target>
+                    <source>{{escapeXml toolVersions.java}}</source>
+                    <target>{{escapeXml toolVersions.java}}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

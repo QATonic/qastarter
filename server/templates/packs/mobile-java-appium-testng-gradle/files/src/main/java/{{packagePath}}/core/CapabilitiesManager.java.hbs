@@ -24,7 +24,7 @@ public static UiAutomator2Options getAndroidOptions() {
 UiAutomator2Options options = new UiAutomator2Options();
 
 // Device settings
-String deviceName = ConfigurationReader.getProperty("mobile.android.deviceName", "{{deviceName}}");
+String deviceName = ConfigurationReader.getProperty("mobile.android.deviceName", "{{string deviceName "double" "java"}}");
 options.setDeviceName(deviceName);
 
 // Platform version (optional — 2-arg getProperty returns "" if absent

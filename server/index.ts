@@ -1,7 +1,7 @@
-import express, { type Request, Response, NextFunction } from 'express';
+import express from 'express';
 import helmet from 'helmet';
 import compression from 'compression';
-import cors from 'cors';
+import { createApiCors } from './middleware/apiCors';
 import { execFile } from 'child_process';
 import { registerRoutes } from './routes';
 import { setupVite, serveStatic, log } from './vite';
@@ -9,6 +9,9 @@ import { errorHandler, notFoundHandler } from './errors';
 import { correlationMiddleware } from './middleware/correlationMiddleware';
 import { setupSwagger } from './swagger';
 import { logger } from './utils/logger';
+import { shutdownCache } from './services/cache';
+import { storage } from './storage';
+import { secureRequestUpgrade } from './middleware/secureRequestUpgrade';
 
 const app = express();
 
@@ -51,76 +54,18 @@ if (isDevelopment) {
           mediaSrc: ["'self'"],
           frameSrc: ["'self'", 'https://www.youtube.com', 'https://www.youtube-nocookie.com'],
           frameAncestors: ["'none'"],
-          upgradeInsecureRequests: [],
+          upgradeInsecureRequests: null,
         },
       },
       crossOriginEmbedderPolicy: false,
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     })
   );
+  app.use(secureRequestUpgrade);
 }
 
-// CORS Configuration - permissive in development, strict in production.
-//
-// The null-origin case (mobile apps, Postman, server-to-server calls) is only
-// allowed in development. In production, combined with `credentials: true`,
-// permitting null-origin would let any site drive CSRF-like requests that carry
-// our session cookie. Set CORS_ALLOW_NO_ORIGIN=true to re-enable for legitimate
-// machine-to-machine integrations that can't send an Origin header.
-//
-// IMPORTANT: CORS is scoped to `/api` only. Top-level browser navigations to
-// the SPA (`GET /`, `/mcp`, `/docs`, `/assets/*.js`, `/favicon.ico`, etc.) do
-// NOT carry an Origin header and must not be blocked by CORS — doing so breaks
-// every bookmark / direct address-bar visit. CORS is a cross-origin API
-// concern, not a static-file concern.
-const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    const allowNoOrigin =
-      isDevelopment || process.env.CORS_ALLOW_NO_ORIGIN === 'true';
-    if (!origin) {
-      if (allowNoOrigin) return callback(null, true);
-      return callback(new Error('Origin header is required in production'));
-    }
-
-    // In development, allow all origins
-    if (isDevelopment) {
-      return callback(null, true);
-    }
-
-    // Production: Check against allowed origins
-    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-    const allowedPatterns = [/^https:\/\/.*\.easypanel\.host$/, /^https:\/\/.*\.qatonic\.com$/];
-
-    // Check if origin matches any pattern
-    const isAllowed =
-      allowedOrigins.includes(origin) || allowedPatterns.some((pattern) => pattern.test(origin));
-
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
-
-// Apply CORS to /api routes. Before handing off to the cors middleware, allow
-// a narrow bypass: non-browser API clients (QAStarter CLI, MCP server, CI
-// scripts) that identify themselves via `X-QAStarter-Client` can proceed even
-// without an Origin header. This is safe because:
-//   1. A browser cannot set custom request headers cross-origin without
-//      triggering a CORS preflight, and that preflight requires an Origin
-//      header — so this bypass is unreachable from a browser CSRF attack.
-//   2. The CLI / MCP server legitimately send no Origin (Node's fetch doesn't
-//      synthesise one), so without this bypass every `qastarter list` /
-//      `generate` call against prod returns 500 instead of the payload.
-app.use('/api', (req, res, next) => {
-  if (!req.headers.origin && req.headers['x-qastarter-client']) {
-    return next();
-  }
-  return cors(corsOptions)(req, res, next);
-});
+// CORS is a browser response policy; originless health and API calls remain valid.
+app.use('/api', createApiCors({ isDevelopment }));
 
 // Correlation ID middleware - adds request/correlation IDs for tracing
 // Must be early in the middleware chain for all subsequent logs to include IDs
@@ -190,8 +135,9 @@ app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 // Verify template packs integrity on startup
 if (process.env.NODE_ENV !== 'production') {
   execFile(
-    'npx', ['tsx', 'server/scripts/verify-packs.ts'],
-    (error: Error | null, stdout: string, stderr: string) => {
+    'npx',
+    ['tsx', 'server/scripts/verify-packs.ts'],
+    (error: Error | null, stdout: string, _stderr: string) => {
       if (error) {
         logger.warn('Template Pack Verification failed', { error: error.message });
         return;
@@ -204,7 +150,7 @@ if (process.env.NODE_ENV !== 'production') {
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  let capturedJsonResponse: Record<string, unknown> | undefined = undefined;
 
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
@@ -264,7 +210,8 @@ app.use((req, res, next) => {
   // Graceful shutdown — close the HTTP server so the process exits cleanly on SIGTERM
   const shutdown = (signal: string) => {
     log(`${signal} received, shutting down...`);
-    server.close(() => {
+    server.close(async () => {
+      await Promise.allSettled([shutdownCache(), storage.flushPending()]);
       log('HTTP server closed');
       process.exit(0);
     });

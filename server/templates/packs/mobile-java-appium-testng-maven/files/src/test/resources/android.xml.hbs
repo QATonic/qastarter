@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite name="{{projectName}}_Android_Test_Suite" parallel="tests" thread-count="1">
+<suite name="{{escapeXml projectName}}_Android_Test_Suite" parallel="tests" thread-count="1">
 
     <parameter name="platform" value="android" />
     <parameter name="environment" value="qa" />
@@ -12,7 +12,7 @@
         <parameter name="environment" value="qa" />
 
         <classes>
-            <class name="{{packageName}}.tests.LoginTests">
+            <class name="{{escapeXml packageName}}.tests.LoginTests">
                 <methods>
                     <include name="testValidLogin" />
                     <include name="testInvalidLogin" />
@@ -34,8 +34,8 @@
 
 
     <listeners>
-        <listener class-name="{{packageName}}.listeners.TestListener" />
-        <listener class-name="{{packageName}}.listeners.RetryAnalyzer" />
+        <listener class-name="{{escapeXml packageName}}.listeners.TestListener" />
+        <listener class-name="{{escapeXml packageName}}.listeners.RetryAnalyzer" />
     </listeners>
 
 </suite>

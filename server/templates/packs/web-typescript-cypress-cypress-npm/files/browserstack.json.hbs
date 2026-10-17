@@ -10,8 +10,8 @@
   ],
   "run_settings": {
     "cypress_config_file": "./cypress.config.{{#if (eq language "typescript")}}ts{{else}}js{{/if}}",
-    "project_name": "{{projectName}}",
-    "build_name": "{{projectName}} - Build #1",
+    "project_name": "{{string projectName "double" "json"}}",
+    "build_name": "{{string projectName "double" "json"}} - Build #1",
     "parallels": 3,
     "cypress_version": "13",
     "headless": true

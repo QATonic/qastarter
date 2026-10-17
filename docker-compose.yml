@@ -4,8 +4,6 @@
 #   Development: Create a docker-compose.override.yml for development settings
 #                (e.g. NODE_ENV=development, LOG_LEVEL=debug, volume mounts)
 
-version: '3.8'
-
 services:
   qastarter:
     build:
@@ -17,21 +15,12 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5000
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=info
       - LOG_CONSOLE=true
-      - DISABLE_CACHE=true
       - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379
     volumes:
-      # Mount source for hot-reload in development
-      - ./client:/app/client
-      - ./server:/app/server
-      - ./shared:/app/shared
-      # Mount templates for live editing
-      - ./server/templates:/app/server/templates
-      # Persist logs
-      - ./logs:/app/logs
-      # Don't overwrite node_modules
-      - /app/node_modules
+      - app-logs:/app/logs
+      - app-data:/app/server/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/api/v1/metadata"]
@@ -40,14 +29,15 @@ services:
       retries: 3
       start_period: 10s
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
 
   # Redis for distributed caching (production ready)
   redis:
     image: redis:7-alpine
     container_name: qastarter-redis
-    ports:
-      - "6379:6379"
+    environment:
+      - REDISCLI_AUTH=${REDIS_PASSWORD:-changeme}
     volumes:
       - redis-data:/data
     restart: unless-stopped
@@ -76,6 +66,8 @@ services:
       - test
 
 volumes:
+  app-logs:
+  app-data:
   redis-data:
     driver: local
 

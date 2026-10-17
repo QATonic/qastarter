@@ -1,3 +1,10 @@
+declare global {
+  interface Window {
+    dataLayer: unknown[][];
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 // Google Analytics integration
 // Loads GA only if VITE_GA_TRACKING_ID environment variable is set
 
@@ -22,11 +29,11 @@ export function initializeAnalytics() {
   document.head.appendChild(script1);
 
   // Initialize gtag using the recommended dataLayer pattern
-  (window as any).dataLayer = (window as any).dataLayer || [];
-  function gtag(...args: any[]) {
-    (window as any).dataLayer.push(args);
+  window.dataLayer = window.dataLayer || [];
+  function gtag(...args: unknown[]) {
+    window.dataLayer.push(args);
   }
-  (window as any).gtag = gtag;
+  window.gtag = gtag;
   gtag('js', new Date());
   gtag('config', trackingId, {
     page_path: window.location.pathname,
@@ -40,22 +47,22 @@ export function initializeAnalytics() {
 export function trackPageView(path: string) {
   const trackingId = import.meta.env.VITE_GA_TRACKING_ID;
 
-  if (!trackingId || typeof window === 'undefined' || !(window as any).gtag) {
+  if (!trackingId || typeof window === 'undefined' || !window.gtag) {
     return;
   }
 
-  (window as any).gtag('config', trackingId, {
+  window.gtag?.('config', trackingId, {
     page_path: path,
   });
 }
 
 // Track custom events
-export function trackEvent(eventName: string, eventParams?: Record<string, any>) {
+export function trackEvent(eventName: string, eventParams?: Record<string, unknown>) {
   const trackingId = import.meta.env.VITE_GA_TRACKING_ID;
 
-  if (!trackingId || typeof window === 'undefined' || !(window as any).gtag) {
+  if (!trackingId || typeof window === 'undefined' || !window.gtag) {
     return;
   }
 
-  (window as any).gtag('event', eventName, eventParams);
+  window.gtag?.('event', eventName, eventParams);
 }

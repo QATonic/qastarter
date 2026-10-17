@@ -2,22 +2,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "{{projectName}}",
+    name: "{{string projectName "double" "swift"}}",
     platforms: [
         .iOS(.v15)
     ],
     products: [
         .library(
-            name: "{{projectName}}",
-            targets: ["{{projectName}}"]),
+            name: "{{string projectName "double" "swift"}}",
+            targets: ["{{string projectName "double" "swift"}}"]),
     ],
     dependencies: [],
     targets: [
         .target(
-            name: "{{projectName}}",
+            name: "{{string projectName "double" "swift"}}",
             dependencies: []),
         .testTarget(
-            name: "{{projectName}}UITests",
-            dependencies: ["{{projectName}}"]),
+            name: "{{string projectName "double" "swift"}}UITests",
+            dependencies: ["{{string projectName "double" "swift"}}"]),
     ]
 )

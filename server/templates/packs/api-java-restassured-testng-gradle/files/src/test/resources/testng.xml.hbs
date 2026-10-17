@@ -3,12 +3,12 @@
 <suite name="API Test Suite" parallel="methods" thread-count="3">
     
     <listeners>
-        <listener class-name="{{javaPackage}}.listeners.TestListener"/>
+        <listener class-name="{{escapeXml javaPackage}}.listeners.TestListener"/>
     </listeners>
     
     <test name="API Tests">
         <packages>
-            <package name="{{javaPackage}}.tests"/>
+            <package name="{{escapeXml javaPackage}}.tests"/>
         </packages>
     </test>
     

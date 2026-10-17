@@ -96,7 +96,10 @@ function cascadeAndAutoSelect(config: WizardConfig): WizardConfig {
   let c = WizardValidator.resetInvalidSelections(config);
 
   // 2. Auto-select downstream fields when only one option exists
-  const steps: Array<{ field: keyof WizardConfig; step: string }> = [
+  const steps: Array<{
+    field: 'framework' | 'language' | 'testRunner' | 'buildTool';
+    step: string;
+  }> = [
     { field: 'framework', step: 'framework' },
     { field: 'language', step: 'language' },
     { field: 'testRunner', step: 'testRunner' },
@@ -106,7 +109,7 @@ function cascadeAndAutoSelect(config: WizardConfig): WizardConfig {
   for (const { field, step } of steps) {
     const options = WizardValidator.getFilteredOptions(step, c);
     if (!c[field] && options.length === 1) {
-      (c as Record<string, string>)[field] = options[0];
+      c[field] = options[0];
     }
   }
 
@@ -276,7 +279,7 @@ function base64UrlDecode(input: string): string | null {
 
 function readConfigFromUrl(): Partial<WizardConfig> {
   const params = new URLSearchParams(window.location.search);
-  const partial: Record<string, any> = {};
+  const partial: Record<string, unknown> = {};
 
   for (const [shortKey, configKey] of Object.entries(URL_KEY_MAP)) {
     const value = params.get(shortKey);
@@ -350,7 +353,9 @@ function readConfigFromLocalStorage(): Partial<WizardConfig> | null {
 function writeConfigToLocalStorage(config: WizardConfig): void {
   try {
     // Strip sensitive fields before persisting
-    const { apiAuthToken, testPassword, ...safeConfig } = config;
+    const safeConfig = { ...config };
+    delete safeConfig.apiAuthToken;
+    delete safeConfig.testPassword;
     localStorage.setItem(LS_CONFIG_KEY, JSON.stringify(safeConfig));
   } catch {
     // Ignore quota errors
@@ -385,9 +390,26 @@ function writeRecentStacksToLocalStorage(stacks: RecentStack[]): void {
 // Provider
 // ---------------------------------------------------------------------------
 export function ExpressGeneratorProvider({ children }: { children: React.ReactNode }) {
-  const [config, dispatch] = useReducer(reducer, DEFAULT_CONFIG);
-  const [recentStacks, setRecentStacks] = useState<RecentStack[]>([]);
-  const initializedRef = useRef(false);
+  const [initial] = useState(() => {
+    const urlConfig = readConfigFromUrl();
+    const stored = Object.keys(urlConfig).length ? null : readConfigFromLocalStorage();
+    const source = Object.keys(urlConfig).length
+      ? ('url' as const)
+      : stored && Object.keys(stored).length
+        ? ('localStorage' as const)
+        : null;
+    return {
+      config: source
+        ? reducer(DEFAULT_CONFIG, {
+            type: 'HYDRATE',
+            config: source === 'url' ? urlConfig : stored!,
+          })
+        : DEFAULT_CONFIG,
+      source,
+    };
+  });
+  const [config, dispatch] = useReducer(reducer, initial.config);
+  const [recentStacks, setRecentStacks] = useState<RecentStack[]>(readRecentStacksFromLocalStorage);
   const urlUpdateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const storageUpdateTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -396,34 +418,10 @@ export function ExpressGeneratorProvider({ children }: { children: React.ReactNo
   // ("Restored your previous stack" / "Loaded from shared link") so returning
   // users aren't confused when they land on the wizard with fields already
   // filled in.
-  const [hydrationSource, setHydrationSource] = useState<'url' | 'localStorage' | null>(null);
-
-  useEffect(() => {
-    if (initializedRef.current) return;
-    initializedRef.current = true;
-
-    // Priority 1: URL params (sharing takes precedence)
-    const urlConfig = readConfigFromUrl();
-    if (Object.keys(urlConfig).length > 0) {
-      dispatch({ type: 'HYDRATE', config: urlConfig });
-      setHydrationSource('url');
-    } else {
-      // Priority 2: localStorage (returning user)
-      const stored = readConfigFromLocalStorage();
-      if (stored && Object.keys(stored).length > 0) {
-        dispatch({ type: 'HYDRATE', config: stored });
-        setHydrationSource('localStorage');
-      }
-    }
-
-    // Always hydrate recent stacks
-    setRecentStacks(readRecentStacksFromLocalStorage());
-  }, []);
+  const hydrationSource = initial.source;
 
   // Debounced URL sync (300ms)
   useEffect(() => {
-    if (!initializedRef.current) return;
-
     if (urlUpdateTimer.current) {
       clearTimeout(urlUpdateTimer.current);
     }
@@ -442,8 +440,6 @@ export function ExpressGeneratorProvider({ children }: { children: React.ReactNo
 
   // Debounced localStorage sync (500ms) — persists across reloads
   useEffect(() => {
-    if (!initializedRef.current) return;
-
     if (storageUpdateTimer.current) {
       clearTimeout(storageUpdateTimer.current);
     }

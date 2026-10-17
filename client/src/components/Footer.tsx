@@ -80,7 +80,7 @@ export default function Footer() {
                 <Code className="h-3.5 w-3.5" />
                 API
               </Link>
-                        </nav>
+            </nav>
 
             {/* Separator */}
             <div className="hidden sm:block h-4 w-px bg-border" />

@@ -13,7 +13,7 @@ const { like, eachLike, regex, integer, string } = MatchersV3;
 
 // Configure the Pact provider
 const provider = new PactV3({
-consumer: '{{projectName}}Consumer',
+consumer: '{{string projectName "single" "ts"}}Consumer',
 provider: 'UserService',
 dir: path.resolve(process.cwd(), 'pacts'),
 logLevel: 'warn',

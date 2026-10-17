@@ -41,7 +41,7 @@ export async function setupVite(app: Express, server: Server) {
     configFile: false,
     customLogger: {
       ...viteLogger,
-      error: (msg: string, options?: any) => {
+      error: (msg: string, options?: Parameters<typeof viteLogger.error>[1]) => {
         viteLogger.error(msg, options);
         process.exit(1);
       },

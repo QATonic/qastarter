@@ -98,6 +98,25 @@ npm run dev
 npm run build
 ```
 
+### Checking Changes
+
+The CLI is a separate package. Install its dependencies before running the full suite:
+
+```bash
+npm ci --prefix cli
+npm run check
+npm run lint
+npm run test:all
+npm run validate:templates
+npm run templates:validate-output
+
+# Production API and browser checks
+npx playwright install chromium firefox webkit
+npm run test:e2e:production
+```
+
+OpenAPI generation accepts standalone JSON or YAML specifications served directly over public HTTPS. Bundle external references first. Invalid or unreachable specifications return a validation error.
+
 ## 📁 Project Structure
 
 ```

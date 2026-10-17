@@ -1,10 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { projectConfigSchema, ProjectConfig } from '@shared/schema';
-import {
-  validationMatrix,
-  WizardValidator,
-  validationLabels,
-} from '@shared/validationMatrix';
+import { validationMatrix, WizardValidator, validationLabels } from '@shared/validationMatrix';
 import { TemplatePackEngine } from '../templates/templatePackEngine';
 import { TemplatePackFile } from '../templates/types';
 
@@ -261,10 +257,8 @@ describe('Validation Matrix — cloudDeviceFarms', () => {
       // Also include 'none' which isn't in the matrix arrays but is in labels
       allFarmKeys.add('none');
 
-      for (const key of allFarmKeys) {
-        expect(
-          (validationLabels.cloudDeviceFarms as Record<string, string>)[key]
-        ).toBeDefined();
+      for (const key of Array.from(allFarmKeys)) {
+        expect((validationLabels.cloudDeviceFarms as Record<string, string>)[key]).toBeDefined();
       }
     });
   });
@@ -287,7 +281,7 @@ describe('Template Context — cloudDeviceFarm', () => {
    * via a small helper that invokes the private method through bracket
    * notation — acceptable in tests to avoid exposing internals.
    */
-  function buildContext(configOverrides: Partial<ProjectConfig> = {}): Record<string, any> {
+  function buildContext(configOverrides: Partial<ProjectConfig> = {}) {
     const baseConfig: ProjectConfig = {
       testingType: 'web',
       framework: 'selenium',
@@ -296,10 +290,12 @@ describe('Template Context — cloudDeviceFarm', () => {
       testRunner: 'testng',
       buildTool: 'maven',
       projectName: 'test-project',
+      cloudDeviceFarm: 'none',
+      includeSampleTests: true,
       ...configOverrides,
     };
     // Access private method for testing
-    return (engine as any).createTemplateContext(baseConfig, {});
+    return engine['createTemplateContext'](baseConfig, {});
   }
 
   it("should default cloudDeviceFarm to 'none' when undefined in config", () => {
@@ -309,7 +305,7 @@ describe('Template Context — cloudDeviceFarm', () => {
 
   it("should default cloudDeviceFarm to 'none' when the field is missing entirely", () => {
     // Construct config without cloudDeviceFarm property at all
-    const config: any = {
+    const config: ProjectConfig = {
       testingType: 'web',
       framework: 'selenium',
       language: 'java',
@@ -317,9 +313,11 @@ describe('Template Context — cloudDeviceFarm', () => {
       testRunner: 'testng',
       buildTool: 'maven',
       projectName: 'test-project',
+      cloudDeviceFarm: 'none',
+      includeSampleTests: true,
     };
-    delete config.cloudDeviceFarm;
-    const ctx = (engine as any).createTemplateContext(config, {});
+    Reflect.deleteProperty(config, 'cloudDeviceFarm');
+    const ctx = engine['createTemplateContext'](config, {});
     expect(ctx.cloudDeviceFarm).toBe('none');
   });
 
@@ -340,12 +338,16 @@ describe('Template Context — cloudDeviceFarm', () => {
 
   it('should trim whitespace from cloudDeviceFarm value', () => {
     // Force a value with whitespace by bypassing enum narrowing
-    const ctx = buildContext({ cloudDeviceFarm: '  browserstack  ' as any });
+    const ctx = buildContext({
+      cloudDeviceFarm: '  browserstack  ' as ProjectConfig['cloudDeviceFarm'],
+    });
     expect(ctx.cloudDeviceFarm).toBe('browserstack');
   });
 
   it('should trim leading/trailing spaces from saucelabs', () => {
-    const ctx = buildContext({ cloudDeviceFarm: ' saucelabs ' as any });
+    const ctx = buildContext({
+      cloudDeviceFarm: ' saucelabs ' as ProjectConfig['cloudDeviceFarm'],
+    });
     expect(ctx.cloudDeviceFarm).toBe('saucelabs');
   });
 });
@@ -375,9 +377,11 @@ describe('Conditional File Inclusion — cloudDeviceFarm', () => {
       testRunner: 'testng',
       buildTool: 'maven',
       projectName: 'test-project',
+      cloudDeviceFarm: 'none',
+      includeSampleTests: true,
       ...configOverrides,
     };
-    return (engine as any).shouldIncludeFile(fileConfig, baseConfig);
+    return engine['shouldIncludeFile'](fileConfig, baseConfig);
   }
 
   it("should include a file conditioned on cloudDeviceFarm: 'browserstack' when config matches", () => {
@@ -476,7 +480,7 @@ describe('Conditional File Inclusion — cloudDeviceFarm', () => {
     ).toBe(false);
   });
 
-  it("should exclude cloudDeviceFarm-conditioned files when config cloudDeviceFarm is undefined", () => {
+  it('should exclude cloudDeviceFarm-conditioned files when config cloudDeviceFarm is undefined', () => {
     const file: TemplatePackFile = {
       path: 'src/config/browserstack.conf.ts',
       isTemplate: true,

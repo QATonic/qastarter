@@ -1,23 +1,23 @@
 plugins {
-id("com.android.application") version "{{toolVersions.androidGradlePlugin}}"
-id("org.jetbrains.kotlin.android") version "{{toolVersions.kotlin}}"
+id("com.android.application") version "{{string toolVersions.androidGradlePlugin "double" "kts"}}"
+id("org.jetbrains.kotlin.android") version "{{string toolVersions.kotlin "double" "kts"}}"
 {{#eq reportingTool "allure"}}
-id("io.qameta.allure") version "{{toolVersions.allure}}"
+id("io.qameta.allure") version "{{string toolVersions.allure "double" "kts"}}"
 {{/eq}}
 }
 
 android {
-namespace = "{{groupId}}"
+namespace = "{{string groupId "double" "kts"}}"
 compileSdk = 34
 
 defaultConfig {
-applicationId = "{{groupId}}"
+applicationId = "{{string groupId "double" "kts"}}"
 minSdk = 24
 targetSdk = 34
 versionCode = 1
 versionName = "1.0"
 
-testInstrumentationRunner = "{{groupId}}.runner.CustomTestRunner"
+testInstrumentationRunner = "{{string groupId "double" "kts"}}.runner.CustomTestRunner"
 }
 
 buildTypes {
@@ -53,15 +53,15 @@ implementation("com.google.android.material:material:1.11.0")
 
 // Testing
 androidTestImplementation("androidx.test.ext:junit:1.1.5")
-androidTestImplementation("androidx.test.espresso:espresso-core:{{toolVersions.espresso}}")
-androidTestImplementation("androidx.test.espresso:espresso-contrib:{{toolVersions.espresso}}")
-androidTestImplementation("androidx.test.espresso:espresso-intents:{{toolVersions.espresso}}")
+androidTestImplementation("androidx.test.espresso:espresso-core:{{string toolVersions.espresso "double" "kts"}}")
+androidTestImplementation("androidx.test.espresso:espresso-contrib:{{string toolVersions.espresso "double" "kts"}}")
+androidTestImplementation("androidx.test.espresso:espresso-intents:{{string toolVersions.espresso "double" "kts"}}")
 androidTestImplementation("androidx.test:runner:1.5.2")
 androidTestImplementation("androidx.test:rules:1.5.0")
 
 // JUnit 5 for Android
-androidTestImplementation("org.junit.jupiter:junit-jupiter-api:{{toolVersions.junit5}}")
-androidTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:{{toolVersions.junit5}}")
+androidTestImplementation("org.junit.jupiter:junit-jupiter-api:{{string toolVersions.junit5 "double" "kts"}}")
+androidTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:{{string toolVersions.junit5 "double" "kts"}}")
 androidTestImplementation("de.mannodermaus.junit5:android-test-core:1.4.0")
 androidTestRuntimeOnly("de.mannodermaus.junit5:android-test-runner:1.4.0")
 
@@ -70,6 +70,6 @@ androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
 {{#eq reportingTool "allure"}}
 // Allure
-androidTestImplementation("io.qameta.allure:allure-kotlin-android:{{toolVersions.allure}}")
+androidTestImplementation("io.qameta.allure:allure-kotlin-android:{{string toolVersions.allure "double" "kts"}}")
 {{/eq}}
 }

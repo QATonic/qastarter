@@ -1,11 +1,11 @@
 {
-  "name": "{{artifactId}}",
+  "name": "{{string artifactId "double" "json"}}",
   "version": "1.0.0",
-  "description": "{{projectName}} - GraphQL API Testing with TypeScript",
+  "description": "{{string projectName "double" "json"}} - GraphQL API Testing with TypeScript",
   "scripts": {"test": "jest"},
-  "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+  "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
     {{#if utilities.faker}}
-    "@faker-js/faker": "^{{toolVersions.fakerJs}}",
+    "@faker-js/faker": "^{{string toolVersions.fakerJs "double" "json"}}",
     {{/if}}
     "@types/jest": "^29.5.0",
     "@types/node": "^20.10.0",

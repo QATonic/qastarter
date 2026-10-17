@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite name="{{projectName}}_API_Only_Suite" parallel="classes" thread-count="2">
+<suite name="{{escapeXml projectName}}_API_Only_Suite" parallel="classes" thread-count="2">
     
     <parameter name="environment" value="qa"/>
     
@@ -10,7 +10,7 @@
         <parameter name="environment" value="qa"/>
         
         <classes>
-            <class name="{{packageName}}.tests.UserAPITests"/>
+            <class name="{{escapeXml packageName}}.tests.UserAPITests"/>
         </classes>
         
         <groups>
@@ -24,7 +24,7 @@
         <parameter name="environment" value="qa"/>
         
         <classes>
-            <class name="{{packageName}}.tests.AuthenticationTests"/>
+            <class name="{{escapeXml packageName}}.tests.AuthenticationTests"/>
         </classes>
         
         <groups>
@@ -35,8 +35,8 @@
     </test>
     
     <listeners>
-        <listener class-name="{{packageName}}.listeners.TestListener"/>
-        <listener class-name="{{packageName}}.listeners.RetryAnalyzer"/>
+        <listener class-name="{{escapeXml packageName}}.listeners.TestListener"/>
+        <listener class-name="{{escapeXml packageName}}.listeners.RetryAnalyzer"/>
     </listeners>
     
 </suite>

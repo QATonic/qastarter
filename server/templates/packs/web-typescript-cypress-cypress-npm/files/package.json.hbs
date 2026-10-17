@@ -1,7 +1,7 @@
 {
-"name": "{{artifactId}}",
+"name": "{{string artifactId "double" "json"}}",
 "version": "1.0.0",
-"description": "{{projectName}} - Cypress TypeScript Automation Framework",
+"description": "{{string projectName "double" "json"}} - Cypress TypeScript Automation Framework",
 "scripts": {
 "test": "{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-cypress run --sync{{else}}cypress run --browser chrome{{/if}}",
 "test:local": "cypress run --browser chrome",
@@ -15,9 +15,9 @@
 "lint:fix": "eslint . --fix",
 "format": "prettier --write ."
 },
-"devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+"devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
 {{#if utilities.faker}}
-"@faker-js/faker": "^{{toolVersions.fakerJs}}",
+"@faker-js/faker": "^{{string toolVersions.fakerJs "double" "json"}}",
 {{/if}}
 "cypress": "^13.6.0",
 "eslint": "^8.56.0",

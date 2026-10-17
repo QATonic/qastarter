@@ -10,7 +10,7 @@ const env = process.env.ENV || "dev";
 const config = require(path.join(__dirname, `${env}.json`));
 
 export const apiConfig = {
-  baseUrl: process.env.BASE_URL || config.baseUrl || "{{baseUrl}}",
+  baseUrl: process.env.BASE_URL || config.baseUrl || "{{string baseUrl "double" "ts"}}",
   timeout: parseInt(process.env.TIMEOUT || config.timeout || "30") * 1000,
   contentType: process.env.CONTENT_TYPE || config.contentType || "application/json",
 };

@@ -38,7 +38,7 @@ public class ExtentManager {
 
                     ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
                     sparkReporter.config().setTheme(Theme.DARK);
-                    sparkReporter.config().setDocumentTitle("{{projectName}} Test Report");
+                    sparkReporter.config().setDocumentTitle("{{string projectName "double" "java"}} Test Report");
                     sparkReporter.config().setReportName("Automation Test Results");
                     sparkReporter.config().setTimelineEnabled(true);
 

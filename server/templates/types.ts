@@ -54,7 +54,7 @@ export interface TemplatePackFile {
   isTemplate: boolean;
   description?: string;
   mode?: string;
-  conditional?: Record<string, any>; // e.g., {"reportingTool": "allure"} or {"utilities.logger": true}
+  conditional?: Record<string, unknown>; // e.g., {"reportingTool": "allure"} or {"utilities.logger": true}
 }
 
 export interface TemplateContext extends ProjectConfig {

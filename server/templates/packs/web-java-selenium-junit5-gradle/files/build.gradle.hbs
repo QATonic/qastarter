@@ -2,7 +2,7 @@ plugins {
 id 'java'
 id 'jacoco'
 {{#if (eq reportingTool "allure")}}
-id 'io.qameta.allure' version '{{toolVersions.allure}}' apply false
+id 'io.qameta.allure' version '{{string toolVersions.allure "single" "gradle"}}' apply false
 {{/if}}
 id 'com.diffplug.spotless' version '6.25.0'
 }
@@ -13,9 +13,9 @@ googleJavaFormat('1.17.0').aosp()
 }
 }
 
-group = '{{groupId}}'
+group = '{{string groupId "single" "gradle"}}'
 version = '1.0.0'
-description = '{{projectName}}'
+description = '{{string projectName "single" "gradle"}}'
 
 java {
 sourceCompatibility = JavaVersion.VERSION_11
@@ -28,19 +28,19 @@ mavenCentral()
 
 ext {
 // Dependency versions
-seleniumVersion = '{{toolVersions.selenium}}'
-junitVersion = '{{toolVersions.junit5}}'
-log4jVersion = '{{toolVersions.log4j}}'
+seleniumVersion = '{{string toolVersions.selenium "single" "gradle"}}'
+junitVersion = '{{string toolVersions.junit5 "single" "gradle"}}'
+log4jVersion = '{{string toolVersions.log4j "single" "gradle"}}'
 {{#if (eq reportingTool "extent-reports")}}
-extentReportsVersion = '{{toolVersions.extentreports}}'
+extentReportsVersion = '{{string toolVersions.extentreports "single" "gradle"}}'
 {{/if}}
 {{#if (eq reportingTool "allure")}}
-allureVersion = '{{toolVersions.allure}}'
+allureVersion = '{{string toolVersions.allure "single" "gradle"}}'
 {{/if}}
 {{#if (eq testingPattern "bdd")}}
-cucumberVersion = '{{toolVersions.cucumber}}'
+cucumberVersion = '{{string toolVersions.cucumber "single" "gradle"}}'
 {{/if}}
-jacksonVersion = '{{toolVersions.jackson}}'
+jacksonVersion = '{{string toolVersions.jackson "single" "gradle"}}'
 commonsCsvVersion = '1.10.0'
 
 // Test configuration
@@ -114,12 +114,12 @@ implementation 'com.browserstack:browserstack-java-sdk:1.25.0'
 
 // User-picked dependencies (from QAStarter dependency search)
 {{#each userDependencies.maven}}
-implementation '{{group}}:{{name}}:{{version}}'
+implementation '{{string group "single" "gradle"}}:{{string name "single" "gradle"}}:{{string version "single" "gradle"}}'
 {{/each}}
 {{/if}}
     {{#if utilities.faker}}
     // DataFaker — Test data generation
-    implementation 'net.datafaker:datafaker:{{toolVersions.datafaker}}'
+    implementation 'net.datafaker:datafaker:{{string toolVersions.datafaker "single" "gradle"}}'
     {{/if}}
 }
 
@@ -222,19 +222,19 @@ delete "screenshots"
 
 // Gradle wrapper task
 wrapper {
-gradleVersion = '{{toolVersions.gradle}}'
+gradleVersion = '{{string toolVersions.gradle "single" "gradle"}}'
 distributionType = Wrapper.DistributionType.BIN
 }
 {{#if (eq reportingTool "allure")}}
 
 // Allure configuration
 allure {
-version = '{{toolVersions.allure}}'
+version = '{{string toolVersions.allure "single" "gradle"}}'
 autoconfigure = true
 aspectjweaver = true
 
 useJUnit5 {
-version = '{{toolVersions.allure}}'
+version = '{{string toolVersions.allure "single" "gradle"}}'
 }
 }
 {{/if}}

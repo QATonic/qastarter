@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite name="{{projectName}}_Mobile_Test_Suite" parallel="tests" thread-count="2">
+<suite name="{{escapeXml projectName}}_Mobile_Test_Suite" parallel="tests" thread-count="2">
 
     <parameter name="environment" value="qa" />
 
@@ -9,7 +9,7 @@
     <!-- BDD Test Configuration with Cucumber -->
     <test name="Mobile_BDD_Tests" preserve-order="true">
         <classes>
-            <class name="{{javaPackage}}.bdd.TestRunner" />
+            <class name="{{escapeXml javaPackage}}.bdd.TestRunner" />
         </classes>
     </test>
     {{else}}
@@ -19,7 +19,7 @@
         <parameter name="environment" value="qa" />
 
         <classes>
-            <class name="{{javaPackage}}.tests.LoginTests">
+            <class name="{{escapeXml javaPackage}}.tests.LoginTests">
                 <methods>
                     <include name="testValidLogin" />
                     <include name="testInvalidLogin" />
@@ -43,7 +43,7 @@
         <parameter name="environment" value="qa" />
 
         <classes>
-            <class name="{{javaPackage}}.tests.LoginTests">
+            <class name="{{escapeXml javaPackage}}.tests.LoginTests">
                 <methods>
                     <include name="testValidLogin" />
                     <include name="testInvalidLogin" />
@@ -62,8 +62,8 @@
     {{/if}}
 
     <listeners>
-        <listener class-name="{{javaPackage}}.listeners.TestListener" />
-        <listener class-name="{{javaPackage}}.listeners.RetryAnalyzer" />
+        <listener class-name="{{escapeXml javaPackage}}.listeners.TestListener" />
+        <listener class-name="{{escapeXml javaPackage}}.listeners.RetryAnalyzer" />
     </listeners>
 
 </suite>

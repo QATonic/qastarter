@@ -11,6 +11,11 @@ import { logger } from '../utils/logger';
 // Configuration
 const CACHE_TTL = process.env.NODE_ENV === 'production' ? 3600 : 60; // 1 hour in prod, 1 min in dev
 const CHECK_PERIOD = 120; // Check for expired keys every 2 minutes
+const configuredTemplateLimit = Number(process.env.TEMPLATE_CACHE_MAX_KEYS || '500');
+const templateLimit =
+  Number.isInteger(configuredTemplateLimit) && configuredTemplateLimit > 0
+    ? configuredTemplateLimit
+    : 500;
 
 // Create cache instances
 // Note: useClones=true prevents callers from accidentally mutating cached objects
@@ -29,7 +34,7 @@ const templateCache = new NodeCache({
   stdTTL: CACHE_TTL,
   checkperiod: CHECK_PERIOD,
   useClones: false,
-  maxKeys: parseInt(process.env.TEMPLATE_CACHE_MAX_KEYS || '500', 10),
+  maxKeys: templateLimit,
 });
 
 const metadataCache = new NodeCache({
@@ -70,7 +75,22 @@ export function getCachedTemplate<T>(templateKey: string): T | undefined {
  * Set a compiled template in cache
  */
 export function setCachedTemplate<T>(templateKey: string, template: T): boolean {
-  return templateCache.set(templateKey, template);
+  try {
+    // NodeCache throws at capacity, including when replacing an existing key.
+    // Evict the oldest entry before insertion; a cache miss must never make
+    // an otherwise valid project impossible to render.
+    if (templateCache.has(templateKey)) templateCache.del(templateKey);
+    else if (templateCache.getStats().keys >= templateLimit) {
+      const oldest = templateCache.keys()[0];
+      if (oldest) templateCache.del(oldest);
+    }
+    return templateCache.set(templateKey, template);
+  } catch (error) {
+    logger.warn('Skipping compiled-template cache write', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return false;
+  }
 }
 
 /**

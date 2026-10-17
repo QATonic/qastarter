@@ -7,8 +7,8 @@ class CapabilitiesManager {
     const caps: Capabilities = {
       platformName: 'Android',
       'appium:automationName': 'UiAutomator2',
-      'appium:deviceName': process.env.DEVICE_NAME || '{{deviceName}}',
-      'appium:platformVersion': process.env.PLATFORM_VERSION || '{{platformVersion}}',
+      'appium:deviceName': process.env.DEVICE_NAME || '{{string deviceName "single" "ts"}}',
+      'appium:platformVersion': process.env.PLATFORM_VERSION || '{{string platformVersion "single" "ts"}}',
       'appium:app': process.env.APP_PATH || '',
       'appium:appPackage': process.env.APP_PACKAGE || 'com.example.app',
       'appium:appActivity': process.env.APP_ACTIVITY || '.MainActivity',
@@ -60,7 +60,7 @@ class CapabilitiesManager {
       'bstack:options': {
         userName: process.env.BROWSERSTACK_USERNAME,
         accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
-        projectName: '{{projectName}}',
+        projectName: '{{string projectName "single" "ts"}}',
         buildName: 'Android Build',
         debug: true,
         networkLogs: true
@@ -73,7 +73,7 @@ class CapabilitiesManager {
       'bstack:options': {
         userName: process.env.BROWSERSTACK_USERNAME,
         accessKey: process.env.BROWSERSTACK_ACCESS_KEY,
-        projectName: '{{projectName}}',
+        projectName: '{{string projectName "single" "ts"}}',
         buildName: 'iOS Build',
         debug: true,
         networkLogs: true
@@ -87,7 +87,7 @@ class CapabilitiesManager {
         username: process.env.SAUCE_USERNAME,
         accessKey: process.env.SAUCE_ACCESS_KEY,
         build: 'Android Build',
-        name: '{{projectName}}'
+        name: '{{string projectName "single" "ts"}}'
       }
     };
   }
@@ -98,7 +98,7 @@ class CapabilitiesManager {
         username: process.env.SAUCE_USERNAME,
         accessKey: process.env.SAUCE_ACCESS_KEY,
         build: 'iOS Build',
-        name: '{{projectName}}'
+        name: '{{string projectName "single" "ts"}}'
       }
     };
   }

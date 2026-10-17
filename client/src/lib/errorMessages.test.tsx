@@ -29,8 +29,8 @@ describe('ErrorMessages constants', () => {
 
     expectedKeys.forEach((key) => {
       expect(ErrorMessages).toHaveProperty(key);
-      expect(typeof (ErrorMessages as any)[key]).toBe('string');
-      expect((ErrorMessages as any)[key].length).toBeGreaterThan(0);
+      expect(typeof ErrorMessages[key as keyof typeof ErrorMessages]).toBe('string');
+      expect(ErrorMessages[key as keyof typeof ErrorMessages].length).toBeGreaterThan(0);
     });
   });
 });
@@ -50,8 +50,8 @@ describe('ErrorTitles constants', () => {
 
     expectedKeys.forEach((key) => {
       expect(ErrorTitles).toHaveProperty(key);
-      expect(typeof (ErrorTitles as any)[key]).toBe('string');
-      expect((ErrorTitles as any)[key].length).toBeGreaterThan(0);
+      expect(typeof ErrorTitles[key as keyof typeof ErrorTitles]).toBe('string');
+      expect(ErrorTitles[key as keyof typeof ErrorTitles].length).toBeGreaterThan(0);
     });
   });
 });

@@ -1,4 +1,5 @@
 import handlebars from 'handlebars';
+import type { TemplateDelegate } from 'handlebars';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { createHash } from 'crypto';
@@ -11,11 +12,11 @@ import {
   getCachedTemplate,
   setCachedTemplate,
   isCacheEnabled,
-  getCacheStats,
 } from '../services/cacheService';
 import { loadSharedVersions, mergeVersions } from './shared/versionLoader';
 import { logger } from '../utils/logger';
 import { isSampleTestFile as checkSampleTestFile } from './sampleTestPatterns';
+import { registerSerializationHelpers } from './serialization';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -36,15 +37,16 @@ export class TemplatePackEngine {
   }
 
   private registerHelpers() {
+    registerSerializationHelpers(this.hb);
     // Existing helpers
-    this.hb.registerHelper('eq', (a: any, b: any) => a === b);
-    this.hb.registerHelper('or', (...args: any[]) => {
-      const opts = args.pop();
+    this.hb.registerHelper('eq', (a: unknown, b: unknown) => a === b);
+    this.hb.registerHelper('or', (...args: unknown[]) => {
+      args.pop();
       return args.some(Boolean);
     });
     this.hb.registerHelper(
       'includes',
-      (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val)
+      (arr: unknown[], val: unknown) => Array.isArray(arr) && arr.includes(val)
     );
 
     // New helpers for sophisticated templates
@@ -71,11 +73,11 @@ export class TemplatePackEngine {
         return entities[char] || char;
       });
     });
-    this.hb.registerHelper('json', (obj: any) => JSON.stringify(obj, null, 2));
+    this.hb.registerHelper('json', (obj: unknown) => JSON.stringify(obj, null, 2));
     this.hb.registerHelper('join', (arr: string[], separator: unknown) =>
       Array.isArray(arr) ? arr.join(typeof separator === 'string' ? separator : ', ') : ''
     );
-    this.hb.registerHelper('ternary', (condition: any, trueVal: any, falseVal: any) =>
+    this.hb.registerHelper('ternary', (condition: unknown, trueVal: unknown, falseVal: unknown) =>
       condition ? trueVal : falseVal
     );
     this.hb.registerHelper('camelCase', (str: string) => {
@@ -96,7 +98,7 @@ export class TemplatePackEngine {
    * Find template pack by configuration combination
    */
   private getTemplatePackKey(config: ProjectConfig): string {
-    const { testingType, framework, language, testingPattern, testRunner, buildTool } = config;
+    const { testingType, framework, language, testRunner, buildTool } = config;
     return `${testingType}-${language}-${framework}-${testRunner}-${buildTool}`;
   }
 
@@ -254,11 +256,9 @@ export class TemplatePackEngine {
     // site, generic placeholders otherwise.
     const isSauceDemo = /saucedemo\.com/i.test(baseUrl);
     const testUsername =
-      (config.testUsername && config.testUsername.trim()) ||
-      (isSauceDemo ? 'standard_user' : 'YOUR_USERNAME_HERE');
+      config.testUsername ?? (isSauceDemo ? 'standard_user' : 'YOUR_USERNAME_HERE');
     const testPassword =
-      (config.testPassword && config.testPassword.trim()) ||
-      (isSauceDemo ? 'secret_sauce' : 'YOUR_PASSWORD_HERE');
+      config.testPassword ?? (isSauceDemo ? 'secret_sauce' : 'YOUR_PASSWORD_HERE');
 
     // App path — testing-type-aware defaults so templates never get empty
     // values. Desktop defaults to Calculator so tests run out of the box
@@ -276,7 +276,7 @@ export class TemplatePackEngine {
 
     // API auth config.
     const apiAuthType = (config.apiAuthType || 'none') as 'none' | 'bearer' | 'basic' | 'api-key';
-    const apiAuthToken = (config.apiAuthToken && config.apiAuthToken.trim()) || '';
+    const apiAuthToken = config.apiAuthToken ?? '';
 
     // Cloud device farm config — guard against undefined/null config value
     // and trim stray whitespace before falling back to 'none'.
@@ -395,19 +395,19 @@ export class TemplatePackEngine {
       // repeat requests for the same template (same pack, same CI/CD-masking result)
       // skip the parse-and-codegen step — a large win on generation latency because
       // a 49-pack project easily renders 20-100 templates per request.
-      let template: HandlebarsTemplateDelegate<TemplateContext>;
+      let template: TemplateDelegate<TemplateContext>;
       if (isCacheEnabled()) {
         const contentHash = createHash('sha256').update(processedContent).digest('hex');
-        const cacheKey = `hb:${contentHash}`;
-        const cached = getCachedTemplate<HandlebarsTemplateDelegate<TemplateContext>>(cacheKey);
+        const cacheKey = `hb:${/\.html?$/.test(filePath) ? 'html' : 'text'}:${contentHash}`;
+        const cached = getCachedTemplate<TemplateDelegate<TemplateContext>>(cacheKey);
         if (cached) {
           template = cached;
         } else {
-          template = this.hb.compile(processedContent);
+          template = this.hb.compile(processedContent, { noEscape: !/\.html?$/.test(filePath) });
           setCachedTemplate(cacheKey, template);
         }
       } else {
-        template = this.hb.compile(processedContent);
+        template = this.hb.compile(processedContent, { noEscape: !/\.html?$/.test(filePath) });
       }
       let result = template(context);
 
@@ -477,17 +477,14 @@ export class TemplatePackEngine {
    */
   private processTemplatePath(filePath: string, context: TemplateContext): string {
     try {
-      return filePath.replace(
-        TemplatePackEngine.PATH_PLACEHOLDER,
-        (match, key: string) => {
-          if (!TemplatePackEngine.PATH_CONTEXT_KEYS.has(key)) {
-            return match; // unknown — leave literal, let downstream validation catch it
-          }
-          const value = (context as unknown as Record<string, unknown>)[key];
-          if (typeof value !== 'string' && typeof value !== 'number') return match;
-          return String(value);
+      return filePath.replace(TemplatePackEngine.PATH_PLACEHOLDER, (match, key: string) => {
+        if (!TemplatePackEngine.PATH_CONTEXT_KEYS.has(key)) {
+          return match; // unknown — leave literal, let downstream validation catch it
         }
-      );
+        const value = (context as unknown as Record<string, unknown>)[key];
+        if (typeof value !== 'string' && typeof value !== 'number') return match;
+        return String(value);
+      });
     } catch (error) {
       throw new Error(`Template path processing failed for ${filePath}: ${error}`);
     }
@@ -526,16 +523,22 @@ export class TemplatePackEngine {
       const keys = key.split('.');
 
       // Try resolving from config first
-      let actualValue: any = config;
+      let actualValue: unknown = config;
       for (const k of keys) {
-        actualValue = actualValue?.[k];
+        actualValue =
+          actualValue !== null && typeof actualValue === 'object'
+            ? (actualValue as Record<string, unknown>)[k]
+            : undefined;
       }
 
       // If not found in config, try resolving from context (computed fields)
       if (actualValue === undefined && context) {
         actualValue = context;
         for (const k of keys) {
-          actualValue = actualValue?.[k];
+          actualValue =
+            actualValue !== null && typeof actualValue === 'object'
+              ? (actualValue as Record<string, unknown>)[k]
+              : undefined;
         }
       }
 
@@ -568,7 +571,10 @@ export class TemplatePackEngine {
    */
   async *generateProjectStream(
     config: ProjectConfig,
-    options: { strict?: boolean; openApiEndpoints?: import('@shared/openApiTypes').OpenApiEndpoint[] } = { strict: true }
+    options: {
+      strict?: boolean;
+      openApiEndpoints?: import('@shared/openApiTypes').OpenApiEndpoint[];
+    } = { strict: true }
   ): AsyncGenerator<TemplateFile> {
     const packKey = this.getTemplatePackKey(config);
 
@@ -577,7 +583,11 @@ export class TemplatePackEngine {
       const manifest = await this.loadManifest(packKey);
 
       // Create template context
-      const context = this.createTemplateContext(config, manifest.toolVersions, options.openApiEndpoints);
+      const context = this.createTemplateContext(
+        config,
+        manifest.toolVersions,
+        options.openApiEndpoints
+      );
 
       for (const fileConfig of manifest.files) {
         // Check if file should be included based on conditional rules
@@ -597,7 +607,7 @@ export class TemplatePackEngine {
               fileConfig.path,
               fileConfig.isTemplate
             );
-          } catch (error) {
+          } catch {
             // If file doesn't exist, skip it (allows for optional files)
             logger.warn(`Template file not found: ${fileConfig.path}, skipping`);
             if (options.strict) {

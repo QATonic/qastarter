@@ -3,12 +3,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>{{groupId}}</groupId>
-    <artifactId>{{artifactId}}</artifactId>
+    <groupId>{{escapeXml groupId}}</groupId>
+    <artifactId>{{escapeXml artifactId}}</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>{{projectName}}</name>
+    <name>{{escapeXml projectName}}</name>
     <description>UI Automation Framework using Selenium WebDriver, JUnit5, and Maven</description>
 
     <properties>
@@ -18,18 +18,18 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Dependency Versions -->
-        <selenium.version>{{toolVersions.selenium}}</selenium.version>
-        <junit.version>{{toolVersions.junit5}}</junit.version>
-        <log4j.version>{{toolVersions.log4j}}</log4j.version>
+        <selenium.version>{{escapeXml toolVersions.selenium}}</selenium.version>
+        <junit.version>{{escapeXml toolVersions.junit5}}</junit.version>
+        <log4j.version>{{escapeXml toolVersions.log4j}}</log4j.version>
         {{#if (eq reportingTool "extent-reports")}}
-        <extentreports.version>{{toolVersions.extentreports}}</extentreports.version>
+        <extentreports.version>{{escapeXml toolVersions.extentreports}}</extentreports.version>
         {{/if}}
         {{#if (eq reportingTool "allure")}}
-        <allure.version>{{toolVersions.allure}}</allure.version>
+        <allure.version>{{escapeXml toolVersions.allure}}</allure.version>
         <aspectj.version>1.9.20</aspectj.version>
         {{/if}}
         {{#if (eq testingPattern "bdd")}}
-        <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
+        <cucumber.version>{{escapeXml toolVersions.cucumber}}</cucumber.version>
         {{/if}}
         <jackson.version>2.15.2</jackson.version>
         <commons-csv.version>1.10.0</commons-csv.version>
@@ -152,9 +152,9 @@
         <!-- User-picked dependencies (from QAStarter dependency search) -->
         {{#each userDependencies.maven}}
         <dependency>
-            <groupId>{{group}}</groupId>
-            <artifactId>{{name}}</artifactId>
-            <version>{{version}}</version>
+            <groupId>{{escapeXml group}}</groupId>
+            <artifactId>{{escapeXml name}}</artifactId>
+            <version>{{escapeXml version}}</version>
         </dependency>
         {{/each}}
         {{/if}}
@@ -163,7 +163,7 @@
         <dependency>
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
-            <version>{{toolVersions.datafaker}}</version>
+            <version>{{escapeXml toolVersions.datafaker}}</version>
         </dependency>
         {{/if}}
     </dependencies>

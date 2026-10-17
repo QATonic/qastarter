@@ -7,7 +7,7 @@ import envConfig from "../config/env.config";
 
 export class HomePage extends BasePage {
   private readonly selectors = {
-    welcomeMessage: ".welcome-message, h1",
+    welcomeMessage: ".title, .welcome-message, h1",
     userProfile: ".user-profile",
     logoutButton: 'button[data-action="logout"], .logout',
   };

@@ -1,8 +1,9 @@
+import { DEFAULT_CONFIG } from '@/components/wizard-steps/types';
 /**
  * Unit Tests for useConfigPersistence hook
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useConfigPersistence } from './useConfigPersistence';
 
@@ -72,7 +73,10 @@ describe('useConfigPersistence', () => {
       const { result } = renderHook(() => useConfigPersistence());
 
       act(() => {
-        result.current.saveConfig({ testingType: 'web', framework: 'selenium' }, 3);
+        result.current.saveConfig(
+          { ...DEFAULT_CONFIG, testingType: 'web', framework: 'selenium' },
+          3
+        );
       });
 
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
@@ -93,7 +97,7 @@ describe('useConfigPersistence', () => {
 
       // Should not throw
       act(() => {
-        result.current.saveConfig({ testingType: 'web' }, 1);
+        result.current.saveConfig({ ...DEFAULT_CONFIG, testingType: 'web' }, 1);
       });
 
       expect(consoleSpy).toHaveBeenCalled();

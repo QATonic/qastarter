@@ -4,25 +4,17 @@
  */
 
 import { Router, Request } from 'express';
-import rateLimit, { type Store } from 'express-rate-limit';
-import { projectConfigSchema, type ProjectConfig } from '@shared/schema';
+import { ipKeyGenerator } from 'express-rate-limit';
+import { sharedRateLimit } from '../middleware/sharedRateLimit';
+import { type ProjectConfig } from '@shared/schema';
+import { parseProjectConfiguration } from '../services/configurationService';
 import { projectService } from '../services/projectService';
-import { WizardValidator } from '@shared/validationMatrix';
-import { sanitizeProjectName, sanitizeGroupId, sanitizeArtifactId } from '@shared/sanitize';
-import {
-  ValidationError,
-  IncompatibleCombinationError,
-  ErrorCode,
-  generateRequestId,
-  asyncHandler,
-} from '../errors';
+import { sanitizeProjectName } from '@shared/sanitize';
+import { ErrorCode, generateRequestId, asyncHandler } from '../errors';
 import { createRequestLogger } from '../utils/logger';
-import { logger } from '../utils/logger';
 import { mcpConfig, rateLimitConfig } from '../config';
 import { trackEvent, generateSessionId } from '../services/analyticsService';
 import { timingSafeEqual } from 'crypto';
-import RedisStore from 'rate-limit-redis';
-import { createClient } from 'redis';
 
 /** Constant-time string equality so attackers can't derive the bypass token via timing. */
 function safeTokenEqual(a: string, b: string): boolean {
@@ -43,10 +35,10 @@ const router = Router();
  *  - `mcp-trusted`: `X-QAStarter-Client: mcp` **and** `X-QAStarter-Token`
  *    matches the server's `QASTARTER_MCP_BYPASS_TOKEN` env. Gets the
  *    elevated `rateLimitConfig.mcpGeneration.max`.
- *  - `mcp`:         `X-QAStarter-Client: mcp` without a valid token — still
+ *  - `mcp`:     `X-QAStarter-Client: mcp` without a valid token — still
  *    tagged for telemetry but subject to the default anonymous limit.
- *  - `cli`:         CLI-shaped user agents (curl / node-fetch / go-http / …).
- *  - `web`:         everything else (presumed a browser).
+ *  - `cli`:     CLI-shaped user agents (curl / node-fetch / go-http / …).
+ *  - `web`:     everything else (presumed a browser).
  */
 export type ClientSource = 'mcp-trusted' | 'mcp' | 'cli' | 'web';
 
@@ -64,68 +56,13 @@ export function detectClientSource(req: Request): ClientSource {
   return 'web';
 }
 
-/**
- * Reusable validation helper to reduce code duplication (DRY)
- * Validates request body against projectConfigSchema
- */
-function validateProjectConfigBody(body: unknown, requestId: string): ProjectConfig {
-  const validationResult = projectConfigSchema.safeParse(body);
-
-  if (!validationResult.success) {
-    const errors = validationResult.error.errors.map((e) => ({
-      field: e.path.join('.'),
-      message: e.message,
-    }));
-    throw new ValidationError('Invalid project configuration', errors, requestId);
-  }
-
-  return validationResult.data;
-}
-
-/**
- * Build the rate-limit store. Defaults to in-memory for single-instance deployments
- * (unit tests, local dev, small Docker runs). If `REDIS_URL` is set we use the
- * shared Redis so multiple app replicas observe the same counters — without it,
- * each replica enforces its own copy of the limit (so 3 replicas ⇒ effectively 3×).
- */
-function buildRateLimitStore(): Store | undefined {
-  const redisUrl = process.env.REDIS_URL;
-  if (!redisUrl) {
-    logger.info('Rate limiter using in-memory store (set REDIS_URL for multi-replica accuracy)');
-    return undefined; // express-rate-limit falls back to its built-in memory store
-  }
-  try {
-    const client = createClient({ url: redisUrl });
-    client.on('error', (err) =>
-      logger.warn('Rate-limit Redis client error', { error: (err as Error).message })
-    );
-    // Fire-and-forget connect. express-rate-limit queues commands until ready.
-    void client.connect();
-    logger.info('Rate limiter using Redis store', {
-      url: redisUrl.replace(/\/\/[^:]+:[^@]+@/, '//*****:*****@'),
-    });
-    return new RedisStore({
-      // `sendCommand` is the v4 redis client's low-level command invoker; rate-limit-redis
-      // relies on this signature to remain store-library-version agnostic.
-      sendCommand: (...args: string[]) => client.sendCommand(args),
-      prefix: 'qastarter-rl:',
-    });
-  } catch (err) {
-    logger.warn('Failed to initialise Redis rate-limit store — falling back to in-memory', {
-      error: err instanceof Error ? err.message : String(err),
-    });
-    return undefined;
-  }
-}
-
 // Project generation rate limiter.
 //
 // The `max` is resolved per-request: trusted MCP clients (valid bypass token)
 // get `rateLimitConfig.mcpGeneration.max`, everyone else gets the default
 // anonymous cap. This keeps wizard users honest while letting AI assistants
 // iterate quickly during a single session.
-const generateProjectLimiter = rateLimit({
-  store: buildRateLimitStore(),
+const generateProjectLimiter = sharedRateLimit('generation', {
   windowMs: rateLimitConfig.generation.windowMs,
   max: (req) =>
     detectClientSource(req as Request) === 'mcp-trusted'
@@ -135,7 +72,7 @@ const generateProjectLimiter = rateLimit({
   // server/index.ts, so this equals the real client IP for the N upstream hops we trust.
   // If `trust proxy` is misconfigured, fail closed on 'anon' rather than per-request unique
   // keys (which would effectively disable the limit).
-  keyGenerator: (req) => req.ip || 'anon',
+  keyGenerator: (req) => ipKeyGenerator(req.ip || 'anon'),
   message: {
     success: false,
     error: {
@@ -158,28 +95,9 @@ router.post(
   asyncHandler(async (req, res) => {
     const requestId = generateRequestId('gen');
 
-    const config: ProjectConfig = validateProjectConfigBody(req.body, requestId);
-
-    // Sanitize user inputs
-    config.projectName = sanitizeProjectName(config.projectName);
-    if (config.groupId) {
-      config.groupId = sanitizeGroupId(config.groupId);
-    }
-    if (config.artifactId) {
-      config.artifactId = sanitizeArtifactId(config.artifactId);
-    }
+    const config: ProjectConfig = await parseProjectConfiguration(req.body, requestId);
 
     const reqLogger = createRequestLogger(requestId);
-
-    // Validate compatibility
-    if (!WizardValidator.isCompatible(config.testingType, config.framework, config.language)) {
-      throw new IncompatibleCombinationError(
-        config.testingType,
-        config.framework,
-        config.language,
-        requestId
-      );
-    }
 
     // Tag the generation event with the client source so we can distinguish
     // AI/MCP picks from human wizard picks in analytics.
@@ -196,7 +114,8 @@ router.post(
         testingPattern: config.testingPattern,
       },
       {
-        userAgent: typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : undefined,
+        userAgent:
+          typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : undefined,
       }
     );
 
@@ -212,16 +131,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const requestId = generateRequestId('deps');
 
-    const config: ProjectConfig = validateProjectConfigBody(req.body, requestId);
-
-    if (!WizardValidator.isCompatible(config.testingType, config.framework, config.language)) {
-      throw new IncompatibleCombinationError(
-        config.testingType,
-        config.framework,
-        config.language,
-        requestId
-      );
-    }
+    const config: ProjectConfig = await parseProjectConfiguration(req.body, requestId);
 
     const dependencies = await projectService.getDependencies(config);
 
@@ -244,16 +154,7 @@ router.post(
   asyncHandler(async (req, res) => {
     const requestId = generateRequestId('preview');
 
-    const config: ProjectConfig = validateProjectConfigBody(req.body, requestId);
-
-    if (!WizardValidator.isCompatible(config.testingType, config.framework, config.language)) {
-      throw new IncompatibleCombinationError(
-        config.testingType,
-        config.framework,
-        config.language,
-        requestId
-      );
-    }
+    const config: ProjectConfig = await parseProjectConfiguration(req.body, requestId);
 
     const files = await projectService.generatePreview(config);
 
@@ -265,63 +166,35 @@ router.post(
       children?: PreviewFile[];
     }
 
-    const buildFileTree = (files: any[]): PreviewFile[] => {
-      const tree: { [key: string]: any } = {};
-
-      const sortedFiles = files.sort((a, b) => {
-        const aDepth = a.path.split('/').length;
-        const bDepth = b.path.split('/').length;
-        return aDepth - bDepth;
-      });
-
-      sortedFiles.forEach((file) => {
-        const pathParts = file.path.split('/');
-        let currentLevel = tree;
-
-        pathParts.forEach((part: string, index: number) => {
-          if (index === pathParts.length - 1) {
-            // Binary file content is not serializable to the UI as text;
-            // substitute a marker so the tree still shows the node.
-            const content = Buffer.isBuffer(file.content)
-              ? `(binary file, ${file.content.length} bytes)`
-              : file.content;
-            currentLevel[part] = {
-              name: part,
+    const buildFileTree = (
+      files: Awaited<ReturnType<typeof projectService.generatePreview>>
+    ): PreviewFile[] => {
+      const children: PreviewFile[] = [];
+      for (const file of [...files].sort(
+        (a, b) => a.path.split('/').length - b.path.split('/').length
+      )) {
+        const parts = file.path.split('/');
+        let level = children;
+        parts.forEach((name, index) => {
+          if (index === parts.length - 1) {
+            level.push({
+              name,
               type: 'file',
-              content,
-            };
+              content: Buffer.isBuffer(file.content)
+                ? '(binary file, ' + file.content.length + ' bytes)'
+                : file.content,
+            });
           } else {
-            if (!currentLevel[part]) {
-              currentLevel[part] = {
-                name: part,
-                type: 'folder',
-                children: {},
-              };
+            let folder = level.find((item) => item.name === name && item.type === 'folder');
+            if (!folder) {
+              folder = { name, type: 'folder', children: [] };
+              level.push(folder);
             }
-            currentLevel = currentLevel[part].children;
+            level = folder.children!;
           }
         });
-      });
-
-      const convertToArray = (obj: any): PreviewFile[] => {
-        return Object.values(obj).map((item: any) => {
-          if (item.type === 'folder' && item.children) {
-            return {
-              ...item,
-              children: convertToArray(item.children),
-            };
-          }
-          return item;
-        });
-      };
-
-      return [
-        {
-          name: config.projectName,
-          type: 'folder' as const,
-          children: convertToArray(tree),
-        },
-      ];
+      }
+      return [{ name: config.projectName, type: 'folder', children }];
     };
 
     const projectStructure = buildFileTree(files);
@@ -414,90 +287,16 @@ router.get(
   asyncHandler(async (req, res) => {
     const requestId = generateRequestId('api-gen');
 
-    const {
-      projectName = 'my-qa-project',
-      testingType: testingTypeParam = 'web',
-      framework = 'selenium',
-      language = 'java',
-      testRunner,
-      buildTool,
-      testingPattern = 'page-object-model',
-      cicdTool,
-      reportingTool,
-      cloudDeviceFarm: cloudDeviceFarmParam,
-      includeSampleTests = 'true',
-      utilities: utilitiesParam,
-    } = req.query as Record<string, string>;
-
-    // Narrow cloudDeviceFarm to the allowed set so a caller can't pass an
-    // unknown value through and have the template engine trip on it later.
-    // browserstack is fully wired; saucelabs and testmu are accepted at
-    // the API surface but flagged as "Coming Soon" in the wizard UI —
-    // the template engine has yml placeholders only.
-    const validCloudFarms = ['none', 'browserstack', 'saucelabs', 'testmu'] as const;
-    const cloudDeviceFarm = validCloudFarms.includes(cloudDeviceFarmParam as (typeof validCloudFarms)[number])
-      ? cloudDeviceFarmParam
-      : undefined;
-
-    const validTestingTypes = ['web', 'mobile', 'api', 'desktop', 'performance'] as const;
-    type TestingType = (typeof validTestingTypes)[number];
-    const testingType: TestingType = validTestingTypes.includes(testingTypeParam as any)
-      ? (testingTypeParam as TestingType)
-      : 'web';
-
-    const utilitiesArray = utilitiesParam
-      ? utilitiesParam
-          .split(',')
-          .map((u) => u.trim())
-          .filter(Boolean)
-      : [];
-    const utilities = {
-      configReader: utilitiesArray.includes('configReader'),
-      jsonReader: utilitiesArray.includes('jsonReader'),
-      screenshotUtility:
-        utilitiesArray.includes('screenshotUtility') || utilitiesArray.includes('screenshot'),
-      logger: utilitiesArray.includes('logger') || utilitiesArray.includes('logging'),
-      dataProvider:
-        utilitiesArray.includes('dataProvider') || utilitiesArray.includes('dataDriver'),
+    const input = {
+      projectName: 'my-qa-project',
+      testingType: 'web',
+      framework: 'selenium',
+      language: 'java',
+      ...req.query,
     };
-
-    const availableTestRunners = WizardValidator.getAvailableTestRunners(language);
-    const availableBuildTools = WizardValidator.getAvailableBuildTools(language);
-
-    const finalTestRunner = testRunner || availableTestRunners[0] || 'testng';
-    const finalBuildTool = buildTool || availableBuildTools[0] || 'maven';
-
-    const config: ProjectConfig = {
-      projectName: sanitizeProjectName(projectName),
-      testingType,
-      framework,
-      language,
-      testRunner: finalTestRunner,
-      buildTool: finalBuildTool,
-      testingPattern,
-      cicdTool: cicdTool || undefined,
-      reportingTool: reportingTool || undefined,
-      cloudDeviceFarm: (cloudDeviceFarm ?? 'none') as ProjectConfig['cloudDeviceFarm'],
-      utilities,
-      includeSampleTests: includeSampleTests !== 'false',
-    };
-
-    const validatedConfig = validateProjectConfigBody(config, requestId);
-
-    if (
-      !WizardValidator.isCompatible(
-        validatedConfig.testingType,
-        validatedConfig.framework,
-        validatedConfig.language
-      )
-    ) {
-      throw new IncompatibleCombinationError(
-        config.testingType,
-        config.framework,
-        config.language,
-        requestId
-      );
-    }
+    if (typeof input.projectName === 'string')
+      input.projectName = sanitizeProjectName(input.projectName);
+    const config = await parseProjectConfiguration(input, requestId);
 
     // Tag the generation event with the client source (mcp / cli / web).
     trackEvent(
@@ -512,7 +311,8 @@ router.get(
         buildTool: config.buildTool,
       },
       {
-        userAgent: typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : undefined,
+        userAgent:
+          typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : undefined,
       }
     );
 

@@ -14,15 +14,15 @@ test.describe('QAStarter API', () => {
     expect(data.data).toHaveProperty('testRunners');
 
     // Verify some expected values exist in the arrays
-    const testingTypeIds = data.data.testingTypes.map((t: any) => t.id);
+    const testingTypeIds = data.data.testingTypes.map((t: { id: string }) => t.id);
     expect(testingTypeIds).toContain('web');
     expect(testingTypeIds).toContain('api');
 
-    const frameworkIds = data.data.frameworks.map((f: any) => f.id);
+    const frameworkIds = data.data.frameworks.map((f: { id: string }) => f.id);
     expect(frameworkIds).toContain('playwright');
     expect(frameworkIds).toContain('selenium');
 
-    const languageIds = data.data.languages.map((l: any) => l.id);
+    const languageIds = data.data.languages.map((l: { id: string }) => l.id);
     expect(languageIds).toContain('typescript');
     expect(languageIds).toContain('java');
   });
@@ -226,7 +226,7 @@ test.describe('QAStarter API', () => {
         testingType: 'api',
         framework: 'restassured',
         language: 'python', // Incompatible
-        testingPattern: 'pom',
+        testingPattern: 'fluent',
         testRunner: 'pytest',
         buildTool: 'pip',
         projectName: 'test',
@@ -323,7 +323,7 @@ test.describe('QAStarter API', () => {
         testingType: 'api',
         framework: 'restassured',
         language: 'java',
-        testingPattern: 'pom',
+        testingPattern: 'fluent',
         testRunner: 'testng',
         buildTool: 'maven',
         projectName: 'api-test-project',

@@ -181,7 +181,7 @@ program
     } catch (error) {
       // stdout is reserved for the MCP protocol — always log errors to stderr.
       process.stderr.write(
-        `[qastarter-mcp] fatal: ${error instanceof Error ? error.stack ?? error.message : String(error)}\n`
+        `[qastarter-mcp] fatal: ${error instanceof Error ? (error.stack ?? error.message) : String(error)}\n`
       );
       process.exit(1);
     }

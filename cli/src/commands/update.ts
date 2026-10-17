@@ -35,9 +35,7 @@ function safeBuildFilePath(filePath: string, cwd: string): string | null {
   const realCwd = fs.realpathSync(cwd);
   const prefix = realCwd.endsWith(path.sep) ? realCwd : realCwd + path.sep;
   if (!real.startsWith(prefix) && real !== realCwd) {
-    throw new Error(
-      `Refusing to edit "${filePath}" — its realpath escapes the project directory.`
-    );
+    throw new Error(`Refusing to edit "${filePath}" — its realpath escapes the project directory.`);
   }
   return real;
 }
@@ -47,10 +45,40 @@ function getBundledBom(): Record<string, Record<string, string>> {
   // Minimal fallback so the CLI can work without a server connection.
   // For the full BOM, the online endpoint is preferred.
   return {
-    java: { selenium: '4.16.0', testng: '7.8.0', junit5: '5.10.1', allure: '2.25.0', cucumber: '7.15.0', appium: '9.0.0', restAssured: '5.3.0', datafaker: '2.1.0' },
-    python: { selenium: '4.16.0', pytest: '8.0.0', requests: '2.31.0', appium: '3.1.0', faker: '22.0.0' },
-    javascript: { selenium: '4.16.0', jest: '29.7.0', mocha: '10.2.0', cypress: '13.6.0', playwright: '1.40.0', webdriverio: '8.24.0', supertest: '6.3.3', fakerJs: '8.4.0' },
-    csharp: { selenium: '4.16.0', nunit: '3.14.0', restsharp: '110.2.0', appium: '5.0.0', bogus: '35.4.0' },
+    java: {
+      selenium: '4.16.0',
+      testng: '7.8.0',
+      junit5: '5.10.1',
+      allure: '2.25.0',
+      cucumber: '7.15.0',
+      appium: '9.0.0',
+      restAssured: '5.3.0',
+      datafaker: '2.1.0',
+    },
+    python: {
+      selenium: '4.16.0',
+      pytest: '8.0.0',
+      requests: '2.31.0',
+      appium: '3.1.0',
+      faker: '22.0.0',
+    },
+    javascript: {
+      selenium: '4.16.0',
+      jest: '29.7.0',
+      mocha: '10.2.0',
+      cypress: '13.6.0',
+      playwright: '1.40.0',
+      webdriverio: '8.24.0',
+      supertest: '6.3.3',
+      fakerJs: '8.4.0',
+    },
+    csharp: {
+      selenium: '4.16.0',
+      nunit: '3.14.0',
+      restsharp: '110.2.0',
+      appium: '5.0.0',
+      bogus: '35.4.0',
+    },
     go: { playwrightGo: '0.4101.1', resty: '2.11.0', testify: '1.8.4', gofakeit: '6.28.0' },
   };
 }
@@ -127,14 +155,18 @@ const pomParser: BuildFileParser = {
     // letting the scanner backtrack across the whole file when a single
     // block is malformed. Also tolerates attributes like <dependency scope="test">.
     const blocks = content.split(/<\/dependency>/);
-    const tagRe = (tag: string) =>
-      new RegExp(`<${tag}\\s*(?:[^>]*)>([^<]+)</${tag}>`, 's');
+    const tagRe = (tag: string) => new RegExp(`<${tag}\\s*(?:[^>]*)>([^<]+)</${tag}>`, 's');
     for (const block of blocks) {
       if (!block.includes('<dependency')) continue;
       const artifactId = block.match(tagRe('artifactId'))?.[1]?.trim();
       const version = block.match(tagRe('version'))?.[1]?.trim();
       if (artifactId && version) {
-        deps.push({ name: artifactId, currentVersion: version, latestVersion: null, status: 'unknown' });
+        deps.push({
+          name: artifactId,
+          currentVersion: version,
+          latestVersion: null,
+          status: 'unknown',
+        });
       }
     }
     return deps;
@@ -164,7 +196,8 @@ const gradleParser: BuildFileParser = {
     const content = fs.readFileSync(filePath, 'utf-8');
     const deps: DependencyInfo[] = [];
     // Match patterns: implementation 'group:name:version'
-    const depRegex = /(?:implementation|testImplementation|api)\s+['"]([^:'"]+):([^:'"]+):([^'"]+)['"]/g;
+    const depRegex =
+      /(?:implementation|testImplementation|api)\s+['"]([^:'"]+):([^:'"]+):([^'"]+)['"]/g;
     let m;
     while ((m = depRegex.exec(content)) !== null) {
       deps.push({ name: m[2], currentVersion: m[3], latestVersion: null, status: 'unknown' });
@@ -176,10 +209,7 @@ const gradleParser: BuildFileParser = {
     for (const dep of updates) {
       if (!dep.latestVersion || dep.status !== 'outdated') continue;
       // Match group:artifactId:version — use the full artifact name context
-      const regex = new RegExp(
-        `(['":]${escapeRegex(dep.name)}:)[^'"]+`,
-        'g'
-      );
+      const regex = new RegExp(`(['":]${escapeRegex(dep.name)}:)[^'"]+`, 'g');
       content = content.replace(regex, `$1${dep.latestVersion}`);
     }
     fs.writeFileSync(filePath, content);
@@ -238,7 +268,12 @@ const requirementsParser: BuildFileParser = {
       // Match: package>=version or package==version
       const m = trimmed.match(/^([a-zA-Z0-9_-]+)\s*([><=!~]+)\s*(.+)$/);
       if (m) {
-        deps.push({ name: m[1], currentVersion: m[3].trim(), latestVersion: null, status: 'unknown' });
+        deps.push({
+          name: m[1],
+          currentVersion: m[3].trim(),
+          latestVersion: null,
+          status: 'unknown',
+        });
       }
     }
     return deps;
@@ -247,10 +282,7 @@ const requirementsParser: BuildFileParser = {
     let content = fs.readFileSync(filePath, 'utf-8');
     for (const dep of updates) {
       if (!dep.latestVersion || dep.status !== 'outdated') continue;
-      const regex = new RegExp(
-        `(${escapeRegex(dep.name)}\\s*[><=!~]+\\s*)\\S+`,
-        'g'
-      );
+      const regex = new RegExp(`(${escapeRegex(dep.name)}\\s*[><=!~]+\\s*)\\S+`, 'g');
       content = content.replace(regex, `$1${dep.latestVersion}`);
     }
     fs.writeFileSync(filePath, content);
@@ -308,7 +340,12 @@ const goModParser: BuildFileParser = {
       if (/^v\d+$/.test(shortName) && parts.length > 1) {
         shortName = parts[parts.length - 2];
       }
-      deps.push({ name: shortName, currentVersion: m[2].replace(/^v/, ''), latestVersion: null, status: 'unknown' });
+      deps.push({
+        name: shortName,
+        currentVersion: m[2].replace(/^v/, ''),
+        latestVersion: null,
+        status: 'unknown',
+      });
     }
     return deps;
   },
@@ -318,10 +355,7 @@ const goModParser: BuildFileParser = {
       if (!dep.latestVersion || dep.status !== 'outdated') continue;
       // Replace version in require block. Handle optional /vN suffix in module path
       // e.g., github.com/go-resty/resty/v2 v2.11.0 → ...resty/v2 v2.12.0
-      const regex = new RegExp(
-        `(${escapeRegex(dep.name)}(?:/v\\d+)?\\s+v)[\\d.]+`,
-        'g'
-      );
+      const regex = new RegExp(`(${escapeRegex(dep.name)}(?:/v\\d+)?\\s+v)[\\d.]+`, 'g');
       content = content.replace(regex, `$1${dep.latestVersion}`);
     }
     fs.writeFileSync(filePath, content);
@@ -373,12 +407,8 @@ export async function runUpdate(options: { dryRun: boolean }): Promise<void> {
     process.exit(1);
   }
 
-  console.log(
-    chalk.white(`  Build file: ${chalk.green(path.relative(cwd, buildFilePath))}`)
-  );
-  console.log(
-    chalk.white(`  Language:   ${chalk.green(parser.language)}\n`)
-  );
+  console.log(chalk.white(`  Build file: ${chalk.green(path.relative(cwd, buildFilePath))}`));
+  console.log(chalk.white(`  Language:   ${chalk.green(parser.language)}\n`));
 
   // 2. Parse current dependencies
   const deps = parser.parse(buildFilePath);
@@ -416,7 +446,9 @@ export async function runUpdate(options: { dryRun: boolean }): Promise<void> {
       `  ${'Dependency'.padEnd(35)} ${'Current'.padEnd(15)} ${'Latest'.padEnd(15)} Status`
     )
   );
-  console.log(chalk.gray(`  ${'─'.repeat(35)} ${'─'.repeat(15)} ${'─'.repeat(15)} ${'─'.repeat(12)}`));
+  console.log(
+    chalk.gray(`  ${'─'.repeat(35)} ${'─'.repeat(15)} ${'─'.repeat(15)} ${'─'.repeat(12)}`)
+  );
 
   for (const dep of deps) {
     const statusColor =
@@ -426,8 +458,7 @@ export async function runUpdate(options: { dryRun: boolean }): Promise<void> {
           ? chalk.green
           : chalk.gray;
 
-    const statusIcon =
-      dep.status === 'outdated' ? '↑' : dep.status === 'up-to-date' ? '✓' : '?';
+    const statusIcon = dep.status === 'outdated' ? '↑' : dep.status === 'up-to-date' ? '✓' : '?';
 
     console.log(
       `  ${chalk.white(dep.name.padEnd(35))} ${chalk.gray(dep.currentVersion.padEnd(15))} ${statusColor((dep.latestVersion || '-').padEnd(15))} ${statusColor(`${statusIcon} ${dep.status}`)}`

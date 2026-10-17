@@ -1865,6 +1865,7 @@ Environment selection:
     Set ENV=qa in .env file or environment variable
 """
 import os
+import json
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -1889,10 +1890,19 @@ class ConfigurationReader:
             config_path = Path(__file__).parent / "dev.ini"
             print(f"[Config] {env}.ini not found, using dev.ini")
         
-        self._config = ConfigParser()
-        self._config.read(config_path)
+        self._config = ConfigParser(interpolation=None)
+        self._config.read(config_path, encoding="utf-8")
         print(f"[Config] Loaded: {config_path}")
     
+    @staticmethod
+    def _decode_value(value):
+        if value.startswith('"'):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                pass
+        return value
+
     def get(self, key: str, default: str = None, section: str = "settings") -> str:
         """Get configuration value."""
         # Check environment variable first
@@ -1902,7 +1912,7 @@ class ConfigurationReader:
         
         # Then check config file
         try:
-            return self._config.get(section, key)
+            return self._decode_value(self._config.get(section, key))
         except:
             return default
     
@@ -2431,6 +2441,8 @@ pytest-playwright>=0.4.0
 pytest-rerunfailures>=12.0
 
 # Reporting
+# Always installed — pytest.ini's addopts unconditionally writes an --html report.
+pytest-html>=4.1.0
 
 # BDD
 

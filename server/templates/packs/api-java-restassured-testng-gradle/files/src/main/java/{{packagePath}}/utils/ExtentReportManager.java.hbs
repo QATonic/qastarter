@@ -29,7 +29,7 @@ private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
 
         ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
         sparkReporter.config().setDocumentTitle("API Test Report");
-        sparkReporter.config().setReportName("{{projectName}} - API Test Results");
+        sparkReporter.config().setReportName("{{string projectName "double" "java"}} - API Test Results");
         sparkReporter.config().setTheme(Theme.DARK);
         sparkReporter.config().setTimeStampFormat("MMM dd, yyyy HH:mm:ss");
 

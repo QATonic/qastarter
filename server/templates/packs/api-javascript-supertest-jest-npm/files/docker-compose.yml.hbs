@@ -11,7 +11,7 @@ services:
       dockerfile: Dockerfile
     environment:
       - TEST_ENV=qa
-      - BASE_URL={{#if baseUrl}}{{baseUrl}}{{else}}https://api.example.com{{/if}}
+      - {{{compose "BASE_URL=" baseUrl}}}
       - NODE_ENV=test
     volumes:
       - ./reports:/app/reports

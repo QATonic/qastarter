@@ -16,31 +16,31 @@ public class OpenApiTests {
 
     @BeforeClass
     public void setup() {
-        RestAssured.baseURI = "{{baseUrl}}";
+        RestAssured.baseURI = "{{string baseUrl "double" "java"}}";
     }
 
 {{#each openApiEndpoints}}
     /**
-     * {{summary}}
-     * {{method}} {{path}}
+     * {{comment summary}}
+     * {{comment method}} {{comment path}}
      */
-    @Test(description = "{{method}} {{path}} — {{summary}}")
+    @Test(description = "{{string method "double" "java"}} {{string path "double" "java"}} — {{string summary "double" "java"}}")
     public void test{{@index}}_{{operationId}}() {
         Response response = given()
 {{#each parameters}}
 {{#if (eq in "query")}}
-            .queryParam("{{name}}", "test-value")
+            .queryParam("{{string name "double" "java"}}", "test-value")
 {{/if}}
 {{#if (eq in "header")}}
-            .header("{{name}}", "test-value")
+            .header("{{string name "double" "java"}}", "test-value")
 {{/if}}
 {{/each}}
 {{#if requestBody}}
-            .contentType("{{requestBody.contentType}}")
+            .contentType("{{string requestBody.contentType "double" "java"}}")
             .body("{}")
 {{/if}}
         .when()
-            .{{lowerCase method}}("{{path}}")
+            .{{lowerCase method}}("{{string path "double" "java"}}")
         .then()
             .extract().response();
 

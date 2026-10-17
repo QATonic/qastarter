@@ -93,11 +93,11 @@ describe('Health Routes', () => {
     });
 
     it('should return unhealthy when cache is down', async () => {
-      vi.mocked(getCacheHealth).mockReturnValue({
+      vi.mocked(getCacheHealth).mockResolvedValue({
         healthy: false,
         provider: 'redis',
-        stats: {},
-      } as any);
+        stats: { hits: 0, misses: 0, keys: 0, hitRate: 0 },
+      });
 
       const app = createApp();
       const res = await request(app).get('/api/v1/health/cache');

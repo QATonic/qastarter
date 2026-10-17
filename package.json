@@ -43,7 +43,7 @@
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "check": "tsc",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
@@ -53,7 +53,9 @@
     "verify:templates": "tsx scripts/verify_templates.ts",
     "test": "vitest run",
     "test:client": "vitest run --config client/vitest.config.ts",
-    "test:all": "npm run test && npm run test:client",
+    "test:cli": "npm --prefix cli test",
+    "test:containers": "node scripts/test-containers.mjs",
+    "test:all": "npm run test && npm run test:client && npm run test:cli",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
@@ -68,7 +70,9 @@
     "templates:check-versions:fix": "tsx scripts/check-bom-staleness.ts --fix",
     "templates:parity": "tsx scripts/check-pack-parity.ts",
     "templates:parity:warn": "tsx scripts/check-pack-parity.ts --warn",
-    "templates:maintain": "npm run validate:templates && npm run templates:sync && npm run templates:check-versions && npm run templates:parity:warn"
+    "templates:maintain": "npm run validate:templates && npm run templates:sync && npm run templates:check-versions && npm run templates:parity:warn",
+    "templates:validate-output": "tsx scripts/validate-all-packs.ts",
+    "test:e2e:production": "npm run build && node scripts/test-production.mjs"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",
@@ -124,6 +128,7 @@
     "helmet": "^8.1.0",
     "highlight.js": "^11.11.1",
     "input-otp": "^1.4.2",
+    "js-yaml": "^4.3.2",
     "lucide-react": "^0.453.0",
     "next-themes": "^0.4.6",
     "node-cache": "^5.1.2",

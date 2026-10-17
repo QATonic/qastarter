@@ -85,7 +85,7 @@ export interface IStorage {
     byTestingType: StatCount[];
     byFramework: StatCount[];
     byLanguage: StatCount[];
-    recentGenerations: Record<string, any>[];
+    recentGenerations: Record<string, unknown>[];
   }>;
 }
 
@@ -115,7 +115,7 @@ export class DatabaseStorage implements IStorage {
     byTestingType: StatCount[];
     byFramework: StatCount[];
     byLanguage: StatCount[];
-    recentGenerations: Record<string, any>[];
+    recentGenerations: Record<string, unknown>[];
   }> {
     if (!db) throw new Error('Database not configured');
     const totalResult = await db.select({ count: count() }).from(projectGenerations);
@@ -167,7 +167,9 @@ export class DatabaseStorage implements IStorage {
 
 export class FileStorage implements IStorage {
   private filePath: string;
-  private memoryCache: any[] = [];
+  private memoryCache: Array<
+    Omit<typeof projectGenerations.$inferSelect, 'createdAt'> & { createdAt: string }
+  > = [];
   private initialized = false;
   private initPromise: Promise<void> | null = null;
   private mutex = new Mutex();
@@ -192,7 +194,7 @@ export class FileStorage implements IStorage {
     process.env.ANALYTICS_FLUSH_MAX_PENDING || '50',
     10
   );
-  private flushTimer: NodeJS.Timeout | null = null;
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingWrites = 0;
   private dirty = false;
 
@@ -255,13 +257,10 @@ export class FileStorage implements IStorage {
           const data = await fs.readFile(this.filePath, 'utf-8');
           this.memoryCache = JSON.parse(data);
           // Initialize idCounter from existing data to ensure unique IDs
-          this.idCounter = this.memoryCache.reduce(
-            (max: number, item: any) => Math.max(max, item.id || 0),
-            0
-          );
+          this.idCounter = this.memoryCache.reduce((max, item) => Math.max(max, item.id || 0), 0);
           // Pre-compute count caches from existing data
           this.rebuildCountCaches();
-        } catch (e) {
+        } catch {
           this.memoryCache = [];
           this.idCounter = 0;
           await this.flush();
@@ -369,7 +368,7 @@ export class FileStorage implements IStorage {
     byTestingType: StatCount[];
     byFramework: StatCount[];
     byLanguage: StatCount[];
-    recentGenerations: Record<string, any>[];
+    recentGenerations: Record<string, unknown>[];
   }> {
     await this.ensureInitialized();
 
@@ -444,7 +443,7 @@ export class ResilientStorage implements IStorage {
     byTestingType: StatCount[];
     byFramework: StatCount[];
     byLanguage: StatCount[];
-    recentGenerations: Record<string, any>[];
+    recentGenerations: Record<string, unknown>[];
   }> {
     if (!this.useDatabase) {
       return await this.fallback.getProjectGenerationStats();

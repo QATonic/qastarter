@@ -6,7 +6,7 @@ import org.testng.annotations.DataProvider;
 
 @CucumberOptions(
     features = "src/test/resources/features",
-    glue = {"{{packageName}}.steps"},
+    glue = {"{{string packageName "double" "java"}}.steps"},
     tags = "@api",
     plugin = {
         "pretty",

@@ -24,6 +24,7 @@ describe('ProjectTemplateGenerator Snapshots', () => {
 
   it('should match snapshot for Java + Selenium + Maven', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'demo-java-selenium',
       testingType: 'web',
       language: 'java',
@@ -51,6 +52,7 @@ describe('ProjectTemplateGenerator Snapshots', () => {
 
   it('should match snapshot for Python + Playwright + Pytest', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'demo-python-playwright',
       testingType: 'web',
       language: 'python',
@@ -59,7 +61,7 @@ describe('ProjectTemplateGenerator Snapshots', () => {
       testRunner: 'pytest',
       testingPattern: 'page-object-model',
       utilities: {
-        htmlReport: true, // intentionally using a non-standard utility key to check handling
+        // intentionally using a non-standard utility key to check handling
       },
       includeSampleTests: true,
     };
@@ -71,6 +73,7 @@ describe('ProjectTemplateGenerator Snapshots', () => {
 
   it('should match snapshot for TypeScript + Cypress', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'demo-ts-cypress',
       testingType: 'web',
       language: 'typescript',

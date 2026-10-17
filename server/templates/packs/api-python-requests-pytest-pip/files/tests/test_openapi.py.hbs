@@ -6,18 +6,18 @@ Each test validates a single endpoint's basic contract.
 import pytest
 import requests
 
-BASE_URL = "{{baseUrl}}"
+BASE_URL = "{{string baseUrl "double" "py"}}"
 
 
 {{#each openApiEndpoints}}
 def test_{{operationId}}():
-    """{{method}} {{path}} — {{summary}}"""
-    url = f"{BASE_URL}{{path}}"
+    """{{string method "double" "py"}} {{string path "double" "py"}} — {{string summary "double" "py"}}"""
+    url = f"{BASE_URL}{{string path "python-f" "py"}}"
 {{#if requestBody}}
     response = requests.{{lowerCase method}}(
         url,
         json={},
-        headers={"Content-Type": "{{requestBody.contentType}}"},
+        headers={"Content-Type": "{{string requestBody.contentType "double" "py"}}"},
     )
 {{else}}
     response = requests.{{lowerCase method}}(url)

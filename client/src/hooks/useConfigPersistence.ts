@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import type { WizardConfig } from '@/components/wizard-steps/types';
 
 const STORAGE_KEY = 'qastarter-wizard-config';
@@ -13,27 +13,26 @@ interface SavedConfig {
 }
 
 export function useConfigPersistence() {
-  const [hasSavedConfig, setHasSavedConfig] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
+  const [hasSavedConfig, setHasSavedConfig] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
         const data: SavedConfig = JSON.parse(saved);
         // Check if config is expired (older than 24 hours)
         if (Date.now() - data.timestamp > MAX_AGE_MS) {
           localStorage.removeItem(STORAGE_KEY);
-          setHasSavedConfig(false);
+          return false;
         } else {
-          setHasSavedConfig(true);
+          return true;
         }
-      } catch {
-        setHasSavedConfig(false);
       }
+    } catch {
+      return false;
     }
-  }, []);
+    return false;
+  });
 
-  const saveConfig = (config: WizardConfig, currentStep: number) => {
+  const saveConfig = useCallback((config: WizardConfig, currentStep: number) => {
     try {
       const data: SavedConfig = {
         version: STORAGE_VERSION,
@@ -46,9 +45,9 @@ export function useConfigPersistence() {
       // Storage might be full or unavailable
       console.warn('Failed to save configuration:', error);
     }
-  };
+  }, []);
 
-  const loadConfig = (): SavedConfig | null => {
+  const loadConfig = useCallback((): SavedConfig | null => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (!saved) return null;
@@ -58,7 +57,8 @@ export function useConfigPersistence() {
       // Validate version compatibility
       if (data.version !== STORAGE_VERSION) {
         console.warn('Saved configuration version mismatch, clearing...');
-        clearConfig();
+        localStorage.removeItem(STORAGE_KEY);
+        setHasSavedConfig(false);
         return null;
       }
 
@@ -66,7 +66,8 @@ export function useConfigPersistence() {
       const currentTime = Date.now();
       if (currentTime - data.timestamp > MAX_AGE_MS) {
         console.warn('Saved configuration expired, clearing...');
-        clearConfig();
+        localStorage.removeItem(STORAGE_KEY);
+        setHasSavedConfig(false);
         return null;
       }
 
@@ -75,16 +76,16 @@ export function useConfigPersistence() {
       console.warn('Failed to load configuration:', error);
       return null;
     }
-  };
+  }, []);
 
-  const clearConfig = () => {
+  const clearConfig = useCallback(() => {
     try {
       localStorage.removeItem(STORAGE_KEY);
       setHasSavedConfig(false);
     } catch (error) {
       console.warn('Failed to clear configuration:', error);
     }
-  };
+  }, []);
 
   return {
     hasSavedConfig,

@@ -1,8 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import analyticsService, {
-  trackProjectGeneration,
-  getAnalyticsStats,
-} from '../services/analyticsService';
+import { trackProjectGeneration, getAnalyticsStats } from '../services/analyticsService';
 import { storage } from '../storage';
 
 // Mock the storage module

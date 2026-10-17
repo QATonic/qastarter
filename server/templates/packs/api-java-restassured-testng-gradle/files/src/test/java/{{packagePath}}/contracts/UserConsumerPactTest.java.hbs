@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @PactTestFor(providerName = "UserService")
 public class UserConsumerPactTest {
 
-@Pact(consumer = "{{projectName}}Consumer")
+@Pact(consumer = "{{string projectName "double" "java"}}Consumer")
 public V4Pact getAllUsersPact(PactDslWithProvider builder) {
 return builder
 .given("users exist")
@@ -48,7 +48,7 @@ user.stringType("createdAt", "2024-01-01T00:00:00Z");
 .toPact(V4Pact.class);
 }
 
-@Pact(consumer = "{{projectName}}Consumer")
+@Pact(consumer = "{{string projectName "double" "java"}}Consumer")
 public V4Pact getUserByIdPact(PactDslWithProvider builder) {
 return builder
 .given("user with ID 1 exists")
@@ -68,7 +68,7 @@ user.stringType("createdAt", "2024-01-01T00:00:00Z");
 .toPact(V4Pact.class);
 }
 
-@Pact(consumer = "{{projectName}}Consumer")
+@Pact(consumer = "{{string projectName "double" "java"}}Consumer")
 public V4Pact userNotFoundPact(PactDslWithProvider builder) {
 return builder
 .given("user with ID 999 does not exist")

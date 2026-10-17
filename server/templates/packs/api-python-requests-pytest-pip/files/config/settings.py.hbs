@@ -11,11 +11,11 @@ class Settings:
     ENVIRONMENT = os.getenv("TEST_ENV", "dev")
     
     # API Base URLs
-    BASE_URL = os.getenv("BASE_URL", "{{baseUrl}}")
+    BASE_URL = os.getenv("BASE_URL", "{{string baseUrl "double" "py"}}")
     
     # Authentication
-    AUTH_TOKEN = os.getenv("AUTH_TOKEN", "{{apiAuthToken}}")
-    API_KEY = os.getenv("API_KEY", "{{apiAuthToken}}")
+    AUTH_TOKEN = os.getenv("AUTH_TOKEN", "{{string apiAuthToken "double" "py"}}")
+    API_KEY = os.getenv("API_KEY", "{{string apiAuthToken "double" "py"}}")
     USERNAME = os.getenv("USERNAME", "")
     PASSWORD = os.getenv("PASSWORD", "")
     

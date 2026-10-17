@@ -246,7 +246,7 @@ export function sanitizeProjectConfig(config: {
   projectName: string;
   groupId?: string;
   artifactId?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }): typeof config {
   return {
     ...config,

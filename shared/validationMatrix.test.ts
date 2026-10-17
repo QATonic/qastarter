@@ -1,10 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  validationMatrix,
-  WizardValidator,
-  validationLabels,
-  ValidationMatrix,
-} from './validationMatrix';
+import { describe, it, expect } from 'vitest';
+import { validationMatrix, WizardValidator, validationLabels } from './validationMatrix';
 
 describe('ValidationMatrix', () => {
   describe('Structure Validation', () => {

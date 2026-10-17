@@ -4,15 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>{{safeGroupId}}</groupId>
-    <artifactId>{{safeArtifactId}}</artifactId>
+    <groupId>{{escapeXml safeGroupId}}</groupId>
+    <artifactId>{{escapeXml safeArtifactId}}</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>{{toolVersions.java}}</maven.compiler.source>
-        <maven.compiler.target>{{toolVersions.java}}</maven.compiler.target>
+        <maven.compiler.source>{{escapeXml toolVersions.java}}</maven.compiler.source>
+        <maven.compiler.target>{{escapeXml toolVersions.java}}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <gatling.version>{{toolVersions.gatling}}</gatling.version>
+        <gatling.version>{{escapeXml toolVersions.gatling}}</gatling.version>
         <gatling-maven-plugin.version>4.8.2</gatling-maven-plugin.version>
     </properties>
 
@@ -31,9 +31,9 @@
         </dependency>
 {{#each userDependencies.maven}}
         <dependency>
-            <groupId>{{this.group}}</groupId>
-            <artifactId>{{this.name}}</artifactId>
-            <version>{{this.version}}</version>
+            <groupId>{{escapeXml this.group}}</groupId>
+            <artifactId>{{escapeXml this.name}}</artifactId>
+            <version>{{escapeXml this.version}}</version>
         </dependency>
 {{/each}}
         {{#if utilities.faker}}
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
-            <version>{{toolVersions.datafaker}}</version>
+            <version>{{escapeXml toolVersions.datafaker}}</version>
         </dependency>
         {{/if}}
     </dependencies>

@@ -25,6 +25,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import AdmZip from 'adm-zip';
 import fs from 'fs';
+import { randomUUID } from 'node:crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
@@ -61,12 +62,6 @@ function readServerVersion(): string {
 const SERVER_VERSION = readServerVersion();
 
 /** Minimum fields the generator requires. */
-interface BaseConfig {
-  projectName: string;
-  testingType: string;
-  framework: string;
-  language: string;
-}
 
 function asText(payload: unknown): { content: Array<{ type: 'text'; text: string }> } {
   return {
@@ -142,13 +137,13 @@ function toGenerateOptions(args: Record<string, unknown> | undefined): GenerateO
  *  - `..`-style traversal is caught on both the raw input (via normalize) and the resolved path
  *    (via a strict startsWith check with the path separator included).
  */
-function resolveTargetDir(input: string, allowAbsolute: boolean): string {
+export function resolveTargetDir(input: string, allowAbsolute: boolean): string {
   if (!input || typeof input !== 'string') {
     throw new Error('targetDir must be a non-empty string');
   }
   // Reject UNC and backslashed absolute paths on Windows pre-emptively — they can slip past
   // `path.isAbsolute` on some Node builds and confuse downstream relative-path math.
-  if (/^(\\\\|\/\/)/.test(input) || /^[a-zA-Z]:[\\\/]/.test(input)) {
+  if (/^(\\\\|\/\/)/.test(input) || /^[a-zA-Z]:[\\/]/.test(input)) {
     if (!allowAbsolute) {
       throw new Error(
         `targetDir "${input}" is absolute (UNC/drive-rooted); pass allowAbsolute: true to opt in.`
@@ -165,7 +160,9 @@ function resolveTargetDir(input: string, allowAbsolute: boolean): string {
   const cwd = path.resolve(process.cwd());
   const resolved = path.resolve(cwd, normalized);
   if (resolved === cwd) {
-    throw new Error(`targetDir cannot be the current working directory itself — pick a subdirectory.`);
+    throw new Error(
+      `targetDir cannot be the current working directory itself — pick a subdirectory.`
+    );
   }
   if (!isAbsolute) {
     // Strict containment check: resolved path must start with cwd + path.sep (not just cwd,
@@ -174,6 +171,17 @@ function resolveTargetDir(input: string, allowAbsolute: boolean): string {
     if (!resolved.startsWith(prefix)) {
       throw new Error(`targetDir "${input}" escapes the current working directory.`);
     }
+  }
+  // Lexical containment is not sufficient when an existing parent is a junction.
+  let ancestor = resolved;
+  while (!fs.existsSync(ancestor)) ancestor = path.dirname(ancestor);
+  const realCwd = fs.realpathSync(cwd);
+  const realResolved = path.resolve(fs.realpathSync(ancestor), path.relative(ancestor, resolved));
+  const relative = path.relative(realCwd, realResolved);
+  if (!relative || (!isAbsolute && (relative.startsWith('..') || path.isAbsolute(relative)))) {
+    throw new Error(
+      'targetDir resolves outside the permitted working directory or to the working directory itself'
+    );
   }
   return resolved;
 }
@@ -194,63 +202,66 @@ function isSymlinkEntry(entry: AdmZip.IZipEntry): boolean {
   return ((attr >>> 16) & S_IFMT) === S_IFLNK;
 }
 
-/**
- * Extract a ZIP buffer into a target directory safely.
- *
- * Defences against Zip-Slip and Windows-symlink tricks:
- *  1. `entryName` is resolved against `targetDir`; anything that `path.relative`
- *     reports as outside is rejected (cheap pre-check).
- *  2. Symlink entries (POSIX S_IFLNK in the external attr field) are refused
- *     outright — AdmZip treats them as regular files, which would otherwise
- *     write a literal symlink whose target could point outside `targetDir`.
- *  3. After each write, `fs.realpathSync(written)` re-checks that the path
- *     the filesystem actually resolves to still starts with `targetDir` —
- *     catches the case where a parent directory was a pre-existing symlink
- *     (e.g. the user's `targetDir` itself was a symlink farm).
- */
-function extractZipSafely(buffer: Buffer, targetDir: string): string[] {
-  const zip = new AdmZip(buffer);
-  const entries = zip.getEntries();
-  const written: string[] = [];
-
-  // Resolve the real path of the target dir once so we can compare against it.
-  const realTargetDir = fs.realpathSync(fs.existsSync(targetDir) ? targetDir : (() => {
-    fs.mkdirSync(targetDir, { recursive: true });
-    return targetDir;
-  })());
-  const prefix = realTargetDir.endsWith(path.sep) ? realTargetDir : realTargetDir + path.sep;
-
+/** Extract into verified directories and replace files atomically. */
+export function extractZipSafely(buffer: Buffer, targetDir: string): string[] {
+  const entries = new AdmZip(buffer).getEntries();
+  if (entries.length > 5000) throw new Error('ZIP contains too many entries');
+  let declaredTotal = 0;
   for (const entry of entries) {
-    // Refuse symlink entries — AdmZip would otherwise materialize them as
-    // regular files containing the target path, or (on systems that honour it)
-    // create an actual symlink pointing anywhere.
-    if (isSymlinkEntry(entry)) {
-      throw new Error(`Unsafe zip entry (symlink): ${entry.entryName}`);
+    declaredTotal += entry.header.size;
+    if (entry.header.size > 10 * 1024 * 1024 || declaredTotal > 100 * 1024 * 1024) {
+      throw new Error('ZIP exceeds the extracted size limit');
     }
-
-    // Pre-check: the declared entry path must resolve inside targetDir.
-    const entryPath = path.resolve(targetDir, entry.entryName);
-    const rel = path.relative(targetDir, entryPath);
-    if (rel.startsWith('..') || path.isAbsolute(rel)) {
-      throw new Error(`Unsafe zip entry: ${entry.entryName}`);
+  }
+  if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+  if (fs.lstatSync(targetDir).isSymbolicLink()) throw new Error('targetDir must not be a symlink');
+  const root = fs.realpathSync(targetDir);
+  const prefix = root.endsWith(path.sep) ? root : root + path.sep;
+  const written: string[] = [];
+  for (const entry of entries) {
+    if (isSymlinkEntry(entry)) throw new Error('Unsafe ZIP symlink entry: ' + entry.entryName);
+    const destination = path.resolve(root, entry.entryName);
+    const relative = path.relative(root, destination);
+    if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
+      throw new Error('Unsafe ZIP entry: ' + entry.entryName);
     }
-
-    if (entry.isDirectory) {
-      fs.mkdirSync(entryPath, { recursive: true });
-      continue;
+    // Verify each existing directory BEFORE writing. The previous post-write
+    // check could overwrite and then delete an outside file through a junction.
+    let directory = root;
+    const parts = relative.split(path.sep);
+    for (const part of parts.slice(0, entry.isDirectory ? undefined : -1)) {
+      directory = path.join(directory, part);
+      if (!fs.existsSync(directory)) fs.mkdirSync(directory);
+      const stat = fs.lstatSync(directory);
+      if (
+        stat.isSymbolicLink() ||
+        !stat.isDirectory() ||
+        !fs.realpathSync(directory).startsWith(prefix)
+      ) {
+        throw new Error('Unsafe ZIP destination directory: ' + directory);
+      }
     }
-    fs.mkdirSync(path.dirname(entryPath), { recursive: true });
-    fs.writeFileSync(entryPath, entry.getData());
-
-    // Post-check: realpath the written file. If any parent directory turned out
-    // to be a symlink that escapes targetDir, delete the write and abort.
-    const real = fs.realpathSync(entryPath);
-    if (!real.startsWith(prefix) && real !== realTargetDir) {
-      // best-effort cleanup — we've already written the file
-      try { fs.unlinkSync(entryPath); } catch { /* ignore */ }
-      throw new Error(`Unsafe zip entry (resolves outside targetDir after realpath): ${entry.entryName}`);
+    if (entry.isDirectory) continue;
+    try {
+      if (fs.lstatSync(destination).isSymbolicLink())
+        throw new Error('Unsafe ZIP destination symlink');
+    } catch (error) {
+      if ((error as { code?: string }).code !== 'ENOENT') throw error;
     }
-    written.push(path.relative(targetDir, entryPath));
+    const temporary = path.join(path.dirname(destination), '.qastarter-' + randomUUID() + '.tmp');
+    const attr = (entry as unknown as { attr?: number }).attr ?? 0;
+    const executable =
+      ((attr >>> 16) & 0o111) !== 0 || /(^|\/)gradlew$|\.sh$/.test(entry.entryName);
+    try {
+      fs.writeFileSync(temporary, entry.getData(), {
+        flag: 'wx',
+        mode: executable ? 0o755 : 0o644,
+      });
+      fs.renameSync(temporary, destination);
+    } finally {
+      if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+    }
+    written.push(relative);
   }
   return written;
 }
@@ -277,11 +288,27 @@ const PROJECT_CONFIG_PROPS = {
   framework: {
     type: 'string',
     enum: [
-      'selenium', 'playwright', 'cypress', 'webdriverio', 'robotframework',
-      'appium', 'espresso', 'xcuitest', 'flutter',
-      'winappdriver', 'pyautogui',
-      'restassured', 'requests', 'supertest', 'restsharp', 'graphql', 'grpc', 'resty',
-      'k6', 'gatling', 'locust',
+      'selenium',
+      'playwright',
+      'cypress',
+      'webdriverio',
+      'robotframework',
+      'appium',
+      'espresso',
+      'xcuitest',
+      'flutter',
+      'winappdriver',
+      'pyautogui',
+      'restassured',
+      'requests',
+      'supertest',
+      'restsharp',
+      'graphql',
+      'grpc',
+      'resty',
+      'k6',
+      'gatling',
+      'locust',
     ],
     description:
       'Automation framework. Not every framework works with every testingType/language — call validate_combination first if unsure.',
@@ -293,18 +320,16 @@ const PROJECT_CONFIG_PROPS = {
   },
   testRunner: {
     type: 'string',
-    enum: ['testng', 'junit5', 'pytest', 'jest', 'mocha', 'cypress', 'nunit', 'xctest', 'testify', 'flutter-test', 'robot', 'k6', 'locust'],
     description: 'Optional — defaults to the canonical runner for the picked language/framework.',
   },
   buildTool: {
     type: 'string',
-    enum: ['maven', 'gradle', 'npm', 'pip', 'nuget', 'mod', 'spm', 'pub'],
     description: 'Optional — defaults to the canonical build tool for the picked language.',
   },
   testingPattern: {
     type: 'string',
-    enum: ['page-object-model', 'bdd', 'fluent'],
-    description: 'Structural pattern. Default: page-object-model.',
+    description:
+      'Structural pattern. Defaults to the canonical pattern for the framework; see list_combinations.',
   },
   cicdTool: {
     type: 'string',
@@ -459,10 +484,7 @@ const TOOLS: ToolDef[] = [
         fileCount: files.length,
         files: files.slice(0, 100),
         truncated: files.length > 100,
-        nextSteps: [
-          `cd "${targetDir}"`,
-          'open README.md for language-specific setup instructions',
-        ],
+        nextSteps: [`cd "${targetDir}"`, 'open README.md for language-specific setup instructions'],
       });
     },
   },
@@ -529,9 +551,7 @@ export async function runMcpServer(): Promise<void> {
     if (uri === 'qastarter://bom') {
       const bom = await fetchBom();
       return {
-        contents: [
-          { uri, mimeType: 'application/json', text: JSON.stringify(bom ?? {}, null, 2) },
-        ],
+        contents: [{ uri, mimeType: 'application/json', text: JSON.stringify(bom ?? {}, null, 2) }],
       };
     }
     throw new Error(`Unknown resource: ${uri}`);
@@ -541,7 +561,5 @@ export async function runMcpServer(): Promise<void> {
   await server.connect(transport);
 
   // stdio is our transport — log via stderr only, stdout is protocol-owned.
-  process.stderr.write(
-    `[qastarter-mcp] ready — ${TOOLS.length} tools, API=${getApiUrl()}\n`
-  );
+  process.stderr.write(`[qastarter-mcp] ready — ${TOOLS.length} tools, API=${getApiUrl()}\n`);
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useExpressGenerator } from './ExpressGeneratorContext';
 import CurlCommand from './CurlCommand';
 import PreviewPanel from './PreviewPanel';
@@ -49,16 +49,7 @@ export default function GenerateBar({ onGenerate, isGenerating }: GenerateBarPro
 
   // One-shot celebration: when the form first becomes valid, briefly highlight
   // the Generate button so users notice it lit up.
-  const [celebrate, setCelebrate] = useState(false);
-  const wasValidRef = useRef(valid);
-  useEffect(() => {
-    if (valid && !wasValidRef.current) {
-      setCelebrate(true);
-      const t = setTimeout(() => setCelebrate(false), 1800);
-      return () => clearTimeout(t);
-    }
-    wasValidRef.current = valid;
-  }, [valid]);
+  const celebrate = valid;
 
   const handleGenerate = useCallback(() => {
     if (isConfigValid() && !isGenerating) {

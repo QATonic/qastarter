@@ -32,7 +32,7 @@ vi.mock('inquirer', () => ({
 vi.mock('ora', () => {
   return {
     default: vi.fn(() => {
-      const spinner: Record<string, any> = {};
+      const spinner: Record<string, ReturnType<typeof vi.fn>> = {};
       for (const method of ['start', 'succeed', 'fail', 'info', 'stop', 'warn']) {
         spinner[method] = vi.fn(() => spinner);
       }
@@ -52,7 +52,6 @@ import inquirer from 'inquirer';
 const mockedFetchBom = fetchBom as ReturnType<typeof vi.fn>;
 
 let tmpDir: string;
-let originalCwd: PropertyDescriptor | undefined;
 let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 let processExitSpy: ReturnType<typeof vi.spyOn>;
 
@@ -301,11 +300,7 @@ describe('requirements.txt parser', () => {
   });
 
   it('skips comment lines and blanks', async () => {
-    const content = [
-      '# A comment',
-      '',
-      'pytest==8.0.0',
-    ].join('\n');
+    const content = ['# A comment', '', 'pytest==8.0.0'].join('\n');
     writeTmpFile('requirements.txt', content);
     mockedFetchBom.mockResolvedValue(fullBom());
 
@@ -619,7 +614,7 @@ describe('dry run mode', () => {
         dependencies: { selenium: '^4.16.0' },
       },
       null,
-      2,
+      2
     );
     writeTmpFile('package.json', originalContent);
     mockedFetchBom.mockResolvedValue(fullBom());
@@ -650,7 +645,7 @@ describe('user cancels update', () => {
         dependencies: { selenium: '^4.16.0' },
       },
       null,
-      2,
+      2
     );
     writeTmpFile('package.json', originalContent);
     mockedFetchBom.mockResolvedValue(fullBom());
@@ -703,11 +698,11 @@ describe('build file detection priority', () => {
       <version>4.16.0</version>
     </dependency>
   </dependencies>
-</project>`,
+</project>`
     );
     writeTmpFile(
       'package.json',
-      JSON.stringify({ name: 'dual', dependencies: { selenium: '1.0.0' } }),
+      JSON.stringify({ name: 'dual', dependencies: { selenium: '1.0.0' } })
     );
     mockedFetchBom.mockResolvedValue(fullBom());
 

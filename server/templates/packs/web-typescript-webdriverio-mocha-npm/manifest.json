@@ -140,7 +140,7 @@
       }
     },
     {
-      "path": "test/data/users.ts",
+      "path": "test/data/credentials.ts",
       "isTemplate": true
     },
     {
@@ -176,6 +176,13 @@
       "isTemplate": true,
       "conditional": {
         "utilities.faker": true
+      }
+    },
+    {
+      "path": "utils/dataReader.ts",
+      "isTemplate": true,
+      "conditional": {
+        "utilities.dataProvider": true
       }
     },
     {

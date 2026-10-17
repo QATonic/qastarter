@@ -13,28 +13,8 @@
  *   - 5-minute in-memory cache
  */
 
-import SwaggerParser from '@apidevtools/swagger-parser';
-
-/**
- * Wall-clock cap on SwaggerParser parsing. A crafted spec with deeply nested $refs
- * can burn CPU unboundedly even when the payload is under MAX_SPEC_SIZE.
- * 15 s is generous for legitimate specs; configurable via env.
- */
-const PARSE_TIMEOUT_MS = parseInt(process.env.OPENAPI_PARSE_TIMEOUT_MS || '15000', 10);
-
-function validateWithTimeout(input: unknown): Promise<any> {
-  return Promise.race([
-    // `circular: false` refuses circular $refs outright — cheaper than letting the
-    // resolver chase them. Legitimate public APIs don't circularly self-reference.
-    SwaggerParser.validate(input as any, { dereference: { circular: false } }),
-    new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error(`OpenAPI parse timed out after ${PARSE_TIMEOUT_MS} ms`)),
-        PARSE_TIMEOUT_MS
-      )
-    ),
-  ]);
-}
+import { fetchOpenApiSpec, isOpenApiUrlSafe } from './openApiFetch';
+import { validateOpenApiContent } from './openApiParser';
 import type { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import type {
   OpenApiEndpoint,
@@ -48,152 +28,25 @@ import { logger } from '../utils/logger';
 const specCache = new Map<string, { endpoints: OpenApiEndpoint[]; expiresAt: number }>();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_ENDPOINTS = 50;
-const MAX_SPEC_SIZE = 5 * 1024 * 1024; // 5 MB
-
-// ── URL Safety ──────────────────────────────────────────────────────
-
-function isUrlSafe(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== 'https:') return false;
-
-    const hostname = parsed.hostname;
-    // Strip IPv6 brackets for analysis
-    const bareHost = hostname.replace(/^\[|\]$/g, '');
-
-    // Block private/reserved IPv4 ranges
-    if (
-      bareHost === 'localhost' ||
-      bareHost.startsWith('127.') ||
-      bareHost.startsWith('10.') ||
-      bareHost.startsWith('192.168.') ||
-      bareHost.startsWith('172.16.') ||
-      bareHost.startsWith('172.17.') ||
-      bareHost.startsWith('172.18.') ||
-      bareHost.startsWith('172.19.') ||
-      bareHost.startsWith('172.2') ||
-      bareHost.startsWith('172.3') ||
-      bareHost === '0.0.0.0' ||
-      bareHost.endsWith('.local') ||
-      bareHost.endsWith('.internal')
-    ) {
-      return false;
-    }
-
-    // Block private/reserved IPv6 ranges — regex-driven so IPv4-mapped notation
-    // (::ffff:a.b.c.d) and AWS IMDS (::ffff:169.254.169.254) can't slip past naive startsWith.
-    const lowerHost = bareHost.toLowerCase();
-    const ipv6Blocked = [
-      /^::1$/,                                             // loopback
-      /^::$/,                                              // unspecified
-      /^fc[0-9a-f]{2}:/,                                   // fc00::/7 unique local
-      /^fd[0-9a-f]{2}:/,                                   // fd00::/8 unique local
-      /^fe[89ab][0-9a-f]:/,                                // fe80::/10 link-local
-      /^ff[0-9a-f]{2}:/,                                   // ff00::/8 multicast
-      // IPv4-mapped IPv6: ::ffff:<private-ipv4>
-      /^::ffff:127\./,                                     // loopback
-      /^::ffff:10\./,                                      // 10/8
-      /^::ffff:169\.254\./,                                // link-local / cloud metadata (AWS IMDS)
-      /^::ffff:192\.168\./,                                // 192.168/16
-      /^::ffff:172\.(1[6-9]|2\d|3[01])\./,                 // 172.16/12
-      /^::ffff:0\.0\.0\.0$/,                               // unspecified mapped
-    ];
-    if (ipv6Blocked.some((re) => re.test(lowerHost))) {
-      return false;
-    }
-
-    // Block IMDS + link-local IPv4 ranges missed above.
-    if (bareHost.startsWith('169.254.')) {                 // AWS IMDS, GCP, Azure metadata
-      return false;
-    }
-
-    // Block alternate IPv4 numeric forms that bypass startsWith() checks.
-    // RFC 6943 / inet_aton accepts decimal (2130706433), octal (0177.0.0.1)
-    // and hex (0x7f000001) shorthand — all collapse to a real IPv4 at
-    // resolution time. Re-stringify any pure-numeric host as dotted-quad
-    // and re-check the private ranges.
-    const dottedQuad = toDottedQuadIPv4(bareHost);
-    if (dottedQuad) {
-      const [a, b] = dottedQuad.split('.').map(Number);
-      if (
-        a === 127 ||                            // loopback
-        a === 10 ||                             // 10/8
-        a === 0 ||                              // "this network"
-        (a === 169 && b === 254) ||             // link-local / IMDS
-        (a === 172 && b >= 16 && b <= 31) ||    // 172.16/12
-        (a === 192 && b === 168) ||             // 192.168/16
-        a >= 224                                // multicast / reserved
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Best-effort coercion of a hostname into dotted-quad IPv4 ("a.b.c.d")
- * or null if the host isn't a numeric IPv4 form. Handles:
- *   - decimal     2130706433   → 127.0.0.1
- *   - hex         0x7f000001   → 127.0.0.1
- *   - octal       0177.0.0.1   → 127.0.0.1
- *   - 3-part      127.1        → 127.0.0.1   (rare but legal)
- *   - dotted-quad 127.0.0.1    → 127.0.0.1   (passthrough)
- * Returns null for DNS hostnames so downstream resolution still applies.
- */
-function toDottedQuadIPv4(host: string): string | null {
-  // DNS-style hostname — bail.
-  if (/[a-z]/i.test(host) && !/^0x/i.test(host)) return null;
-
-  const parts = host.split('.');
-  if (parts.length === 0 || parts.length > 4) return null;
-
-  const parseSeg = (s: string): number => {
-    if (/^0x[0-9a-f]+$/i.test(s)) return parseInt(s, 16);
-    if (/^0[0-7]+$/.test(s)) return parseInt(s, 8);
-    if (/^\d+$/.test(s)) return parseInt(s, 10);
-    return NaN;
-  };
-
-  const nums = parts.map(parseSeg);
-  if (nums.some((n) => Number.isNaN(n) || n < 0)) return null;
-
-  let n: number;
-  if (nums.length === 1) {
-    if (nums[0] > 0xffffffff) return null;
-    n = nums[0];
-  } else if (nums.length === 2) {
-    if (nums[0] > 0xff || nums[1] > 0xffffff) return null;
-    n = (nums[0] << 24) | nums[1];
-  } else if (nums.length === 3) {
-    if (nums[0] > 0xff || nums[1] > 0xff || nums[2] > 0xffff) return null;
-    n = (nums[0] << 24) | (nums[1] << 16) | nums[2];
-  } else {
-    if (nums.some((x) => x > 0xff)) return null;
-    n = (nums[0] << 24) | (nums[1] << 16) | (nums[2] << 8) | nums[3];
-  }
-  // Coerce to unsigned 32-bit
-  n = n >>> 0;
-  return `${(n >>> 24) & 0xff}.${(n >>> 16) & 0xff}.${(n >>> 8) & 0xff}.${n & 0xff}`;
-}
 
 // ── Schema Helpers ──────────────────────────────────────────────────
 
-function resolveSchemaType(schema: any): string {
+function resolveSchemaType(
+  schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined
+): string {
   if (!schema) return 'any';
+  if ('$ref' in schema) return 'object';
   if (schema.type) return schema.type as string;
   if (schema.oneOf || schema.anyOf) return 'object';
   if (schema.allOf) return 'object';
-  if (schema.$ref) return 'object';
   return 'any';
 }
 
-function extractProperties(schema: any): Record<string, string> {
+function extractProperties(
+  schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined
+): Record<string, string> {
   const props: Record<string, string> = {};
-  if (!schema?.properties) return props;
+  if (!schema || '$ref' in schema || !schema.properties) return props;
 
   for (const [name, propSchema] of Object.entries(schema.properties)) {
     props[name] = resolveSchemaType(propSchema);
@@ -208,7 +61,9 @@ function toOperationId(method: string, path: string): string {
     .split(/[/\-_.]/)
     .filter(Boolean);
   const joined = parts
-    .map((p, i) => (i === 0 ? p.toLowerCase() : p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()))
+    .map((p, i) =>
+      i === 0 ? p.toLowerCase() : p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()
+    )
     .join('');
   return `${method.toLowerCase()}${joined.charAt(0).toUpperCase()}${joined.slice(1)}`;
 }
@@ -221,19 +76,13 @@ function parseOpenApiSpec(api: OpenAPI.Document): OpenApiEndpoint[] {
 
   if (!spec.paths) return endpoints;
 
-  const methods: (keyof OpenAPIV3.PathItemObject)[] = [
-    'get',
-    'post',
-    'put',
-    'delete',
-    'patch',
-  ];
+  const methods = ['get', 'post', 'put', 'delete', 'patch'] as const;
 
   for (const [pathStr, pathItem] of Object.entries(spec.paths)) {
     if (!pathItem) continue;
 
     for (const method of methods) {
-      const operation = (pathItem as any)[method] as OpenAPIV3.OperationObject | undefined;
+      const operation = pathItem[method] as OpenAPIV3.OperationObject | undefined;
       if (!operation) continue;
 
       if (endpoints.length >= MAX_ENDPOINTS) {
@@ -243,17 +92,14 @@ function parseOpenApiSpec(api: OpenAPI.Document): OpenApiEndpoint[] {
 
       // Parameters
       const params: OpenApiParam[] = [];
-      const allParams = [
-        ...((pathItem as any).parameters || []),
-        ...(operation.parameters || []),
-      ];
+      const allParams = [...(pathItem.parameters || []), ...(operation.parameters || [])];
       for (const p of allParams) {
         const param = p as OpenAPIV3.ParameterObject;
         params.push({
           name: param.name,
           in: param.in as OpenApiParam['in'],
           required: param.required ?? false,
-          type: resolveSchemaType((param as any).schema),
+          type: resolveSchemaType(param.schema),
           description: param.description,
         });
       }
@@ -275,7 +121,7 @@ function parseOpenApiSpec(api: OpenAPI.Document): OpenApiEndpoint[] {
           if (firstType) {
             requestBody = {
               contentType: firstType,
-              properties: extractProperties((body.content as any)?.[firstType]?.schema),
+              properties: extractProperties(body.content?.[firstType]?.schema),
               required: body.required ?? false,
             };
           }
@@ -316,13 +162,11 @@ function parseOpenApiSpec(api: OpenAPI.Document): OpenApiEndpoint[] {
  * Fetch and parse an OpenAPI/Swagger spec from a URL.
  * Returns an array of simplified endpoints for template generation.
  *
- * Returns null if parsing fails (caller should fall back to default stubs).
+ * Returns null if parsing fails; generation rejects the requested specification.
  */
-export async function parseOpenApiFromUrl(
-  specUrl: string
-): Promise<OpenApiEndpoint[] | null> {
+export async function parseOpenApiFromUrl(specUrl: string): Promise<OpenApiEndpoint[] | null> {
   // Validate URL safety
-  if (!isUrlSafe(specUrl)) {
+  if (!isOpenApiUrlSafe(specUrl)) {
     logger.warn('Rejected unsafe OpenAPI URL', { url: specUrl });
     return null;
   }
@@ -335,50 +179,16 @@ export async function parseOpenApiFromUrl(
   }
 
   try {
-    // Fetch with size limit and timeout
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-
-    const response = await fetch(specUrl, {
-      signal: controller.signal,
-      headers: { Accept: 'application/json, application/yaml, text/yaml' },
-    });
-    clearTimeout(timeout);
-
-    if (!response.ok) {
-      logger.warn('Failed to fetch OpenAPI spec', { url: specUrl, status: response.status });
-      return null;
-    }
-
-    // Check content length
-    const contentLength = Number(response.headers.get('content-length') || 0);
-    if (contentLength > MAX_SPEC_SIZE) {
-      logger.warn('OpenAPI spec too large', { url: specUrl, size: contentLength });
-      return null;
-    }
-
-    const text = await response.text();
-    if (text.length > MAX_SPEC_SIZE) {
-      logger.warn('OpenAPI spec body too large', { url: specUrl, size: text.length });
-      return null;
-    }
-
-    // Parse and validate with swagger-parser (handles $ref resolution).
-    // SwaggerParser.validate() accepts both JSON objects and raw YAML strings,
-    // so we try JSON.parse first, then fall back to passing the raw text for YAML.
-    let specInput: any;
-    try {
-      specInput = JSON.parse(text);
-    } catch {
-      // Not valid JSON — pass raw text (YAML) to swagger-parser
-      specInput = text;
-    }
-
-    const api = await validateWithTimeout(specInput);
+    const text = await fetchOpenApiSpec(specUrl);
+    const api = await validateOpenApiContent(text);
 
     const endpoints = parseOpenApiSpec(api);
 
     // Cache result
+    specCache.forEach((entry, key) => {
+      if (Date.now() >= entry.expiresAt) specCache.delete(key);
+    });
+    if (specCache.size >= 100) specCache.delete(specCache.keys().next().value!);
     specCache.set(specUrl, {
       endpoints,
       expiresAt: Date.now() + CACHE_TTL_MS,
@@ -408,8 +218,7 @@ export async function parseOpenApiFromString(
   specContent: string
 ): Promise<OpenApiEndpoint[] | null> {
   try {
-    const parsed = JSON.parse(specContent);
-    const api = await validateWithTimeout(parsed);
+    const api = await validateOpenApiContent(specContent);
     return parseOpenApiSpec(api);
   } catch (error) {
     logger.warn('Failed to parse OpenAPI string', {

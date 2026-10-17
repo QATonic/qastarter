@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Link } from 'wouter';
-import { ArrowLeft, Copy, Check, Terminal, Code, Database, Zap, FileCode2, Gauge } from 'lucide-react';
+import { ArrowLeft, Copy, Check, Terminal, Code, Database, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
@@ -369,7 +369,8 @@ curl "https://qastarter.com/api/v1/generate?framework=playwright&language=typesc
                 />
                 <p className="text-sm text-muted-foreground">
                   The POST endpoint accepts the same fields as the GET endpoint, but as a JSON body.
-                  This is useful for passing complex configurations like OpenAPI URLs and environments.
+                  This is useful for passing complex configurations like OpenAPI URLs and
+                  environments.
                 </p>
               </CardContent>
             </Card>

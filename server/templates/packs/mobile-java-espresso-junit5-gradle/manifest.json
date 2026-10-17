@@ -1,5 +1,6 @@
 {
   "id": "mobile-java-espresso-junit5-gradle",
+  "version": "2.0.0",
   "displayName": "Espresso Android Testing Framework",
   "supportsDynamic": true,
   "name": "Espresso Android Testing Framework",

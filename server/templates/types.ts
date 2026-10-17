@@ -54,7 +54,7 @@ export interface TemplatePackFile {
   isTemplate: boolean;
   description?: string;
   mode?: string;
-  conditional?: Record<string, any>; // e.g., {"reportingTool": "allure"} or {"utilities.logger": true}
+  conditional?: Record<string, unknown>; // e.g., {"reportingTool": "allure"} or {"utilities.logger": true}
 }
 
 export interface TemplateContext extends ProjectConfig {
@@ -83,7 +83,7 @@ export interface TemplateContext extends ProjectConfig {
   /** Mobile platform OS version */
   platformVersion: string;
   /** Cloud device farm provider (browserstack, saucelabs, or none) */
-  cloudDeviceFarm: string;
+  cloudDeviceFarm: 'none' | 'browserstack' | 'saucelabs' | 'testmu';
   /** API auth type */
   apiAuthType: 'none' | 'bearer' | 'basic' | 'api-key';
   /** API auth token/key value */

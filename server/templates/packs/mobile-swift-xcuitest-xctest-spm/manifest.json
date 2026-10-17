@@ -1,5 +1,6 @@
 {
   "id": "mobile-swift-xcuitest-xctest-spm",
+  "version": "2.0.0",
   "displayName": "XCUITest iOS Testing Framework",
   "supportsDynamic": true,
   "name": "XCUITest iOS Testing Framework",

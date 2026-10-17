@@ -12,7 +12,7 @@
 import { LoginPage } from "../pages/LoginPage";
 import envConfig from "../config/env.config";
 {{#if utilities.dataProvider}}
-import { TestDataReader } from "../utils/dataReader";
+import { DataReader } from "../utils/dataReader";
 {{/if}}
 
 interface UserTestData {
@@ -51,7 +51,7 @@ describe("Login Tests", () => {
    * Add more rows to users.json and they will be picked up automatically.
    */
   describe("Data-driven login tests", () => {
-    const testData = TestDataReader.readJson<UserTestData[]>("users.json") || [];
+    const testData = DataReader.readJson<UserTestData[]>("users.json") || [];
 
     test.each(testData.map((u) => [u.username, u.password, u.expected] as const))(
       "should verify login for user: %s",

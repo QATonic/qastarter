@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace '{{packageName}}'
+    namespace '{{string packageName "single" "gradle"}}'
     compileSdk 34
     
     defaultConfig {
-        applicationId "{{packageName}}"
+        applicationId "{{string packageName "double" "gradle"}}"
         minSdk 24
         targetSdk 34
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -26,7 +26,7 @@ dependencies {
 
 // User-picked dependencies (from QAStarter dependency search)
 {{#each userDependencies.maven}}
-implementation '{{group}}:{{name}}:{{version}}'
+implementation '{{string group "single" "gradle"}}:{{string name "single" "gradle"}}:{{string version "single" "gradle"}}'
 {{/each}}
 {{/if}}
 }

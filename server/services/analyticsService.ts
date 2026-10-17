@@ -24,7 +24,7 @@ export interface AnalyticsEvent {
   eventType: AnalyticsEventType;
   timestamp: Date;
   sessionId: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   metadata: {
     userAgent?: string;
     country?: string;
@@ -35,10 +35,10 @@ export interface AnalyticsEvent {
 
 export interface GenerationStats {
   totalGenerated: number;
-  byTestingType: any[];
-  byFramework: any[];
-  byLanguage: any[];
-  recentGenerations: any[];
+  byTestingType: import('../storage').StatCount[];
+  byFramework: import('../storage').StatCount[];
+  byLanguage: import('../storage').StatCount[];
+  recentGenerations: Record<string, unknown>[];
 }
 
 // In-memory analytics store for high-volume ephemeral events (wizard steps, etc.)
@@ -102,7 +102,7 @@ export function getDeviceType(userAgent: string): 'mobile' | 'tablet' | 'desktop
 export function trackEvent(
   eventType: AnalyticsEventType,
   sessionId: string,
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   metadata: AnalyticsEvent['metadata'] = {}
 ): void {
   const event: AnalyticsEvent = {
@@ -158,7 +158,7 @@ export async function trackProjectGeneration(
     // config has almost all ProjectConfig fields except maybe testingPattern if not passed
     const projectConfig: ProjectConfig = {
       projectName: config.projectName || 'untitled-project',
-      testingType: config.testingType as any,
+      testingType: config.testingType as ProjectConfig['testingType'],
       framework: config.framework,
       language: config.language,
       testRunner: config.testRunner,
@@ -166,6 +166,7 @@ export async function trackProjectGeneration(
       testingPattern: 'page-object-model', // Default implicitly
       cicdTool: config.cicdTool,
       reportingTool: config.reportingTool,
+      cloudDeviceFarm: 'none',
       includeSampleTests: true,
       utilities: config.utilities,
     };

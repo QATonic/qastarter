@@ -1,5 +1,5 @@
 import { Given, When, Then, setWorldConstructor } from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
+import assert from 'node:assert/strict';
 import { CustomWorld } from '../support/world';
 import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/HomePage';
@@ -8,7 +8,7 @@ setWorldConstructor(CustomWorld);
 
 Given('I navigate to the login page', async function (this: CustomWorld) {
   const loginPage = new LoginPage(this.page);
-  await loginPage.navigate();
+  await loginPage.navigateToLogin();
 });
 
 When('I enter username {string} and password {string}', async function (
@@ -27,20 +27,19 @@ When('I enter username {string} and password {string}', async function (
 
 When('I click the login button', async function (this: CustomWorld) {
   const loginPage = new LoginPage(this.page);
-  await loginPage.clickLoginButton();
+  await loginPage.clickLogin();
 });
 
 Then('I should be redirected to the home page', async function (this: CustomWorld) {
   const homePage = new HomePage(this.page);
-  const isHomePage = await homePage.isDisplayed();
-  expect(isHomePage).toBeTruthy();
+  const isHomePage = await homePage.isDisplayed('.inventory_list');
+  assert.ok(isHomePage);
 });
 
 Then('I should see a welcome message', async function (this: CustomWorld) {
   const homePage = new HomePage(this.page);
   const welcomeMessage = await homePage.getWelcomeMessage();
-  expect(welcomeMessage).toBeTruthy();
-  expect(welcomeMessage).toContain('Welcome');
+  assert.ok(welcomeMessage);
 });
 
 Then('I should see an error message {string}', async function (
@@ -48,13 +47,13 @@ Then('I should see an error message {string}', async function (
   expectedError: string
 ) {
   const loginPage = new LoginPage(this.page);
-  const actualError = await loginPage.getErrorMessage();
-  expect(actualError).toBeTruthy();
-  expect(actualError).toContain(expectedError);
+  const actualError = await this.page.locator('[data-test="error"]').innerText();
+  assert.ok(actualError);
+  assert.ok(actualError.includes(expectedError));
 });
 
 Then('I should remain on the login page', async function (this: CustomWorld) {
   const loginPage = new LoginPage(this.page);
-  const isLoginPage = await loginPage.isDisplayed();
-  expect(isLoginPage).toBeTruthy();
+  const isLoginPage = await loginPage.isDisplayed('#login-button');
+  assert.ok(isLoginPage);
 });

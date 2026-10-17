@@ -5,12 +5,11 @@
  * Uses supertest with a minimal express setup.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import express, { Express, Request, Response, NextFunction } from 'express';
 import request from 'supertest';
 import { projectConfigSchema, type ProjectConfig } from '../../shared/schema';
 import { WizardValidator, validationMatrix, validationLabels } from '../../shared/validationMatrix';
-import { ErrorCode } from '../errors';
 
 // Create a minimal test app with just the routes we want to test
 function createTestApp(): Express {
@@ -18,16 +17,23 @@ function createTestApp(): Express {
   app.use(express.json());
 
   // Mock error handler
-  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    const statusCode = err.statusCode || 500;
-    res.status(statusCode).json({
-      success: false,
-      error: {
-        code: err.code || 'INTERNAL_ERROR',
-        message: err.message,
-      },
-    });
-  });
+  app.use(
+    (
+      err: Error & { statusCode?: number; code?: string; details?: unknown },
+      req: Request,
+      res: Response,
+      _next: NextFunction
+    ) => {
+      const statusCode = err.statusCode || 500;
+      res.status(statusCode).json({
+        success: false,
+        error: {
+          code: err.code || 'INTERNAL_ERROR',
+          message: err.message,
+        },
+      });
+    }
+  );
 
   // === Metadata endpoint ===
   app.get('/api/v1/metadata', (req, res) => {
@@ -188,7 +194,7 @@ function createTestApp(): Express {
 
   // === Analytics events endpoint ===
   app.post('/api/analytics/events', (req, res) => {
-    const { sessionId, events, metadata } = req.body;
+    const { sessionId, events } = req.body;
 
     if (!sessionId || !events || !Array.isArray(events)) {
       return res.status(400).json({
@@ -282,7 +288,7 @@ describe('API Routes', () => {
       const testingTypes = response.body.data.testingTypes;
       expect(Array.isArray(testingTypes)).toBe(true);
 
-      const webType = testingTypes.find((t: any) => t.id === 'web');
+      const webType = testingTypes.find((t: { id: string; label: string }) => t.id === 'web');
       expect(webType).toBeDefined();
       expect(webType).toHaveProperty('id');
       expect(webType).toHaveProperty('label');
@@ -296,7 +302,7 @@ describe('API Routes', () => {
       expect(Array.isArray(utilities)).toBe(true);
       expect(utilities.length).toBeGreaterThan(0);
 
-      utilities.forEach((util: any) => {
+      utilities.forEach((util: { id: string; label: string }) => {
         expect(util).toHaveProperty('id');
         expect(util).toHaveProperty('label');
         expect(util).toHaveProperty('description');

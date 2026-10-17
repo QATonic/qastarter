@@ -1865,6 +1865,7 @@ Environment selection:
     Set ENV=qa in .env file or environment variable
 """
 import os
+import json
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -1889,10 +1890,19 @@ class ConfigurationReader:
             config_path = Path(__file__).parent / "dev.ini"
             print(f"[Config] {env}.ini not found, using dev.ini")
         
-        self._config = ConfigParser()
-        self._config.read(config_path)
+        self._config = ConfigParser(interpolation=None)
+        self._config.read(config_path, encoding="utf-8")
         print(f"[Config] Loaded: {config_path}")
     
+    @staticmethod
+    def _decode_value(value):
+        if value.startswith('"'):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                pass
+        return value
+
     def get(self, key: str, default: str = None, section: str = "settings") -> str:
         """Get configuration value."""
         # Check environment variable first
@@ -1902,7 +1912,7 @@ class ConfigurationReader:
         
         # Then check config file
         try:
-            return self._config.get(section, key)
+            return self._decode_value(self._config.get(section, key))
         except:
             return default
     
@@ -2431,6 +2441,8 @@ pytest-playwright>=0.4.0
 pytest-rerunfailures>=12.0
 
 # Reporting
+# Always installed — pytest.ini's addopts unconditionally writes an --html report.
+pytest-html>=4.1.0
 
 # BDD
 
@@ -2766,12 +2778,15 @@ export default defineConfig({
     baseUrl: "https://www.saucedemo.com",
     specPattern: "cypress/e2e/**/*.cy.ts",
     supportFile: "cypress/support/e2e.ts",
-    video: true,
+    video: false,
     screenshotOnRunFailure: true,
     viewportWidth: 1920,
     viewportHeight: 1080,
     defaultCommandTimeout: 10000,
-    pageLoadTimeout: 30000,
+    pageLoadTimeout: 60000,
+    // Retry a failed test before marking it red — smooths over transient
+    // network hiccups when hitting a live demo site.
+    retries: { runMode: 2, openMode: 0 },
     env: {
       username: "standard_user",
       password: "secret_sauce"
@@ -3229,10 +3244,10 @@ export default {
 "version": "1.0.0",
 "description": "demo-ts-cypress - Cypress TypeScript Automation Framework",
 "scripts": {
-"test": "cypress run",
-"test:local": "cypress run",
+"test": "cypress run --browser chrome",
+"test:local": "cypress run --browser chrome",
 "test:open": "cypress open",
-"test:headed": "cypress run --headed",
+"test:headed": "cypress run --browser chrome --headed",
 "lint": "eslint .",
 "lint:fix": "eslint . --fix",
 "format": "prettier --write ."

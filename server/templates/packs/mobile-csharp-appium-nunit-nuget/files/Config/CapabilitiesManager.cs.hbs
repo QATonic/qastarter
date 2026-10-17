@@ -14,8 +14,8 @@ public class CapabilitiesManager
         
         options.PlatformName = "Android";
         options.AutomationName = "UiAutomator2";
-        options.AddAdditionalAppiumOption("deviceName", Environment.GetEnvironmentVariable("DEVICE_NAME") ?? "{{deviceName}}");
-        options.AddAdditionalAppiumOption("platformVersion", Environment.GetEnvironmentVariable("PLATFORM_VERSION") ?? "{{platformVersion}}");
+        options.AddAdditionalAppiumOption("deviceName", Environment.GetEnvironmentVariable("DEVICE_NAME") ?? "{{string deviceName "double" "cs"}}");
+        options.AddAdditionalAppiumOption("platformVersion", Environment.GetEnvironmentVariable("PLATFORM_VERSION") ?? "{{string platformVersion "double" "cs"}}");
         options.AddAdditionalAppiumOption("app", Environment.GetEnvironmentVariable("APP_PATH") ?? "");
         options.AddAdditionalAppiumOption("appPackage", Environment.GetEnvironmentVariable("APP_PACKAGE") ?? "com.example.app");
         options.AddAdditionalAppiumOption("appActivity", Environment.GetEnvironmentVariable("APP_ACTIVITY") ?? ".MainActivity");
@@ -74,7 +74,7 @@ public class CapabilitiesManager
         {
             { "userName", Environment.GetEnvironmentVariable("BROWSERSTACK_USERNAME") ?? "" },
             { "accessKey", Environment.GetEnvironmentVariable("BROWSERSTACK_ACCESS_KEY") ?? "" },
-            { "projectName", "{{projectName}}" },
+            { "projectName", "{{string projectName "double" "cs"}}" },
             { "buildName", "Android Build" },
             { "debug", true },
             { "networkLogs", true }
@@ -87,7 +87,7 @@ public class CapabilitiesManager
         {
             { "userName", Environment.GetEnvironmentVariable("BROWSERSTACK_USERNAME") ?? "" },
             { "accessKey", Environment.GetEnvironmentVariable("BROWSERSTACK_ACCESS_KEY") ?? "" },
-            { "projectName", "{{projectName}}" },
+            { "projectName", "{{string projectName "double" "cs"}}" },
             { "buildName", "iOS Build" },
             { "debug", true },
             { "networkLogs", true }
@@ -101,7 +101,7 @@ public class CapabilitiesManager
             { "username", Environment.GetEnvironmentVariable("SAUCE_USERNAME") ?? "" },
             { "accessKey", Environment.GetEnvironmentVariable("SAUCE_ACCESS_KEY") ?? "" },
             { "build", "Android Build" },
-            { "name", "{{projectName}}" }
+            { "name", "{{string projectName "double" "cs"}}" }
         });
     }
 
@@ -112,7 +112,7 @@ public class CapabilitiesManager
             { "username", Environment.GetEnvironmentVariable("SAUCE_USERNAME") ?? "" },
             { "accessKey", Environment.GetEnvironmentVariable("SAUCE_ACCESS_KEY") ?? "" },
             { "build", "iOS Build" },
-            { "name", "{{projectName}}" }
+            { "name", "{{string projectName "double" "cs"}}" }
         });
     }
 }

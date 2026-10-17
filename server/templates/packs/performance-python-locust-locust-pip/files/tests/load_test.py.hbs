@@ -1,7 +1,7 @@
 """
 Load Test — simulates normal expected traffic.
 
-Run: locust -f tests/load_test.py --host={{baseUrl}} --headless -u 50 -r 10 --run-time 5m
+Run: locust -f tests/load_test.py --host={{string baseUrl "double" "py"}} --headless -u 50 -r 10 --run-time 5m
 """
 
 from locust import HttpUser, task, between, events

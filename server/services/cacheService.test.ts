@@ -57,6 +57,17 @@ describe('CacheService', () => {
   });
 
   describe('Template Cache', () => {
+    it('evicts old templates at capacity without interrupting generation', () => {
+      const capacity = caches.templates.options.maxKeys!;
+      for (let i = 0; i < capacity + 20; i++) {
+        expect(setCachedTemplate(`template-${i}`, () => String(i))).toBe(true);
+      }
+      expect(getCacheStats().templates.keys).toBe(capacity);
+      expect(getCachedTemplate('template-0')).toBeUndefined();
+      expect(getCachedTemplate(`template-${capacity + 19}`)).toBeTypeOf('function');
+      expect(setCachedTemplate(`template-${capacity + 19}`, () => 'updated')).toBe(true);
+    });
+
     it('should store and retrieve a template', () => {
       const template = { compiled: true, content: 'test content' };
 

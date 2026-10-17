@@ -1,10 +1,8 @@
 import { ProjectConfig } from '@shared/schema';
-import { ProjectTemplateGenerator, TemplateFile } from '../templates';
+import { ProjectTemplateGenerator } from '../templates';
 import { storage } from '../storage';
 import { logGeneration } from '../utils/logger';
 import { sanitizeFilename } from '@shared/sanitize';
-import { parseOpenApiFromUrl } from './openApiService';
-import type { OpenApiEndpoint } from '@shared/openApiTypes';
 import archiver from 'archiver';
 import path from 'path';
 import { Response } from 'express';
@@ -28,7 +26,10 @@ export class ProjectService {
     config: ProjectConfig,
     res: Response,
     requestId: string,
-    reqLogger: any
+    reqLogger: Pick<
+      ReturnType<typeof import('../utils/logger').createRequestLogger>,
+      'warn' | 'error' | 'info' | 'debug'
+    >
   ): Promise<void> {
     const startTime = Date.now();
 
@@ -59,8 +60,14 @@ export class ProjectService {
     // the server or streaming an abusive payload downstream. If the generator ever
     // legitimately produces more than these, raise them via env explicitly.
     const MAX_FILE_COUNT = parseInt(process.env.QASTARTER_MAX_FILE_COUNT || '5000', 10);
-    const MAX_FILE_BYTES = parseInt(process.env.QASTARTER_MAX_FILE_BYTES || String(10 * 1024 * 1024), 10); // 10 MB
-    const MAX_TOTAL_BYTES = parseInt(process.env.QASTARTER_MAX_TOTAL_BYTES || String(100 * 1024 * 1024), 10); // 100 MB
+    const MAX_FILE_BYTES = parseInt(
+      process.env.QASTARTER_MAX_FILE_BYTES || String(10 * 1024 * 1024),
+      10
+    ); // 10 MB
+    const MAX_TOTAL_BYTES = parseInt(
+      process.env.QASTARTER_MAX_TOTAL_BYTES || String(100 * 1024 * 1024),
+      10
+    ); // 100 MB
 
     // Set Headers with sanitized filename (RFC 5987 encoding for safety)
     const safeName = sanitizeFilename(config.projectName);
@@ -92,26 +99,11 @@ export class ProjectService {
     let totalSize = 0;
     const streamStart = Date.now();
 
-    // Parse OpenAPI spec if provided (API testing type only)
-    let openApiEndpoints: OpenApiEndpoint[] = [];
-    if (config.testingType === 'api' && config.openApiSpecUrl) {
-      try {
-        const endpoints = await parseOpenApiFromUrl(config.openApiSpecUrl);
-        if (endpoints) {
-          openApiEndpoints = endpoints;
-          reqLogger.info('Parsed OpenAPI spec', { endpointCount: endpoints.length });
-        }
-      } catch (err) {
-        reqLogger.warn('OpenAPI parsing failed, falling back to static stubs', {
-          error: err instanceof Error ? err.message : String(err),
-        });
-        // Silently continue — generation will use default static stubs
-      }
-    }
-
     try {
       // Consume the generator
-      for await (const file of this.templateGenerator.generateProjectStream(config, { strict: true, openApiEndpoints })) {
+      for await (const file of this.templateGenerator.generateProjectStream(config, {
+        strict: true,
+      })) {
         // Buffer content measures byte length directly; string content
         // is encoded as UTF-8 to get on-disk size.
         const fileBytes = Buffer.isBuffer(file.content)
@@ -135,7 +127,12 @@ export class ProjectService {
           );
         }
         // archiver accepts string | Buffer natively — no conversion needed.
-        archive.append(file.content, { name: file.path });
+        const executable =
+          file.path === 'gradlew' || file.path.endsWith('/gradlew') || file.path.endsWith('.sh');
+        archive.append(file.content, {
+          name: file.path,
+          mode: file.mode ? parseInt(file.mode, 8) : executable ? 0o755 : 0o644,
+        });
       }
 
       await archive.finalize();
@@ -158,6 +155,8 @@ export class ProjectService {
         reqLogger.error('Streaming generation failed', { error });
         archive.abort();
         if (!res.headersSent) {
+          res.removeHeader('Content-Disposition');
+          res.removeHeader('Content-Type');
           throw error; // Let controller handle it
         } else if (!res.writableEnded) {
           res.destroy(error as Error);

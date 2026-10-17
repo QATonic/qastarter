@@ -48,7 +48,8 @@ const testingPatternLabels: Record<string, string> = validationLabels.testingPat
 };
 
 export default function ConfigPanel() {
-  const { config, updateConfig, getFilteredOptions, reset, hydrationSource } = useExpressGenerator();
+  const { config, updateConfig, getFilteredOptions, reset, hydrationSource } =
+    useExpressGenerator();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [hydrationBannerDismissed, setHydrationBannerDismissed] = useState(false);
 
@@ -56,37 +57,22 @@ export default function ConfigPanel() {
   // when an *upstream* choice changes — not on every re-render (e.g. keystrokes
   // in the project name input trigger a full ConfigPanel render without these deps
   // actually changing).
-  const frameworkOptions = useMemo(
-    () => getFilteredOptions('framework'),
-    [getFilteredOptions, config.testingType]
-  );
-  const languageOptions = useMemo(
-    () => getFilteredOptions('language'),
-    [getFilteredOptions, config.testingType, config.framework]
-  );
-  const testRunnerOptions = useMemo(
-    () => getFilteredOptions('testRunner'),
-    [getFilteredOptions, config.framework, config.language]
-  );
-  const buildToolOptions = useMemo(
-    () => getFilteredOptions('buildTool'),
-    [getFilteredOptions, config.framework, config.language]
-  );
+  const frameworkOptions = useMemo(() => getFilteredOptions('framework'), [getFilteredOptions]);
+  const languageOptions = useMemo(() => getFilteredOptions('language'), [getFilteredOptions]);
+  const testRunnerOptions = useMemo(() => getFilteredOptions('testRunner'), [getFilteredOptions]);
+  const buildToolOptions = useMemo(() => getFilteredOptions('buildTool'), [getFilteredOptions]);
   const testingPatternOptions = useMemo(
     () => getFilteredOptions('testingPattern'),
-    [getFilteredOptions, config.framework, config.language]
+    [getFilteredOptions]
   );
-  const cicdToolOptions = useMemo(
-    () => getFilteredOptions('cicdTool'),
-    [getFilteredOptions, config.framework]
-  );
+  const cicdToolOptions = useMemo(() => getFilteredOptions('cicdTool'), [getFilteredOptions]);
   const reportingToolOptions = useMemo(
     () => getFilteredOptions('reportingTool'),
-    [getFilteredOptions, config.framework, config.language]
+    [getFilteredOptions]
   );
   const cloudDeviceFarmOptions = useMemo(
     () => ['none', ...getFilteredOptions('cloudDeviceFarm')],
-    [getFilteredOptions, config.testingType, config.framework]
+    [getFilteredOptions]
   );
 
   const isProjectNameValid = (name: string) => {
@@ -621,7 +607,8 @@ export default function ConfigPanel() {
                     if (envs.length >= 10) return;
                     const names = ['dev', 'staging', 'prod', 'qa', 'uat'];
                     const usedNames = new Set(envs.map((e) => e.name));
-                    const nextName = names.find((n) => !usedNames.has(n)) || `env-${envs.length + 1}`;
+                    const nextName =
+                      names.find((n) => !usedNames.has(n)) || `env-${envs.length + 1}`;
                     updateConfig('environments', [
                       ...envs,
                       { name: nextName, baseUrl: 'https://example.com' },

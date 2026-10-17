@@ -1,17 +1,17 @@
 [
   {
-    "username": "{{testUsername}}",
-    "password": "{{testPassword}}",
+    "username": "{{string testUsername "double" "json"}}",
+    "password": "{{string testPassword "double" "json"}}",
     "expected": "success"
   },
   {
     "username": "locked_out_user",
-    "password": "{{testPassword}}",
+    "password": "{{string testPassword "double" "json"}}",
     "expected": "error"
   },
   {
     "username": "problem_user",
-    "password": "{{testPassword}}",
+    "password": "{{string testPassword "double" "json"}}",
     "expected": "success"
   }
 ]

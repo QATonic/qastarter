@@ -2,18 +2,21 @@ import { defineConfig } from "cypress";
 
 export default defineConfig({
   e2e: {
-    baseUrl: "{{baseUrl}}",
+    baseUrl: "{{string baseUrl "double" "ts"}}",
     specPattern: "cypress/e2e/**/*.cy.ts",
     supportFile: "cypress/support/e2e.ts",
-    video: true,
+    video: false,
     screenshotOnRunFailure: true,
     viewportWidth: 1920,
     viewportHeight: 1080,
     defaultCommandTimeout: 10000,
-    pageLoadTimeout: 30000,
+    pageLoadTimeout: 60000,
+    // Retry a failed test before marking it red — smooths over transient
+    // network hiccups when hitting a live demo site.
+    retries: { runMode: 2, openMode: 0 },
     env: {
-      username: "{{testUsername}}",
-      password: "{{testPassword}}"
+      username: "{{string testUsername "double" "ts"}}",
+      password: "{{string testPassword "double" "ts"}}"
     },
     setupNodeEvents(on, config) {
 {{#if (eq reportingTool "allure")}}

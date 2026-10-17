@@ -1,3 +1,4 @@
+import type { ProjectConfig } from '@shared/schema';
 /**
  * Unit Tests for Analytics Service
  */
@@ -6,10 +7,10 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock storage to avoid file system / DB dependencies in unit tests
 vi.mock('../storage', () => {
-  const generations: any[] = [];
+  const generations: Array<ProjectConfig & { createdAt: string }> = [];
   return {
     storage: {
-      saveProjectGeneration: vi.fn(async (config: any) => {
+      saveProjectGeneration: vi.fn(async (config: ProjectConfig) => {
         generations.push({ ...config, createdAt: new Date().toISOString() });
         return String(generations.length);
       }),
@@ -46,7 +47,6 @@ import analyticsService, {
   trackWizardStep,
   getAnalyticsStats,
   getRecentAnalyticsEvents,
-  type AnalyticsEventType,
 } from './analyticsService';
 
 describe('AnalyticsService', () => {
@@ -262,9 +262,9 @@ describe('AnalyticsService', () => {
       });
 
       const stats = await getAnalyticsStats();
-      const mobileEntry = stats.byTestingType.find((entry: any) => entry.testingType === 'mobile');
+      const mobileEntry = stats.byTestingType.find((entry) => entry.testingType === 'mobile');
       expect(mobileEntry).toBeDefined();
-      expect(mobileEntry.count).toBeGreaterThan(0);
+      expect(mobileEntry?.count).toBeGreaterThan(0);
     });
 
     it('should track by framework', async () => {
@@ -280,9 +280,9 @@ describe('AnalyticsService', () => {
       });
 
       const stats = await getAnalyticsStats();
-      const cypressEntry = stats.byFramework.find((entry: any) => entry.framework === 'cypress');
+      const cypressEntry = stats.byFramework.find((entry) => entry.framework === 'cypress');
       expect(cypressEntry).toBeDefined();
-      expect(cypressEntry.count).toBeGreaterThan(0);
+      expect(cypressEntry?.count).toBeGreaterThan(0);
     });
   });
 

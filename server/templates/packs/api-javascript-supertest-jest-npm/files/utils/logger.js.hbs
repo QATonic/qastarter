@@ -17,8 +17,18 @@ class Logger {
 
   info(message) { this.write("INFO", message); }
   error(message) { this.write("ERROR", message); }
+  warn(message) { this.write("WARN", message); }
+  debug(message) { this.write("DEBUG", message); }
   step(message) { this.write("STEP", message); }
 }
 
 const log = new Logger();
-module.exports = { log };
+// Export the Logger instance itself, then attach named aliases onto it, so
+// EVERY import style resolves to the same working instance — even through
+// Babel's CommonJS default-interop (which wraps module.exports):
+//   const { log } = require(...)        // ApiClient
+//   import { logger } from '...'        // SchemaValidator
+//   import logger from '...'            // authHelper / retryHelper (default)
+module.exports = log;
+module.exports.log = log;
+module.exports.logger = log;

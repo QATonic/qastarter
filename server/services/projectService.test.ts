@@ -44,6 +44,7 @@ describe('ProjectService', () => {
   let service: ProjectService;
 
   const mockConfig: ProjectConfig = {
+    cloudDeviceFarm: 'none' as const,
     projectName: 'test-project',
     testingType: 'web',
     framework: 'selenium',
@@ -98,8 +99,9 @@ describe('ProjectService Integration', () => {
   // They test the integration between components
 
   describe('Configuration validation', () => {
-    it('should handle valid web + selenium + java config', () => {
+    it('should handle valid web + selenium + java config', async () => {
       const config: ProjectConfig = {
+        cloudDeviceFarm: 'none' as const,
         projectName: 'valid-project',
         testingType: 'web',
         framework: 'selenium',
@@ -111,11 +113,12 @@ describe('ProjectService Integration', () => {
       };
 
       // Should not throw during service creation
-      expect(() => new ProjectService()).not.toThrow();
+      expect((await new ProjectService().generatePreview(config)).length).toBeGreaterThan(0);
     });
 
     it('should handle config with all optional fields', () => {
       const config: ProjectConfig = {
+        cloudDeviceFarm: 'none' as const,
         projectName: 'full-config-project',
         testingType: 'web',
         framework: 'playwright',

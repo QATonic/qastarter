@@ -86,7 +86,10 @@ async function main() {
     await page.evaluate(() => {
       const btns = document.querySelectorAll('button');
       for (const b of btns) {
-        if (b.textContent?.includes('Launch Generator')) { b.click(); break; }
+        if (b.textContent?.includes('Launch Generator')) {
+          b.click();
+          break;
+        }
       }
     });
     await page.waitForTimeout(600);
@@ -107,7 +110,10 @@ async function main() {
     await page.evaluate(() => {
       const btns = document.querySelectorAll('button');
       for (const b of btns) {
-        if (b.textContent?.trim() === 'Java') { (b as HTMLElement).click(); break; }
+        if (b.textContent?.trim() === 'Java') {
+          (b as HTMLElement).click();
+          break;
+        }
       }
     });
     await page.waitForTimeout(400);
@@ -128,7 +134,10 @@ async function main() {
     await page.evaluate(() => {
       const els = document.querySelectorAll('button, a, span');
       for (const e of els) {
-        if (e.textContent?.includes('Use suggested')) { (e as HTMLElement).click(); break; }
+        if (e.textContent?.includes('Use suggested')) {
+          (e as HTMLElement).click();
+          break;
+        }
       }
     });
     await page.waitForTimeout(300);
@@ -140,7 +149,10 @@ async function main() {
     await page.evaluate(() => {
       const btns = document.querySelectorAll('button');
       for (const b of btns) {
-        if (b.textContent?.includes('Advanced Options')) { b.click(); break; }
+        if (b.textContent?.includes('Advanced Options')) {
+          b.click();
+          break;
+        }
       }
     });
     await page.waitForTimeout(400);
@@ -155,7 +167,8 @@ async function main() {
       const btns = document.querySelectorAll('button');
       for (const b of btns) {
         if (b.textContent?.includes('Generate') && b.textContent?.includes('Download')) {
-          b.click(); break;
+          b.click();
+          break;
         }
       }
     });
@@ -171,7 +184,12 @@ async function main() {
       for (const c of containers) {
         if (c.scrollHeight > c.clientHeight + 20) {
           const style = getComputedStyle(c);
-          if (style.overflow === 'auto' || style.overflow === 'scroll' || style.overflowY === 'auto' || style.overflowY === 'scroll') {
+          if (
+            style.overflow === 'auto' ||
+            style.overflow === 'scroll' ||
+            style.overflowY === 'auto' ||
+            style.overflowY === 'scroll'
+          ) {
             c.scrollTop = 0;
             break;
           }
@@ -190,7 +208,10 @@ async function main() {
     const resizedFrames: Buffer[] = [];
     for (const framePath of frames) {
       const resized = await sharp(framePath)
-        .resize(GIF_WIDTH, GIF_HEIGHT, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
+        .resize(GIF_WIDTH, GIF_HEIGHT, {
+          fit: 'contain',
+          background: { r: 255, g: 255, b: 255, alpha: 1 },
+        })
         .png()
         .toBuffer();
       resizedFrames.push(resized);
@@ -198,7 +219,6 @@ async function main() {
 
     // Create animated GIF using sharp
     // Sharp can create animated GIFs from multiple frames
-    const gifFrames = resizedFrames.map(buf => sharp(buf).gif({ delay: FRAME_DELAY_MS }));
 
     // Use sharp's animation support
     await sharp(resizedFrames[0], { animated: false })
@@ -207,10 +227,8 @@ async function main() {
 
     // For multi-frame GIF, we need to use sharp differently
     // Create individual GIF frames and merge
-    const frameBuffers: sharp.OverlayOptions[] = [];
 
     // Alternative: create animated WebP (better quality, widely supported)
-    const webpOutput = GIF_OUTPUT.replace('.gif', '.webp');
 
     // Create each frame as a separate image first
     const frameFiles: string[] = [];
@@ -226,20 +244,14 @@ async function main() {
     // Use sharp to create animated GIF by joining frames
     // Sharp 0.33+ supports creating animated images via the join method
     try {
-      const inputFrames = frameFiles.map(f => ({ input: f, animated: false }));
-
       // Create animated GIF: read first frame, then composite others as animation frames
-      const firstFrame = sharp(frameFiles[0], { animated: false });
 
       // Save as animated GIF using delay array
-      const delays = new Array(frameFiles.length).fill(FRAME_DELAY_MS);
 
-      await sharp(frameFiles[0])
-        .toFormat('gif')
-        .toFile(GIF_OUTPUT.replace('.gif', '-static.gif'));
+      await sharp(frameFiles[0]).toFormat('gif').toFile(GIF_OUTPUT.replace('.gif', '-static.gif'));
 
       console.log(`  ✅ Static GIF frame saved`);
-    } catch (e) {
+    } catch {
       console.log(`  ⚠️ Sharp GIF animation limited, using alternative approach`);
     }
 
@@ -254,7 +266,6 @@ async function main() {
 
     console.log(`\n🎉 Demo assets created in: ${path.dirname(GIF_OUTPUT)}`);
     console.log(`   Screenshots: ${OUTPUT_DIR}`);
-
   } catch (error) {
     console.error('❌ Error:', error);
   } finally {
@@ -296,7 +307,7 @@ async function createGifFromFrames(frames: Buffer[], outputPath: string) {
 }
 
 function createHtmlSlideshow(framePaths: string[]): string {
-  const frameNames = framePaths.map(f => path.basename(f));
+  const frameNames = framePaths.map((f) => path.basename(f));
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -400,9 +411,12 @@ function createHtmlSlideshow(framePaths: string[]): string {
     <h1>⚡ QAStarter Demo</h1>
     <p class="subtitle">Generate production-ready test automation frameworks in seconds</p>
     <div class="slideshow" id="slideshow">
-      ${frameNames.map((name, i) =>
-        `<img src="screenshots/${name}" alt="Step ${i + 1}" class="${i === 0 ? 'active' : ''}" />`
-      ).join('\n      ')}
+      ${frameNames
+        .map(
+          (name, i) =>
+            `<img src="screenshots/${name}" alt="Step ${i + 1}" class="${i === 0 ? 'active' : ''}" />`
+        )
+        .join('\n      ')}
     </div>
     <div class="step-label" id="stepLabel"></div>
     <div class="progress"><div class="progress-bar" id="progressBar"></div></div>

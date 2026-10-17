@@ -15,7 +15,7 @@ setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
     reporters: [
     'default'{{#if (eq reportingTool "jest-html")}},
     ['jest-html-reporter', {
-    pageTitle: '{{projectName}} - API Test Report',
+    pageTitle: '{{string projectName "single" "js"}} - API Test Report',
     outputPath: 'reports/test-report.html',
     includeFailureMsg: true,
     includeConsoleLog: true

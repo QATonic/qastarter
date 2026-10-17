@@ -48,7 +48,7 @@
         </Logger>
 
         <!-- Application Loggers -->
-        <Logger name="{{packageName}}" level="DEBUG" additivity="false">
+        <Logger name="{{escapeXml packageName}}" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFileAppender"/>
         </Logger>

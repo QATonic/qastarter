@@ -13,7 +13,7 @@ services:
       - BROWSER=chromium
       - HEADLESS=true
       - TEST_ENV=qa
-      - BASE_URL={{#if baseUrl}}{{baseUrl}}{{else}}https://example.com{{/if}}
+      - {{{compose "BASE_URL=" baseUrl}}}
     volumes:
       - ./reports:/app/reports
       - ./screenshots:/app/screenshots

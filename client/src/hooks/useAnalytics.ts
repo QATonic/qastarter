@@ -5,7 +5,7 @@
  * Uses sessionStorage for session persistence within a browser tab.
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 // Generate a session ID
 function generateSessionId(): string {
@@ -44,7 +44,7 @@ const MAX_QUEUE_SIZE = 200; // Cap to prevent unbounded memory growth
 
 let eventQueue: Array<{
   eventType: EventType;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   timestamp: number;
 }> = [];
 
@@ -87,7 +87,7 @@ async function flushEvents(sessionId: string): Promise<void> {
 function queueEvent(
   sessionId: string,
   eventType: EventType,
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   options: TrackEventOptions = {}
 ): void {
   // Enforce queue cap — drop oldest events if at limit
@@ -115,7 +115,8 @@ function queueEvent(
  * Hook for tracking analytics events
  */
 export function useAnalytics() {
-  const sessionIdRef = useRef<string>('');
+  const [sessionId] = useState(getSessionId);
+  const sessionIdRef = useRef(sessionId);
   // Use a lazy initialization for the ref to avoid impure call warning, though useRef init is only run once.
   // Better yet, initialize in useEffect to be strictly pure or use a lazy init function.
   const startTimeRef = useRef<number>(0);
@@ -184,7 +185,7 @@ export function useAnalytics() {
     []
   );
 
-  const trackWizardComplete = useCallback((config: Record<string, any>) => {
+  const trackWizardComplete = useCallback((config: Record<string, unknown>) => {
     const totalTime = Date.now() - startTimeRef.current;
 
     queueEvent(
@@ -201,22 +202,25 @@ export function useAnalytics() {
     );
   }, []);
 
-  const trackProjectDownload = useCallback((projectName: string, config: Record<string, any>) => {
-    queueEvent(
-      sessionIdRef.current,
-      'project_download',
-      {
-        projectName,
-        testingType: config.testingType,
-        framework: config.framework,
-        language: config.language,
-      },
-      { immediate: true }
-    );
-  }, []);
+  const trackProjectDownload = useCallback(
+    (projectName: string, config: Record<string, unknown>) => {
+      queueEvent(
+        sessionIdRef.current,
+        'project_download',
+        {
+          projectName,
+          testingType: config.testingType,
+          framework: config.framework,
+          language: config.language,
+        },
+        { immediate: true }
+      );
+    },
+    []
+  );
 
   const trackError = useCallback(
-    (errorType: string, message: string, context?: Record<string, any>) => {
+    (errorType: string, message: string, context?: Record<string, unknown>) => {
       queueEvent(
         sessionIdRef.current,
         'error',
@@ -236,7 +240,7 @@ export function useAnalytics() {
   }, []);
 
   return {
-    sessionId: sessionIdRef.current,
+    sessionId,
     trackWizardStart,
     trackWizardStep,
     trackWizardComplete,

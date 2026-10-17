@@ -75,34 +75,34 @@
         </Root>
 
         <!-- Framework Package Loggers -->
-        <Logger name="{{groupId}}" level="DEBUG" additivity="false">
+        <Logger name="{{escapeXml groupId}}" level="DEBUG" additivity="false">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="RollingFileAppender"/>
             <AppenderRef ref="ErrorFileAppender"/>
         </Logger>
 
         <!-- Test Results Logger -->
-        <Logger name="{{groupId}}.tests" level="INFO" additivity="false">
+        <Logger name="{{escapeXml groupId}}.tests" level="INFO" additivity="false">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="TestResultsAppender"/>
             <AppenderRef ref="ErrorFileAppender"/>
         </Logger>
 
         <!-- Core Framework Logger -->
-        <Logger name="{{groupId}}.core" level="DEBUG" additivity="false">
+        <Logger name="{{escapeXml groupId}}.core" level="DEBUG" additivity="false">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="RollingFileAppender"/>
             <AppenderRef ref="ErrorFileAppender"/>
         </Logger>
 
         <!-- Utils Logger -->
-        <Logger name="{{groupId}}.utils" level="DEBUG" additivity="false">
+        <Logger name="{{escapeXml groupId}}.utils" level="DEBUG" additivity="false">
             <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="RollingFileAppender"/>
         </Logger>
 
         <!-- Performance Logger -->
-        <Logger name="{{groupId}}.performance" level="INFO" additivity="false">
+        <Logger name="{{escapeXml groupId}}.performance" level="INFO" additivity="false">
             <AppenderRef ref="PerformanceAppender"/>
         </Logger>
 

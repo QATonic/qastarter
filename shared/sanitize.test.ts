@@ -48,8 +48,8 @@ describe('sanitizeProjectName', () => {
 
   it('should return default for empty/invalid input', () => {
     expect(sanitizeProjectName('')).toBe('my-project');
-    expect(sanitizeProjectName(null as any)).toBe('my-project');
-    expect(sanitizeProjectName(undefined as any)).toBe('my-project');
+    expect(sanitizeProjectName(null as unknown as string)).toBe('my-project');
+    expect(sanitizeProjectName(undefined as unknown as string)).toBe('my-project');
     expect(sanitizeProjectName('...')).toBe('my-project');
   });
 });
@@ -77,7 +77,7 @@ describe('sanitizeGroupId', () => {
 
   it('should return default for empty/invalid input', () => {
     expect(sanitizeGroupId('')).toBe('com.example');
-    expect(sanitizeGroupId(null as any)).toBe('com.example');
+    expect(sanitizeGroupId(null as unknown as string)).toBe('com.example');
     expect(sanitizeGroupId('...')).toBe('com.example');
   });
 });
@@ -105,7 +105,7 @@ describe('sanitizeArtifactId', () => {
 
   it('should return default for empty/invalid input', () => {
     expect(sanitizeArtifactId('')).toBe('my-artifact');
-    expect(sanitizeArtifactId(null as any)).toBe('my-artifact');
+    expect(sanitizeArtifactId(null as unknown as string)).toBe('my-artifact');
   });
 });
 
@@ -142,7 +142,7 @@ describe('sanitizeFilePath', () => {
 
   it('should return empty string for invalid input', () => {
     expect(sanitizeFilePath('')).toBe('');
-    expect(sanitizeFilePath(null as any)).toBe('');
+    expect(sanitizeFilePath(null as unknown as string)).toBe('');
   });
 });
 
@@ -172,7 +172,7 @@ describe('sanitizeTemplateValue', () => {
 
   it('should return empty string for invalid input', () => {
     expect(sanitizeTemplateValue('')).toBe('');
-    expect(sanitizeTemplateValue(null as any)).toBe('');
+    expect(sanitizeTemplateValue(null as unknown as string)).toBe('');
   });
 });
 
@@ -205,7 +205,7 @@ describe('sanitizeJsonValue', () => {
 
   it('should return empty string for invalid input', () => {
     expect(sanitizeJsonValue('')).toBe('');
-    expect(sanitizeJsonValue(null as any)).toBe('');
+    expect(sanitizeJsonValue(null as unknown as string)).toBe('');
   });
 });
 
@@ -280,7 +280,7 @@ describe('sanitizeFilename', () => {
 
   it('should return default for empty/invalid input', () => {
     expect(sanitizeFilename('')).toBe('download');
-    expect(sanitizeFilename(null as any)).toBe('download');
+    expect(sanitizeFilename(null as unknown as string)).toBe('download');
   });
 });
 

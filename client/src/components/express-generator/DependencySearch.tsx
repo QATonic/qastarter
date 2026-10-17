@@ -106,24 +106,34 @@ const REGISTRY_META: Record<DependencyRegistry, { label: string; placeholder: st
 
 export default function DependencySearch() {
   const { config, updateConfig } = useExpressGenerator();
-  const selected: UserDependency[] = config.dependencies ?? [];
+  const selected = useMemo(() => config.dependencies ?? [], [config.dependencies]);
 
-  const [registry, setRegistry] = useState<DependencyRegistry>(() =>
-    defaultRegistryFor(config.language)
-  );
+  const [registryChoice, setRegistryChoice] = useState<{
+    language: string;
+    registry: DependencyRegistry;
+  } | null>(null);
+  const registry =
+    registryChoice?.language === config.language
+      ? registryChoice.registry
+      : defaultRegistryFor(config.language);
+  const setRegistry = (value: DependencyRegistry) =>
+    setRegistryChoice({ language: config.language, registry: value });
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [resultCount, setResultCount] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
+  const requestKey = JSON.stringify([registry, debouncedQuery]);
+  const [search, setSearch] = useState<{
+    key: string;
+    results: SearchResult[];
+    count: number;
+    error: string | null;
+  } | null>(null);
+  const isCurrent = search?.key === requestKey;
+  const canSearch = debouncedQuery.length >= MIN_QUERY_LEN;
+  const results = canSearch && isCurrent ? search.results : [];
+  const resultCount = canSearch && isCurrent ? search.count : 0;
+  const loading = canSearch && !isCurrent;
+  const error = canSearch && isCurrent ? search.error : null;
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Auto-flip registry when the language changes (only if user hasn't picked anything yet)
-  useEffect(() => {
-    setRegistry(defaultRegistryFor(config.language));
-  }, [config.language]);
 
   // Keyboard shortcut: "/" to focus the search input (Spring Initializr-style)
   useEffect(() => {
@@ -148,24 +158,8 @@ export default function DependencySearch() {
 
   // Fire the search when debouncedQuery / registry changes
   useEffect(() => {
-    if (abortRef.current) {
-      abortRef.current.abort();
-      abortRef.current = null;
-    }
-
-    if (debouncedQuery.length < MIN_QUERY_LEN) {
-      setResults([]);
-      setResultCount(0);
-      setError(null);
-      setLoading(false);
-      return;
-    }
-
+    if (!canSearch) return;
     const controller = new AbortController();
-    abortRef.current = controller;
-    setLoading(true);
-    setError(null);
-
     const url = `/api/v1/dependencies/search?registry=${encodeURIComponent(
       registry
     )}&q=${encodeURIComponent(debouncedQuery)}&limit=15`;
@@ -176,24 +170,26 @@ export default function DependencySearch() {
         if (!res.ok || !json.success) {
           throw new Error(json.error?.message || `Search failed (${res.status})`);
         }
-        setResults(json.data?.results ?? []);
-        setResultCount(json.data?.count ?? 0);
+        if (!controller.signal.aborted)
+          setSearch({
+            key: requestKey,
+            results: json.data?.results ?? [],
+            count: json.data?.count ?? 0,
+            error: null,
+          });
       })
       .catch((err) => {
-        if (err.name === 'AbortError') return;
-        setResults([]);
-        setResultCount(0);
-        setError(err instanceof Error ? err.message : 'Search failed. Please try again.');
-      })
-      .finally(() => {
-        if (abortRef.current === controller) {
-          setLoading(false);
-          abortRef.current = null;
-        }
+        if (controller.signal.aborted) return;
+        setSearch({
+          key: requestKey,
+          results: [],
+          count: 0,
+          error: err instanceof Error ? err.message : 'Search failed. Please try again.',
+        });
       });
 
     return () => controller.abort();
-  }, [debouncedQuery, registry]);
+  }, [debouncedQuery, registry, requestKey, canSearch]);
 
   const selectedIds = useMemo(
     () => new Set(selected.map((d) => `${d.registry}:${d.id}`)),
@@ -245,19 +241,21 @@ export default function DependencySearch() {
         onValueChange={(v) => {
           setRegistry(v as DependencyRegistry);
           setQuery('');
-          setResults([]);
-          setResultCount(0);
+          setDebouncedQuery('');
+          setSearch(null);
         }}
         className="w-full"
       >
         {/* Tailwind safelist: grid-cols-1 grid-cols-2 grid-cols-3 grid-cols-4 */}
         {registries.length > 1 && (
-          <TabsList className={cn('grid w-full h-9', {
-            'grid-cols-1': registries.length === 1,
-            'grid-cols-2': registries.length === 2,
-            'grid-cols-3': registries.length === 3,
-            'grid-cols-4': registries.length >= 4,
-          })}>
+          <TabsList
+            className={cn('grid w-full h-9', {
+              'grid-cols-1': registries.length === 1,
+              'grid-cols-2': registries.length === 2,
+              'grid-cols-3': registries.length === 3,
+              'grid-cols-4': registries.length >= 4,
+            })}
+          >
             {registries.map((r) => (
               <TabsTrigger key={r} value={r} className="text-xs gap-1.5">
                 <Package className="w-3.5 h-3.5" />
@@ -295,8 +293,7 @@ export default function DependencySearch() {
             ) : !isSearching ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 <Search className="w-5 h-5 mx-auto mb-2 opacity-40" />
-                Type at least {MIN_QUERY_LEN} characters to search{' '}
-                {REGISTRY_META[registry].label}.
+                Type at least {MIN_QUERY_LEN} characters to search {REGISTRY_META[registry].label}.
               </div>
             ) : loading && results.length === 0 ? (
               <div className="flex flex-col items-center gap-2 p-6 text-sm text-muted-foreground">
@@ -315,8 +312,8 @@ export default function DependencySearch() {
                 )}
                 {registry === 'pypi' && (
                   <p className="text-xs mt-1 opacity-70">
-                    Tip: Try the exact package name (e.g. &quot;selenium&quot;, &quot;requests&quot;,
-                    &quot;pytest&quot;).
+                    Tip: Try the exact package name (e.g. &quot;selenium&quot;,
+                    &quot;requests&quot;, &quot;pytest&quot;).
                   </p>
                 )}
               </div>
@@ -463,19 +460,22 @@ interface DependencyChipProps {
 
 function DependencyChip({ dep, onRemove, onVersionChange }: DependencyChipProps) {
   const [open, setOpen] = useState(false);
-  const [versions, setVersions] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const fetchedRef = useRef(false);
+  const [versionState, setVersionState] = useState<{
+    key: string;
+    versions: string[];
+    error: string | null;
+  } | null>(null);
+  const versionKey = JSON.stringify([dep.registry, dep.id]);
+  const loaded = versionState?.key === versionKey;
+  const versions = loaded ? versionState.versions : [];
+  const error = loaded ? versionState.error : null;
+  const loading = open && !loaded;
 
   // Fetch versions lazily on first open
   useEffect(() => {
-    if (!open || fetchedRef.current) return;
-    fetchedRef.current = true;
+    if (!open || loaded) return;
 
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
 
     const url = `/api/v1/dependencies/versions?registry=${encodeURIComponent(
       dep.registry
@@ -492,16 +492,20 @@ function DependencyChip({ dep, onRemove, onVersionChange }: DependencyChipProps)
         if (dep.version && !list.includes(dep.version)) {
           list.unshift(dep.version);
         }
-        setVersions(list);
+        if (!controller.signal.aborted)
+          setVersionState({ key: versionKey, versions: list, error: null });
       })
       .catch((err) => {
-        if (err.name === 'AbortError') return;
-        setError(err instanceof Error ? err.message : 'Could not load versions');
-      })
-      .finally(() => setLoading(false));
+        if (controller.signal.aborted) return;
+        setVersionState({
+          key: versionKey,
+          versions: [],
+          error: err instanceof Error ? err.message : 'Could not load versions',
+        });
+      });
 
     return () => controller.abort();
-  }, [open, dep.registry, dep.id, dep.version]);
+  }, [open, dep.registry, dep.id, dep.version, versionKey, loaded]);
 
   return (
     <Tooltip>

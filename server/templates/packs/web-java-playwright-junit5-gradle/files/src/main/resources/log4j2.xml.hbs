@@ -22,7 +22,7 @@
     </Appenders>
 
     <Loggers>
-        <Logger name="{{javaPackage}}" level="DEBUG" additivity="false">
+        <Logger name="{{escapeXml javaPackage}}" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </Logger>

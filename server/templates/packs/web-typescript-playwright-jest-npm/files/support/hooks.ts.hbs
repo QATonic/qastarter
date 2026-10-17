@@ -1,7 +1,6 @@
 import { Before, After, AfterStep, Status, setDefaultTimeout } from '@cucumber/cucumber';
 import { CustomWorld } from './world';
-import { logger } from '../utils/logger';
-import { captureScreenshot } from '../utils/screenshotHelper';
+import logger from '../utils/logger';
 
 // Set default timeout for steps
 setDefaultTimeout(60000);
@@ -17,7 +16,7 @@ After(async function (this: CustomWorld, { result, pickle }) {
     
     // Capture screenshot on failure
     if (this.page) {
-      const screenshot = await captureScreenshot(this.page, `failed-${Date.now()}`);
+      const screenshot = await this.page.screenshot({ fullPage: true });
       this.attach(screenshot, 'image/png');
     }
     
@@ -39,7 +38,7 @@ AfterStep(async function (this: CustomWorld, { result, pickleStep }) {
     
     // Capture screenshot on step failure
     if (this.page) {
-      const screenshot = await captureScreenshot(this.page, `step-failed-${Date.now()}`);
+      const screenshot = await this.page.screenshot({ fullPage: true });
       this.attach(screenshot, 'image/png');
     }
   }

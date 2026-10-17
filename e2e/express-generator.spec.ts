@@ -68,7 +68,7 @@ async function expectGenerateEnabled(page: Page): Promise<void> {
  * server's websocket session.
  */
 async function freshExpressPage(page: Page): Promise<void> {
-  await page.goto('/express');
+  await page.goto('/express', { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => {
     try {
       localStorage.clear();
@@ -77,7 +77,7 @@ async function freshExpressPage(page: Page): Promise<void> {
       // Some test contexts block storage access — safe to ignore
     }
   });
-  await page.goto('/express');
+  await page.goto('/express', { waitUntil: 'domcontentloaded' });
   // Wait for the Configure header to render so we know the app is ready.
   await expect(page.getByText(/Configure Your Project/i)).toBeVisible({
     timeout: 10_000,

@@ -21,8 +21,8 @@ export const config = {
   screenshotOnFailure: process.env.SCREENSHOT_ON_FAILURE === 'true',
   
   // Authentication
-  authToken: process.env.AUTH_TOKEN || '{{apiAuthToken}}',
-  apiKey: process.env.API_KEY || '{{apiAuthToken}}',
+  authToken: process.env.AUTH_TOKEN || '{{string apiAuthToken "single" "js"}}',
+  apiKey: process.env.API_KEY || '{{string apiAuthToken "single" "js"}}',
 
   // Logging
   logLevel: process.env.LOG_LEVEL || 'info'

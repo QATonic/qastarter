@@ -38,7 +38,7 @@ describe('useAnalytics', () => {
 
   describe('session management', () => {
     it('should create session ID in sessionStorage', async () => {
-      const { result } = await loadAndRenderHook();
+      await loadAndRenderHook();
 
       // Trigger useEffect
       await act(async () => {
@@ -53,7 +53,7 @@ describe('useAnalytics', () => {
     it('should reuse existing session ID', async () => {
       sessionStorage.setItem('qa_session_id', 'sess_existing_123');
 
-      const { result } = await loadAndRenderHook();
+      await loadAndRenderHook();
 
       await act(async () => {
         vi.runAllTimers();
@@ -81,9 +81,7 @@ describe('useAnalytics', () => {
       });
 
       expect(mockFetch).toHaveBeenCalled();
-      const fetchCall = mockFetch.mock.calls.find(
-        (call) => call[0]?.includes?.('analytics') || call[1]?.body?.includes?.('wizard_start')
-      );
+
       // The hook sends batched events to /api/analytics/events
       expect(mockFetch).toHaveBeenCalledWith(
         '/api/v1/analytics/events',
@@ -115,7 +113,9 @@ describe('useAnalytics', () => {
 
       expect(mockFetch).toHaveBeenCalled();
       const body = JSON.parse(mockFetch.mock.calls[0][1].body);
-      const stepEvent = body.events.find((e: any) => e.eventType === 'wizard_step');
+      const stepEvent = body.events.find(
+        (e: { eventType: string }) => e.eventType === 'wizard_step'
+      );
       expect(stepEvent).toBeDefined();
       expect(stepEvent.data.stepNumber).toBe(2);
       expect(stepEvent.data.stepName).toBe('Framework');

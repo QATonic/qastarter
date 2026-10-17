@@ -10,6 +10,10 @@ import globals from 'globals';
 export default [
     {
         ignores: [
+            '.claude/**',
+            '.codex/**',
+            '**/node_modules/**',
+            '**/dist/**',
             'dist/**',
             'node_modules/**',
             '**/*.config.js',

@@ -61,7 +61,7 @@ public class ExtentManager {
         try {
             // Set report name and document title
             sparkReporter.config().setDocumentTitle("Desktop Automation Test Report");
-            sparkReporter.config().setReportName("{{projectName}} - Desktop Test Execution Report");
+            sparkReporter.config().setReportName("{{string projectName "double" "java"}} - Desktop Test Execution Report");
             
             // Set theme
             sparkReporter.config().setTheme(Theme.DARK);
@@ -86,7 +86,7 @@ public class ExtentManager {
      */
     private static void setSystemInformation() {
         try {
-            extent.setSystemInfo("Application", "{{projectName}}");
+            extent.setSystemInfo("Application", "{{string projectName "double" "java"}}");
             extent.setSystemInfo("Framework", "WinAppDriver + Java + TestNG + Maven");
             extent.setSystemInfo("Platform", System.getProperty("os.name"));
             extent.setSystemInfo("Platform Version", System.getProperty("os.version"));

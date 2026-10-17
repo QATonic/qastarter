@@ -1,14 +1,14 @@
 {
-  "_comment": "UPDATE THESE VALUES FOR YOUR APPLICATION",
-  "baseUrl": "https://your-app-url.com",
+  "_comment": "Defaults target the public SauceDemo site so `npm test` passes out of the box. Update these values for your own application.",
+  "baseUrl": "https://www.saucedemo.com",
   "credentials": {
     "validUser": {
-      "username": "your-test-user@email.com",
-      "password": "YourTestPassword123"
+      "username": "{{string testUsername "double" "json"}}",
+      "password": "{{string testPassword "double" "json"}}"
     },
     "adminUser": {
-      "username": "your-admin@email.com",
-      "password": "YourAdminPassword123"
+      "username": "{{string testUsername "double" "json"}}",
+      "password": "{{string testPassword "double" "json"}}"
     }
   },
   "timeout": 30000

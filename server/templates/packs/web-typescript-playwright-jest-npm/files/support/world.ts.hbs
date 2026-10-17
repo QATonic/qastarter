@@ -1,7 +1,6 @@
 import { World, IWorldOptions } from '@cucumber/cucumber';
 import { Browser, BrowserContext, Page, chromium, firefox, webkit } from 'playwright';
-import { logger } from '../utils/logger';
-import { config } from '../config/test.config';
+import logger from '../utils/logger';
 
 export class CustomWorld extends World {
   browser!: Browser;
@@ -32,15 +31,14 @@ export class CustomWorld extends World {
       
       this.context = await this.browser.newContext({
         viewport: { width: 1280, height: 720 },
-        recordVideo: config.recordVideo ? { dir: 'videos/' } : undefined,
-        screenshot: 'only-on-failure'
+        recordVideo: process.env.RECORD_VIDEO === 'true' ? { dir: 'videos/' } : undefined
       });
       
       this.page = await this.context.newPage();
       
       logger.info('Browser initialized successfully');
     } catch (error) {
-      logger.error('Failed to initialize browser:', error);
+      logger.error(`Failed to initialize browser: ${String(error)}`);
       throw error;
     }
   }
@@ -58,7 +56,7 @@ export class CustomWorld extends World {
       }
       logger.info('Browser cleanup completed');
     } catch (error) {
-      logger.error('Error during cleanup:', error);
+      logger.error(`Error during cleanup: ${String(error)}`);
     }
   }
 }

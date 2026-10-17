@@ -65,6 +65,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
 
   // Configuration persistence
   const persistence = useConfigPersistence();
+  const { loadConfig, saveConfig } = persistence;
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [savedTimestamp, setSavedTimestamp] = useState(0);
   const isInitialMount = useRef(true);
@@ -73,7 +74,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
   // Check for saved configuration on mount
   useEffect(() => {
     if (isInitialMount.current) {
-      const saved = persistence.loadConfig();
+      const saved = loadConfig();
       if (saved) {
         setSavedTimestamp(saved.timestamp);
         setShowResumeDialog(true);
@@ -82,17 +83,17 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
       }
       isInitialMount.current = false;
     }
-  }, []);
+  }, [loadConfig]);
 
   // Auto-save configuration on changes (debounced)
   useEffect(() => {
     if (hasResumedOrStartedFresh.current && !showResumeDialog) {
       const timer = setTimeout(() => {
-        persistence.saveConfig(config, currentStep);
+        saveConfig(config, currentStep);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [config, currentStep, showResumeDialog]);
+  }, [config, currentStep, showResumeDialog, saveConfig]);
 
   // Handle resume configuration
   const handleResume = () => {
@@ -172,7 +173,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
         web: 'https://www.saucedemo.com/',
         api: 'https://jsonplaceholder.typicode.com',
       };
-      newConfig.baseUrl = urlDefaults[value] || '';
+      newConfig.baseUrl = urlDefaults[value as string] || '';
 
       // Web: pre-fill SauceDemo credentials
       if (value === 'web') {
@@ -204,7 +205,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
 
     // When baseUrl changes for web, auto-switch credentials
     if (key === 'baseUrl' && config.testingType === 'web') {
-      const isSauceDemo = /saucedemo\.com/i.test(value);
+      const isSauceDemo = /saucedemo\.com/i.test(value as string);
       if (isSauceDemo) {
         newConfig.testUsername = 'standard_user';
         newConfig.testPassword = 'secret_sauce';
@@ -231,7 +232,7 @@ export function WizardProvider({ children, onComplete, onBack }: WizardProviderP
       newConfig.language === 'java' &&
       (newConfig.buildTool === 'maven' || newConfig.buildTool === 'gradle')
     ) {
-      newConfig.artifactId = value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      newConfig.artifactId = (value as string).toLowerCase().replace(/[^a-z0-9-]/g, '-');
     }
 
     const validatedConfig = WizardValidator.resetInvalidSelections(newConfig);

@@ -8,7 +8,7 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
-import { fileURLToPath } from 'url';
+
 import { getCorrelationContext } from '../middleware/correlationMiddleware';
 
 // Determine logs directory - handle Docker/Production environment explicitly
@@ -63,13 +63,29 @@ const correlationFormat = winston.format((info) => {
  * forgets to strip a field before `logger.info('...', body)`.
  */
 const SENSITIVE_KEYS = new Set([
-  'token', 'accessToken', 'access_token', 'refreshToken', 'refresh_token',
-  'authorization', 'apiKey', 'api_key', 'apikey', 'secret',
-  'password', 'passwd', 'privatekey', 'private_key',
-  'githubToken', 'github_token', 'bypasstoken',
+  'token',
+  'accessToken',
+  'access_token',
+  'refreshToken',
+  'refresh_token',
+  'authorization',
+  'apiKey',
+  'api_key',
+  'apikey',
+  'secret',
+  'password',
+  'passwd',
+  'privatekey',
+  'private_key',
+  'githubToken',
+  'github_token',
+  'bypasstoken',
 ]);
 const SENSITIVE_HEADER_NAMES = new Set([
-  'authorization', 'cookie', 'x-qastarter-token', 'proxy-authorization',
+  'authorization',
+  'cookie',
+  'x-qastarter-token',
+  'proxy-authorization',
 ]);
 
 /**
@@ -81,7 +97,7 @@ const SENSITIVE_HEADER_NAMES = new Set([
 const redactionFormat = winston.format((info) => {
   const TOKEN_SHAPES = [
     /\b(sk|ghp|ghs|gho|npm|xoxb|xoxp|AIza)_?[A-Za-z0-9_-]{16,}/g,
-    /\bBearer\s+[A-Za-z0-9._\-]+/gi,
+    /\bBearer\s+[A-Za-z0-9._-]+/gi,
   ];
   const redactString = (s: string): string => {
     let out = s;
@@ -123,7 +139,11 @@ const consoleFormat = winston.format.combine(
       const reqIdStr = reqId ? `[${reqId}]` : '';
       const durationStr = duration ? `(${duration}ms)` : '';
       // Filter out context fields from meta for cleaner output
-      const { path: _p, method: _m, traceId: _t, spanId: _s, ...cleanMeta } = meta;
+      const cleanMeta = { ...meta };
+      delete cleanMeta.path;
+      delete cleanMeta.method;
+      delete cleanMeta.traceId;
+      delete cleanMeta.spanId;
       const metaStr = Object.keys(cleanMeta).length ? ` ${JSON.stringify(cleanMeta)}` : '';
       return `${timestamp} ${level}: ${corrIdStr}${reqIdStr} ${message} ${durationStr}${metaStr}`;
     }
@@ -204,7 +224,11 @@ export function createRequestLogger(requestId: string): winston.Logger {
 /**
  * Log HTTP request (for middleware)
  */
-export function logHttpRequest(req: any, res: any, duration: number): void {
+export function logHttpRequest(
+  req: import('express').Request,
+  res: import('express').Response,
+  duration: number
+): void {
   const meta = {
     method: req.method,
     url: req.url,
@@ -227,7 +251,7 @@ export function logHttpRequest(req: any, res: any, duration: number): void {
 export function logGeneration(
   requestId: string,
   event: 'started' | 'completed' | 'failed',
-  details: Record<string, any>
+  details: Record<string, unknown>
 ): void {
   const log = createRequestLogger(requestId);
 
@@ -249,7 +273,7 @@ export function logGeneration(
  */
 export function logTemplate(
   operation: 'load' | 'compile' | 'cache-hit' | 'cache-miss',
-  details: Record<string, any>
+  details: Record<string, unknown>
 ): void {
   logger.debug(`Template ${operation}`, details);
 }
@@ -257,7 +281,11 @@ export function logTemplate(
 /**
  * Log API error
  */
-export function logApiError(requestId: string, error: Error, context?: Record<string, any>): void {
+export function logApiError(
+  requestId: string,
+  error: Error,
+  context?: Record<string, unknown>
+): void {
   const log = createRequestLogger(requestId);
   log.error('API Error', {
     message: error.message,

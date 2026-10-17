@@ -1,0 +1,29 @@
+const fs = require('fs');
+const path = require('path');
+
+/**
+ * Reads JSON / CSV test data from the `data/` folder.
+ */
+class TestDataReader {
+  static readJson(filename) {
+    const filepath = path.join(process.cwd(), 'data', filename);
+    const content = fs.readFileSync(filepath, 'utf-8');
+    return JSON.parse(content);
+  }
+
+  static readCsv(filename) {
+    const filepath = path.join(process.cwd(), 'data', filename);
+    const content = fs.readFileSync(filepath, 'utf-8').trim();
+    const lines = content.split(/\r?\n/);
+    const headers = lines[0].split(',').map((h) => h.trim());
+    return lines.slice(1).map((line) => {
+      const values = line.split(',').map((v) => v.trim());
+      return headers.reduce((obj, header, i) => {
+        obj[header] = values[i];
+        return obj;
+      }, {});
+    });
+  }
+}
+
+module.exports = TestDataReader;

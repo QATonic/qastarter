@@ -12,7 +12,7 @@
 const { LoginPage } = require('../pages/LoginPage');
 const envConfig = require('../config/env.config');
 {{#if utilities.dataProvider}}
-const { TestDataReader } = require('../utils/dataReader');
+const DataReader = require('../utils/dataReader');
 {{/if}}
 
 describe('Login Tests', () => {
@@ -45,7 +45,7 @@ describe('Login Tests', () => {
    * Add more rows to users.json and they will be picked up automatically.
    */
   describe('Data-driven login tests', () => {
-    const testData = TestDataReader.readJson('users.json') || [];
+    const testData = DataReader.readJson('users.json') || [];
 
     test.each(testData.map((u) => [u.username, u.password, u.expected]))(
       'should verify login for user: %s',

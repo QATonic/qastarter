@@ -1,13 +1,14 @@
 """
 Login Page - Page object for SauceDemo login page.
 
-URL: {{baseUrl}}
+URL: {{string baseUrl "double" "py"}}
 
 HOW TO CUSTOMIZE:
   1. Update locators below for your app
   2. Update credentials in: config/dev.ini
 """
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
 from config.config_reader import config
 
@@ -63,8 +64,16 @@ class LoginPage(BasePage):
         return self.is_displayed(self.ERROR_MESSAGE)
     
     def is_login_successful(self) -> bool:
-        """Check if login was successful (redirected to inventory)."""
-        return "inventory" in self.get_current_url()
+        """Check if login was successful (redirected to inventory).
+
+        Waits for the post-login redirect so the check isn't racing the
+        browser navigation.
+        """
+        try:
+            self._wait().until(EC.url_contains("inventory"))
+            return True
+        except Exception:
+            return "inventory" in self.get_current_url()
     
     def is_loaded(self) -> bool:
         """Check if login page is loaded."""

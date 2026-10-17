@@ -6,6 +6,7 @@ Usage:
     base_url = config.base_url
 """
 import os
+import json
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -15,29 +16,38 @@ class ConfigReader:
     
     def __init__(self):
         self.env = os.getenv("ENV", "dev")
-        self._config = ConfigParser()
+        self._config = ConfigParser(interpolation=None)
         self._load_config()
     
     def _load_config(self):
         config_file = Path(__file__).parent / f"{self.env}.ini"
         if config_file.exists():
-            self._config.read(config_file)
+            self._config.read(config_file, encoding="utf-8")
             print(f"[Config] Loaded: {config_file}")
         else:
             print(f"[Config] Using defaults - {config_file} not found")
     
+    @staticmethod
+    def _decode_value(value):
+        if value.startswith('"'):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                pass
+        return value
+
     def get(self, key: str, default: str = "") -> str:
         env_value = os.getenv(key.upper().replace(".", "_"))
         if env_value:
             return env_value
         try:
-            return self._config.get("api", key)
+            return self._decode_value(self._config.get("api", key))
         except:
             return default
     
     @property
     def base_url(self) -> str:
-        return self.get("base_url", "{{baseUrl}}")
+        return self.get("base_url", "{{string baseUrl "double" "py"}}")
     
     @property
     def timeout(self) -> int:

@@ -87,9 +87,15 @@ export default function Docs() {
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {[
-                { title: '1. Select Type', desc: 'Choose Web, Mobile, API, Desktop, or Performance testing.' },
+                {
+                  title: '1. Select Type',
+                  desc: 'Choose Web, Mobile, API, Desktop, or Performance testing.',
+                },
                 { title: '2. Choose Tech', desc: 'Pick your language, framework, and tools.' },
-                { title: '3. Configure', desc: 'Set project name, cloud farms, test data, environments, and utilities.' },
+                {
+                  title: '3. Configure',
+                  desc: 'Set project name, cloud farms, test data, environments, and utilities.',
+                },
                 { title: '4. Download', desc: 'Get a production-ready ZIP file instantly.' },
               ].map((step, i) => (
                 <Card key={i} className="relative overflow-hidden border-primary/20">
@@ -232,7 +238,9 @@ export default function Docs() {
                 <Card>
                   <CardHeader>
                     <CardTitle>API Automation (RestAssured, Resty, Supertest, RestSharp)</CardTitle>
-                    <CardDescription>REST, GraphQL, and OpenAPI schema-driven testing</CardDescription>
+                    <CardDescription>
+                      REST, GraphQL, and OpenAPI schema-driven testing
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <ul className="grid md:grid-cols-2 gap-3">
@@ -314,7 +322,9 @@ export default function Docs() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Performance Testing (k6, Gatling, Locust)</CardTitle>
-                    <CardDescription>Load, stress, and scalability testing frameworks</CardDescription>
+                    <CardDescription>
+                      Load, stress, and scalability testing frameworks
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <ul className="grid md:grid-cols-2 gap-3">
@@ -405,9 +415,7 @@ export default function Docs() {
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-4">
-                <AccordionTrigger className="text-lg font-medium">
-                  C# (.NET)
-                </AccordionTrigger>
+                <AccordionTrigger className="text-lg font-medium">C# (.NET)</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-2">
                   <DocCodeBlock
                     code={
@@ -513,8 +521,9 @@ export default function Docs() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Run your Web and Mobile tests on BrowserStack or Sauce Labs cloud infrastructure.
-                    Select a cloud provider in the generator and your project will include:
+                    Run your Web and Mobile tests on BrowserStack or Sauce Labs cloud
+                    infrastructure. Select a cloud provider in the generator and your project will
+                    include:
                   </p>
                   <ul className="space-y-1 text-sm text-muted-foreground">
                     <li className="flex items-center gap-2">
@@ -638,8 +647,8 @@ export default function Docs() {
             <Card>
               <CardContent className="pt-6 space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  QAStarter also provides a command-line interface for generating projects and keeping
-                  dependencies up to date.
+                  QAStarter also provides a command-line interface for generating projects and
+                  keeping dependencies up to date.
                 </p>
                 <DocCodeBlock
                   code={

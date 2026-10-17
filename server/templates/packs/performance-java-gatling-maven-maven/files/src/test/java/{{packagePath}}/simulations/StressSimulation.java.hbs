@@ -16,10 +16,10 @@ import static io.gatling.javaapi.http.HttpDsl.*;
 public class StressSimulation extends Simulation {
 
     private final HttpProtocolBuilder httpProtocol = http
-            .baseUrl("{{baseUrl}}")
+            .baseUrl("{{string baseUrl "double" "java"}}")
             .acceptHeader("text/html,application/json")
             .acceptEncodingHeader("gzip, deflate")
-            .userAgentHeader("Gatling/{{toolVersions.gatling}}");
+            .userAgentHeader("Gatling/{{string toolVersions.gatling "double" "java"}}");
 
     private final ScenarioBuilder stressScenario = scenario("Stress Test")
             .exec(

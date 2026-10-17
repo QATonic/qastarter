@@ -3,35 +3,35 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>{{groupId}}</groupId>
-    <artifactId>{{artifactId}}</artifactId>
+    <groupId>{{escapeXml groupId}}</groupId>
+    <artifactId>{{escapeXml artifactId}}</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <name>{{projectName}}</name>
+    <name>{{escapeXml projectName}}</name>
     <description>Web UI Test Automation Framework using Playwright, TestNG, and Maven</description>
 
     <properties>
-        <maven.compiler.source>{{toolVersions.java}}</maven.compiler.source>
-        <maven.compiler.target>{{toolVersions.java}}</maven.compiler.target>
+        <maven.compiler.source>{{escapeXml toolVersions.java}}</maven.compiler.source>
+        <maven.compiler.target>{{escapeXml toolVersions.java}}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Core Dependencies -->
-        <playwright.version>{{toolVersions.playwright}}</playwright.version>
-        <testng.version>{{toolVersions.testng}}</testng.version>
-        <log4j.version>{{toolVersions.log4j}}</log4j.version>
+        <playwright.version>{{escapeXml toolVersions.playwright}}</playwright.version>
+        <testng.version>{{escapeXml toolVersions.testng}}</testng.version>
+        <log4j.version>{{escapeXml toolVersions.log4j}}</log4j.version>
 
         {{#if (eq reportingTool "allure")}}
         <!-- Allure Reporting -->
-        <allure.version>{{toolVersions.allure}}</allure.version>
+        <allure.version>{{escapeXml toolVersions.allure}}</allure.version>
         <aspectj.version>1.9.20</aspectj.version>
         {{/if}}
         {{#if (eq reportingTool "extent-reports")}}
         <!-- ExtentReports -->
-        <extentreports.version>{{toolVersions.extentreports}}</extentreports.version>
+        <extentreports.version>{{escapeXml toolVersions.extentreports}}</extentreports.version>
         {{/if}}
         {{#if (eq testingPattern "bdd")}}
         <!-- Cucumber BDD -->
-        <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
+        <cucumber.version>{{escapeXml toolVersions.cucumber}}</cucumber.version>
         {{/if}}
 
         <!-- Utilities -->
@@ -138,9 +138,9 @@
         <!-- User-picked dependencies (from QAStarter dependency search) -->
         {{#each userDependencies.maven}}
         <dependency>
-            <groupId>{{group}}</groupId>
-            <artifactId>{{name}}</artifactId>
-            <version>{{version}}</version>
+            <groupId>{{escapeXml group}}</groupId>
+            <artifactId>{{escapeXml name}}</artifactId>
+            <version>{{escapeXml version}}</version>
         </dependency>
         {{/each}}
         {{/if}}
@@ -149,7 +149,7 @@
         <dependency>
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
-            <version>{{toolVersions.datafaker}}</version>
+            <version>{{escapeXml toolVersions.datafaker}}</version>
         </dependency>
         {{/if}}
     </dependencies>

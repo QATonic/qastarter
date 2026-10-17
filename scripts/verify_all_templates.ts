@@ -74,6 +74,7 @@ async function verifyAllTemplates() {
         includeSampleTests: true,
         reportingTool: undefined,
         cicdTool: undefined,
+        cloudDeviceFarm: 'none',
       };
 
       // 3. Attempt Generation

@@ -46,11 +46,11 @@ namespace {{projectNamespace}}.Config
                    value.Equals("1", StringComparison.OrdinalIgnoreCase);
         }
 
-        public string BaseUrl => Get("BaseUrl", "{{baseUrl}}");
+        public string BaseUrl => Get("BaseUrl", "{{string baseUrl "double" "cs"}}");
         public string Browser => Get("Browser", "chrome");
         public bool Headless => GetBool("Headless", false);
         public int Timeout => GetInt("Timeout", 30);
-        public string Username => Get("Username", "{{testUsername}}");
-        public string Password => Get("Password", "{{testPassword}}");
+        public string Username => Get("Username", "{{string testUsername "double" "cs"}}");
+        public string Password => Get("Password", "{{string testPassword "double" "cs"}}");
     }
 }

@@ -46,6 +46,7 @@ describe('GitHubService', () => {
     isPrivate: false,
     description: 'Test project',
     projectConfig: {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'my-qa-project',
       testingType: 'web' as const,
       framework: 'selenium',
@@ -217,9 +218,7 @@ describe('GitHubService', () => {
     });
 
     it('should throw GitHubServiceError on network error during push', async () => {
-      mockGit.createBlob.mockRejectedValue(
-        new Error('fetch failed')
-      );
+      mockGit.createBlob.mockRejectedValue(new Error('fetch failed'));
 
       await expect(pushProjectToGitHub(defaultOptions)).rejects.toThrow(GitHubServiceError);
       await expect(pushProjectToGitHub(defaultOptions)).rejects.toThrow(/Failed to push files/);

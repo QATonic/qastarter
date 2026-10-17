@@ -1,5 +1,5 @@
 [
-  {"username": "{{testUsername}}", "password": "{{testPassword}}", "expected": "success"},
-  {"username": "locked_out_user", "password": "{{testPassword}}", "expected": "error"},
-  {"username": "problem_user", "password": "{{testPassword}}", "expected": "success"}
+  {"username": "{{string testUsername "double" "json"}}", "password": "{{string testPassword "double" "json"}}", "expected": "success"},
+  {"username": "locked_out_user", "password": "{{string testPassword "double" "json"}}", "expected": "error"},
+  {"username": "problem_user", "password": "{{string testPassword "double" "json"}}", "expected": "success"}
 ]

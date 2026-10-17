@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { z } from 'zod';
 
 export interface GenerateOptions {
   projectName: string;
@@ -147,7 +148,7 @@ export function redactSecrets(text: string): string {
   // Strip any header-looking lines that carry our tokens / auth
   out = out.replace(/(X-QAStarter-Token|Authorization)\s*:\s*[^\r\n]*/gi, '$1: [REDACTED]');
   // Bearer / sk-… / gh[pso]_… / npm_… — common credential shapes
-  out = out.replace(/\bBearer\s+[A-Za-z0-9._\-]+/g, 'Bearer [REDACTED]');
+  out = out.replace(/\bBearer\s+[A-Za-z0-9._-]+/g, 'Bearer [REDACTED]');
   out = out.replace(/\b(sk|ghp|ghs|gho|npm)_[A-Za-z0-9_-]{10,}/g, '[REDACTED_TOKEN]');
   return out;
 }
@@ -201,7 +202,9 @@ export async function fetchMetadata(): Promise<MetadataResponse> {
     signal: AbortSignal.timeout(10_000),
   });
   if (!response.ok) {
-    throw new Error(`Failed to fetch metadata: ${redactSecrets(response.statusText)}${rateLimitSuffix(response)}`);
+    throw new Error(
+      `Failed to fetch metadata: ${redactSecrets(response.statusText)}${rateLimitSuffix(response)}`
+    );
   }
   const raw: RawMetadataResponse = await response.json();
   return transformMetadata(raw);
@@ -257,7 +260,9 @@ export async function generateProjectBuffer(options: GenerateOptions): Promise<{
   const response = await fetch(url, { headers: clientHeaders() });
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to generate project (HTTP ${response.status}): ${redactSecrets(errorText)}${rateLimitSuffix(response)}`);
+    throw new Error(
+      `Failed to generate project (HTTP ${response.status}): ${redactSecrets(errorText)}${rateLimitSuffix(response)}`
+    );
   }
 
   // Defence-in-depth: caller decides the ceiling, default 50 MB. Stops a compromised or
@@ -298,9 +303,7 @@ export async function generateProjectBuffer(options: GenerateOptions): Promise<{
 /**
  * POST to /api/v1/project-preview — returns project file tree and sample contents.
  */
-export async function previewProject(
-  options: GenerateOptions
-): Promise<Record<string, unknown>> {
+export async function previewProject(options: GenerateOptions): Promise<Record<string, unknown>> {
   const response = await fetch(`${getApiUrl()}/api/v1/project-preview`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...clientHeaders() },
@@ -308,7 +311,9 @@ export async function previewProject(
     signal: AbortSignal.timeout(15_000),
   });
   if (!response.ok) {
-    throw new Error(`Failed to preview project (HTTP ${response.status}): ${redactSecrets(await response.text())}${rateLimitSuffix(response)}`);
+    throw new Error(
+      `Failed to preview project (HTTP ${response.status}): ${redactSecrets(await response.text())}${rateLimitSuffix(response)}`
+    );
   }
   const body = (await response.json()) as { data?: Record<string, unknown> };
   return body.data ?? {};
@@ -349,18 +354,36 @@ export async function validateConfig(
   });
   if (!response.ok) {
     const text = await response.text();
+    if (response.status !== 400 && response.status !== 422) {
+      throw new Error(
+        `Configuration validation failed (HTTP ${response.status}): ${redactSecrets(text)}${rateLimitSuffix(response)}`
+      );
+    }
     // Incompatible combos return 400; surface as structured error instead of throwing.
     try {
       const body = JSON.parse(text) as { error?: { message?: string } };
-      return { valid: false, errors: [{ field: 'combination', message: body.error?.message ?? text }] };
+      return {
+        valid: false,
+        errors: [{ field: 'combination', message: redactSecrets(body.error?.message ?? text) }],
+      };
     } catch {
-      return { valid: false, errors: [{ field: 'combination', message: text }] };
+      return { valid: false, errors: [{ field: 'combination', message: redactSecrets(text) }] };
     }
   }
-  const body = (await response.json()) as {
-    data?: { valid: boolean; errors?: Array<{ field: string; message: string }> };
-  };
-  return body.data ?? { valid: true };
+  const resultSchema = z.object({
+    valid: z.boolean(),
+    errors: z.array(z.object({ field: z.string(), message: z.string() })).optional(),
+  });
+  const body: unknown = await response.json();
+  const current = z.object({ success: z.literal(true), data: resultSchema }).safeParse(body);
+  if (current.success) return current.data.data;
+  // Older API releases used top-level isValid. Accept that explicit result,
+  // but never interpret an unknown or missing response shape as success.
+  const legacy = z
+    .object({ isValid: z.boolean(), errors: resultSchema.shape.errors })
+    .safeParse(body);
+  if (legacy.success) return { valid: legacy.data.isValid, errors: legacy.data.errors };
+  throw new Error('Unexpected configuration validation response');
 }
 
 export async function generateProject(
@@ -394,7 +417,9 @@ export async function generateProject(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to generate project: ${redactSecrets(errorText)}${rateLimitSuffix(response)}`);
+    throw new Error(
+      `Failed to generate project: ${redactSecrets(errorText)}${rateLimitSuffix(response)}`
+    );
   }
 
   const contentDisposition = response.headers.get('content-disposition');

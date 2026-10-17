@@ -14,10 +14,10 @@ func LoadConfig() {
 // In a real app, you might use viper or read from .env
 authToken := os.Getenv("AUTH_TOKEN")
 if authToken == "" {
-authToken = "{{apiAuthToken}}"
+authToken = "{{string apiAuthToken "double" "go"}}"
 }
 AppConfig = &Config{
-BaseURL:   "{{baseUrl}}",
+BaseURL:   "{{string baseUrl "double" "go"}}",
 AuthToken: authToken,
 }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "{{projectName}}",
+  "name": "{{string projectName "double" "json"}}",
   "version": "1.0.0",
   "description": "Performance test suite using k6",
   "scripts": {
@@ -14,7 +14,7 @@
   "license": "MIT",
   "devDependencies": {
     {{#if utilities.faker}}
-    "@faker-js/faker": "^{{toolVersions.fakerJs}}"
+    "@faker-js/faker": "^{{string toolVersions.fakerJs "double" "json"}}"
     {{/if}}
   }
 }

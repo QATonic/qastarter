@@ -20,32 +20,35 @@ const SCREENSHOTS_DIR = path.join(__dirname2, '..', 'assets', 'screenshots');
 const ASSETS_DIR = path.join(__dirname2, '..', 'assets');
 const WIDTH = 800;
 const HEIGHT = 600;
-const FRAME_DELAY = 2000; // 2 seconds per normal frame
 
 async function main() {
   console.log('🎞️  Assembling animated GIF from screenshots...\n');
 
   // Get ordered screenshot files
-  const files = fs.readdirSync(SCREENSHOTS_DIR)
-    .filter(f => /^\d{2}-/.test(f) && f.endsWith('.png'))
+  const files = fs
+    .readdirSync(SCREENSHOTS_DIR)
+    .filter((f) => /^\d{2}-/.test(f) && f.endsWith('.png'))
     .sort();
 
   console.log(`Found ${files.length} frames:`);
-  files.forEach(f => console.log(`  - ${f}`));
+  files.forEach((f) => console.log(`  - ${f}`));
 
   // Prepare frame data with delays
-  interface FrameEntry { file: string; delay: number; }
+  interface FrameEntry {
+    file: string;
+    delay: number;
+  }
   const frameEntries: FrameEntry[] = [
-    { file: files[0], delay: 2500 },    // Landing page - hold longer
-    { file: files[1], delay: 1500 },    // Config panel empty
-    { file: files[2], delay: 1500 },    // Web selected
-    { file: files[3], delay: 1500 },    // Selenium selected
-    { file: files[4], delay: 1500 },    // Java selected
-    { file: files[5], delay: 2000 },    // TestNG + Maven
-    { file: files[6], delay: 2000 },    // Project name set
-    { file: files[7], delay: 2500 },    // Advanced options - show longer
-    { file: files[8], delay: 3000 },    // Project Ready!
-    { file: files[9], delay: 3000 },    // Success page - hold longest
+    { file: files[0], delay: 2500 }, // Landing page - hold longer
+    { file: files[1], delay: 1500 }, // Config panel empty
+    { file: files[2], delay: 1500 }, // Web selected
+    { file: files[3], delay: 1500 }, // Selenium selected
+    { file: files[4], delay: 1500 }, // Java selected
+    { file: files[5], delay: 2000 }, // TestNG + Maven
+    { file: files[6], delay: 2000 }, // Project name set
+    { file: files[7], delay: 2500 }, // Advanced options - show longer
+    { file: files[8], delay: 3000 }, // Project Ready!
+    { file: files[9], delay: 3000 }, // Success page - hold longest
   ];
 
   // Create GIF encoder
@@ -55,8 +58,8 @@ async function main() {
 
   encoder.createReadStream().pipe(writeStream);
   encoder.start();
-  encoder.setRepeat(0);       // 0 = loop forever
-  encoder.setQuality(10);     // image quality (lower = better but slower)
+  encoder.setRepeat(0); // 0 = loop forever
+  encoder.setQuality(10); // image quality (lower = better but slower)
   encoder.setTransparent(0);
 
   console.log(`\nEncoding ${frameEntries.length} frames...`);
@@ -108,7 +111,10 @@ async function main() {
     const filePath = path.join(SCREENSHOTS_DIR, file);
 
     const rawBuffer = await sharp(filePath)
-      .resize(SMALL_WIDTH, SMALL_HEIGHT, { fit: 'contain', background: { r: 255, g: 255, b: 255, alpha: 1 } })
+      .resize(SMALL_WIDTH, SMALL_HEIGHT, {
+        fit: 'contain',
+        background: { r: 255, g: 255, b: 255, alpha: 1 },
+      })
       .ensureAlpha()
       .raw()
       .toBuffer();
@@ -124,8 +130,10 @@ async function main() {
   console.log(`✅ Small GIF: ${smallGifPath} (${(smallSize / 1024 / 1024).toFixed(2)} MB)`);
 
   console.log('\n📁 All assets:');
-  const assets = fs.readdirSync(ASSETS_DIR).filter(f => !fs.statSync(path.join(ASSETS_DIR, f)).isDirectory());
-  assets.forEach(f => {
+  const assets = fs
+    .readdirSync(ASSETS_DIR)
+    .filter((f) => !fs.statSync(path.join(ASSETS_DIR, f)).isDirectory());
+  assets.forEach((f) => {
     const size = fs.statSync(path.join(ASSETS_DIR, f)).size;
     console.log(`   ${f} (${(size / 1024).toFixed(0)} KB)`);
   });

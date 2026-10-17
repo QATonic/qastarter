@@ -116,7 +116,7 @@ export default function Header({ onLogoClick }: HeaderProps) {
               <span>Star</span>
             </a>
 
-                        <Button
+            <Button
               variant="ghost"
               size="sm"
               onClick={() => setTrendsOpen(true)}
@@ -148,7 +148,12 @@ export default function Header({ onLogoClick }: HeaderProps) {
 
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Toggle navigation menu">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="lg:hidden"
+                  aria-label="Toggle navigation menu"
+                >
                   <Menu className="h-6 w-6" aria-hidden="true" />
                 </Button>
               </SheetTrigger>
@@ -202,7 +207,7 @@ export default function Header({ onLogoClick }: HeaderProps) {
                     Star on GitHub
                   </a>
 
-                                    <Button
+                  <Button
                     variant="ghost"
                     onClick={() => handleNavClick(() => setTrendsOpen(true))}
                     className="justify-start gap-3 h-12 text-lg font-medium"

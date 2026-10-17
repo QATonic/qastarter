@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 
 // Database schema for analytics
@@ -114,16 +114,16 @@ export const projectConfigSchema = z.object({
   /** Mobile platform OS version (e.g., "13.0", "16.0") */
   platformVersion: z.string().max(50).optional(),
   /** Cloud device farm provider for web and mobile testing */
-  cloudDeviceFarm: z.enum(['none', 'browserstack', 'saucelabs', 'testmu']).optional().default('none'),
+  cloudDeviceFarm: z
+    .enum(['none', 'browserstack', 'saucelabs', 'testmu'])
+    .optional()
+    .default('none'),
   /** OpenAPI/Swagger spec URL for API schema-driven test generation */
   openApiSpecUrl: z
     .string()
     .max(2000)
     .optional()
-    .refine(
-      (val) => !val || /^https:\/\/.+/i.test(val),
-      'OpenAPI spec URL must use HTTPS'
-    ),
+    .refine((val) => !val || /^https:\/\/.+/i.test(val), 'OpenAPI spec URL must use HTTPS'),
   /** API authentication type */
   apiAuthType: z.enum(['none', 'bearer', 'basic', 'api-key']).optional(),
   /** API auth token / key value */
@@ -138,10 +138,14 @@ export const projectConfigSchema = z.object({
     .array(
       z.object({
         name: z.string().min(1).max(50),
-        baseUrl: z.string().min(1).max(500).refine(
-          (val) => /^https?:\/\/.+/i.test(val),
-          'Base URL must start with http:// or https://'
-        ),
+        baseUrl: z
+          .string()
+          .min(1)
+          .max(500)
+          .refine(
+            (val) => /^https?:\/\/.+/i.test(val),
+            'Base URL must start with http:// or https://'
+          ),
         username: z.string().max(200).optional(),
         password: z.string().max(200).optional(),
       })

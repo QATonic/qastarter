@@ -84,15 +84,15 @@ paths:
               example:
                 success: true
                 data:
-                  version: "1.0.0"
+                  version: '1.0.0'
                   testingTypes:
-                    - id: "web"
-                      label: "Web Testing"
-                      frameworks: ["selenium", "playwright", "cypress"]
+                    - id: 'web'
+                      label: 'Web Testing'
+                      frameworks: ['selenium', 'playwright', 'cypress']
                   frameworks:
-                    - id: "playwright"
-                      label: "Playwright"
-                      languages: ["javascript", "typescript", "python", "java"]
+                    - id: 'playwright'
+                      label: 'Playwright'
+                      languages: ['javascript', 'typescript', 'python', 'java']
 
   /api/v1/config/options:
     get:
@@ -218,15 +218,15 @@ paths:
             schema:
               $ref: '#/components/schemas/ProjectConfig'
             example:
-              projectName: "my-test-project"
-              testingType: "web"
-              framework: "playwright"
-              language: "typescript"
-              testingPattern: "pom"
-              testRunner: "playwright-test"
-              buildTool: "npm"
-              cicdTool: ""
-              reportingTool: ""
+              projectName: 'my-test-project'
+              testingType: 'web'
+              framework: 'playwright'
+              language: 'typescript'
+              testingPattern: 'pom'
+              testRunner: 'playwright-test'
+              buildTool: 'npm'
+              cicdTool: ''
+              reportingTool: ''
               utilities: {}
       responses:
         '200':
@@ -310,6 +310,25 @@ paths:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    required: [valid]
+                    properties:
+                      valid:
+                        type: boolean
+                      errors:
+                        type: array
+                        items:
+                          type: object
+                          required: [field, message]
+                          properties:
+                            field:
+                              type: string
+                            message:
+                              type: string
                   isValid:
                     type: boolean
                   message:
@@ -524,10 +543,10 @@ components:
           example:
             success: false
             error:
-              code: "VALIDATION_ERROR"
-              message: "Invalid project configuration"
-              requestId: "gen-1234567890"
-              timestamp: "2024-12-29T00:00:00.000Z"
+              code: 'VALIDATION_ERROR'
+              message: 'Invalid project configuration'
+              requestId: 'gen-1234567890'
+              timestamp: '2024-12-29T00:00:00.000Z'
 
     RateLimitError:
       description: Rate limit exceeded
@@ -551,5 +570,5 @@ components:
           example:
             success: false
             error:
-              code: "RATE_LIMIT_EXCEEDED"
-              message: "Too many requests, please try again later"
+              code: 'RATE_LIMIT_EXCEEDED'
+              message: 'Too many requests, please try again later'

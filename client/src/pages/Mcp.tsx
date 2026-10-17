@@ -120,8 +120,8 @@ export default function Mcp() {
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Let Claude Desktop, Cursor, Claude Code, Windsurf, and any other MCP-aware AI client
-              scaffold production-ready test automation projects directly into your workspace —
-              no browser, no download, no rate-limit mid-session.
+              scaffold production-ready test automation projects directly into your workspace — no
+              browser, no download, no rate-limit mid-session.
             </p>
           </div>
 
@@ -135,13 +135,12 @@ export default function Mcp() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Paste this into your <code className="rounded bg-muted px-1.5 py-0.5">claude_desktop_config.json</code>{' '}
+                Paste this into your{' '}
+                <code className="rounded bg-muted px-1.5 py-0.5">claude_desktop_config.json</code>{' '}
                 (or the equivalent MCP block for Cursor / Claude Code / Windsurf):
               </p>
               <CopyableBlock value={CLAUDE_DESKTOP_CONFIG} language="json" />
-              <p className="text-sm text-muted-foreground">
-                Restart the client and ask it:
-              </p>
+              <p className="text-sm text-muted-foreground">Restart the client and ask it:</p>
               <blockquote className="border-l-2 border-emerald-500/60 pl-4 italic text-foreground/90">
                 “Use qastarter to scaffold a Playwright TypeScript project with Jest into{' '}
                 <code className="not-italic">./tests/e2e</code>.”
@@ -154,18 +153,24 @@ export default function Mcp() {
             <div className="rounded-lg border bg-card p-5">
               <h3 className="text-sm font-semibold mb-2">One-off via npx</h3>
               <CopyableBlock value={NPX_CMD} />
-              <p className="text-xs text-muted-foreground mt-2">No global install. MCP clients that run `npx` will pick this up automatically.</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                No global install. MCP clients that run `npx` will pick this up automatically.
+              </p>
             </div>
             <div className="rounded-lg border bg-card p-5">
               <h3 className="text-sm font-semibold mb-2">Or install globally</h3>
               <CopyableBlock value={GLOBAL_INSTALL_CMD} />
-              <p className="text-xs text-muted-foreground mt-2">Gives you the <code>qastarter</code> binary for direct use.</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Gives you the <code>qastarter</code> binary for direct use.
+              </p>
             </div>
           </div>
 
           {/* What the AI can do */}
           <section className="mb-16">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 tracking-tight">Six tools your AI gets</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 tracking-tight">
+              Six tools your AI gets
+            </h2>
             <div className="grid md:grid-cols-2 gap-4">
               {TOOLS.map((t) => (
                 <Card key={t.name} className="h-full">
@@ -189,21 +194,24 @@ export default function Mcp() {
               <Shield className="h-6 w-6 text-emerald-500 mb-3" />
               <h3 className="font-semibold mb-1">Safe by default</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Relative paths only. Refuses non-empty directories unless you opt in. Zip-slip + symlink guarded.
+                Relative paths only. Refuses non-empty directories unless you opt in. Zip-slip +
+                symlink guarded.
               </p>
             </div>
             <div>
               <Zap className="h-6 w-6 text-emerald-500 mb-3" />
               <h3 className="font-semibold mb-1">Built for AI iteration</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Authenticated MCP clients get 10× the anonymous rate limit. No more "too many requests" mid-session.
+                Authenticated MCP clients get 10× the anonymous rate limit. No more &quot;too many
+                requests&quot; mid-session.
               </p>
             </div>
             <div>
               <Sparkles className="h-6 w-6 text-emerald-500 mb-3" />
               <h3 className="font-semibold mb-1">Same engine as the web app</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Every combo you can pick in the wizard is available through MCP. Templates stay canonical.
+                Every combo you can pick in the wizard is available through MCP. Templates stay
+                canonical.
               </p>
             </div>
           </section>
@@ -212,7 +220,8 @@ export default function Mcp() {
           <div className="text-center py-12 rounded-xl border bg-card/40">
             <h2 className="text-2xl font-bold mb-3">Try it now</h2>
             <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-              Open your AI IDE, paste the config above, and ask it to scaffold your next QA framework.
+              Open your AI IDE, paste the config above, and ask it to scaffold your next QA
+              framework.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button asChild>

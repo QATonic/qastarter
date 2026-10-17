@@ -4,19 +4,11 @@
  */
 
 import { Router } from 'express';
-import rateLimit from 'express-rate-limit';
+import { sharedRateLimit } from '../middleware/sharedRateLimit';
 import { z } from 'zod';
-import { projectConfigSchema, type ProjectConfig } from '@shared/schema';
-import { WizardValidator } from '@shared/validationMatrix';
-import { sanitizeProjectName, sanitizeGroupId, sanitizeArtifactId } from '@shared/sanitize';
-import {
-  ValidationError,
-  IncompatibleCombinationError,
-  AppError,
-  ErrorCode,
-  generateRequestId,
-  asyncHandler,
-} from '../errors';
+import { projectRequestSchema } from '@shared/projectRequest';
+import { parseProjectConfiguration } from '../services/configurationService';
+import { ValidationError, AppError, ErrorCode, generateRequestId, asyncHandler } from '../errors';
 import { pushProjectToGitHub, GitHubServiceError } from '../services/githubService';
 import { createRequestLogger } from '../utils/logger';
 
@@ -35,11 +27,11 @@ const githubPushSchema = z.object({
     ),
   isPrivate: z.boolean().optional().default(false),
   description: z.string().max(500).optional(),
-  projectConfig: projectConfigSchema,
+  projectConfig: projectRequestSchema,
 });
 
 // Rate limiter for GitHub push (stricter than generation)
-const githubPushLimiter = rateLimit({
+const githubPushLimiter = sharedRateLimit('github', {
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // 10 pushes per 15 minutes
   message: () => ({
@@ -75,32 +67,8 @@ router.post(
       throw new ValidationError('Invalid push-to-GitHub request', errors, requestId);
     }
 
-    const { githubToken, repoName, isPrivate, description, projectConfig } = bodyResult.data;
-
-    // 2. Sanitize project config
-    projectConfig.projectName = sanitizeProjectName(projectConfig.projectName);
-    if (projectConfig.groupId) {
-      projectConfig.groupId = sanitizeGroupId(projectConfig.groupId);
-    }
-    if (projectConfig.artifactId) {
-      projectConfig.artifactId = sanitizeArtifactId(projectConfig.artifactId);
-    }
-
-    // 3. Validate compatibility
-    if (
-      !WizardValidator.isCompatible(
-        projectConfig.testingType,
-        projectConfig.framework,
-        projectConfig.language
-      )
-    ) {
-      throw new IncompatibleCombinationError(
-        projectConfig.testingType,
-        projectConfig.framework,
-        projectConfig.language,
-        requestId
-      );
-    }
+    const { githubToken, repoName, isPrivate, description } = bodyResult.data;
+    const projectConfig = await parseProjectConfiguration(bodyResult.data.projectConfig, requestId);
 
     reqLogger.info('Push to GitHub requested', {
       repoName,

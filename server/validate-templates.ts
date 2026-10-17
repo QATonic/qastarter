@@ -49,7 +49,7 @@ const manifestSchema = z.object({
   version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semantic (x.y.z)'),
   supportsDynamic: z.boolean().optional().default(true),
   supportedCombination: z.object({
-    testingType: z.enum(['web', 'mobile', 'api', 'desktop']),
+    testingType: z.enum(['web', 'mobile', 'api', 'desktop', 'performance']),
     framework: z.string().min(1),
     language: z.string().min(1),
     testRunner: z.string().min(1),
@@ -69,7 +69,6 @@ const manifestSchema = z.object({
 });
 
 type Manifest = z.infer<typeof manifestSchema>;
-type ManifestFile = z.infer<typeof manifestFileSchema>;
 
 // Use an isolated Handlebars instance (like the engine does) to avoid
 // polluting the global handlebars registry.
@@ -77,12 +76,15 @@ const hb = handlebars.create();
 
 // Register Handlebars helpers (same as templatePackEngine)
 function registerHelpers(): void {
-  hb.registerHelper('eq', (a: any, b: any) => a === b);
-  hb.registerHelper('or', (...args: any[]) => {
+  hb.registerHelper('eq', (a: unknown, b: unknown) => a === b);
+  hb.registerHelper('or', (...args: unknown[]) => {
     args.pop();
     return args.some(Boolean);
   });
-  hb.registerHelper('includes', (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val));
+  hb.registerHelper(
+    'includes',
+    (arr: unknown[], val: unknown) => Array.isArray(arr) && arr.includes(val)
+  );
   hb.registerHelper('lowerCase', (str: string) => str?.toLowerCase() || '');
   hb.registerHelper('upperCase', (str: string) => str?.toUpperCase() || '');
   hb.registerHelper('pascalCase', (str: string) => {
@@ -106,11 +108,11 @@ function registerHelpers(): void {
       return entities[char] || char;
     });
   });
-  hb.registerHelper('json', (obj: any) => JSON.stringify(obj, null, 2));
+  hb.registerHelper('json', (obj: unknown) => JSON.stringify(obj, null, 2));
   hb.registerHelper('join', (arr: string[], separator: unknown) =>
     Array.isArray(arr) ? arr.join(typeof separator === 'string' ? separator : ', ') : ''
   );
-  hb.registerHelper('ternary', (condition: any, trueVal: any, falseVal: any) =>
+  hb.registerHelper('ternary', (condition: unknown, trueVal: unknown, falseVal: unknown) =>
     condition ? trueVal : falseVal
   );
 }

@@ -4,12 +4,12 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>{{groupId}}</groupId>
-    <artifactId>{{artifactId}}</artifactId>
+    <groupId>{{escapeXml groupId}}</groupId>
+    <artifactId>{{escapeXml artifactId}}</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>{{projectName}}</name>
+    <name>{{escapeXml projectName}}</name>
     <description>Desktop Test Automation Framework using WinAppDriver, TestNG, and Maven</description>
 
     <properties>
@@ -27,14 +27,14 @@
 
         {{#if (eq reportingTool "allure")}}
         <!-- Allure Reporting -->
-        <allure.version>{{toolVersions.allure}}</allure.version>
+        <allure.version>{{escapeXml toolVersions.allure}}</allure.version>
         <aspectj.version>1.9.20</aspectj.version>
         {{/if}}
         <!-- ExtentReports (used by TestListener regardless of reporting tool selection) -->
-        <extentreports.version>{{toolVersions.extentreports}}</extentreports.version>
+        <extentreports.version>{{escapeXml toolVersions.extentreports}}</extentreports.version>
         {{#if (eq testingPattern "bdd")}}
         <!-- Cucumber BDD -->
-        <cucumber.version>{{toolVersions.cucumber}}</cucumber.version>
+        <cucumber.version>{{escapeXml toolVersions.cucumber}}</cucumber.version>
         {{/if}}
 
         <!-- Plugin Versions -->
@@ -157,9 +157,9 @@
         <!-- User-picked dependencies (from QAStarter dependency search) -->
         {{#each userDependencies.maven}}
         <dependency>
-            <groupId>{{group}}</groupId>
-            <artifactId>{{name}}</artifactId>
-            <version>{{version}}</version>
+            <groupId>{{escapeXml group}}</groupId>
+            <artifactId>{{escapeXml name}}</artifactId>
+            <version>{{escapeXml version}}</version>
         </dependency>
         {{/each}}
         {{/if}}
@@ -168,7 +168,7 @@
         <dependency>
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
-            <version>{{toolVersions.datafaker}}</version>
+            <version>{{escapeXml toolVersions.datafaker}}</version>
         </dependency>
         {{/if}}
     </dependencies>

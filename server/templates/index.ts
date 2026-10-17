@@ -1,8 +1,9 @@
-import handlebars from 'handlebars';
 import { ProjectConfig } from '@shared/schema';
 import { TemplatePackEngine } from './templatePackEngine';
 import { logger } from '../utils/logger';
 import type { TemplateFile } from './types';
+import { parseOpenApiFromUrl } from '../services/openApiService';
+import { ValidationError } from '../errors';
 
 // Re-export TemplateFile type for backward compatibility
 export type { TemplateFile } from './types';
@@ -12,48 +13,42 @@ export class ProjectTemplateGenerator {
 
   constructor(packsDirectory?: string) {
     this.templatePackEngine = new TemplatePackEngine(packsDirectory);
-
-    // Register required Handlebars helpers for fallback
-    handlebars.registerHelper('eq', (a: any, b: any) => a === b);
-    handlebars.registerHelper('or', (...args: any[]) => {
-      const opts = args.pop();
-      return args.some(Boolean);
-    });
-    handlebars.registerHelper(
-      'includes',
-      (arr: any[], val: any) => Array.isArray(arr) && arr.includes(val)
-    );
   }
 
   public async generateProject(config: ProjectConfig): Promise<TemplateFile[]> {
-    // Try to use sophisticated template pack first
-    const hasTemplatePack = await this.templatePackEngine.hasTemplatePack(config);
-
-    if (hasTemplatePack) {
-      logger.debug('Using template pack', {
-        testingType: config.testingType,
-        language: config.language,
-        framework: config.framework,
-        testRunner: config.testRunner,
-        buildTool: config.buildTool,
-      });
-      // Use strict mode by default
-      return await this.templatePackEngine.generateProject(config, { strict: true });
-    } else {
-      logger.error('Template pack not found', { config });
-      throw new Error(
-        `No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}. Please verify your selection.`
-      );
-    }
+    const files: TemplateFile[] = [];
+    for await (const file of this.generateProjectStream(config)) files.push(file);
+    return files;
   }
 
   public async *generateProjectStream(
     config: ProjectConfig,
-    options?: { strict?: boolean; openApiEndpoints?: import('@shared/openApiTypes').OpenApiEndpoint[] }
+    options?: {
+      strict?: boolean;
+      openApiEndpoints?: import('@shared/openApiTypes').OpenApiEndpoint[];
+    }
   ): AsyncGenerator<TemplateFile> {
     const hasTemplatePack = await this.templatePackEngine.hasTemplatePack(config);
     if (hasTemplatePack) {
-      yield* this.templatePackEngine.generateProjectStream(config, { strict: true, ...options });
+      let openApiEndpoints = options?.openApiEndpoints;
+      if (config.testingType === 'api' && config.openApiSpecUrl && openApiEndpoints === undefined) {
+        const parsed = await parseOpenApiFromUrl(config.openApiSpecUrl);
+        if (parsed === null) {
+          throw new ValidationError('Could not load the OpenAPI specification', [
+            {
+              field: 'openApiSpecUrl',
+              message:
+                'Provide a public HTTPS URL serving a valid standalone JSON or YAML specification. Bundle external references first.',
+            },
+          ]);
+        }
+        openApiEndpoints = parsed;
+      }
+      yield* this.templatePackEngine.generateProjectStream(config, {
+        strict: true,
+        ...options,
+        openApiEndpoints,
+      });
     } else {
       throw new Error(
         `No template pack found for configuration: ${config.testingType}/${config.language}/${config.framework}.`

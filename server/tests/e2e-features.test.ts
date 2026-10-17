@@ -13,15 +13,12 @@
 
 import { describe, it, expect, beforeAll, afterAll, vi, beforeEach } from 'vitest';
 import path from 'path';
-import fs from 'fs';
+
 import { ProjectTemplateGenerator } from '../templates';
 import { ProjectConfig, projectConfigSchema } from '@shared/schema';
 import { WizardValidator, validationMatrix, validationLabels } from '@shared/validationMatrix';
 import { BOM } from '@shared/bom';
-import {
-  parseOpenApiFromString,
-  clearOpenApiCache,
-} from '../services/openApiService';
+import { parseOpenApiFromString, clearOpenApiCache } from '../services/openApiService';
 
 // ── Setup ──────────────────────────────────────────────────────────
 const templatesPath = path.join(process.cwd(), 'server', 'templates', 'packs');
@@ -83,6 +80,7 @@ describe('E2E Feature Integration Tests', () => {
   describe('Feature 2: Test Data / Faker Templates', () => {
     it('generates project WITH faker factory when utilities.faker is true', async () => {
       const config: ProjectConfig = {
+        cloudDeviceFarm: 'none' as const,
         projectName: 'faker-test-java',
         testingType: 'web',
         language: 'java',
@@ -99,13 +97,17 @@ describe('E2E Feature Integration Tests', () => {
 
       // Should contain a TestDataFactory file
       const hasFactory = paths.some(
-        (p) => p.includes('TestDataFactory') || p.includes('testDataFactory') || p.includes('test_data_factory')
+        (p) =>
+          p.includes('TestDataFactory') ||
+          p.includes('testDataFactory') ||
+          p.includes('test_data_factory')
       );
       expect(hasFactory).toBe(true);
     });
 
     it('generates project WITHOUT faker factory when utilities.faker is false', async () => {
       const config: ProjectConfig = {
+        cloudDeviceFarm: 'none' as const,
         projectName: 'no-faker-java',
         testingType: 'web',
         language: 'java',
@@ -121,13 +123,17 @@ describe('E2E Feature Integration Tests', () => {
       const paths = files.map((f) => f.path);
 
       const hasFactory = paths.some(
-        (p) => p.includes('TestDataFactory') || p.includes('testDataFactory') || p.includes('test_data_factory')
+        (p) =>
+          p.includes('TestDataFactory') ||
+          p.includes('testDataFactory') ||
+          p.includes('test_data_factory')
       );
       expect(hasFactory).toBe(false);
     });
 
     it('generates Python faker factory when utilities.faker is true', async () => {
       const config: ProjectConfig = {
+        cloudDeviceFarm: 'none' as const,
         projectName: 'faker-test-python',
         testingType: 'api',
         language: 'python',
@@ -142,14 +148,13 @@ describe('E2E Feature Integration Tests', () => {
       const files = await generator.generateProject(config);
       const paths = files.map((f) => f.path);
 
-      const hasFactory = paths.some(
-        (p) => p.includes('test_data_factory')
-      );
+      const hasFactory = paths.some((p) => p.includes('test_data_factory'));
       expect(hasFactory).toBe(true);
     });
 
     it('generates TypeScript faker factory for supertest pack', async () => {
       const config: ProjectConfig = {
+        cloudDeviceFarm: 'none' as const,
         projectName: 'faker-test-ts',
         testingType: 'api',
         language: 'typescript',
@@ -164,9 +169,7 @@ describe('E2E Feature Integration Tests', () => {
       const files = await generator.generateProject(config);
       const paths = files.map((f) => f.path);
 
-      const hasFactory = paths.some(
-        (p) => p.includes('testDataFactory')
-      );
+      const hasFactory = paths.some((p) => p.includes('testDataFactory'));
       expect(hasFactory).toBe(true);
     });
   });
@@ -499,7 +502,7 @@ describe('E2E Feature Integration Tests', () => {
 
       it('truncates at 50 endpoints max', async () => {
         // Build spec with 55 endpoints
-        const paths: Record<string, any> = {};
+        const paths: Record<string, unknown> = {};
         for (let i = 0; i < 55; i++) {
           paths[`/resource-${i}`] = {
             get: { responses: { '200': { description: 'OK' } } },
@@ -523,6 +526,7 @@ describe('E2E Feature Integration Tests', () => {
         expect(endpoints).not.toBeNull();
 
         const config: ProjectConfig = {
+          cloudDeviceFarm: 'none' as const,
           projectName: 'api-openapi-gen',
           testingType: 'api',
           language: 'java',
@@ -535,7 +539,7 @@ describe('E2E Feature Integration Tests', () => {
         };
 
         // Generate with openApiEndpoints
-        const files: { path: string; content: string }[] = [];
+        const files: import('../templates/types').TemplateFile[] = [];
         for await (const file of generator.generateProjectStream(config, {
           strict: true,
           openApiEndpoints: endpoints!,
@@ -565,6 +569,7 @@ describe('E2E Feature Integration Tests', () => {
 
       it('generates project WITHOUT OpenAPI tests when no endpoints', async () => {
         const config: ProjectConfig = {
+          cloudDeviceFarm: 'none' as const,
           projectName: 'api-no-openapi',
           testingType: 'api',
           language: 'java',
@@ -575,7 +580,7 @@ describe('E2E Feature Integration Tests', () => {
           includeSampleTests: true,
         };
 
-        const files: { path: string; content: string }[] = [];
+        const files: import('../templates/types').TemplateFile[] = [];
         for await (const file of generator.generateProjectStream(config, { strict: true })) {
           files.push(file);
         }
@@ -583,9 +588,7 @@ describe('E2E Feature Integration Tests', () => {
         const paths = files.map((f) => f.path);
 
         // hasOpenApiEndpoints should be false, so conditional OpenAPI files should be excluded
-        const hasOpenApiTests = paths.some(
-          (p) => p.toLowerCase().includes('openapi')
-        );
+        const hasOpenApiTests = paths.some((p) => p.toLowerCase().includes('openapi'));
         expect(hasOpenApiTests).toBe(false);
       });
     });
@@ -640,6 +643,7 @@ describe('E2E Feature Integration Tests', () => {
       );
 
       const config: ProjectConfig = {
+        cloudDeviceFarm: 'none' as const,
         projectName: 'api-faker-openapi',
         testingType: 'api',
         language: 'typescript',
@@ -652,7 +656,7 @@ describe('E2E Feature Integration Tests', () => {
         includeSampleTests: true,
       };
 
-      const files: { path: string; content: string }[] = [];
+      const files: import('../templates/types').TemplateFile[] = [];
       for await (const file of generator.generateProjectStream(config, {
         strict: true,
         openApiEndpoints: endpoints!,
@@ -737,7 +741,16 @@ describe('E2E Feature Integration Tests', () => {
 
     it('BUG #5: IPv6 private ranges are blocked', () => {
       // Test the isUrlSafe logic for IPv6 (inline verification)
-      const privateIPv6 = ['::1', '::', 'fc00::1', 'fd12::1', 'fe80::1', '::ffff:127.0.0.1', '::ffff:10.0.0.1', '::ffff:192.168.1.1'];
+      const privateIPv6 = [
+        '::1',
+        '::',
+        'fc00::1',
+        'fd12::1',
+        'fe80::1',
+        '::ffff:127.0.0.1',
+        '::ffff:10.0.0.1',
+        '::ffff:192.168.1.1',
+      ];
 
       for (const ip of privateIPv6) {
         const lowerHost = ip.toLowerCase();

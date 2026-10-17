@@ -32,7 +32,7 @@ export interface CacheProvider {
   close(): Promise<void>;
 
   /** Get the underlying client (if any) */
-  getClient(): any;
+  getClient(): unknown;
 }
 
 /**

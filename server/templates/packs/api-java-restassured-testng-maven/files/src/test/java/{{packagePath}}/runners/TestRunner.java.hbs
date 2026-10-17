@@ -6,7 +6,7 @@ import org.testng.annotations.DataProvider;
 
 @CucumberOptions(
     features = "src/test/resources/features",
-    glue = {"{{javaPackage}}.steps"},
+    glue = {"{{string javaPackage "double" "java"}}.steps"},
     plugin = {
         "pretty",
         "html:target/cucumber-reports/cucumber.html",

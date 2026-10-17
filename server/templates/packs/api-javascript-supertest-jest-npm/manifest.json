@@ -28,6 +28,11 @@
       "description": "Jest configuration"
     },
     {
+      "path": "babel.config.js",
+      "isTemplate": true,
+      "description": "Babel config so Jest can transform ESM import/export"
+    },
+    {
       "path": "README.md",
       "isTemplate": true,
       "description": "Project documentation"

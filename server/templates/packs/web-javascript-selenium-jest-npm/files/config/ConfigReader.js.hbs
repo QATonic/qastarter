@@ -40,12 +40,12 @@ class ConfigurationReader {
     return ["true", "1", "yes"].includes(value.toLowerCase());
   }
 
-  get baseUrl() { return this.get("BASE_URL", "{{baseUrl}}"); }
+  get baseUrl() { return this.get("BASE_URL", "{{string baseUrl "double" "js"}}"); }
   get browser() { return this.get("BROWSER", "chrome"); }
   get headless() { return this.getBoolean("HEADLESS", false); }
   get timeout() { return this.getNumber("TIMEOUT", 30000); }
-  get username() { return this.get("USERNAME", "{{testUsername}}"); }
-  get password() { return this.get("PASSWORD", "{{testPassword}}"); }
+  get username() { return this.get("USERNAME", "{{string testUsername "double" "js"}}"); }
+  get password() { return this.get("PASSWORD", "{{string testPassword "double" "js"}}"); }
 }
 
 const config = new ConfigurationReader();

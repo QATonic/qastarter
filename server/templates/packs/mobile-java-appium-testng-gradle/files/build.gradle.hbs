@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = '{{groupId}}'
+group = '{{string groupId "single" "gradle"}}'
 version = '1.0.0'
 sourceCompatibility = '17'
 
@@ -12,13 +12,13 @@ repositories {
 
 dependencies {
     // Appium
-    implementation 'io.appium:java-client:{{toolVersions.appium}}'
+    implementation 'io.appium:java-client:{{string toolVersions.appium "single" "gradle"}}'
     
     // Selenium
-    implementation 'org.seleniumhq.selenium:selenium-java:{{toolVersions.selenium}}'
+    implementation 'org.seleniumhq.selenium:selenium-java:{{string toolVersions.selenium "single" "gradle"}}'
     
     // TestNG
-    implementation 'org.testng:testng:{{toolVersions.testng}}'
+    implementation 'org.testng:testng:{{string toolVersions.testng "single" "gradle"}}'
     
     // Logging
     implementation 'org.slf4j:slf4j-simple:2.0.9'
@@ -29,16 +29,19 @@ dependencies {
     implementation 'io.qameta.allure:allure-testng:2.24.0'
     // File utilities (used by ScreenshotUtils)
     implementation 'commons-io:commons-io:2.15.1'
+    // JSON / CSV test-data parsing (used by TestDataReader)
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    implementation 'com.opencsv:opencsv:5.8'
 {{#if userDependencies.hasMaven}}
 
 // User-picked dependencies (from QAStarter dependency search)
 {{#each userDependencies.maven}}
-implementation '{{group}}:{{name}}:{{version}}'
+implementation '{{string group "single" "gradle"}}:{{string name "single" "gradle"}}:{{string version "single" "gradle"}}'
 {{/each}}
 {{/if}}
     {{#if utilities.faker}}
     // DataFaker — Test data generation
-    implementation 'net.datafaker:datafaker:{{toolVersions.datafaker}}'
+    implementation 'net.datafaker:datafaker:{{string toolVersions.datafaker "single" "gradle"}}'
     {{/if}}
 {{#if (eq cloudDeviceFarm "browserstack")}}
 

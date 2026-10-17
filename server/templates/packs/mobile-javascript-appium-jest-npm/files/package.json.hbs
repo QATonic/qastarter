@@ -1,13 +1,13 @@
 {
-  "name": "{{artifactId}}",
+  "name": "{{string artifactId "double" "json"}}",
   "version": "1.0.0",
   "scripts": {
     "test": "{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-node-sdk jest{{else}}jest{{/if}}",
     "test:local": "jest"
   },
-  "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{name}}": "{{version}}",{{/each}}
+  "devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
     {{#if utilities.faker}}
-    "@faker-js/faker": "^{{toolVersions.fakerJs}}",
+    "@faker-js/faker": "^{{string toolVersions.fakerJs "double" "json"}}",
     {{/if}}
     "webdriverio": "^8.27.0",
     "jest": "^29.7.0",

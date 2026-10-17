@@ -19,7 +19,7 @@ test.describe('QAStarter smoke', () => {
   test.beforeEach(async ({ page }) => {
     // Re-navigate instead of reload to dodge a Firefox-specific stall
     // on the Vite HMR websocket during page.reload() under parallel load.
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
       try {
         localStorage.clear();
@@ -27,7 +27,7 @@ test.describe('QAStarter smoke', () => {
         // ignore
       }
     });
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
   });
 
   test('landing page renders heading and primary CTA', async ({ page }) => {

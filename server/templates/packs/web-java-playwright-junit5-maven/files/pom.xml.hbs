@@ -4,22 +4,22 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>{{groupId}}</groupId>
-    <artifactId>{{artifactId}}</artifactId>
+    <groupId>{{escapeXml groupId}}</groupId>
+    <artifactId>{{escapeXml artifactId}}</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>{{projectName}}</name>
+    <name>{{escapeXml projectName}}</name>
     <description>Web UI Test Automation Framework using Java, Playwright, JUnit5, and Maven</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>{{toolVersions.java}}</java.version>
-        <maven.compiler.source>{{toolVersions.java}}</maven.compiler.source>
-        <maven.compiler.target>{{toolVersions.java}}</maven.compiler.target>
+        <java.version>{{escapeXml toolVersions.java}}</java.version>
+        <maven.compiler.source>{{escapeXml toolVersions.java}}</maven.compiler.source>
+        <maven.compiler.target>{{escapeXml toolVersions.java}}</maven.compiler.target>
 
         <!-- Playwright Configuration -->
-        <playwright.version>{{toolVersions.playwright}}</playwright.version>
+        <playwright.version>{{escapeXml toolVersions.playwright}}</playwright.version>
 
         <!-- JUnit 5 Configuration -->
         <junit.jupiter.version>5.10.1</junit.jupiter.version>
@@ -159,9 +159,9 @@
         <!-- User-picked dependencies (from QAStarter dependency search) -->
         {{#each userDependencies.maven}}
         <dependency>
-            <groupId>{{group}}</groupId>
-            <artifactId>{{name}}</artifactId>
-            <version>{{version}}</version>
+            <groupId>{{escapeXml group}}</groupId>
+            <artifactId>{{escapeXml name}}</artifactId>
+            <version>{{escapeXml version}}</version>
         </dependency>
         {{/each}}
         {{/if}}
@@ -170,7 +170,7 @@
         <dependency>
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
-            <version>{{toolVersions.datafaker}}</version>
+            <version>{{escapeXml toolVersions.datafaker}}</version>
         </dependency>
         {{/if}}
     </dependencies>

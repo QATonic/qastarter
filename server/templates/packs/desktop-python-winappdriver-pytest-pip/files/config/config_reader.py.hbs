@@ -2,6 +2,7 @@
 Config Reader - Load WinAppDriver settings.
 """
 import os
+import json
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -9,16 +10,25 @@ from pathlib import Path
 class ConfigReader:
     def __init__(self):
         self.env = os.getenv("ENV", "dev")
-        self._config = ConfigParser()
+        self._config = ConfigParser(interpolation=None)
         self._load_config()
     
     def _load_config(self):
         config_file = Path(__file__).parent / f"{self.env}.ini"
         if config_file.exists():
-            self._config.read(config_file)
+            self._config.read(config_file, encoding="utf-8")
     
+    @staticmethod
+    def _decode_value(value):
+        if value.startswith('"'):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                pass
+        return value
+
     def get(self, key: str, default: str = "") -> str:
-        try: return self._config.get("winappdriver", key)
+        try: return self._decode_value(self._config.get("winappdriver", key))
         except: return default
     
     @property

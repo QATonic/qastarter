@@ -69,9 +69,7 @@ export default function LandingPage() {
         if (cancelled) return;
 
         const stats =
-          statsRes.status === 'fulfilled' && statsRes.value?.success
-            ? statsRes.value.data
-            : null;
+          statsRes.status === 'fulfilled' && statsRes.value?.success ? statsRes.value.data : null;
         const github =
           githubRes.status === 'fulfilled' && githubRes.value?.success
             ? githubRes.value.data
@@ -151,10 +149,11 @@ export default function LandingPage() {
               aria-label="Learn about the new MCP server"
             >
               <Rocket className="h-3.5 w-3.5" aria-hidden="true" />
-              <span>
-                NEW — QAStarter now works inside Claude Desktop, Cursor &amp; Claude Code
-              </span>
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              <span>NEW — QAStarter now works inside Claude Desktop, Cursor &amp; Claude Code</span>
+              <ArrowRight
+                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
             </button>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 text-foreground leading-[1.1] tracking-tight text-balance">
@@ -167,7 +166,8 @@ export default function LandingPage() {
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed text-balance">
               Get fully implemented, production-ready test automation frameworks instantly. Includes
               source code for Selenium, Playwright, Cypress, Appium, RestAssured, k6 with POM, BDD,
-              cloud device farms, OpenAPI-driven test stubs, Faker data factories, and CI/CD pipelines.
+              cloud device farms, OpenAPI-driven test stubs, Faker data factories, and CI/CD
+              pipelines.
             </p>
 
             {/* Trust badges - simplified */}
@@ -389,19 +389,26 @@ export default function LandingPage() {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['Selenium', 'Playwright', 'Cypress', 'Appium', 'Flutter', 'Resty', 'k6', 'RestSharp'].map(
-                    (tech) => (
-                      <div
-                        key={tech}
-                        className="group flex items-center space-x-3 p-3 rounded-lg bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/10 hover:border-blue-500/20 transition-all duration-300 hover-elevate"
-                      >
-                        <div className="w-2 h-2 rounded-full bg-blue-500 group-hover:scale-125 transition-transform duration-300" />
-                        <span className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors">
-                          {tech}
-                        </span>
-                      </div>
-                    )
-                  )}
+                  {[
+                    'Selenium',
+                    'Playwright',
+                    'Cypress',
+                    'Appium',
+                    'Flutter',
+                    'Resty',
+                    'k6',
+                    'RestSharp',
+                  ].map((tech) => (
+                    <div
+                      key={tech}
+                      className="group flex items-center space-x-3 p-3 rounded-lg bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/10 hover:border-blue-500/20 transition-all duration-300 hover-elevate"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-blue-500 group-hover:scale-125 transition-transform duration-300" />
+                      <span className="text-sm font-medium text-foreground group-hover:text-blue-600 transition-colors">
+                        {tech}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -437,17 +444,19 @@ export default function LandingPage() {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['TestNG', 'JUnit', 'Pytest', 'Jest', 'NUnit', 'Testify', 'Locust'].map((tech) => (
-                    <div
-                      key={tech}
-                      className="group flex items-center space-x-3 p-3 rounded-lg bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/10 hover:border-rose-500/20 transition-all duration-300 hover-elevate"
-                    >
-                      <div className="w-2 h-2 rounded-full bg-rose-500 group-hover:scale-125 transition-transform duration-300" />
-                      <span className="text-sm font-medium text-foreground group-hover:text-rose-600 transition-colors">
-                        {tech}
-                      </span>
-                    </div>
-                  ))}
+                  {['TestNG', 'JUnit', 'Pytest', 'Jest', 'NUnit', 'Testify', 'Locust'].map(
+                    (tech) => (
+                      <div
+                        key={tech}
+                        className="group flex items-center space-x-3 p-3 rounded-lg bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/10 hover:border-rose-500/20 transition-all duration-300 hover-elevate"
+                      >
+                        <div className="w-2 h-2 rounded-full bg-rose-500 group-hover:scale-125 transition-transform duration-300" />
+                        <span className="text-sm font-medium text-foreground group-hover:text-rose-600 transition-colors">
+                          {tech}
+                        </span>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
 
@@ -460,17 +469,19 @@ export default function LandingPage() {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  {['Maven', 'Gradle', 'npm', 'dotnet', 'Go Mod', 'GitHub Actions', 'Jenkins'].map((tech) => (
-                    <div
-                      key={tech}
-                      className="group flex items-center space-x-3 p-3 rounded-lg bg-orange-500/5 dark:bg-orange-500/10 border border-orange-500/10 hover:border-orange-500/20 transition-all duration-300 hover-elevate"
-                    >
-                      <div className="w-2 h-2 rounded-full bg-orange-500 group-hover:scale-125 transition-transform duration-300" />
-                      <span className="text-sm font-medium text-foreground group-hover:text-orange-600 transition-colors">
-                        {tech}
-                      </span>
-                    </div>
-                  ))}
+                  {['Maven', 'Gradle', 'npm', 'dotnet', 'Go Mod', 'GitHub Actions', 'Jenkins'].map(
+                    (tech) => (
+                      <div
+                        key={tech}
+                        className="group flex items-center space-x-3 p-3 rounded-lg bg-orange-500/5 dark:bg-orange-500/10 border border-orange-500/10 hover:border-orange-500/20 transition-all duration-300 hover-elevate"
+                      >
+                        <div className="w-2 h-2 rounded-full bg-orange-500 group-hover:scale-125 transition-transform duration-300" />
+                        <span className="text-sm font-medium text-foreground group-hover:text-orange-600 transition-colors">
+                          {tech}
+                        </span>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -691,9 +702,9 @@ export default function LandingPage() {
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
                       49+ templates: Web (Selenium, Playwright, Cypress), Mobile (Appium, Espresso,
-                      Flutter), API (RestAssured, Resty, Supertest, RestSharp), Desktop (WinAppDriver,
-                      PyAutoGUI), and Performance (k6, Gatling, Locust) with POM, BDD, cloud device
-                      farms, OpenAPI-driven stubs, and Docker support.
+                      Flutter), API (RestAssured, Resty, Supertest, RestSharp), Desktop
+                      (WinAppDriver, PyAutoGUI), and Performance (k6, Gatling, Locust) with POM,
+                      BDD, cloud device farms, OpenAPI-driven stubs, and Docker support.
                     </AccordionContent>
                   </AccordionItem>
 
@@ -715,9 +726,9 @@ export default function LandingPage() {
                     </AccordionTrigger>
                     <AccordionContent className="text-sm text-muted-foreground pb-3">
                       Complete source code with Page Object Model, working sample tests, configured
-                      runners, reusable utilities, Faker test data factories, cloud device farm configs,
-                      OpenAPI-generated test stubs, multi-environment support, CI/CD pipelines, and
-                      reporting integration.
+                      runners, reusable utilities, Faker test data factories, cloud device farm
+                      configs, OpenAPI-generated test stubs, multi-environment support, CI/CD
+                      pipelines, and reporting integration.
                     </AccordionContent>
                   </AccordionItem>
 

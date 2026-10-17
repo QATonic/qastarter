@@ -151,6 +151,7 @@ function buildConfig(manifest: PackManifest): ProjectConfig {
     includeSampleTests: true,
     reportingTool,
     cicdTool,
+    cloudDeviceFarm: 'none',
     groupId: 'com.example',
     artifactId: 'test-project',
     utilities: {
@@ -292,7 +293,8 @@ function hasReadme(files: TemplateFile[]): boolean {
 function hasTestFiles(files: TemplateFile[]): boolean {
   return files.some((f) => {
     const normalized = f.path.replace(/\\/g, '/').toLowerCase();
-    return TEST_DIR_PREFIXES.some((prefix) => normalized.includes(prefix));
+    return TEST_DIR_PREFIXES.some((prefix) => normalized.includes(prefix)) ||
+      /^scripts\/(load|stress|spike|soak)-test\.js$/.test(normalized);
   });
 }
 
@@ -359,7 +361,7 @@ async function validateAllPacks() {
     let files: TemplateFile[];
     try {
       files = [];
-      for await (const file of engine.generateProjectStream(config, { strict: false })) {
+      for await (const file of engine.generateProjectStream(config, { strict: true })) {
         files.push(file);
       }
     } catch (err: any) {
@@ -381,20 +383,22 @@ async function validateAllPacks() {
     // 4. Validate each file
     for (const file of files) {
       const ext = path.extname(file.path).toLowerCase();
+      const content =
+        typeof file.content === 'string' ? file.content : file.content.toString('utf-8');
 
       // 4a. Unrendered Handlebars
-      const hbIssues = findUnrenderedHandlebars(file.path, file.content);
+      const hbIssues = findUnrenderedHandlebars(file.path, content);
       report.unrenderedHandlebars.push(...hbIssues);
 
       // 4b. Empty files (skip legitimately empty files)
       const basename = path.basename(file.path);
-      if (isEmptyFile(file.content) && !ALLOWED_EMPTY_FILES.includes(basename)) {
+      if (isEmptyFile(content) && !ALLOWED_EMPTY_FILES.includes(basename)) {
         report.emptyFiles.push(file.path);
       }
 
       // 4c. Broken XML
       if (ext === '.xml') {
-        const xmlError = validateXml(file.path, file.content);
+        const xmlError = validateXml(file.path, content);
         if (xmlError) {
           report.invalidXmlJson.push({ file: file.path, reason: xmlError });
         }
@@ -402,7 +406,7 @@ async function validateAllPacks() {
 
       // 4d. Broken JSON
       if (ext === '.json') {
-        const jsonError = validateJson(file.path, file.content);
+        const jsonError = validateJson(file.path, content);
         if (jsonError) {
           report.invalidXmlJson.push({ file: file.path, reason: jsonError });
         }

@@ -183,7 +183,11 @@ export default function ProjectPreview({ configuration }: ProjectPreviewProps) {
                 `}
                 style={{ paddingLeft: `${depth * 12 + 8}px` }}
                 role="button"
-                aria-label={file.type === 'folder' ? `${isExpanded ? 'Collapse' : 'Expand'} ${file.name} folder` : `View ${file.name}`}
+                aria-label={
+                  file.type === 'folder'
+                    ? `${isExpanded ? 'Collapse' : 'Expand'} ${file.name} folder`
+                    : `View ${file.name}`
+                }
                 tabIndex={0}
                 onClick={() => handleFileClick(file, currentPath)}
                 onKeyDown={(e) => {
@@ -418,10 +422,7 @@ export default function ProjectPreview({ configuration }: ProjectPreviewProps) {
               <h3 className="text-sm font-medium mb-2">File Preview</h3>
               <ScrollArea className="h-80 border rounded-md p-2">
                 {selectedFile ? (
-                  <CodeHighlight
-                    code={selectedFile}
-                    filename={selectedFilePath ?? undefined}
-                  />
+                  <CodeHighlight code={selectedFile} filename={selectedFilePath ?? undefined} />
                 ) : (
                   <div className="flex items-center justify-center h-full text-muted-foreground text-sm text-center px-4">
                     Click any file on the left to peek at its contents

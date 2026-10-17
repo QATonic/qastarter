@@ -2,8 +2,8 @@ package tests
 
 import (
 "testing"
-"{{projectName}}/pages"
-"{{projectName}}/utils"
+"{{string projectName "double" "go"}}/pages"
+"{{string projectName "double" "go"}}/utils"
 
 "github.com/stretchr/testify/assert"
 "github.com/stretchr/testify/suite"
@@ -28,7 +28,7 @@ suite.Driver.Page.Goto(utils.BaseURL)
 
 func (suite *LoginTestSuite) TestValidLogin() {
 loginPage := pages.NewLoginPage(suite.Driver.Page)
-loginPage.Login("{{testUsername}}", "{{testPassword}}")
+loginPage.Login("{{string testUsername "double" "go"}}", "{{string testPassword "double" "go"}}")
 
 // Assert URL contains inventory.html
 assert.Contains(suite.T(), suite.Driver.Page.URL(), "inventory.html")
@@ -36,7 +36,7 @@ assert.Contains(suite.T(), suite.Driver.Page.URL(), "inventory.html")
 
 func (suite *LoginTestSuite) TestInvalidLogin() {
 loginPage := pages.NewLoginPage(suite.Driver.Page)
-loginPage.Login("locked_out_user", "{{testPassword}}")
+loginPage.Login("locked_out_user", "{{string testPassword "double" "go"}}")
 
 assert.Contains(suite.T(), loginPage.GetErrorMessage(), "Epic sadface")
 }

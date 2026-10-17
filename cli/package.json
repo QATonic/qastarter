@@ -31,10 +31,10 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc && node dist/index.js",
-    "clean": "rm -rf dist",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
     "prebuild": "npm run clean",
     "prepublishOnly": "npm run build",
-    "test": "echo \"Tests pending\" && exit 0",
+    "test": "vitest run",
     "version": "npm run build"
   },
   "keywords": [
@@ -68,7 +68,8 @@
     "@types/adm-zip": "^0.5.7",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^20.11.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^3.2.7"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -46,13 +46,20 @@ function createTestApp(): Express {
   app.use(express.json());
   app.use('/api', configRoutes);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const statusCode = err.statusCode || 500;
-    res.status(statusCode).json({
-      success: false,
-      error: { code: err.code || 'INTERNAL_ERROR', message: err.message },
-    });
-  });
+  app.use(
+    (
+      err: Error & { statusCode?: number; code?: string; details?: unknown },
+      _req: Request,
+      res: Response,
+      _next: NextFunction
+    ) => {
+      const statusCode = err.statusCode || 500;
+      res.status(statusCode).json({
+        success: false,
+        error: { code: err.code || 'INTERNAL_ERROR', message: err.message },
+      });
+    }
+  );
 
   return app;
 }
@@ -71,10 +78,7 @@ describe('GET /api/v1/bom', () => {
   });
 
   it('should return JSON content-type', async () => {
-    await request(app)
-      .get('/api/v1/bom')
-      .expect('Content-Type', /json/)
-      .expect(200);
+    await request(app).get('/api/v1/bom').expect('Content-Type', /json/).expect(200);
   });
 
   // -----------------------------------------------------------------------

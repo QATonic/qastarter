@@ -113,7 +113,7 @@ export interface RequestContext {
 export class AppError extends Error {
   public readonly code: ErrorCode;
   public readonly statusCode: number;
-  public readonly details?: any;
+  public readonly details?: unknown;
   public readonly requestId?: string;
   public readonly timestamp: string;
   public readonly cause?: Error;
@@ -123,7 +123,7 @@ export class AppError extends Error {
   constructor(
     code: ErrorCode,
     message?: string,
-    details?: any,
+    details?: unknown,
     requestId?: string,
     options?: {
       cause?: Error;
@@ -154,7 +154,7 @@ export class AppError extends Error {
       error: {
         code: this.code,
         message: this.message,
-        ...(this.details && { details: this.details }),
+        ...(this.details ? { details: this.details } : {}),
         ...(this.requestId && { requestId: this.requestId }),
         ...(this.retryAfter && { retryAfter: this.retryAfter }),
         timestamp: this.timestamp,
@@ -228,7 +228,7 @@ export class IncompatibleCombinationError extends AppError {
 export class ConfigurationError extends AppError {
   constructor(
     message: string,
-    invalidFields: Array<{ field: string; value: any; suggestion?: string }>,
+    invalidFields: Array<{ field: string; value: unknown; suggestion?: string }>,
     requestId?: string,
     cause?: Error
   ) {
@@ -340,7 +340,7 @@ export function generateRequestId(prefix: string = 'req'): string {
 /**
  * Log error with context
  */
-export function logError(error: Error | AppError, context?: Record<string, any>): void {
+export function logError(error: Error | AppError, context?: Record<string, unknown>): void {
   const isAppError = error instanceof AppError;
   const appError = isAppError ? (error as AppError) : null;
 
@@ -350,7 +350,7 @@ export function logError(error: Error | AppError, context?: Record<string, any>)
     code: appError?.code || 'UNKNOWN',
     message: error.message,
     ...(appError?.requestId && { requestId: appError.requestId }),
-    ...(appError?.details && { details: appError.details }),
+    ...(appError?.details ? { details: appError.details } : {}),
     ...(appError?.retryAfter && { retryAfter: appError.retryAfter }),
     ...(appError?.requestContext && { requestContext: appError.requestContext }),
     ...(appError?.cause && { errorChain: appError.getErrorChain() }),
@@ -394,10 +394,10 @@ export function errorHandler(
 
   // Handle Zod validation errors
   if (err.name === 'ZodError') {
-    const zodError = err as any;
+    const zodError = err as import('zod').ZodError;
     const validationError = new ValidationError(
       'Validation failed',
-      zodError.errors?.map((e: any) => ({
+      zodError.errors?.map((e) => ({
         field: e.path?.join('.') || 'unknown',
         message: e.message,
       })) || []
@@ -431,7 +431,7 @@ export function errorHandler(
  * Async route handler wrapper to catch errors
  */
 export function asyncHandler(
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);

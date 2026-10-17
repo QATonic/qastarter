@@ -3,9 +3,9 @@ namespace {{projectNamespace}}.Config;
 public static class Settings
 {
     public static string Environment => GetEnvironmentVariable("TEST_ENV", "dev");
-    public static string BaseURL => GetEnvironmentVariable("BASE_URL", "{{baseUrl}}");
-    public static string AuthToken => GetEnvironmentVariable("AUTH_TOKEN", "{{apiAuthToken}}");
-    public static string ApiKey => GetEnvironmentVariable("API_KEY", "{{apiAuthToken}}");
+    public static string BaseURL => GetEnvironmentVariable("BASE_URL", "{{string baseUrl "double" "cs"}}");
+    public static string AuthToken => GetEnvironmentVariable("AUTH_TOKEN", "{{string apiAuthToken "double" "cs"}}");
+    public static string ApiKey => GetEnvironmentVariable("API_KEY", "{{string apiAuthToken "double" "cs"}}");
     public static string Username => GetEnvironmentVariable("USERNAME", "");
     public static string Password => GetEnvironmentVariable("PASSWORD", "");
     public static int RequestTimeout => int.Parse(GetEnvironmentVariable("REQUEST_TIMEOUT", "30000"));

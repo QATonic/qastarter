@@ -12,8 +12,8 @@ export class SchemaValidator {
    * Validate data against JSON schema
    */
   static validate<T>(data: T, schema: JSONSchemaType<T> | any): boolean {
-    const valid = ajv.validate(schema, data);
-    
+    const valid = ajv.validate(schema, data) as boolean;
+
     if (!valid) {
       logger.error('Schema validation failed', ajv.errors);
       throw new Error(`Schema validation failed: ${JSON.stringify(ajv.errors)}`);

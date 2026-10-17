@@ -7,7 +7,7 @@
  * - GET /api/v1/bom          — Bill of Materials
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import express, { type Express, type Request, type Response, type NextFunction } from 'express';
 import request from 'supertest';
 import { BOM } from '../../shared/bom';
@@ -54,16 +54,23 @@ function createTestApp(): Express {
   app.use('/api', configRoutes);
 
   // Global error handler so asyncHandler rejections don't crash tests
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const statusCode = err.statusCode || 500;
-    res.status(statusCode).json({
-      success: false,
-      error: {
-        code: err.code || 'INTERNAL_ERROR',
-        message: err.message,
-      },
-    });
-  });
+  app.use(
+    (
+      err: Error & { statusCode?: number; code?: string; details?: unknown },
+      _req: Request,
+      res: Response,
+      _next: NextFunction
+    ) => {
+      const statusCode = err.statusCode || 500;
+      res.status(statusCode).json({
+        success: false,
+        error: {
+          code: err.code || 'INTERNAL_ERROR',
+          message: err.message,
+        },
+      });
+    }
+  );
 
   return app;
 }

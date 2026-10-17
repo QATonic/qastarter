@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
-<suite name="{{projectName}}_Regression_Suite" parallel="methods" thread-count="4">
+<suite name="{{escapeXml projectName}}_Regression_Suite" parallel="methods" thread-count="4">
     
     <parameter name="environment" value="qa"/>
     
@@ -10,9 +10,9 @@
         <parameter name="environment" value="qa"/>
         
         <classes>
-            <class name="{{packageName}}.tests.UserAPITests"/>
-            <class name="{{packageName}}.tests.AuthenticationTests"/>
-            <class name="{{packageName}}.tests.DataDrivenTests"/>
+            <class name="{{escapeXml packageName}}.tests.UserAPITests"/>
+            <class name="{{escapeXml packageName}}.tests.AuthenticationTests"/>
+            <class name="{{escapeXml packageName}}.tests.DataDrivenTests"/>
         </classes>
         
         <groups>
@@ -29,12 +29,12 @@
         <parameter name="environment" value="qa"/>
         
         <classes>
-            <class name="{{packageName}}.tests.UserAPITests">
+            <class name="{{escapeXml packageName}}.tests.UserAPITests">
                 <methods>
                     <include name="testUserAPIPerformance"/>
                 </methods>
             </class>
-            <class name="{{packageName}}.tests.AuthenticationTests">
+            <class name="{{escapeXml packageName}}.tests.AuthenticationTests">
                 <methods>
                     <include name="testAuthenticationPerformance"/>
                 </methods>
@@ -49,8 +49,8 @@
     </test>
     
     <listeners>
-        <listener class-name="{{packageName}}.listeners.TestListener"/>
-        <listener class-name="{{packageName}}.listeners.RetryAnalyzer"/>
+        <listener class-name="{{escapeXml packageName}}.listeners.TestListener"/>
+        <listener class-name="{{escapeXml packageName}}.listeners.RetryAnalyzer"/>
     </listeners>
     
 </suite>

@@ -4,7 +4,6 @@ import { promises as fs, existsSync } from 'fs';
 import { BOM } from '@shared/bom';
 import { ProjectTemplateGenerator } from '../templates';
 import { ProjectConfig } from '@shared/schema';
-import { TemplatePackEngine } from '../templates/templatePackEngine';
 
 // ─── Helpers ──────────────────────────────────────────────────────────
 
@@ -104,7 +103,8 @@ describe('Manifest faker conditional entries', () => {
     for (const pack of javaPacks) {
       const manifest = await readManifest(pack);
       const fakerFile = manifest.files?.find(
-        (f: any) => f.conditional && f.conditional['utilities.faker'] === true
+        (f: import('../templates/types').TemplatePackFile) =>
+          f.conditional && f.conditional['utilities.faker'] === true
       );
       if (fakerFile) {
         found = true;
@@ -123,7 +123,8 @@ describe('Manifest faker conditional entries', () => {
     for (const pack of pythonPacks) {
       const manifest = await readManifest(pack);
       const fakerFile = manifest.files?.find(
-        (f: any) => f.conditional && f.conditional['utilities.faker'] === true
+        (f: import('../templates/types').TemplatePackFile) =>
+          f.conditional && f.conditional['utilities.faker'] === true
       );
       if (fakerFile) {
         found = true;
@@ -142,7 +143,8 @@ describe('Manifest faker conditional entries', () => {
     for (const pack of jsPacks) {
       const manifest = await readManifest(pack);
       const fakerFile = manifest.files?.find(
-        (f: any) => f.conditional && f.conditional['utilities.faker'] === true
+        (f: import('../templates/types').TemplatePackFile) =>
+          f.conditional && f.conditional['utilities.faker'] === true
       );
       if (fakerFile) {
         found = true;
@@ -161,7 +163,8 @@ describe('Manifest faker conditional entries', () => {
     for (const pack of tsPacks) {
       const manifest = await readManifest(pack);
       const fakerFile = manifest.files?.find(
-        (f: any) => f.conditional && f.conditional['utilities.faker'] === true
+        (f: import('../templates/types').TemplatePackFile) =>
+          f.conditional && f.conditional['utilities.faker'] === true
       );
       if (fakerFile) {
         found = true;
@@ -180,7 +183,8 @@ describe('Manifest faker conditional entries', () => {
     for (const pack of csharpPacks) {
       const manifest = await readManifest(pack);
       const fakerFile = manifest.files?.find(
-        (f: any) => f.conditional && f.conditional['utilities.faker'] === true
+        (f: import('../templates/types').TemplatePackFile) =>
+          f.conditional && f.conditional['utilities.faker'] === true
       );
       if (fakerFile) {
         found = true;
@@ -199,7 +203,8 @@ describe('Manifest faker conditional entries', () => {
     for (const pack of goPacks) {
       const manifest = await readManifest(pack);
       const fakerFile = manifest.files?.find(
-        (f: any) => f.conditional && f.conditional['utilities.faker'] === true
+        (f: import('../templates/types').TemplatePackFile) =>
+          f.conditional && f.conditional['utilities.faker'] === true
       );
       if (fakerFile) {
         found = true;
@@ -252,6 +257,7 @@ describe('shouldIncludeFile conditional logic for utilities.faker', () => {
   });
 
   const baseJavaConfig: ProjectConfig = {
+    cloudDeviceFarm: 'none' as const,
     projectName: 'faker-test-project',
     testingType: 'web',
     language: 'java',
@@ -308,6 +314,7 @@ describe('shouldIncludeFile conditional logic for utilities.faker', () => {
 
   // Repeat for Python to verify cross-language consistency
   const basePythonConfig: ProjectConfig = {
+    cloudDeviceFarm: 'none' as const,
     projectName: 'faker-test-python',
     testingType: 'web',
     language: 'python',
@@ -359,6 +366,7 @@ describe('Faker template rendering', () => {
 
   it('rendered Java TestDataFactory contains DataFaker import', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'render-test-java',
       testingType: 'web',
       language: 'java',
@@ -384,6 +392,7 @@ describe('Faker template rendering', () => {
 
   it('rendered Python test_data_factory contains faker import', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'render-test-python',
       testingType: 'web',
       language: 'python',
@@ -407,6 +416,7 @@ describe('Faker template rendering', () => {
 
   it('rendered TypeScript testDataFactory contains @faker-js/faker reference', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'render-test-ts',
       testingType: 'web',
       language: 'typescript',
@@ -428,6 +438,7 @@ describe('Faker template rendering', () => {
 
   it('rendered C# TestDataFactory contains Bogus reference', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'render-test-csharp',
       testingType: 'web',
       language: 'csharp',
@@ -449,6 +460,7 @@ describe('Faker template rendering', () => {
 
   it('rendered Go test_data_factory contains gofakeit import', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'render-test-go',
       testingType: 'web',
       language: 'go',
@@ -470,6 +482,7 @@ describe('Faker template rendering', () => {
 
   it('rendered JavaScript testDataFactory contains faker reference', async () => {
     const config: ProjectConfig = {
+      cloudDeviceFarm: 'none' as const,
       projectName: 'render-test-js',
       testingType: 'web',
       language: 'javascript',
@@ -503,7 +516,8 @@ describe('All packs with faker conditional files are internally consistent', () 
     for (const pack of allPacks) {
       const manifest = await readManifest(pack);
       const fakerFiles = (manifest.files || []).filter(
-        (f: any) => f.conditional && f.conditional['utilities.faker'] === true
+        (f: import('../templates/types').TemplatePackFile) =>
+          f.conditional && f.conditional['utilities.faker'] === true
       );
 
       for (const fakerFile of fakerFiles) {
@@ -543,7 +557,8 @@ describe('All packs with faker conditional files are internally consistent', () 
     for (const pack of allPacks) {
       const manifest = await readManifest(pack);
       const fakerFiles = (manifest.files || []).filter(
-        (f: any) => f.conditional && f.conditional['utilities.faker'] === true
+        (f: import('../templates/types').TemplatePackFile) =>
+          f.conditional && f.conditional['utilities.faker'] === true
       );
 
       for (const fakerFile of fakerFiles) {

@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import { buildSync } from 'esbuild';
+import { request as httpRequest } from 'node:http';
 
 const exec = promisify(execFile);
 const name = `qastarter-verify-${randomBytes(5).toString('hex')}`;
@@ -13,8 +14,7 @@ const password = randomBytes(24).toString('hex');
 const image = process.env.CONTAINER_TEST_IMAGE || 'qastarter:review-fixes';
 const created = [];
 let networkCreated = false;
-// Keep this short-lived process alive while fetch's unreferenced socket/timeout
-// handles are waiting on container startup, and bound the whole verification.
+// Bound the whole verification, including container startup and readiness.
 const deadline = new AbortController();
 const deadlineTimer = setTimeout(
   () => deadline.abort(new Error('Container integration exceeded three minutes')),
@@ -25,20 +25,46 @@ async function docker(...args) {
   return stdout.trim();
 }
 async function waitFor(fn, label) {
+  let lastError;
   for (let attempt = 0; attempt < 60; attempt++) {
-    deadline.signal.throwIfAborted();
+    if (deadline.signal.aborted) break;
     try {
       return await fn();
-    } catch {
+    } catch (error) {
+      lastError = error;
       await delay(500);
     }
   }
-  throw new Error(`Timed out waiting for ${label}`);
+  throw new Error(`Timed out waiting for ${label}`, { cause: lastError });
 }
-async function request(url, options) {
-  return fetch(url, {
-    ...options,
-    signal: AbortSignal.any([deadline.signal, AbortSignal.timeout(15_000)]),
+function request(url, options = {}) {
+  return new Promise((resolve, reject) => {
+    const req = httpRequest(url, {
+      method: options.method || 'GET',
+      headers: { ...options.headers, Connection: 'close' },
+      signal: deadline.signal,
+    });
+    const timeout = setTimeout(
+      () => req.destroy(new Error(`HTTP request timed out: ${url}`)),
+      15_000
+    );
+    req.once('close', () => clearTimeout(timeout));
+    req.once('error', reject);
+    req.once('response', (res) => {
+      const chunks = [];
+      res.on('data', (chunk) => chunks.push(chunk));
+      res.once('error', reject);
+      res.once('end', () => {
+        const body = Buffer.concat(chunks);
+        resolve({
+          status: res.statusCode,
+          json: async () => JSON.parse(body.toString('utf8')),
+          arrayBuffer: async () =>
+            body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength),
+        });
+      });
+    });
+    req.end(options.body);
   });
 }
 try {
@@ -90,11 +116,14 @@ try {
       'RATE_LIMIT_GENERATE_MAX=2',
       '-e',
       'LOG_LEVEL=warn',
+      '-e',
+      'LOG_CONSOLE=true',
       image
     );
     created.push(app);
     const port = (await docker('port', app, '5000/tcp')).split(':').at(-1);
     const base = `http://127.0.0.1:${port}`;
+    console.log(`Checking readiness: ${base}`);
     await waitFor(async () => {
       const response = await request(`${base}/api/v1/health/deep`);
       assert.equal(response.status, 200);

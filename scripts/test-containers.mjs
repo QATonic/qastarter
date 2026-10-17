@@ -3,6 +3,7 @@ import { promisify } from 'node:util';
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
+import { buildSync } from 'esbuild';
 
 const exec = promisify(execFile);
 const name = `qastarter-verify-${randomBytes(5).toString('hex')}`;
@@ -12,12 +13,20 @@ const password = randomBytes(24).toString('hex');
 const image = process.env.CONTAINER_TEST_IMAGE || 'qastarter:review-fixes';
 const created = [];
 let networkCreated = false;
+// Keep this short-lived process alive while fetch's unreferenced socket/timeout
+// handles are waiting on container startup, and bound the whole verification.
+const deadline = new AbortController();
+const deadlineTimer = setTimeout(
+  () => deadline.abort(new Error('Container integration exceeded three minutes')),
+  180_000
+);
 async function docker(...args) {
   const { stdout } = await exec('docker', args, { maxBuffer: 4 * 1024 * 1024, timeout: 120_000 });
   return stdout.trim();
 }
 async function waitFor(fn, label) {
   for (let attempt = 0; attempt < 60; attempt++) {
+    deadline.signal.throwIfAborted();
     try {
       return await fn();
     } catch {
@@ -27,9 +36,13 @@ async function waitFor(fn, label) {
   throw new Error(`Timed out waiting for ${label}`);
 }
 async function request(url, options) {
-  return fetch(url, { ...options, signal: AbortSignal.timeout(15_000) });
+  return fetch(url, {
+    ...options,
+    signal: AbortSignal.any([deadline.signal, AbortSignal.timeout(15_000)]),
+  });
 }
 try {
+  console.log('Starting isolated Redis integration network');
   await docker('network', 'create', name);
   networkCreated = true;
   await docker(
@@ -58,6 +71,7 @@ try {
     'Redis'
   );
   const urls = [];
+  console.log('Redis is ready; starting two production replicas');
   for (const app of apps) {
     await docker(
       'run',
@@ -92,6 +106,7 @@ try {
     assert.equal(await docker('exec', app, 'id', '-u'), '1001');
     assert.equal((await request(`${base}/`)).status, 200);
     urls.push(base);
+    console.log(`Production replica ready: ${app}`);
   }
   const config = {
     projectName: 'container-check',
@@ -141,6 +156,7 @@ try {
     );
     assert.ok(keys.length, `missing Redis ${namespace} counters`);
   }
+  console.log('ZIP generation and distributed rate limits passed; checking cache operations');
   // Exercise serialization, expiry and namespaced flush against the actual Redis adapter.
   const probe = `import {RedisCacheProvider} from './server/services/cache/redisCacheProvider.ts';
     import assert from 'node:assert/strict';
@@ -158,8 +174,8 @@ try {
       assert.ok((await cache.getClient().keys('qastarter:rate:*')).length);
     } finally {await cache.close();}`;
   // Compile the probe with the build-stage dependencies, then run with production dependencies.
-  const { build } = await import('esbuild');
-  const compiled = await build({
+  // Compile this small probe synchronously before running it in the container.
+  const compiled = buildSync({
     stdin: {
       contents: probe,
       resolveDir: process.cwd(),
@@ -184,4 +200,5 @@ try {
 } finally {
   for (const container of created.reverse()) await docker('rm', '-f', container).catch(() => {});
   if (networkCreated) await docker('network', 'rm', name).catch(() => {});
+  clearTimeout(deadlineTimer);
 }

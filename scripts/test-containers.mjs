@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
 import { buildSync } from 'esbuild';
-import { request as httpRequest } from 'node:http';
 
 const exec = promisify(execFile);
 const name = `qastarter-verify-${randomBytes(5).toString('hex')}`;
@@ -37,36 +36,47 @@ async function waitFor(fn, label) {
   }
   throw new Error(`Timed out waiting for ${label}`, { cause: lastError });
 }
-function request(url, options = {}) {
-  return new Promise((resolve, reject) => {
-    const req = httpRequest(url, {
-      method: options.method || 'GET',
-      headers: { ...options.headers, Connection: 'close' },
-      signal: deadline.signal,
-    });
-    const timeout = setTimeout(
-      () => req.destroy(new Error(`HTTP request timed out: ${url}`)),
-      15_000
-    );
-    req.once('close', () => clearTimeout(timeout));
-    req.once('error', reject);
-    req.once('response', (res) => {
-      const chunks = [];
-      res.on('data', (chunk) => chunks.push(chunk));
-      res.once('error', reject);
-      res.once('end', () => {
-        const body = Buffer.concat(chunks);
-        resolve({
-          status: res.statusCode,
-          json: async () => JSON.parse(body.toString('utf8')),
-          arrayBuffer: async () =>
-            body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength),
-        });
-      });
-    });
-    req.end(options.body);
+// Use a client on the test network instead of assuming the Docker daemon
+// publishes ports into the machine/network namespace running this script.
+const httpProbe = String.raw`
+  const { request } = require('node:http');
+  const [url, options] = JSON.parse(process.argv[1]);
+  const req = request(url, {
+    method: options.method || 'GET',
+    headers: { ...options.headers, Connection: 'close' },
   });
+  const timeout = setTimeout(() => req.destroy(new Error('HTTP request timed out: ' + url)), 15000);
+  req.once('close', () => clearTimeout(timeout));
+  req.once('error', error => { console.error(error); process.exitCode = 1; });
+  req.once('response', res => {
+    const chunks = [];
+    res.on('data', chunk => chunks.push(chunk));
+    res.once('error', error => { console.error(error); process.exitCode = 1; });
+    res.once('end', () => console.log(JSON.stringify({ status: res.statusCode, body: Buffer.concat(chunks).toString('base64') })));
+  });
+  req.end(options.body);
+`;
+async function request(url, options = {}) {
+  deadline.signal.throwIfAborted();
+  const result = JSON.parse(
+    await docker(
+      'exec',
+      apps[0],
+      'node',
+      '--input-type=commonjs',
+      '-e',
+      httpProbe,
+      JSON.stringify([url, options])
+    )
+  );
+  const body = Buffer.from(result.body, 'base64');
+  return {
+    status: result.status,
+    json: async () => JSON.parse(body.toString('utf8')),
+    arrayBuffer: async () => body.buffer.slice(body.byteOffset, body.byteOffset + body.byteLength),
+  };
 }
+
 try {
   console.log('Starting isolated Redis integration network');
   await docker('network', 'create', name);
@@ -106,8 +116,6 @@ try {
       app,
       '--network',
       name,
-      '-p',
-      '127.0.0.1::5000',
       '-e',
       `REDIS_URL=redis://:${password}@${redis}:6379`,
       '-e',
@@ -121,8 +129,7 @@ try {
       image
     );
     created.push(app);
-    const port = (await docker('port', app, '5000/tcp')).split(':').at(-1);
-    const base = `http://127.0.0.1:${port}`;
+    const base = `http://${app}:5000`;
     console.log(`Checking readiness: ${base}`);
     await waitFor(async () => {
       const response = await request(`${base}/api/v1/health/deep`);

@@ -18,7 +18,7 @@ stages:
 test:chromium:
   stage: test
   before_script:
-    - npm ci
+    - npm install --no-audit --no-fund
     - npx playwright install --with-deps chromium
   script:
     - BROWSER=chromium npm test
@@ -41,7 +41,7 @@ test:chromium:
 test:firefox:
   stage: test
   before_script:
-    - npm ci
+    - npm install --no-audit --no-fund
     - npx playwright install --with-deps firefox
   script:
     - BROWSER=firefox npm test
@@ -65,9 +65,9 @@ test:firefox:
 allure:report:
   stage: report
   before_script:
-    - npm ci
+    - npm install --no-audit --no-fund
   script:
-    - npm run report:generate
+    - npx allure generate allure-results --clean -o allure-report
   dependencies:
     - test:chromium
     - test:firefox

@@ -37,7 +37,7 @@ pipeline {
 {{#if (eq buildTool "maven")}}
                 sh 'mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"'
 {{else}}
-                sh './gradlew playwright install'
+                sh './gradlew installPlaywright'
 {{/if}}
             }
         }
@@ -46,9 +46,9 @@ pipeline {
         stage('Test') {
             steps {
 {{#if (eq buildTool "maven")}}
-                sh 'mvn test -Dheadless=${HEADLESS}'
+                sh 'mvn test -Pheadless=${HEADLESS}'
 {{else}}
-                sh './gradlew test -Dheadless=${HEADLESS}'
+                sh './gradlew test -Pheadless=${HEADLESS}'
 {{/if}}
             }
             post {

@@ -576,6 +576,11 @@ export class TemplatePackEngine {
       openApiEndpoints?: import('@shared/openApiTypes').OpenApiEndpoint[];
     } = { strict: true }
   ): AsyncGenerator<TemplateFile> {
+    // Compose templates build the local project image and therefore require
+    // its Dockerfile, including when API callers select Compose on its own.
+    if (config.utilities?.includeDockerCompose && !config.utilities.includeDocker) {
+      config = { ...config, utilities: { ...config.utilities, includeDocker: true } };
+    }
     const packKey = this.getTemplatePackKey(config);
 
     try {

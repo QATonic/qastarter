@@ -36,4 +36,56 @@ describe('configuration validation', () => {
       parseProjectConfiguration({ ...minimal, testingPattern: 'not-a-pattern' })
     ).rejects.toMatchObject({ statusCode: 400 });
   });
+
+  it.each([
+    ['playwright', 'csharp', 'nunit', 'extent-reports'],
+    ['playwright', 'java', 'junit5', 'testng-reports'],
+    ['selenium', 'java', 'junit5', 'testng-reports'],
+    ['cypress', 'javascript', 'cypress', 'jest-html-reporter'],
+    ['cypress', 'typescript', 'cypress', 'jest-html-reporter'],
+    ['selenium', 'javascript', 'jest', 'jest-html-reporter'],
+    ['selenium', 'typescript', 'jest', 'mochawesome'],
+    ['webdriverio', 'javascript', 'mocha', 'mochawesome'],
+    ['webdriverio', 'typescript', 'mocha', 'jest-html-reporter'],
+  ])(
+    'rejects an unimplemented reporter for %s/%s/%s: %s',
+    async (framework, language, testRunner, reportingTool) => {
+      await expect(
+        parseProjectConfiguration({
+          projectName: 'demo',
+          testingType: 'web',
+          framework,
+          language,
+          testRunner,
+          reportingTool,
+        })
+      ).rejects.toMatchObject({ statusCode: 400 });
+    }
+  );
+
+  it('keeps native TestNG reporting available to TestNG web projects', async () => {
+    await expect(
+      parseProjectConfiguration({
+        projectName: 'demo',
+        testingType: 'web',
+        framework: 'selenium',
+        language: 'java',
+        testRunner: 'testng',
+        reportingTool: 'testng-reports',
+      })
+    ).resolves.toMatchObject({ reportingTool: 'testng-reports' });
+  });
+
+  it('does not advertise a Jest formatter for a Cucumber runner', async () => {
+    await expect(
+      parseProjectConfiguration({
+        projectName: 'demo',
+        testingType: 'web',
+        framework: 'playwright',
+        language: 'typescript',
+        testingPattern: 'bdd',
+        reportingTool: 'jest-html',
+      })
+    ).rejects.toMatchObject({ statusCode: 400 });
+  });
 });

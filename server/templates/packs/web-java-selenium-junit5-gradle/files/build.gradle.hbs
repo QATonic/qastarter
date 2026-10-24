@@ -126,6 +126,9 @@ implementation '{{string group "single" "gradle"}}:{{string name "single" "gradl
 // Test task configuration
 test {
 useJUnitPlatform() {
+{{#if (eq testingPattern "bdd")}}
+includeEngines 'junit-platform-suite'
+{{/if}}
 // Include/exclude tests by tag
 includeTags 'smoke', 'regression', 'integration'
 excludeTags 'slow'

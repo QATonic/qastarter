@@ -109,3 +109,12 @@ CI/CD pipeline configuration is included for automated testing.
 - **Screenshots**: Auto-capture on failure (`utils/screenshotHelper.ts`)
 - **Wait Helpers**: Custom wait utilities (`utils/waitHelpers.ts`)
 - **Data Reader**: Test data utilities (`utils/dataReader.ts`)
+{{#if (eq testingPattern "bdd")}}
+## Run BDD scenarios
+
+Install dependencies with `npm install`, then run `npm test` (or `npm run test:bdd`).
+Cucumber executes `features/` with the selected browser library. Results are written
+to `reports/cucumber.json` and `reports/cucumber.html`. Use `HEADLESS=false` to show
+the browser. Credentials use `TEST_USERNAME` and `TEST_PASSWORD`; update the sample
+selectors and assertions in `step-definitions/` for your application.
+{{/if}}

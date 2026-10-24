@@ -285,23 +285,23 @@ export const validationMatrix: ValidationMatrix = {
     'selenium-java': ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
     'selenium-python': ['allure', 'pytest-html'],
     'selenium-csharp': ['allure', 'extent-reports', 'nunit-reports'],
-    'selenium-javascript': ['allure', 'jest-html-reporter', 'mochawesome'],
-    'selenium-typescript': ['allure', 'jest-html-reporter', 'mochawesome'],
+    'selenium-javascript': ['allure'],
+    'selenium-typescript': ['allure'],
 
     // Web - Playwright
     'playwright-java': ['allure', 'extent-reports', 'testng-reports', 'junit-reports'],
     'playwright-python': ['allure', 'pytest-html'],
-    'playwright-csharp': ['allure', 'extent-reports', 'nunit-reports'],
+    'playwright-csharp': ['allure', 'nunit-reports'],
     'playwright-javascript': ['allure', 'jest-html'],
     'playwright-typescript': ['allure', 'jest-html'],
 
     // Web - Cypress
-    'cypress-javascript': ['allure', 'mochawesome', 'jest-html-reporter'],
-    'cypress-typescript': ['allure', 'mochawesome', 'jest-html-reporter'],
+    'cypress-javascript': ['allure', 'mochawesome'],
+    'cypress-typescript': ['allure', 'mochawesome'],
 
     // Web - WebdriverIO
-    'webdriverio-javascript': ['allure', 'mochawesome', 'jest-html-reporter'],
-    'webdriverio-typescript': ['allure', 'mochawesome', 'jest-html-reporter'],
+    'webdriverio-javascript': ['allure'],
+    'webdriverio-typescript': ['allure'],
 
     // Web - Robot Framework
     'robotframework-python': ['robot-reports', 'allure'],
@@ -393,8 +393,6 @@ export const validationMatrix: ValidationMatrix = {
       'extent-reports',
       'testng-reports',
       'junit-reports',
-      'jest-html-reporter',
-      'mochawesome',
       'pytest-html',
       'nunit-reports',
     ],
@@ -407,8 +405,8 @@ export const validationMatrix: ValidationMatrix = {
       'pytest-html',
       'nunit-reports',
     ],
-    cypress: ['allure', 'jest-html-reporter', 'mochawesome'],
-    webdriverio: ['allure', 'jest-html-reporter', 'mochawesome'],
+    cypress: ['allure', 'mochawesome'],
+    webdriverio: ['allure'],
     robotframework: ['robot-reports', 'allure'],
     appium: [
       'allure',
@@ -635,12 +633,32 @@ export class WizardValidator {
    * Get available reporting tools for specific framework + language combination (precise)
    * This ensures only valid combinations that have actual templates are shown
    */
-  static getAvailableReportingToolsForFramework(framework: string, language: string): string[] {
+  static getAvailableReportingToolsForFramework(
+    framework: string,
+    language: string,
+    testRunner?: string,
+    testingPattern?: string
+  ): string[] {
     const key = `${framework}-${language}`;
-    return (
+    let tools =
       validationMatrix.frameworkLanguageReportingTools[key] ||
-      this.getAvailableReportingTools(framework)
-    );
+      this.getAvailableReportingTools(framework);
+    // TestNG's native reports are unavailable to the JUnit web packs.
+    if (
+      language === 'java' &&
+      ['selenium', 'playwright'].includes(framework) &&
+      testRunner === 'junit5'
+    ) {
+      tools = tools.filter((tool) => tool !== 'testng-reports');
+    }
+    if (
+      testingPattern === 'bdd' &&
+      framework === 'playwright' &&
+      ['javascript', 'typescript'].includes(language)
+    ) {
+      tools = tools.filter((tool) => tool !== 'jest-html');
+    }
+    return tools;
   }
 
   /**
@@ -757,7 +775,12 @@ export class WizardValidator {
       case 'reportingTool':
         // Use precise mapping when both framework and language are selected
         if (config.framework && config.language) {
-          return this.getAvailableReportingToolsForFramework(config.framework, config.language);
+          return this.getAvailableReportingToolsForFramework(
+            config.framework,
+            config.language,
+            config.testRunner,
+            config.testingPattern
+          );
         }
         return config.framework ? this.getAvailableReportingTools(config.framework) : [];
 
@@ -834,7 +857,9 @@ export class WizardValidator {
     if (config.framework && config.language && config.reportingTool) {
       const availableReportingTools = this.getAvailableReportingToolsForFramework(
         config.framework,
-        config.language
+        config.language,
+        config.testRunner,
+        config.testingPattern
       );
       if (!availableReportingTools.includes(config.reportingTool)) {
         newConfig.reportingTool = '';

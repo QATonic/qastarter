@@ -1,41 +1,24 @@
 stages:
-- test
-- report
-
+  - test
 variables:
-PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-BROWSER: chrome
-HEADLESS: "true"
-
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 cache:
-paths:
-- .cache/pip/
-
+  paths:
+    - .cache/pip/
 test:
-stage: test
-image: python:{{toolVersions.python}}
-before_script:
-- apt-get update && apt-get install -y chromium chromium-driver
-- pip install -r requirements.txt
-script:
-- robot --variable HEADLESS:true --outputdir results tests/
-artifacts:
-when: always
-paths:
-- results/
-reports:
-junit: results/output.xml
-
-{{#eq reportingTool "allure"}}
-allure:
-stage: report
-image: python:{{toolVersions.python}}
-dependencies:
-- test
-script:
-- pip install allure-robotframework
-- allure generate results -o allure-report
-artifacts:
-paths:
-- allure-report/
-{{/eq}}
+  stage: test
+  image: python:{{toolVersions.python}}
+  before_script:
+    - apt-get update && apt-get install -y chromium chromium-driver
+    - python -m pip install -r requirements.txt
+  script:
+    - robot --variable BROWSER:chromium --variable HEADLESS:true --xunit junit.xml --outputdir results {{#if (eq reportingTool "allure")}}--listener allure_robotframework:allure-results {{/if}}tests/
+  artifacts:
+    when: always
+    paths:
+      - results/
+{{#if (eq reportingTool "allure")}}
+      - allure-results/
+{{/if}}
+    reports:
+      junit: results/junit.xml

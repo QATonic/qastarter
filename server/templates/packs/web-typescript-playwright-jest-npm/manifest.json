@@ -179,20 +179,6 @@
       }
     },
     {
-      "path": "support/hooks.ts",
-      "isTemplate": true,
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
-      "path": "support/world.ts",
-      "isTemplate": true,
-      "conditional": {
-        "testingPattern": "bdd"
-      }
-    },
-    {
       "path": "tests/login.test.ts",
       "isTemplate": true
     },
@@ -243,6 +229,10 @@
       "conditional": {
         "cloudDeviceFarm": "saucelabs"
       }
+    },
+    {
+      "path": "eslint.config.mjs",
+      "isTemplate": true
     }
   ],
   "directories": [

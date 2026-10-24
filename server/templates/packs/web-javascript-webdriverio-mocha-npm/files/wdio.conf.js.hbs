@@ -41,7 +41,7 @@ export const config = {
   capabilities: [{
     browserName: "chrome",
     "goog:chromeOptions": {
-      args: process.argv.includes("--headless")
+      args: (process.env.HEADLESS === "true" || process.argv.includes("--headless"))
         ? ["--headless", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"]
         : []
     }
@@ -70,8 +70,8 @@ export const config = {
     timeout: 60000
   },
 
-  before: function (capabilities, specs) {
-    browser.maximizeWindow();
+  before: async function () {
+    await browser.maximizeWindow();
   },
 
   afterTest: async function(test, context, { error, result, duration, passed, retries }) {

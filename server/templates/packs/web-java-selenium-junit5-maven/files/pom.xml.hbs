@@ -45,6 +45,18 @@
         <env>dev</env>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Selenium WebDriver -->
         <dependency>
@@ -72,6 +84,10 @@
         {{#if (eq testingPattern "bdd")}}
 
         <!-- Cucumber -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
@@ -205,6 +221,12 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+{{#if (eq testingPattern "bdd")}}
+                    <includeJUnit5Engines>
+                        <engine>junit-platform-suite</engine>
+                    </includeJUnit5Engines>
+{{/if}}
+
                     <systemPropertyVariables>
                         <browser>${browser}</browser>
                         <headless>${headless}</headless>

@@ -1,0 +1,10 @@
+module.exports = {
+  default: {
+    paths: ['features/**/*.feature'],
+    requireModule: ['ts-node/register'],
+    require: ['step-definitions/**/*.ts'],
+    format: ['progress', 'json:reports/cucumber.json', 'html:reports/cucumber.html'{{#if (eq reportingTool "allure")}}, 'allure-cucumberjs/reporter'{{/if}}],
+    formatOptions: { resultsDir: 'allure-results' },
+    parallel: 1
+  }
+};

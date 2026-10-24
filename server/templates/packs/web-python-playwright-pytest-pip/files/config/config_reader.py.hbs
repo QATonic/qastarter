@@ -52,7 +52,8 @@ class ConfigurationReader:
     def get(self, key: str, default: str = None, section: str = "settings") -> str:
         """Get configuration value."""
         # Check environment variable first
-        env_value = os.getenv(key.upper())
+        env_key = f"TEST_{key.upper()}" if key in ("username", "password") else key.upper()
+        env_value = os.getenv(env_key)
         if env_value:
             return env_value
         
@@ -89,6 +90,14 @@ class ConfigurationReader:
     @property
     def timeout(self) -> int:
         return self.get_int("timeout", 30)
+
+    @property
+    def username(self) -> str:
+        return self.get("username", "")
+
+    @property
+    def password(self) -> str:
+        return self.get("password", "")
 
 
 # Singleton instance

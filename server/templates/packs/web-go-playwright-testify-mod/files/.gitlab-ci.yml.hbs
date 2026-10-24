@@ -8,7 +8,7 @@ stage: test
 script:
 - apt-get update && apt-get install -y golang
 - go mod download
-- go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
+- go run github.com/playwright-community/playwright-go/cmd/playwright@v0.5101.0 install --with-deps
 - go test ./tests/... -v
 artifacts:
 reports:

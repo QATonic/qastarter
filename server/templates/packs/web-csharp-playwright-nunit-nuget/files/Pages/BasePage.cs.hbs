@@ -7,7 +7,8 @@ namespace {{projectNamespace}}.Pages
     public abstract class BasePage
     {
         protected IPage Page => PlaywrightManager.Page;
-        protected int Timeout => ConfigReader.Instance.Timeout * 1000;
+        // Playwright timeouts are expressed in milliseconds.
+        protected int Timeout => ConfigReader.Instance.Timeout;
 
         protected async Task ClickAsync(string selector) => await Page.ClickAsync(selector, new() { Timeout = Timeout });
         protected async Task TypeAsync(string selector, string text) => await Page.FillAsync(selector, text, new() { Timeout = Timeout });

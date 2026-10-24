@@ -1,0 +1,9 @@
+module.exports = {
+  default: {
+    paths: ['features/**/*.feature'],
+    import: ['step-definitions/**/*.js'],
+    format: ['progress', 'json:reports/cucumber.json', 'html:reports/cucumber.html'{{#if (eq reportingTool "allure")}}, 'allure-cucumberjs/reporter'{{/if}}],
+    formatOptions: { resultsDir: 'allure-results' },
+    parallel: 1
+  }
+};

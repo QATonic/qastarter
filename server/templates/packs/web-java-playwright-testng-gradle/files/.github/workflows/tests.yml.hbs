@@ -22,11 +22,11 @@ jobs:
 
 {{#if (eq framework "playwright")}}
       - name: Install Playwright Browsers
-        run: {{#if (eq buildTool "maven")}}mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"{{else}}./gradlew playwright install{{/if}}
+        run: {{#if (eq buildTool "maven")}}mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="install --with-deps"{{else}}./gradlew installPlaywright{{/if}}
 {{/if}}
 
       - name: Run Tests
-        run: {{#if (eq buildTool "maven")}}mvn clean test -Dheadless=true{{else}}./gradlew clean test -Dheadless=true{{/if}}
+        run: {{#if (eq buildTool "maven")}}mvn clean test -Dheadless=true{{else}}./gradlew clean test -Pheadless=true{{/if}}
 {{#if (eq reportingTool "allure")}}
 
       - name: Generate Allure Report

@@ -1,0 +1,14 @@
+import js from '@eslint/js';
+
+export default [
+  { ignores: ["node_modules/**", "dist/**", "build/**", "reports/**", "test-results/**", "allure-results/**", "allure-report/**", "coverage/**", "cypress/screenshots/**", "cypress/videos/**"] },
+  js.configs.recommended,
+  {
+    files: ["**/*.{js,cjs,mjs}"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      globals: {"process": "readonly", "Buffer": "readonly", "__dirname": "readonly", "__filename": "readonly", "module": "readonly", "require": "readonly", "exports": "readonly", "console": "readonly", "setTimeout": "readonly", "clearTimeout": "readonly", "setInterval": "readonly", "clearInterval": "readonly", "URL": "readonly", "fetch": "readonly", "document": "readonly", "window": "readonly", "navigator": "readonly", "localStorage": "readonly", "sessionStorage": "readonly", "browser": "readonly", "$": "readonly", "$$": "readonly", "driver": "readonly", "cy": "readonly", "Cypress": "readonly", "expect": "readonly", "assert": "readonly", "jest": "readonly", "describe": "readonly", "xdescribe": "readonly", "fdescribe": "readonly", "it": "readonly", "xit": "readonly", "fit": "readonly", "test": "readonly", "xtest": "readonly", "before": "readonly", "after": "readonly", "beforeEach": "readonly", "afterEach": "readonly", "beforeAll": "readonly", "afterAll": "readonly", "context": "readonly", "page": "readonly", "browserName": "readonly", "playwright": "readonly"}
+    },
+    rules: { "no-unused-vars": ["warn", { args: "none", varsIgnorePattern: "^_" }] }
+  },
+];

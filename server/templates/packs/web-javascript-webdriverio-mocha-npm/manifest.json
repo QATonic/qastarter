@@ -165,6 +165,17 @@
       "conditional": {
         "cloudDeviceFarm": "saucelabs"
       }
+    },
+    {
+      "path": "eslint.config.mjs",
+      "isTemplate": true
+    },
+    {
+      "path": "cucumber.cjs",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     }
   ],
   "directories": [

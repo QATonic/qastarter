@@ -3,12 +3,12 @@
 "version": "1.0.0",
 "description": "{{string projectName "double" "json"}} - Playwright TypeScript Automation Framework",
 "scripts": {
-"postinstall": "playwright install chromium",
-"test": "{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-node-sdk jest{{else}}jest{{/if}}",
-"test:local": "jest",
 {{#if (eq testingPattern "bdd")}}
 "test:bdd": "cucumber-js",
 {{/if}}
+"postinstall": "playwright install chromium",
+"test": "{{#if (eq testingPattern "bdd")}}cucumber-js{{else}}{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-node-sdk jest{{else}}jest{{/if}}{{/if}}",
+"test:local": "jest",
 "test:headed": "HEADLESS=false jest",
 "test:parallel": "jest --maxWorkers=4",
 {{#if (eq reportingTool "allure")}}
@@ -21,11 +21,15 @@
 "playwright": "^1.41.0",
 "dotenv": "^16.3.0"
 },
-"devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
+"devDependencies": {
 {{#if (eq testingPattern "bdd")}}
 "@cucumber/cucumber": "^11.0.0",
+{{#if (eq reportingTool "allure")}}
+"allure-cucumberjs": "^3.0.0",
+{{/if}}
 "ts-node": "^10.9.2",
 {{/if}}
+"@eslint/js": "^8.57.1",{{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
 {{#if utilities.faker}}
 "@faker-js/faker": "^{{string toolVersions.fakerJs "double" "json"}}",
 {{/if}}

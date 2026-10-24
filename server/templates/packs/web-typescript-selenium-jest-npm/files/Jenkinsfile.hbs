@@ -19,7 +19,7 @@ pipeline {
         
         stage('Install Dependencies') {
             steps {
-                sh 'npm ci'
+                sh 'npm install --no-audit --no-fund'
             }
         }
         
@@ -33,7 +33,7 @@ pipeline {
             post {
                 always {
                     {{#if (eq reportingTool "allure")}}
-                    sh 'npm run report:generate'
+                    sh 'npx allure generate allure-results --clean -o allure-report'
                     allure([
                         results: [[path: 'allure-results']]
                     ])
@@ -72,7 +72,7 @@ pipeline {
             post {
                 always {
                     {{#if (eq reportingTool "allure")}}
-                    sh 'npm run report:generate'
+                    sh 'npx allure generate allure-results --clean -o allure-report'
                     allure([
                         results: [[path: 'allure-results']]
                     ])

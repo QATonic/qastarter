@@ -18,15 +18,15 @@ jobs:
       
       - restore_cache:
           keys:
-            - v1-deps-{{raw}}{{ checksum "package-lock.json" }}{{/raw}}
+            - v1-deps-{{raw}}{{ checksum "package.json" }}{{/raw}}
             - v1-deps-
       
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm install --no-audit --no-fund
       
       - save_cache:
-          key: v1-deps-{{raw}}{{ checksum "package-lock.json" }}{{/raw}}
+          key: v1-deps-{{raw}}{{ checksum "package.json" }}{{/raw}}
           paths:
             - node_modules
       
@@ -41,7 +41,7 @@ jobs:
       
       - run:
           name: Generate Allure Report
-          command: npm run report:generate
+          command: npx allure generate allure-results --clean -o allure-report
           when: always
       
       - store_artifacts:
@@ -88,15 +88,15 @@ jobs:
       
       - restore_cache:
           keys:
-            - v1-deps-{{raw}}{{ checksum "package-lock.json" }}{{/raw}}
+            - v1-deps-{{raw}}{{ checksum "package.json" }}{{/raw}}
             - v1-deps-
       
       - run:
           name: Install dependencies
-          command: npm ci
+          command: npm install --no-audit --no-fund
       
       - save_cache:
-          key: v1-deps-{{raw}}{{ checksum "package-lock.json" }}{{/raw}}
+          key: v1-deps-{{raw}}{{ checksum "package.json" }}{{/raw}}
           paths:
             - node_modules
       
@@ -111,7 +111,7 @@ jobs:
       
       - run:
           name: Generate Allure Report
-          command: npm run report:generate
+          command: npx allure generate allure-results --clean -o allure-report
           when: always
       
       - store_artifacts:

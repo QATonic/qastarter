@@ -1,0 +1,158 @@
+name: Generated web project audit
+
+on:
+  pull_request:
+    paths:
+      - 'server/templates/**'
+      - 'shared/validationMatrix.ts'
+      - 'scripts/web-audit/**'
+      - '.github/workflows/web-template-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-template-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+# Projects use public SauceDemo sample credentials. Generated ZIPs, dependency
+# inventories, logs and reports stay on the runner; no artifacts are uploaded.
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run lint
+      - run: npm run test:all
+      - run: npm run validate:templates
+      - run: npm run templates:validate-output
+  native:
+    name: Native / ${{ matrix.pack }}
+    runs-on: windows-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        pack:
+          - web-csharp-playwright-nunit-nuget
+          - web-csharp-selenium-nunit-nuget
+          - web-go-playwright-testify-mod
+          - web-java-playwright-junit5-gradle
+          - web-java-playwright-junit5-maven
+          - web-java-playwright-testng-gradle
+          - web-java-playwright-testng-maven
+          - web-java-selenium-junit5-gradle
+          - web-java-selenium-junit5-maven
+          - web-java-selenium-testng-gradle
+          - web-java-selenium-testng-maven
+          - web-javascript-cypress-cypress-npm
+          - web-javascript-playwright-jest-npm
+          - web-javascript-selenium-jest-npm
+          - web-javascript-webdriverio-mocha-npm
+          - web-typescript-cypress-cypress-npm
+          - web-typescript-playwright-jest-npm
+          - web-typescript-selenium-jest-npm
+          - web-typescript-webdriverio-mocha-npm
+          - web-python-playwright-pytest-pip
+          - web-python-selenium-pytest-pip
+          - web-python-robotframework-robot-pip
+    env:
+      WEB_AUDIT_RUN: tmp/web-audit/ci
+      WEB_AUDIT_BASE_URL: https://www.saucedemo.com
+      WEB_AUDIT_PACK: ${{ matrix.pack }}
+      WEB_AUDIT_CATEGORY: runtime
+      WEB_AUDIT_EXTRACT_CATEGORY: runtime
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.x'
+          cache: false
+      - run: npm ci
+      - run: npm run build
+      - name: Download and validate generated ZIPs
+        shell: pwsh
+        run: |
+          node node_modules/tsx/dist/cli.mjs scripts/web-audit/generate.ts --variants
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python scripts/web-audit/inspect_zip.py $env:WEB_AUDIT_RUN
+          node scripts/web-audit/inspect.mjs $env:WEB_AUDIT_RUN
+          python scripts/web-audit/options.py $env:WEB_AUDIT_RUN
+      - name: Verify every supported pattern and reporter
+        shell: pwsh
+        run: |
+          $env:WEB_AUDIT_JAVA_HOME = $env:JAVA_HOME
+          node scripts/web-audit/verify.mjs verify
+          node scripts/web-audit/verdict.mjs $env:WEB_AUDIT_RUN verify
+
+  containers:
+    name: Docker / ${{ matrix.pack }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        pack:
+          - web-csharp-playwright-nunit-nuget
+          - web-csharp-selenium-nunit-nuget
+          - web-go-playwright-testify-mod
+          - web-java-playwright-junit5-gradle
+          - web-java-playwright-junit5-maven
+          - web-java-playwright-testng-gradle
+          - web-java-playwright-testng-maven
+          - web-java-selenium-junit5-gradle
+          - web-java-selenium-junit5-maven
+          - web-java-selenium-testng-gradle
+          - web-java-selenium-testng-maven
+          - web-javascript-cypress-cypress-npm
+          - web-javascript-playwright-jest-npm
+          - web-javascript-selenium-jest-npm
+          - web-javascript-webdriverio-mocha-npm
+          - web-typescript-cypress-cypress-npm
+          - web-typescript-playwright-jest-npm
+          - web-typescript-selenium-jest-npm
+          - web-typescript-webdriverio-mocha-npm
+          - web-python-playwright-pytest-pip
+          - web-python-selenium-pytest-pip
+          - web-python-robotframework-robot-pip
+    env:
+      WEB_AUDIT_RUN: tmp/web-audit/ci
+      WEB_AUDIT_BASE_URL: https://www.saucedemo.com
+      WEB_AUDIT_PACK: ${{ matrix.pack }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: node node_modules/tsx/dist/cli.mjs scripts/web-audit/generate.ts
+      - name: Build and execute the generated Docker project
+        run: |
+          node scripts/web-audit/containers.mjs
+          node scripts/web-audit/verdict.mjs "$WEB_AUDIT_RUN" container

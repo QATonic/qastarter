@@ -31,7 +31,7 @@ steps:
       path: $(CYPRESS_CACHE_FOLDER)
     displayName: 'Cache Cypress binary'
 
-  - script: npm ci
+  - script: npm install --no-audit --no-fund
     displayName: 'Install dependencies'
 
   - script: npx cypress install
@@ -43,7 +43,7 @@ steps:
       TEST_ENV: $(TEST_ENV)
 
 {{#if (eq reportingTool "allure")}}
-  - script: npm run report:generate
+  - script: npx allure generate allure-results --clean -o allure-report
     displayName: 'Generate Allure Report'
     condition: always()
 

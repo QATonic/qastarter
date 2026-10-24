@@ -1,60 +1,37 @@
-import { Given, When, Then, setWorldConstructor } from '@cucumber/cucumber';
-import { expect } from '@playwright/test';
-import { CustomWorld } from '../support/world';
-import { LoginPage } from '../pages/LoginPage';
-import { HomePage } from '../pages/HomePage';
+import { Before, After, Given, When, Then, setDefaultTimeout } from '@cucumber/cucumber';
+import assert from 'node:assert/strict';
+import { Builder, By, until, type WebDriver } from 'selenium-webdriver';
+import chrome from 'selenium-webdriver/chrome';
+type LoginWorld = { driver: WebDriver };
 
-setWorldConstructor(CustomWorld);
-
-Given('I navigate to the login page', async function (this: CustomWorld) {
-  const loginPage = new LoginPage(this.page);
-  await loginPage.navigate();
+setDefaultTimeout(60000);
+const baseUrl = process.env.BASE_URL || "{{string baseUrl "double" "js"}}";
+const username = process.env.TEST_USERNAME || "{{string testUsername "double" "js"}}";
+const password = process.env.TEST_PASSWORD || "{{string testPassword "double" "js"}}";
+Before(async function (this: LoginWorld) {
+  const options = new chrome.Options().addArguments("--no-sandbox", "--disable-dev-shm-usage");
+  if (process.env.HEADLESS !== "false") options.addArguments("--headless=new");
+  this.driver = await new Builder().forBrowser("chrome").setChromeOptions(options).build();
 });
-
-When('I enter username {string} and password {string}', async function (
-  this: CustomWorld,
-  username: string,
-  password: string
-) {
-  const loginPage = new LoginPage(this.page);
-  if (username) {
-    await loginPage.enterUsername(username);
-  }
-  if (password) {
-    await loginPage.enterPassword(password);
-  }
+After(async function (this: LoginWorld) {
+  await this.driver?.quit();
 });
-
-When('I click the login button', async function (this: CustomWorld) {
-  const loginPage = new LoginPage(this.page);
-  await loginPage.clickLoginButton();
+Given('I open the login page', async function (this: LoginWorld) {
+  await this.driver.get(baseUrl);
 });
-
-Then('I should be redirected to the home page', async function (this: CustomWorld) {
-  const homePage = new HomePage(this.page);
-  const isHomePage = await homePage.isDisplayed();
-  expect(isHomePage).toBeTruthy();
+async function signIn(this: LoginWorld, username: string, password: string) {
+  await this.driver.findElement(By.id("user-name")).sendKeys(username);
+  await this.driver.findElement(By.id("password")).sendKeys(password);
+  await this.driver.findElement(By.id("login-button")).click();
+}
+When('I sign in with the configured credentials', async function (this: LoginWorld) { await signIn.call(this, username, password); });
+When('I sign in with a locked account', async function (this: LoginWorld) { await signIn.call(this, "locked_out_user", password); });
+When('I sign in with empty credentials', async function (this: LoginWorld) { await signIn.call(this, "", ""); });
+Then('I should see the inventory', async function (this: LoginWorld) {
+  await this.driver.wait(until.urlContains("/inventory.html"), 30000);
+  assert.ok((await this.driver.getCurrentUrl()).includes("/inventory.html"));
 });
-
-Then('I should see a welcome message', async function (this: CustomWorld) {
-  const homePage = new HomePage(this.page);
-  const welcomeMessage = await homePage.getWelcomeMessage();
-  expect(welcomeMessage).toBeTruthy();
-  expect(welcomeMessage).toContain('Welcome');
-});
-
-Then('I should see an error message {string}', async function (
-  this: CustomWorld,
-  expectedError: string
-) {
-  const loginPage = new LoginPage(this.page);
-  const actualError = await loginPage.getErrorMessage();
-  expect(actualError).toBeTruthy();
-  expect(actualError).toContain(expectedError);
-});
-
-Then('I should remain on the login page', async function (this: CustomWorld) {
-  const loginPage = new LoginPage(this.page);
-  const isLoginPage = await loginPage.isDisplayed();
-  expect(isLoginPage).toBeTruthy();
+Then('I should see a login error', async function (this: LoginWorld) {
+  const error = await this.driver.wait(until.elementLocated(By.css('[data-test="error"]')), 30000);
+  assert.ok((await error.getText()).includes("Epic sadface"));
 });

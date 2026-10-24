@@ -1,0 +1,21 @@
+version: 2.1
+jobs:
+  test:
+    docker:
+      - image: golang:1.21
+    environment:
+      HEADLESS: "true"
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies and matching Playwright browsers
+          command: |
+            go mod download
+            go run github.com/playwright-community/playwright-go/cmd/playwright@v0.5101.0 install --with-deps chromium
+      - run:
+          name: Run tests
+          command: go test ./... -v
+workflows:
+  tests:
+    jobs:
+      - test

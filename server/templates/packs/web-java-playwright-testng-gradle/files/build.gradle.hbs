@@ -163,7 +163,7 @@ delete fileTree(dir: "test-output", include: "**/*")
 }
 
 // Task to install Playwright browsers
-task installPlaywrightBrowsers(type: JavaExec) {
+task installPlaywright(type: JavaExec) {
 classpath = sourceSets.main.runtimeClasspath
 mainClass = 'com.microsoft.playwright.CLI'
 args = ['install', '--with-deps']

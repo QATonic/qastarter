@@ -24,7 +24,7 @@ jobs:
       
       - restore_cache:
           keys:
-            - gradle-cache-v1-{{ checksum "build.gradle" }}
+            - gradle-cache-v1-{{raw}}{{ checksum "build.gradle" }}{{/raw}}
             - gradle-cache-v1-
       
       - run:
@@ -47,7 +47,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-          key: gradle-cache-v1-{{ checksum "build.gradle" }}
+          key: gradle-cache-v1-{{raw}}{{ checksum "build.gradle" }}{{/raw}}
       
       - store_test_results:
           path: build/test-results

@@ -1,15 +1,10 @@
-FROM mcr.microsoft.com/playwright:v1.38.0-focal
+FROM node:24-bookworm-slim
 
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
-
+RUN npm install --no-audit --no-fund
+RUN npx playwright install --with-deps chromium
 COPY . .
-
-RUN mkdir -p test-results logs screenshots playwright-report trace
-
 ENV HEADLESS=true
-ENV TEST_ENV=qa
-
+ENV CI=true
 CMD ["npm", "test"]

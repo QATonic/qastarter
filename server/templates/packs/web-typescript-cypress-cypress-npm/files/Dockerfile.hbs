@@ -1,13 +1,12 @@
 FROM cypress/included:13.6.0
 
+# Reset the inherited cypress run entrypoint so npm can run project scripts.
+ENTRYPOINT []
+
 WORKDIR /app
-
 COPY package*.json ./
-COPY tsconfig.json ./
-RUN npm ci
-
+# The generated ZIP has no lockfile; npm install creates one.
+RUN npm install --no-audit --no-fund
 COPY . .
-
-ENV BASE_URL=https://qa.example.com
-
+ENV CI=true
 CMD ["npm", "test"]

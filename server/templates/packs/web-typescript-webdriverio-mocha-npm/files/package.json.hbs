@@ -3,11 +3,24 @@
 "version": "1.0.0",
 "description": "{{string projectName "double" "json"}} - WebdriverIO TypeScript Automation Framework",
 "scripts": {
-"test": "wdio run wdio.conf.ts",
+{{#if (eq testingPattern "bdd")}}
+"test:bdd": "cucumber-js",
+{{/if}}
+"lint": "eslint .",
+"test": "{{#if (eq testingPattern "bdd")}}cucumber-js{{else}}wdio run wdio.conf.ts{{/if}}",
 "test:headed": "HEADLESS=false wdio run wdio.conf.ts",
 "format": "prettier --write ."
 },
-"devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
+"devDependencies": {
+{{#if (eq testingPattern "bdd")}}
+"@cucumber/cucumber": "^11.0.0",
+{{#if (eq reportingTool "allure")}}
+"allure-cucumberjs": "^3.0.0",
+{{/if}}
+"webdriverio": "^8.27.0",
+{{/if}}
+"@typescript-eslint/parser": "^6.19.0",
+"@eslint/js": "^8.57.1",{{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
 {{#if utilities.faker}}
 "@faker-js/faker": "^{{string toolVersions.fakerJs "double" "json"}}",
 {{/if}}

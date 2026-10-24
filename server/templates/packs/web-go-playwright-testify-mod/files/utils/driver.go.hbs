@@ -2,6 +2,8 @@ package utils
 
 import (
 	"log"
+    "os"
+    "strconv"
 {{#if (eq cloudDeviceFarm "browserstack")}}
 	"encoding/json"
 	"net/url"
@@ -57,7 +59,13 @@ func buildBrowserStackWSEndpoint() string {
 {{/if}}
 
 func InitDriver() *Driver {
-	pw, err := playwright.Run()
+	headless := true
+    if value := os.Getenv("HEADLESS"); value != "" {
+        parsed, err := strconv.ParseBool(value)
+        if err != nil { log.Fatalf("invalid HEADLESS value: %v", err) }
+        headless = parsed
+    }
+    pw, err := playwright.Run()
 	if err != nil {
 		log.Fatalf("could not start playwright: %v", err)
 	}
@@ -72,7 +80,7 @@ func InitDriver() *Driver {
 	}
 {{else}}
 	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{
-		Headless: playwright.Bool(false),
+		Headless: playwright.Bool(headless),
 	})
 	if err != nil {
 		log.Fatalf("could not launch browser: %v", err)

@@ -233,6 +233,13 @@
     {
       "path": "utils/screenshot_helper.py",
       "isTemplate": true
+    },
+    {
+      "path": "conftest.py",
+      "isTemplate": true,
+      "conditional": {
+        "testingPattern": "bdd"
+      }
     }
   ],
   "directories": [

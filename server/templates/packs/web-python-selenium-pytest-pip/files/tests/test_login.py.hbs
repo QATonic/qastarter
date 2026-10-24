@@ -60,7 +60,8 @@ class TestLogin:
     @pytest.mark.regression
     @pytest.mark.parametrize(
         "username,password,expected",
-        DataReader.read_csv("users.csv"),
+        [(row["username"], row["password"], row["expected_result"])
+         for row in DataReader.read_csv("users.csv")],
     )
     def test_login_with_csv_data(self, driver, username, password, expected):
         """Data-driven login test using CSV file."""

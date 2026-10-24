@@ -299,6 +299,26 @@ describe('WizardValidator', () => {
   });
 
   describe('getAvailableReportingToolsForFramework', () => {
+    it('filters native TestNG reporting when the selected web runner is JUnit', () => {
+      for (const framework of ['selenium', 'playwright']) {
+        expect(
+          WizardValidator.getFilteredOptions('reportingTool', {
+            framework,
+            language: 'java',
+            testRunner: 'junit5',
+          })
+        ).not.toContain('testng-reports');
+        expect(
+          WizardValidator.resetInvalidSelections({
+            testingType: 'web',
+            framework,
+            language: 'java',
+            testRunner: 'junit5',
+            reportingTool: 'testng-reports',
+          }).reportingTool
+        ).toBe('');
+      }
+    });
     it('should return Java-specific reporting tools for Selenium + Java', () => {
       const tools = WizardValidator.getAvailableReportingToolsForFramework('selenium', 'java');
       expect(tools).toContain('allure');

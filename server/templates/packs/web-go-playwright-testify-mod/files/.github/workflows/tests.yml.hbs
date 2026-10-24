@@ -1,27 +1,22 @@
 name: Go Playwright Tests
-
 on:
-push:
-branches: [ main, master ]
-pull_request:
-branches: [ main, master ]
-
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 jobs:
-test:
-runs-on: ubuntu-latest
-steps:
-- uses: actions/checkout@v3
-
-- name: Set up Go
-uses: actions/setup-go@v4
-with:
-go-version: '1.21'
-
-- name: Install dependencies
-run: go mod download
-
-- name: Install Playwright Browsers
-run: go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
-
-- name: Run Tests
-run: go test ./tests/... -v
+  test:
+    runs-on: ubuntu-latest
+    env:
+      HEADLESS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Install dependencies
+        run: go mod download
+      - name: Install matching Playwright browsers
+        run: go run github.com/playwright-community/playwright-go/cmd/playwright@v0.5101.0 install --with-deps chromium
+      - name: Run tests
+        run: go test ./... -v

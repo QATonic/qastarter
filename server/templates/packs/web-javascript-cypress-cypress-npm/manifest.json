@@ -177,6 +177,10 @@
       "conditional": {
         "cloudDeviceFarm": "saucelabs"
       }
+    },
+    {
+      "path": "eslint.config.mjs",
+      "isTemplate": true
     }
   ],
   "directories": [

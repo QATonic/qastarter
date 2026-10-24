@@ -1,37 +1,14 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jdk-jammy
 
-# Install browsers for headless testing
-RUN apk add --no-cache \
-    chromium \
-    chromium-chromedriver \
-    firefox \
-    font-noto \
-    font-noto-cjk
-
-# Set environment variables
-ENV CHROME_BIN=/usr/bin/chromium-browser \
-    CHROME_DRIVER=/usr/bin/chromedriver \
-    JAVA_OPTS="-Xmx512m"
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget gnupg ca-certificates \
+    && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub \
+       | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update && apt-get install -y --no-install-recommends google-chrome-stable \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
-# Copy project files
-COPY build.gradle settings.gradle ./
-{{#if (eq buildTool "maven")}}
-COPY mvnw ./
-COPY .mvn .mvn
-RUN chmod +x mvnw && ./mvnw dependency:resolve
-{{else}}
-COPY gradlew ./
-COPY gradle gradle
-RUN chmod +x gradlew && ./gradlew dependencies
-{{/if}}
-
-COPY src ./src
-
-# Run tests
-{{#if (eq buildTool "maven")}}
-CMD ["./mvnw", "clean", "test", "-Dheadless=true"]
-{{else}}
-CMD ["./gradlew", "clean", "test", "-Dheadless=true"]
-{{/if}}
+COPY . .
+RUN chmod +x gradlew && ./gradlew testClasses --no-daemon --max-workers=2
+CMD ["./gradlew", "test", "--no-daemon", "--max-workers=2", "-Pheadless=true"]

@@ -1,0 +1,610 @@
+{
+  "date": "2026-10-20",
+  "status": "INCOMPLETE \u2014 runtime, reporter, dependency remediation and live-provider verification remain",
+  "coverage": {
+    "webPacks": 22,
+    "downloadVariants": 697,
+    "downloadPassed": 697,
+    "syntaxIssues": 0
+  },
+  "projects": [
+    {
+      "pack": "web-csharp-playwright-nunit-nuget",
+      "language": "csharp",
+      "framework": "playwright",
+      "runner": "nunit",
+      "buildTool": "nuget",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (earlier repaired ZIP)",
+      "buildSteps": [
+        {
+          "step": "restore",
+          "status": "passed",
+          "seconds": 1
+        },
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 5
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-csharp-selenium-nunit-nuget",
+      "language": "csharp",
+      "framework": "selenium",
+      "runner": "nunit",
+      "buildTool": "nuget",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (earlier repaired ZIP)",
+      "buildSteps": [
+        {
+          "step": "restore",
+          "status": "passed",
+          "seconds": 1
+        },
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 2
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-go-playwright-testify-mod",
+      "language": "go",
+      "framework": "playwright",
+      "runner": "testify",
+      "buildTool": "mod",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 2
+        },
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 6
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-java-playwright-junit5-gradle",
+      "language": "java",
+      "framework": "playwright",
+      "runner": "junit5",
+      "buildTool": "gradle",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 23
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-java-playwright-junit5-maven",
+      "language": "java",
+      "framework": "playwright",
+      "runner": "junit5",
+      "buildTool": "maven",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 8
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-java-playwright-testng-gradle",
+      "language": "java",
+      "framework": "playwright",
+      "runner": "testng",
+      "buildTool": "gradle",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 11
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-java-playwright-testng-maven",
+      "language": "java",
+      "framework": "playwright",
+      "runner": "testng",
+      "buildTool": "maven",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 5
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-java-selenium-junit5-gradle",
+      "language": "java",
+      "framework": "selenium",
+      "runner": "junit5",
+      "buildTool": "gradle",
+      "build": "passed",
+      "browser": "failed; see findings",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 13
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-java-selenium-junit5-maven",
+      "language": "java",
+      "framework": "selenium",
+      "runner": "junit5",
+      "buildTool": "maven",
+      "build": "passed",
+      "browser": "interrupted; no completed verdict",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 9
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-java-selenium-testng-gradle",
+      "language": "java",
+      "framework": "selenium",
+      "runner": "testng",
+      "buildTool": "gradle",
+      "build": "passed",
+      "browser": "pending",
+      "target": "not run",
+      "buildSteps": [
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 12
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-java-selenium-testng-maven",
+      "language": "java",
+      "framework": "selenium",
+      "runner": "testng",
+      "buildTool": "maven",
+      "build": "passed",
+      "browser": "pending",
+      "target": "not run",
+      "buildSteps": [
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 5
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-javascript-cypress-cypress-npm",
+      "language": "javascript",
+      "framework": "cypress",
+      "runner": "cypress",
+      "buildTool": "npm",
+      "build": "failed or interrupted",
+      "browser": "failed in initial ZIP (fixture shape); source fixed, retest pending",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 33
+        },
+        {
+          "step": "lint",
+          "status": "failed",
+          "seconds": 4
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-javascript-playwright-jest-npm",
+      "language": "javascript",
+      "framework": "playwright",
+      "runner": "jest",
+      "buildTool": "npm",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 46
+        },
+        {
+          "step": "lint",
+          "status": "passed",
+          "seconds": 2
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-javascript-selenium-jest-npm",
+      "language": "javascript",
+      "framework": "selenium",
+      "runner": "jest",
+      "buildTool": "npm",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 33
+        },
+        {
+          "step": "lint",
+          "status": "passed",
+          "seconds": 2
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-javascript-webdriverio-mocha-npm",
+      "language": "javascript",
+      "framework": "webdriverio",
+      "runner": "mocha",
+      "buildTool": "npm",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 75
+        },
+        {
+          "step": "lint",
+          "status": "passed",
+          "seconds": 3
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-python-playwright-pytest-pip",
+      "language": "python",
+      "framework": "playwright",
+      "runner": "pytest",
+      "buildTool": "pip",
+      "build": "passed",
+      "browser": "failed in initial ZIP (configuration/report output); source fixed, retest pending",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 67
+        },
+        {
+          "step": "collect",
+          "status": "passed",
+          "seconds": 3
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-python-robotframework-robot-pip",
+      "language": "python",
+      "framework": "robotframework",
+      "runner": "robot",
+      "buildTool": "pip",
+      "build": "passed",
+      "browser": "passed (5 tests)",
+      "target": "public SauceDemo; explicit headless browser override",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 38
+        },
+        {
+          "step": "collect",
+          "status": "passed",
+          "seconds": 2
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-python-selenium-pytest-pip",
+      "language": "python",
+      "framework": "selenium",
+      "runner": "pytest",
+      "buildTool": "pip",
+      "build": "failed or interrupted",
+      "browser": "failed; see findings",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 61
+        },
+        {
+          "step": "collect",
+          "status": "failed",
+          "seconds": 2
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-typescript-cypress-cypress-npm",
+      "language": "typescript",
+      "framework": "cypress",
+      "runner": "cypress",
+      "buildTool": "npm",
+      "build": "passed",
+      "browser": "failed in initial ZIP (fixture shape); source fixed, retest pending",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 37
+        },
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 4
+        },
+        {
+          "step": "lint",
+          "status": "passed",
+          "seconds": 3
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-typescript-playwright-jest-npm",
+      "language": "typescript",
+      "framework": "playwright",
+      "runner": "jest",
+      "buildTool": "npm",
+      "build": "passed",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "passed",
+          "seconds": 57
+        },
+        {
+          "step": "compile",
+          "status": "passed",
+          "seconds": 5
+        },
+        {
+          "step": "lint",
+          "status": "passed",
+          "seconds": 4
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-typescript-selenium-jest-npm",
+      "language": "typescript",
+      "framework": "selenium",
+      "runner": "jest",
+      "buildTool": "npm",
+      "build": "failed or interrupted",
+      "browser": "passed",
+      "target": "local audit application (initial ZIP)",
+      "buildSteps": [
+        {
+          "step": "install",
+          "status": "failed",
+          "seconds": 902
+        }
+      ],
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    },
+    {
+      "pack": "web-typescript-webdriverio-mocha-npm",
+      "language": "typescript",
+      "framework": "webdriverio",
+      "runner": "mocha",
+      "buildTool": "npm",
+      "build": "pending",
+      "browser": "interrupted; no completed verdict",
+      "target": "local audit application (initial ZIP)",
+      "scope": "Earlier/partial evidence; final repaired ZIP runtime verdict remains pending"
+    }
+  ],
+  "localBlocker": {
+    "observed": "Initial Swagger import recovered; global npm cache returned missing-file errors. Workspace npm cache allowed installs. Cypress execution, BDD npm installation, ESLint and ZIP extraction later stalled locally.",
+    "suspectedCause": "Quick Heal blocking or quarantining CLI/dependency files (user reported on 2026-10-20; unconfirmed)",
+    "securityHistoryChecked": false,
+    "antivirusSettingsChanged": false,
+    "nextCheck": "Confirm the cause using matching local security-history/quarantine evidence and verify normal API startup and package restores"
+  },
+  "pending": [
+    "Complete final regenerated ZIP build/lint/browser and BDD/reporter artifact verification across all web packs",
+    "Remediate dependency advisory matches and scan optional BDD/reporter/cloud dependency graphs",
+    "Complete parallel execution and failure-cleanup verification",
+    "Finish generated Docker build/run and Compose verification, including reruns after Docker fixes",
+    "Run GitHub Actions matrix and address its findings",
+    "Configure BrowserStack credentials and execute real cloud sessions",
+    "Obtain access for live GitLab/Jenkins/Azure/CircleCI and Sauce Labs/TestMu checks if those providers must be certified",
+    "Consolidate source-specific evidence and final readiness assessment"
+  ],
+  "limits": [
+    "No completed final public-app browser run for every repaired baseline ZIP",
+    "BDD/reporter runtime coverage incomplete",
+    "Cloud sessions and remote CI pipelines not executed",
+    "Generated Docker images not validated for every pack",
+    "API/mobile/desktop/performance audits not started"
+  ],
+  "lastUpdated": "2026-10-24",
+  "historicalOptionFindings": {
+    "web-csharp-playwright-nunit-nuget: extent-reports: Selected reporter produces no functional change from no reporter": 1,
+    "web-java-playwright-junit5-gradle: testng-reports: Selected reporter produces no functional change from no reporter": 2,
+    "web-java-playwright-junit5-maven: testng-reports: Selected reporter produces no functional change from no reporter": 2,
+    "web-java-selenium-junit5-gradle: testng-reports: Selected reporter produces no functional change from no reporter": 2,
+    "web-java-selenium-junit5-maven: testng-reports: Selected reporter produces no functional change from no reporter": 2,
+    "web-javascript-cypress-cypress-npm: jest-html-reporter: Selected reporter produces no functional change from no reporter": 2,
+    "web-javascript-selenium-jest-npm: jest-html-reporter: Selected reporter produces no functional change from no reporter": 2,
+    "web-javascript-selenium-jest-npm: mochawesome: Selected reporter produces no functional change from no reporter": 2,
+    "web-javascript-webdriverio-mocha-npm: mochawesome: Selected reporter produces no functional change from no reporter": 2,
+    "web-javascript-webdriverio-mocha-npm: jest-html-reporter: Selected reporter produces no functional change from no reporter": 2,
+    "web-typescript-cypress-cypress-npm: jest-html-reporter: Selected reporter produces no functional change from no reporter": 2,
+    "web-typescript-selenium-jest-npm: jest-html-reporter: Selected reporter produces no functional change from no reporter": 2,
+    "web-typescript-selenium-jest-npm: mochawesome: Selected reporter produces no functional change from no reporter": 2,
+    "web-typescript-webdriverio-mocha-npm: mochawesome: Selected reporter produces no functional change from no reporter": 2,
+    "web-typescript-webdriverio-mocha-npm: jest-html-reporter: Selected reporter produces no functional change from no reporter": 2
+  },
+  "remainingOptionFindings": {},
+  "followUp": {
+    "date": "2026-10-24",
+    "latestCompletedStructuralMatrix": {
+      "run": "tmp/web-audit/complete-20261024",
+      "downloadVariants": 665,
+      "downloadPassed": 665,
+      "syntaxIssues": 0,
+      "optionNoOps": 0,
+      "scope": "Before the latest C#/Java BDD, TypeScript WebdriverIO and CI follow-up repairs; not a final runtime verdict"
+    },
+    "repositoryChecks": {
+      "serverSharedPassed": 829,
+      "clientPassed": 63,
+      "cliPassed": 36,
+      "snapshotsUpdated": true,
+      "types": "passed",
+      "lint": "latest retry stalled locally; CI verification pending"
+    },
+    "dependencyScan": {
+      "source": "https://api.osv.dev/v1/querybatch",
+      "projects": 22,
+      "inventoriesComplete": 22,
+      "uniqueDependencies": 1225,
+      "queriedDependencies": 1225,
+      "queryErrors": 0,
+      "affectedProjectPackagePairs": 90,
+      "scope": "Resolved baseline dependencies only; optional BDD/reporter/cloud dependency graphs require separate checks",
+      "status": "Advisory matches require remediation and reachability review; not a vulnerability-free certification"
+    },
+    "providers": {
+      "github": "Existing Git credential has write access; CI preparation underway",
+      "browserstack": "No repository secrets or process/local environment credentials found; live sessions blocked until credentials are configured",
+      "otherProviders": "No account access supplied; live verification pending"
+    },
+    "csharpBddRetest": [
+      {
+        "pack": "web-csharp-playwright-nunit-nuget",
+        "steps": [
+          {
+            "label": "restore",
+            "status": "passed",
+            "seconds": 5
+          },
+          {
+            "label": "compile",
+            "status": "passed",
+            "seconds": 6
+          },
+          {
+            "label": "browser",
+            "status": "passed",
+            "seconds": 3
+          },
+          {
+            "label": "tests",
+            "status": "passed",
+            "seconds": 27
+          }
+        ],
+        "evidence": {
+          "testCount": 9,
+          "bddScenarios": 3,
+          "artifacts": [],
+          "issues": [],
+          "status": "passed"
+        }
+      },
+      {
+        "pack": "web-csharp-selenium-nunit-nuget",
+        "steps": [
+          {
+            "label": "restore",
+            "status": "passed",
+            "seconds": 2
+          },
+          {
+            "label": "compile",
+            "status": "passed",
+            "seconds": 2
+          },
+          {
+            "label": "tests",
+            "status": "passed",
+            "seconds": 29
+          }
+        ],
+        "evidence": {
+          "testCount": 9,
+          "bddScenarios": 3,
+          "artifacts": [],
+          "issues": [],
+          "status": "passed"
+        }
+      }
+    ]
+  }
+}

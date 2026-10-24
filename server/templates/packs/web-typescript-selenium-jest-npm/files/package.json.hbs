@@ -4,7 +4,10 @@
 "description": "{{string projectName "double" "json"}} - Selenium TypeScript Automation Framework",
 "main": "index.js",
 "scripts": {
-"test": "{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-node-sdk jest{{else}}jest{{/if}}",
+{{#if (eq testingPattern "bdd")}}
+"test:bdd": "cucumber-js",
+{{/if}}
+"test": "{{#if (eq testingPattern "bdd")}}cucumber-js{{else}}{{#if (eq cloudDeviceFarm "browserstack")}}browserstack-node-sdk jest{{else}}jest{{/if}}{{/if}}",
 "test:local": "jest",
 "test:smoke": "jest --testPathPattern=smoke",
 "test:ci": "jest --ci --reporters=default --reporters=jest-junit",
@@ -12,7 +15,7 @@
 "allure:generate": "allure generate allure-results -o allure-report --clean",
 "allure:open": "allure open allure-report",
 {{/if}}
-"lint": "eslint . --ext .ts",
+"lint": "eslint .",
 "format": "prettier --write .",
 "clean": "rimraf node_modules dist reports screenshots"
 },
@@ -20,7 +23,16 @@
 "selenium-webdriver": "^4.16.0",
 "dotenv": "^16.3.0"
 },
-"devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
+"devDependencies": {
+{{#if (eq testingPattern "bdd")}}
+"@cucumber/cucumber": "^11.0.0",
+{{#if (eq reportingTool "allure")}}
+"allure-cucumberjs": "^3.0.0",
+{{/if}}
+{{/if}}
+"@typescript-eslint/parser": "^6.19.0",
+"@eslint/js": "^8.57.1",
+"eslint": "^8.57.1",{{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
 {{#if utilities.faker}}
 "@faker-js/faker": "^{{string toolVersions.fakerJs "double" "json"}}",
 {{/if}}

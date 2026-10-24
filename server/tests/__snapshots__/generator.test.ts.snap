@@ -1906,7 +1906,8 @@ class ConfigurationReader:
     def get(self, key: str, default: str = None, section: str = "settings") -> str:
         """Get configuration value."""
         # Check environment variable first
-        env_value = os.getenv(key.upper())
+        env_key = f"TEST_{key.upper()}" if key in ("username", "password") else key.upper()
+        env_value = os.getenv(env_key)
         if env_value:
             return env_value
         
@@ -1943,6 +1944,14 @@ class ConfigurationReader:
     @property
     def timeout(self) -> int:
         return self.get_int("timeout", 30)
+
+    @property
+    def username(self) -> str:
+        return self.get("username", "")
+
+    @property
+    def password(self) -> str:
+        return self.get("password", "")
 
 
 # Singleton instance
@@ -2327,7 +2336,7 @@ python_files = test_*.py
 python_classes = Test*
 python_functions = test_*
 addopts =
-    --html=test-results/report.html
+    --html=reports/report.html
     --self-contained-html
     -v
     --tb=short
@@ -2382,7 +2391,7 @@ HEADLESS=false pytest
 pytest -n auto
 
 # View HTML report
-open test-results/report.html
+open reports/report.html
 \`\`\`
 
 ## Environment Configuration
@@ -2791,7 +2800,7 @@ export default defineConfig({
       username: "standard_user",
       password: "secret_sauce"
     },
-    setupNodeEvents(on, config) {
+    async setupNodeEvents(on, config) {
       return config;
     },
   },
@@ -3239,6 +3248,28 @@ export default {
     "path": "cypress/support/utils.ts",
   },
   {
+    "content": "import js from '@eslint/js';
+import tsParser from '@typescript-eslint/parser';
+
+export default [
+  { ignores: ["node_modules/**", "dist/**", "build/**", "reports/**", "test-results/**", "allure-results/**", "allure-report/**", "coverage/**", "cypress/screenshots/**", "cypress/videos/**"] },
+  js.configs.recommended,
+  {
+    files: ["**/*.{js,cjs,mjs,ts}"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      globals: {"process": "readonly", "Buffer": "readonly", "__dirname": "readonly", "__filename": "readonly", "module": "readonly", "require": "readonly", "exports": "readonly", "console": "readonly", "setTimeout": "readonly", "clearTimeout": "readonly", "setInterval": "readonly", "clearInterval": "readonly", "URL": "readonly", "fetch": "readonly", "document": "readonly", "window": "readonly", "navigator": "readonly", "localStorage": "readonly", "sessionStorage": "readonly", "browser": "readonly", "$": "readonly", "$$": "readonly", "driver": "readonly", "cy": "readonly", "Cypress": "readonly", "expect": "readonly", "assert": "readonly", "jest": "readonly", "describe": "readonly", "xdescribe": "readonly", "fdescribe": "readonly", "it": "readonly", "xit": "readonly", "fit": "readonly", "test": "readonly", "xtest": "readonly", "before": "readonly", "after": "readonly", "beforeEach": "readonly", "afterEach": "readonly", "beforeAll": "readonly", "afterAll": "readonly", "context": "readonly", "page": "readonly", "browserName": "readonly", "playwright": "readonly"}
+    },
+    rules: { "no-unused-vars": ["warn", { args: "none", varsIgnorePattern: "^_" }] }
+  },
+  { files: ["**/*.ts"], languageOptions: { parser: tsParser }, rules: { "no-undef": "off", "no-unused-vars": "off" } },
+];
+",
+    "isTemplate": true,
+    "mode": undefined,
+    "path": "eslint.config.mjs",
+  },
+  {
     "content": "{
 "name": "demo-ts-cypress",
 "version": "1.0.0",
@@ -3252,7 +3283,9 @@ export default {
 "lint:fix": "eslint . --fix",
 "format": "prettier --write ."
 },
-"devDependencies": { 
+"devDependencies": {
+"@typescript-eslint/parser": "^6.19.0",
+"@eslint/js": "^8.57.1",
 "cypress": "^13.6.0",
 "eslint": "^8.56.0",
 "eslint-plugin-cypress": "^2.15.1",
@@ -3392,16 +3425,27 @@ Mochawesome HTML reports are generated in \`cypress/results/\` after test execut
   "compilerOptions": {
     "target": "ES2021",
     "module": "CommonJS",
-    "lib": ["ES2021", "DOM"],
+    "lib": [
+      "ES2021",
+      "DOM"
+    ],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "types": ["cypress", "node"]
+    "types": [
+      "cypress",
+      "node"
+    ]
   },
-  "include": ["cypress/**/*.ts"]
-}",
+  "include": [
+    "cypress/**/*.ts",
+    "utils/**/*.ts",
+    "cypress.config.ts"
+  ]
+}
+",
     "isTemplate": true,
     "mode": undefined,
     "path": "tsconfig.json",

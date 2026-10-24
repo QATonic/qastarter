@@ -6,14 +6,14 @@ from utils.logger import logger
 class DataReader:
     @staticmethod
     def read_json(filename: str) -> dict:
-        filepath = Path('data') / filename
+        filepath = Path(__file__).resolve().parent.parent / "data" / filename
         logger.info(f"Reading data from: {filepath}")
-        with open(filepath, 'r') as file:
+        with open(filepath, 'r', encoding='utf-8', newline='') as file:
             return json.load(file)
 
     @staticmethod
     def read_csv(filename: str) -> list:
-        filepath = Path('data') / filename
+        filepath = Path(__file__).resolve().parent.parent / "data" / filename
         logger.info(f"Reading CSV from: {filepath}")
-        with open(filepath, 'r') as file:
-            return list(csv.reader(file))
+        with open(filepath, 'r', encoding='utf-8', newline='') as file:
+            return list(csv.DictReader(file))

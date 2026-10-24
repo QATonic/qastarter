@@ -1,11 +1,18 @@
 [pytest]
+{{#if (eq testingPattern "bdd")}}
+testpaths = step_defs
+{{else}}
 testpaths = tests
+{{/if}}
 python_files = test_*.py
 python_classes = Test*
 python_functions = test_*
 addopts =
-    --html=test-results/report.html
+    --html=reports/report.html
     --self-contained-html
+{{#if (eq reportingTool "allure")}}
+    --alluredir=allure-results
+{{/if}}
     -v
     --tb=short
 markers =

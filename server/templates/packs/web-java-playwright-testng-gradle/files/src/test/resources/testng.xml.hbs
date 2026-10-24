@@ -8,7 +8,11 @@
 
     <test name="Login Tests">
         <classes>
+            {{#if (eq testingPattern "bdd")}}
+            <class name="{{escapeXml javaPackage}}.runners.TestRunner" />
+{{else}}
             <class name="{{escapeXml javaPackage}}.tests.LoginTests" />
+{{/if}}
         </classes>
     </test>
 

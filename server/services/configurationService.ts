@@ -51,7 +51,12 @@ export async function parseProjectConfiguration(
     [
       'reportingTool',
       config.reportingTool,
-      WizardValidator.getAvailableReportingToolsForFramework(config.framework, config.language),
+      WizardValidator.getAvailableReportingToolsForFramework(
+        config.framework,
+        config.language,
+        config.testRunner,
+        config.testingPattern
+      ),
     ],
   ];
   for (const [field, value, options] of choices) {

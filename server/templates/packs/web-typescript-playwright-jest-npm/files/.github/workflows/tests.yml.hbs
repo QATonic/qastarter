@@ -24,8 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '{{toolVersions.node}}'
-          cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm install
       
@@ -42,7 +41,7 @@ jobs:
       
       - name: Generate Allure Report
         if: always()
-        run: npm run report:generate
+        run: npx allure generate allure-results --clean -o allure-report
       
       - name: Upload Allure Results
         if: always()

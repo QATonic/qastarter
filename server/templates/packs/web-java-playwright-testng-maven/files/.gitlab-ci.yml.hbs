@@ -13,7 +13,7 @@ before_script:
 {{#if (eq buildTool "maven")}}
   - mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
 {{else}}
-  - ./gradlew playwright install
+  - ./gradlew installPlaywright
 {{/if}}
 {{/if}}
 
@@ -23,7 +23,7 @@ test:
 {{#if (eq buildTool "maven")}}
     - mvn clean test -Dheadless=$HEADLESS
 {{else}}
-    - ./gradlew clean test -Dheadless=$HEADLESS
+    - ./gradlew clean test -Pheadless=$HEADLESS
 {{/if}}
   artifacts:
     when: always

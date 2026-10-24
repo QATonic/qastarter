@@ -6,6 +6,7 @@ Library          String
 
 *** Variables ***
 ${BROWSER}           chrome
+${HEADLESS}          %{HEADLESS=false}
 ${BASE_URL}          {{robot baseUrl}}
 ${TIMEOUT}           30s
 ${USERNAME}          {{robot testUsername}}
@@ -20,7 +21,11 @@ ${ERROR_MESSAGE}     css:[data-test='error']
 *** Keywords ***
 Open Browser To Login Page
     [Documentation]    Open a browser on the configured BASE_URL.
-    Open Browser                    ${BASE_URL}    ${BROWSER}
+    ${browser_name}=    Set Variable    ${BROWSER}
+    IF    str($HEADLESS).lower() in ("true", "1", "yes")
+        ${browser_name}=    Set Variable    headless${BROWSER}
+    END
+    Open Browser                    ${BASE_URL}    ${browser_name}
     Maximize Browser Window
     Set Selenium Implicit Wait      ${TIMEOUT}
 

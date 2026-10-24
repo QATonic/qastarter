@@ -19,7 +19,8 @@
       "jenkins",
       "github-actions",
       "gitlab-ci",
-      "azure-devops"
+      "azure-devops",
+      "circleci"
     ],
     "testingPatterns": []
   },
@@ -158,6 +159,13 @@
       "isTemplate": true,
       "conditional": {
         "cloudDeviceFarm": "saucelabs"
+      }
+    },
+    {
+      "path": ".circleci/config.yml",
+      "isTemplate": true,
+      "conditional": {
+        "cicdTool": "circleci"
       }
     }
   ],

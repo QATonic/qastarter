@@ -1,59 +1,36 @@
-import { Given, When, Then, setWorldConstructor } from '@cucumber/cucumber';
+import { Before, After, Given, When, Then, setDefaultTimeout } from '@cucumber/cucumber';
 import assert from 'node:assert/strict';
-import { CustomWorld } from '../support/world';
-import { LoginPage } from '../pages/LoginPage';
-import { HomePage } from '../pages/HomePage';
+import { chromium, type Browser, type Page } from 'playwright';
+type LoginWorld = { browser?: Browser; page: Page };
 
-setWorldConstructor(CustomWorld);
-
-Given('I navigate to the login page', async function (this: CustomWorld) {
-  const loginPage = new LoginPage(this.page);
-  await loginPage.navigateToLogin();
+setDefaultTimeout(60000);
+const baseUrl = process.env.BASE_URL || "{{string baseUrl "double" "js"}}";
+const username = process.env.TEST_USERNAME || "{{string testUsername "double" "js"}}";
+const password = process.env.TEST_PASSWORD || "{{string testPassword "double" "js"}}";
+Before(async function (this: LoginWorld) {
+  this.browser = await chromium.launch({ headless: process.env.HEADLESS !== "false" });
+  this.page = await this.browser.newPage();
 });
-
-When('I enter username {string} and password {string}', async function (
-  this: CustomWorld,
-  username: string,
-  password: string
-) {
-  const loginPage = new LoginPage(this.page);
-  if (username) {
-    await loginPage.enterUsername(username);
-  }
-  if (password) {
-    await loginPage.enterPassword(password);
-  }
+After(async function (this: LoginWorld) {
+  await this.browser?.close();
 });
-
-When('I click the login button', async function (this: CustomWorld) {
-  const loginPage = new LoginPage(this.page);
-  await loginPage.clickLogin();
+Given('I open the login page', async function (this: LoginWorld) {
+  await this.page.goto(baseUrl);
 });
-
-Then('I should be redirected to the home page', async function (this: CustomWorld) {
-  const homePage = new HomePage(this.page);
-  const isHomePage = await homePage.isDisplayed('.inventory_list');
-  assert.ok(isHomePage);
+async function signIn(this: LoginWorld, username: string, password: string) {
+  await this.page.locator("#user-name").fill(username);
+  await this.page.locator("#password").fill(password);
+  await this.page.locator("#login-button").click();
+}
+When('I sign in with the configured credentials', async function (this: LoginWorld) { await signIn.call(this, username, password); });
+When('I sign in with a locked account', async function (this: LoginWorld) { await signIn.call(this, "locked_out_user", password); });
+When('I sign in with empty credentials', async function (this: LoginWorld) { await signIn.call(this, "", ""); });
+Then('I should see the inventory', async function (this: LoginWorld) {
+  await this.page.waitForURL("**/inventory.html");
+  assert.ok(this.page.url().includes("/inventory.html"));
 });
-
-Then('I should see a welcome message', async function (this: CustomWorld) {
-  const homePage = new HomePage(this.page);
-  const welcomeMessage = await homePage.getWelcomeMessage();
-  assert.ok(welcomeMessage);
-});
-
-Then('I should see an error message {string}', async function (
-  this: CustomWorld,
-  expectedError: string
-) {
-  const loginPage = new LoginPage(this.page);
-  const actualError = await this.page.locator('[data-test="error"]').innerText();
-  assert.ok(actualError);
-  assert.ok(actualError.includes(expectedError));
-});
-
-Then('I should remain on the login page', async function (this: CustomWorld) {
-  const loginPage = new LoginPage(this.page);
-  const isLoginPage = await loginPage.isDisplayed('#login-button');
-  assert.ok(isLoginPage);
+Then('I should see a login error', async function (this: LoginWorld) {
+  const error = this.page.locator('[data-test="error"]');
+  await error.waitFor({ state: "visible" });
+  assert.ok((await error.innerText()).includes("Epic sadface"));
 });

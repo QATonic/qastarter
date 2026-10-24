@@ -25,7 +25,7 @@ steps:
       versionSpec: '{{toolVersions.node}}'
     displayName: 'Install Node.js {{toolVersions.node}}'
 
-  - script: npm ci
+  - script: npm install --no-audit --no-fund
     displayName: 'Install dependencies'
 
   - script: npm test
@@ -36,7 +36,7 @@ steps:
       HEADLESS: $(HEADLESS)
 
 {{#if (eq reportingTool "allure")}}
-  - script: npm run report:generate
+  - script: npx allure generate allure-results --clean -o allure-report
     displayName: 'Generate Allure Report'
     condition: always()
 

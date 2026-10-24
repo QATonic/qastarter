@@ -1,0 +1,95 @@
+"""
+Pytest fixtures — setup and teardown for all tests.
+
+Creates a fresh Selenium WebDriver per test function and navigates to
+the baseUrl from config. Selenium Manager (built into Selenium 4.6+)
+handles driver binaries automatically — no separate driver_manager /
+driver_factory module is needed.
+"""
+import pytest
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from utils.logger import log
+from utils.screenshot_helper import ScreenshotHelper
+from config.config_reader import config
+{{#if (eq reportingTool "allure")}}
+import allure
+{{/if}}
+
+
+def _build_driver():
+    """Build a WebDriver for the configured browser."""
+    browser = config.browser.lower()
+    headless = config.headless
+
+    if browser in ("chrome", "chromium"):
+        opts = ChromeOptions()
+        if headless:
+            opts.add_argument("--headless=new")
+        opts.add_argument("--disable-gpu")
+        opts.add_argument("--no-sandbox")
+        opts.add_argument("--window-size=1920,1080")
+        return webdriver.Chrome(options=opts)
+
+    if browser == "firefox":
+        opts = FirefoxOptions()
+        if headless:
+            opts.add_argument("-headless")
+        return webdriver.Firefox(options=opts)
+
+    raise ValueError(f"Unsupported browser: {browser}")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_session():
+    """Session-wide setup / teardown."""
+    log.info("=" * 60)
+    log.info(" TEST SESSION STARTED")
+    log.info("=" * 60)
+    log.info(f"Browser: {config.browser}")
+    log.info(f"Base URL: {config.base_url}")
+    yield
+    log.info("=" * 60)
+    log.info(" TEST SESSION COMPLETED")
+    log.info("=" * 60)
+
+
+@pytest.fixture(scope="function")
+def driver():
+    """Provides a WebDriver instance per test, navigated to baseUrl."""
+    log.info("--- Test Setup ---")
+    drv = _build_driver()
+    drv.set_page_load_timeout(config.timeout)
+    drv.implicitly_wait(config.timeout)
+
+    if config.base_url:
+        drv.get(config.base_url)
+        log.info(f"Navigated to: {config.base_url}")
+
+    yield drv
+
+    log.info("--- Test Teardown ---")
+    drv.quit()
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Capture screenshot on test failure."""
+    outcome = yield
+    report = outcome.get_result()
+
+    if report.when == "call" and report.failed:
+        log.error(f"TEST FAILED: {item.name}")
+        drv = item.funcargs.get("driver")
+        if drv is not None:
+            screenshot_path = ScreenshotHelper.capture_on_failure(drv, item.name)
+            {{#if (eq reportingTool "allure")}}
+            if screenshot_path:
+                with open(screenshot_path, "rb") as f:
+                    allure.attach(
+                        f.read(),
+                        name="Screenshot",
+                        attachment_type=allure.attachment_type.PNG,
+                    )
+            {{/if}}

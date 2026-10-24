@@ -11,7 +11,16 @@
 "lint:fix": "eslint . --fix",
 "format": "prettier --write ."
 },
-"devDependencies": { {{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
+{{#if (eq testingPattern "bdd")}}
+"cypress-cucumber-preprocessor": { "json": { "enabled": true, "output": "reports/cucumber.json" }, "stepDefinitions": "cypress/support/step_definitions/**/*.js" },
+{{/if}}
+"devDependencies": {
+{{#if (eq testingPattern "bdd")}}
+"@badeball/cypress-cucumber-preprocessor": "^22.0.0",
+"@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
+"esbuild": "^0.25.0",
+{{/if}}
+"@eslint/js": "^8.57.1",{{!-- User-picked deps from QAStarter dependency search --}}{{#each userDependencies.npm}}"{{string name "double" "json"}}": "{{string version "double" "json"}}",{{/each}}
 {{#if utilities.faker}}
 "@faker-js/faker": "^{{string toolVersions.fakerJs "double" "json"}}",
 {{/if}}

@@ -35,9 +35,7 @@ pipeline {
         stage('Install Browsers') {
             steps {
 {{#if (eq buildTool "maven")}}
-                sh 'mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"'
 {{else}}
-                sh './gradlew playwright install'
 {{/if}}
             }
         }
@@ -48,7 +46,7 @@ pipeline {
 {{#if (eq buildTool "maven")}}
                 sh 'mvn test -Dheadless=${HEADLESS}'
 {{else}}
-                sh './gradlew test -Dheadless=${HEADLESS}'
+                sh './gradlew test -Pheadless=${HEADLESS}'
 {{/if}}
             }
             post {

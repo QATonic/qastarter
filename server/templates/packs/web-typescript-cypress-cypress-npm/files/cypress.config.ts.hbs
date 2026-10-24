@@ -1,9 +1,13 @@
 import { defineConfig } from "cypress";
 
 export default defineConfig({
+{{#if (eq reportingTool "mochawesome")}}
+reporter: 'mochawesome',
+reporterOptions: { reportDir: 'cypress/results', overwrite: false, html: true, json: true },
+{{/if}}
   e2e: {
     baseUrl: "{{string baseUrl "double" "ts"}}",
-    specPattern: "cypress/e2e/**/*.cy.ts",
+    specPattern: "{{#if (eq testingPattern "bdd")}}cypress/e2e/**/*.feature{{else}}cypress/e2e/**/*.cy.ts{{/if}}",
     supportFile: "cypress/support/e2e.ts",
     video: false,
     screenshotOnRunFailure: true,
@@ -15,10 +19,20 @@ export default defineConfig({
     // network hiccups when hitting a live demo site.
     retries: { runMode: 2, openMode: 0 },
     env: {
+{{#if (eq reportingTool "allure")}}
+allure: true,
+{{/if}}
       username: "{{string testUsername "double" "ts"}}",
       password: "{{string testPassword "double" "ts"}}"
     },
-    setupNodeEvents(on, config) {
+    async setupNodeEvents(on, config) {
+{{#if (eq testingPattern "bdd")}}
+const { addCucumberPreprocessorPlugin } = require('@badeball/cypress-cucumber-preprocessor');
+const { createEsbuildPlugin } = require('@badeball/cypress-cucumber-preprocessor/esbuild');
+const createBundler = require('@bahmutov/cypress-esbuild-preprocessor');
+await addCucumberPreprocessorPlugin(on, config);
+on('file:preprocessor', createBundler({ plugins: [createEsbuildPlugin(config)] }));
+{{/if}}
 {{#if (eq reportingTool "allure")}}
       // Allure reporter
       require("@shelex/cypress-allure-plugin/writer")(on, config);

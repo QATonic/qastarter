@@ -23,13 +23,13 @@ namespace {{projectNamespace}}.Config
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true)
                 .AddJsonFile($"appsettings.{env}.json", optional: true)
-                .AddEnvironmentVariables()
+                .AddEnvironmentVariables(prefix: "QASTARTER_")
                 .Build();
         }
 
         public string Get(string key, string defaultValue = "")
         {
-            return Environment.GetEnvironmentVariable(key) ?? _configuration[key] ?? defaultValue;
+            return Environment.GetEnvironmentVariable($"QASTARTER_{key}") ?? _configuration[key] ?? defaultValue;
         }
 
         public int GetInt(string key, int defaultValue = 0)
@@ -47,10 +47,10 @@ namespace {{projectNamespace}}.Config
         }
 
         public string BaseUrl => Get("BaseUrl", "{{string baseUrl "double" "cs"}}");
-        public string Browser => Get("Browser", "chrome");
-        public bool Headless => GetBool("Headless", false);
+        public string Browser => Environment.GetEnvironmentVariable("BROWSER") ?? Get("Browser", "chrome");
+        public bool Headless => bool.TryParse(Environment.GetEnvironmentVariable("HEADLESS"), out var headless) ? headless : GetBool("Headless", false);
         public int Timeout => GetInt("Timeout", 30);
-        public string Username => Get("Username", "{{string testUsername "double" "cs"}}");
-        public string Password => Get("Password", "{{string testPassword "double" "cs"}}");
+        public string Username => Environment.GetEnvironmentVariable("TEST_USERNAME") ?? Get("Username", "{{string testUsername "double" "cs"}}");
+        public string Password => Environment.GetEnvironmentVariable("TEST_PASSWORD") ?? Get("Password", "{{string testPassword "double" "cs"}}");
     }
 }
